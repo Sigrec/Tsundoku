@@ -1,0 +1,142 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:local="clr-namespace:Tsundoku.Models"
+        xmlns:vm="using:Tsundoku.ViewModels"
+		xmlns:cv="clr-namespace:Tsundoku.Src"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="Tsundoku.Views.MainWindow"
+        Icon="\Assets\tsundoku-logo.ico"
+        Title="Tsundoku"
+		SizeToContent="WidthAndHeight"
+        Background="#12171d">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+	<Window.Resources>
+		<cv:BitmapValueConverter x:Key="ConvertImage"/>
+	</Window.Resources>
+
+	<DockPanel>
+		<Panel DockPanel.Dock="Top">
+			<Button FontWeight="Bold"
+					FontSize="33"
+					FontFamily="Segoe UI Symbol"
+					Background="Red"
+					Foreground="Yellow"
+					Command="{Binding OpenAddNewSeriesWindow}">Add New Series</Button>
+		</Panel>
+		
+		<ScrollViewer VerticalScrollBarVisibility="Auto" DockPanel.Dock="Bottom">
+			<ItemsControl Margin="50" Items="{Binding Collection}" HorizontalAlignment="Center">
+				<ItemsControl.ItemsPanel>
+					<ItemsPanelTemplate>
+						<WrapPanel/>
+					</ItemsPanelTemplate>
+				</ItemsControl.ItemsPanel>
+
+				<ItemsControl.ItemTemplate>
+					<DataTemplate>
+						<Border Margin="20">
+							<DockPanel Width="{Binding Source={x:Static local:Constants.CARD_WIDTH}}" Height="{Binding Constants.CARD_HEIGHT}">
+								<Border CornerRadius="10" ClipToBounds="True">
+									<Canvas Width="{Binding Source={x:Static local:Constants.LEFT_SIDE_CARD_WIDTH}}">
+										<Image Height="{Binding Source={x:Static local:Constants.CARD_HEIGHT}}"
+											   Source="{Binding Cover, Converter={StaticResource ConvertImage}}" 
+											   Stretch="UniformToFill" 
+											   DockPanel.Dock="Left"/>
+										<TextBlock Canvas.Left="0" 
+												   Canvas.Bottom="0" 
+												   Width="{Binding Source={x:Static local:Constants.LEFT_SIDE_CARD_WIDTH}}" 
+												   Height="{Binding Source={x:Static local:Constants.BOTTOM_SECTION_CARD_HEIGHT}}" 
+												   Background="#2c2d42" 
+												   Opacity="0.95" 
+												   Foreground="#dfd59e" 
+												   FontWeight="Bold" 
+												   FontSize="18" 
+												   FontFamily="Segoe UI Symbol" 
+												   TextAlignment="Center" 
+												   Padding="0,7,0,0">
+											<TextBlock.Text>
+												<MultiBinding StringFormat="{}{0} | {1}">
+													<Binding Path="Status"/>
+													<Binding Path="Format"/>
+												</MultiBinding>
+											</TextBlock.Text>
+										</TextBlock>
+									</Canvas>
+								</Border>
+								<Border CornerRadius="10" ClipToBounds="True">
+									<DockPanel Width="{Binding Source={x:Static local:Constants.RIGHT_SIDE_CARD_WIDTH}}" DockPanel.Dock="Right">
+										<DockPanel Height="{Binding Source={x:Static local:Constants.TOP_SECTION_CARD_HEIGHT}}" DockPanel.Dock="Top" LastChildFill="True">
+											<TextBlock Background="#20232d"
+														DockPanel.Dock="Top"
+														FontFamily="Segoe UI Symbol"
+														TextWrapping="Wrap"
+														Text="{Binding NativeTitle}"
+														Foreground="#dfd59e"
+														TextAlignment="Left"
+														FontWeight="Bold"
+														FontSize="23"
+														Padding="10,4,4,0"/>
+											<TextBlock Background="#20232d"
+														DockPanel.Dock="Top"
+														FontFamily="Segoe UI Symbol"
+														TextWrapping="Wrap"
+														Foreground="#dfd59e"
+														Text="{Binding NativeStaff}"
+														Padding="10,2,4,0"/>
+											<ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" DockPanel.Dock="Bottom">
+												<TextBlock Background="#20232d"
+														TextWrapping="Wrap"
+														FontFamily="Segoe UI Symbol"
+														Foreground="#ececec"
+														Opacity="0.9"
+														Text="{Binding Description}"
+														Padding="10,-2,5,10"/>
+											</ScrollViewer>
+										</DockPanel>
+										<StackPanel Height="{Binding Source={x:Static local:Constants.BOTTOM_SECTION_CARD_HEIGHT}}" 
+													Background="#2c2d42" 
+													DockPanel.Dock="Bottom" 
+													Width="{Binding Source={x:Static local:Constants.RIGHT_SIDE_CARD_WIDTH}}" 
+													Orientation="Horizontal" 
+													HorizontalAlignment="Stretch">
+											<ProgressBar Height="25" 
+														 Width="250" 
+														 Background="#ececec" 
+														 Value="{Binding CurVolumeCount}" 
+														 Foreground="#20232d" BorderBrush="Red" 
+														 BorderThickness="1.8" 
+														 Margin="10,0,10,0" 
+														 Minimum="0" 
+														 Maximum="{Binding MaxVolumeCount}"/>
+											<Grid Width="85" Margin="-6,0,0,0">
+												<TextBlock Grid.Row="0" Grid.Column="0" TextAlignment="Center" FontSize="15" FontWeight="Bold" FontFamily="Segoe UI Symbol" Foreground="#dfd59e" Margin="2,3,0,0">
+													<TextBlock.Text>
+														<MultiBinding StringFormat="{}{0}/{1}">
+															<Binding Path="CurVolumeCount"/>
+															<Binding Path="MaxVolumeCount"/>
+														</MultiBinding>
+													</TextBlock.Text>
+												</TextBlock>
+												<Button  Grid.Row="1" Grid.Column="0" Background="Transparent" Foreground="#dfd59e" FontWeight="Bold" FontSize="33" FontFamily="Segoe UI Symbol" Margin="18,5,0,0" Height="23" Width="26" Padding="5,-10,0,0">-
+												</Button>
+												<Button Grid.Row="2" Grid.Column="0" Background="Transparent" Foreground="#dfd59e" FontWeight="Bold" FontSize="26.5" FontFamily="Segoe UI Symbol" Margin="43,16,0,0" Height="23" Width="26" Padding="2,-10,0,0">+
+												</Button>
+											</Grid>
+										</StackPanel>
+									</DockPanel>
+								</Border>
+							</DockPanel>
+						</Border>
+					</DataTemplate>
+				</ItemsControl.ItemTemplate>
+			</ItemsControl>
+		</ScrollViewer>
+	</DockPanel>
+	
+</Window>
