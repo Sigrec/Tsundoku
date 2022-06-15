@@ -6,8 +6,11 @@ using Tsundoku.Views;
 using System.Windows.Input;
 using System.ComponentModel;
 using System;
-using Avalonia.Media.Imaging;
+using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Reactive.Linq;
 
 namespace Tsundoku.ViewModels
 {
@@ -17,34 +20,76 @@ namespace Tsundoku.ViewModels
         private bool _isBusy;
         private Series? _selectedSeries;
         private static string filePath = @"\Tsundoku\UserData\Collection.bin";
-        private Bitmap? _cover;
-        public Bitmap? Cover
-        {
-            get => _cover;
-            private set => this.RaiseAndSetIfChanged(ref _cover, value);
-        }
 
         public ICommand OpenAddNewSeriesWindow { get; }
 
-        public static ObservableCollection<Series> Collection { get; set; } = new();
-        private User MainUser = new();
+        public static Collection<Series> Collection { get; set; } = new();
+        public static ObservableCollection<Series> SearchedCollection { get; set; } = new();
+        public static User MainUser { get; set; } = new();
         private AddNewSeriesWindow newSeriesWindow;
+        private static List<string> Languages = new List<string> { "Romaji", "English", "Native" };
+
+        // Binding event to track what the current search text is in a users collection
+        public string? SearchText
+        {
+            get => _searchText;
+            set => this.RaiseAndSetIfChanged(ref _searchText, value);
+        }
+
+        // Binding event to check if the user is searching for anything in their list
+        public bool IsBusy
+        {
+            get => _isBusy;
+            set => this.RaiseAndSetIfChanged(ref _isBusy, value);
+        }
+
+        public Series? SelectedSeries
+        {
+            get => _selectedSeries;
+            set => this.RaiseAndSetIfChanged(ref _selectedSeries, value);
+        }
 
         public MainWindowViewModel()
         {
             RetriveUserData();
-            OpenAddNewSeriesWindow = ReactiveCommand.CreateFromTask(() => {
+            this.WhenAnyValue(x => x.SearchText).Throttle(TimeSpan.FromMilliseconds(500)).ObserveOn(RxApp.MainThreadScheduler).Subscribe(SearchCollection!);
+            // Need to disable the add new series while this window is open
+            OpenAddNewSeriesWindow = ReactiveCommand.CreateFromTask(() =>
+            {
                 newSeriesWindow = new AddNewSeriesWindow();
                 newSeriesWindow.Show();
                 return Task.CompletedTask;
             });
         }
 
-        protected virtual void MainWindowCloseEvent(CancelEventArgs e)
-        {
-            SaveUsersData();
+        public static void UpdateCollectionNumbers(ushort maxVolumes, ushort curVolumes){
+            MainUser.NumVolumesCollected += curVolumes;
+            MainUser.NumVolumesToBeCollected += (ushort)(maxVolumes - curVolumes);
         }
 
+        private void SearchCollection(string searchText)
+        {
+            IsBusy = true;
+            SearchedCollection.Clear();
+            if (!string.IsNullOrWhiteSpace(searchText))
+            {
+                Parallel.ForEach(Collection.Where(series => series.EnglishTitle.Contains(searchText, StringComparison.CurrentCultureIgnoreCase)), series =>
+                {
+                    SearchedCollection.Add(series);
+                });
+            }
+            else
+            {
+                Parallel.ForEach(Collection, series =>
+                {
+                    SearchedCollection.Add(series);
+                });
+            }
+        }
+            
+        /**
+        * 
+        */
         public void RetriveUserData(){
             if (new FileInfo(filePath).Length != 0)
             {
@@ -65,10 +110,14 @@ namespace Tsundoku.ViewModels
                 var binaryFormatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
                 MainUser = (User)binaryFormatter.Deserialize(stream);
                 Collection = MainUser.UserCollection;
+                Parallel.ForEach(Collection, series =>
+                {
+                    SearchedCollection.Add(series);
+                });
             }
         }
 
-        public void SaveUsersData(bool append = false){
+        public static void SaveUsersData(bool append = false){
             MainUser.UserCollection = Collection;
             using (Stream stream = File.Open(filePath, append ? FileMode.Append : FileMode.Create))
             {
@@ -77,24 +126,13 @@ namespace Tsundoku.ViewModels
             }
         }
 
-        // Binding event to track what the current search text is in a users collection
-        public string? SearchText
-        {
-            get => _searchText;
-            set => this.RaiseAndSetIfChanged(ref _searchText, value);
-        }
-
-        // Binding event to check if the user is searching for anything in their list
-        public bool IsBusy
-        {
-            get => _isBusy;
-            set => this.RaiseAndSetIfChanged(ref _isBusy, value);
-        }
-
-        public Series? SelectedSeries
-        {
-            get => _selectedSeries;
-            set => this.RaiseAndSetIfChanged(ref _selectedSeries, value);
+        public object? GetCurrentLanguage(){
+            return MainUser.CurLanguage switch
+			{
+				'E' => 1,
+				'N' => 2,
+				_ => 0
+			};
         }
     }
 }

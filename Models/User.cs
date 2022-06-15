@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Tsundoku.Src;
 
 namespace Tsundoku.Models
 {
@@ -13,13 +14,15 @@ namespace Tsundoku.Models
         public char CurLanguage { get; set; }
         public string MainTheme { get; set; }
         public Dictionary<string, TsundokuTheme>? SavedThemes { get; set; }
-        public ObservableCollection<Series> UserCollection { get; set; }
+        public Collection<Series> UserCollection { get; set; }
 
         public User() {}
 
-        public User(string userName, char curLanguage, string mainTheme, Dictionary<string, TsundokuTheme>? savedThemes, ObservableCollection<Series> userCollection)
+        public User(string userName, char curLanguage, string mainTheme, Dictionary<string, TsundokuTheme>? savedThemes, Collection<Series> userCollection)
         {
             UserName = userName;
+            NumVolumesCollected = 0;
+            NumVolumesToBeCollected = 0;
             CurLanguage = curLanguage;
             MainTheme = mainTheme;
             SavedThemes = savedThemes;

@@ -119,7 +119,7 @@ namespace Tsundoku.Models
 
         public static string SaveNewCoverImage(String coverLink, String title, String bookType)
         {
-            string newPath = @"\Tsundoku\Assets\Covers\" + Regex.Replace(title, @"[^A-Za-z\d]", "") + "_" + bookType + ".png"; //C:\Tsundoku\Assets\Covers\Ottoman_Manga.png
+            string newPath = @"\Tsundoku\Assets\Covers\" + Regex.Replace(title, @"[^A-Za-z\d]", "") + "_" + bookType + "." + coverLink.Substring(coverLink.Length - 3); //C:\Tsundoku\Assets\Covers\Ottoman_Manga.png
             Debug.WriteLine(newPath);
 
             if (!File.Exists(newPath))
