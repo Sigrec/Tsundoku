@@ -1,5 +1,7 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Markup.Xaml;
 using System.Diagnostics;
 using Tsundoku.Models;
 using Tsundoku.ViewModels;
@@ -8,36 +10,51 @@ namespace Tsundoku.Views
 {
     public partial class MainWindow : Window
     {
+        public string curTitle;
+        private TextBlock currentTitle;
         public MainWindow()
         {
             InitializeComponent();
         }
 
-        public string GetTitle(object sender, RoutedEventArgs args)
-        {
-            return ((TextBlock)sender).Text;
-        }
-
         public void AddVolume(object sender, RoutedEventArgs args)
         {
-            foreach (Series series in MainWindowViewModel.Collection)
+            /*WrapPanel test = (WrapPanel)SeriesCollection;
+            foreach (var series in test.Children)
             {
-                if (series.EnglishTitle.Equals(GetTitle))
+                Debug.WriteLine(series);
+                /*if (series.EnglishTitle.Equals(curTitle) || series.RomajiTitle.Equals(curTitle) || series.NativeTitle.Equals(curTitle))
                 {
-                    series.CurVolumeCount += 1;
+                    if (series.CurVolumeCount < series.MaxVolumeCount)
+                    {
+                        series.CurVolumeCount += 1;
+                        MainWindowViewModel.MainUser.NumVolumesCollected += 1;
+                        MainWindowViewModel.MainUser.NumVolumesToBeCollected -= 1;
+                    }
+                    break;
                 }
-            }
+            }*/
         }
-
+        
         public void SubtractVolume(object sender, RoutedEventArgs args)
         {
-            foreach (Series series in MainWindowViewModel.Collection)
+            Debug.WriteLine("Removing 1 Volumes");
+            /*foreach (Series series in MainWindowViewModel.Collection)
             {
-                if (series.EnglishTitle.Equals(GetTitle))
+               if (series.EnglishTitle.Equals(curTitle) || series.RomajiTitle.Equals(curTitle) || series.NativeTitle.Equals(curTitle))
                 {
-                    series.CurVolumeCount -= 1;
+                    Debug.WriteLine("Found Series... Making Changes");
+                    if (series.CurVolumeCount > 0)
+                    {
+                        series.CurVolumeCount -= 1;
+                        MainWindowViewModel.MainUser.NumVolumesCollected -= 1;
+                        MainWindowViewModel.MainUser.NumVolumesToBeCollected += 1;
+                    }
+                    MainWindowViewModel.UpdateCollectionNumbers(series.MaxVolumeCount, series.CurVolumeCount);
+                    MainWindowViewModel.SaveUsersData();
+                    break;
                 }
-            }
+            }*/
         }
     }
 }

@@ -36,13 +36,6 @@ namespace Tsundoku.ViewModels
             set => this.RaiseAndSetIfChanged(ref _searchText, value);
         }
 
-        // Binding event to check if the user is searching for anything in their list
-        public bool IsBusy
-        {
-            get => _isBusy;
-            set => this.RaiseAndSetIfChanged(ref _isBusy, value);
-        }
-
         public Series? SelectedSeries
         {
             get => _selectedSeries;
@@ -61,15 +54,12 @@ namespace Tsundoku.ViewModels
                 return Task.CompletedTask;
             });
         }
-
         public static void UpdateCollectionNumbers(ushort maxVolumes, ushort curVolumes){
             MainUser.NumVolumesCollected += curVolumes;
             MainUser.NumVolumesToBeCollected += (ushort)(maxVolumes - curVolumes);
         }
-
         private void SearchCollection(string searchText)
         {
-            IsBusy = true;
             SearchedCollection.Clear();
             if (!string.IsNullOrWhiteSpace(searchText))
             {
@@ -86,10 +76,6 @@ namespace Tsundoku.ViewModels
                 });
             }
         }
-            
-        /**
-        * 
-        */
         public void RetriveUserData(){
             if (new FileInfo(filePath).Length != 0)
             {
@@ -124,15 +110,6 @@ namespace Tsundoku.ViewModels
                 var binaryFormatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
                  binaryFormatter.Serialize(stream, MainUser);
             }
-        }
-
-        public object? GetCurrentLanguage(){
-            return MainUser.CurLanguage switch
-			{
-				'E' => 1,
-				'N' => 2,
-				_ => 0
-			};
         }
     }
 }

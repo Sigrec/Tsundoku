@@ -72,7 +72,7 @@
 			<ItemsControl Margin="50" Items="{Binding SearchedCollection}" HorizontalAlignment="Center">
 				<ItemsControl.ItemsPanel>
 					<ItemsPanelTemplate>
-						<WrapPanel/>
+						<WrapPanel Name="SeriesCollection"/>
 					</ItemsPanelTemplate>
 				</ItemsControl.ItemsPanel>
 
@@ -119,7 +119,7 @@
 														FontWeight="Bold"
 														FontSize="23"
 														Padding="10,4,4,0"
-														x:Name="SeriesTitle"/>
+														Name="SeriesTitle"/>
 											<TextBlock Background="#20232d"
 														DockPanel.Dock="Top"
 														TextWrapping="Wrap"
@@ -160,9 +160,9 @@
 														</MultiBinding>
 													</TextBlock.Text>
 												</TextBlock>
-												<Button  Grid.Row="1" Grid.Column="0" Background="Transparent" Foreground="#dfd59e" FontWeight="Bold" FontSize="33" Margin="18,5,0,0" Height="23" Width="26" Padding="5,-10,0,0" Click="AddVolume">-
+												<Button  Grid.Row="1" Grid.Column="0" Background="Transparent" Foreground="#dfd59e" FontWeight="Bold" FontSize="33" Margin="18,5,0,0" Height="23" Width="26" Padding="5,-10,0,0" Click="SubtractVolume">-
 												</Button>
-												<Button Grid.Row="2" Grid.Column="0" Background="Transparent" Foreground="#dfd59e" FontWeight="Bold" FontSize="26.5" Margin="43,16,0,0" Height="23" Width="26" Padding="2,-10,0,0" Click="SubstractVolume">+
+												<Button Grid.Row="2" Grid.Column="0" Background="Transparent" Foreground="#dfd59e" FontWeight="Bold" FontSize="26.5" Margin="43,16,0,0" Height="23" Width="26" Padding="2,-10,0,0" Click="AddVolume">+
 												</Button>
 											</Grid>
 										</StackPanel>
@@ -175,5 +175,4 @@
 			</ItemsControl>
 		</ScrollViewer>
 	</DockPanel>
-	
 </Window>
