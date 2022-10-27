@@ -11,17 +11,16 @@ using System.Diagnostics;
 using Avalonia.Media.Imaging;
 using Avalonia;
 using Avalonia.Platform;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Tsundoku.Models
 {
-    [Serializable]
-    public class Series
-    {
-		public string EnglishTitle { get; }
-		public string RomajiTitle { get; }
-		public string NativeTitle { get; }
-		public string RomajiStaff { get; }
-		public string NativeStaff { get; }
+	[Serializable]
+	public class Series
+	{
+		public List<string> Titles { get; } //[Romaji, English, Native]
+        public List<string> Staff { get; } //[Romaji, Native]
 		public string Description { get; }
 		public string Format { get; }
 		public string Status { get; }
@@ -31,14 +30,11 @@ namespace Tsundoku.Models
 		public ushort MaxVolumeCount { get; set; }
 		public ushort CurVolumeCount { get; set; }
 
-		public Series(string englishTitle, string romajiTitle, string nativeTitle, string romajiStaff, string nativeStaff, string description, string format, string status, string cover, string link, ushort maxVolumeCount, ushort curVolumeCount)
+		public Series(List<string> titles, List<string> staff, string description, string format, string status, string cover, string link, ushort maxVolumeCount, ushort curVolumeCount)
         {
-            EnglishTitle = englishTitle;
-            RomajiTitle = romajiTitle;
-            NativeTitle = nativeTitle;
-            RomajiStaff = romajiStaff;
-            NativeStaff = nativeStaff;
-            Description = description;
+			Titles = titles;
+			Staff = staff;
+			Description = description;
             Format = format;
             Status = status;
             Cover = cover;
@@ -57,15 +53,21 @@ namespace Tsundoku.Models
 				JObject finalObj = JObject.Parse(seriesDataQuery.Result.ToString());
 				var seriesData = finalObj["Media"];
 				if (seriesData != null)
-                {
+				{
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
 					string romajiTitle = seriesData["title"]["romaji"].ToString();
 					Series _newSeries = new Series(
-                        string.IsNullOrEmpty(seriesData["title"]["english"].ToString()) ? seriesData["title"]["romaji"].ToString() : seriesData["title"]["english"].ToString(),
-						romajiTitle,
-                        seriesData["title"]["native"].ToString(),
-                        GetSeriesStaff(seriesData["staff"]["edges"], "full"),
-						GetSeriesStaff(seriesData["staff"]["edges"], "native"),
+                        new List<string>()
+						{
+							string.IsNullOrEmpty(seriesData["title"]["english"].ToString()) ? seriesData["title"]["romaji"].ToString() : seriesData["title"]["english"].ToString(),
+							romajiTitle, seriesData["title"]["native"].ToString(),
+							GetSeriesStaff(seriesData["staff"]["edges"], "native")
+						},
+                        new List<string>()
+						{
+							GetSeriesStaff(seriesData["staff"]["edges"], "full"),
+							GetSeriesStaff(seriesData["staff"]["edges"], "native")
+						},
 						seriesData["description"] == null ? "" : ConvertUnicodeInDesc(Regex.Replace(seriesData["description"].ToString(), @"\(Source: [\S\s]+|\<.*?\>", "").Trim()),
 						bookType.Equals("MANGA") ? GetCorrectComicName(seriesData["countryOfOrigin"].ToString()) : "Novel",
 						GetSeriesStatus(seriesData["status"].ToString()),
@@ -168,11 +170,8 @@ namespace Tsundoku.Models
 		public override string ToString()
 		{
 			return "Series{" + "\n" +
-					"EnglishTitle=" + EnglishTitle  + "\n" +
-					"RomajiTitle=" + RomajiTitle  + "\n" +
-					"NativeTitle=" + NativeTitle  + "\n" +
-					"RomajiStaff=" + RomajiStaff  + "\n" +
-					"NativeStaff=" + NativeStaff  + "\n" +
+					"Titles=" + Titles + "\n" +
+					"Staff=" + Staff + "\n" +
 					"Description=" + Description  + "\n" +
 					"Format=" + Format  + "\n" +
 					"Status=" + Status  + "\n" +

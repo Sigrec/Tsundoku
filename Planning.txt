@@ -1,0 +1,13 @@
+Features
+ - German Language Addition
+ - Theme Creation
+ - TrayIcon?
+ - Card Edit Pane
+ - Changing of Display Format
+ - Auto Deletion of Covers that aren't in Users List
+
+Fixes
+ - Overlapping of progress bar when current vol count = max volume count
+ - Progress Bar pixel coloring
+ - Uniform Font
+ - Need to check for duplicate series before adding

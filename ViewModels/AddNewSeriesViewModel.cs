@@ -1,6 +1,8 @@
 ﻿using Tsundoku.Models;
 using System.Diagnostics;
 using System.Collections.ObjectModel;
+using Microsoft.VisualBasic;
+using System.Threading.Tasks;
 
 namespace Tsundoku.ViewModels
 {
@@ -16,8 +18,8 @@ namespace Tsundoku.ViewModels
             Series _series = Series.CreateNewSeriesCard(title, bookType, maxVolCount, curVolCount);
             Debug.WriteLine(_series.ToString());
             MainWindowViewModel.Collection.Add(_series);
+            MainWindowViewModel.SearchedCollection.Add(_series);
             MainWindowViewModel.UpdateCollectionNumbers(_series.MaxVolumeCount, _series.CurVolumeCount);
-            MainWindowViewModel.SaveUsersData();
         }
     }
 }
