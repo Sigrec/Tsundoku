@@ -1,25 +1,48 @@
 ﻿using Tsundoku.Models;
-using System.Diagnostics;
-using System.Collections.ObjectModel;
-using Microsoft.VisualBasic;
+using System.Linq;
 using System.Threading.Tasks;
+using ReactiveUI;
+using System.Reactive;
+using Avalonia.Controls.Chrome;
 
 namespace Tsundoku.ViewModels
 {
-    public class AddNewSeriesViewModel : ViewModelBase
+    public class AddNewSeriesViewModel : MainWindowViewModel
     {
+        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
+        public string[] AdditionalLanguages { get; } = new string[] {"French", "Italian", "German", "Spanish"};
+        private ReactiveCommand<Unit, Unit> GetNewSeriesData { get; }
         public AddNewSeriesViewModel()
         {
-            
-        }
 
+        }
         public static void GetSeriesData(string title, string bookType, ushort curVolCount, ushort maxVolCount)
         {
-            Series _series = Series.CreateNewSeriesCard(title, bookType, maxVolCount, curVolCount);
-            Debug.WriteLine(_series.ToString());
-            MainWindowViewModel.Collection.Add(_series);
-            MainWindowViewModel.SearchedCollection.Add(_series);
-            MainWindowViewModel.UpdateCollectionNumbers(_series.MaxVolumeCount, _series.CurVolumeCount);
+            Logger.Info($"Adding New Series -> {title} | {bookType} | {curVolCount} | {maxVolCount}");
+            Series newSeries = Series.CreateNewSeriesCard(title, bookType, maxVolCount, curVolCount);
+            if (newSeries!= null)
+            {
+                bool duplicateSeriesCheck = false;
+                Parallel.ForEach(MainWindowViewModel.Collection, (series, state) =>
+                {
+                    if (Enumerable.SequenceEqual(newSeries.Titles, series.Titles) && newSeries.Format.Equals(series.Format))
+                    {
+                        duplicateSeriesCheck = true;
+                        state.Break();
+                    }
+                });
+
+                if (!duplicateSeriesCheck)
+                {
+                    Logger.Info("New Series JSON\n" + newSeries.ToString());
+                    MainWindowViewModel.Collection.Add(newSeries);
+                    MainWindowViewModel.SortCollection();
+                }
+                else
+                {
+                    Logger.Info("Duplicate Check, Series Already Exists");
+                }
+            }
         }
     }
 }

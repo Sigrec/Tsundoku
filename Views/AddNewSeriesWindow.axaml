@@ -7,55 +7,64 @@
         x:Class="Tsundoku.Views.AddNewSeriesWindow"
 		Icon="\Assets\tsundoku-logo.ico"
         Title="Add New Series"
-		FontFamily="Segoe UI Symbol"
+		FontFamily="Segoe UI"
 		SizeToContent="WidthAndHeight"
         Background="#12171d">
-
-	<Design.DataContext>
-		<vm:AddNewSeriesViewModel/>
-	</Design.DataContext>
 	
     <Border BorderBrush="Yellow" BorderThickness="3">
-        <StackPanel Margin="20">
-			<TextBlock Text="Enter Title (Copy Title From AniList)"/>
-            <TextBox Name="TitleBox"
-					 Width="400"
-					 FontFamily="MS Gothic"
-					 FontSize="20"
-					 TextWrapping="Wrap"
-					 Watermark="Title..."
-					 KeyUp="GetTitleText"/>
-			<TextBlock Text="Select Book Type" Margin="0,10,0,0"/>
-            <StackPanel Orientation="Horizontal">
-				<RadioButton Name="MangaButton"
-							 Margin="0,0,20,0"
-							 GroupName="BookType"
-							 Click="GetMangaBookType">
-					<TextBlock Text="Manga"
-							   FontWeight="Bold"/>
-				</RadioButton>
-				<RadioButton Name="NovelButton"
-							 GroupName="BookType"
-							 Click="GetNovelBookType">
-					<TextBlock Text="Novel"
-							   FontWeight="Bold"/>
-				</RadioButton>
-		</StackPanel>
-            <Grid>
+        <StackPanel Margin="20" Spacing="20">
+			<StackPanel>
+				<TextBlock Text="Enter Title (Copy Title From AniList)" FontSize="20" FontWeight="Bold" Foreground="#dfd59e"/>
+				<TextBox Name="TitleBox"
+						 Width="400"
+						 FontFamily="MS UI Gothic"
+						 FontSize="20"
+						 Background="#20232d"
+						 BorderBrush="#dfd59e"
+						 BorderThickness="2"
+						 TextWrapping="Wrap"
+						 Watermark="Title..."/>
+			</StackPanel>
+			<Grid>
                 <Grid.ColumnDefinitions>    
-                    <ColumnDefinition ></ColumnDefinition>    
-                    <ColumnDefinition></ColumnDefinition>      
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>     
                 </Grid.ColumnDefinitions>    
                 <Grid.RowDefinitions>    
-                    <RowDefinition></RowDefinition>    
-                    <RowDefinition></RowDefinition>        
+                    <RowDefinition/>  
+                    <RowDefinition/>       
                 </Grid.RowDefinitions>    
-                <TextBlock Text="Cur Volumes" Grid.Row="0" Grid.Column="0"/>
-                <TextBlock Text="Max Volumes" Grid.Row="0" Grid.Column="1"/>
-                <TextBox Name="CurVolCount" Grid.Row="1" Grid.Column="0" KeyUp="GetCurVolCount" Margin="0,0,20,0"/>
-				<TextBox Name="MaxVolCount" Grid.Row="1" Grid.Column="1" KeyUp="GetMaxVolCount"/>
+                <TextBlock Text="Cur Volumes" Grid.Row="0" Grid.Column="0" FontSize="20" FontWeight="Bold" Foreground="#dfd59e"/>
+                <TextBlock Text="Max Volumes" Grid.Row="0" Grid.Column="1" FontSize="20" FontWeight="Bold" Foreground="#dfd59e"/>
+                <TextBox Name="CurVolCount" Grid.Row="1" Grid.Column="0" Margin="0,0,20,0" Background="#20232d" BorderBrush="#dfd59e" BorderThickness="2"/>
+				<TextBox Name="MaxVolCount" Grid.Row="1" Grid.Column="1" Background="#20232d" BorderBrush="#dfd59e" BorderThickness="2"/>
             </Grid>
-			<Button Margin="0,10,0,0" Content="Add" Click="OnButtonClicked"></Button>
+			<StackPanel>
+				<TextBlock Text="Select Book Type" Margin="0,10,0,0" FontSize="20" FontWeight="Bold" Foreground="#dfd59e"/>
+				<StackPanel Orientation="Horizontal" Spacing="40">
+					<StackPanel Orientation="Horizontal">
+						<RadioButton Name="MangaButton" Margin="0,0,20,0" GroupName="BookType">
+							<TextBlock Text="Manga" FontWeight="Bold" FontSize="20" Foreground="#dfd59e"/>
+						</RadioButton>
+						<RadioButton Name="NovelButton" GroupName="BookType">
+							<TextBlock Text="Novel" FontWeight="Bold" FontSize="20" Foreground="#dfd59e"/>
+						</RadioButton>
+					</StackPanel>
+					<ComboBox
+						Name="AdditionalLangSelector"
+						Items="{Binding AdditionalLanguages}"
+						SelectedItem="French"
+						Width="150"
+						Height="35"
+						Background="#20232d"
+						BorderBrush="#dfd59e"
+						BorderThickness="2"
+						FontWeight="Bold"
+						FontSize="15"
+						Foreground="#dfd59e"/>
+				</StackPanel>
+			</StackPanel>
+			<Button Margin="0,10,0,0" Content="Add" Click="OnButtonClicked" Background="#20232d" BorderBrush="#dfd59e" BorderThickness="2" FontWeight="Bold" FontSize="20" Foreground="#dfd59e"/>
         </StackPanel>
     </Border>
 </Window>

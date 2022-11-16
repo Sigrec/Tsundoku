@@ -12,63 +12,55 @@
         Icon="\Assets\tsundoku-logo.ico"
         Title="Tsundoku"
 		x:Name="TsundokuWindow"
-		FontFamily="Segoe UI Symbol" 
-		SizeToContent="WidthAndHeight"
+		FontFamily="Segoe UI" 
         Background="#12171d"
 		MinWidth="850"
 		MinHeight="500"
+		WindowStartupLocation="1"
+		Topmost="True"
+		WindowState="2"
 		Closing="SaveOnClose">
 
 	<Window.Resources>
 		<cv:BitmapValueConverter x:Key="ConvertImage"/>
 		<cv:TitleLangConverter x:Key="ConvertTitle"/>
 		<cv:StaffLangConverter x:Key="ConvertStaff"/>
-		<cv:VolumeCountConverter x:Key="ConvertVolumeCount"/>
 	</Window.Resources>
 
 	<DockPanel Name="Navigation">
 		<Border DockPanel.Dock="Top" BorderBrush="#dfd59e" BorderThickness="0,0,0,3">
 			<StackPanel Orientation="Horizontal" Spacing="20" HorizontalAlignment="Center" VerticalAlignment="Center">
+				<StackPanel.Styles>
+					<Style Selector="Button:pointerover /template/ ContentPresenter">
+						<Setter Property="Background" Value="#dfd59e"/>
+						<Setter Property="BorderBrush" Value="#20232d"/>
+						<Setter Property="BorderThickness" Value="2"/>
+						<Setter Property="TextBlock.Foreground" Value="#20232d"/>
+					</Style>
+				</StackPanel.Styles>
 				<StackPanel Spacing="5" Margin="0,10,0,10" HorizontalAlignment="Center">
 					<TextBlock Text="{Binding MainUser.UserName}" FontSize="20" FontWeight="Bold" TextAlignment="Center" Foreground="#dfd59e"/>
 					<StackPanel Orientation="Horizontal" Spacing="5">
-						<Button FontSize="20" Background="#20232d" BorderBrush="#dfd59e" BorderThickness="2">
-							<i:Icon Value="fa-address-book" Foreground="#dfd59e"/>
-						</Button>
-						<Button FontSize="20" Background="#20232d" BorderBrush="#dfd59e" BorderThickness="2">
-							<i:Icon Value="fa-swatchbook" Foreground="#dfd59e"/>
-						</Button>
+						<Button FontSize="20" Background="#20232d" BorderBrush="#dfd59e" BorderThickness="2" i:Attached.Icon="fa-address-book" Foreground="#dfd59e"/>
+						<Button FontSize="20" Background="#20232d" BorderBrush="#dfd59e" BorderThickness="2" i:Attached.Icon="fa-swatchbook" Foreground="#dfd59e"/>
 						<Button FontWeight="Bold"
 								FontSize="20"
 								Background="#20232d"
 								BorderBrush="#dfd59e"
 								BorderThickness="2"
-								Command="{Binding OpenAddNewSeriesWindow}">
-							<i:Icon Value="fa-server" Foreground="#dfd59e"/>
-						</Button>
+								Command="{Binding OpenAddNewSeriesWindow}"
+								i:Attached.Icon="fa-book-medical"
+								Foreground="#dfd59e"/>
 					</StackPanel>
 				</StackPanel>
-				<TextBlock VerticalAlignment="Center" TextAlignment="Center" FontSize="20" FontWeight="Bold" Foreground="#dfd59e">
-					<TextBlock.Text>
-						<MultiBinding StringFormat="Collected&#x0a;{0} Volumes">
-							<Binding Path="#DecrementButton.IsPressed"/>
-						</MultiBinding>
-					</TextBlock.Text>
-				</TextBlock>
+				<TextBlock Name="NumVolumesCollectedText" Text="{Binding UsersNumVolumesCollected, StringFormat='Collected&#x0a;{0} Volumes'}" VerticalAlignment="Center" TextAlignment="Center" FontSize="20" FontWeight="Bold" Foreground="#dfd59e"/>
 				<StackPanel VerticalAlignment="Center" Spacing="5">
 					<TextBlock Text="Search Collection" HorizontalAlignment="Center" FontSize="20" FontWeight="Bold" Foreground="#dfd59e"/>
-					<TextBox Text="{Binding SearchText}" BorderBrush="#dfd59e" BorderThickness="2">
-					</TextBox>
+					<TextBox Text="{Binding SearchText}" BorderBrush="#dfd59e" BorderThickness="2"/>
 				</StackPanel>
-				<TextBlock VerticalAlignment="Center" TextAlignment="Center" FontSize="20" FontWeight="Bold" Foreground="#dfd59e">
-					<TextBlock.Text>
-						<MultiBinding StringFormat="Need To Collect&#x0a;{0} Volumes">
-							<Binding Path="MainUser.NumVolumesToBeCollected"/>
-						</MultiBinding>
-					</TextBlock.Text>
-				</TextBlock>
+				<TextBlock Name="NumVolumesToBeCollectedText" Text="{Binding UsersNumVolumesToBeCollected, StringFormat='Need To Collect&#x0a;{0} Volumes'}" VerticalAlignment="Center" TextAlignment="Center" FontSize="20" FontWeight="Bold" Foreground="#dfd59e"/>
 				<StackPanel Spacing="5" Margin="0,10,0,10">
-					<ComboBox Name="DisplaySelector" 
+					<ComboBox Name="DisplaySelector"
 							  Items="{Binding AvailableDisplays}"
 							  SelectionChanged="DisplayChanged"
 							  SelectedItem="{Binding CurDisplay}"
@@ -80,9 +72,8 @@
 							  FontWeight="Bold"
 							  FontSize="15"
 							  Foreground="#dfd59e"
-							  AutoScrollToSelectedItem="True">
-					</ComboBox>
-					<ComboBox Name="LanguageSelector" 
+							  AutoScrollToSelectedItem="True"/>
+					<ComboBox Name="LanguageSelector"
 							  Items="{Binding AvailableLanguages}"
 							  SelectionChanged="LanguageChanged"
 							  SelectedItem="{Binding CurLanguage}"
@@ -94,8 +85,7 @@
 							  FontWeight="Bold"
 							  FontSize="15"
 							  Foreground="#dfd59e"
-							  AutoScrollToSelectedItem="True">
-					</ComboBox>
+							  AutoScrollToSelectedItem="True"/>
 				</StackPanel>
 			</StackPanel>
 		</Border>
@@ -112,20 +102,32 @@
 					<DataTemplate>
 						<Border Margin="20">
 							<DockPanel Width="{Binding Source={x:Static local:Constants.CARD_WIDTH}}" Height="{Binding Constants.CARD_HEIGHT}">
+
+								<!-- Left Side Card -->
 								<Border CornerRadius="10" ClipToBounds="True" OpacityMask="#20232d">
 									<Canvas Name="{Binding Link}" PointerPressed="OpenSiteLink" Width="{Binding Source={x:Static local:Constants.LEFT_SIDE_CARD_WIDTH}}">
+									<Canvas.Styles>
+										<Style Selector="TextBlock:pointerenter /template/ ContentPresenter">
+											<Setter Property="TextBlock.Background" Value="#dfd59e"/>
+											<Setter Property="TextBlock.Foreground" Value="White"/>
+										</Style>
+									</Canvas.Styles>
+
+										<!-- Top Left Side Card -->
 										<Image Height="250"
 											   Width="{Binding Source={x:Static local:Constants.LEFT_SIDE_CARD_WIDTH}}"
 											   Source="{Binding Cover, Converter={StaticResource ConvertImage}}"
 											   Stretch="Fill"
 											   DockPanel.Dock="Left"/>
+
+										<!-- Bottom Left Side Card -->
 										<TextBlock Canvas.Left="0"
 												   Name="StatusAndFormat"
 												   Canvas.Bottom="0"
 												   Width="{Binding Source={x:Static local:Constants.LEFT_SIDE_CARD_WIDTH}}"
 												   Height="{Binding Source={x:Static local:Constants.BOTTOM_SECTION_CARD_HEIGHT}}"
 												   Background="#2c2d42"
-												   Opacity="0.97"
+												   Opacity="0.985"
 												   Foreground="#dfd59e"
 												   FontWeight="Bold"
 												   FontSize="18"
@@ -140,9 +142,15 @@
 										</TextBlock>
 									</Canvas>
 								</Border>
+
+								<!-- Right Side Series Card -->
 								<Border CornerRadius="10" ClipToBounds="True">
-									<DockPanel Width="{Binding Source={x:Static local:Constants.RIGHT_SIDE_CARD_WIDTH}}" DockPanel.Dock="Right">
-										<DockPanel Height="{Binding Source={x:Static local:Constants.TOP_SECTION_CARD_HEIGHT}}" DockPanel.Dock="Top" LastChildFill="True">
+									<Grid Width="{Binding Source={x:Static local:Constants.RIGHT_SIDE_CARD_WIDTH}}" DockPanel.Dock="Right" RowDefinitions="*, 40">
+										<!-- <DockPanel Height="{Binding Source={x:Static local:Constants.TOP_SECTION_CARD_HEIGHT}}" ZIndex="1" Background="Red">
+										</DockPanel> -->
+
+										<!-- Top Right Side Card -->
+										<DockPanel Height="{Binding Source={x:Static local:Constants.TOP_SECTION_CARD_HEIGHT}}" Grid.Row="0" LastChildFill="True">
 											<TextBlock Background="#20232d"
 													   DockPanel.Dock="Top"
 													   TextWrapping="Wrap"
@@ -176,7 +184,7 @@
 													</MultiBinding>
 												</TextBlock.Text>
 											</TextBlock>
-											<ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" DockPanel.Dock="Bottom">
+											<ScrollViewer VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled" DockPanel.Dock="Bottom">
 												<TextBlock Background="#20232d"
 														TextWrapping="Wrap"
 														Foreground="#ececec"
@@ -185,59 +193,79 @@
 														Padding="10,-2,5,10"/>
 											</ScrollViewer>
 										</DockPanel>
+
+										<!-- Bottom Right Side Card -->
 										<StackPanel Height="{Binding Source={x:Static local:Constants.BOTTOM_SECTION_CARD_HEIGHT}}"
 													Background="#2c2d42"
-													DockPanel.Dock="Bottom"
 													Width="{Binding Source={x:Static local:Constants.RIGHT_SIDE_CARD_WIDTH}}"
 													Orientation="Horizontal"
+													Grid.Row="1"
 													HorizontalAlignment="Stretch">
+											<StackPanel.Styles>
+												<Style Selector="Button:pointerover /template/ ContentPresenter">
+													<Setter Property="Background" Value="#dfd59e"/>
+													<Setter Property="BorderBrush" Value="#20232d"/>
+													<Setter Property="BorderThickness" Value="2"/>
+													<Setter Property="TextBlock.Foreground" Value="#20232d"/>
+												</Style>
+											</StackPanel.Styles>
+											<Button CornerRadius="0,0,0,10"
+													FontSize="20"
+													Height="42"
+													Width="45"
+													Background="#20232d"
+													i:Attached.Icon="fa-book-bookmark"
+													Foreground="#dfd59e"
+													Command="{Binding #Navigation.DataContext.EditPaneButtonIsPressedCommand}"/>
 											<ProgressBar Height="25"
-														 Width="250"
-														 Background="#ececec"
+														 Width="220"
+														 Background="#20232d"
 														 Value="{Binding CurVolumeCount}"
-														 Foreground="#20232d"
-														 BorderBrush="Red"
+														 Foreground="#dfd59e"
+														 BorderBrush="#20232d"
 														 BorderThickness="1.8"
 														 Margin="10,0,10,0"
 														 Minimum="0"
 														 Maximum="{Binding MaxVolumeCount}"
 														 Name="VolumeProgress"/>
-											<Grid Width="85" Margin="-6,0,0,0">
-												<TextBlock Name="VolumeCount" Grid.Row="0" Grid.Column="0" TextAlignment="Center" FontSize="15" FontWeight="Bold" Foreground="#dfd59e" Margin="2,3,0,0">
-													<TextBlock.Text>
-														<MultiBinding StringFormat="{}{0}/{1}">
-															<Binding Path="CurVolumeCount"/>
-															<Binding Path="MaxVolumeCount"/>
-														</MultiBinding>
-													</TextBlock.Text>
-												</TextBlock>
-												<Button Grid.Row="1"
-														Grid.Column="0"
-														Background="Transparent"
-														Foreground="#dfd59e"
-														FontWeight="Bold"
-														FontSize="33"
-														Margin="18,5,0,0"
-														Height="23"
-														Width="26"
-														Padding="5,-10,0,0"
-														Click="SubtractVolume"
-														Name="DecrementButton">-</Button>
-												<Button Grid.Row="2"
-														Grid.Column="0"
-														Background="Transparent"
-														Foreground="#dfd59e"
-														FontWeight="Bold"
-														FontSize="26.5"
-														Margin="43,16,0,0"
-														Height="23"
-														Width="26"
-														Padding="2,-10,0,0"
-														Click="AddVolume"
-														Name="IncrementButton">+</Button>
-											</Grid>
+											<Border CornerRadius="0,0,10,0">
+												<Grid Width="68" Margin="0,0,0,0">
+													<TextBlock Name="VolumeCount" Grid.Row="0" Grid.Column="0" TextAlignment="Center" FontSize="15" FontWeight="Bold" Foreground="#dfd59e" Margin="-8,3,0,0">
+														<TextBlock.Text>
+															<MultiBinding StringFormat="{}{0}/{1}">
+																<Binding Path="CurVolumeCount"/>
+																<Binding Path="MaxVolumeCount"/>
+															</MultiBinding>
+														</TextBlock.Text>
+													</TextBlock>
+													<Button Grid.Row="1"
+															Grid.Column="0"
+															Background="Transparent"
+															Foreground="#dfd59e"
+															FontWeight="Bold"
+															FontSize="40"
+															Margin="8,5,0,0"
+															Height="23"
+															Width="26"
+															Padding="0,-15,0,0"
+															Click="SubtractVolume"
+															Name="DecrementButton">-</Button>
+													<Button Grid.Row="2"
+															Grid.Column="0"
+															Background="Transparent"
+															Foreground="#dfd59e"
+															FontWeight="Bold"
+															FontSize="25"
+															Margin="30,16,0,0"
+															Height="23"
+															Width="26"
+															Padding="2,-8,0,0"
+															Command="{Binding #Navigation.DataContext.IncrementVolumeCount}"
+															Name="IncrementButton">+</Button>
+												</Grid>
+											</Border>
 										</StackPanel>
-									</DockPanel>
+									</Grid>
 								</Border>
 							</DockPanel>
 						</Border>

@@ -1,13 +1,24 @@
-Features
- - German Language Addition
+V1.0.0 Features
+ - German Language Support [Ideally woudl like an actual Database]
  - Theme Creation
- - TrayIcon?
- - Card Edit Pane
- - Changing of Display Format
- - Auto Deletion of Covers that aren't in Users List
+ - Card/Series Edit Pane [In-Progress]
 
-Fixes
- - Overlapping of progress bar when current vol count = max volume count
- - Progress Bar pixel coloring
- - Uniform Font
- - Need to check for duplicate series before adding
+V1.5.0
+ - Changing of Display Format
+
+V2.0.0 Features
+ - Price Analysis Window
+
+Bugs/Fixes
+ - Issue with staff that don't have native titles (Check Overlord)
+ - Make the maximum window width = to the width of the users monitor
+ - Fix padding/ui to add new button
+ - Overlapping of progress bar when current vol count = max volume count (https://github.com/AvaloniaUI/Avalonia/pull/8488#issue-1301658827)
+ - Clicking button to open AddNewSeriesWindow again after it's already open generates another instance instead of moving the current one to the front
+ - Issues with ComboBox to select additional langauges
+ - Memory Issues (Resets memory usage when restarting the app)
+     - When Sorting/Searching Collection It Increases Memory
+
+Other/Random
+ - Uniform Font?
+ - TrayIcon?

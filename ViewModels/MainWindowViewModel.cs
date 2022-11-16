@@ -4,50 +4,47 @@ using System.Collections.ObjectModel;
 using System.IO;
 using Tsundoku.Views;
 using System.Windows.Input;
-using System.ComponentModel;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Reactive.Linq;
-using Avalonia.Animation;
-using DynamicData;
-using DynamicData.Binding;
-using System.Runtime.InteropServices;
-using Avalonia.Controls;
+using Avalonia.Metadata;
+using System.ComponentModel;
+using ReactiveUI.Fody.Helpers;
+using System.Diagnostics;
+using System.Reactive;
+using System.Collections.Specialized;
+using System.Collections.Generic;
 
 namespace Tsundoku.ViewModels
 {
-    public class MainWindowViewModel : ViewModelBase
+    public partial class MainWindowViewModel : ViewModelBase
     {
+        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         private string? _searchText;
         private Series? _selectedSeries;
-        private static string filePath = @"\Tsundoku\UserData\Collection.bin";
+        private static string filePath = @"\Tsundoku\UserData\UserData.dat";
         public ICommand OpenAddNewSeriesWindow { get; }
-        public static Collection<Series> Collection { get; set; } = new();
-        public static ObservableCollection<Series> SearchedCollection { get; set; } = new();
-        public static User MainUser { get; set; } = new();
+        public ICommand ShowEditSeriesPane { get; }
+        public static ObservableCollection<Series> SearchedCollection { get; set; }
+        public static ObservableCollection<Series> Collection { get; set; } = new();
+        public static User MainUser { get; set; }
         private AddNewSeriesWindow newSeriesWindow;
-        public static string? _curLanguage, _curDisplay;
-        public static ushort _numCollected;
-        public string[] AvailableLanguages { get; } = new string[]
-        {
-            "Romaji", "English", "Native"
-        };
-        public string[] AvailableDisplays { get; } = new string[]
-        {
-            "Card", "Mini-Card"
-        };
+        public static string _curLanguage, _curDisplay;
+        public static uint _curVolumesCollected, _curVolumesToBeCollected;
+        public string[] AvailableLanguages { get; } = new string[] {"Romaji", "English", "Native"};
+        public string[] AvailableDisplays { get; } = new string[] {"Card", "Mini-Card"};
 
-        // Binding event to track what the current search text is in a users collection
-        public string? SearchText
-        {
-            get => _searchText;
-            set => this.RaiseAndSetIfChanged(ref _searchText, value);
-        }
+        [Reactive]
+        public string SearchText { get; set; }
 
-        // Binding event to track what the current language is in a users collection
+        [Reactive]
+        public uint UsersNumVolumesCollected { get; set; }
+
+        [Reactive]
+        public uint UsersNumVolumesToBeCollected { get; set; }
+        private ReactiveCommand<Unit, uint> IncrementVolumeCount { get; }
+        
         public string CurLanguage
         {
             get => _curLanguage;
@@ -60,35 +57,56 @@ namespace Tsundoku.ViewModels
             set => this.RaiseAndSetIfChanged(ref _curDisplay, value);
         }
 
-        public Series? SelectedSeries
-        {
-            get => _selectedSeries;
-            set => this.RaiseAndSetIfChanged(ref _selectedSeries, value);
-        }
-
-        public ushort CurNumVolumesCollected
-        {
-            get => _numCollected;
-            set => this.RaiseAndSetIfChanged(ref _numCollected, value);
-        }
-
         public MainWindowViewModel()
         {
             RetriveUserData();
-            this.WhenAnyValue(x => x.SearchText).Throttle(TimeSpan.FromMilliseconds(500)).ObserveOn(RxApp.MainThreadScheduler).Subscribe(SearchCollection!);
-            //this.WhenValueChanged(x => x.CurLanguage).Throttle(TimeSpan.FromMilliseconds(500)).ObserveOn(RxApp.MainThreadScheduler).Subscribe(GetCurTitle!);
-            // Need to disable the add new series while this window is open
+            this.WhenAnyValue(x => x.SearchText).Throttle(TimeSpan.FromMilliseconds(300)).ObserveOn(RxApp.MainThreadScheduler).Subscribe(SearchCollection!);
             OpenAddNewSeriesWindow = ReactiveCommand.CreateFromTask(() =>
             {
                 newSeriesWindow = new AddNewSeriesWindow();
                 newSeriesWindow.Show();
                 return Task.CompletedTask;
             });
+
+            IncrementVolumeCount = ReactiveCommand.Create(() => UsersNumVolumesCollected += 1);
+            this.WhenAnyValue(x => x.UsersNumVolumesCollected).Subscribe(x => MainUser.NumVolumesCollected = x);
+            this.WhenAnyValue(x => x.UsersNumVolumesToBeCollected).Subscribe(x => MainUser.NumVolumesToBeCollected = x);
+            Collection.CollectionChanged += (sender, e) =>
+            {
+                if (e.Action == NotifyCollectionChangedAction.Add)
+                {
+                    UsersNumVolumesCollected += Collection[Collection.Count - 1].CurVolumeCount;
+                    UsersNumVolumesToBeCollected += (uint)Collection[Collection.Count - 1].MaxVolumeCount - Collection[Collection.Count - 1].CurVolumeCount;
+                }
+            };
         }
 
-        public static void UpdateCollectionNumbers(ushort maxVolumes, ushort curVolumes){
-            MainUser.NumVolumesCollected += curVolumes;
-            MainUser.NumVolumesToBeCollected += (ushort)(maxVolumes - curVolumes);
+        public static void SortCollection()
+        {
+            SearchedCollection.Clear();
+            switch (_curLanguage)
+            {
+                case "Native":
+                    foreach (Series x in Collection.OrderBy(x => x.Titles[2], StringComparer.CurrentCulture))
+                    {
+                        SearchedCollection.Add(x);
+                    }
+                    break;
+                case "English":
+                    foreach (Series x in Collection.OrderBy(x => x.Titles[1], StringComparer.CurrentCulture))
+                    {
+                        SearchedCollection.Add(x);
+                    }
+                    break;
+                default:
+                    foreach (Series x in Collection.OrderBy(x => x.Titles[0], StringComparer.CurrentCulture))
+                    {
+                        SearchedCollection.Add(x);
+                    }
+                    break;
+            }
+            //Collection = SearchedCollection;
+            Logger.Info($"Sorting {_curLanguage}");
         }
 
         private void SearchCollection(string searchText)
@@ -96,24 +114,31 @@ namespace Tsundoku.ViewModels
             SearchedCollection.Clear();
             if (!string.IsNullOrWhiteSpace(searchText))
             {
-                Parallel.ForEach(Collection.Where(series => series.Titles[1].Contains(searchText, StringComparison.CurrentCultureIgnoreCase) | series.Titles[2].Contains(searchText, StringComparison.CurrentCultureIgnoreCase) | series.Titles[0].Contains(searchText, StringComparison.CurrentCultureIgnoreCase) | series.Staff[0].Contains(searchText, StringComparison.CurrentCultureIgnoreCase) | series.Staff[1].Contains(searchText, StringComparison.CurrentCultureIgnoreCase)), series =>
+                foreach (var series in Collection.Where(x => x.Titles[1].Contains(searchText, StringComparison.CurrentCultureIgnoreCase) | x.Titles[2].Contains(searchText, StringComparison.CurrentCultureIgnoreCase) | x.Titles[0].Contains(searchText, StringComparison.CurrentCultureIgnoreCase) | x.Staff[0].Contains(searchText, StringComparison.CurrentCultureIgnoreCase) | x.Staff[1].Contains(searchText, StringComparison.CurrentCultureIgnoreCase)))
                 {
                     SearchedCollection.Add(series);
-                });
+                }
             }
             else
             {
-                Parallel.ForEach(Collection, series =>
-                {
-                    SearchedCollection.Add(series);
-                });
+                // foreach (var series in Collection)
+                // {
+                //     SearchedCollection.Add(series);
+                // }
+                SortCollection();
             }
         }
 
         public void RetriveUserData(){
-            if (new FileInfo(filePath).Length == 0)
+            Logger.Info("Starting TsundOku");
+            if (!File.Exists(filePath))
             {
+                Logger.Info("Creating New User");
                 MainUser = new User("UserName", "Native", "Rustic", "Card", null, Collection);
+                _curLanguage = MainUser.CurLanguage;
+                _curDisplay = MainUser.Display;
+                UsersNumVolumesCollected = 0;
+                UsersNumVolumesToBeCollected = 0;
                 SaveUsersData();
             }
             GetUserData();
@@ -125,26 +150,26 @@ namespace Tsundoku.ViewModels
             {
                 var binaryFormatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
                 MainUser = (User)binaryFormatter.Deserialize(stream);
-                Collection = MainUser.UserCollection;
-                _curLanguage = MainUser.CurLanguage;
-                _curDisplay = MainUser.Display;
-                _numCollected = MainUser.NumVolumesCollected;
-                Parallel.ForEach(Collection, series =>
-                {
-                    SearchedCollection.Add(series);
-                });
             }
+            Collection = MainUser.UserCollection;
+            SearchedCollection = new ObservableCollection<Series>(Collection);
+            _curLanguage = MainUser.CurLanguage;
+            _curDisplay = MainUser.Display;
+            UsersNumVolumesCollected = MainUser.NumVolumesCollected;
+            UsersNumVolumesToBeCollected = MainUser.NumVolumesToBeCollected;
+            Logger.Info($"Loading {MainUser.UserName}'s Data");
         }
 
-        public static void SaveUsersData(bool append = false){
+        public static async void SaveUsersData(bool append = false){
+
+            //Collection = SearchedCollection;
             MainUser.UserCollection = Collection;
             MainUser.CurLanguage = _curLanguage;
             MainUser.Display = _curDisplay;
-            MainUser.NumVolumesCollected = _numCollected;
             using (Stream stream = File.Open(filePath, append ? FileMode.Append : FileMode.Create))
             {
                 var binaryFormatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-                 binaryFormatter.Serialize(stream, MainUser);
+                binaryFormatter.Serialize(stream, MainUser);
             }
         }
     }

@@ -7,15 +7,13 @@ using Tsundoku.ViewModels;
 using System;
 using Avalonia.Input;
 using MessageBox.Avalonia.DTO;
+using Tsundoku.Models;
 
 namespace Tsundoku.Views
 {
     public partial class AddNewSeriesWindow : Window
     {
-        public string titleText;
-        public string bookType;
-        public string maxVolCount;
-        public string curVolCount;
+        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 
         public AddNewSeriesWindow()
         {
@@ -25,46 +23,11 @@ namespace Tsundoku.Views
 #endif
         }
 
-        private void InitializeComponent()
-        {
-            AvaloniaXamlLoader.Load(this);
-        }
-
-        public void GetTitleText(object sender, KeyEventArgs args)
-        {
-            titleText = ((TextBox)sender).Text;
-        }
-
-        public void GetMangaBookType(object sender, RoutedEventArgs args)
-        {
-            if ((bool)((RadioButton)sender).IsChecked)
-            {
-                bookType = "MANGA";
-            }
-        }
-
-        public void GetNovelBookType(object sender, RoutedEventArgs args)
-        {
-            if ((bool)((RadioButton)sender).IsChecked)
-            {
-                bookType = "NOVEL";
-            }
-        }
-
-        public void GetMaxVolCount(object sender, KeyEventArgs args)
-        {
-            maxVolCount = ((TextBox)sender).Text;
-        }
-
-        public void GetCurVolCount(object sender, KeyEventArgs args)
-        {
-            curVolCount = ((TextBox)sender).Text;
-        }
-
         public void OnButtonClicked(object sender, RoutedEventArgs args)
         {
-            if (String.IsNullOrEmpty(titleText) || String.IsNullOrEmpty(bookType) || String.IsNullOrEmpty(maxVolCount) || String.IsNullOrEmpty(curVolCount))
+            if (string.IsNullOrEmpty(TitleBox.Text) || (!(bool)MangaButton.IsChecked && !(bool)NovelButton.IsChecked) || string.IsNullOrEmpty(MaxVolCount.Text) || string.IsNullOrEmpty(CurVolCount.Text))
             {
+                Logger.Warn("Fields Missing Input");
                 var errorBox = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(
                 new MessageBoxStandardParams
                 {
@@ -76,7 +39,7 @@ namespace Tsundoku.Views
             }
             else
             {
-                AddNewSeriesViewModel.GetSeriesData(titleText, bookType, Convert.ToUInt16(curVolCount), Convert.ToUInt16(maxVolCount));
+                AddNewSeriesViewModel.GetSeriesData(TitleBox.Text, (bool)MangaButton.IsChecked ? "MANGA" : "NOVEL", Convert.ToUInt16(CurVolCount.Text), Convert.ToUInt16(MaxVolCount.Text));
             }
         }
     }

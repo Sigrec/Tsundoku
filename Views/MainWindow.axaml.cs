@@ -1,24 +1,34 @@
+using System.Security.Cryptography.X509Certificates;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
 using Tsundoku.Models;
 using Tsundoku.ViewModels;
+using ReactiveUI;
 
 namespace Tsundoku.Views
 {
     public partial class MainWindow : Window
     {
+        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         public MainWindow()
         {
             InitializeComponent();
-            //Debug.WriteLine(SeriesCollection.GetLogicalChildren().ToString());
+            //Logger.Debug("Test = " + NumVolumesToBeCollectedText.);
+            // MainWindowViewModel.SearchedCollection.CollectionChanged += (sender, e) =>
+            // {
+            //     if (e.Action == NotifyCollectionChangedAction.Add || e.Action == NotifyCollectionChangedAction.Remove)
+            //     {
+            //         UpdateCollectionViewNumbers();
+            //     }
+            // };
         }
 
         private void LanguageChanged(object sender, SelectionChangedEventArgs e)
@@ -36,7 +46,7 @@ namespace Tsundoku.Views
                     MainWindowViewModel._curLanguage = "Romaji";
                     break;
             }
-            Debug.WriteLine("Current Lang = " + MainWindowViewModel._curLanguage);
+            MainWindowViewModel.SortCollection();
         }
 
         private void DisplayChanged(object sender, SelectionChangedEventArgs e)
@@ -50,63 +60,86 @@ namespace Tsundoku.Views
             {
                 MainWindowViewModel._curDisplay = "Mini-Card";
             }
-            Debug.WriteLine("Current Display = " + MainWindowViewModel._curDisplay);
+            Logger.Info($"Current Display = {MainWindowViewModel._curDisplay}");
         }
 
         private void SaveOnClose(object sender, CancelEventArgs e)
         {
+            Logger.Info("Closing & Saving TsundOku");
             MainWindowViewModel.SaveUsersData();
         }
 
         private void OpenSiteLink(object sender, PointerPressedEventArgs args)
         {
             string link = ((Canvas)sender).Name;
-            Debug.WriteLine("Opening Site " + link);
+            Logger.Info($"Opening Site {link}");
             try
             {
                 Process.Start(new ProcessStartInfo(link) { UseShellExecute = true });
             }
             catch (Win32Exception noBrowser)
             {
-                Debug.WriteLine(noBrowser.Message);
+                Logger.Error(noBrowser.Message);
             }
-            catch (System.Exception other)
+            catch (Exception other)
             {
-                Debug.WriteLine(other.Message);
+                Logger.Error(other.Message);
             }
         }
 
         private async void CopySeriesTitleAsync(object sender, PointerPressedEventArgs args)
         {
             string title = ((TextBlock)sender).Text;
-            Debug.WriteLine("Copying " + title + " to Clipboard");
+            Logger.Info($"Copying{title}to Clipboard");
             await Application.Current.Clipboard.SetTextAsync(title);
         }
+
+        public void UpdateCollectionViewNumbers()
+        {
+            NumVolumesCollectedText.Text = $"Collected\n{MainWindowViewModel._curVolumesCollected} Volumes";
+            NumVolumesToBeCollectedText.Text = $"Need To Collect\n{MainWindowViewModel._curVolumesToBeCollected} Volumes";
+        }
+
+        /*
+         Decrements the series current volume count
+        */
         public void AddVolume(object sender, RoutedEventArgs args)
         {
-            /*WrapPanel test = (WrapPanel)SeriesCollection;
-            foreach (var series in test.Children)
+            Series curSeries = (Series)((Button)sender).DataContext;
+            if (curSeries.CurVolumeCount < curSeries.MaxVolumeCount)
             {
-                Debug.WriteLine(series);
-                /*if (series.EnglishTitle.Equals(curTitle) || series.RomajiTitle.Equals(curTitle) || series.NativeTitle.Equals(curTitle))
-                {
-                    if (series.CurVolumeCount < series.MaxVolumeCount)
-                    {
-                        series.CurVolumeCount += 1;
-                        MainWindowViewModel.MainUser.NumVolumesCollected += 1;
-                        MainWindowViewModel.MainUser.NumVolumesToBeCollected -= 1;
-                    }
-                    break;
-                }
-            }*/
+                //MainWindowViewModel.UsersNumVolumesCollected += 1;
+                MainWindowViewModel._curVolumesToBeCollected -= 1;
+                //UpdateCollectionViewNumbers();
+                TextBlock volumeDisplay = (TextBlock)((Button)sender).GetLogicalSiblings().ToList()[0];
+                string log = "Adding 1 Volume To " + curSeries.Titles[0] + " : " + volumeDisplay.Text + " -> ";
+                ProgressBar seriesProgressBar = (ProgressBar)((Button)sender).Parent.Parent.Parent.GetLogicalChildren().ToList()[1];
+                curSeries.CurVolumeCount += 1;
+                volumeDisplay.Text = curSeries.CurVolumeCount + "/" + curSeries.MaxVolumeCount;
+                seriesProgressBar.Value = curSeries.CurVolumeCount;
+                Logger.Info(log + volumeDisplay.Text);
+            }
         }
+
+        /*
+         Decrements the series current volume count
+        */
         public void SubtractVolume(object sender, RoutedEventArgs args)
         {
-            Series curSeries = ((Series)((Button)sender).DataContext);
-            Debug.WriteLine("Removing 1 Volume from " + curSeries.Titles[0]);
-            curSeries.CurVolumeCount -= 1;
-            MainWindowViewModel._numCollected -= 1;
-            MainWindowViewModel.MainUser.NumVolumesToBeCollected += 1;
+            Series curSeries = (Series)((Button)sender).DataContext; //Get the current series data
+            if (curSeries.CurVolumeCount >= 1) //Only decrement if the user currently has 1 or more volumes
+            {
+                MainWindowViewModel._curVolumesCollected -= 1;
+                MainWindowViewModel._curVolumesToBeCollected += 1;
+                //UpdateCollectionViewNumbers();
+                TextBlock volumeDisplay = (TextBlock)((Button)sender).GetLogicalSiblings().ToList()[0];
+                string log = "Removing 1 Volume From " + curSeries.Titles[0] + " : " + volumeDisplay.Text + " -> ";
+                ProgressBar seriesProgressBar = (ProgressBar)((Button)sender).Parent.Parent.Parent.GetLogicalChildren().ToList()[1];
+                curSeries.CurVolumeCount -= 1;
+                volumeDisplay.Text = curSeries.CurVolumeCount + "/" + curSeries.MaxVolumeCount;
+                seriesProgressBar.Value = curSeries.CurVolumeCount;
+                Logger.Info(log + volumeDisplay.Text);
+            }
         }
     }
 }

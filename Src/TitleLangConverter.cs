@@ -2,6 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
+using Tsundoku.Models;
+using Tsundoku.ViewModels;
 
 namespace Tsundoku.Src
 {

@@ -3,6 +3,7 @@
              xmlns:local="using:Tsundoku"
 			 xmlns:dataTemplates="using:Tsundoku.SrcCardTemplateSelector"
 			 xmlns:series="using:Tsundoku.Moddels.Series"
+			 xmlns:vm="using:Tsundoku.ViewModels"
              x:Class="Tsundoku.App">
 
     <Application.Styles>

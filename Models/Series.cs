@@ -8,10 +8,6 @@ using Tsundoku.Source;
 using System.Text;
 using System.Linq;
 using System.Diagnostics;
-using Avalonia.Media.Imaging;
-using Avalonia;
-using Avalonia.Platform;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace Tsundoku.Models
@@ -30,7 +26,7 @@ namespace Tsundoku.Models
 		public ushort MaxVolumeCount { get; set; }
 		public ushort CurVolumeCount { get; set; }
 
-		public Series(List<string> titles, List<string> staff, string description, string format, string status, string cover, string link, ushort maxVolumeCount, ushort curVolumeCount)
+        public Series(List<string> titles, List<string> staff, string description, string format, string status, string cover, string link, ushort maxVolumeCount, ushort curVolumeCount)
         {
 			Titles = titles;
 			Staff = staff;
@@ -45,7 +41,7 @@ namespace Tsundoku.Models
 
 		public static Series? CreateNewSeriesCard(string title, string bookType, ushort maxVolCount, ushort minVolCount)
         {
-			Task<JObject?> seriesDataQuery = new GraphQLQuery().GetSeries(title, bookType);
+			Task<JObject?> seriesDataQuery = new AniListQuery().GetSeries(title, bookType);
             seriesDataQuery.Wait();
 
 			if (seriesDataQuery.Result != null)
@@ -56,17 +52,18 @@ namespace Tsundoku.Models
 				{
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
 					string romajiTitle = seriesData["title"]["romaji"].ToString();
+					string nativeStaff = GetSeriesStaff(seriesData["staff"]["edges"], "native");
 					Series _newSeries = new Series(
                         new List<string>()
 						{
-							string.IsNullOrEmpty(seriesData["title"]["english"].ToString()) ? seriesData["title"]["romaji"].ToString() : seriesData["title"]["english"].ToString(),
-							romajiTitle, seriesData["title"]["native"].ToString(),
-							GetSeriesStaff(seriesData["staff"]["edges"], "native")
+                            romajiTitle,
+                            string.IsNullOrEmpty(seriesData["title"]["english"].ToString()) ? romajiTitle : seriesData["title"]["english"].ToString(),
+							seriesData["title"]["native"].ToString()
 						},
                         new List<string>()
 						{
-							GetSeriesStaff(seriesData["staff"]["edges"], "full"),
-							GetSeriesStaff(seriesData["staff"]["edges"], "native")
+							nativeStaff,
+							nativeStaff.Equals(" | ") ? GetSeriesStaff(seriesData["staff"]["edges"], "full") : nativeStaff
 						},
 						seriesData["description"] == null ? "" : ConvertUnicodeInDesc(Regex.Replace(seriesData["description"].ToString(), @"\(Source: [\S\s]+|\<.*?\>", "").Trim()),
 						bookType.Equals("MANGA") ? GetCorrectComicName(seriesData["countryOfOrigin"].ToString()) : "Novel",
@@ -102,7 +99,8 @@ namespace Tsundoku.Models
 				"KR" => "Manhwa",
 				"CN" => "Manhua",
 				"FR" => "Manfra",
-				_ => "Manga"
+				"JP" => "Manga",
+				_ => "Error"
 			};
 		}
 
@@ -121,27 +119,27 @@ namespace Tsundoku.Models
 
         public static string SaveNewCoverImage(String coverLink, String title, String bookType)
         {
-            string newPath = @"\Tsundoku\Assets\Covers\" + Regex.Replace(title, @"[^A-Za-z\d]", "") + "_" + bookType + "." + coverLink.Substring(coverLink.Length - 3); //C:\Tsundoku\Assets\Covers\Ottoman_Manga.png
+            string newPath = @$"\Tsundoku\Assets\Covers\{Regex.Replace(title, @"[^A-Za-z\d]", "")}_{bookType}.{coverLink.Substring(coverLink.Length - 3)}";
             Debug.WriteLine(newPath);
 
             if (!File.Exists(newPath))
             {
                 try
                 {
-                    DirectoryInfo newDir = Directory.CreateDirectory(@"\Tsundoku\Covers\");
+                    //DirectoryInfo newDir = Directory.CreateDirectory(@"\Tsundoku\Assets\Covers\");
                     HttpClient client = new HttpClient();
-                    var response = Task.Run(async () => await client.GetAsync(new Uri(coverLink)));
+                    Task<HttpResponseMessage> response = Task.Run(async () => await client.GetAsync(new Uri(coverLink)));
                     response.Wait();
-                    var clientResponse = response.Result;
+                    HttpResponseMessage clientResponse = response.Result;
                     using (var fs = new FileStream(newPath, FileMode.CreateNew))
                     {
-                        var fileResponse = Task.Run(async () => await clientResponse.Content.CopyToAsync(fs));
+                        Task fileResponse = Task.Run(async () => await clientResponse.Content.CopyToAsync(fs));
                         fileResponse.Wait();
                     }
                 }
                 catch (Exception e)
                 {
-                    Console.Error.Write(e.ToString());
+                    Debug.WriteLine(e.ToString());
                 }
             }
 			return newPath;
@@ -154,14 +152,22 @@ namespace Tsundoku.Models
             {
 				if (validRoles.Contains(name["role"].ToString()))
                 {
-					if (nameType.Equals("full"))
-                    {
-						staffList.Append(name["node"]["name"]["full"] + " | ");
-                    }
-					else if (nameType.Equals("native"))
-                    {
-						staffList.Append(name["node"]["name"]["native"] + " | ");
+					JToken newStaff = name["node"]["name"][nameType];
+					if (!string.IsNullOrEmpty((string?)newStaff))
+					{
+						staffList.Append(newStaff + " | ");
 					}
+					else
+                    {
+						if (nameType.Equals("native"))
+						{
+							staffList.Append(name["node"]["name"]["full"] + " | ");
+						}
+						else // If the staff member does not have a full name entry
+						{
+							staffList.Append(name["node"]["name"]["native"] + " | ");
+						}
+                    }
                 }
             }
 			return staffList.ToString(0, staffList.Length - 3);
@@ -170,16 +176,16 @@ namespace Tsundoku.Models
 		public override string ToString()
 		{
 			return "Series{" + "\n" +
-					"Titles=" + Titles + "\n" +
-					"Staff=" + Staff + "\n" +
-					"Description=" + Description  + "\n" +
-					"Format=" + Format  + "\n" +
-					"Status=" + Status  + "\n" +
-					"Cover=" + Cover  + "\n" +
-					"Link=" + Link  + "\n" +
-					"MaxVolumeCount=" + MaxVolumeCount  + "\n" +
-					"CurVolumeCount=" + CurVolumeCount  + "\n" +
+					"Titles = " + Titles[0] + " | " + Titles[1] + " | " + Titles[2] + "\n" +
+					"Staff = " + Staff[0] + " | " + Staff[1] + "\n" +
+					"Description = " + Description  + "\n" +
+					"Format = " + Format  + "\n" +
+					"Status = " + Status  + "\n" +
+					"Cover = " + Cover  + "\n" +
+					"Link = " + Link  + "\n" +
+					"MaxVolumeCount = " + MaxVolumeCount  + "\n" +
+					"CurVolumeCount = " + CurVolumeCount  + "\n" +
 					'}';
 		}
-	}
+    }
 }

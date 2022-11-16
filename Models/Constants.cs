@@ -1,3 +1,5 @@
+using Avalonia.Platform;
+
 namespace Tsundoku.Models
 {
     public class Constants
