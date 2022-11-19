@@ -1,49 +1,82 @@
-using System.Security.Cryptography.X509Certificates;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
 using System;
-using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using Tsundoku.Models;
 using Tsundoku.ViewModels;
+using System.Reactive.Linq;
+using Avalonia.ReactiveUI;
 using ReactiveUI;
+using System.Threading.Tasks;
 
 namespace Tsundoku.Views
 {
-    public partial class MainWindow : Window
+    public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
+        private MainWindowViewModel CollectionViewModel => DataContext as MainWindowViewModel;
+        private bool SeriesEditPaneIsOpenView = false;
         public MainWindow()
         {
             InitializeComponent();
-            //Logger.Debug("Test = " + NumVolumesToBeCollectedText.);
-            // MainWindowViewModel.SearchedCollection.CollectionChanged += (sender, e) =>
-            // {
-            //     if (e.Action == NotifyCollectionChangedAction.Add || e.Action == NotifyCollectionChangedAction.Remove)
-            //     {
-            //         UpdateCollectionViewNumbers();
-            //     }
-            // };
+        }
+
+        private void ChangeSeriesVolumeCounts(object sender, RoutedEventArgs args)
+        {
+            var textBoxes = ((Button)sender).GetLogicalSiblings();
+            ushort maxVolumeChange = Convert.ToUInt16(((MaskedTextBox)textBoxes.ElementAt(1)).Text.Replace("_", ""));
+            ushort curVolumeChange = Convert.ToUInt16(((MaskedTextBox)textBoxes.ElementAt(2)).Text.Replace("_", ""));
+            Series curSeries = (Series)((Button)sender).DataContext;
+            if (maxVolumeChange >= curVolumeChange)
+            {
+                CollectionViewModel.UsersNumVolumesCollected = CollectionViewModel.UsersNumVolumesCollected - curSeries.CurVolumeCount + curVolumeChange;
+                CollectionViewModel.UsersNumVolumesToBeCollected = CollectionViewModel.UsersNumVolumesToBeCollected - (uint)(curSeries.MaxVolumeCount - curSeries.CurVolumeCount) + (uint)(maxVolumeChange - curVolumeChange);
+                Logger.Info($"Changed Series Values For {curSeries.Titles[0]} From {curSeries.CurVolumeCount}/{curSeries.MaxVolumeCount} -> {curVolumeChange}/{maxVolumeChange}");
+                curSeries.CurVolumeCount = curVolumeChange;
+                curSeries.MaxVolumeCount = maxVolumeChange;
+                TextBlock volumeDisplay = (TextBlock)(((Button)sender)).Parent.Parent.GetLogicalSiblings().ElementAt(2).GetLogicalChildren().ElementAt(2).GetLogicalChildren().ElementAt(0).GetLogicalChildren().ElementAt(0);
+                volumeDisplay.Text = curSeries.CurVolumeCount + "/" + curSeries.MaxVolumeCount;
+            }
+        }
+
+        private void RemoveSeries(object sender, RoutedEventArgs args)
+        {
+            for (int x = 0; x < MainWindowViewModel.SearchedCollection.Count(); x++)
+            {
+                Series curSeries = MainWindowViewModel.SearchedCollection[x];
+                if (curSeries.Equals((Series)((Button)sender).DataContext))
+                {
+                    CollectionViewModel.UsersNumVolumesCollected -= curSeries.CurVolumeCount;
+                    CollectionViewModel.UsersNumVolumesToBeCollected -= (uint)(curSeries.MaxVolumeCount - curSeries.CurVolumeCount);
+                    MainWindowViewModel.SearchedCollection.Remove(curSeries);
+                    Logger.Info($"Removed {curSeries.Titles[0]} From Collection");
+                }
+            }
+            MainWindowViewModel.Collection = MainWindowViewModel.SearchedCollection;
+        }
+
+        private void ShowEditPane(object sender, RoutedEventArgs args)
+        {
+            ((Grid)((Button)sender).Parent.Parent.GetLogicalChildren().ElementAt(0)).IsVisible = (SeriesEditPaneIsOpenView ^= true);
         }
 
         private void LanguageChanged(object sender, SelectionChangedEventArgs e)
         {
-            string text = (sender as ComboBox).SelectedItem as string;
-            switch (text)
+            switch (LanguageSelector.SelectedItem)
             {
                 case "Native":
-                    MainWindowViewModel._curLanguage = "Native";
+                    MainWindowViewModel.MainUser.CurLanguage = "Native";
                     break;
                 case "English":
-                    MainWindowViewModel._curLanguage = "English";
+                    MainWindowViewModel.MainUser.CurLanguage = "English";
                     break;
                 default:
-                    MainWindowViewModel._curLanguage = "Romaji";
+                    MainWindowViewModel.MainUser.CurLanguage = "Romaji";
                     break;
             }
             MainWindowViewModel.SortCollection();
@@ -60,11 +93,15 @@ namespace Tsundoku.Views
             {
                 MainWindowViewModel._curDisplay = "Mini-Card";
             }
-            Logger.Info($"Current Display = {MainWindowViewModel._curDisplay}");
+            Logger.Info($"Changed Display To {MainWindowViewModel._curDisplay}");
         }
 
         private void SaveOnClose(object sender, CancelEventArgs e)
         {
+            if (CollectionViewModel.newSeriesWindow != null)
+            {
+                CollectionViewModel.newSeriesWindow.Close();
+            }
             Logger.Info("Closing & Saving TsundOku");
             MainWindowViewModel.SaveUsersData();
         }
@@ -72,7 +109,7 @@ namespace Tsundoku.Views
         private void OpenSiteLink(object sender, PointerPressedEventArgs args)
         {
             string link = ((Canvas)sender).Name;
-            Logger.Info($"Opening Site {link}");
+            Logger.Info($"Opening Link {link}");
             try
             {
                 Process.Start(new ProcessStartInfo(link) { UseShellExecute = true });
@@ -90,14 +127,8 @@ namespace Tsundoku.Views
         private async void CopySeriesTitleAsync(object sender, PointerPressedEventArgs args)
         {
             string title = ((TextBlock)sender).Text;
-            Logger.Info($"Copying{title}to Clipboard");
+            Logger.Info($"Copying {title} to Clipboard");
             await Application.Current.Clipboard.SetTextAsync(title);
-        }
-
-        public void UpdateCollectionViewNumbers()
-        {
-            NumVolumesCollectedText.Text = $"Collected\n{MainWindowViewModel._curVolumesCollected} Volumes";
-            NumVolumesToBeCollectedText.Text = $"Need To Collect\n{MainWindowViewModel._curVolumesToBeCollected} Volumes";
         }
 
         /*
@@ -108,16 +139,14 @@ namespace Tsundoku.Views
             Series curSeries = (Series)((Button)sender).DataContext;
             if (curSeries.CurVolumeCount < curSeries.MaxVolumeCount)
             {
-                //MainWindowViewModel.UsersNumVolumesCollected += 1;
-                MainWindowViewModel._curVolumesToBeCollected -= 1;
-                //UpdateCollectionViewNumbers();
-                TextBlock volumeDisplay = (TextBlock)((Button)sender).GetLogicalSiblings().ToList()[0];
-                string log = "Adding 1 Volume To " + curSeries.Titles[0] + " : " + volumeDisplay.Text + " -> ";
-                ProgressBar seriesProgressBar = (ProgressBar)((Button)sender).Parent.Parent.Parent.GetLogicalChildren().ToList()[1];
                 curSeries.CurVolumeCount += 1;
+                TextBlock volumeDisplay = (TextBlock)((Button)sender).Parent.GetLogicalSiblings().ElementAt(0);
+                string log = "Adding 1 Volume To " + curSeries.Titles[0] + " : " + volumeDisplay.Text + " -> ";
                 volumeDisplay.Text = curSeries.CurVolumeCount + "/" + curSeries.MaxVolumeCount;
-                seriesProgressBar.Value = curSeries.CurVolumeCount;
                 Logger.Info(log + volumeDisplay.Text);
+
+                ProgressBar curProgressBar = (ProgressBar)((Button)sender).Parent.Parent.Parent.Parent.GetLogicalChildren().ElementAt(1);
+                curProgressBar.Value = curSeries.CurVolumeCount;
             }
         }
 
@@ -129,16 +158,14 @@ namespace Tsundoku.Views
             Series curSeries = (Series)((Button)sender).DataContext; //Get the current series data
             if (curSeries.CurVolumeCount >= 1) //Only decrement if the user currently has 1 or more volumes
             {
-                MainWindowViewModel._curVolumesCollected -= 1;
-                MainWindowViewModel._curVolumesToBeCollected += 1;
-                //UpdateCollectionViewNumbers();
-                TextBlock volumeDisplay = (TextBlock)((Button)sender).GetLogicalSiblings().ToList()[0];
-                string log = "Removing 1 Volume From " + curSeries.Titles[0] + " : " + volumeDisplay.Text + " -> ";
-                ProgressBar seriesProgressBar = (ProgressBar)((Button)sender).Parent.Parent.Parent.GetLogicalChildren().ToList()[1];
                 curSeries.CurVolumeCount -= 1;
+                TextBlock volumeDisplay = (TextBlock)((Button)sender).Parent.GetLogicalSiblings().ElementAt(0);
+                string log = "Removing 1 Volume From " + curSeries.Titles[0] + " : " + volumeDisplay.Text + " -> ";
                 volumeDisplay.Text = curSeries.CurVolumeCount + "/" + curSeries.MaxVolumeCount;
-                seriesProgressBar.Value = curSeries.CurVolumeCount;
                 Logger.Info(log + volumeDisplay.Text);
+
+                ProgressBar curProgressBar = (ProgressBar)((Button)sender).Parent.Parent.Parent.Parent.GetLogicalChildren().ElementAt(1);
+                curProgressBar.Value = curSeries.CurVolumeCount;
             }
         }
     }

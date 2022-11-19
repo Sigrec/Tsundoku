@@ -21,35 +21,39 @@ namespace Tsundoku.ViewModels
     public partial class MainWindowViewModel : ViewModelBase
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
-        private string? _searchText;
-        private Series? _selectedSeries;
         private static string filePath = @"\Tsundoku\UserData\UserData.dat";
-        public ICommand OpenAddNewSeriesWindow { get; }
-        public ICommand ShowEditSeriesPane { get; }
         public static ObservableCollection<Series> SearchedCollection { get; set; }
         public static ObservableCollection<Series> Collection { get; set; } = new();
         public static User MainUser { get; set; }
-        private AddNewSeriesWindow newSeriesWindow;
-        public static string _curLanguage, _curDisplay;
+        public AddNewSeriesWindow newSeriesWindow;
+        public static string _curDisplay;
         public static uint _curVolumesCollected, _curVolumesToBeCollected;
-        public string[] AvailableLanguages { get; } = new string[] {"Romaji", "English", "Native"};
-        public string[] AvailableDisplays { get; } = new string[] {"Card", "Mini-Card"};
+        public string[] AvailableLanguages { get; } = new string[] { "Romaji", "English", "Native" };
+        public string[] AvailableDisplays { get; } = new string[] { "Card", "Mini-Card" };
 
         [Reactive]
         public string SearchText { get; set; }
 
         [Reactive]
         public uint UsersNumVolumesCollected { get; set; }
+        private ReactiveCommand<Unit, Unit> IncrementVolumeCount { get; }
 
         [Reactive]
         public uint UsersNumVolumesToBeCollected { get; set; }
-        private ReactiveCommand<Unit, uint> IncrementVolumeCount { get; }
+        private ReactiveCommand<Unit, Unit> DecrementVolumeCount { get; }
         
-        public string CurLanguage
-        {
-            get => _curLanguage;
-            set => this.RaiseAndSetIfChanged(ref _curLanguage, value);
-        }
+        [Reactive]
+        public bool SeriesEditPaneIsOpen { get; set; } = false;
+        private ReactiveCommand<Unit, bool> SeriesEditPaneButtonPressed { get; }
+        
+        [Reactive]
+        public string CurLanguage { get; set; }
+
+        public Interaction<AddNewSeriesViewModel, MainWindowViewModel?> ShowDialog { get; }
+        public ReactiveCommand<Unit, Unit> OpenAddNewSeriesWindow { get; }
+
+        // [Reactive]
+        // private string CurDisplay { get; set; }
 
         public string CurDisplay
         {
@@ -63,28 +67,55 @@ namespace Tsundoku.ViewModels
             this.WhenAnyValue(x => x.SearchText).Throttle(TimeSpan.FromMilliseconds(300)).ObserveOn(RxApp.MainThreadScheduler).Subscribe(SearchCollection!);
             OpenAddNewSeriesWindow = ReactiveCommand.CreateFromTask(() =>
             {
-                newSeriesWindow = new AddNewSeriesWindow();
+                if (newSeriesWindow == null)
+                {
+                    newSeriesWindow = new AddNewSeriesWindow();
+                }
                 newSeriesWindow.Show();
                 return Task.CompletedTask;
             });
 
-            IncrementVolumeCount = ReactiveCommand.Create(() => UsersNumVolumesCollected += 1);
-            this.WhenAnyValue(x => x.UsersNumVolumesCollected).Subscribe(x => MainUser.NumVolumesCollected = x);
-            this.WhenAnyValue(x => x.UsersNumVolumesToBeCollected).Subscribe(x => MainUser.NumVolumesToBeCollected = x);
+            IncrementVolumeCount = ReactiveCommand.Create(IncrementSeriesVolumeCount);
+            this.WhenAnyValue(x => x.UsersNumVolumesCollected).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.NumVolumesCollected = x);
+
+            DecrementVolumeCount = ReactiveCommand.Create(DecrementSeriesVolumeCount);
+            this.WhenAnyValue(x => x.UsersNumVolumesToBeCollected).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.NumVolumesToBeCollected = x);
+
+            this.WhenAnyValue(x => x.CurLanguage).Subscribe(x => MainUser.CurLanguage = x);
+
+            SeriesEditPaneButtonPressed = ReactiveCommand.Create(() => SeriesEditPaneIsOpen ^= true);
+
             Collection.CollectionChanged += (sender, e) =>
             {
                 if (e.Action == NotifyCollectionChangedAction.Add)
                 {
                     UsersNumVolumesCollected += Collection[Collection.Count - 1].CurVolumeCount;
-                    UsersNumVolumesToBeCollected += (uint)Collection[Collection.Count - 1].MaxVolumeCount - Collection[Collection.Count - 1].CurVolumeCount;
+                    UsersNumVolumesToBeCollected += (uint)(Collection[Collection.Count - 1].MaxVolumeCount - Collection[Collection.Count - 1].CurVolumeCount);
                 }
             };
+        }
+
+        private void IncrementSeriesVolumeCount()
+        {
+            UsersNumVolumesCollected += 1;
+            UsersNumVolumesToBeCollected -= 1;
+        }
+
+        private void DecrementSeriesVolumeCount()
+        {
+            UsersNumVolumesCollected -= 1;
+            UsersNumVolumesToBeCollected += 1;
+        }
+
+        private void ShowSeriesEditPaneAsync()
+        {
+            SeriesEditPaneIsOpen ^= true;
         }
 
         public static void SortCollection()
         {
             SearchedCollection.Clear();
-            switch (_curLanguage)
+            switch (MainUser.CurLanguage)
             {
                 case "Native":
                     foreach (Series x in Collection.OrderBy(x => x.Titles[2], StringComparer.CurrentCulture))
@@ -106,7 +137,7 @@ namespace Tsundoku.ViewModels
                     break;
             }
             //Collection = SearchedCollection;
-            Logger.Info($"Sorting {_curLanguage}");
+            Logger.Info($"Sorting {MainUser.CurLanguage}");
         }
 
         private void SearchCollection(string searchText)
@@ -126,6 +157,7 @@ namespace Tsundoku.ViewModels
                 //     SearchedCollection.Add(series);
                 // }
                 SortCollection();
+                //SearchedCollection = Collection;
             }
         }
 
@@ -135,8 +167,9 @@ namespace Tsundoku.ViewModels
             {
                 Logger.Info("Creating New User");
                 MainUser = new User("UserName", "Native", "Rustic", "Card", null, Collection);
-                _curLanguage = MainUser.CurLanguage;
-                _curDisplay = MainUser.Display;
+                Collection = MainUser.UserCollection;
+                CurLanguage = MainUser.CurLanguage;
+                CurDisplay = MainUser.Display;
                 UsersNumVolumesCollected = 0;
                 UsersNumVolumesToBeCollected = 0;
                 SaveUsersData();
@@ -152,9 +185,9 @@ namespace Tsundoku.ViewModels
                 MainUser = (User)binaryFormatter.Deserialize(stream);
             }
             Collection = MainUser.UserCollection;
-            SearchedCollection = new ObservableCollection<Series>(Collection);
-            _curLanguage = MainUser.CurLanguage;
-            _curDisplay = MainUser.Display;
+            SearchedCollection = new ObservableCollection<Series>(MainUser.UserCollection);
+            CurLanguage = MainUser.CurLanguage;
+            CurDisplay = MainUser.Display;
             UsersNumVolumesCollected = MainUser.NumVolumesCollected;
             UsersNumVolumesToBeCollected = MainUser.NumVolumesToBeCollected;
             Logger.Info($"Loading {MainUser.UserName}'s Data");
@@ -162,9 +195,7 @@ namespace Tsundoku.ViewModels
 
         public static async void SaveUsersData(bool append = false){
 
-            //Collection = SearchedCollection;
             MainUser.UserCollection = Collection;
-            MainUser.CurLanguage = _curLanguage;
             MainUser.Display = _curDisplay;
             using (Stream stream = File.Open(filePath, append ? FileMode.Append : FileMode.Create))
             {

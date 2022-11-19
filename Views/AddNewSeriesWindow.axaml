@@ -5,11 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Tsundoku.Views.AddNewSeriesWindow"
-		Icon="\Assets\tsundoku-logo.ico"
+		Icon="\Assets\Icons\Tsundoku-Logo.ico"
         Title="Add New Series"
 		FontFamily="Segoe UI"
 		SizeToContent="WidthAndHeight"
-        Background="#12171d">
+        Background="#12171d"
+		WindowStartupLocation="CenterOwner">
 	
     <Border BorderBrush="Yellow" BorderThickness="3">
         <StackPanel Margin="20" Spacing="20">

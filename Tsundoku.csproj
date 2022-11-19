@@ -11,35 +11,38 @@
 	<AvaloniaNameGeneratorFilterByNamespace>*</AvaloniaNameGeneratorFilterByNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <AvaloniaResource Include="Assets\**" />
-    <Compile Remove="Assets\BitmapValueConverter.cs" />
+    <AvaloniaResource Include="Assets\Icons\**" />
     <None Remove=".gitignore" />
-  </ItemGroup>
-  <ItemGroup>
-    <AvaloniaResource Include="Src\BitmapValueConverter.cs" />
   </ItemGroup>
   <ItemGroup>
     <!--This helps with theme dll-s trimming.
 	If you will publish your application in self-contained mode with p:PublishTrimmed=true and it will use Fluent theme Default theme will be trimmed from the output and vice versa.
 	https://github.com/AvaloniaUI/Avalonia/issues/5593 -->
-    <TrimmableAssembly Include="Avalonia.Themes.Fluent" />
+	<TrimmableAssembly Include="Avalonia.Themes.Fluent" />
     <TrimmableAssembly Include="Avalonia.Themes.Default" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="0.10.18" />
-    <PackageReference Include="Avalonia.Desktop" Version="0.10.18" />
+    <PackageReference Include="Avalonia" Version="11.0.0-preview4" />
+    <PackageReference Include="Avalonia.Controls.ColorPicker" Version="11.0.0-preview4" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.0.0-preview4" />
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="0.10.18" />
-    <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.18" />
+    <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.0-preview4" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="11.0.0-preview4" />
+    <PackageReference Include="Avalonia.Svg" Version="11.0.0-preview4" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.0-preview4" />
+    <PackageReference Include="Avalonia.Themes.Simple" Version="11.0.0-preview4" />
     <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.18" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.0.0" />
+    <PackageReference Include="DynamicData" Version="7.12.1" />
     <PackageReference Include="GraphQL.Client" Version="5.1.0" />
     <PackageReference Include="GraphQL.Client.Serializer.Newtonsoft" Version="5.1.0" />
-    <PackageReference Include="MessageBox.Avalonia" Version="2.0.0" />
+    <PackageReference Include="MessageBox.Avalonia" Version="2.2.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="NLog" Version="5.0.5" />
-    <PackageReference Include="Projektanker.Icons.Avalonia.FontAwesome" Version="5.5.0" />
+    <PackageReference Include="Projektanker.Icons.Avalonia" Version="6.2.0-preview1" />
+    <PackageReference Include="Projektanker.Icons.Avalonia.FontAwesome" Version="6.2.0-preview1" />
     <PackageReference Include="ReactiveUI.Fody" Version="18.3.1" />
+    <PackageReference Include="Svg.Model" Version="0.6.0-preview4" />
     <PackageReference Include="XamlNameReferenceGenerator" Version="1.4.2" />
   </ItemGroup>
   <ItemGroup>

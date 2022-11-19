@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using ReactiveUI;
 using System.Reactive;
-using Avalonia.Controls.Chrome;
 
 namespace Tsundoku.ViewModels
 {
