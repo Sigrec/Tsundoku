@@ -22,10 +22,10 @@ namespace Tsundoku.ViewModels
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         private static string filePath = @"\Tsundoku\UserData\UserData.dat";
-        public static ObservableCollection<Series> SearchedCollection { get; set; }
+        public static ObservableCollection<Series> SearchedCollection { get; set; } = new();
         public static ObservableCollection<Series> Collection { get; set; } = new();
         public static User MainUser { get; set; }
-        public AddNewSeriesWindow newSeriesWindow;
+        public AddNewSeriesWindow newSeriesWindow = new AddNewSeriesWindow();
         public static string _curDisplay;
         public static uint _curVolumesCollected, _curVolumesToBeCollected;
         public string[] AvailableLanguages { get; } = new string[] { "Romaji", "English", "Native" };
@@ -48,8 +48,9 @@ namespace Tsundoku.ViewModels
         
         [Reactive]
         public string CurLanguage { get; set; }
+        [Reactive]
+        public bool LanguageChanged { get; set; } = false;
 
-        public Interaction<AddNewSeriesViewModel, MainWindowViewModel?> ShowDialog { get; }
         public ReactiveCommand<Unit, Unit> OpenAddNewSeriesWindow { get; }
 
         // [Reactive]
@@ -67,10 +68,6 @@ namespace Tsundoku.ViewModels
             this.WhenAnyValue(x => x.SearchText).Throttle(TimeSpan.FromMilliseconds(300)).ObserveOn(RxApp.MainThreadScheduler).Subscribe(SearchCollection!);
             OpenAddNewSeriesWindow = ReactiveCommand.CreateFromTask(() =>
             {
-                if (newSeriesWindow == null)
-                {
-                    newSeriesWindow = new AddNewSeriesWindow();
-                }
                 newSeriesWindow.Show();
                 return Task.CompletedTask;
             });
@@ -136,7 +133,7 @@ namespace Tsundoku.ViewModels
                     }
                     break;
             }
-            //Collection = SearchedCollection;
+            MainUser.UserCollection = new ObservableCollection<Series>(SearchedCollection);
             Logger.Info($"Sorting {MainUser.CurLanguage}");
         }
 
@@ -145,19 +142,15 @@ namespace Tsundoku.ViewModels
             SearchedCollection.Clear();
             if (!string.IsNullOrWhiteSpace(searchText))
             {
-                foreach (var series in Collection.Where(x => x.Titles[1].Contains(searchText, StringComparison.CurrentCultureIgnoreCase) | x.Titles[2].Contains(searchText, StringComparison.CurrentCultureIgnoreCase) | x.Titles[0].Contains(searchText, StringComparison.CurrentCultureIgnoreCase) | x.Staff[0].Contains(searchText, StringComparison.CurrentCultureIgnoreCase) | x.Staff[1].Contains(searchText, StringComparison.CurrentCultureIgnoreCase)))
+                Logger.Debug($"Searching For {searchText}");
+                foreach (Series series in MainUser.UserCollection.Where(x => x.Titles[0].Contains(searchText, StringComparison.InvariantCultureIgnoreCase) | x.Titles[1].Contains(searchText, StringComparison.InvariantCultureIgnoreCase) | x.Titles[2].Contains(searchText, StringComparison.CurrentCultureIgnoreCase) | x.Staff[0].Contains(searchText, StringComparison.InvariantCultureIgnoreCase) | x.Staff[1].Contains(searchText, StringComparison.CurrentCultureIgnoreCase)))
                 {
                     SearchedCollection.Add(series);
                 }
             }
             else
             {
-                // foreach (var series in Collection)
-                // {
-                //     SearchedCollection.Add(series);
-                // }
                 SortCollection();
-                //SearchedCollection = Collection;
             }
         }
 
@@ -185,7 +178,7 @@ namespace Tsundoku.ViewModels
                 MainUser = (User)binaryFormatter.Deserialize(stream);
             }
             Collection = MainUser.UserCollection;
-            SearchedCollection = new ObservableCollection<Series>(MainUser.UserCollection);
+            //SearchedCollection = new ObservableCollection<Series>(MainUser.UserCollection);
             CurLanguage = MainUser.CurLanguage;
             CurDisplay = MainUser.Display;
             UsersNumVolumesCollected = MainUser.NumVolumesCollected;

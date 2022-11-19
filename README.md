@@ -16,11 +16,9 @@ C# Avalonia App for Manga &amp; Light Novel Collecting
 - [ ] Changing of Display Format
 
 ### Bugs/Fixes
-- [ ] Need to change search method so it uses sorted list when searching
 - [ ] Font change caused some alignment issues
 - [ ] Avalonia Preview 11 causing border not to apply corner radius
 - [ ] Hovering over left side for link and title to copy to clipboard does not change cursor 
-- [ ] Clicking button to open AddNewSeriesWindow again after it's already open generates another instance instead of moving the current one to the front
 - [ ] Issues with ComboBox to select additional langauges
 - [ ] Memory Issues (Resets memory usage when restarting the app) [Memory leak when sorting and searching]
 

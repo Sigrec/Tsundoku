@@ -13,6 +13,7 @@ using System.Reactive.Linq;
 using Avalonia.ReactiveUI;
 using ReactiveUI;
 using System.Threading.Tasks;
+using System.Reactive;
 
 namespace Tsundoku.Views
 {
@@ -70,13 +71,13 @@ namespace Tsundoku.Views
             switch (LanguageSelector.SelectedItem)
             {
                 case "Native":
-                    MainWindowViewModel.MainUser.CurLanguage = "Native";
+                    CollectionViewModel.CurLanguage = "Native";
                     break;
                 case "English":
-                    MainWindowViewModel.MainUser.CurLanguage = "English";
+                    CollectionViewModel.CurLanguage = "English";
                     break;
                 default:
-                    MainWindowViewModel.MainUser.CurLanguage = "Romaji";
+                    CollectionViewModel.CurLanguage = "Romaji";
                     break;
             }
             MainWindowViewModel.SortCollection();
@@ -100,6 +101,7 @@ namespace Tsundoku.Views
         {
             if (CollectionViewModel.newSeriesWindow != null)
             {
+                CollectionViewModel.newSeriesWindow.Closing += (s, e) => { e.Cancel = false; };
                 CollectionViewModel.newSeriesWindow.Close();
             }
             Logger.Info("Closing & Saving TsundOku");

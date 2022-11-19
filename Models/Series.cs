@@ -53,6 +53,7 @@ namespace Tsundoku.Models
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
 					string romajiTitle = seriesData["title"]["romaji"].ToString();
 					string nativeStaff = GetSeriesStaff(seriesData["staff"]["edges"], "native");
+					string fullStaff = GetSeriesStaff(seriesData["staff"]["edges"], "full");
 					Series _newSeries = new Series(
                         new List<string>()
 						{
@@ -62,8 +63,8 @@ namespace Tsundoku.Models
 						},
                         new List<string>()
 						{
-							nativeStaff,
-							nativeStaff.Equals(" | ") ? GetSeriesStaff(seriesData["staff"]["edges"], "full") : nativeStaff
+							fullStaff,
+							nativeStaff.Equals(" | ") ? fullStaff : nativeStaff,
 						},
 						seriesData["description"] == null ? "" : ConvertUnicodeInDesc(Regex.Replace(seriesData["description"].ToString(), @"\(Source: [\S\s]+|\<.*?\>", "").Trim()),
 						bookType.Equals("MANGA") ? GetCorrectComicName(seriesData["countryOfOrigin"].ToString()) : "Novel",

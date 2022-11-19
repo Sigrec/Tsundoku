@@ -58,7 +58,7 @@
 				<TextBlock Text="{Binding UsersNumVolumesCollected, StringFormat='Collected&#x0a;{0} Volumes'}" VerticalAlignment="Center" TextAlignment="Center" FontSize="20" FontWeight="Bold" Foreground="#dfd59e"/>
 				<StackPanel VerticalAlignment="Center" Spacing="5">
 					<TextBlock Text="Search Collection" HorizontalAlignment="Center" FontSize="20" FontWeight="Bold" Foreground="#dfd59e"/>
-					<TextBox BorderBrush="#dfd59e" BorderThickness="2"/>
+					<TextBox Text="{Binding SearchText}" BorderBrush="#dfd59e" BorderThickness="2"/>
 				</StackPanel>
 				<TextBlock Text="{Binding UsersNumVolumesToBeCollected, StringFormat='Need To Collect&#x0a;{0} Volumes'}" VerticalAlignment="Center" TextAlignment="Center" FontSize="20" FontWeight="Bold" Foreground="#dfd59e"/>
 				<StackPanel Spacing="5" Margin="0,10,0,10">
@@ -229,7 +229,6 @@
 													   TextAlignment="Left"
 													   FontWeight="Bold"
 													   FontSize="23"
-													   LineHeight="25"
 													   PointerPressed="CopySeriesTitleAsync"
 													   Name="SeriesTitle"
 													   Padding="10,4,4,5">
@@ -246,7 +245,7 @@
 													   DockPanel.Dock="Top"
 													   TextWrapping="Wrap"
 													   Foreground="#dfd59e"
-													   Padding="10,2,4,2">
+													   Padding="10,0,4,2">
 												<TextBlock.Text>
 													<MultiBinding Converter="{StaticResource ConvertStaff}" Mode="OneWay">
 														<Binding Path="Staff[0]"/>

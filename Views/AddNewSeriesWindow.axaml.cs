@@ -1,23 +1,26 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using Avalonia.Markup.Xaml;
-using System.Diagnostics;
 using Tsundoku.ViewModels;
 using System;
-using Avalonia.Input;
 using MessageBox.Avalonia.DTO;
-using Tsundoku.Models;
+using Avalonia.Controls.ApplicationLifetimes;
 
 namespace Tsundoku.Views
 {
     public partial class AddNewSeriesWindow : Window
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
+        private MainWindow CollectionWindow => DataContext as MainWindow;
 
         public AddNewSeriesWindow()
         {
             InitializeComponent();
+            this.Closing += (s, e) =>
+            {
+                ((AddNewSeriesWindow)s).Hide();
+                e.Cancel = true;
+            };
 #if DEBUG
             this.AttachDevTools();
 #endif
