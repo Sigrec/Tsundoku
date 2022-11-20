@@ -14,6 +14,8 @@ using Avalonia.ReactiveUI;
 using ReactiveUI;
 using System.Threading.Tasks;
 using System.Reactive;
+using System.Text.RegularExpressions;
+using System.IO;
 
 namespace Tsundoku.Views
 {
@@ -25,6 +27,11 @@ namespace Tsundoku.Views
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void SearchCollection(object sender, KeyEventArgs args)
+        {
+            CollectionViewModel.SearchIsBusy = true;
         }
 
         private void ChangeSeriesVolumeCounts(object sender, RoutedEventArgs args)
@@ -55,10 +62,10 @@ namespace Tsundoku.Views
                     CollectionViewModel.UsersNumVolumesCollected -= curSeries.CurVolumeCount;
                     CollectionViewModel.UsersNumVolumesToBeCollected -= (uint)(curSeries.MaxVolumeCount - curSeries.CurVolumeCount);
                     MainWindowViewModel.SearchedCollection.Remove(curSeries);
+                    MainWindowViewModel.Collection.Remove(curSeries);
                     Logger.Info($"Removed {curSeries.Titles[0]} From Collection");
                 }
             }
-            MainWindowViewModel.Collection = MainWindowViewModel.SearchedCollection;
         }
 
         private void ShowEditPane(object sender, RoutedEventArgs args)
@@ -97,6 +104,16 @@ namespace Tsundoku.Views
             Logger.Info($"Changed Display To {MainWindowViewModel._curDisplay}");
         }
 
+        public static string Slice(string source, int start, int end)
+        {
+            if (end < 0) // Keep this for negative end support
+            {
+                end = source.Length + end;
+            }
+            int len = end - start;               // Calculate length
+            return source.Substring(start, len); // Return Substring of length
+        }
+
         private void SaveOnClose(object sender, CancelEventArgs e)
         {
             if (CollectionViewModel.newSeriesWindow != null)
@@ -104,6 +121,34 @@ namespace Tsundoku.Views
                 CollectionViewModel.newSeriesWindow.Closing += (s, e) => { e.Cancel = false; };
                 CollectionViewModel.newSeriesWindow.Close();
             }
+
+            // Cleans the Covers asset folder of images for series that is not in the users collection on close/save
+            bool removeSeriesCheck = true;
+            foreach (string coverPath in Directory.GetFiles(@"Assets\Covers"))
+            {
+                int underscoreIndex = coverPath.IndexOf("_");
+                int periodIndex = coverPath.IndexOf(".");
+                foreach (Series curSeries in MainWindowViewModel.Collection)
+                {
+                    string curTitle = Regex.Replace(curSeries.Titles[0], @"[^A-Za-z\d]", "");
+                    string coverPathTitleAndFormat = coverPath.Substring(14);
+                    // Logger.Debug(Slice(coverPathTitleAndFormat, 0, coverPathTitleAndFormat.IndexOf("_")) + " | " + curTitle); // Gets title
+                    // Logger.Debug(Slice(coverPathTitleAndFormat, coverPathTitleAndFormat.IndexOf("_") + 1, coverPathTitleAndFormat.IndexOf(".")) + " | " + curSeries.Format.ToUpper()); // Get Format
+                    if (Slice(coverPathTitleAndFormat, 0, coverPathTitleAndFormat.IndexOf("_")).Equals(curTitle) && Slice(coverPathTitleAndFormat, coverPathTitleAndFormat.IndexOf("_") + 1, coverPathTitleAndFormat.IndexOf(".")).Equals(curSeries.Format.ToUpper()))
+                    {
+                        removeSeriesCheck = false;
+                        break;
+                    }
+                }
+
+                if (removeSeriesCheck)
+                {
+                    Logger.Info($"Deleted {coverPath}");
+                    File.Delete(coverPath);
+                }
+                removeSeriesCheck = true;
+            }
+
             Logger.Info("Closing & Saving TsundOku");
             MainWindowViewModel.SaveUsersData();
         }

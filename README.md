@@ -6,8 +6,9 @@ C# Avalonia App for Manga &amp; Light Novel Collecting
 - [ ] Theme Creation & Window
 - [ ] User Edit Window
   - [ ] Changing Username
-  - [ ] Saving Collection
-  - [ ] Export to Excel
+  - [ ] Save Collection Button
+  - [ ] Export to Excel Button
+  - [ ] Delete Collection Button
 
 ### V1.5.0
 - [ ] Price Analysis Window
@@ -17,8 +18,9 @@ C# Avalonia App for Manga &amp; Light Novel Collecting
 
 ### Bugs/Fixes
 - [ ] Font change caused some alignment issues
+- [ ] Font is to big for "status|format" when using Manhwa,etc check Solo Leveling
 - [ ] Avalonia Preview 11 causing border not to apply corner radius
-- [ ] Hovering over left side for link and title to copy to clipboard does not change cursor 
+- [ ] Hovering over left side for link and title to copy to clipboard configure tooltip
 - [ ] Issues with ComboBox to select additional langauges
 - [ ] Memory Issues (Resets memory usage when restarting the app) [Memory leak when sorting and searching]
 

@@ -54,6 +54,7 @@ namespace Tsundoku.Models
 					string romajiTitle = seriesData["title"]["romaji"].ToString();
 					string nativeStaff = GetSeriesStaff(seriesData["staff"]["edges"], "native");
 					string fullStaff = GetSeriesStaff(seriesData["staff"]["edges"], "full");
+					string filteredBookType = bookType.Equals("MANGA") ? GetCorrectComicName(seriesData["countryOfOrigin"].ToString()) : "Novel";
 					Series _newSeries = new Series(
                         new List<string>()
 						{
@@ -67,9 +68,9 @@ namespace Tsundoku.Models
 							nativeStaff.Equals(" | ") ? fullStaff : nativeStaff,
 						},
 						seriesData["description"] == null ? "" : ConvertUnicodeInDesc(Regex.Replace(seriesData["description"].ToString(), @"\(Source: [\S\s]+|\<.*?\>", "").Trim()),
-						bookType.Equals("MANGA") ? GetCorrectComicName(seriesData["countryOfOrigin"].ToString()) : "Novel",
+						filteredBookType,
 						GetSeriesStatus(seriesData["status"].ToString()),
-						SaveNewCoverImage(seriesData["coverImage"]["extraLarge"].ToString(), romajiTitle, bookType),
+						SaveNewCoverImage(seriesData["coverImage"]["extraLarge"].ToString(), romajiTitle, filteredBookType.ToUpper()),
 						seriesData["siteUrl"].ToString(),
 						maxVolCount,
 						minVolCount);
@@ -120,7 +121,7 @@ namespace Tsundoku.Models
 
         public static string SaveNewCoverImage(String coverLink, String title, String bookType)
         {
-            string newPath = @$"\Tsundoku\Assets\Covers\{Regex.Replace(title, @"[^A-Za-z\d]", "")}_{bookType}.{coverLink.Substring(coverLink.Length - 3)}";
+            string newPath = @$"Assets\Covers\{Regex.Replace(title, @"[^A-Za-z\d]", "")}_{bookType}.{coverLink.Substring(coverLink.Length - 3)}";
 
             if (!File.Exists(newPath))
             {

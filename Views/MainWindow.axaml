@@ -58,7 +58,7 @@
 				<TextBlock Text="{Binding UsersNumVolumesCollected, StringFormat='Collected&#x0a;{0} Volumes'}" VerticalAlignment="Center" TextAlignment="Center" FontSize="20" FontWeight="Bold" Foreground="#dfd59e"/>
 				<StackPanel VerticalAlignment="Center" Spacing="5">
 					<TextBlock Text="Search Collection" HorizontalAlignment="Center" FontSize="20" FontWeight="Bold" Foreground="#dfd59e"/>
-					<TextBox Text="{Binding SearchText}" BorderBrush="#dfd59e" BorderThickness="2"/>
+					<TextBox Text="{Binding SearchText}" KeyUp="SearchCollection" BorderBrush="#dfd59e" BorderThickness="2"/>
 				</StackPanel>
 				<TextBlock Text="{Binding UsersNumVolumesToBeCollected, StringFormat='Need To Collect&#x0a;{0} Volumes'}" VerticalAlignment="Center" TextAlignment="Center" FontSize="20" FontWeight="Bold" Foreground="#dfd59e"/>
 				<StackPanel Spacing="5" Margin="0,10,0,10">
@@ -107,7 +107,7 @@
 
 								<!-- Left Side Card -->
 								<Border CornerRadius="10" ClipToBounds="True">
-									<Canvas Name="{Binding Link}" PointerPressed="OpenSiteLink" Width="{Binding Source={x:Static local:Constants.LEFT_SIDE_CARD_WIDTH}}">
+									<Canvas Name="{Binding Link}" PointerPressed="OpenSiteLink" Width="{Binding Source={x:Static local:Constants.LEFT_SIDE_CARD_WIDTH}}" ToolTip.Tip="Open Page">
 									<Canvas.Styles>
 										<Style Selector="TextBlock:pointerenter /template/ ContentPresenter">
 											<Setter Property="TextBlock.Background" Value="#dfd59e"/>
@@ -231,7 +231,8 @@
 													   FontSize="23"
 													   PointerPressed="CopySeriesTitleAsync"
 													   Name="SeriesTitle"
-													   Padding="10,4,4,5">
+													   Padding="10,4,4,5"
+													   ToolTip.Tip="Copy Title">
 												<TextBlock.Text>
 													<MultiBinding Converter="{StaticResource ConvertTitle}" Mode="OneWay">
 														<Binding Path="Titles[0]"/>

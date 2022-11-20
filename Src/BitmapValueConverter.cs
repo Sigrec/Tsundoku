@@ -10,6 +10,7 @@ namespace Tsundoku.Src
     public class BitmapValueConverter : IValueConverter
     {
         public static BitmapValueConverter Instance = new BitmapValueConverter();
+        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

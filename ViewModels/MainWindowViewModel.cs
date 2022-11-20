@@ -21,7 +21,7 @@ namespace Tsundoku.ViewModels
     public partial class MainWindowViewModel : ViewModelBase
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
-        private static string filePath = @"\Tsundoku\UserData\UserData.dat";
+        private static string filePath = @"UserData\UserData.dat";
         public static ObservableCollection<Series> SearchedCollection { get; set; } = new();
         public static ObservableCollection<Series> Collection { get; set; } = new();
         public static User MainUser { get; set; }
@@ -50,6 +50,8 @@ namespace Tsundoku.ViewModels
         public string CurLanguage { get; set; }
         [Reactive]
         public bool LanguageChanged { get; set; } = false;
+        [Reactive]
+        public bool SearchIsBusy { get; set; } = false;
 
         public ReactiveCommand<Unit, Unit> OpenAddNewSeriesWindow { get; }
 
@@ -65,7 +67,7 @@ namespace Tsundoku.ViewModels
         public MainWindowViewModel()
         {
             RetriveUserData();
-            this.WhenAnyValue(x => x.SearchText).Throttle(TimeSpan.FromMilliseconds(300)).ObserveOn(RxApp.MainThreadScheduler).Subscribe(SearchCollection!);
+            this.WhenAnyValue(x => x.SearchText).Throttle(TimeSpan.FromMilliseconds(400)).ObserveOn(RxApp.MainThreadScheduler).Subscribe(SearchCollection!);
             OpenAddNewSeriesWindow = ReactiveCommand.CreateFromTask(() =>
             {
                 newSeriesWindow.Show();
@@ -139,17 +141,18 @@ namespace Tsundoku.ViewModels
 
         private void SearchCollection(string searchText)
         {
-            SearchedCollection.Clear();
             if (!string.IsNullOrWhiteSpace(searchText))
             {
+                SearchedCollection.Clear();
                 Logger.Debug($"Searching For {searchText}");
                 foreach (Series series in MainUser.UserCollection.Where(x => x.Titles[0].Contains(searchText, StringComparison.InvariantCultureIgnoreCase) | x.Titles[1].Contains(searchText, StringComparison.InvariantCultureIgnoreCase) | x.Titles[2].Contains(searchText, StringComparison.CurrentCultureIgnoreCase) | x.Staff[0].Contains(searchText, StringComparison.InvariantCultureIgnoreCase) | x.Staff[1].Contains(searchText, StringComparison.CurrentCultureIgnoreCase)))
                 {
                     SearchedCollection.Add(series);
                 }
             }
-            else
+            else if (SearchIsBusy)
             {
+                SearchIsBusy = false;
                 SortCollection();
             }
         }
@@ -178,7 +181,6 @@ namespace Tsundoku.ViewModels
                 MainUser = (User)binaryFormatter.Deserialize(stream);
             }
             Collection = MainUser.UserCollection;
-            //SearchedCollection = new ObservableCollection<Series>(MainUser.UserCollection);
             CurLanguage = MainUser.CurLanguage;
             CurDisplay = MainUser.Display;
             UsersNumVolumesCollected = MainUser.NumVolumesCollected;
