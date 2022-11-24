@@ -26,6 +26,7 @@ namespace Tsundoku.ViewModels
         public static ObservableCollection<Series> Collection { get; set; } = new();
         public static User MainUser { get; set; }
         public AddNewSeriesWindow newSeriesWindow = new AddNewSeriesWindow();
+        public SettingsWindow settingsWindow = new SettingsWindow();
         public static string _curDisplay;
         public static uint _curVolumesCollected, _curVolumesToBeCollected;
         public string[] AvailableLanguages { get; } = new string[] { "Romaji", "English", "Native" };
@@ -48,12 +49,18 @@ namespace Tsundoku.ViewModels
         
         [Reactive]
         public string CurLanguage { get; set; }
+
         [Reactive]
         public bool LanguageChanged { get; set; } = false;
+
         [Reactive]
         public bool SearchIsBusy { get; set; } = false;
 
+        [Reactive]
+        public string UserName { get; set; }
+
         public ReactiveCommand<Unit, Unit> OpenAddNewSeriesWindow { get; }
+        public ReactiveCommand<Unit, Unit> OpenSettingsWindow { get; }
 
         // [Reactive]
         // private string CurDisplay { get; set; }
@@ -66,11 +73,18 @@ namespace Tsundoku.ViewModels
 
         public MainWindowViewModel()
         {
-            RetriveUserData();
+            GetUserData();
             this.WhenAnyValue(x => x.SearchText).Throttle(TimeSpan.FromMilliseconds(400)).ObserveOn(RxApp.MainThreadScheduler).Subscribe(SearchCollection!);
+
             OpenAddNewSeriesWindow = ReactiveCommand.CreateFromTask(() =>
             {
                 newSeriesWindow.Show();
+                return Task.CompletedTask;
+            });
+
+            OpenSettingsWindow = ReactiveCommand.CreateFromTask(() =>
+            {
+                settingsWindow.Show();
                 return Task.CompletedTask;
             });
 
@@ -80,7 +94,8 @@ namespace Tsundoku.ViewModels
             DecrementVolumeCount = ReactiveCommand.Create(DecrementSeriesVolumeCount);
             this.WhenAnyValue(x => x.UsersNumVolumesToBeCollected).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.NumVolumesToBeCollected = x);
 
-            this.WhenAnyValue(x => x.CurLanguage).Subscribe(x => MainUser.CurLanguage = x);
+            this.WhenAnyValue(x => x.CurLanguage).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.CurLanguage = x);
+            this.WhenAnyValue(x => x.UserName).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.UserName = x);
 
             SeriesEditPaneButtonPressed = ReactiveCommand.Create(() => SeriesEditPaneIsOpen ^= true);
 
@@ -104,11 +119,6 @@ namespace Tsundoku.ViewModels
         {
             UsersNumVolumesCollected -= 1;
             UsersNumVolumesToBeCollected += 1;
-        }
-
-        private void ShowSeriesEditPaneAsync()
-        {
-            SeriesEditPaneIsOpen ^= true;
         }
 
         public static void SortCollection()
@@ -157,12 +167,14 @@ namespace Tsundoku.ViewModels
             }
         }
 
-        public void RetriveUserData(){
+        private void GetUserData()
+        {
             Logger.Info("Starting TsundOku");
             if (!File.Exists(filePath))
             {
                 Logger.Info("Creating New User");
                 MainUser = new User("UserName", "Native", "Rustic", "Card", null, Collection);
+                UserName = MainUser.UserName;
                 Collection = MainUser.UserCollection;
                 CurLanguage = MainUser.CurLanguage;
                 CurDisplay = MainUser.Display;
@@ -170,16 +182,13 @@ namespace Tsundoku.ViewModels
                 UsersNumVolumesToBeCollected = 0;
                 SaveUsersData();
             }
-            GetUserData();
-        }
-
-        private void GetUserData()
-        {
+            
             using (Stream stream = File.Open(filePath, FileMode.Open))
             {
                 var binaryFormatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
                 MainUser = (User)binaryFormatter.Deserialize(stream);
             }
+            UserName = MainUser.UserName;
             Collection = MainUser.UserCollection;
             CurLanguage = MainUser.CurLanguage;
             CurDisplay = MainUser.Display;

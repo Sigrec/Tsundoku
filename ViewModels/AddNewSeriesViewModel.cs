@@ -1,20 +1,20 @@
 ﻿using Tsundoku.Models;
 using System.Linq;
 using System.Threading.Tasks;
-using ReactiveUI;
-using System.Reactive;
+using ReactiveUI.Fody.Helpers;
 
 namespace Tsundoku.ViewModels
 {
-    public class AddNewSeriesViewModel : MainWindowViewModel
+    public class AddNewSeriesViewModel : ViewModelBase
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         public string[] AdditionalLanguages { get; } = new string[] {"French", "Italian", "German", "Spanish"};
-        private ReactiveCommand<Unit, Unit> GetNewSeriesData { get; }
+        
         public AddNewSeriesViewModel()
         {
 
         }
+
         public static void GetSeriesData(string title, string bookType, ushort curVolCount, ushort maxVolCount)
         {
             Logger.Info($"Adding New Series -> {title} | {bookType} | {curVolCount} | {maxVolCount}");

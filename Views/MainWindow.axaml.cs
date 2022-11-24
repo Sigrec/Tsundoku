@@ -11,9 +11,6 @@ using Tsundoku.Models;
 using Tsundoku.ViewModels;
 using System.Reactive.Linq;
 using Avalonia.ReactiveUI;
-using ReactiveUI;
-using System.Threading.Tasks;
-using System.Reactive;
 using System.Text.RegularExpressions;
 using System.IO;
 
@@ -22,7 +19,7 @@ namespace Tsundoku.Views
     public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
-        private MainWindowViewModel CollectionViewModel => DataContext as MainWindowViewModel;
+        public MainWindowViewModel CollectionViewModel => DataContext as MainWindowViewModel;
         private bool SeriesEditPaneIsOpenView = false;
         public MainWindow()
         {
@@ -122,6 +119,12 @@ namespace Tsundoku.Views
                 CollectionViewModel.newSeriesWindow.Close();
             }
 
+            if (CollectionViewModel.settingsWindow != null)
+            {
+                CollectionViewModel.settingsWindow.Closing += (s, e) => { e.Cancel = false; };
+                CollectionViewModel.settingsWindow.Close();
+            }
+
             // Cleans the Covers asset folder of images for series that is not in the users collection on close/save
             bool removeSeriesCheck = true;
             foreach (string coverPath in Directory.GetFiles(@"Assets\Covers"))
@@ -132,8 +135,6 @@ namespace Tsundoku.Views
                 {
                     string curTitle = Regex.Replace(curSeries.Titles[0], @"[^A-Za-z\d]", "");
                     string coverPathTitleAndFormat = coverPath.Substring(14);
-                    // Logger.Debug(Slice(coverPathTitleAndFormat, 0, coverPathTitleAndFormat.IndexOf("_")) + " | " + curTitle); // Gets title
-                    // Logger.Debug(Slice(coverPathTitleAndFormat, coverPathTitleAndFormat.IndexOf("_") + 1, coverPathTitleAndFormat.IndexOf(".")) + " | " + curSeries.Format.ToUpper()); // Get Format
                     if (Slice(coverPathTitleAndFormat, 0, coverPathTitleAndFormat.IndexOf("_")).Equals(curTitle) && Slice(coverPathTitleAndFormat, coverPathTitleAndFormat.IndexOf("_") + 1, coverPathTitleAndFormat.IndexOf(".")).Equals(curSeries.Format.ToUpper()))
                     {
                         removeSeriesCheck = false;

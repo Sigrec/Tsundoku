@@ -22,7 +22,7 @@ namespace Tsundoku.Models
 		public string Status { get; }
 		public string Cover { get; set; }
 		public string Link { get; }
-		public string UserNotes { get; set; }
+		public string SeriesNotes { get; set; }
 		public ushort MaxVolumeCount { get; set; }
 		public ushort CurVolumeCount { get; set; }
 

@@ -1,0 +1,38 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:vm="using:Tsundoku.ViewModels"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+        xmlns:viewModel="clr-namespace:Tsundoku.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="Tsundoku.Views.SettingsWindow"
+        Icon="\Assets\Icons\Tsundoku-Logo.ico"
+        Title="Settings"
+        FontFamily="Segoe UI"
+        SizeToContent="WidthAndHeight"
+        Background="#12171d"
+        WindowStartupLocation="CenterOwner">
+
+    <Border BorderBrush="#dfd59e" BorderThickness="3">
+        <StackPanel Margin="20" Spacing="20">
+            <StackPanel Spacing="5">
+                <TextBlock Text="Change Username" FontSize="20" FontWeight="Bold" Foreground="#dfd59e"/>
+                <StackPanel Orientation="Horizontal" Spacing="5">
+                    <TextBox Name="UsernameChange"
+                            Width="400"
+                            FontSize="15"
+                            Background="#20232d"
+                            BorderBrush="#dfd59e"
+                            BorderThickness="2"/>
+                    <Button FontSize="20" Background="#20232d" BorderBrush="#dfd59e" BorderThickness="2" Foreground="#dfd59e" i:Attached.Icon="fa-check" Click="ChangeUsername"/>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
+                <Button FontSize="15" FontWeight="Bold" Background="#20232d" BorderBrush="#dfd59e" BorderThickness="2" Foreground="#dfd59e" i:Attached.Icon="fa-check" Click="SaveCollection">Save Collection</Button>
+                <Button FontSize="15" FontWeight="Bold" Background="#20232d" BorderBrush="#dfd59e" BorderThickness="2" Foreground="#dfd59e" i:Attached.Icon="fa-check" Click="ExportToSpreadsheet">Export to Spreadsheet</Button>
+            </StackPanel>
+            <Button FontSize="15" FontWeight="Bold" Background="#20232d" BorderBrush="#dfd59e" BorderThickness="2" Foreground="#dfd59e" i:Attached.Icon="fa-check" Click="DeleteCollection" HorizontalAlignment="Center">Delete Collection</Button>
+        </StackPanel>
+    </Border>
+</Window>

@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Tsundoku.Views.AddNewSeriesWindow"
 		Icon="\Assets\Icons\Tsundoku-Logo.ico"
@@ -12,7 +13,7 @@
         Background="#12171d"
 		WindowStartupLocation="CenterOwner">
 	
-    <Border BorderBrush="Yellow" BorderThickness="3">
+    <Border BorderBrush="#dfd59e" BorderThickness="3">
         <StackPanel Margin="20" Spacing="20">
 			<StackPanel>
 				<TextBlock Text="Enter Title (Copy Title From AniList)" FontSize="20" FontWeight="Bold" Foreground="#dfd59e"/>
@@ -40,23 +41,22 @@
                 <TextBox Name="CurVolCount" Grid.Row="1" Grid.Column="0" Margin="0,0,20,0" Background="#20232d" BorderBrush="#dfd59e" BorderThickness="2"/>
 				<TextBox Name="MaxVolCount" Grid.Row="1" Grid.Column="1" Background="#20232d" BorderBrush="#dfd59e" BorderThickness="2"/>
             </Grid>
-			<StackPanel>
-				<TextBlock Text="Select Book Type" Margin="0,10,0,0" FontSize="20" FontWeight="Bold" Foreground="#dfd59e"/>
-				<StackPanel Orientation="Horizontal" Spacing="40">
+			<StackPanel Orientation="Horizontal" Spacing="30">
+				<StackPanel Spacing="5" VerticalAlignment="Center">
+					<TextBlock HorizontalAlignment="Center" Text="Select Book Type" Margin="0,10,0,0" FontSize="20" FontWeight="Bold" Foreground="#dfd59e"/>
 					<StackPanel Orientation="Horizontal">
-						<RadioButton Name="MangaButton" Margin="0,0,20,0" GroupName="BookType">
-							<TextBlock Text="Manga" FontWeight="Bold" FontSize="20" Foreground="#dfd59e"/>
-						</RadioButton>
-						<RadioButton Name="NovelButton" GroupName="BookType">
-							<TextBlock Text="Novel" FontWeight="Bold" FontSize="20" Foreground="#dfd59e"/>
-						</RadioButton>
+						<CheckBox Name="MangaButton" Checked="MangaCheck" BorderBrush="#dfd59e" FontSize="20" FontWeight="Bold" Foreground="#dfd59e" Margin="0,0,20,0" Content="Manga"/>
+						<CheckBox Name="NovelButton" Checked="NovelCheck" BorderBrush="#dfd59e" FontSize="20" FontWeight="Bold" Foreground="#dfd59e" Margin="0,0,20,0" Content="Novel"/>
 					</StackPanel>
+				</StackPanel>
+				<StackPanel Spacing="5" VerticalAlignment="Center">
+					<TextBlock HorizontalAlignment="Center" Text="Select Languages" Margin="0,10,0,0" FontSize="20" FontWeight="Bold" Foreground="#dfd59e"/>
 					<ComboBox
 						Name="AdditionalLangSelector"
 						Items="{Binding AdditionalLanguages}"
 						SelectedItem="French"
 						Width="150"
-						Height="35"
+						Height="35" 
 						Background="#20232d"
 						BorderBrush="#dfd59e"
 						BorderThickness="2"
@@ -65,7 +65,7 @@
 						Foreground="#dfd59e"/>
 				</StackPanel>
 			</StackPanel>
-			<Button Margin="0,10,0,0" Content="Add" Click="OnButtonClicked" Background="#20232d" BorderBrush="#dfd59e" BorderThickness="2" FontWeight="Bold" FontSize="20" Foreground="#dfd59e"/>
+			<Button Margin="0,10,0,0" Content="Add" Click="OnButtonClicked" Background="#20232d" BorderBrush="#dfd59e" BorderThickness="2" FontWeight="Bold" FontSize="20" Foreground="#dfd59e" HorizontalAlignment="Center"/>
         </StackPanel>
     </Border>
 </Window>

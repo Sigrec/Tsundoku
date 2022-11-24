@@ -5,6 +5,7 @@ using Tsundoku.ViewModels;
 using System;
 using MessageBox.Avalonia.DTO;
 using Avalonia.Controls.ApplicationLifetimes;
+using ReactiveUI.Fody.Helpers;
 
 namespace Tsundoku.Views
 {
@@ -24,6 +25,16 @@ namespace Tsundoku.Views
 #if DEBUG
             this.AttachDevTools();
 #endif
+        }
+
+        private void MangaCheck(object sender, RoutedEventArgs args)
+        {
+            NovelButton.IsChecked = false;
+        }
+
+        private void NovelCheck(object sender, RoutedEventArgs args)
+        {
+            MangaButton.IsChecked = false;
         }
 
         public void OnButtonClicked(object sender, RoutedEventArgs args)
