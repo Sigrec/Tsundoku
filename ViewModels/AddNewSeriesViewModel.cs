@@ -42,6 +42,10 @@ namespace Tsundoku.ViewModels
                     Logger.Info("Duplicate Check, Series Already Exists");
                 }
             }
+            else
+            {
+                Logger.Info($"{title} | {bookType} | {curVolCount} | {maxVolCount} -> Does Not Exist");
+            }
         }
     }
 }

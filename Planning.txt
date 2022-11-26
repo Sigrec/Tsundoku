@@ -1,24 +1,34 @@
-V1.0.0 Features
- - German Language Support [Ideally woudl like an actual Database]
- - Theme Creation
- - Card/Series Edit Pane [In-Progress]
+Theme Creation Colors
+- Menu
+    - Background
+    - Button Text Color
+    - Button Text Hover Color
+    - Button Border Color
+    - Button Border Hover Color
+    - Button Background Color
+    - Button Background Hover Color
+    - Text Color except Username
+    - Username Text Color
 
-V1.5.0
- - Changing of Display Format
+- Collection
+    - Background
+    - Title Text Color
+    - STaff Text Color
+    - Description Text Color
+    - Volume Progress Text Color
+    - Series Data Background Color
+    - Series Progress Background Color
+    - Progress Bar Border Color
+    - Progress Bar Background Color
+    - Progress Bar Color
+    - Series Edit Button Background Color
+    - Series Edit Button Icon Color
+    - Series Edit Button Background Hover Color
+    - Series Edit Button Icon Hover Color
+    - Left Side Text Color
+    - Left Side Text Hover Color
+    - Left Side Text Background Color
+    - Left Side Text Background Hover Color
 
-V2.0.0 Features
- - Price Analysis Window
-
-Bugs/Fixes
- - Issue with staff that don't have native titles (Check Overlord)
- - Make the maximum window width = to the width of the users monitor
- - Fix padding/ui to add new button
- - Overlapping of progress bar when current vol count = max volume count (https://github.com/AvaloniaUI/Avalonia/pull/8488#issue-1301658827)
- - Clicking button to open AddNewSeriesWindow again after it's already open generates another instance instead of moving the current one to the front
- - Issues with ComboBox to select additional langauges
- - Memory Issues (Resets memory usage when restarting the app)
-     - When Sorting/Searching Collection It Increases Memory
-
-Other/Random
- - Uniform Font?
- - TrayIcon?
+- Other
+    - Border Color Between Menu & Collection includes Border Around other Windows

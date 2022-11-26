@@ -5,14 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
         xmlns:viewModel="clr-namespace:Tsundoku.ViewModels"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Tsundoku.Views.SettingsWindow"
         Icon="\Assets\Icons\Tsundoku-Logo.ico"
         Title="Settings"
         FontFamily="Segoe UI"
         SizeToContent="WidthAndHeight"
         Background="#12171d"
-        WindowStartupLocation="CenterOwner">
+        WindowStartupLocation="CenterOwner"
+        CanResize="false">
 
     <Border BorderBrush="#dfd59e" BorderThickness="3">
         <StackPanel Margin="20" Spacing="20">

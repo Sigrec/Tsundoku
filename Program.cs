@@ -23,6 +23,10 @@ namespace Tsundoku
                 .LogToTrace()
                 .WithIcons(container => container
                     .Register<FontAwesomeIconProvider>())
-                .UseReactiveUI();
+                .UseReactiveUI()
+                .With(new Win32PlatformOptions
+                {
+                    UseCompositor = false
+                });
     }
 }

@@ -148,10 +148,10 @@ namespace Tsundoku.Models
 
         public static string GetSeriesStaff(JToken staffArray, string nameType) {
 			StringBuilder staffList = new StringBuilder();
-			string[] validRoles = { "Story & Art", "Story", "Art", "Original Creator", "Character Design", "Illustration", "Mechanical Design" };
+			string[] validRoles = { "Story & Art", "Story", "Art", "Original Creator", "Character Design", "Illustration", "Mechanical Design", "Original Story" };
 			foreach(JToken name in staffArray)
             {
-				if (validRoles.Contains(name["role"].ToString()))
+				if (validRoles.Contains(Regex.Replace(name["role"].ToString(), @" \(.*\)", "")))
                 {
 					JToken newStaff = name["node"]["name"][nameType];
 					if (!string.IsNullOrEmpty((string?)newStaff))

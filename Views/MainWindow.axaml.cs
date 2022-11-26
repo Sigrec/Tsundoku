@@ -21,6 +21,7 @@ namespace Tsundoku.Views
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         public MainWindowViewModel CollectionViewModel => DataContext as MainWindowViewModel;
         private bool SeriesEditPaneIsOpenView = false;
+        
         public MainWindow()
         {
             InitializeComponent();

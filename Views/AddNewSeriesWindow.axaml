@@ -4,14 +4,14 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Tsundoku.Views.AddNewSeriesWindow"
 		Icon="\Assets\Icons\Tsundoku-Logo.ico"
         Title="Add New Series"
 		FontFamily="Segoe UI"
 		SizeToContent="WidthAndHeight"
         Background="#12171d"
-		WindowStartupLocation="CenterOwner">
+		WindowStartupLocation="CenterOwner"
+		CanResize="false">
 	
     <Border BorderBrush="#dfd59e" BorderThickness="3">
         <StackPanel Margin="20" Spacing="20">
@@ -38,8 +38,31 @@
                 </Grid.RowDefinitions>    
                 <TextBlock Text="Cur Volumes" Grid.Row="0" Grid.Column="0" FontSize="20" FontWeight="Bold" Foreground="#dfd59e"/>
                 <TextBlock Text="Max Volumes" Grid.Row="0" Grid.Column="1" FontSize="20" FontWeight="Bold" Foreground="#dfd59e"/>
-                <TextBox Name="CurVolCount" Grid.Row="1" Grid.Column="0" Margin="0,0,20,0" Background="#20232d" BorderBrush="#dfd59e" BorderThickness="2"/>
-				<TextBox Name="MaxVolCount" Grid.Row="1" Grid.Column="1" Background="#20232d" BorderBrush="#dfd59e" BorderThickness="2"/>
+                <MaskedTextBox Name="CurVolCount" 
+							   Grid.Row="1" 
+							   Grid.Column="0" 
+							   Margin="0,0,20,0" 
+							   Background="#20232d" 
+							   BorderBrush="#dfd59e" 
+							   BorderThickness="2"
+							   SelectionBrush="#dfd59e"
+							   SelectionForegroundBrush="#12171d"
+							   Mask="###"
+							   FontWeight="Bold"
+							   FontSize="18"
+							   MaxLength="3"/>
+				<MaskedTextBox Name="MaxVolCount"
+							   Grid.Row="1" 
+							   Grid.Column="1" 
+							   Background="#20232d" 
+							   BorderBrush="#dfd59e" 
+							   BorderThickness="2"
+							   SelectionBrush="#dfd59e"
+							   SelectionForegroundBrush="#12171d"
+							   Mask="###"
+							   FontWeight="Bold"
+							   FontSize="18"
+							   MaxLength="3"/>
             </Grid>
 			<StackPanel Orientation="Horizontal" Spacing="30">
 				<StackPanel Spacing="5" VerticalAlignment="Center">

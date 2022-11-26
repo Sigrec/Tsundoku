@@ -27,6 +27,7 @@ namespace Tsundoku.ViewModels
         public static User MainUser { get; set; }
         public AddNewSeriesWindow newSeriesWindow = new AddNewSeriesWindow();
         public SettingsWindow settingsWindow = new SettingsWindow();
+        public CollectionThemeWindow themeSettingsWindow = new CollectionThemeWindow();
         public static string _curDisplay;
         public static uint _curVolumesCollected, _curVolumesToBeCollected;
         public string[] AvailableLanguages { get; } = new string[] { "Romaji", "English", "Native" };
@@ -59,8 +60,16 @@ namespace Tsundoku.ViewModels
         [Reactive]
         public string UserName { get; set; }
 
+        [Reactive]
+        public uint TestVal1 { get; set; } = 99999;
+
+        [Reactive]
+        public uint TestVal2 { get; set; } = 9999;
+
+
         public ReactiveCommand<Unit, Unit> OpenAddNewSeriesWindow { get; }
         public ReactiveCommand<Unit, Unit> OpenSettingsWindow { get; }
+        public ReactiveCommand<Unit, Unit> OpenThemeSettingsWindow { get; }
 
         // [Reactive]
         // private string CurDisplay { get; set; }
@@ -85,6 +94,12 @@ namespace Tsundoku.ViewModels
             OpenSettingsWindow = ReactiveCommand.CreateFromTask(() =>
             {
                 settingsWindow.Show();
+                return Task.CompletedTask;
+            });
+
+            OpenThemeSettingsWindow = ReactiveCommand.CreateFromTask(() =>
+            {
+                themeSettingsWindow.Show();
                 return Task.CompletedTask;
             });
 
