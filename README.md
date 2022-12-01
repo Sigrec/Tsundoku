@@ -17,9 +17,12 @@ C# Avalonia App for Manga &amp; Light Novel Collecting
 - [ ] Seperate out the ItemControl (Collection) to a UserControl
 - [ ] On load it calls LanguageChange method and sorts even though a value was never selected, need to fix that
 - [ ] Hovering over left side for link and title to copy to clipboard configure tooltip
-- [ ] Change AdditionalLanguages ComboBox to ListBox w/ CheckBoxes
 - [ ] Clean NuGet Packages when done
 - [ ] Memory Issues (Resets memory usage when restarting the app) [Memory leak when sorting and searching]
+- [ ] Misalignment in menu of controls
+- [ ] CopyTitle Tooltip has a random extra newline
+- [ ] Need new bg color for Hiatus in spreadsheet
+- [ ] Need to finish adding the params to TsundokuTheme and to the Window (cs and .axaml)
 
 ### Other/Random
 - [ ] Uniform Font?

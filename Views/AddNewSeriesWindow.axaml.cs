@@ -12,7 +12,6 @@ namespace Tsundoku.Views
     public partial class AddNewSeriesWindow : Window
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
-        private MainWindow CollectionWindow => DataContext as MainWindow;
 
         public AddNewSeriesWindow()
         {

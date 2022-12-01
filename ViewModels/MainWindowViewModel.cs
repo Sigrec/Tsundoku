@@ -3,31 +3,27 @@ using Tsundoku.Models;
 using System.Collections.ObjectModel;
 using System.IO;
 using Tsundoku.Views;
-using System.Windows.Input;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Reactive.Linq;
-using Avalonia.Metadata;
-using System.ComponentModel;
 using ReactiveUI.Fody.Helpers;
-using System.Diagnostics;
 using System.Reactive;
 using System.Collections.Specialized;
-using System.Collections.Generic;
+using Avalonia.Media;
 
 namespace Tsundoku.ViewModels
 {
     public partial class MainWindowViewModel : ViewModelBase
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
-        private static string filePath = @"UserData\UserData.dat";
+        private static string filePath = @"UserData.dat";
         public static ObservableCollection<Series> SearchedCollection { get; set; } = new();
         public static ObservableCollection<Series> Collection { get; set; } = new();
         public static User MainUser { get; set; }
         public AddNewSeriesWindow newSeriesWindow = new AddNewSeriesWindow();
-        public SettingsWindow settingsWindow = new SettingsWindow();
-        public CollectionThemeWindow themeSettingsWindow = new CollectionThemeWindow();
+        public SettingsWindow settingsWindow;
+        public CollectionThemeWindow themeSettingsWindow;
         public static string _curDisplay;
         public static uint _curVolumesCollected, _curVolumesToBeCollected;
         public string[] AvailableLanguages { get; } = new string[] { "Romaji", "English", "Native" };
@@ -66,13 +62,12 @@ namespace Tsundoku.ViewModels
         [Reactive]
         public uint TestVal2 { get; set; } = 9999;
 
+        [Reactive]
+        public TsundokuTheme CurrentTheme { get; set; }
 
         public ReactiveCommand<Unit, Unit> OpenAddNewSeriesWindow { get; }
         public ReactiveCommand<Unit, Unit> OpenSettingsWindow { get; }
         public ReactiveCommand<Unit, Unit> OpenThemeSettingsWindow { get; }
-
-        // [Reactive]
-        // private string CurDisplay { get; set; }
 
         public string CurDisplay
         {
@@ -85,18 +80,22 @@ namespace Tsundoku.ViewModels
             GetUserData();
             this.WhenAnyValue(x => x.SearchText).Throttle(TimeSpan.FromMilliseconds(400)).ObserveOn(RxApp.MainThreadScheduler).Subscribe(SearchCollection!);
 
+            this.WhenAnyValue(x => x.CurrentTheme).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.MainTheme = x);
+
             OpenAddNewSeriesWindow = ReactiveCommand.CreateFromTask(() =>
             {
                 newSeriesWindow.Show();
                 return Task.CompletedTask;
             });
 
+            settingsWindow = new SettingsWindow();
             OpenSettingsWindow = ReactiveCommand.CreateFromTask(() =>
             {
                 settingsWindow.Show();
                 return Task.CompletedTask;
             });
 
+            themeSettingsWindow = new CollectionThemeWindow();
             OpenThemeSettingsWindow = ReactiveCommand.CreateFromTask(() =>
             {
                 themeSettingsWindow.Show();
@@ -188,35 +187,39 @@ namespace Tsundoku.ViewModels
             if (!File.Exists(filePath))
             {
                 Logger.Info("Creating New User");
-                MainUser = new User("UserName", "Native", "Rustic", "Card", null, Collection);
+                TsundokuTheme DefaultTheme = new TsundokuTheme("Default");
+                MainUser = new User("UserName", "Native", DefaultTheme, "Card", new ObservableCollection<TsundokuTheme>(), Collection);
                 UserName = MainUser.UserName;
                 Collection = MainUser.UserCollection;
                 CurLanguage = MainUser.CurLanguage;
                 CurDisplay = MainUser.Display;
-                UsersNumVolumesCollected = 0;
-                UsersNumVolumesToBeCollected = 0;
+                MainUser.SavedThemes.Add(DefaultTheme);
+                ThemeSettingsViewModel.UserThemes = MainUser.SavedThemes;
                 SaveUsersData();
             }
-            
-            using (Stream stream = File.Open(filePath, FileMode.Open))
+
+            using (Stream stream = File.Open(filePath, FileMode.Open, FileAccess.Read))
             {
                 var binaryFormatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
                 MainUser = (User)binaryFormatter.Deserialize(stream);
             }
+            Logger.Info($"Loading {MainUser.UserName}'s Data");
             UserName = MainUser.UserName;
             Collection = MainUser.UserCollection;
+            ThemeSettingsViewModel.UserThemes = MainUser.SavedThemes;
             CurLanguage = MainUser.CurLanguage;
             CurDisplay = MainUser.Display;
+            CurrentTheme = MainUser.MainTheme;
             UsersNumVolumesCollected = MainUser.NumVolumesCollected;
             UsersNumVolumesToBeCollected = MainUser.NumVolumesToBeCollected;
-            Logger.Info($"Loading {MainUser.UserName}'s Data");
         }
 
-        public static async void SaveUsersData(bool append = false){
-
+        public static async void SaveUsersData(){
+            Logger.Info($"Saving {MainUser.UserName}'s Data");
             MainUser.UserCollection = Collection;
             MainUser.Display = _curDisplay;
-            using (Stream stream = File.Open(filePath, append ? FileMode.Append : FileMode.Create))
+            MainUser.SavedThemes = ThemeSettingsViewModel.UserThemes;
+            using (Stream stream = File.Open(filePath, FileMode.Create, FileAccess.Write))
             {
                 var binaryFormatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
                 binaryFormatter.Serialize(stream, MainUser);

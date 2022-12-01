@@ -12,6 +12,10 @@
   </PropertyGroup>
   <ItemGroup>
     <AvaloniaResource Include="Assets\Icons\**" />
+    <AvaloniaXaml Remove="Assets\NewFolder\**" />
+    <Compile Remove="Assets\NewFolder\**" />
+    <EmbeddedResource Remove="Assets\NewFolder\**" />
+    <None Remove="Assets\NewFolder\**" />
     <None Remove=".gitignore" />
   </ItemGroup>
   <ItemGroup>
@@ -31,7 +35,9 @@
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.0-preview4" />
     <PackageReference Include="Avalonia.Themes.Simple" Version="11.0.0-preview4" />
     <PackageReference Include="Avalonia.Xaml.Behaviors" Version="11.0.0-preview4" />
-    <PackageReference Include="DynamicData" Version="7.12.8" />
+    <PackageReference Include="Egorozh.ColorPicker.Avalonia" Version="11.0.0-preview1" />
+    <PackageReference Include="Egorozh.ColorPicker.Avalonia.Dialog" Version="11.0.0-preview1" />
+    <PackageReference Include="Egorozh.ColorPicker.Core" Version="11.0.0-preview1" />
     <PackageReference Include="GemBox.Spreadsheet" Version="49.0.1153" />
     <PackageReference Include="GraphQL.Client" Version="5.1.0" />
     <PackageReference Include="GraphQL.Client.Serializer.Newtonsoft" Version="5.1.0" />
@@ -42,9 +48,6 @@
     <PackageReference Include="Projektanker.Icons.Avalonia.FontAwesome" Version="6.2.0-preview1" />
     <PackageReference Include="ReactiveUI.Fody" Version="18.4.1" />
     <PackageReference Include="XamlNameReferenceGenerator" Version="1.4.2" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="UserData\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Views\SettingsWindow.axaml.cs">

@@ -10,29 +10,29 @@
         Title="Settings"
         FontFamily="Segoe UI"
         SizeToContent="WidthAndHeight"
-        Background="#12171d"
+        Background="{DynamicResource 'Menu BG'}"
         WindowStartupLocation="CenterOwner"
         CanResize="false">
 
-    <Border BorderBrush="#dfd59e" BorderThickness="3">
+    <Border BorderBrush="{DynamicResource Sperator}" BorderThickness="3">
         <StackPanel Margin="20" Spacing="20">
             <StackPanel Spacing="5">
-                <TextBlock Text="Change Username" FontSize="20" FontWeight="Bold" Foreground="#dfd59e"/>
+                <TextBlock Text="Change Username" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
                 <StackPanel Orientation="Horizontal" Spacing="5">
                     <TextBox Name="UsernameChange"
                             Width="400"
                             FontSize="15"
-                            Background="#20232d"
-                            BorderBrush="#dfd59e"
+                            Background="{DynamicResource 'Menu Button BG'}"
+                            BorderBrush="{DynamicResource 'Menu Button Icon/Text'}"
                             BorderThickness="2"/>
-                    <Button FontSize="20" Background="#20232d" BorderBrush="#dfd59e" BorderThickness="2" Foreground="#dfd59e" i:Attached.Icon="fa-check" Click="ChangeUsername"/>
+                    <Button FontSize="20" Background="{DynamicResource 'Menu Button BG'}" BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2" Foreground="{DynamicResource 'Menu Button Icon/Text'}" i:Attached.Icon="fa-check" Click="ChangeUsername"/>
                 </StackPanel>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
-                <Button FontSize="15" FontWeight="Bold" Background="#20232d" BorderBrush="#dfd59e" BorderThickness="2" Foreground="#dfd59e" i:Attached.Icon="fa-check" Click="SaveCollection">Save Collection</Button>
-                <Button FontSize="15" FontWeight="Bold" Background="#20232d" BorderBrush="#dfd59e" BorderThickness="2" Foreground="#dfd59e" i:Attached.Icon="fa-check" Click="ExportToSpreadsheet">Export to Spreadsheet</Button>
+                <Button FontSize="15" FontWeight="Bold" Background="{DynamicResource 'Menu Button BG'}" BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2" Foreground="{DynamicResource 'Menu Button Icon/Text'}" i:Attached.Icon="fa-check" Click="SaveCollection">Save Collection</Button>
+                <Button FontSize="15" FontWeight="Bold" Background="{DynamicResource 'Menu Button BG'}" BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2" Foreground="{DynamicResource 'Menu Button Icon/Text'}" i:Attached.Icon="fa-check" Click="ExportToSpreadsheet">Export to Spreadsheet</Button>
             </StackPanel>
-            <Button FontSize="15" FontWeight="Bold" Background="#20232d" BorderBrush="#dfd59e" BorderThickness="2" Foreground="#dfd59e" i:Attached.Icon="fa-check" Click="DeleteCollection" HorizontalAlignment="Center">Delete Collection</Button>
+            <Button FontSize="15" FontWeight="Bold" Background="{DynamicResource 'Menu Button BG'}" BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2" Foreground="{DynamicResource 'Menu Button Icon/Text'}" i:Attached.Icon="fa-check" Click="DeleteCollection" HorizontalAlignment="Center">Delete Collection</Button>
         </StackPanel>
     </Border>
 </Window>

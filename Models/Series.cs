@@ -176,7 +176,7 @@ namespace Tsundoku.Models
 
 		public override string ToString()
 		{
-			return "Series{" + "\n" +
+			return "Series\n{\n" +
 					"Titles = " + Titles[0] + " | " + Titles[1] + " | " + Titles[2] + "\n" +
 					"Staff = " + Staff[0] + " | " + Staff[1] + "\n" +
 					"Description = " + Description  + "\n" +

@@ -4,14 +4,274 @@
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+	xmlns:cp="clr-namespace:Egorozh.ColorPicker.Dialog;assembly=Egorozh.ColorPicker.Avalonia.Dialog"
 	x:Class="Tsundoku.Views.CollectionThemeWindow"
 	Icon="\Assets\Icons\Tsundoku-Logo.ico"
 	Title="Theme Settings"
 	FontFamily="Segoe UI"
-	SizeToContent="WidthAndHeight"
 	Background="#12171d"
+	Width="1000"
+	Height="1200"
 	WindowStartupLocation="CenterOwner"
 	CanResize="false">
 
-	<ColorPicker Color="Red" Height="200" Width="200"/>
+	<StackPanel Spacing="50" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="30">
+		<StackPanel HorizontalAlignment="Center">
+			<TextBlock Text="Menu / Nav Bar" FontSize="30" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}" TextAlignment="Center"/>
+			<WrapPanel VerticalAlignment="Center">
+				<StackPanel Spacing="5" VerticalAlignment="Center" Margin="10">
+					<TextBlock Text="Menu BG" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
+					<Border BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2">
+						<cp:ColorPickerButton Name="Menu_BG" Color="#99029344" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="200"/>
+					</Border>
+				</StackPanel>
+				<StackPanel Spacing="5" VerticalAlignment="Center" Margin="10">
+					<TextBlock Text="Username" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
+					<Border BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2">
+						<cp:ColorPickerButton Name="Username" Color="#99029344" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="200"/>
+					</Border>
+				</StackPanel>
+				<StackPanel Spacing="5" VerticalAlignment="Center" Margin="10">
+					<TextBlock Text="Menu Text" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
+					<Border BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2">
+						<cp:ColorPickerButton Name="Menu_Text" Color="#99029344" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="200"/>
+					</Border>
+				</StackPanel>
+				<StackPanel Spacing="5" VerticalAlignment="Center" Margin="10">
+					<TextBlock Text="Search Bar BG" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
+					<Border BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2">
+						<cp:ColorPickerButton Name="SearchBar_BG" Color="#99029344" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="200"/>
+					</Border>
+				</StackPanel>
+				<StackPanel Spacing="5" VerticalAlignment="Center" Margin="10">
+					<TextBlock Text="Search Bar Border" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
+					<Border BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2">
+						<cp:ColorPickerButton Name="SearchBar_Border" Color="#99029344" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="200"/>
+					</Border>
+				</StackPanel>
+				<StackPanel Spacing="5" VerticalAlignment="Center" Margin="10">
+					<TextBlock Text="Search Bar Text" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
+					<Border BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2">
+						<cp:ColorPickerButton Name="SearchBar_Text" Color="#99029344" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="200"/>
+					</Border>
+				</StackPanel>
+				<StackPanel Spacing="5" VerticalAlignment="Center" Margin="10">
+					<TextBlock Text="Seperator" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
+					<Border BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2">
+						<cp:ColorPickerButton Name="Seperator" Color="#99029344" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="200"/>
+					</Border>
+				</StackPanel>
+				<StackPanel Spacing="5" VerticalAlignment="Center" Margin="10">
+					<TextBlock Text="Menu Button BG" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
+					<Border BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2">
+						<cp:ColorPickerButton Name="MenuButton_BG" Color="#99029344" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="200"/>
+					</Border>
+				</StackPanel>
+				<StackPanel Spacing="5" VerticalAlignment="Center" Margin="10">
+					<TextBlock Text="Menu Button BG (Hover)" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
+					<Border BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2">
+						<cp:ColorPickerButton Name="MenuButton_BG_Hover" Color="#99029344" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="200"/>
+					</Border>
+				</StackPanel>
+				<StackPanel Spacing="5" VerticalAlignment="Center" Margin="10">
+					<TextBlock Text="Menu Button Border" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
+					<Border BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2">
+						<cp:ColorPickerButton Name="MenuButton_Border" Color="#99029344" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="200"/>
+					</Border>
+				</StackPanel>
+				<StackPanel Spacing="5" VerticalAlignment="Center" Margin="10">
+					<TextBlock Text="Menu Button Border (Hover)" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
+					<Border BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2">
+						<cp:ColorPickerButton Name="MenuButton_Border_Hover" Color="#99029344" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="200"/>
+					</Border>
+				</StackPanel>
+				<StackPanel Spacing="5" VerticalAlignment="Center" Margin="10">
+					<TextBlock Text="Menu Button Icon/Text" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
+					<Border BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2">
+						<cp:ColorPickerButton Name="MenuButton_IconAndText" Color="#99029344" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="200"/>
+					</Border>
+				</StackPanel>
+				<StackPanel Spacing="5" VerticalAlignment="Center" Margin="10">
+					<TextBlock Text="Menu Button Icon/Text (Hover)" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
+					<Border BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2">
+						<cp:ColorPickerButton Name="MenuButton_IconAndText_Hover" Color="#99029344" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="200"/>
+					</Border>
+				</StackPanel>
+			</WrapPanel>
+		</StackPanel>
+		<StackPanel HorizontalAlignment="Center">
+			<TextBlock Text="Collection" FontSize="30" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}" TextAlignment="Center"/>
+			<WrapPanel>
+				<StackPanel Spacing="5" VerticalAlignment="Center" Margin="10">
+					<TextBlock Text="Collection BG" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
+					<Border BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2">
+						<cp:ColorPickerButton Name="Collection_BG" Color="#99029344" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="200" />
+					</Border>
+				</StackPanel>
+				<StackPanel Spacing="5" VerticalAlignment="Center" Margin="10">
+					<TextBlock Text="Status And BookType BG" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
+					<Border BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2">
+						<cp:ColorPickerButton Color="#99029344" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="200"/>
+					</Border>
+				</StackPanel>
+				<StackPanel Spacing="5" VerticalAlignment="Center" Margin="10">
+					<TextBlock Text="Status And BookType Text" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
+					<Border BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2">
+						<cp:ColorPickerButton Color="#99029344" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="200"/>
+					</Border>
+				</StackPanel>
+				<StackPanel Spacing="5" VerticalAlignment="Center" Margin="10">
+					<TextBlock Text="Series Card BG" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
+					<Border BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2">
+						<cp:ColorPickerButton Color="#99029344" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="200"/>
+					</Border>
+				</StackPanel>
+				<StackPanel Spacing="5" VerticalAlignment="Center" Margin="10">
+					<TextBlock Text="Series Title" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
+					<Border BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2">
+						<cp:ColorPickerButton Color="#99029344" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="200"/>
+					</Border>
+				</StackPanel>
+				<StackPanel Spacing="5" VerticalAlignment="Center" Margin="10">
+					<TextBlock Text="Series Staff" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
+					<Border BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2">
+						<cp:ColorPickerButton Color="#99029344" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="200"/>
+					</Border>
+				</StackPanel>
+				<StackPanel Spacing="5" VerticalAlignment="Center" Margin="10">
+					<TextBlock Text="Series Description" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
+					<Border BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2">
+						<cp:ColorPickerButton Color="#99029344" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="200"/>
+					</Border>
+				</StackPanel>
+				<StackPanel Spacing="5" VerticalAlignment="Center" Margin="10">
+					<TextBlock Text="Series Progress BG" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
+					<Border BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2">
+						<cp:ColorPickerButton Color="#99029344" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="200"/>
+					</Border>
+				</StackPanel>
+				<StackPanel Spacing="5" VerticalAlignment="Center" Margin="10">
+					<TextBlock Text="Series Progress Bar" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
+					<Border BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2">
+						<cp:ColorPickerButton Color="#99029344" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="200"/>
+					</Border>
+				</StackPanel>
+				<StackPanel Spacing="5" VerticalAlignment="Center" Margin="10">
+					<TextBlock Text="Series Progress Bar BG" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
+					<Border BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2">
+						<cp:ColorPickerButton Color="#99029344" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="200"/>
+					</Border>
+				</StackPanel>
+				<StackPanel Spacing="5" VerticalAlignment="Center" Margin="10">
+					<TextBlock Text="Series Progress Bar Border" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
+					<Border BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2">
+						<cp:ColorPickerButton Color="#99029344" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="200"/>
+					</Border>
+				</StackPanel>
+				<StackPanel Spacing="5" VerticalAlignment="Center" Margin="10">
+					<TextBlock Text="Series Progress Text" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
+					<Border BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2">
+						<cp:ColorPickerButton Color="#99029344" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="200"/>
+					</Border>
+				</StackPanel>
+				<StackPanel Spacing="5" VerticalAlignment="Center" Margin="10">
+					<TextBlock Text="Series Progress Buttons" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
+					<Border BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2">
+						<cp:ColorPickerButton Color="#99029344" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="200"/>
+					</Border>
+				</StackPanel>
+				<StackPanel Spacing="5" VerticalAlignment="Center" Margin="10">
+					<TextBlock Text="Series Edit Pane BG" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
+					<Border BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2">
+						<cp:ColorPickerButton Color="#99029344" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="200"/>
+					</Border>
+				</StackPanel>
+				<StackPanel Spacing="5" VerticalAlignment="Center" Margin="10">
+					<TextBlock Text="Series Notes BG" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
+					<Border BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2">
+						<cp:ColorPickerButton Color="#99029344" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="200"/>
+					</Border>
+				</StackPanel>
+				<StackPanel Spacing="5" VerticalAlignment="Center" Margin="10">
+					<TextBlock Text="Series Notes Border" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
+					<Border BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2">
+						<cp:ColorPickerButton Color="#99029344" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="200"/>
+					</Border>
+				</StackPanel>
+				<StackPanel Spacing="5" VerticalAlignment="Center" Margin="10">
+					<TextBlock Text="Series Notes Text" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
+					<Border BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2">
+						<cp:ColorPickerButton Color="#99029344" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="200"/>
+					</Border>
+				</StackPanel>
+				<StackPanel Spacing="5" VerticalAlignment="Center" Margin="10">
+					<TextBlock Text="Series Card Button BG" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
+					<Border BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2">
+						<cp:ColorPickerButton Color="#99029344" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="200"/>
+					</Border>
+				</StackPanel>
+				<StackPanel Spacing="5" VerticalAlignment="Center" Margin="10">
+					<TextBlock Text="Series Card Button BG (Hover)" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
+					<Border BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2">
+						<cp:ColorPickerButton Color="#99029344" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="200"/>
+					</Border>
+				</StackPanel>
+				<StackPanel Spacing="5" VerticalAlignment="Center" Margin="10">
+					<TextBlock Text="Series Card Button Border" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
+					<Border BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2">
+						<cp:ColorPickerButton Color="#99029344" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="200"/>
+					</Border>
+				</StackPanel>
+				<StackPanel Spacing="5" VerticalAlignment="Center" Margin="10">
+					<TextBlock Text="Series Card Button Border (Hover)" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
+					<Border BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2">
+						<cp:ColorPickerButton Color="#99029344" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="200"/>
+					</Border>
+				</StackPanel>
+				<StackPanel Spacing="5" VerticalAlignment="Center" Margin="10">
+					<TextBlock Text="Series Card Button Icon" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
+					<Border BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2">
+						<cp:ColorPickerButton Color="#99029344" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="200"/>
+					</Border>
+				</StackPanel>
+				<StackPanel Spacing="5" VerticalAlignment="Center" Margin="10">
+					<TextBlock Text="Series Card Button Icon (Hover)" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
+					<Border BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2">
+						<cp:ColorPickerButton Color="#99029344" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="200"/>
+					</Border>
+				</StackPanel>
+			</WrapPanel>
+		</StackPanel>
+		<StackPanel HorizontalAlignment="Center">
+			<TextBlock Text="Save/Change Theme" FontSize="30" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}" TextAlignment="Center"/>
+			<StackPanel Orientation="Horizontal" Spacing="5" Margin="0,10,0,0">
+				<TextBox Name="NewThemeName"
+						 Width="250"
+						 FontSize="15"
+						 Background="{DynamicResource 'Menu Button BG'}"
+						 BorderBrush="{DynamicResource 'Menu Button Icon/Text'}"
+						 BorderThickness="2"/>
+				<Button FontSize="15" FontWeight="Bold" Background="{DynamicResource 'Menu Button BG'}" BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2" Foreground="{DynamicResource 'Menu Button Icon/Text'}" HorizontalAlignment="Center" Content="Save" Click="SaveNewTheme"/>
+				<ComboBox Name="ThemeSelector"
+						  SelectionChanged="ChangeMainTheme"
+						  Items="{Binding UserThemes}"
+						  Width="150"
+						  Height="35"
+						  SelectedItem="{Binding CurrentTheme}"
+						  Background="{DynamicResource 'Menu Button BG'}"
+						  BorderBrush="{DynamicResource 'Menu Button Border'}"
+						  BorderThickness="2"
+						  Foreground="{DynamicResource 'Menu Button Icon/Text'}"
+						  AutoScrollToSelectedItem="True"
+						  Margin="10,0,0,0">
+				    <ComboBox.ItemTemplate>
+						<DataTemplate>
+							<TextBlock FontSize="15" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}" Text="{Binding ThemeName}"/>
+						</DataTemplate>
+					</ComboBox.ItemTemplate>
+				</ComboBox>
+				<Button FontSize="20" FontWeight="Bold" Background="{DynamicResource 'Menu Button BG'}" BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2" Foreground="{DynamicResource 'Menu Button Icon/Text'}" HorizontalAlignment="Center" i:Attached.Icon="fa-xmark" Click="RemoveSavedTheme"/>
+			</StackPanel>
+		</StackPanel>
+	</StackPanel>
 </Window>

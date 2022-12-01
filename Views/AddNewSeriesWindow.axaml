@@ -9,20 +9,20 @@
         Title="Add New Series"
 		FontFamily="Segoe UI"
 		SizeToContent="WidthAndHeight"
-        Background="#12171d"
+        Background="{DynamicResource 'Menu BG'}"
 		WindowStartupLocation="CenterOwner"
 		CanResize="false">
 	
-    <Border BorderBrush="#dfd59e" BorderThickness="3">
+    <Border BorderBrush="{DynamicResource Seperator}" BorderThickness="3">
         <StackPanel Margin="20" Spacing="20">
 			<StackPanel>
-				<TextBlock Text="Enter Title (Copy Title From AniList)" FontSize="20" FontWeight="Bold" Foreground="#dfd59e"/>
+				<TextBlock Text="Enter Title (Copy Title From AniList)" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
 				<TextBox Name="TitleBox"
 						 Width="400"
 						 FontFamily="MS UI Gothic"
 						 FontSize="20"
-						 Background="#20232d"
-						 BorderBrush="#dfd59e"
+						 Background="{DynamicResource 'Menu Button BG'}"
+						 BorderBrush="{DynamicResource 'Menu Button Border'}"
 						 BorderThickness="2"
 						 TextWrapping="Wrap"
 						 Watermark="Title..."/>
@@ -36,17 +36,18 @@
                     <RowDefinition/>  
                     <RowDefinition/>       
                 </Grid.RowDefinitions>    
-                <TextBlock Text="Cur Volumes" Grid.Row="0" Grid.Column="0" FontSize="20" FontWeight="Bold" Foreground="#dfd59e"/>
-                <TextBlock Text="Max Volumes" Grid.Row="0" Grid.Column="1" FontSize="20" FontWeight="Bold" Foreground="#dfd59e"/>
+                <TextBlock Text="Cur Volumes" Grid.Row="0" Grid.Column="0" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
+                <TextBlock Text="Max Volumes" Grid.Row="0" Grid.Column="1" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
                 <MaskedTextBox Name="CurVolCount" 
 							   Grid.Row="1" 
 							   Grid.Column="0" 
 							   Margin="0,0,20,0" 
-							   Background="#20232d" 
-							   BorderBrush="#dfd59e" 
+							   Background="{DynamicResource 'Menu Button BG'}" 
+							   BorderBrush="{DynamicResource 'Menu Button Border'}" 
+							   Foreground="{DynamicResource 'Menu Button Text'}"
 							   BorderThickness="2"
-							   SelectionBrush="#dfd59e"
-							   SelectionForegroundBrush="#12171d"
+							   SelectionBrush="{DynamicResource 'Menu Button Text'}"
+							   SelectionForegroundBrush="{DynamicResource 'Menu Button BG'}"
 							   Mask="###"
 							   FontWeight="Bold"
 							   FontSize="18"
@@ -54,11 +55,12 @@
 				<MaskedTextBox Name="MaxVolCount"
 							   Grid.Row="1" 
 							   Grid.Column="1" 
-							   Background="#20232d" 
-							   BorderBrush="#dfd59e" 
+							   Background="{DynamicResource 'Menu Button BG'}" 
+							   BorderBrush="{DynamicResource 'Menu Button Border'}" 
+							   Foreground="{DynamicResource 'Menu Button Text'}"
 							   BorderThickness="2"
-							   SelectionBrush="#dfd59e"
-							   SelectionForegroundBrush="#12171d"
+							   SelectionBrush="{DynamicResource 'Menu Button Text'}"
+							   SelectionForegroundBrush="{DynamicResource 'Menu Button BG'}"
 							   Mask="###"
 							   FontWeight="Bold"
 							   FontSize="18"
@@ -66,29 +68,29 @@
             </Grid>
 			<StackPanel Orientation="Horizontal" Spacing="30">
 				<StackPanel Spacing="5" VerticalAlignment="Center">
-					<TextBlock HorizontalAlignment="Center" Text="Select Book Type" Margin="0,10,0,0" FontSize="20" FontWeight="Bold" Foreground="#dfd59e"/>
+					<TextBlock HorizontalAlignment="Center" Text="Select Book Type" Margin="0,10,0,0" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
 					<StackPanel Orientation="Horizontal">
-						<CheckBox Name="MangaButton" Checked="MangaCheck" BorderBrush="#dfd59e" FontSize="20" FontWeight="Bold" Foreground="#dfd59e" Margin="0,0,20,0" Content="Manga"/>
-						<CheckBox Name="NovelButton" Checked="NovelCheck" BorderBrush="#dfd59e" FontSize="20" FontWeight="Bold" Foreground="#dfd59e" Margin="0,0,20,0" Content="Novel"/>
+						<CheckBox Name="MangaButton" Checked="MangaCheck" BorderBrush="{DynamicResource 'Menu Button Border'}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource 'Menu Button Icon/Text'}" Margin="0,0,20,0" Content="Manga"/>
+						<CheckBox Name="NovelButton" Checked="NovelCheck" BorderBrush="{DynamicResource 'Menu Button Border'}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource 'Menu Button Icon/Text'}" Margin="0,0,20,0" Content="Novel"/>
 					</StackPanel>
 				</StackPanel>
 				<StackPanel Spacing="5" VerticalAlignment="Center">
-					<TextBlock HorizontalAlignment="Center" Text="Select Languages" Margin="0,10,0,0" FontSize="20" FontWeight="Bold" Foreground="#dfd59e"/>
+					<TextBlock HorizontalAlignment="Center" Text="Select Languages" Margin="0,10,0,0" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
 					<ComboBox
 						Name="AdditionalLangSelector"
 						Items="{Binding AdditionalLanguages}"
 						SelectedItem="French"
 						Width="150"
 						Height="35" 
-						Background="#20232d"
-						BorderBrush="#dfd59e"
+						Background="{DynamicResource 'Menu Button BG'}"
+						BorderBrush="{DynamicResource 'Menu Button Border'}"
 						BorderThickness="2"
 						FontWeight="Bold"
 						FontSize="15"
-						Foreground="#dfd59e"/>
+						Foreground="{DynamicResource 'Menu Button Icon/Text'}"/>
 				</StackPanel>
 			</StackPanel>
-			<Button Margin="0,10,0,0" Content="Add" Click="OnButtonClicked" Background="#20232d" BorderBrush="#dfd59e" BorderThickness="2" FontWeight="Bold" FontSize="20" Foreground="#dfd59e" HorizontalAlignment="Center"/>
+			<Button Margin="0,10,0,0" Content="Add" Click="OnButtonClicked" Background="{DynamicResource 'Menu Button BG'}" BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2" FontWeight="Bold" FontSize="20" Foreground="{DynamicResource 'Menu Button Icon/Text'}" HorizontalAlignment="Center"/>
         </StackPanel>
     </Border>
 </Window>

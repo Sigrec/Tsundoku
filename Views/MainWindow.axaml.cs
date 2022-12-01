@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -13,6 +14,8 @@ using System.Reactive.Linq;
 using Avalonia.ReactiveUI;
 using System.Text.RegularExpressions;
 using System.IO;
+using ReactiveUI;
+using System.Threading.Tasks;
 
 namespace Tsundoku.Views
 {
@@ -114,6 +117,7 @@ namespace Tsundoku.Views
 
         private void SaveOnClose(object sender, CancelEventArgs e)
         {
+            Logger.Info("Closing TsundOku");
             if (CollectionViewModel.newSeriesWindow != null)
             {
                 CollectionViewModel.newSeriesWindow.Closing += (s, e) => { e.Cancel = false; };
@@ -124,6 +128,12 @@ namespace Tsundoku.Views
             {
                 CollectionViewModel.settingsWindow.Closing += (s, e) => { e.Cancel = false; };
                 CollectionViewModel.settingsWindow.Close();
+            }
+
+            if (CollectionViewModel.themeSettingsWindow != null)
+            {
+                CollectionViewModel.themeSettingsWindow.Closing += (s, e) => { e.Cancel = false; };
+                CollectionViewModel.themeSettingsWindow.Close();
             }
 
             // Cleans the Covers asset folder of images for series that is not in the users collection on close/save
@@ -145,13 +155,12 @@ namespace Tsundoku.Views
 
                 if (removeSeriesCheck)
                 {
-                    Logger.Info($"Deleted {coverPath}");
+                    Logger.Info($"Deleted Cover -> {coverPath}");
                     File.Delete(coverPath);
                 }
                 removeSeriesCheck = true;
             }
 
-            Logger.Info("Closing & Saving TsundOku");
             MainWindowViewModel.SaveUsersData();
         }
 
