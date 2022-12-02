@@ -23,6 +23,7 @@ C# Avalonia App for Manga &amp; Light Novel Collecting
 - [ ] CopyTitle Tooltip has a random extra newline
 - [ ] Need new bg color for Hiatus in spreadsheet
 - [ ] Need to finish adding the params to TsundokuTheme and to the Window (cs and .axaml)
+- [ ] Need to prevent the default theme from being removed/changed
 
 ### Other/Random
 - [ ] Uniform Font?

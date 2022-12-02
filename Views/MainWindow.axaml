@@ -23,43 +23,75 @@
 		<cv:BitmapValueConverter x:Key="ConvertImage"/>
 		<cv:TitleLangConverter x:Key="ConvertTitle"/>
 		<cv:StaffLangConverter x:Key="ConvertStaff"/>
-		<cv:ColorConverter x:Key="ConvertColor"/>
 	</Window.Resources>
 
 	<DockPanel>
 		<!-- Menu -->
-		<Border Name="Navigation" DockPanel.Dock="Top" BorderBrush="{DynamicResource Seperator}" BorderThickness="0,0,0,3" Height="100" Background="{Binding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}">
+		<Border Name="Navigation" DockPanel.Dock="Top" BorderBrush="{Binding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" BorderThickness="0,0,0,3" Height="100" Background="{Binding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}">
 			<StackPanel Orientation="Horizontal" Spacing="20" HorizontalAlignment="Center" VerticalAlignment="Center">
 				<StackPanel.Styles>
 					<Style Selector="Button:pointerover /template/ ContentPresenter">
-						<Setter Property="Background" Value="{DynamicResource 'Menu Button BG (Hover)'}"/>
-						<Setter Property="BorderBrush" Value="{DynamicResource 'Menu Button Border (Hover)'}"/>
-						<Setter Property="TextBlock.Foreground" Value="{DynamicResource 'Menu Button Icon/Text (Hover)'}"/>
+						<Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
+						<Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
+						<Setter Property="TextBlock.Foreground" Value="{Binding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
 					</Style>
 				</StackPanel.Styles>
 				<StackPanel Spacing="5" Margin="0,10,0,10" HorizontalAlignment="Center" VerticalAlignment="Center">
-					<TextBlock Name="Username" Text="{Binding UserName}" FontSize="20" FontWeight="Bold" TextAlignment="Center" Foreground="{DynamicResource Username}"/>
+					<TextBlock Name="Username" 
+							   Text="{Binding UserName}" 
+							   FontSize="20" 
+							   FontWeight="Bold" 
+							   TextAlignment="Center" 
+							   Foreground="{Binding CurrentTheme.UsernameColor, Converter={StaticResource ConvertColor}}"/>
 					<StackPanel Orientation="Horizontal" Spacing="5">
-						<Button Name="SettingsButton" FontSize="20" Background="{DynamicResource 'Menu Button BG'}" BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2" Foreground="{DynamicResource 'Menu Button Icon/Text'}" i:Attached.Icon="fa-address-book" Command="{Binding OpenSettingsWindow}"/>
-						<Button Name="ThemeButton" FontSize="20" Background="{DynamicResource 'Menu Button BG'}" BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2" Foreground="{DynamicResource 'Menu Button Icon/Text'}" i:Attached.Icon="fa-swatchbook" Command="{Binding OpenThemeSettingsWindow}"/>
+						<Button Name="SettingsButton"
+								FontSize="20" 
+								Background="{Binding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}" 
+								BorderBrush="{Binding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}" 
+								BorderThickness="2" 
+								Foreground="{Binding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}" 
+								i:Attached.Icon="fa-address-book" 
+								Command="{Binding OpenSettingsWindow}"/>
+						<Button Name="ThemeButton" 
+								FontSize="20" 
+								Background="{Binding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}" 
+								BorderBrush="{Binding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}" 
+								BorderThickness="2" 
+								Foreground="{Binding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}" 
+								i:Attached.Icon="fa-swatchbook" 
+								Command="{Binding OpenThemeSettingsWindow}"/>
 						<Button FontWeight="Bold"
 								Name="AddNewSeriesButton"
 								FontSize="20"
-								Background="{DynamicResource 'Menu Button BG'}"
-								BorderBrush="{DynamicResource 'Menu Button Border'}"
+								Background="{Binding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"
+								BorderBrush="{Binding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"
 								BorderThickness="2"
 								Command="{Binding OpenAddNewSeriesWindow}"
 								i:Attached.Icon="fa-book-medical"
-								Foreground="{DynamicResource 'Menu Button Icon/Text'}">
+								Foreground="{Binding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}">
 						</Button>
 					</StackPanel>
 				</StackPanel>
-				<TextBlock Name="NumVolumesCollected" Text="{Binding UsersNumVolumesCollected, StringFormat='Collected&#x0a;{0} Volumes'}" TextAlignment="Center" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,10,0,10"/>
+				<TextBlock Name="NumVolumesCollected" 
+						   Text="{Binding UsersNumVolumesCollected, StringFormat='Collected&#x0a;{0} Volumes'}" TextAlignment="Center" 
+						   FontSize="20" 
+						   FontWeight="Bold" 
+						   Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}" 
+						   VerticalAlignment="Center" 
+						   HorizontalAlignment="Center" 
+						   Margin="0,10,0,10"/>
 				<StackPanel VerticalAlignment="Center" Spacing="5">
-					<TextBlock Text="Search Collection" HorizontalAlignment="Center" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
-					<TextBox Name="SearchBar" Text="{Binding SearchText}" KeyUp="SearchCollection" BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2" FontWeight="Bold"/>
+					<TextBlock Text="Search Collection" HorizontalAlignment="Center" FontSize="20" FontWeight="Bold" Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}"/>
+					<TextBox Name="SearchBar" Text="{Binding SearchText}" KeyUp="SearchCollection" BorderBrush="{Binding CurrentTheme.SearchBarBorderColor, Converter={StaticResource ConvertColor}}" BorderThickness="2" FontWeight="Bold" Background="{Binding CurrentTheme.SearchBarBGColor, Converter={StaticResource ConvertColor}}"/>
 				</StackPanel>
-				<TextBlock Name="NumVolumesToBeCollected" Text="{Binding UsersNumVolumesToBeCollected, StringFormat='Need To Collect&#x0a;{0} Volumes'}" TextAlignment="Center" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}" VerticalAlignment= "Center" HorizontalAlignment="Center" Margin="0,10,0,10"/>
+				<TextBlock Name="NumVolumesToBeCollected" 
+						   Text="{Binding UsersNumVolumesToBeCollected, StringFormat='Need To Collect&#x0a;{0} Volumes'}" 
+						   TextAlignment="Center" 
+						   FontSize="20" 
+						   FontWeight="Bold" 
+						   Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}" VerticalAlignment= "Center" 
+						   HorizontalAlignment="Center" 
+						   Margin="0,10,0,10"/>
 				<StackPanel Spacing="5" Margin="0,10,0,10">
 					<ComboBox Name="DisplaySelector"
 							  Items="{Binding AvailableDisplays}"
@@ -67,12 +99,12 @@
 							  SelectedItem="{Binding CurDisplay}"
 							  Width="150"
 							  Height="35"
-							  Background="{DynamicResource 'Menu Button BG'}"
-							  BorderBrush="{DynamicResource 'Menu Button Border'}"
+							  Background="{Binding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"
+							  BorderBrush="{Binding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"
 							  BorderThickness="2"
 							  FontWeight="Bold"
 							  FontSize="15"
-							  Foreground="{DynamicResource 'Menu Button Icon/Text'}"
+							  Foreground="{Binding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"
 							  AutoScrollToSelectedItem="True"/>
 					<ComboBox Name="LanguageSelector"
 							  Items="{Binding AvailableLanguages}"
@@ -80,19 +112,20 @@
 							  SelectedItem="{Binding MainUser.CurLanguage}"
 							  Width="150"
 							  Height="35"
-							  Background="{DynamicResource 'Menu Button BG'}"
-							  BorderBrush="{DynamicResource 'Menu Button Border'}"
+							  Background="{Binding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"
+							  BorderBrush="{Binding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"
 							  BorderThickness="2"
 							  FontWeight="Bold"
 							  FontSize="15"
-							  Foreground="{DynamicResource 'Menu Button Icon/Text'}"
+							  Foreground="{Binding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"
 							  AutoScrollToSelectedItem="True"/>
 				</StackPanel>
 			</StackPanel>
 		</Border>
 		
+		<!-- Collection -->
 		<ScrollViewer Name="CollectionTheme" VerticalScrollBarVisibility="Auto" DockPanel.Dock="Bottom" Background="{Binding CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}">
-			<ItemsControl Name="SeriesCollection" Margin="50" Items="{Binding SearchedCollection}" HorizontalAlignment="Center">
+			<ItemsControl Name="CollectionControl" Margin="50" Items="{Binding SearchedCollection}" HorizontalAlignment="Center">
 				<ItemsControl.ItemsPanel>
 					<ItemsPanelTemplate>
 						<WrapPanel/>
@@ -128,8 +161,7 @@
 												   Width="{Binding Source={x:Static local:Constants.LEFT_SIDE_CARD_WIDTH}}"
 												   Height="{Binding Source={x:Static local:Constants.BOTTOM_SECTION_CARD_HEIGHT}}"
 												   Background="{DynamicResource 'Status And Format BG'}"
-												   Opacity="0.985"
-												   Foreground="{DynamicResource 'Status And Format Text'}"
+												   Foreground="{Binding CurrentTheme.StatusAndBookTypeTextColor, Converter={StaticResource ConvertColor}}"
 												   FontWeight="Bold"
 												   FontSize="16"
 												   TextAlignment="Center"
@@ -148,7 +180,13 @@
 								<Border CornerRadius="10" ClipToBounds="True">
 									<Grid Width="{Binding Source={x:Static local:Constants.RIGHT_SIDE_CARD_WIDTH}}" DockPanel.Dock="Right" RowDefinitions="*, 40">
 										<!-- Top Right Side Card Series Edit-->
-										<Grid Name="EditPane" Height="{Binding Source={x:Static local:Constants.TOP_SECTION_CARD_HEIGHT}}" Grid.Row="0" ZIndex="1" Background="{DynamicResource 'Series Edit Pane BG'}" ColumnDefinitions="*, 75" IsVisible="false">
+										<Grid Name="EditPane" 
+											  Height="{Binding Source={x:Static local:Constants.TOP_SECTION_CARD_HEIGHT}}" 
+											  Grid.Row="0" 
+											  Background="{DynamicResource 'Series Edit Pane BG'}" 
+											  ColumnDefinitions="*, 75" 
+											  IsVisible="false"
+											  ZIndex="0">
 											<Grid.Styles>
 												<Style Selector="TextBox:focused /template/ ContentPresenter">
 													<Setter Property="Background" Value="#12171d"/>
@@ -220,7 +258,7 @@
 										</Grid>
 
 										<!-- Top Right Side Card Series Data-->
-										<DockPanel Height="{Binding Source={x:Static local:Constants.TOP_SECTION_CARD_HEIGHT}}" Grid.Row="0" LastChildFill="True" Width="{Binding Source={x:Static local:Constants.RIGHT_SIDE_CARD_WIDTH}}" Background="{DynamicResource 'Series Card BG'}">
+										<DockPanel Height="{Binding Source={x:Static local:Constants.TOP_SECTION_CARD_HEIGHT}}" Grid.Row="0" LastChildFill="True" Width="{Binding Source={x:Static local:Constants.RIGHT_SIDE_CARD_WIDTH}}" Background="{DynamicResource 'Series Card BG'}" ZIndex="1">
 											<TextBlock DockPanel.Dock="Top"
 													   TextWrapping="Wrap"
 													   Foreground="{DynamicResource 'Series Title'}"

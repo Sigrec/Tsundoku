@@ -1,6 +1,3 @@
-using Avalonia;
-using Avalonia.Media.Imaging;
-using Avalonia.Platform;
 using System;
 using System.Globalization;
 using Avalonia.Data.Converters;
@@ -9,13 +6,21 @@ namespace Tsundoku.Src
 {
     public class ColorConverter : IValueConverter
     {
-        public static ColorConverter Instance = new ColorConverter();
+        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is UInt32)
             {
-                return new Avalonia.Media.SolidColorBrush((uint)value);
+                if (parameter != null && parameter.Equals("Picker"))
+                {
+                    
+                    return Avalonia.Media.HsvColor.Parse(value.ToString());
+                }
+                else
+                {
+                    return new Avalonia.Media.SolidColorBrush((uint)value);
+                }
             }
 
             throw new NotSupportedException();

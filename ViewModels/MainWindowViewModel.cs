@@ -10,18 +10,19 @@ using System.Reactive.Linq;
 using ReactiveUI.Fody.Helpers;
 using System.Reactive;
 using System.Collections.Specialized;
-using Avalonia.Media;
+using System.Text.Json;
+using System.Reactive.Concurrency;
 
 namespace Tsundoku.ViewModels
 {
     public partial class MainWindowViewModel : ViewModelBase
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
-        private static string filePath = @"UserData.dat";
+        private static string filePath = @"UserData.json";
         public static ObservableCollection<Series> SearchedCollection { get; set; } = new();
         public static ObservableCollection<Series> Collection { get; set; } = new();
         public static User MainUser { get; set; }
-        public AddNewSeriesWindow newSeriesWindow = new AddNewSeriesWindow();
+        public AddNewSeriesWindow newSeriesWindow;
         public SettingsWindow settingsWindow;
         public CollectionThemeWindow themeSettingsWindow;
         public static string _curDisplay;
@@ -62,8 +63,8 @@ namespace Tsundoku.ViewModels
         [Reactive]
         public uint TestVal2 { get; set; } = 9999;
 
-        [Reactive]
-        public TsundokuTheme CurrentTheme { get; set; }
+        // [Reactive]
+        // public TsundokuTheme CurrentTheme { get; set; }
 
         public ReactiveCommand<Unit, Unit> OpenAddNewSeriesWindow { get; }
         public ReactiveCommand<Unit, Unit> OpenSettingsWindow { get; }
@@ -77,11 +78,12 @@ namespace Tsundoku.ViewModels
 
         public MainWindowViewModel()
         {
-            GetUserData();
+            RxApp.MainThreadScheduler.Schedule(GetUserData);
             this.WhenAnyValue(x => x.SearchText).Throttle(TimeSpan.FromMilliseconds(400)).ObserveOn(RxApp.MainThreadScheduler).Subscribe(SearchCollection!);
 
             this.WhenAnyValue(x => x.CurrentTheme).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.MainTheme = x);
 
+            newSeriesWindow = new AddNewSeriesWindow();
             OpenAddNewSeriesWindow = ReactiveCommand.CreateFromTask(() =>
             {
                 newSeriesWindow.Show();
@@ -181,28 +183,23 @@ namespace Tsundoku.ViewModels
             }
         }
 
-        private void GetUserData()
+        public void GetUserData()
         {
             Logger.Info("Starting TsundOku");
             if (!File.Exists(filePath))
             {
                 Logger.Info("Creating New User");
-                TsundokuTheme DefaultTheme = new TsundokuTheme("Default");
-                MainUser = new User("UserName", "Native", DefaultTheme, "Card", new ObservableCollection<TsundokuTheme>(), Collection);
+                ThemeSettingsViewModel.UserThemes = new ObservableCollection<TsundokuTheme>() { TsundokuTheme.DEFAULT_THEME };
+                MainUser = new User("UserName", "Romaji", ThemeSettingsViewModel.UserThemes[0], "Card", (ObservableCollection<TsundokuTheme>)ThemeSettingsViewModel.UserThemes, Collection);
                 UserName = MainUser.UserName;
                 Collection = MainUser.UserCollection;
                 CurLanguage = MainUser.CurLanguage;
                 CurDisplay = MainUser.Display;
-                MainUser.SavedThemes.Add(DefaultTheme);
-                ThemeSettingsViewModel.UserThemes = MainUser.SavedThemes;
                 SaveUsersData();
             }
 
-            using (Stream stream = File.Open(filePath, FileMode.Open, FileAccess.Read))
-            {
-                var binaryFormatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-                MainUser = (User)binaryFormatter.Deserialize(stream);
-            }
+            MainUser = JsonSerializer.Deserialize<User>(File.ReadAllText(filePath));
+
             Logger.Info($"Loading {MainUser.UserName}'s Data");
             UserName = MainUser.UserName;
             Collection = MainUser.UserCollection;
@@ -214,16 +211,15 @@ namespace Tsundoku.ViewModels
             UsersNumVolumesToBeCollected = MainUser.NumVolumesToBeCollected;
         }
 
-        public static async void SaveUsersData(){
+        public static void SaveUsersData()
+        {
             Logger.Info($"Saving {MainUser.UserName}'s Data");
             MainUser.UserCollection = Collection;
             MainUser.Display = _curDisplay;
             MainUser.SavedThemes = ThemeSettingsViewModel.UserThemes;
-            using (Stream stream = File.Open(filePath, FileMode.Create, FileAccess.Write))
-            {
-                var binaryFormatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-                binaryFormatter.Serialize(stream, MainUser);
-            }
+
+            var options = new JsonSerializerOptions { WriteIndented = true };
+            File.WriteAllText(filePath, JsonSerializer.Serialize(MainUser, options));
         }
     }
 }

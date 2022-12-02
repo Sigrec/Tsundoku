@@ -4,17 +4,25 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Interactivity;
 using Avalonia.ReactiveUI;
 using Tsundoku.ViewModels;
+using ReactiveUI;
 
 namespace Tsundoku.Views
 {
     public partial class SettingsWindow : ReactiveWindow<MainWindowViewModel>
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
+        public ViewModelBase UserSettingsVM => DataContext as ViewModelBase;
         
         public SettingsWindow()
         {
             InitializeComponent();
-            this.Closing += (s, e) =>
+            DataContext = new ViewModelBase();
+            Activated += (s, e) =>
+            {
+                UserSettingsVM.CurrentTheme = ((MainWindow)((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).MainWindow).CollectionViewModel.CurrentTheme;
+            };
+
+            Closing += (s, e) =>
             {
                 ((SettingsWindow)s).Hide();
                 e.Cancel = true;

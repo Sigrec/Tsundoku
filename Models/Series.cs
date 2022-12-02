@@ -12,7 +12,6 @@ using System.Collections.Generic;
 
 namespace Tsundoku.Models
 {
-	[Serializable]
 	public class Series
 	{
 		public List<string> Titles { get; } //[Romaji, English, Native]

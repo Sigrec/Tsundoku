@@ -1,8 +1,9 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="using:Tsundoku"
-			 xmlns:vm="using:Tsundoku.ViewModels"
+			 xmlns:vm="using:Tsundoku.ViewModels.MainWindowViewModel"
 			 xmlns:cp="clr-namespace:Egorozh.ColorPicker.Dialog;assembly=Egorozh.ColorPicker.Avalonia.Dialog"
+             xmlns:cv="clr-namespace:Tsundoku.Src"
              x:Class="Tsundoku.App">
 
     <Application.Styles>
@@ -11,6 +12,7 @@
     </Application.Styles>
 
     <Application.Resources>
+        <cv:ColorConverter x:Key="ConvertColor"/>
         <SolidColorBrush x:Key="Menu BG">#12171d</SolidColorBrush>
         <SolidColorBrush x:Key="Username">#dfd59e</SolidColorBrush>
         <SolidColorBrush x:Key="Menu Text">#dfd59e</SolidColorBrush>
@@ -24,7 +26,7 @@
         <SolidColorBrush x:Key="Seperator">#dfd59e</SolidColorBrush>
 
         <SolidColorBrush x:Key="Collection BG" Color="{Binding UserThemes[0].Collection_BG_Color}"/>
-        <SolidColorBrush x:Key="Status And Format BG">#2c2d42</SolidColorBrush>
+        <SolidColorBrush x:Key="Status And Format BG" Color="{Binding ViewModelBase.CurrentTheme.StatusAndBookTypeBGColor, Converter={StaticResource ConvertColor}}"/>
         <SolidColorBrush x:Key="Status And Format Text">#dfd59e</SolidColorBrush>
         <SolidColorBrush x:Key="Series Card BG">#20232d</SolidColorBrush>
         <SolidColorBrush x:Key="Series Title">#dfd59e</SolidColorBrush>

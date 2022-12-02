@@ -12,10 +12,8 @@
   </PropertyGroup>
   <ItemGroup>
     <AvaloniaResource Include="Assets\Icons\**" />
-    <AvaloniaXaml Remove="Assets\NewFolder\**" />
-    <Compile Remove="Assets\NewFolder\**" />
-    <EmbeddedResource Remove="Assets\NewFolder\**" />
-    <None Remove="Assets\NewFolder\**" />
+    <Compile Remove="Assets\Covers\**" />
+    <EmbeddedResource Remove="Assets\Cover\**" />
     <None Remove=".gitignore" />
   </ItemGroup>
   <ItemGroup>
