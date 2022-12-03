@@ -8,21 +8,31 @@
 		Icon="\Assets\Icons\Tsundoku-Logo.ico"
         Title="Add New Series"
 		FontFamily="Segoe UI"
-		SizeToContent="WidthAndHeight"
-        Background="{DynamicResource 'Menu BG'}"
+		Width="450"
+		Height="370"
+        Background="{Binding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}"
 		WindowStartupLocation="CenterOwner"
 		CanResize="false">
 	
-    <Border BorderBrush="{DynamicResource Seperator}" BorderThickness="3">
+    <Border BorderBrush="{Binding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" BorderThickness="3">
         <StackPanel Margin="20" Spacing="20">
+			<StackPanel.Styles>
+				<Style Selector="TextBox:pointerover /template/ Border#PART_BorderElement, TextBox:focus /template/ Border#PART_BorderElement">
+					<Setter Property="Background" Value="{Binding CurrentTheme.SearchBarBGColor, Converter={StaticResource ConvertColor}}"/>
+					<Setter Property="BorderBrush" Value="{Binding CurrentTheme.SearchBarBorderColor, Converter={StaticResource ConvertColor}}"/>
+				</Style>
+			</StackPanel.Styles>
 			<StackPanel>
-				<TextBlock Text="Enter Title (Copy Title From AniList)" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
+				<TextBlock Margin="2,0,0,0" Text="Enter Title" FontSize="18" FontWeight="Bold" Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}"/>
 				<TextBox Name="TitleBox"
 						 Width="400"
-						 FontFamily="MS UI Gothic"
-						 FontSize="20"
-						 Background="{DynamicResource 'Menu Button BG'}"
-						 BorderBrush="{DynamicResource 'Menu Button Border'}"
+						 FontSize="18"
+						 FontWeight="Bold"
+						 Background="{Binding CurrentTheme.SearchBarBGColor, Converter={StaticResource ConvertColor}}"
+						 BorderBrush="{Binding CurrentTheme.SearchBarBorderColor, Converter={StaticResource ConvertColor}}"
+						 Foreground="{Binding CurrentTheme.SearchBarTextColor, Converter={StaticResource ConvertColor}}"
+						 SelectionBrush="{Binding CurrentTheme.SearchBarTextColor, Converter={StaticResource ConvertColor}}"
+						 SelectionForegroundBrush="{Binding CurrentTheme.SearchBarBGColor, Converter={StaticResource ConvertColor}}"
 						 BorderThickness="2"
 						 TextWrapping="Wrap"
 						 Watermark="Title..."/>
@@ -36,31 +46,33 @@
                     <RowDefinition/>  
                     <RowDefinition/>       
                 </Grid.RowDefinitions>    
-                <TextBlock Text="Cur Volumes" Grid.Row="0" Grid.Column="0" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
-                <TextBlock Text="Max Volumes" Grid.Row="0" Grid.Column="1" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
+                <TextBlock Text="Cur Volumes" Margin="2,0,0,0" Grid.Row="0" Grid.Column="0" FontSize="18" FontWeight="Bold" Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}"/>
+                <TextBlock Text="Max Volumes" Margin="12,0,0,0" Grid.Row="0" Grid.Column="1" FontSize="18" FontWeight="Bold" Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}"/>
                 <MaskedTextBox Name="CurVolCount" 
+							   Width="180"
 							   Grid.Row="1" 
 							   Grid.Column="0" 
 							   Margin="0,0,20,0" 
-							   Background="{DynamicResource 'Menu Button BG'}" 
-							   BorderBrush="{DynamicResource 'Menu Button Border'}" 
-							   Foreground="{DynamicResource 'Menu Button Text'}"
+							   Background="{Binding CurrentTheme.SearchBarBGColor, Converter={StaticResource ConvertColor}}" 
+							   BorderBrush="{Binding CurrentTheme.SearchBarBorderColor, Converter={StaticResource ConvertColor}}" 
+							   Foreground="{Binding CurrentTheme.SearchBarTextColor, Converter={StaticResource ConvertColor}}"
+						 	   SelectionBrush="{Binding CurrentTheme.SearchBarTextColor, Converter={StaticResource ConvertColor}}"
+						 	   SelectionForegroundBrush="{Binding CurrentTheme.SearchBarBGColor, Converter={StaticResource ConvertColor}}"
 							   BorderThickness="2"
-							   SelectionBrush="{DynamicResource 'Menu Button Text'}"
-							   SelectionForegroundBrush="{DynamicResource 'Menu Button BG'}"
 							   Mask="###"
 							   FontWeight="Bold"
 							   FontSize="18"
 							   MaxLength="3"/>
 				<MaskedTextBox Name="MaxVolCount"
+							   Width="180"
 							   Grid.Row="1" 
 							   Grid.Column="1" 
-							   Background="{DynamicResource 'Menu Button BG'}" 
-							   BorderBrush="{DynamicResource 'Menu Button Border'}" 
-							   Foreground="{DynamicResource 'Menu Button Text'}"
+							   Background="{Binding CurrentTheme.SearchBarBGColor, Converter={StaticResource ConvertColor}}" 
+							   BorderBrush="{Binding CurrentTheme.SearchBarBorderColor, Converter={StaticResource ConvertColor}}" 
+							   Foreground="{Binding CurrentTheme.SearchBarTextColor, Converter={StaticResource ConvertColor}}"
+						 	   SelectionBrush="{Binding CurrentTheme.SearchBarTextColor, Converter={StaticResource ConvertColor}}"
+						 	   SelectionForegroundBrush="{Binding CurrentTheme.SearchBarBGColor, Converter={StaticResource ConvertColor}}"
 							   BorderThickness="2"
-							   SelectionBrush="{DynamicResource 'Menu Button Text'}"
-							   SelectionForegroundBrush="{DynamicResource 'Menu Button BG'}"
 							   Mask="###"
 							   FontWeight="Bold"
 							   FontSize="18"
@@ -68,29 +80,57 @@
             </Grid>
 			<StackPanel Orientation="Horizontal" Spacing="30">
 				<StackPanel Spacing="5" VerticalAlignment="Center">
-					<TextBlock HorizontalAlignment="Center" Text="Select Book Type" Margin="0,10,0,0" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
+					<TextBlock HorizontalAlignment="Center" 
+							   Text="Select Book Type" 
+							   Margin="0,10,0,0" 
+							   FontSize="18" 
+							   FontWeight="Bold" 
+							   Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}"/>
 					<StackPanel Orientation="Horizontal">
-						<CheckBox Name="MangaButton" Checked="MangaCheck" BorderBrush="{DynamicResource 'Menu Button Border'}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource 'Menu Button Icon/Text'}" Margin="0,0,20,0" Content="Manga"/>
-						<CheckBox Name="NovelButton" Checked="NovelCheck" BorderBrush="{DynamicResource 'Menu Button Border'}" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource 'Menu Button Icon/Text'}" Margin="0,0,20,0" Content="Novel"/>
+						<CheckBox Name="MangaButton" 
+								  Checked="MangaCheck" 
+								  BorderBrush="{Binding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}" 
+								  FontSize="18" 
+								  FontWeight="Bold" 
+								  Foreground="{Binding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}" 
+								  Margin="0,0,20,0" 
+								  Content="Manga"/>
+						<CheckBox Name="NovelButton" 
+								  Checked="NovelCheck" 
+								  BorderBrush="{Binding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}" 
+								  FontSize="18" 
+								  FontWeight="Bold" 
+								  Foreground="{Binding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}" 
+								  Margin="0,0,20,0" 
+								  Content="Novel"/>
 					</StackPanel>
 				</StackPanel>
 				<StackPanel Spacing="5" VerticalAlignment="Center">
-					<TextBlock HorizontalAlignment="Center" Text="Select Languages" Margin="0,10,0,0" FontSize="20" FontWeight="Bold" Foreground="{DynamicResource 'Menu Text'}"/>
+					<TextBlock HorizontalAlignment="Center" Text="Select Languages" Margin="0,10,0,0" FontSize="18" FontWeight="Bold" Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}"/>
 					<ComboBox
 						Name="AdditionalLangSelector"
 						Items="{Binding AdditionalLanguages}"
 						SelectedItem="French"
 						Width="150"
 						Height="35" 
-						Background="{DynamicResource 'Menu Button BG'}"
-						BorderBrush="{DynamicResource 'Menu Button Border'}"
+						Background="{Binding CurrentTheme.SearchBarBGColor, Converter={StaticResource ConvertColor}}"
+						BorderBrush="{Binding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"
 						BorderThickness="2"
 						FontWeight="Bold"
-						FontSize="15"
-						Foreground="{DynamicResource 'Menu Button Icon/Text'}"/>
+						FontSize="18"
+						Foreground="{Binding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"/>
 				</StackPanel>
 			</StackPanel>
-			<Button Margin="0,10,0,0" Content="Add" Click="OnButtonClicked" Background="{DynamicResource 'Menu Button BG'}" BorderBrush="{DynamicResource 'Menu Button Border'}" BorderThickness="2" FontWeight="Bold" FontSize="20" Foreground="{DynamicResource 'Menu Button Icon/Text'}" HorizontalAlignment="Center"/>
+			<Button Margin="0,10,0,0" 
+				    Content="Add" 
+					Click="OnButtonClicked" 
+					Background="{Binding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}" 
+					BorderBrush="{Binding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}" 
+					BorderThickness="2" 
+					FontWeight="Bold" 
+					FontSize="20" 
+					Foreground="{Binding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}" 
+					HorizontalAlignment="Center"/>
         </StackPanel>
     </Border>
 </Window>

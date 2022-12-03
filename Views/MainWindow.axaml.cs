@@ -71,7 +71,7 @@ namespace Tsundoku.Views
 
         private void ShowEditPane(object sender, RoutedEventArgs args)
         {
-            ((Grid)((Button)sender).Parent.Parent.GetLogicalChildren().ElementAt(0)).IsVisible = (SeriesEditPaneIsOpenView ^= true);
+            ((Button)sender).FindLogicalAncestorOfType<Grid>(false).FindLogicalDescendantOfType<Grid>(false).IsVisible = (SeriesEditPaneIsOpenView ^= true);
         }
 
         private void LanguageChanged(object sender, SelectionChangedEventArgs e)
@@ -88,7 +88,10 @@ namespace Tsundoku.Views
                     CollectionViewModel.CurLanguage = "Romaji";
                     break;
             }
-            MainWindowViewModel.SortCollection();
+            if ((sender as ComboBox).IsDropDownOpen)
+            {
+                MainWindowViewModel.SortCollection();
+            }
         }
 
         private void DisplayChanged(object sender, SelectionChangedEventArgs e)
@@ -160,6 +163,7 @@ namespace Tsundoku.Views
                 }
                 removeSeriesCheck = true;
             }
+            ThemeSettingsViewModel.UserThemes.Move(ThemeSettingsViewModel.UserThemes.IndexOf(MainWindowViewModel.MainUser.MainTheme), 0);
 
             MainWindowViewModel.SaveUsersData();
         }
@@ -203,8 +207,7 @@ namespace Tsundoku.Views
                 volumeDisplay.Text = curSeries.CurVolumeCount + "/" + curSeries.MaxVolumeCount;
                 Logger.Info(log + volumeDisplay.Text);
 
-                ProgressBar curProgressBar = (ProgressBar)((Button)sender).Parent.Parent.Parent.Parent.GetLogicalChildren().ElementAt(1);
-                curProgressBar.Value = curSeries.CurVolumeCount;
+                (sender as Button).FindLogicalAncestorOfType<Grid>(false).FindLogicalDescendantOfType<ProgressBar>(false).Value = curSeries.CurVolumeCount;
             }
         }
 
@@ -216,14 +219,14 @@ namespace Tsundoku.Views
             Series curSeries = (Series)((Button)sender).DataContext; //Get the current series data
             if (curSeries.CurVolumeCount >= 1) //Only decrement if the user currently has 1 or more volumes
             {
+                // Uncomment when fix is implemented
                 curSeries.CurVolumeCount -= 1;
                 TextBlock volumeDisplay = (TextBlock)((Button)sender).Parent.GetLogicalSiblings().ElementAt(0);
                 string log = "Removing 1 Volume From " + curSeries.Titles[0] + " : " + volumeDisplay.Text + " -> ";
                 volumeDisplay.Text = curSeries.CurVolumeCount + "/" + curSeries.MaxVolumeCount;
                 Logger.Info(log + volumeDisplay.Text);
 
-                ProgressBar curProgressBar = (ProgressBar)((Button)sender).Parent.Parent.Parent.Parent.GetLogicalChildren().ElementAt(1);
-                curProgressBar.Value = curSeries.CurVolumeCount;
+                (sender as Button).FindLogicalAncestorOfType<Grid>(false).FindLogicalDescendantOfType<ProgressBar>(false).Value = curSeries.CurVolumeCount;
             }
         }
     }

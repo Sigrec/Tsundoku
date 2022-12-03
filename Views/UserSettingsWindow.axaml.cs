@@ -2,13 +2,12 @@ using Avalonia;
 using GemBox.Spreadsheet;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Interactivity;
-using Avalonia.ReactiveUI;
 using Tsundoku.ViewModels;
-using ReactiveUI;
+using Avalonia.Controls;
 
 namespace Tsundoku.Views
 {
-    public partial class SettingsWindow : ReactiveWindow<MainWindowViewModel>
+    public partial class SettingsWindow : Window
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         public ViewModelBase UserSettingsVM => DataContext as ViewModelBase;

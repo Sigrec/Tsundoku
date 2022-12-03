@@ -4,18 +4,23 @@ using Avalonia.Interactivity;
 using Tsundoku.ViewModels;
 using System;
 using MessageBox.Avalonia.DTO;
-using Avalonia.Controls.ApplicationLifetimes;
-using ReactiveUI.Fody.Helpers;
 
 namespace Tsundoku.Views
 {
     public partial class AddNewSeriesWindow : Window
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
+        public AddNewSeriesViewModel AddNewSeriesVM => DataContext as AddNewSeriesViewModel;
 
         public AddNewSeriesWindow()
         {
             InitializeComponent();
+            this.DataContext = new AddNewSeriesViewModel();
+            Activated += (s, e) =>
+            {
+                AddNewSeriesVM.CurrentTheme = ((MainWindow)((Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).MainWindow).CollectionViewModel.CurrentTheme;
+            };
+            
             this.Closing += (s, e) =>
             {
                 ((AddNewSeriesWindow)s).Hide();

@@ -12,6 +12,7 @@ using System.Reactive;
 using System.Collections.Specialized;
 using System.Text.Json;
 using System.Reactive.Concurrency;
+using System.Diagnostics;
 
 namespace Tsundoku.ViewModels
 {
@@ -62,9 +63,6 @@ namespace Tsundoku.ViewModels
 
         [Reactive]
         public uint TestVal2 { get; set; } = 9999;
-
-        // [Reactive]
-        // public TsundokuTheme CurrentTheme { get; set; }
 
         public ReactiveCommand<Unit, Unit> OpenAddNewSeriesWindow { get; }
         public ReactiveCommand<Unit, Unit> OpenSettingsWindow { get; }
@@ -209,6 +207,11 @@ namespace Tsundoku.ViewModels
             CurrentTheme = MainUser.MainTheme;
             UsersNumVolumesCollected = MainUser.NumVolumesCollected;
             UsersNumVolumesToBeCollected = MainUser.NumVolumesToBeCollected;
+
+            foreach (Series x in Collection)
+            {
+                SearchedCollection.Add(x);
+            }
         }
 
         public static void SaveUsersData()
@@ -218,7 +221,12 @@ namespace Tsundoku.ViewModels
             MainUser.Display = _curDisplay;
             MainUser.SavedThemes = ThemeSettingsViewModel.UserThemes;
 
-            var options = new JsonSerializerOptions { WriteIndented = true };
+            var options = new JsonSerializerOptions { 
+                WriteIndented = true,
+                ReadCommentHandling = JsonCommentHandling.Skip,
+                AllowTrailingCommas = true,
+            };
+
             File.WriteAllText(filePath, JsonSerializer.Serialize(MainUser, options));
         }
     }

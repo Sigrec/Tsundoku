@@ -13,7 +13,7 @@
 
     <Application.Resources>
         <cv:ColorConverter x:Key="ConvertColor"/>
-        <SolidColorBrush x:Key="Menu BG">#12171d</SolidColorBrush>
+        <!-- <SolidColorBrush x:Key="Menu BG">#12171d</SolidColorBrush>
         <SolidColorBrush x:Key="Username">#dfd59e</SolidColorBrush>
         <SolidColorBrush x:Key="Menu Text">#dfd59e</SolidColorBrush>
         <SolidColorBrush x:Key="Menu Button BG">#20232d</SolidColorBrush>
@@ -49,6 +49,6 @@
         <SolidColorBrush x:Key="Series Card Button Icon">#dfd59e</SolidColorBrush>
         <SolidColorBrush x:Key="Series Card Button BG (Hover)">#dfd59e</SolidColorBrush>
         <SolidColorBrush x:Key="Series Card Button Border (Hover)">#20232d</SolidColorBrush>
-        <SolidColorBrush x:Key="Series Card Button Icon (Hover)">#20232d</SolidColorBrush>
+        <SolidColorBrush x:Key="Series Card Button Icon (Hover)">#20232d</SolidColorBrush> -->
     </Application.Resources>
 </Application>

@@ -21,9 +21,12 @@
                     <TextBox Name="UsernameChange"
                              Width="400"
                              FontSize="15"
-                             Background="{DynamicResource 'Menu Button BG'}"
-                             BorderBrush="{DynamicResource 'Menu Button Border'}"
-                             BorderThickness="2"/>
+                             Background="{Binding CurrentTheme.SearchBarBGColor, Converter={StaticResource ConvertColor}}"
+						    BorderBrush="{Binding CurrentTheme.SearchBarBorderColor, Converter={StaticResource ConvertColor}}"
+						    Foreground="{Binding CurrentTheme.SearchBarTextColor, Converter={StaticResource ConvertColor}}"
+						    SelectionBrush="{Binding CurrentTheme.SearchBarTextColor, Converter={StaticResource ConvertColor}}"
+						    SelectionForegroundBrush="{Binding CurrentTheme.SearchBarBGColor, Converter={StaticResource ConvertColor}}"
+                            BorderThickness="2"/>
                     <Button FontSize="20" 
                             Background="{Binding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}" 
                             BorderBrush="{Binding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}" 

@@ -12,6 +12,6 @@ namespace Tsundoku.Models
         public const ushort TOP_SECTION_CARD_HEIGHT = CARD_HEIGHT - BOTTOM_SECTION_CARD_HEIGHT - 40;
         public const ushort USER_NOTES_WIDTH = RIGHT_SIDE_CARD_WIDTH - 74;
         public const ushort USER_NOTES_HEIGHT = TOP_SECTION_CARD_HEIGHT - 16;
-        public const ushort TEST = 40;
+        public const ushort IMAGE_HEIGHT = CARD_HEIGHT - BOTTOM_SECTION_CARD_HEIGHT;
     }
 }

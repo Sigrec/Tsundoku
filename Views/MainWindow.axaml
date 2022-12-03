@@ -82,7 +82,22 @@
 						   Margin="0,10,0,10"/>
 				<StackPanel VerticalAlignment="Center" Spacing="5">
 					<TextBlock Text="Search Collection" HorizontalAlignment="Center" FontSize="20" FontWeight="Bold" Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}"/>
-					<TextBox Name="SearchBar" Text="{Binding SearchText}" KeyUp="SearchCollection" BorderBrush="{Binding CurrentTheme.SearchBarBorderColor, Converter={StaticResource ConvertColor}}" BorderThickness="2" FontWeight="Bold" Background="{Binding CurrentTheme.SearchBarBGColor, Converter={StaticResource ConvertColor}}"/>
+					<StackPanel.Styles>
+						<Style Selector="#SearchBar:pointerover /template/ Border#PART_BorderElement, #SearchBar:focus /template/ Border#PART_BorderElement">
+							<Setter Property="Background" Value="{Binding CurrentTheme.SearchBarBGColor, Converter={StaticResource ConvertColor}}"/>
+							<Setter Property="BorderBrush" Value="{Binding CurrentTheme.SearchBarBorderColor, Converter={StaticResource ConvertColor}}"/>
+						</Style>
+					</StackPanel.Styles>
+					<TextBox Name="SearchBar" 
+							 Text="{Binding SearchText}" 
+							 KeyUp="SearchCollection"
+							 BorderBrush="{Binding CurrentTheme.SearchBarBorderColor, Converter={StaticResource ConvertColor}}" 
+							 Foreground="{Binding CurrentTheme.SearchBarTextColor, Converter={StaticResource ConvertColor}}"
+							 SelectionBrush="{Binding CurrentTheme.SearchBarTextColor, Converter={StaticResource ConvertColor}}"
+							 SelectionForegroundBrush="{Binding CurrentTheme.SearchBarBGColor, Converter={StaticResource ConvertColor}}"
+							 BorderThickness="2" 
+							 FontWeight="Bold" 
+							 Background="{Binding CurrentTheme.SearchBarBGColor, Converter={StaticResource ConvertColor}}"/>
 				</StackPanel>
 				<TextBlock Name="NumVolumesToBeCollected" 
 						   Text="{Binding UsersNumVolumesToBeCollected, StringFormat='Need To Collect&#x0a;{0} Volumes'}" 
@@ -93,6 +108,73 @@
 						   HorizontalAlignment="Center" 
 						   Margin="0,10,0,10"/>
 				<StackPanel Spacing="5" Margin="0,10,0,10">
+					<StackPanel.Styles>
+						<Style Selector="ComboBox:pointerover /template/ Border#Background, ComboBox:pressed /template/ Border#Background">
+							<Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
+							<Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
+						</Style>
+						<!-- <Style Selector="ComboBox:focused:pressed">
+							<Style Selector="^ /template/ ContentControl#ContentPresenter">
+								<Setter Property="Foreground" Value="{Binding CurrentTheme.MenuButtonTextHoverColor, Converter={StaticResource ConvertColor}}" />
+							</Style>
+							<Style Selector="^ /template/ TextBlock#PlaceholderTextBlock">
+								<Setter Property="Foreground" Value="{Binding CurrentTheme.MenuButtonTextHoverColor, Converter={StaticResource ConvertColor}}" />
+							</Style>
+							<Style Selector="^ /template/ PathIcon#DropDownGlyph">
+								<Setter Property="Foreground" Value="{Binding CurrentTheme.MenuButtonTextHoverColor, Converter={StaticResource ConvertColor}}" />
+							</Style>
+						</Style>
+						<Style Selector="ComboBox:focus">
+							<Style Selector="^ /template/ Border#HighlightBackground">
+								<Setter Property="IsVisible" Value="True" />
+								<Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}" />
+							</Style>
+							<Style Selector="^ /template/ ContentControl#ContentPresenter">
+								<Setter Property="Foreground" Value="{Binding CurrentTheme.MenuButtonTextHoverColor, Converter={StaticResource ConvertColor}}" />
+							</Style>
+							<Style Selector="^ /template/ TextBlock#PlaceholderTextBlock">
+								<Setter Property="Foreground" Value="{Binding CurrentTheme.MenuButtonTextHoverColor, Converter={StaticResource ConvertColor}}" />
+							</Style>
+							<Style Selector="^ /template/ PathIcon#DropDownGlyph">
+								<Setter Property="Foreground" Value="{Binding CurrentTheme.MenuButtonTextHoverColor, Converter={StaticResource ConvertColor}}" />
+							</Style>
+						</Style> -->
+						<!-- <Style Selector="ComboBoxItem:pointerover /template/ ContentPresenter">
+							<Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}" />
+							<Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}" />
+							<Setter Property="Foreground" Value="{Binding CurrentTheme.MenuButtonTextHoverColor, Converter={StaticResource ConvertColor}}" />
+						</Style>
+						<Style Selector="ComboBoxItem:pressed /template/ ContentPresenter">
+							<Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}" />
+							<Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}" />
+							<Setter Property="Foreground" Value="{Binding CurrentTheme.MenuButtonTextHoverColor, Converter={StaticResource ConvertColor}}" />
+						</Style>
+						<Style Selector="ComboBoxItem:selected">
+							<Style Selector="^ /template/ ContentPresenter">
+								<Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}" />
+							<Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}" />
+							<Setter Property="Foreground" Value="{Binding CurrentTheme.MenuButtonTextHoverColor, Converter={StaticResource ConvertColor}}" />
+							</Style>
+
+							<Style Selector="^:disabled /template/ ContentPresenter">
+								<Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}" />
+							<Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}" />
+							<Setter Property="Foreground" Value="{Binding CurrentTheme.MenuButtonTextHoverColor, Converter={StaticResource ConvertColor}}" />
+							</Style>
+
+							<Style Selector="^:pointerover /template/ ContentPresenter">
+								<Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}" />
+							<Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}" />
+							<Setter Property="Foreground" Value="{Binding CurrentTheme.MenuButtonTextHoverColor, Converter={StaticResource ConvertColor}}" />
+							</Style>
+
+							<Style Selector="^:pressed /template/ ContentPresenter">
+								<Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}" />
+							<Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}" />
+							<Setter Property="Foreground" Value="{Binding CurrentTheme.MenuButtonTextHoverColor, Converter={StaticResource ConvertColor}}" />
+							</Style>
+						</Style> -->
+					</StackPanel.Styles>
 					<ComboBox Name="DisplaySelector"
 							  Items="{Binding AvailableDisplays}"
 							  SelectionChanged="DisplayChanged"
@@ -102,10 +184,18 @@
 							  Background="{Binding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"
 							  BorderBrush="{Binding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"
 							  BorderThickness="2"
-							  FontWeight="Bold"
-							  FontSize="15"
 							  Foreground="{Binding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"
-							  AutoScrollToSelectedItem="True"/>
+							  AutoScrollToSelectedItem="True">
+						<ComboBox.ItemTemplate>
+							<DataTemplate>
+								<TextBlock FontSize="15" 
+										   FontWeight="Bold"
+										   Background="{Binding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"
+										   Foreground="{Binding CurrentTheme.MenuButtonTextColor, Converter={StaticResource ConvertColor}}"
+										   Text="{Binding}"/>
+							</DataTemplate>
+						</ComboBox.ItemTemplate>
+					</ComboBox>
 					<ComboBox Name="LanguageSelector"
 							  Items="{Binding AvailableLanguages}"
 							  SelectionChanged="LanguageChanged"
@@ -125,7 +215,7 @@
 		
 		<!-- Collection -->
 		<ScrollViewer Name="CollectionTheme" VerticalScrollBarVisibility="Auto" DockPanel.Dock="Bottom" Background="{Binding CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}">
-			<ItemsControl Name="CollectionControl" Margin="50" Items="{Binding SearchedCollection}" HorizontalAlignment="Center">
+			<ItemsControl Margin="50" Items="{Binding SearchedCollection}" HorizontalAlignment="Center">
 				<ItemsControl.ItemsPanel>
 					<ItemsPanelTemplate>
 						<WrapPanel/>
@@ -134,34 +224,36 @@
 
 				<ItemsControl.ItemTemplate>
 					<DataTemplate>
-						<Border Margin="20">
+						<Border Margin="20" BorderBrush="Transparent" CornerRadius="8" BorderThickness="0" BoxShadow="4 4 8 2 #141313">
 							<DockPanel Width="{Binding Source={x:Static local:Constants.CARD_WIDTH}}" Height="{Binding Constants.CARD_HEIGHT}">
 
 								<!-- Left Side Card -->
-								<Border CornerRadius="10" ClipToBounds="True">
-									<Canvas Name="{Binding Link}" PointerPressed="OpenSiteLink" Width="{Binding Source={x:Static local:Constants.LEFT_SIDE_CARD_WIDTH}}" ToolTip.Tip="Open Page">
+								<Border CornerRadius="8,0,0,8" ClipToBounds="True">
+									<Canvas Name="{Binding Link}" PointerPressed="OpenSiteLink" Width="{Binding Source={x:Static local:Constants.LEFT_SIDE_CARD_WIDTH}}">
 									<Canvas.Styles>
 										<Style Selector="TextBlock:pointerenter /template/ ContentPresenter">
-											<Setter Property="TextBlock.Background" Value="#dfd59e"/>
-											<Setter Property="TextBlock.Foreground" Value="White"/>
+											<Setter Property="TextBlock.Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.StatusAndBookTypeBGHoverColor, Converter={StaticResource ConvertColor}}"/>
+											<Setter Property="TextBlock.Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.StatusAndBookTypeTextHoverColor, Converter={StaticResource ConvertColor}}"/>
 										</Style>
 									</Canvas.Styles>
 
 										<!-- Top Left Side Card -->
-										<Image Height="250"
+										<Image Height="{Binding Source={x:Static local:Constants.IMAGE_HEIGHT}}"
 											   Width="{Binding Source={x:Static local:Constants.LEFT_SIDE_CARD_WIDTH}}"
 											   Source="{Binding Cover, Converter={StaticResource ConvertImage}}"
 											   Stretch="Fill"
+											   Cursor="Hand"
 											   DockPanel.Dock="Left"/>
 
 										<!-- Bottom Left Side Card -->
 										<TextBlock Canvas.Left="0"
 												   Name="StatusAndFormat"
 												   Canvas.Bottom="0"
+												   Cursor="Hand"
 												   Width="{Binding Source={x:Static local:Constants.LEFT_SIDE_CARD_WIDTH}}"
 												   Height="{Binding Source={x:Static local:Constants.BOTTOM_SECTION_CARD_HEIGHT}}"
-												   Background="{DynamicResource 'Status And Format BG'}"
-												   Foreground="{Binding CurrentTheme.StatusAndBookTypeTextColor, Converter={StaticResource ConvertColor}}"
+												   Background="{Binding #CollectionTheme.DataContext.CurrentTheme.StatusAndBookTypeBGColor, Converter={StaticResource ConvertColor}}"
+												   Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.StatusAndBookTypeTextColor, Converter={StaticResource ConvertColor}}"
 												   FontWeight="Bold"
 												   FontSize="16"
 												   TextAlignment="Center"
@@ -177,25 +269,23 @@
 								</Border>
 
 								<!-- Right Side Series Card -->
-								<Border CornerRadius="10" ClipToBounds="True">
+								<Border CornerRadius="0,8,8,0" ClipToBounds="True">
 									<Grid Width="{Binding Source={x:Static local:Constants.RIGHT_SIDE_CARD_WIDTH}}" DockPanel.Dock="Right" RowDefinitions="*, 40">
 										<!-- Top Right Side Card Series Edit-->
 										<Grid Name="EditPane" 
 											  Height="{Binding Source={x:Static local:Constants.TOP_SECTION_CARD_HEIGHT}}" 
 											  Grid.Row="0" 
-											  Background="{DynamicResource 'Series Edit Pane BG'}" 
+											  Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneBGColor, Converter={StaticResource ConvertColor}}" 
 											  ColumnDefinitions="*, 75" 
 											  IsVisible="false"
-											  ZIndex="0">
+											  ZIndex="1">
 											<Grid.Styles>
-												<Style Selector="TextBox:focused /template/ ContentPresenter">
-													<Setter Property="Background" Value="#12171d"/>
-													<Setter Property="BorderBrush" Value="#dfd59e"/>
-													<Setter Property="BorderThickness" Value="2"/>
-													<Setter Property="TextBlock.Foreground" Value="#dfd59e"/>
+												<Style Selector="TextBox:pointerover /template/ Border#PART_BorderElement, TextBox:focus /template/ Border#PART_BorderElement">
+													<Setter Property="Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesNotesBGColor, Converter={StaticResource ConvertColor}}"/>
+													<Setter Property="BorderBrush" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesNotesBorderColor, Converter={StaticResource ConvertColor}}"/>
 												</Style>
 											</Grid.Styles>
-											<TextBox Grid.Column="0" 
+											<TextBox Grid.Column="0"
 													 MinHeight="{Binding Source={x:Static local:Constants.USER_NOTES_HEIGHT}}"
 													 MinWidth="{Binding Source={x:Static local:Constants.USER_NOTES_WIDTH}}" 
 													 Margin="8"
@@ -203,71 +293,87 @@
 													 AcceptsReturn="True" 
 													 TextWrapping="Wrap"
 													 BorderThickness="2"
-													 BorderBrush="{DynamicResource 'Series Notes Border'}"
+													 BorderBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesNotesBorderColor, Converter={StaticResource ConvertColor}}"
 													 FontWeight="Bold"
-													 Foreground="{DynamicResource 'Series Notes Text'}"
-													 Background="{DynamicResource 'Series Notes BG'}"
-													 SelectionBrush="{DynamicResource 'Series Notes Text'}"
-													 SelectionForegroundBrush="{DynamicResource 'Series Notes BG'}"/>
+													 Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesNotesTextColor, Converter={StaticResource ConvertColor}}"
+													 Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesNotesBGColor, Converter={StaticResource ConvertColor}}"
+													 SelectionBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesNotesTextColor, Converter={StaticResource ConvertColor}}"
+													 SelectionForegroundBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesNotesBGColor, Converter={StaticResource ConvertColor}}"/>
 											<StackPanel Grid.Column="1" Spacing="10" VerticalAlignment="Center" HorizontalAlignment="Center">
 												<StackPanel.Styles>
 													<Style Selector="Button:pointerover /template/ ContentPresenter">
-														<Setter Property="Background" Value="{DynamicResource 'Series Card Button BG (Hover)'}"/>
-														<Setter Property="BorderBrush" Value="{DynamicResource 'Series Card Button Border (Hover)'}"/>
-														<Setter Property="BorderThickness" Value="2"/>
-														<Setter Property="TextBlock.Foreground" Value="{DynamicResource 'Series Card Button Icon (Hover)'}"/>
+														<Setter Property="Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesSwitchPaneButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
+														<Setter Property="TextBlock.Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesSwitchPaneButtonIconHoverColor, Converter={StaticResource ConvertColor}}"/>
 													</Style>
 												</StackPanel.Styles>
-												<Button FontSize="26" Background="{DynamicResource 'Series Card Button BG'}" BorderBrush="{DynamicResource 'Series Card Button Border'}" BorderThickness="2" Foreground="{DynamicResource 'Series Card Button Icon'}" i:Attached.Icon="fa-trash-can" Margin="3,10,0,0" Click="RemoveSeries"/>
+												<Button FontSize="26" 
+														Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsBGColor, Converter={StaticResource ConvertColor}}" 
+														BorderBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsBorderColor, Converter={StaticResource ConvertColor}}" 
+														BorderThickness="2" 
+														Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsIconColor, Converter={StaticResource ConvertColor}}" 
+														i:Attached.Icon="fa-trash-can" 
+														Margin="3,10,0,0" 
+														Click="RemoveSeries"/>
 												<MaskedTextBox MinHeight="40"
 															   MinWidth="51"
 															   MaxHeight="40"
 															   MaxWidth="51"
-															   BorderBrush="{DynamicResource 'Series Notes Border'}"
+															   BorderBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesNotesBorderColor, Converter={StaticResource ConvertColor}}"
 															   BorderThickness="2"
-															   Background="{DynamicResource 'Series Notes BG'}"
+															   Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesNotesBGColor, Converter={StaticResource ConvertColor}}"
 															   FontWeight="Bold"
-															   Foreground="{DynamicResource 'Series Notes Text'}"
+															   Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesNotesTextColor, Converter={StaticResource ConvertColor}}"
 															   Margin="1,0,23,0"
 															   FontSize="18"
 															   TextAlignment="Center"
 															   MaxLength="3"
 															   Padding="1,6,0,0"
-															   SelectionBrush="{DynamicResource 'Series Notes Text'}"
-															   SelectionForegroundBrush="{DynamicResource 'Series Notes BG'}"
+															   SelectionBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesNotesTextColor, Converter={StaticResource ConvertColor}}"
+															   SelectionForegroundBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesNotesBGColor, Converter={StaticResource ConvertColor}}"
 															   Mask="###"/>
 												<MaskedTextBox MinHeight="40"
 															   MinWidth="51"
 															   MaxHeight="40"
 															   MaxWidth="51"
-															   BorderBrush="{DynamicResource 'Series Notes Border'}"
+															   BorderBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesNotesBorderColor, Converter={StaticResource ConvertColor}}"
 															   BorderThickness="2"
-															   Background="{DynamicResource 'Series Notes BG'}"
+															   Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesNotesBGColor, Converter={StaticResource ConvertColor}}"
 															   FontWeight="Bold"
-															   Foreground="{DynamicResource 'Series Notes Text'}"
+															   Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesNotesTextColor, Converter={StaticResource ConvertColor}}"
 															   Margin="1,0,23,0"
 															   FontSize="18"
 															   TextAlignment="Center"
 															   MaxLength="3"
 															   Padding="1,6,0,0"
-															   SelectionBrush="{DynamicResource 'Series Notes Text'}"
-															   SelectionForegroundBrush="{DynamicResource 'Series Notes BG'}"
+															   SelectionBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesNotesTextColor, Converter={StaticResource ConvertColor}}"
+															   SelectionForegroundBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesNotesBGColor, Converter={StaticResource ConvertColor}}"
 															   Mask="###"/>
-												<Button FontSize="26" Background="{DynamicResource 'Series Card Button BG'}" BorderBrush="{DynamicResource 'Series Card Button Border'}" BorderThickness="2" Foreground="{DynamicResource 'Series Card Button Icon'}" i:Attached.Icon="fa-repeat" Margin="3,0,0,10" Click="ChangeSeriesVolumeCounts"/>
+												<Button FontSize="26" 
+														Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsBGColor, Converter={StaticResource ConvertColor}}" 
+														BorderBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsBorderColor, Converter={StaticResource ConvertColor}}" 
+														BorderThickness="2" 
+														Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsIconColor, Converter={StaticResource ConvertColor}}" 
+														i:Attached.Icon="fa-repeat" 
+														Margin="3,0,0,10" 
+														Click="ChangeSeriesVolumeCounts"/>
 											</StackPanel>
 										</Grid>
 
 										<!-- Top Right Side Card Series Data-->
-										<DockPanel Height="{Binding Source={x:Static local:Constants.TOP_SECTION_CARD_HEIGHT}}" Grid.Row="0" LastChildFill="True" Width="{Binding Source={x:Static local:Constants.RIGHT_SIDE_CARD_WIDTH}}" Background="{DynamicResource 'Series Card BG'}" ZIndex="1">
+										<DockPanel Height="{Binding Source={x:Static local:Constants.TOP_SECTION_CARD_HEIGHT}}" 
+												   Grid.Row="0" 
+												   LastChildFill="True"
+												   Width="{Binding Source={x:Static local:Constants.RIGHT_SIDE_CARD_WIDTH}}" 
+												   Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesCardBGColor, Converter={StaticResource ConvertColor}}">
 											<TextBlock DockPanel.Dock="Top"
 													   TextWrapping="Wrap"
-													   Foreground="{DynamicResource 'Series Title'}"
+													   Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesCardTitleColor, Converter={StaticResource ConvertColor}}"
 													   FontWeight="Bold"
 													   FontSize="23"
 													   PointerPressed="CopySeriesTitleAsync"
 													   Name="SeriesTitle"
 													   Padding="10,2,0,0"
-													   ToolTip.Tip="Copy Title"
+													   Cursor="Hand"
 													   LineHeight="30.0"> <!-- 24.0 -->
 												<TextBlock.Text>
 													<MultiBinding Converter="{StaticResource ConvertTitle}" Mode="OneWay">
@@ -280,7 +386,7 @@
 											</TextBlock>
 											<TextBlock DockPanel.Dock="Top"
 													   TextWrapping="Wrap"
-													   Foreground="{DynamicResource 'Series Staff'}"
+													   Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesCardStaffColor, Converter={StaticResource ConvertColor}}"
 													   Padding="10,0,4,2">
 												<TextBlock.Text>
 													<MultiBinding Converter="{StaticResource ConvertStaff}" Mode="OneWay">
@@ -292,7 +398,7 @@
 											</TextBlock>
 											<ScrollViewer VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled" DockPanel.Dock="Bottom">
 												<TextBlock TextWrapping="Wrap"
-														   Foreground="{DynamicResource 'Series Description'}"
+														   Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesCardDescColor, Converter={StaticResource ConvertColor}}"
 														   Opacity="0.9"
 														   Text="{Binding Description}"
 														   Padding="10,-2,5,10"/>
@@ -301,40 +407,66 @@
 
 										<!-- Bottom Right Side Card -->
 										<StackPanel Height="{Binding Source={x:Static local:Constants.BOTTOM_SECTION_CARD_HEIGHT}}"
-													Background="{DynamicResource 'Series Progress BG'}"
+													Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressBGColor, Converter={StaticResource ConvertColor}}"
 													Width="{Binding Source={x:Static local:Constants.RIGHT_SIDE_CARD_WIDTH}}"
 													Orientation="Horizontal"
 													Grid.Row="1"
+													Name="BottomRightSideCard"
 													HorizontalAlignment="Stretch">
 											<StackPanel.Styles>
 												<Style Selector="#EditSeriesButton:pointerover /template/ ContentPresenter">
-													<Setter Property="Background" Value="{DynamicResource 'Series Card Button BG (Hover)'}"/>
-													<Setter Property="TextBlock.Foreground" Value="{DynamicResource 'Series Card Button Icon (Hover)'}"/>
+													<Setter Property="TextBlock.Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesSwitchPaneButtonIconHoverColor, Converter={StaticResource ConvertColor}}"/>
+													<Setter Property="Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesSwitchPaneButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
 												</Style>
 											</StackPanel.Styles>
-											<Button CornerRadius="0,0,0,10"
-													Name="EditSeriesButton"
+											<Button Name="EditSeriesButton"
+													Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesSwitchPaneButtonBGColor, Converter={StaticResource ConvertColor}}"
 													FontSize="20"
-													Height="42"
+													Height="{Binding Source={x:Static local:Constants.BOTTOM_SECTION_CARD_HEIGHT}}"
 													Width="45"
-													Background="{DynamicResource 'Series Card Button BG'}"
-													Foreground="{DynamicResource 'Series Card Button Icon'}"
+													Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesSwitchPaneButtonIconColor, Converter={StaticResource ConvertColor}}"
 													i:Attached.Icon="fa-book-bookmark"
 													Click="ShowEditPane"/>
-											<ProgressBar Height="25"
-														 Width="220"
-														 Background="{DynamicResource 'Series Progress Bar BG'}"
-														 Value="{Binding CurVolumeCount}"
-														 Foreground="{DynamicResource 'Series Progress Bar'}"
-														 BorderBrush="{DynamicResource 'Series Progress Bar Border'}"
-														 BorderThickness="3"
-														 Margin="10,0,10,0"
-														 Minimum="0"
-														 Maximum="{Binding MaxVolumeCount}"
-														 Name="VolumeProgress"/>
+											<Border BorderBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressBarBorderColor, Converter={StaticResource ConvertColor}}" 
+													BorderThickness="1" 
+													CornerRadius="4" 
+													ClipToBounds="True" 
+													Height="25" 
+													Width="226" 
+													Margin="8,0,8,0" 
+													Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressBarBGColor, Converter={StaticResource ConvertColor}}">
+												<ProgressBar Height="25"
+														 	 Width="220"
+														 	 Value="{Binding CurVolumeCount}"
+															 Background="Transparent"
+														 	 Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressBarColor, Converter={StaticResource ConvertColor}}"
+															 Padding="0,3.5,0,3.5"
+														 	 Minimum="0"
+														 	 Maximum="{Binding MaxVolumeCount}"
+														 	 Name="VolumeProgress"/>
+											</Border>
+											<!-- Ideal Method but is Currently Broken as of 11.0.0-preview4 -->
+											<!-- <ProgressBar Height="25"
+														 	  Width="220"
+														 	  Value="{Binding CurVolumeCount}"
+															  Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressBarBGColor, Converter={StaticResource ConvertColor}}"
+														 	  Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressBarColor, Converter={StaticResource ConvertColor}}"
+															  BorderBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressBarBorderColor, Converter={StaticResource ConvertColor}}"
+															  BorderThickness="1"
+															  Margin="10,0,10,0"
+															  Padding="3.5"
+														 	  Minimum="0"
+														 	  Maximum="{Binding MaxVolumeCount}"
+														 	  Name="VolumeProgress"/> -->
 											<Border CornerRadius="0,0,10,0" ClipToBounds="true">
 												<StackPanel Width="68" VerticalAlignment="Center">
-													<TextBlock x:Name="VolumeCount" Grid.Row="0" Grid.Column="0" TextAlignment="Center" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource 'Series Progress Text'}" Margin="-8,2,0,0">
+													<TextBlock x:Name="VolumeCount" 
+															   Grid.Row="0" 
+															   Grid.Column="0" 
+															   TextAlignment="Center" 
+															   FontSize="15" 
+															   FontWeight="Bold" 
+															   Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressTextColor, Converter={StaticResource ConvertColor}}" Margin="-8,2,0,0">
 														<TextBlock.Text>
 															<MultiBinding StringFormat="{}{0}/{1}">
 																<Binding Path="CurVolumeCount"/>
@@ -345,12 +477,11 @@
 													<StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
 														<StackPanel.Styles>
 															<Style Selector="Button:pointerover /template/ ContentPresenter">
-																<Setter Property="Background" Value="Transparent"/>
-																<Setter Property="TextBlock.Foreground" Value="#20232d"/>
+																<Setter Property="TextBlock.Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressButtonsHoverColor, Converter={StaticResource ConvertColor}}"/>
 															</Style>
 														</StackPanel.Styles>
 														<Button Background="Transparent"
-																Foreground="{DynamicResource 'Series Progress Buttons'}"
+																Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressTextColor, Converter={StaticResource ConvertColor}}"
 																FontWeight="Bold"
 																FontSize="30"
 																MaxHeight="20"
@@ -361,7 +492,7 @@
 																Name="DecrementButton"
 																Content="-"/>
 														<Button Background="Transparent"
-																Foreground="{DynamicResource 'Series Progress Buttons'}"
+																Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressTextColor, Converter={StaticResource ConvertColor}}"
 																FontWeight="Bold"
 																FontSize="27"
 																MaxHeight="20"

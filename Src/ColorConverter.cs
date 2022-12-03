@@ -12,10 +12,9 @@ namespace Tsundoku.Src
         {
             if (value is UInt32)
             {
-                if (parameter != null && parameter.Equals("Picker"))
+                if (parameter != null && parameter.Equals("Hex"))
                 {
-                    
-                    return Avalonia.Media.HsvColor.Parse(value.ToString());
+                    return "0 5 10 1 " + Avalonia.Media.Color.FromUInt32((uint)value).ToString();
                 }
                 else
                 {
