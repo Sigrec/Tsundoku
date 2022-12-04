@@ -6,7 +6,7 @@ using ReactiveUI.Fody.Helpers;
 
 namespace Tsundoku.Models
 {
-    public class TsundokuTheme : ICloneable, IDisposable
+    public class TsundokuTheme : ICloneable, IDisposable, IEquatable<TsundokuTheme?>
     {
         public string ThemeName { get; set; }
         public uint MenuBGColor { get; set; }
@@ -46,11 +46,9 @@ namespace Tsundoku.Models
         public uint SeriesNotesBorderColor { get; set; }
         public uint SeriesNotesTextColor { get; set; }
         public uint SeriesEditPaneButtonsBGColor { get; set; }
-
         public uint SeriesEditPaneButtonsBGHoverColor { get; set; }
         public uint SeriesEditPaneButtonsBorderColor { get; set; }
         public uint SeriesEditPaneButtonsBorderHoverColor { get; set; }
-
         public uint SeriesEditPaneButtonsIconColor { get; set; }
         public uint SeriesEditPaneButtonsIconHoverColor { get; set; }
 
@@ -172,54 +170,6 @@ namespace Tsundoku.Models
             return Cloning();
         }
 
-        public override bool Equals(object? obj)
-        {
-            return obj is TsundokuTheme theme &&
-                   ThemeName == theme.ThemeName &&
-                   MenuBGColor == theme.MenuBGColor &&
-                   UsernameColor == theme.UsernameColor &&
-                   MenuTextColor == theme.MenuTextColor &&
-                   SearchBarBGColor == theme.SearchBarBGColor &&
-                   SearchBarBorderColor == theme.SearchBarBorderColor &&
-                   SearchBarTextColor == theme.SearchBarTextColor &&
-                   MenuButtonBGColor == theme.MenuButtonBGColor &&
-                   MenuButtonBGHoverColor == theme.MenuButtonBGHoverColor &&
-                   MenuButtonBorderColor == theme.MenuButtonBorderColor &&
-                   MenuButtonBorderHoverColor == theme.MenuButtonBorderHoverColor &&
-                   MenuButtonTextAndIconColor == theme.MenuButtonTextAndIconColor &&
-                   MenuButtonTextAndIconHoverColor == theme.MenuButtonTextAndIconHoverColor &&
-                   DividerColor == theme.DividerColor &&
-                   CollectionBGColor == theme.CollectionBGColor &&
-                   StatusAndBookTypeBGColor == theme.StatusAndBookTypeBGColor &&
-                   StatusAndBookTypeBGHoverColor == theme.StatusAndBookTypeBGHoverColor &&
-                   StatusAndBookTypeTextColor == theme.StatusAndBookTypeTextColor &&
-                   StatusAndBookTypeTextHoverColor == theme.StatusAndBookTypeTextHoverColor &&
-                   SeriesCardBGColor == theme.SeriesCardBGColor &&
-                   SeriesCardTitleColor == theme.SeriesCardTitleColor &&
-                   SeriesCardStaffColor == theme.SeriesCardStaffColor &&
-                   SeriesCardDescColor == theme.SeriesCardDescColor &&
-                   SeriesProgressBGColor == theme.SeriesProgressBGColor &&
-                   SeriesProgressBarColor == theme.SeriesProgressBarColor &&
-                   SeriesProgressBarBGColor == theme.SeriesProgressBarBGColor &&
-                   SeriesProgressBarBorderColor == theme.SeriesProgressBarBorderColor &&
-                   SeriesProgressTextColor == theme.SeriesProgressTextColor &&
-                   SeriesProgressButtonsHoverColor == theme.SeriesProgressButtonsHoverColor &&
-                   SeriesSwitchPaneButtonBGColor == theme.SeriesSwitchPaneButtonBGColor &&
-                   SeriesSwitchPaneButtonBGHoverColor == theme.SeriesSwitchPaneButtonBGHoverColor &&
-                   SeriesSwitchPaneButtonIconColor == theme.SeriesSwitchPaneButtonIconColor &&
-                   SeriesSwitchPaneButtonIconHoverColor == theme.SeriesSwitchPaneButtonIconHoverColor &&
-                   SeriesEditPaneBGColor == theme.SeriesEditPaneBGColor &&
-                   SeriesNotesBGColor == theme.SeriesNotesBGColor &&
-                   SeriesNotesBorderColor == theme.SeriesNotesBorderColor &&
-                   SeriesNotesTextColor == theme.SeriesNotesTextColor &&
-                   SeriesEditPaneButtonsBGColor == theme.SeriesEditPaneButtonsBGColor &&
-                   SeriesEditPaneButtonsBGHoverColor == theme.SeriesEditPaneButtonsBGHoverColor &&
-                   SeriesEditPaneButtonsBorderColor == theme.SeriesEditPaneButtonsBorderColor &&
-                   SeriesEditPaneButtonsBorderHoverColor == theme.SeriesEditPaneButtonsBorderHoverColor &&
-                   SeriesEditPaneButtonsIconColor == theme.SeriesEditPaneButtonsIconColor &&
-                   SeriesEditPaneButtonsIconHoverColor == theme.SeriesEditPaneButtonsIconHoverColor;
-        }
-
         public override int GetHashCode()
         {
             HashCode hash = new HashCode();
@@ -296,6 +246,69 @@ namespace Tsundoku.Models
             // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return Equals(obj as TsundokuTheme);
+        }
+
+        public bool Equals(TsundokuTheme? other)
+        {
+            return other is not null &&
+                   ThemeName == other.ThemeName &&
+                   MenuBGColor == other.MenuBGColor &&
+                   UsernameColor == other.UsernameColor &&
+                   MenuTextColor == other.MenuTextColor &&
+                   SearchBarBGColor == other.SearchBarBGColor &&
+                   SearchBarBorderColor == other.SearchBarBorderColor &&
+                   SearchBarTextColor == other.SearchBarTextColor &&
+                   MenuButtonBGColor == other.MenuButtonBGColor &&
+                   MenuButtonBGHoverColor == other.MenuButtonBGHoverColor &&
+                   MenuButtonBorderColor == other.MenuButtonBorderColor &&
+                   MenuButtonBorderHoverColor == other.MenuButtonBorderHoverColor &&
+                   MenuButtonTextAndIconColor == other.MenuButtonTextAndIconColor &&
+                   MenuButtonTextAndIconHoverColor == other.MenuButtonTextAndIconHoverColor &&
+                   DividerColor == other.DividerColor &&
+                   CollectionBGColor == other.CollectionBGColor &&
+                   StatusAndBookTypeBGColor == other.StatusAndBookTypeBGColor &&
+                   StatusAndBookTypeBGHoverColor == other.StatusAndBookTypeBGHoverColor &&
+                   StatusAndBookTypeTextColor == other.StatusAndBookTypeTextColor &&
+                   StatusAndBookTypeTextHoverColor == other.StatusAndBookTypeTextHoverColor &&
+                   SeriesCardBGColor == other.SeriesCardBGColor &&
+                   SeriesCardTitleColor == other.SeriesCardTitleColor &&
+                   SeriesCardStaffColor == other.SeriesCardStaffColor &&
+                   SeriesCardDescColor == other.SeriesCardDescColor &&
+                   SeriesProgressBGColor == other.SeriesProgressBGColor &&
+                   SeriesProgressBarColor == other.SeriesProgressBarColor &&
+                   SeriesProgressBarBGColor == other.SeriesProgressBarBGColor &&
+                   SeriesProgressBarBorderColor == other.SeriesProgressBarBorderColor &&
+                   SeriesProgressTextColor == other.SeriesProgressTextColor &&
+                   SeriesProgressButtonsHoverColor == other.SeriesProgressButtonsHoverColor &&
+                   SeriesSwitchPaneButtonBGColor == other.SeriesSwitchPaneButtonBGColor &&
+                   SeriesSwitchPaneButtonBGHoverColor == other.SeriesSwitchPaneButtonBGHoverColor &&
+                   SeriesSwitchPaneButtonIconColor == other.SeriesSwitchPaneButtonIconColor &&
+                   SeriesSwitchPaneButtonIconHoverColor == other.SeriesSwitchPaneButtonIconHoverColor &&
+                   SeriesEditPaneBGColor == other.SeriesEditPaneBGColor &&
+                   SeriesNotesBGColor == other.SeriesNotesBGColor &&
+                   SeriesNotesBorderColor == other.SeriesNotesBorderColor &&
+                   SeriesNotesTextColor == other.SeriesNotesTextColor &&
+                   SeriesEditPaneButtonsBGColor == other.SeriesEditPaneButtonsBGColor &&
+                   SeriesEditPaneButtonsBGHoverColor == other.SeriesEditPaneButtonsBGHoverColor &&
+                   SeriesEditPaneButtonsBorderColor == other.SeriesEditPaneButtonsBorderColor &&
+                   SeriesEditPaneButtonsBorderHoverColor == other.SeriesEditPaneButtonsBorderHoverColor &&
+                   SeriesEditPaneButtonsIconColor == other.SeriesEditPaneButtonsIconColor &&
+                   SeriesEditPaneButtonsIconHoverColor == other.SeriesEditPaneButtonsIconHoverColor;
+        }
+
+        public static bool operator ==(TsundokuTheme? left, TsundokuTheme? right)
+        {
+            return EqualityComparer<TsundokuTheme>.Default.Equals(left, right);
+        }
+
+        public static bool operator !=(TsundokuTheme? left, TsundokuTheme? right)
+        {
+            return !(left == right);
         }
     }
 }

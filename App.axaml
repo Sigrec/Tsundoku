@@ -13,42 +13,20 @@
 
     <Application.Resources>
         <cv:ColorConverter x:Key="ConvertColor"/>
-        <!-- <SolidColorBrush x:Key="Menu BG">#12171d</SolidColorBrush>
-        <SolidColorBrush x:Key="Username">#dfd59e</SolidColorBrush>
-        <SolidColorBrush x:Key="Menu Text">#dfd59e</SolidColorBrush>
-        <SolidColorBrush x:Key="Menu Button BG">#20232d</SolidColorBrush>
-        <SolidColorBrush x:Key="Menu Button Border">#dfd59e</SolidColorBrush>
-        <SolidColorBrush x:Key="Menu Button Icon/Text">#dfd59e</SolidColorBrush>
-        <SolidColorBrush x:Key="Menu Button BG (Hover)">#dfd59e</SolidColorBrush>
-        <SolidColorBrush x:Key="Menu Button Border (Hover)">#20232d</SolidColorBrush>
-        <SolidColorBrush x:Key="Menu Button Icon/Text (Hover)">#20232d</SolidColorBrush>
-
-        <SolidColorBrush x:Key="Seperator">#dfd59e</SolidColorBrush>
-
-        <SolidColorBrush x:Key="Collection BG" Color="{Binding UserThemes[0].Collection_BG_Color}"/>
-        <SolidColorBrush x:Key="Status And Format BG" Color="{Binding ViewModelBase.CurrentTheme.StatusAndBookTypeBGColor, Converter={StaticResource ConvertColor}}"/>
-        <SolidColorBrush x:Key="Status And Format Text">#dfd59e</SolidColorBrush>
-        <SolidColorBrush x:Key="Series Card BG">#20232d</SolidColorBrush>
-        <SolidColorBrush x:Key="Series Title">#dfd59e</SolidColorBrush>
-        <SolidColorBrush x:Key="Series Staff">#dfd59e</SolidColorBrush>
-        <SolidColorBrush x:Key="Series Description">#ececec</SolidColorBrush>
-
-        <SolidColorBrush x:Key="Series Progress BG">#2c2d42</SolidColorBrush>
-        <SolidColorBrush x:Key="Series Progress Bar">#dfd59e</SolidColorBrush>
-        <SolidColorBrush x:Key="Series Progress Bar BG">#20232d</SolidColorBrush>
-        <SolidColorBrush x:Key="Series Progress Bar Border">#12171d</SolidColorBrush>
-        <SolidColorBrush x:Key="Series Progress Text">#dfd59e</SolidColorBrush>
-        <SolidColorBrush x:Key="Series Progress Buttons">#dfd59e</SolidColorBrush>
-
-        <SolidColorBrush x:Key="Series Edit Pane BG">#20232d</SolidColorBrush>
-        <SolidColorBrush x:Key="Series Notes BG">#12171d</SolidColorBrush>
-        <SolidColorBrush x:Key="Series Notes Border">#dfd59e</SolidColorBrush>
-        <SolidColorBrush x:Key="Series Notes Text">#dfd59e</SolidColorBrush>
-        <SolidColorBrush x:Key="Series Card Button BG">#20232d</SolidColorBrush>
-        <SolidColorBrush x:Key="Series Card Button Border">#dfd59e</SolidColorBrush>
-        <SolidColorBrush x:Key="Series Card Button Icon">#dfd59e</SolidColorBrush>
-        <SolidColorBrush x:Key="Series Card Button BG (Hover)">#dfd59e</SolidColorBrush>
-        <SolidColorBrush x:Key="Series Card Button Border (Hover)">#20232d</SolidColorBrush>
-        <SolidColorBrush x:Key="Series Card Button Icon (Hover)">#20232d</SolidColorBrush> -->
     </Application.Resources>
+
+    <TrayIcon.Icons>
+		<TrayIcons>
+			<TrayIcon Icon="\Assets\Icons\Tsundoku-Logo.ico" ToolTipText="Tsundoku">
+				<!-- <TrayIcon.Menu>
+					<NativeMenu>
+						<NativeMenuItem Header="Open User Settings" ToggleType="Radio" IsChecked="False" Command="{Binding ToggleCommand}" />
+						<NativeMenuItem Header="Open Theme Settings" ToggleType="Radio" IsChecked="True" Command="{Binding OpenThemeSettingsWindow}" />
+						<NativeMenuItem Header="Open Add New Series Window" ToggleType="CheckBox" IsChecked="True" Command="{Binding ToggleCommand}" />
+						<NativeMenuItem Header="Exit" Command="{Binding SaveOnClose}" />
+					</NativeMenu>
+				</TrayIcon.Menu> -->
+			</TrayIcon>
+		</TrayIcons>
+  	</TrayIcon.Icons>
 </Application>

@@ -10,11 +10,11 @@ namespace Tsundoku.Models
         public uint NumVolumesToBeCollected { get; set; }
         public string CurLanguage { get; set; }
         public string Display { get; set; }
-        public TsundokuTheme MainTheme { get; set; }
+        public string MainTheme { get; set; }
         public ObservableCollection<TsundokuTheme> SavedThemes { get; set; }
         public ObservableCollection<Series> UserCollection { get; set; }
 
-        public User(string userName, string curLanguage, TsundokuTheme mainTheme, string display, ObservableCollection<TsundokuTheme> savedThemes, ObservableCollection<Series> userCollection)
+        public User(string userName, string curLanguage, string mainTheme, string display, ObservableCollection<TsundokuTheme> savedThemes, ObservableCollection<Series> userCollection)
         {
             UserName = userName;
             CurLanguage = curLanguage;

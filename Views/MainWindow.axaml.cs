@@ -16,6 +16,7 @@ using System.Text.RegularExpressions;
 using System.IO;
 using ReactiveUI;
 using System.Threading.Tasks;
+using System.Reactive.Concurrency;
 
 namespace Tsundoku.Views
 {
@@ -28,6 +29,7 @@ namespace Tsundoku.Views
         public MainWindow()
         {
             InitializeComponent();
+           //RxApp.MainThreadScheduler.Schedule(() => ChangeSeriesVolumeCountsAsync());
         }
 
         private void SearchCollection(object sender, KeyEventArgs args)
@@ -35,22 +37,32 @@ namespace Tsundoku.Views
             CollectionViewModel.SearchIsBusy = true;
         }
 
-        private void ChangeSeriesVolumeCounts(object sender, RoutedEventArgs args)
+        private async void ChangeSeriesVolumeCountsAsync(object sender, RoutedEventArgs args)
         {
-            var textBoxes = ((Button)sender).GetLogicalSiblings();
-            ushort maxVolumeChange = Convert.ToUInt16(((MaskedTextBox)textBoxes.ElementAt(1)).Text.Replace("_", ""));
-            ushort curVolumeChange = Convert.ToUInt16(((MaskedTextBox)textBoxes.ElementAt(2)).Text.Replace("_", ""));
-            Series curSeries = (Series)((Button)sender).DataContext;
-            if (maxVolumeChange >= curVolumeChange)
+            var result = await Observable.Start(() => 
             {
-                CollectionViewModel.UsersNumVolumesCollected = CollectionViewModel.UsersNumVolumesCollected - curSeries.CurVolumeCount + curVolumeChange;
-                CollectionViewModel.UsersNumVolumesToBeCollected = CollectionViewModel.UsersNumVolumesToBeCollected - (uint)(curSeries.MaxVolumeCount - curSeries.CurVolumeCount) + (uint)(maxVolumeChange - curVolumeChange);
-                Logger.Info($"Changed Series Values For {curSeries.Titles[0]} From {curSeries.CurVolumeCount}/{curSeries.MaxVolumeCount} -> {curVolumeChange}/{maxVolumeChange}");
-                curSeries.CurVolumeCount = curVolumeChange;
-                curSeries.MaxVolumeCount = maxVolumeChange;
-                TextBlock volumeDisplay = (TextBlock)(((Button)sender)).Parent.Parent.GetLogicalSiblings().ElementAt(2).GetLogicalChildren().ElementAt(2).GetLogicalChildren().ElementAt(0).GetLogicalChildren().ElementAt(0);
-                volumeDisplay.Text = curSeries.CurVolumeCount + "/" + curSeries.MaxVolumeCount;
-            }
+                var textBoxes = ((Button)sender).GetLogicalSiblings();
+                ushort maxVolumeChange = Convert.ToUInt16(((MaskedTextBox)textBoxes.ElementAt(1)).Text.Replace("_", ""));
+                ushort curVolumeChange = Convert.ToUInt16(((MaskedTextBox)textBoxes.ElementAt(2)).Text.Replace("_", ""));
+                Series curSeries = (Series)((Button)sender).DataContext;
+                if (maxVolumeChange >= curVolumeChange)
+                {
+                    CollectionViewModel.UsersNumVolumesCollected = CollectionViewModel.UsersNumVolumesCollected - curSeries.CurVolumeCount + curVolumeChange;
+                    CollectionViewModel.UsersNumVolumesToBeCollected = CollectionViewModel.UsersNumVolumesToBeCollected - (uint)(curSeries.MaxVolumeCount - curSeries.CurVolumeCount) + (uint)(maxVolumeChange - curVolumeChange);
+                    Logger.Info($"Changed Series Values For {curSeries.Titles[0]} From {curSeries.CurVolumeCount}/{curSeries.MaxVolumeCount} -> {curVolumeChange}/{maxVolumeChange}");
+                    curSeries.CurVolumeCount = curVolumeChange;
+                    curSeries.MaxVolumeCount = maxVolumeChange;
+                    
+                    var parentControl = (sender as Button).FindLogicalAncestorOfType<Border>(false).GetLogicalChildren().ElementAt(0).GetLogicalChildren().ElementAt(2);
+                    parentControl.FindLogicalDescendantOfType<TextBlock>(false).Text = curSeries.CurVolumeCount + "/" + curSeries.MaxVolumeCount;
+                    
+                    ProgressBar seriesProgressBar = parentControl.FindLogicalDescendantOfType<ProgressBar>(false);
+                    seriesProgressBar.Maximum = maxVolumeChange;
+                    seriesProgressBar.Value = curVolumeChange;
+                    parentControl = null;
+                    seriesProgressBar = null;  
+                }
+            }, RxApp.MainThreadScheduler);
         }
 
         private void RemoveSeries(object sender, RoutedEventArgs args)
@@ -118,7 +130,7 @@ namespace Tsundoku.Views
             return source.Substring(start, len); // Return Substring of length
         }
 
-        private void SaveOnClose(object sender, CancelEventArgs e)
+        public void SaveOnCloseTwo()
         {
             Logger.Info("Closing TsundOku");
             if (CollectionViewModel.newSeriesWindow != null)
@@ -163,9 +175,15 @@ namespace Tsundoku.Views
                 }
                 removeSeriesCheck = true;
             }
-            ThemeSettingsViewModel.UserThemes.Move(ThemeSettingsViewModel.UserThemes.IndexOf(MainWindowViewModel.MainUser.MainTheme), 0);
+            
+            ThemeSettingsViewModel.UserThemes.Move(ThemeSettingsViewModel.UserThemes.IndexOf(ThemeSettingsViewModel.UserThemes.Single(x => x.ThemeName == MainWindowViewModel.MainUser.MainTheme)), 0);
 
             MainWindowViewModel.SaveUsersData();
+        }
+
+        public void SaveOnClose(object sender, CancelEventArgs e)
+        {
+            SaveOnCloseTwo();
         }
 
         private void OpenSiteLink(object sender, PointerPressedEventArgs args)

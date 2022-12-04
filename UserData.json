@@ -1,54 +1,10 @@
 {
-  "UserName": "UserName",
-  "NumVolumesCollected": 17,
-  "NumVolumesToBeCollected": 37,
+  "UserName": "Username",
+  "NumVolumesCollected": 24,
+  "NumVolumesToBeCollected": 99,
   "CurLanguage": "English",
   "Display": "Card",
-  "MainTheme": {
-    "ThemeName": "Default",
-    "MenuBGColor": 4281085250,
-    "UsernameColor": 4292859294,
-    "MenuTextColor": 4292859294,
-    "SearchBarBGColor": 4279375645,
-    "SearchBarBorderColor": 4292859294,
-    "SearchBarTextColor": 4292859294,
-    "MenuButtonBGColor": 2568099613,
-    "MenuButtonBGHoverColor": 3001013662,
-    "MenuButtonBorderColor": 4292859294,
-    "MenuButtonBorderHoverColor": 4279375645,
-    "MenuButtonTextAndIconColor": 4292859294,
-    "MenuButtonTextAndIconHoverColor": 4279375645,
-    "DividerColor": 4292859294,
-    "CollectionBGColor": 4279375645,
-    "StatusAndBookTypeBGColor": 4229964589,
-    "StatusAndBookTypeBGHoverColor": 4280296237,
-    "StatusAndBookTypeTextColor": 4074755486,
-    "StatusAndBookTypeTextHoverColor": 4292859294,
-    "SeriesCardBGColor": 4280296237,
-    "SeriesCardTitleColor": 4292859294,
-    "SeriesCardStaffColor": 4292859294,
-    "SeriesCardDescColor": 3857509612,
-    "SeriesProgressBGColor": 4281085250,
-    "SeriesProgressBarColor": 4292859294,
-    "SeriesProgressBarBGColor": 4279375645,
-    "SeriesProgressBarBorderColor": 4292859294,
-    "SeriesProgressTextColor": 4292859294,
-    "SeriesProgressButtonsHoverColor": 4279375645,
-    "SeriesSwitchPaneButtonBGColor": 4281085250,
-    "SeriesSwitchPaneButtonBGHoverColor": 4292859294,
-    "SeriesSwitchPaneButtonIconColor": 4292859294,
-    "SeriesSwitchPaneButtonIconHoverColor": 4279375645,
-    "SeriesEditPaneBGColor": 4280296237,
-    "SeriesNotesBGColor": 4279375645,
-    "SeriesNotesBorderColor": 4292859294,
-    "SeriesNotesTextColor": 4292859294,
-    "SeriesEditPaneButtonsBGColor": 4281085250,
-    "SeriesEditPaneButtonsBGHoverColor": 4292859294,
-    "SeriesEditPaneButtonsBorderColor": 4292859294,
-    "SeriesEditPaneButtonsBorderHoverColor": 4281085250,
-    "SeriesEditPaneButtonsIconColor": 4292859294,
-    "SeriesEditPaneButtonsIconHoverColor": 4281085250
-  },
+  "MainTheme": "Default",
   "SavedThemes": [
     {
       "ThemeName": "Default",
@@ -94,6 +50,51 @@
       "SeriesEditPaneButtonsBorderHoverColor": 4281085250,
       "SeriesEditPaneButtonsIconColor": 4292859294,
       "SeriesEditPaneButtonsIconHoverColor": 4281085250
+    },
+    {
+      "ThemeName": "Test",
+      "MenuBGColor": 4285136896,
+      "UsernameColor": 4285657612,
+      "MenuTextColor": 4293513749,
+      "SearchBarBGColor": 4294928640,
+      "SearchBarBorderColor": 4278255615,
+      "SearchBarTextColor": 4286578629,
+      "MenuButtonBGColor": 2580557503,
+      "MenuButtonBGHoverColor": 2991387148,
+      "MenuButtonBorderColor": 4294967295,
+      "MenuButtonBorderHoverColor": 4278190080,
+      "MenuButtonTextAndIconColor": 4282908927,
+      "MenuButtonTextAndIconHoverColor": 4278255615,
+      "DividerColor": 4280022536,
+      "CollectionBGColor": 4286526208,
+      "StatusAndBookTypeBGColor": 4241512494,
+      "StatusAndBookTypeBGHoverColor": 4280296237,
+      "StatusAndBookTypeTextColor": 4063046866,
+      "StatusAndBookTypeTextHoverColor": 4292859294,
+      "SeriesCardBGColor": 4278209151,
+      "SeriesCardTitleColor": 4286513207,
+      "SeriesCardStaffColor": 4282850304,
+      "SeriesCardDescColor": 3857113112,
+      "SeriesProgressBGColor": 4282351431,
+      "SeriesProgressBarColor": 4281348144,
+      "SeriesProgressBarBGColor": 4286540288,
+      "SeriesProgressBarBorderColor": 4294934509,
+      "SeriesProgressTextColor": 4286578687,
+      "SeriesProgressButtonsHoverColor": 4294901760,
+      "SeriesSwitchPaneButtonBGColor": 4292542335,
+      "SeriesSwitchPaneButtonBGHoverColor": 4286529371,
+      "SeriesSwitchPaneButtonIconColor": 4278195071,
+      "SeriesSwitchPaneButtonIconHoverColor": 4285366079,
+      "SeriesEditPaneBGColor": 4283891839,
+      "SeriesNotesBGColor": 4286550783,
+      "SeriesNotesBorderColor": 4294957056,
+      "SeriesNotesTextColor": 4283596607,
+      "SeriesEditPaneButtonsBGColor": 4278195071,
+      "SeriesEditPaneButtonsBGHoverColor": 4294934509,
+      "SeriesEditPaneButtonsBorderColor": 4294901870,
+      "SeriesEditPaneButtonsBorderHoverColor": 4278255393,
+      "SeriesEditPaneButtonsIconColor": 4294928896,
+      "SeriesEditPaneButtonsIconHoverColor": 4287720531
     }
   ],
   "UserCollection": [
@@ -153,6 +154,101 @@
       "SeriesNotes": null,
       "MaxVolumeCount": 34,
       "CurVolumeCount": 0
+    },
+    {
+      "Titles": [
+        "Overlord",
+        "Overlord",
+        "\u30AA\u30FC\u30D0\u30FC\u30ED\u30FC\u30C9"
+      ],
+      "Staff": [
+        "Kugane Maruyama | so-bin",
+        "\u4E38\u5C71\u304F\u304C\u306D | so-bin"
+      ],
+      "Description": "For twelve years, the virtual world of Yggdrasil has served as the playground and battlefield for the skeletal lord Momonga and his guild of fellow monsters, Ainz Ooal Gown. But the guild\u0027s glory days are over, and the game is shutting down permanently. When Momonga logs in one last time just to be there when the servers go dark, something happens--and suddenly, fantasy is reality. A rogues\u0027 gallery of fanatically devoted NPCs is ready to obey his every order, but the world Momonga now inhabits is not the one he remembers. The game may be over, but the epic tale of Ainz Ooal Gown is only beginning...",
+      "Format": "Novel",
+      "Status": "Ongoing",
+      "Cover": "Assets\\Covers\\Overlord_NOVEL.png",
+      "Link": "https://anilist.co/manga/85976",
+      "SeriesNotes": "test",
+      "MaxVolumeCount": 18,
+      "CurVolumeCount": 0
+    },
+    {
+      "Titles": [
+        "Vagabond",
+        "Vagabond",
+        "\u30D0\u30AC\u30DC\u30F3\u30C9"
+      ],
+      "Staff": [
+        "Takehiko Inoue | Eiji Yoshikawa",
+        "\u4E95\u4E0A\u96C4\u5F66 | \u5409\u5DDD\u82F1\u6CBB"
+      ],
+      "Description": "At seventeen years of age, Miyamoto Musashi--still known by his childhood name, Shinmen Takezo--was a wild young brute just setting out along the way of the sword.\n\nIn the aftermath of the epic Battle of Sekigahara, Takezo finds himself a fugitive survivor on the losing side of the war. Takezo\u0027s vicious nature has made him an outcast even in his own village, and he is hunted down like an animal. At this crucial crossroads in Takezo\u0027s life, an eccentric monk and a childhood friend are the only ones who can help him find his way.",
+      "Format": "Manga",
+      "Status": "Hiatus",
+      "Cover": "Assets\\Covers\\Vagabond_MANGA.png",
+      "Link": "https://anilist.co/manga/30656",
+      "SeriesNotes": null,
+      "MaxVolumeCount": 36,
+      "CurVolumeCount": 0
+    },
+    {
+      "Titles": [
+        "Gakuen Mokushiroku: HIGHSCHOOL OF THE DEAD",
+        "Highschool of the Dead",
+        "\u5B66\u5712\u9ED9\u793A\u9332 HIGHSCHOOL OF THE DEAD"
+      ],
+      "Staff": [
+        "Daisuke Satou | Shouji Satou",
+        "\u4F50\u85E4\u5927\u8F14 | \u4F50\u85E4\u30B7\u30E7\u30A6\u30B8"
+      ],
+      "Description": "A mysterious illness is spreading rapidly through the halls of Fujimi High School. In a matter of hours, the campus is transformed from a place of learning into a hive of nightmares, as the infected students collapse and are reborn as flesh-hungry zombies! Only a handful of students escape the initial outbreak - among them Takashi Komuro and his childhood friend, Rei. He manages to protect Rei from the initial onslaught, but how long can Takashi and the other students hope to survive when the whole school - maybe the whole town - is out for their blood?!",
+      "Format": "Manga",
+      "Status": "Cancelled",
+      "Cover": "Assets\\Covers\\GakuenMokushirokuHIGHSCHOOLOFTHEDEAD_MANGA.jpg",
+      "Link": "https://anilist.co/manga/30669",
+      "SeriesNotes": null,
+      "MaxVolumeCount": 7,
+      "CurVolumeCount": 0
+    },
+    {
+      "Titles": [
+        "Lycoris Recoil Koushiki Comic Anthology: Repeat",
+        "Lycoris Recoil Koushiki Comic Anthology: Repeat",
+        "\u30EA\u30B3\u30EA\u30B9\u30FB\u30EA\u30B3\u30A4\u30EB \u516C\u5F0F\u30B3\u30DF\u30C3\u30AF\u30A2\u30F3\u30BD\u30ED\u30B8\u30FC \u30EA\u30D4\u30FC\u30C8"
+      ],
+      "Staff": [
+        "Atto | Miki Morinaga | Takeshi Kojima | Tiv | Nachi Aono | Ren Sakuragi | Itsuki Takano | Ginmoku | Kanari Abe | GUNP | Nikomi Wakadori | sometime | Ryou Niina | Mekimeki | Sou Hamayumiba |  Nyoijizai  | Raika Suzumi | Mikaduchi | Ree",
+        "\u3042\u3063\u3068 | \u68EE\u6C38\u30DF\u30AD |  \u3053\u3058\u307E\u305F\u3051\u3057 | Tiv | \u3042\u304A\u306E\u306A\u3061 | \u685C\u6728\u84EE | \u9AD8\u91CE\u3044\u3064\u304D | \u304E\u3093\u3082\u304F | \u963F\u90E8\u304B\u306A\u308A | GUNP | \u82E5\u9D8F\u306B\u3053\u307F | \u305D\u3081\u3061\u3081 | \u306B\u3044\u306A\u6DBC | \u3081\u304D\u3081\u304D  | \u6D5C\u5F13\u5834\u53CC | \u5982\u610F\u81EA\u5728 | \u6DBC\u6D77\u6765\u590F | \u307F\u304B\u3065\u3061 | \u308C\u3047"
+      ],
+      "Description": "",
+      "Format": "Manga",
+      "Status": "Coming Soon",
+      "Cover": "Assets\\Covers\\LycorisRecoilKoushikiComicAnthologyRepeat_MANGA.jpg",
+      "Link": "https://anilist.co/manga/157671",
+      "SeriesNotes": null,
+      "MaxVolumeCount": 2,
+      "CurVolumeCount": 1
+    },
+    {
+      "Titles": [
+        "Sekai Saikyou no Kouei: Meikyuukoku no Shinjin Tansakusha",
+        "Sekai Saikyou no Kouei: Meikyuukoku no Shinjin Tansakusha",
+        "\u4E16\u754C\u6700\u5F37\u306E\u5F8C\u885B\u3000\uFF5E\u8FF7\u5BAE\u56FD\u306E\u65B0\u4EBA\u63A2\u7D22\u8005\uFF5E"
+      ],
+      "Staff": [
+        "Rikizo | Huuka Kazabana | Toowa Akatsuki",
+        "\u529B\u8535 | \u98A8\u82B1\u98A8\u82B1 | \u6731\u6708\u5341\u8A71"
+      ],
+      "Description": "Corporate slave Arihito Atobe\u0027s death in a freak bus accident marks the beginning of his new life as a kind of adventurer called a Seeker. Reborn into a fantasy world, he settles into a previously unknown job class called \u0022rearguard,\u0022 capable of providing his (all-female) party with critical attack, defense, and recovery support. And it comes with an added bonus: Simply being at the back of the party line increases his companions\u0027 fondness for him! Freed from the shackles of corporate life, Arihito is eager to start fresh as a newly minted Seeker!",
+      "Format": "Manga",
+      "Status": "Ongoing",
+      "Cover": "Assets\\Covers\\SekaiSaikyounoKoueiMeikyuukokunoShinjinTansakusha_MANGA.jpg",
+      "Link": "https://anilist.co/manga/101734",
+      "SeriesNotes": null,
+      "MaxVolumeCount": 6,
+      "CurVolumeCount": 6
     }
   ]
 }

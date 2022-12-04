@@ -16,7 +16,7 @@ namespace Tsundoku.Views
         {
             InitializeComponent();
             this.DataContext = new AddNewSeriesViewModel();
-            Activated += (s, e) =>
+            Opened += (s, e) =>
             {
                 AddNewSeriesVM.CurrentTheme = ((MainWindow)((Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).MainWindow).CollectionViewModel.CurrentTheme;
             };

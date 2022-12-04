@@ -162,7 +162,7 @@
 					</Border>
 				</StackPanel>
 				<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
-					<TextBlock Text="Status And BookType Text" FontSize="12" FontWeight="Bold" Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}"/>
+					<TextBlock Text="Status And BookType Text (Hover)" FontSize="12" FontWeight="Bold" Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}"/>
 					<Border Background="{Binding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}" BorderBrush="{Binding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}" BorderThickness="2">
 						<Border Background="{Binding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}" BorderBrush="{Binding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}" BorderThickness="2" Margin="2">	
 							<cp:ColorPickerButton Margin="2" Name="Status_And_BookType_Text_Hover" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
@@ -370,6 +370,16 @@
 					<Style Selector="TextBox:pointerover /template/ Border#PART_BorderElement, TextBox:focus /template/ Border#PART_BorderElement">
 						<Setter Property="Background" Value="{Binding CurrentTheme.SearchBarBGColor, Converter={StaticResource ConvertColor}}"/>
 						<Setter Property="BorderBrush" Value="{Binding CurrentTheme.SearchBarBorderColor, Converter={StaticResource ConvertColor}}"/>
+					</Style>
+					<Style Selector="ComboBox:pointerover /template/ Border#Background, ComboBox:pressed /template/ Border#Background">
+						<Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
+						<Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
+						<Setter Property="TextBlock.Foreground" Value="{Binding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
+					</Style>
+					<Style Selector="Button:pointerover /template/ ContentPresenter">
+						<Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
+						<Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
+						<Setter Property="TextBlock.Foreground" Value="{Binding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
 					</Style>
 				</StackPanel.Styles>
 				<TextBox Name="NewThemeName"

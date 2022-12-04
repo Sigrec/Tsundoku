@@ -29,7 +29,7 @@ namespace Tsundoku.ViewModels
         public static string _curDisplay;
         public static uint _curVolumesCollected, _curVolumesToBeCollected;
         public string[] AvailableLanguages { get; } = new string[] { "Romaji", "English", "Native" };
-        public string[] AvailableDisplays { get; } = new string[] { "Card", "Mini-Card" };
+        public string[] AvailableDisplays { get; } = new string[] { "Card" };
 
         [Reactive]
         public string SearchText { get; set; }
@@ -79,7 +79,7 @@ namespace Tsundoku.ViewModels
             RxApp.MainThreadScheduler.Schedule(GetUserData);
             this.WhenAnyValue(x => x.SearchText).Throttle(TimeSpan.FromMilliseconds(400)).ObserveOn(RxApp.MainThreadScheduler).Subscribe(SearchCollection!);
 
-            this.WhenAnyValue(x => x.CurrentTheme).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.MainTheme = x);
+            this.WhenAnyValue(x => x.CurrentTheme).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.MainTheme = x.ThemeName);
 
             newSeriesWindow = new AddNewSeriesWindow();
             OpenAddNewSeriesWindow = ReactiveCommand.CreateFromTask(() =>
@@ -188,7 +188,7 @@ namespace Tsundoku.ViewModels
             {
                 Logger.Info("Creating New User");
                 ThemeSettingsViewModel.UserThemes = new ObservableCollection<TsundokuTheme>() { TsundokuTheme.DEFAULT_THEME };
-                MainUser = new User("UserName", "Romaji", ThemeSettingsViewModel.UserThemes[0], "Card", (ObservableCollection<TsundokuTheme>)ThemeSettingsViewModel.UserThemes, Collection);
+                MainUser = new User("UserName", "Romaji", "Default", "Card", (ObservableCollection<TsundokuTheme>)ThemeSettingsViewModel.UserThemes, Collection);
                 UserName = MainUser.UserName;
                 Collection = MainUser.UserCollection;
                 CurLanguage = MainUser.CurLanguage;
@@ -204,7 +204,7 @@ namespace Tsundoku.ViewModels
             ThemeSettingsViewModel.UserThemes = MainUser.SavedThemes;
             CurLanguage = MainUser.CurLanguage;
             CurDisplay = MainUser.Display;
-            CurrentTheme = MainUser.MainTheme;
+            CurrentTheme = ThemeSettingsViewModel.UserThemes.Single(x => x.ThemeName == MainUser.MainTheme).Cloning();
             UsersNumVolumesCollected = MainUser.NumVolumesCollected;
             UsersNumVolumesToBeCollected = MainUser.NumVolumesToBeCollected;
 

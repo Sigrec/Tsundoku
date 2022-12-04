@@ -14,6 +14,7 @@ namespace Tsundoku.Models
 {
 	public class Series
 	{
+		private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 		public List<string> Titles { get; } //[Romaji, English, Native]
         public List<string> Staff { get; } //[Romaji, Native]
 		public string Description { get; }
@@ -147,19 +148,19 @@ namespace Tsundoku.Models
 
         public static string GetSeriesStaff(JToken staffArray, string nameType) {
 			StringBuilder staffList = new StringBuilder();
-			string[] validRoles = { "Story & Art", "Story", "Art", "Original Creator", "Character Design", "Illustration", "Mechanical Design", "Original Story" };
+			string[] validRoles = { "Story & Art", "Story", "Art", "Original Creator", "Character Design", "Illustration", "Mechanical Design", "Original Story", "Cover Illustration"};
 			foreach(JToken name in staffArray)
             {
 				if (validRoles.Contains(Regex.Replace(name["role"].ToString(), @" \(.*\)", "")))
                 {
-					JToken newStaff = name["node"]["name"][nameType];
-					if (!string.IsNullOrEmpty((string?)newStaff))
+					String newStaff = name["node"]["name"][nameType].ToString();
+					if (!staffList.ToString().Contains(newStaff))
 					{
-						staffList.Append(newStaff + " | ");
-					}
-					else
-                    {
-						if (nameType.Equals("native"))
+						if (!string.IsNullOrEmpty(newStaff))
+						{
+							staffList.Append(newStaff + " | ");
+						}
+						else if (nameType.Equals("native"))
 						{
 							staffList.Append(name["node"]["name"]["full"] + " | ");
 						}
@@ -167,7 +168,11 @@ namespace Tsundoku.Models
 						{
 							staffList.Append(name["node"]["name"]["native"] + " | ");
 						}
-                    }
+					}
+					else
+					{
+						Logger.Debug($"Duplicate Staff Entry For {newStaff}");
+					}
                 }
             }
 			return staffList.ToString(0, staffList.Length - 3);

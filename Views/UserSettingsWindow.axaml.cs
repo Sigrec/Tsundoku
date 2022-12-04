@@ -16,7 +16,7 @@ namespace Tsundoku.Views
         {
             InitializeComponent();
             DataContext = new ViewModelBase();
-            Activated += (s, e) =>
+            Opened += (s, e) =>
             {
                 UserSettingsVM.CurrentTheme = ((MainWindow)((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).MainWindow).CollectionViewModel.CurrentTheme;
             };
@@ -62,7 +62,7 @@ namespace Tsundoku.Views
 
             // Add new sheet and add headers to spreadsheet
             ExcelWorksheet worksheet = workbook.Worksheets.Add("Collection");
-            string[] headers = new string[] { "Title", "Format", "Status", "Cur Volumes", "Max Volumes", "Staff", "Notes" };
+            string[] headers = new string[] { "Title", "Format", "Status", "Cur Volumes", "Max Volumes", "Notes", "Staff" };
             worksheet.Rows["1"].Style.Font.Weight = ExcelFont.BoldWeight;
             for (int col = 0; col < headers.Length; col++)
             {
@@ -77,15 +77,15 @@ namespace Tsundoku.Views
                 {
                     case "Native":
                         worksheet.Cells[row + 1, 0].Value = curSeries.Titles[2];
-                        worksheet.Cells[row + 1, 5].Value = curSeries.Staff[1];
+                        worksheet.Cells[row + 1, 6].Value = curSeries.Staff[1];
                         break;
                     case "English":
                         worksheet.Cells[row + 1, 0].Value = curSeries.Titles[1];
-                        worksheet.Cells[row + 1, 5].Value = curSeries.Staff[0];
+                        worksheet.Cells[row + 1, 6].Value = curSeries.Staff[0];
                         break;
                     default:
                         worksheet.Cells[row + 1, 0].Value = curSeries.Titles[0];
-                        worksheet.Cells[row + 1, 5].Value = curSeries.Staff[0];
+                        worksheet.Cells[row + 1, 6].Value = curSeries.Staff[0];
                         break;
                 }
 
@@ -101,7 +101,7 @@ namespace Tsundoku.Views
                         worksheet.Cells[row + 1, 2].Style.FillPattern.SetSolid(SpreadsheetColor.FromArgb(254, 107, 95)); // Red
                         break;
                     case "Hiatus":
-                        worksheet.Cells[row + 1, 2].Style.FillPattern.SetSolid(SpreadsheetColor.FromArgb(195, 153, 110)); // Tan?
+                        worksheet.Cells[row + 1, 2].Style.FillPattern.SetSolid(SpreadsheetColor.FromArgb(250, 218, 94)); // Yellow
                         break;
                     case "Coming Soon":
                         worksheet.Cells[row + 1, 2].Style.FillPattern.SetSolid(SpreadsheetColor.FromArgb(134, 135, 217)); // Blue
@@ -112,7 +112,7 @@ namespace Tsundoku.Views
                 worksheet.Cells[row + 1, 2].Value = curSeries.Status;
                 worksheet.Cells[row + 1, 3].Value = curSeries.CurVolumeCount;
                 worksheet.Cells[row + 1, 4].Value = curSeries.MaxVolumeCount;
-                worksheet.Cells[row + 1, 6].Value = curSeries.SeriesNotes;
+                worksheet.Cells[row + 1, 5].Value = curSeries.SeriesNotes;
             }
 
             worksheet.Columns["A"].AutoFit(); // Title
@@ -120,8 +120,8 @@ namespace Tsundoku.Views
             worksheet.Columns["C"].AutoFit(); // Status
             worksheet.Columns["D"].AutoFit(); // Cur Volumes
             worksheet.Columns["E"].AutoFit(); // Max Volumes
-            worksheet.Columns["F"].AutoFit(); // Staff
-            worksheet.Columns["G"].AutoFit(); // Notes
+            worksheet.Columns["F"].AutoFit(); // Notes
+            worksheet.Columns["G"].AutoFit(); // Staff
 
             workbook.Save($"{MainWindowViewModel.MainUser.UserName}_Collection.xlsx");
             Logger.Info($"Exported {MainWindowViewModel.MainUser.UserName}'s Data To -> {MainWindowViewModel.MainUser.UserName}_Collection.xlsx");

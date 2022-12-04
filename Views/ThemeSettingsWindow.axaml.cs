@@ -18,29 +18,18 @@ namespace Tsundoku.Views
         public ThemeSettingsViewModel ThemeSettingsVM => DataContext as ThemeSettingsViewModel;
         private TsundokuTheme NewTheme;
         MainWindow CollectionWindow;
+        AddNewSeriesWindow AddSeriesWindow;
 
         public CollectionThemeWindow()
         {
             InitializeComponent();
             DataContext = new ThemeSettingsViewModel();
-            //TsundokuTheme NewTheme = new;
+
             Opened += (s, e) =>
             {
                 CollectionWindow = (MainWindow)((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).MainWindow;
-                //Logger.Debug(Tree);
                 ThemeSettingsVM.CurrentTheme = CollectionWindow.CollectionViewModel.CurrentTheme;
-                NewTheme = ThemeSettingsVM.CurrentTheme;
-                // for (int x = 0; x < ThemeSettingsViewModel.UserThemes.Count(); x++)
-                // {
-                //     if (ThemeSettingsViewModel.UserThemes[x] == MainWindowViewModel.MainUser.MainTheme)
-                //     {
-                //         //ThemeSettingsViewModel.UserThemes.Move(x, 0);
-                //         ThemeSelector.SelectedItem = ThemeSettingsViewModel.UserThemes[x];
-                //         break;
-                //     }
-                // }
-                //ThemeSelector.SelectedItem = ThemeSettingsViewModel.UserThemes[0];
-
+                NewTheme = ThemeSettingsVM.CurrentTheme.Cloning();
                 ApplyColors();
             };
 
@@ -56,22 +45,30 @@ namespace Tsundoku.Views
 
         private void SaveNewTheme(object sender, RoutedEventArgs args)
         {
-            if (!NewThemeName.Text.Equals("Default"))
+            NewTheme.ThemeName = NewThemeName.Text;
+            if (!string.IsNullOrWhiteSpace(NewThemeName.Text) && !NewThemeName.Text.Equals("Default") && !NewTheme.Equals(ThemeSettingsVM.CurrentTheme))
             {
-                NewTheme.ThemeName = NewThemeName.Text;
                 bool duplicateCheck = false;
                 TsundokuTheme replaceTheme;
                 for (int x = 0; x < ThemeSettingsViewModel.UserThemes.Count; x++)
                 {
                     if (NewTheme.ThemeName.Equals(ThemeSettingsViewModel.UserThemes[x].ThemeName))
                     {
+                        Logger.Info($"{NewTheme.ThemeName} Already Exists Replacing Color Values at {x}");
                         duplicateCheck = true;
                         replaceTheme = NewTheme.Cloning();
-                        ThemeSelector.SelectedItem = ThemeSettingsViewModel.UserThemes[1];
-                        ThemeSettingsViewModel.UserThemes.Remove(ThemeSettingsViewModel.UserThemes[x]);
-                        Logger.Info($"{NewTheme.ThemeName} Already Exists Replacing Color Values");
-                        ThemeSettingsViewModel.UserThemes.Insert(0, replaceTheme);
-                        break;
+
+                        for (int y = 0; y < ThemeSettingsViewModel.UserThemes.Count(); y++)
+                        {
+                            if (y != x)
+                            {
+                                ThemeSelector.SelectedIndex = y;
+                                ThemeSettingsViewModel.UserThemes[x] = replaceTheme;
+                                ThemeSelector.SelectedIndex = x;
+                                replaceTheme = null;
+                                return;
+                            }
+                        }
                     }
                 }
 
@@ -79,10 +76,13 @@ namespace Tsundoku.Views
                 {
                     ThemeSettingsViewModel.UserThemes.Insert(0, NewTheme.Cloning());
                     Logger.Info($"Added New Theme {NewTheme.ThemeName} to Saved Themes");
+                    ThemeSelector.SelectedIndex = 0;
                 }
-
-                replaceTheme = null;
-                ThemeSelector.SelectedItem = ThemeSettingsViewModel.UserThemes[0];
+            }
+            else
+            {
+                Logger.Debug($"{NewTheme.ThemeName} | {ThemeSettingsVM.CurrentTheme.ThemeName} | {NewTheme.MenuBGColor} | {ThemeSettingsVM.CurrentTheme.MenuBGColor}");
+                Logger.Debug($"CAN'T SAVE THEME {!string.IsNullOrWhiteSpace(NewThemeName.Text)} | {!NewThemeName.Text.Equals("Default")} | {NewTheme != ThemeSettingsVM.CurrentTheme}");
             }
         }
 
@@ -90,14 +90,14 @@ namespace Tsundoku.Views
         {
             if (ThemeSettingsViewModel.UserThemes.Count > 1 && !(ThemeSelector.SelectedItem as TsundokuTheme).ThemeName.Equals("Default"))
             {
-                int curIndex = ThemeSettingsViewModel.UserThemes.IndexOf((ThemeSelector.SelectedItem as TsundokuTheme));
+                int curIndex = ThemeSettingsViewModel.UserThemes.IndexOf((ThemeSelector.SelectedItem as TsundokuTheme)); //1
                 for (int x = 0; x < ThemeSettingsViewModel.UserThemes.Count(); x++)
                 {
                     if (x != curIndex)
                     {
                         ThemeSelector.SelectedIndex = x;
-                        Logger.Info($"Removed Theme {ThemeSettingsViewModel.UserThemes[curIndex].ThemeName} From Saved Themes");
                         ThemeSettingsViewModel.UserThemes.Remove(ThemeSettingsViewModel.UserThemes[curIndex]);
+                        Logger.Info($"Removed Theme {ThemeSettingsViewModel.UserThemes[curIndex].ThemeName} From Saved Themes");
                         break; 
                     }
                 }
@@ -109,6 +109,10 @@ namespace Tsundoku.Views
             if (this.IsActive)
             {
                 CollectionWindow.CollectionViewModel.CurrentTheme = (ThemeSelector.SelectedItem as TsundokuTheme);
+                ThemeSettingsVM.CurrentTheme = CollectionWindow.CollectionViewModel.CurrentTheme;
+                CollectionWindow.CollectionViewModel.newSeriesWindow.AddNewSeriesVM.CurrentTheme = CollectionWindow.CollectionViewModel.CurrentTheme;
+                CollectionWindow.CollectionViewModel.settingsWindow.UserSettingsVM.CurrentTheme = CollectionWindow.CollectionViewModel.CurrentTheme;
+                
                 Logger.Info($"Theme Changed To {(ThemeSelector.SelectedItem as TsundokuTheme).ThemeName}");
                 ApplyColors();
             }
@@ -166,7 +170,7 @@ namespace Tsundoku.Views
             {
                 if (e.Property == Egorozh.ColorPicker.ColorPickerButtonBase.ColorProperty)
                 {
-                    CollectionWindow.Navigation.Background = new SolidColorBrush(Menu_BG.Color);
+                    // CollectionWindow.Navigation.Background = new SolidColorBrush(Menu_BG.Color);
                     NewTheme.MenuBGColor = Menu_BG.Color.ToUint32();
                 }
             };
@@ -175,7 +179,7 @@ namespace Tsundoku.Views
             {
                 if (e.Property == Egorozh.ColorPicker.ColorPickerButtonBase.ColorProperty)
                 {
-                    CollectionWindow.Username.Foreground = new SolidColorBrush(Username.Color);
+                    // CollectionWindow.Username.Foreground = new SolidColorBrush(Username.Color);
                     NewTheme.UsernameColor = Username.Color.ToUint32();
                 }
             };
@@ -184,8 +188,9 @@ namespace Tsundoku.Views
             {
                 if (e.Property == Egorozh.ColorPicker.ColorPickerButtonBase.ColorProperty)
                 {
-                    CollectionWindow.NumVolumesCollected.Foreground = new SolidColorBrush(Menu_Text.Color);
-                    CollectionWindow.NumVolumesToBeCollected.Foreground = new SolidColorBrush(Menu_Text.Color);
+                    // CollectionWindow.NumVolumesCollected.Foreground = new SolidColorBrush(Menu_Text.Color);
+                    // CollectionWindow.NumVolumesToBeCollected.Foreground = new SolidColorBrush(Menu_Text.Color);
+                    // CollectionWindow.SearchCollectionHeader.Foreground = new SolidColorBrush(Menu_Text.Color);
                     NewTheme.MenuTextColor = Menu_Text.Color.ToUint32();
                 }
             };
@@ -194,7 +199,7 @@ namespace Tsundoku.Views
             {
                 if (e.Property == Egorozh.ColorPicker.ColorPickerButtonBase.ColorProperty)
                 {
-                    CollectionWindow.SearchBar.Background = new SolidColorBrush(SearchBar_BG.Color);
+                    // CollectionWindow.SearchBar.Background = new SolidColorBrush(SearchBar_BG.Color);
                     NewTheme.SearchBarBGColor = SearchBar_BG.Color.ToUint32();
                 }
             };
@@ -203,7 +208,7 @@ namespace Tsundoku.Views
             {
                 if (e.Property == Egorozh.ColorPicker.ColorPickerButtonBase.ColorProperty)
                 {
-                    CollectionWindow.SearchBar.BorderBrush = new SolidColorBrush(SearchBar_Border.Color);
+                    // CollectionWindow.SearchBar.BorderBrush = new SolidColorBrush(SearchBar_Border.Color);
                     NewTheme.SearchBarBorderColor = SearchBar_Border.Color.ToUint32();
                 }
             };
@@ -212,7 +217,7 @@ namespace Tsundoku.Views
             {
                 if (e.Property == Egorozh.ColorPicker.ColorPickerButtonBase.ColorProperty)
                 {
-                    CollectionWindow.SearchBar.Foreground = new SolidColorBrush(SearchBar_Text.Color);
+                    // CollectionWindow.SearchBar.Foreground = new SolidColorBrush(SearchBar_Text.Color);
                     NewTheme.SearchBarTextColor = SearchBar_Text.Color.ToUint32();
                 }
             };
@@ -221,7 +226,7 @@ namespace Tsundoku.Views
             {
                 if (e.Property == Egorozh.ColorPicker.ColorPickerButtonBase.ColorProperty)
                 {
-                    CollectionWindow.Navigation.BorderBrush = new SolidColorBrush(Divider.Color);
+                    // CollectionWindow.Navigation.BorderBrush = new SolidColorBrush(Divider.Color);
                     NewTheme.DividerColor = Divider.Color.ToUint32();
                 }
             };
@@ -230,12 +235,12 @@ namespace Tsundoku.Views
             {
                 if (e.Property == Egorozh.ColorPicker.ColorPickerButtonBase.ColorProperty)
                 {
-                    SolidColorBrush menuButtonBG = new SolidColorBrush(MenuButton_BG.Color);
-                    CollectionWindow.SettingsButton.Background = menuButtonBG;
-                    CollectionWindow.ThemeButton.Background = menuButtonBG;
-                    CollectionWindow.AddNewSeriesButton.Background = menuButtonBG;
-                    CollectionWindow.DisplaySelector.Background = menuButtonBG;
-                    CollectionWindow.LanguageSelector.Background = menuButtonBG;
+                    // SolidColorBrush menuButtonBG = new SolidColorBrush(MenuButton_BG.Color);
+                    // CollectionWindow.SettingsButton.Background = menuButtonBG;
+                    // CollectionWindow.ThemeButton.Background = menuButtonBG;
+                    // CollectionWindow.AddNewSeriesButton.Background = menuButtonBG;
+                    // CollectionWindow.DisplaySelector.Background = menuButtonBG;
+                    // CollectionWindow.LanguageSelector.Background = menuButtonBG;
                     NewTheme.MenuButtonBGColor = MenuButton_BG.Color.ToUint32();
                 }
             };
@@ -245,6 +250,7 @@ namespace Tsundoku.Views
                 if (e.Property == Egorozh.ColorPicker.ColorPickerButtonBase.ColorProperty)
                 {
                     //CollectionWindow.SettingsButton.PointerEntered += new EventHandler<Avalonia.Input.PointerEventArgs>(Button_PointerEnter);
+                    NewTheme.MenuButtonBGHoverColor = MenuButton_BG_Hover.Color.ToUint32();
                 }
             };
 
@@ -252,12 +258,12 @@ namespace Tsundoku.Views
             {
                 if (e.Property == Egorozh.ColorPicker.ColorPickerButtonBase.ColorProperty)
                 {
-                    SolidColorBrush menuButtonBorder = new SolidColorBrush(MenuButton_Border.Color);
-                    CollectionWindow.SettingsButton.BorderBrush = menuButtonBorder;
-                    CollectionWindow.ThemeButton.BorderBrush = menuButtonBorder;
-                    CollectionWindow.AddNewSeriesButton.BorderBrush = menuButtonBorder;
-                    CollectionWindow.DisplaySelector.BorderBrush = menuButtonBorder;
-                    CollectionWindow.LanguageSelector.BorderBrush = menuButtonBorder;
+                    // SolidColorBrush menuButtonBorder = new SolidColorBrush(MenuButton_Border.Color);
+                    // CollectionWindow.SettingsButton.BorderBrush = menuButtonBorder;
+                    // CollectionWindow.ThemeButton.BorderBrush = menuButtonBorder;
+                    // CollectionWindow.AddNewSeriesButton.BorderBrush = menuButtonBorder;
+                    // CollectionWindow.DisplaySelector.BorderBrush = menuButtonBorder;
+                    // CollectionWindow.LanguageSelector.BorderBrush = menuButtonBorder;
                     NewTheme.MenuButtonBorderColor = MenuButton_Border.Color.ToUint32();
                 }
             };
@@ -267,6 +273,7 @@ namespace Tsundoku.Views
                 if (e.Property == Egorozh.ColorPicker.ColorPickerButtonBase.ColorProperty)
                 {
                     //CollectionWindow.SettingsButton.PointerEntered += new EventHandler<Avalonia.Input.PointerEventArgs>(Button_PointerEnter);
+                    NewTheme.MenuButtonBorderHoverColor = MenuButton_Border_Hover.Color.ToUint32();
                 }
             };
 
@@ -274,12 +281,12 @@ namespace Tsundoku.Views
             {
                 if (e.Property == Egorozh.ColorPicker.ColorPickerButtonBase.ColorProperty)
                 {
-                    SolidColorBrush menuButtonTextAndIconColor = new SolidColorBrush(MenuButton_IconAndText.Color);
-                    CollectionWindow.SettingsButton.Foreground = menuButtonTextAndIconColor;
-                    CollectionWindow.ThemeButton.Foreground = menuButtonTextAndIconColor;
-                    CollectionWindow.AddNewSeriesButton.Foreground = menuButtonTextAndIconColor;
-                    CollectionWindow.DisplaySelector.Foreground = menuButtonTextAndIconColor;
-                    CollectionWindow.LanguageSelector.Foreground = menuButtonTextAndIconColor;
+                    // SolidColorBrush menuButtonTextAndIconColor = new SolidColorBrush(MenuButton_IconAndText.Color);
+                    // CollectionWindow.SettingsButton.Foreground = menuButtonTextAndIconColor;
+                    // CollectionWindow.ThemeButton.Foreground = menuButtonTextAndIconColor;
+                    // CollectionWindow.AddNewSeriesButton.Foreground = menuButtonTextAndIconColor;
+                    // CollectionWindow.DisplaySelector.Foreground = menuButtonTextAndIconColor;
+                    // CollectionWindow.LanguageSelector.Foreground = menuButtonTextAndIconColor;
                     NewTheme.MenuButtonTextAndIconColor = MenuButton_IconAndText.Color.ToUint32();
                 }
             };
@@ -289,6 +296,7 @@ namespace Tsundoku.Views
                 if (e.Property == Egorozh.ColorPicker.ColorPickerButtonBase.ColorProperty)
                 {
                     //CollectionWindow.SettingsButton.PointerEntered += new EventHandler<Avalonia.Input.PointerEventArgs>(Button_PointerEnter);
+                    NewTheme.MenuButtonTextAndIconHoverColor = MenuButton_IconAndText_Hover.Color.ToUint32();
                 }
             };
         }
@@ -299,7 +307,7 @@ namespace Tsundoku.Views
             {
                 if (e.Property == Egorozh.ColorPicker.ColorPickerButtonBase.ColorProperty)
                 {
-                    CollectionWindow.CollectionTheme.Background = new SolidColorBrush(Collection_BG.Color);
+                    //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(Collection_BG.Color);
                     NewTheme.CollectionBGColor = Collection_BG.Color.ToUint32();
                 }
             };
@@ -308,8 +316,7 @@ namespace Tsundoku.Views
             {
                 if (e.Property == Egorozh.ColorPicker.ColorPickerButtonBase.ColorProperty)
                 {
-                    //CollectionWindow.CollectionControl.GetLogicalChildren() = new SolidColorBrush(Status_And_BookType_BG.Color);
-                    Logger.Debug("Status and BookType Color Changed to -> " + Status_And_BookType_BG.Color);
+                    //CollectionWindow.CollectionTheme.FindLogicalDescendantOfType<TextBlock>(false).Background = new SolidColorBrush(Status_And_BookType_BG.Color);
                     NewTheme.StatusAndBookTypeBGColor = Status_And_BookType_BG.Color.ToUint32();
                 }
             };

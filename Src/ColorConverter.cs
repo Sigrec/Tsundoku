@@ -12,14 +12,7 @@ namespace Tsundoku.Src
         {
             if (value is UInt32)
             {
-                if (parameter != null && parameter.Equals("Hex"))
-                {
-                    return "0 5 10 1 " + Avalonia.Media.Color.FromUInt32((uint)value).ToString();
-                }
-                else
-                {
-                    return new Avalonia.Media.SolidColorBrush((uint)value);
-                }
+                return new Avalonia.Media.SolidColorBrush((uint)value);
             }
 
             throw new NotSupportedException();

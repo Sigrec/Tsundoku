@@ -21,6 +21,11 @@
 					<Setter Property="Background" Value="{Binding CurrentTheme.SearchBarBGColor, Converter={StaticResource ConvertColor}}"/>
 					<Setter Property="BorderBrush" Value="{Binding CurrentTheme.SearchBarBorderColor, Converter={StaticResource ConvertColor}}"/>
 				</Style>
+				<Style Selector="Button:pointerover /template/ ContentPresenter">
+					<Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
+					<Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
+					<Setter Property="TextBlock.Foreground" Value="{Binding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
+				</Style>
 			</StackPanel.Styles>
 			<StackPanel>
 				<TextBlock Margin="2,0,0,0" Text="Enter Title" FontSize="18" FontWeight="Bold" Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}"/>
@@ -87,18 +92,94 @@
 							   FontWeight="Bold" 
 							   Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}"/>
 					<StackPanel Orientation="Horizontal">
+						<StackPanel.Styles>
+							<!-- Unchecked Normal State -->
+							<Style Selector="CheckBox /template/ Border#NormalRectangle">
+								<Setter Property="BorderBrush" Value="Aqua"/>
+								<Setter Property="Background" Value="Red"/>
+							</Style>
+
+							<!-- Unchecked PointerOver State -->
+							<Style Selector="CheckBox:pointerover">
+								<Style Selector="^ /template/ ContentPresenter#ContentPresenter">
+									<Setter Property="Foreground" Value="{Binding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}" />
+								</Style>
+								<Style Selector="^ /template/ Border#NormalRectangle">
+									<Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
+									<Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
+								</Style>
+							</Style>
+
+							<!-- Unchecked Pressed State -->
+							<Style Selector="CheckBox:pressed">
+								<Style Selector="^ /template/ ContentPresenter#ContentPresenter">
+									<Setter Property="Foreground" Value="{Binding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}" />
+								</Style>
+								<Style Selector="^ /template/ Border#NormalRectangle">
+									<Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"/>
+									<Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"/>
+								</Style>
+
+								<Style Selector="^ /template/ Path#CheckGlyph">
+									<Setter Property="Fill" Value="{Binding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"/>
+								</Style>
+							</Style>
+
+							<!-- Checked Pressed State -->
+							<Style Selector="CheckBox:checked">
+								<!-- Checked Normal State -->
+								<Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"/>
+
+								<Style Selector="^ /template/ Border#NormalRectangle">
+									<Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"/>
+									<Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"/>
+								</Style>
+
+								<Style Selector="^ /template/ Path#CheckGlyph">
+									<Setter Property="Fill" Value="{Binding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"/>
+								</Style>
+
+								<!-- Checked PointerOver State -->
+								<Style Selector="^:pointerover">
+									<Style Selector="^ /template/ ContentPresenter#ContentPresenter">
+										<Setter Property="Foreground" Value="{Binding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}" />
+									</Style>
+									<Style Selector="^ /template/ Border#NormalRectangle">
+										<Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
+										<Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
+									</Style>
+
+									<Style Selector="^ /template/ Path#CheckGlyph">
+										<Setter Property="Fill" Value="{Binding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}" />
+									</Style>
+								</Style>
+
+								<!-- Checked Pressed State -->
+								<Style Selector="^:pressed">
+									<Style Selector="^ /template/ ContentPresenter#ContentPresenter">
+										<Setter Property="Foreground" Value="{Binding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}" />
+									</Style>
+									<Style Selector="^ /template/ Border#NormalRectangle">
+										<Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"/>
+										<Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"/>
+									</Style>
+
+									<Style Selector="^ /template/ Path#CheckGlyph">
+										<Setter Property="Fill" Value="{Binding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"/>
+									</Style>
+								</Style>
+							</Style>
+						</StackPanel.Styles>
 						<CheckBox Name="MangaButton" 
-								  Checked="MangaCheck" 
-								  BorderBrush="{Binding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}" 
-								  FontSize="18" 
+								  Checked="MangaCheck"
+								  FontSize="20" 
 								  FontWeight="Bold" 
 								  Foreground="{Binding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}" 
 								  Margin="0,0,20,0" 
 								  Content="Manga"/>
 						<CheckBox Name="NovelButton" 
-								  Checked="NovelCheck" 
-								  BorderBrush="{Binding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}" 
-								  FontSize="18" 
+								  Checked="NovelCheck"
+								  FontSize="20" 
 								  FontWeight="Bold" 
 								  Foreground="{Binding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}" 
 								  Margin="0,0,20,0" 
@@ -106,6 +187,13 @@
 					</StackPanel>
 				</StackPanel>
 				<StackPanel Spacing="5" VerticalAlignment="Center">
+					<StackPanel.Styles>
+						<Style Selector="ComboBox:pointerover /template/ Border#Background, ComboBox:pressed /template/ Border#Background">
+							<Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
+							<Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
+							<Setter Property="TextBlock.Foreground" Value="{Binding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
+						</Style>
+					</StackPanel.Styles>
 					<TextBlock HorizontalAlignment="Center" Text="Select Languages" Margin="0,10,0,0" FontSize="18" FontWeight="Bold" Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}"/>
 					<ComboBox
 						Name="AdditionalLangSelector"
