@@ -47,7 +47,8 @@
                             BorderThickness="2" 
                             Foreground="{Binding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}" 
                             i:Attached.Icon="fa-check" 
-                            Click="ChangeUsername"/>
+                            Click="ChangeUsername"
+                            IsEnabled="{Binding #UsernameChange.Text}"/>
                 </StackPanel>
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">

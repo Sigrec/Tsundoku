@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 using Avalonia;
 using Avalonia.Controls;
@@ -15,22 +16,21 @@ using Avalonia.ReactiveUI;
 using System.Text.RegularExpressions;
 using System.IO;
 using ReactiveUI;
-using System.Threading.Tasks;
-using System.Reactive.Concurrency;
+using ReactiveUI.Fody.Helpers;
+using System.Reactive;
 
 namespace Tsundoku.Views
 {
     public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
-        public MainWindowViewModel CollectionViewModel => DataContext as MainWindowViewModel;
-        private bool SeriesEditPaneIsOpenView = false;
-        
+        public MainWindowViewModel? CollectionViewModel => DataContext as MainWindowViewModel;
+
         public MainWindow()
         {
             InitializeComponent();
-           //RxApp.MainThreadScheduler.Schedule(() => ChangeSeriesVolumeCountsAsync());
         }
+
 
         private void SearchCollection(object sender, KeyEventArgs args)
         {
@@ -42,8 +42,8 @@ namespace Tsundoku.Views
             var result = await Observable.Start(() => 
             {
                 var textBoxes = ((Button)sender).GetLogicalSiblings();
-                ushort maxVolumeChange = Convert.ToUInt16(((MaskedTextBox)textBoxes.ElementAt(1)).Text.Replace("_", ""));
-                ushort curVolumeChange = Convert.ToUInt16(((MaskedTextBox)textBoxes.ElementAt(2)).Text.Replace("_", ""));
+                ushort curVolumeChange = Convert.ToUInt16(((MaskedTextBox)textBoxes.ElementAt(1)).Text.Replace("_", ""));
+                ushort maxVolumeChange = Convert.ToUInt16(((MaskedTextBox)textBoxes.ElementAt(2)).Text.Replace("_", ""));
                 Series curSeries = (Series)((Button)sender).DataContext;
                 if (maxVolumeChange >= curVolumeChange)
                 {
@@ -83,7 +83,7 @@ namespace Tsundoku.Views
 
         private void ShowEditPane(object sender, RoutedEventArgs args)
         {
-            ((Button)sender).FindLogicalAncestorOfType<Grid>(false).FindLogicalDescendantOfType<Grid>(false).IsVisible = (SeriesEditPaneIsOpenView ^= true);
+            ((Button)sender).FindLogicalAncestorOfType<Grid>(false).FindLogicalDescendantOfType<Grid>(false).IsVisible ^= true;
         }
 
         private void LanguageChanged(object sender, SelectionChangedEventArgs e)
@@ -102,6 +102,7 @@ namespace Tsundoku.Views
             }
             if ((sender as ComboBox).IsDropDownOpen)
             {
+                Logger.Info($"Changed Langauge to {CollectionViewModel.CurLanguage}");
                 MainWindowViewModel.SortCollection();
             }
         }
@@ -111,13 +112,13 @@ namespace Tsundoku.Views
             string display = (sender as ComboBox).SelectedItem as string;
             if (display.Equals("Card"))
             {
-                MainWindowViewModel._curDisplay = "Card";
+                CollectionViewModel.CurDisplay = "Card";
             }
             else if (display.Equals("Mini-Card"))
             {
-                MainWindowViewModel._curDisplay = "Mini-Card";
+                CollectionViewModel.CurDisplay = "Mini-Card";
             }
-            Logger.Info($"Changed Display To {MainWindowViewModel._curDisplay}");
+            Logger.Info($"Changed Display To {CollectionViewModel.CurDisplay}");
         }
 
         public static string Slice(string source, int start, int end)
@@ -153,29 +154,31 @@ namespace Tsundoku.Views
 
             // Cleans the Covers asset folder of images for series that is not in the users collection on close/save
             bool removeSeriesCheck = true;
-            foreach (string coverPath in Directory.GetFiles(@"Assets\Covers"))
+            if (Directory.Exists(@$"{Environment.CurrentDirectory}\Covers"))
             {
-                int underscoreIndex = coverPath.IndexOf("_");
-                int periodIndex = coverPath.IndexOf(".");
-                foreach (Series curSeries in MainWindowViewModel.Collection)
+                foreach (string coverPath in Directory.GetFiles(@"\Tsundoku\Covers"))
                 {
-                    string curTitle = Regex.Replace(curSeries.Titles[0], @"[^A-Za-z\d]", "");
-                    string coverPathTitleAndFormat = coverPath.Substring(14);
-                    if (Slice(coverPathTitleAndFormat, 0, coverPathTitleAndFormat.IndexOf("_")).Equals(curTitle) && Slice(coverPathTitleAndFormat, coverPathTitleAndFormat.IndexOf("_") + 1, coverPathTitleAndFormat.IndexOf(".")).Equals(curSeries.Format.ToUpper()))
+                    int underscoreIndex = coverPath.IndexOf("_");
+                    int periodIndex = coverPath.IndexOf(".");
+                    foreach (Series curSeries in MainWindowViewModel.Collection)
                     {
-                        removeSeriesCheck = false;
-                        break;
+                        string curTitle = Regex.Replace(curSeries.Titles[0], @"[^A-Za-z\d]", "");
+                        string coverPathTitleAndFormat = coverPath.Substring(17);
+                        if (Slice(coverPathTitleAndFormat, 0, coverPathTitleAndFormat.IndexOf("_")).Equals(curTitle) && Slice(coverPathTitleAndFormat, coverPathTitleAndFormat.IndexOf("_") + 1, coverPathTitleAndFormat.IndexOf(".")).Equals(curSeries.Format.ToUpper()))
+                        {
+                            removeSeriesCheck = false;
+                            break;
+                        }
                     }
-                }
 
-                if (removeSeriesCheck)
-                {
-                    Logger.Info($"Deleted Cover -> {coverPath}");
-                    File.Delete(coverPath);
+                    if (removeSeriesCheck)
+                    {
+                        Logger.Info($"Deleted Cover -> {coverPath}");
+                        File.Delete(coverPath);
+                    }
+                    removeSeriesCheck = true;
                 }
-                removeSeriesCheck = true;
             }
-            
             ThemeSettingsViewModel.UserThemes.Move(ThemeSettingsViewModel.UserThemes.IndexOf(ThemeSettingsViewModel.UserThemes.Single(x => x.ThemeName == MainWindowViewModel.MainUser.MainTheme)), 0);
 
             MainWindowViewModel.SaveUsersData();
@@ -219,6 +222,8 @@ namespace Tsundoku.Views
             Series curSeries = (Series)((Button)sender).DataContext;
             if (curSeries.CurVolumeCount < curSeries.MaxVolumeCount)
             {
+                CollectionViewModel.UsersNumVolumesCollected++;
+                CollectionViewModel.UsersNumVolumesToBeCollected--;
                 curSeries.CurVolumeCount += 1;
                 TextBlock volumeDisplay = (TextBlock)((Button)sender).Parent.GetLogicalSiblings().ElementAt(0);
                 string log = "Adding 1 Volume To " + curSeries.Titles[0] + " : " + volumeDisplay.Text + " -> ";
@@ -237,7 +242,8 @@ namespace Tsundoku.Views
             Series curSeries = (Series)((Button)sender).DataContext; //Get the current series data
             if (curSeries.CurVolumeCount >= 1) //Only decrement if the user currently has 1 or more volumes
             {
-                // Uncomment when fix is implemented
+                CollectionViewModel.UsersNumVolumesCollected--;
+                CollectionViewModel.UsersNumVolumesToBeCollected++;
                 curSeries.CurVolumeCount -= 1;
                 TextBlock volumeDisplay = (TextBlock)((Button)sender).Parent.GetLogicalSiblings().ElementAt(0);
                 string log = "Removing 1 Volume From " + curSeries.Titles[0] + " : " + volumeDisplay.Text + " -> ";

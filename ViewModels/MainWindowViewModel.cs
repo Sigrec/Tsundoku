@@ -1,4 +1,5 @@
-﻿using ReactiveUI;
+﻿using System.Reflection;
+using ReactiveUI;
 using Tsundoku.Models;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -13,13 +14,19 @@ using System.Collections.Specialized;
 using System.Text.Json;
 using System.Reactive.Concurrency;
 using System.Diagnostics;
+using Avalonia.Controls;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Tsundoku.ViewModels
 {
     public partial class MainWindowViewModel : ViewModelBase
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
-        private static string filePath = @"UserData.json";
+#if (!DEBUG)
+        private static string filePath = Environment.CurrentDirectory + @"\UserData.json";
+#else
+        private static string filePath = @"\Tsundoku\UserData.json";
+#endif
         public static ObservableCollection<Series> SearchedCollection { get; set; } = new();
         public static ObservableCollection<Series> Collection { get; set; } = new();
         public static User MainUser { get; set; }
@@ -36,11 +43,9 @@ namespace Tsundoku.ViewModels
 
         [Reactive]
         public uint UsersNumVolumesCollected { get; set; }
-        private ReactiveCommand<Unit, Unit> IncrementVolumeCount { get; }
 
         [Reactive]
         public uint UsersNumVolumesToBeCollected { get; set; }
-        private ReactiveCommand<Unit, Unit> DecrementVolumeCount { get; }
         
         [Reactive]
         public bool SeriesEditPaneIsOpen { get; set; } = false;
@@ -59,20 +64,11 @@ namespace Tsundoku.ViewModels
         public string UserName { get; set; }
 
         [Reactive]
-        public uint TestVal1 { get; set; } = 99999;
-
-        [Reactive]
-        public uint TestVal2 { get; set; } = 9999;
+        public string CurDisplay { get; set; }
 
         public ReactiveCommand<Unit, Unit> OpenAddNewSeriesWindow { get; }
         public ReactiveCommand<Unit, Unit> OpenSettingsWindow { get; }
         public ReactiveCommand<Unit, Unit> OpenThemeSettingsWindow { get; }
-
-        public string CurDisplay
-        {
-            get => _curDisplay;
-            set => this.RaiseAndSetIfChanged(ref _curDisplay, value);
-        }
 
         public MainWindowViewModel()
         {
@@ -80,32 +76,63 @@ namespace Tsundoku.ViewModels
             this.WhenAnyValue(x => x.SearchText).Throttle(TimeSpan.FromMilliseconds(400)).ObserveOn(RxApp.MainThreadScheduler).Subscribe(SearchCollection!);
 
             this.WhenAnyValue(x => x.CurrentTheme).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.MainTheme = x.ThemeName);
+            this.WhenAnyValue(x => x.CurDisplay).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.Display = x);
 
             newSeriesWindow = new AddNewSeriesWindow();
             OpenAddNewSeriesWindow = ReactiveCommand.CreateFromTask(() =>
             {
-                newSeriesWindow.Show();
+                if (newSeriesWindow.WindowState == WindowState.Minimized) 
+                {
+                    newSeriesWindow.WindowState = WindowState.Normal;
+                }
+                else if(newSeriesWindow.Topmost == false && newSeriesWindow.IsOpen)
+                {
+                    newSeriesWindow.Topmost = true;
+                }
+                else
+                {
+                    newSeriesWindow.Show();
+                }
                 return Task.CompletedTask;
             });
 
             settingsWindow = new SettingsWindow();
             OpenSettingsWindow = ReactiveCommand.CreateFromTask(() =>
             {
-                settingsWindow.Show();
+                if (settingsWindow.WindowState == WindowState.Minimized) 
+                {
+                    settingsWindow.WindowState = WindowState.Normal;
+                }
+                else if(settingsWindow.Topmost == false && settingsWindow.IsOpen)
+                {
+                    settingsWindow.Topmost = true;
+                }
+                else
+                {
+                    settingsWindow.Show();
+                }
                 return Task.CompletedTask;
             });
 
             themeSettingsWindow = new CollectionThemeWindow();
             OpenThemeSettingsWindow = ReactiveCommand.CreateFromTask(() =>
             {
-                themeSettingsWindow.Show();
+                if (themeSettingsWindow.WindowState == WindowState.Minimized) 
+                {
+                    themeSettingsWindow.WindowState = WindowState.Normal;
+                }
+                else if(themeSettingsWindow.Topmost == false && themeSettingsWindow.IsOpen)
+                {
+                    themeSettingsWindow.Topmost = true;
+                }
+                else
+                {
+                    themeSettingsWindow.Show();
+                }
                 return Task.CompletedTask;
             });
 
-            IncrementVolumeCount = ReactiveCommand.Create(IncrementSeriesVolumeCount);
             this.WhenAnyValue(x => x.UsersNumVolumesCollected).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.NumVolumesCollected = x);
-
-            DecrementVolumeCount = ReactiveCommand.Create(DecrementSeriesVolumeCount);
             this.WhenAnyValue(x => x.UsersNumVolumesToBeCollected).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.NumVolumesToBeCollected = x);
 
             this.WhenAnyValue(x => x.CurLanguage).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.CurLanguage = x);
@@ -121,18 +148,6 @@ namespace Tsundoku.ViewModels
                     UsersNumVolumesToBeCollected += (uint)(Collection[Collection.Count - 1].MaxVolumeCount - Collection[Collection.Count - 1].CurVolumeCount);
                 }
             };
-        }
-
-        private void IncrementSeriesVolumeCount()
-        {
-            UsersNumVolumesCollected += 1;
-            UsersNumVolumesToBeCollected -= 1;
-        }
-
-        private void DecrementSeriesVolumeCount()
-        {
-            UsersNumVolumesCollected -= 1;
-            UsersNumVolumesToBeCollected += 1;
         }
 
         public static void SortCollection()
@@ -181,6 +196,7 @@ namespace Tsundoku.ViewModels
             }
         }
 
+        [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "A New file will always be created if it doesn't exist before deserialization")]
         public void GetUserData()
         {
             Logger.Info("Starting TsundOku");
@@ -188,7 +204,7 @@ namespace Tsundoku.ViewModels
             {
                 Logger.Info("Creating New User");
                 ThemeSettingsViewModel.UserThemes = new ObservableCollection<TsundokuTheme>() { TsundokuTheme.DEFAULT_THEME };
-                MainUser = new User("UserName", "Romaji", "Default", "Card", (ObservableCollection<TsundokuTheme>)ThemeSettingsViewModel.UserThemes, Collection);
+                MainUser = new User("UserName", "Romaji", "Default", "Card", ThemeSettingsViewModel.UserThemes, Collection);
                 UserName = MainUser.UserName;
                 Collection = MainUser.UserCollection;
                 CurLanguage = MainUser.CurLanguage;
@@ -214,11 +230,11 @@ namespace Tsundoku.ViewModels
             }
         }
 
+        [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "A New file will always be created if it doesn't exist before serialization")]
         public static void SaveUsersData()
         {
             Logger.Info($"Saving {MainUser.UserName}'s Data");
             MainUser.UserCollection = Collection;
-            MainUser.Display = _curDisplay;
             MainUser.SavedThemes = ThemeSettingsViewModel.UserThemes;
 
             var options = new JsonSerializerOptions { 

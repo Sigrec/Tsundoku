@@ -15,10 +15,10 @@ namespace Tsundoku.Views
     public partial class CollectionThemeWindow : Window
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
-        public ThemeSettingsViewModel ThemeSettingsVM => DataContext as ThemeSettingsViewModel;
+        public ThemeSettingsViewModel? ThemeSettingsVM => DataContext as ThemeSettingsViewModel;
         private TsundokuTheme NewTheme;
+        public bool IsOpen = false;
         MainWindow CollectionWindow;
-        AddNewSeriesWindow AddSeriesWindow;
 
         public CollectionThemeWindow()
         {
@@ -30,12 +30,14 @@ namespace Tsundoku.Views
                 CollectionWindow = (MainWindow)((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).MainWindow;
                 ThemeSettingsVM.CurrentTheme = CollectionWindow.CollectionViewModel.CurrentTheme;
                 NewTheme = ThemeSettingsVM.CurrentTheme.Cloning();
+                IsOpen ^= true;
                 ApplyColors();
             };
 
             Closing += (s, e) =>
             {
                 ((CollectionThemeWindow)s).Hide();
+                IsOpen ^= true;
                 e.Cancel = true;
             };
 
@@ -45,44 +47,47 @@ namespace Tsundoku.Views
 
         private void SaveNewTheme(object sender, RoutedEventArgs args)
         {
-            NewTheme.ThemeName = NewThemeName.Text;
-            if (!string.IsNullOrWhiteSpace(NewThemeName.Text) && !NewThemeName.Text.Equals("Default") && !NewTheme.Equals(ThemeSettingsVM.CurrentTheme))
+            if (!string.IsNullOrWhiteSpace(NewThemeName.Text) && !NewThemeName.Text.Equals("Default"))
             {
-                bool duplicateCheck = false;
-                TsundokuTheme replaceTheme;
-                for (int x = 0; x < ThemeSettingsViewModel.UserThemes.Count; x++)
+                NewTheme.ThemeName = NewThemeName.Text;
+                if (!NewTheme.Equals(ThemeSettingsVM.CurrentTheme))
                 {
-                    if (NewTheme.ThemeName.Equals(ThemeSettingsViewModel.UserThemes[x].ThemeName))
+                    bool duplicateCheck = false;
+                    TsundokuTheme replaceTheme;
+                    for (int x = 0; x < ThemeSettingsViewModel.UserThemes.Count; x++)
                     {
-                        Logger.Info($"{NewTheme.ThemeName} Already Exists Replacing Color Values at {x}");
-                        duplicateCheck = true;
-                        replaceTheme = NewTheme.Cloning();
-
-                        for (int y = 0; y < ThemeSettingsViewModel.UserThemes.Count(); y++)
+                        if (NewTheme.ThemeName.Equals(ThemeSettingsViewModel.UserThemes[x].ThemeName))
                         {
-                            if (y != x)
+                            Logger.Info($"{NewTheme.ThemeName} Already Exists Replacing Color Values at {x}");
+                            duplicateCheck = true;
+                            replaceTheme = NewTheme.Cloning();
+
+                            for (int y = 0; y < ThemeSettingsViewModel.UserThemes.Count(); y++)
                             {
-                                ThemeSelector.SelectedIndex = y;
-                                ThemeSettingsViewModel.UserThemes[x] = replaceTheme;
-                                ThemeSelector.SelectedIndex = x;
-                                replaceTheme = null;
-                                return;
+                                if (y != x)
+                                {
+                                    ThemeSelector.SelectedIndex = y;
+                                    ThemeSettingsViewModel.UserThemes[x] = replaceTheme;
+                                    ThemeSelector.SelectedIndex = x;
+                                    replaceTheme = null;
+                                    return;
+                                }
                             }
                         }
                     }
-                }
 
-                if (!duplicateCheck)
-                {
-                    ThemeSettingsViewModel.UserThemes.Insert(0, NewTheme.Cloning());
-                    Logger.Info($"Added New Theme {NewTheme.ThemeName} to Saved Themes");
-                    ThemeSelector.SelectedIndex = 0;
+                    if (!duplicateCheck)
+                    {
+                        ThemeSettingsViewModel.UserThemes.Insert(0, NewTheme.Cloning());
+                        Logger.Info($"Added New Theme {NewTheme.ThemeName} to Saved Themes");
+                        ThemeSelector.SelectedIndex = 0;
+                    }
                 }
             }
             else
             {
                 Logger.Debug($"{NewTheme.ThemeName} | {ThemeSettingsVM.CurrentTheme.ThemeName} | {NewTheme.MenuBGColor} | {ThemeSettingsVM.CurrentTheme.MenuBGColor}");
-                Logger.Debug($"CAN'T SAVE THEME {!string.IsNullOrWhiteSpace(NewThemeName.Text)} | {!NewThemeName.Text.Equals("Default")} | {NewTheme != ThemeSettingsVM.CurrentTheme}");
+                Logger.Debug($"CAN'T SAVE THEME {!string.IsNullOrWhiteSpace(NewThemeName.Text) && !NewThemeName.Text.Equals("Default")} | {NewTheme != ThemeSettingsVM.CurrentTheme}");
             }
         }
 

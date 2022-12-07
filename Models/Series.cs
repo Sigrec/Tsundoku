@@ -9,6 +9,7 @@ using System.Text;
 using System.Linq;
 using System.Diagnostics;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace Tsundoku.Models
 {
@@ -50,7 +51,6 @@ namespace Tsundoku.Models
 				var seriesData = finalObj["Media"];
 				if (seriesData != null)
 				{
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
 					string romajiTitle = seriesData["title"]["romaji"].ToString();
 					string nativeStaff = GetSeriesStaff(seriesData["staff"]["edges"], "native");
 					string fullStaff = GetSeriesStaff(seriesData["staff"]["edges"], "full");
@@ -74,7 +74,6 @@ namespace Tsundoku.Models
 						seriesData["siteUrl"].ToString(),
 						maxVolCount,
 						minVolCount);
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
 					return _newSeries;
 				}
 			}
@@ -108,31 +107,37 @@ namespace Tsundoku.Models
 
 		public static String GetSeriesStatus(String jsonStatus)
 		{
-			return jsonStatus switch
+			
+			switch(jsonStatus)
 			{
-				"RELEASING" => "Ongoing",
-				"FINISHED" => "Complete",
-				"CANCELLED" => "Cancelled",
-				"HIATUS" => "Hiatus",
-				"NOT_YET_RELEASED" => "Coming Soon",
-				_ => "Error",
-			};
+				case "RELEASING":
+				case "NOT_YET_RELEASED" :
+					return "Ongoing";
+				case "FINISHED":
+					return "Complete";
+				case "CANCELLED":
+					return "Cancelled";
+				case "HIATUS":
+					return "Hiatus";
+				default:
+					return "Error";
+			}
 		}
 
         public static string SaveNewCoverImage(String coverLink, String title, String bookType)
         {
-            string newPath = @$"Assets\Covers\{Regex.Replace(title, @"[^A-Za-z\d]", "")}_{bookType}.{coverLink.Substring(coverLink.Length - 3)}";
+            string newPath = @$"\Tsundoku\Covers\{Regex.Replace(title, @"[^A-Za-z\d]", "")}_{bookType}.{coverLink.Substring(coverLink.Length - 3)}";
+            Directory.CreateDirectory(@"\Tsundoku\Covers");
 
             if (!File.Exists(newPath))
             {
                 try
                 {
-                    //DirectoryInfo newDir = Directory.CreateDirectory(@"\Tsundoku\Assets\Covers\");
                     HttpClient client = new HttpClient();
                     Task<HttpResponseMessage> response = Task.Run(async () => await client.GetAsync(new Uri(coverLink)));
                     response.Wait();
                     HttpResponseMessage clientResponse = response.Result;
-                    using (var fs = new FileStream(newPath, FileMode.CreateNew))
+                    using (FileStream fs = new FileStream(newPath, FileMode.OpenOrCreate, FileAccess.Write))
                     {
                         Task fileResponse = Task.Run(async () => await clientResponse.Content.CopyToAsync(fs));
                         fileResponse.Wait();
@@ -148,13 +153,13 @@ namespace Tsundoku.Models
 
         public static string GetSeriesStaff(JToken staffArray, string nameType) {
 			StringBuilder staffList = new StringBuilder();
-			string[] validRoles = { "Story & Art", "Story", "Art", "Original Creator", "Character Design", "Illustration", "Mechanical Design", "Original Story", "Cover Illustration"};
+			string[] validRoles = { "Story & Art", "Story", "Art", "Original Creator", "Character Design", "Illustration", "Mechanical Design", "Original Story", "Cover Illustration", "Mechanical Design"};
 			foreach(JToken name in staffArray)
             {
 				if (validRoles.Contains(Regex.Replace(name["role"].ToString(), @" \(.*\)", "")))
                 {
-					String newStaff = name["node"]["name"][nameType].ToString();
-					if (!staffList.ToString().Contains(newStaff))
+					String newStaff = name["node"]["name"][nameType].ToString().Trim();
+					if (!staffList.ToString().Contains(newStaff)) // Check to see if this staff member has multiple roles to only add them once
 					{
 						if (!string.IsNullOrEmpty(newStaff))
 						{
@@ -162,16 +167,16 @@ namespace Tsundoku.Models
 						}
 						else if (nameType.Equals("native"))
 						{
-							staffList.Append(name["node"]["name"]["full"] + " | ");
+							staffList.Append(name["node"]["name"]["full"].ToString().Trim() + " | ");
 						}
 						else // If the staff member does not have a full name entry
 						{
-							staffList.Append(name["node"]["name"]["native"] + " | ");
+							staffList.Append(name["node"]["name"]["native"].ToString().Trim() + " | ");
 						}
 					}
 					else
 					{
-						Logger.Debug($"Duplicate Staff Entry For {newStaff}");
+						Logger.Info($"Duplicate Staff Entry For {newStaff}");
 					}
                 }
             }

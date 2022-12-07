@@ -10,7 +10,8 @@ namespace Tsundoku.Views
     public partial class AddNewSeriesWindow : Window
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
-        public AddNewSeriesViewModel AddNewSeriesVM => DataContext as AddNewSeriesViewModel;
+        public AddNewSeriesViewModel? AddNewSeriesVM => DataContext as AddNewSeriesViewModel;
+        public bool IsOpen = false;
 
         public AddNewSeriesWindow()
         {
@@ -19,13 +20,16 @@ namespace Tsundoku.Views
             Opened += (s, e) =>
             {
                 AddNewSeriesVM.CurrentTheme = ((MainWindow)((Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).MainWindow).CollectionViewModel.CurrentTheme;
+                IsOpen ^= true;
             };
             
             this.Closing += (s, e) =>
             {
                 ((AddNewSeriesWindow)s).Hide();
+                IsOpen ^= true;
                 e.Cancel = true;
             };
+
 #if DEBUG
             this.AttachDevTools();
 #endif
@@ -43,17 +47,17 @@ namespace Tsundoku.Views
 
         public void OnButtonClicked(object sender, RoutedEventArgs args)
         {
-            if (string.IsNullOrEmpty(TitleBox.Text) || (!(bool)MangaButton.IsChecked && !(bool)NovelButton.IsChecked) || string.IsNullOrEmpty(MaxVolCount.Text) || string.IsNullOrEmpty(CurVolCount.Text))
+            if (string.IsNullOrEmpty(TitleBox.Text) || !((bool)MangaButton.IsChecked || (bool)NovelButton.IsChecked) || string.IsNullOrEmpty(MaxVolCount.Text) || string.IsNullOrEmpty(CurVolCount.Text))
             {
                 Logger.Warn("Fields Missing Input");
-                var errorBox = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(
-                new MessageBoxStandardParams
-                {
-                    ContentTitle = "Error!",
-                    ContentMessage = "One or More Fields are Empty... Please Enter Data For All Fields",
-                    WindowIcon = new WindowIcon(@"\Tsundoku\Assets\tsundoku-logo.ico")
-                });
-                errorBox.Show();
+                // var errorBox = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(
+                // new MessageBoxStandardParams
+                // {
+                //     ContentTitle = "Error!",
+                //     ContentMessage = "One or More Fields are Empty... Please Enter Data For All Fields",
+                //     WindowIcon = new WindowIcon(@"Assets\Icons\Tsundoku-Logo.ico")
+                // });
+                // errorBox.Show();
             }
             else
             {

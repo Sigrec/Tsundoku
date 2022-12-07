@@ -1,7 +1,7 @@
 {
-  "UserName": "Username",
-  "NumVolumesCollected": 24,
-  "NumVolumesToBeCollected": 99,
+  "UserName": "Prem",
+  "NumVolumesCollected": 1011,
+  "NumVolumesToBeCollected": 47,
   "CurLanguage": "English",
   "Display": "Card",
   "MainTheme": "Default",
@@ -50,167 +50,27 @@
       "SeriesEditPaneButtonsBorderHoverColor": 4281085250,
       "SeriesEditPaneButtonsIconColor": 4292859294,
       "SeriesEditPaneButtonsIconHoverColor": 4281085250
-    },
-    {
-      "ThemeName": "Test",
-      "MenuBGColor": 4285136896,
-      "UsernameColor": 4285657612,
-      "MenuTextColor": 4293513749,
-      "SearchBarBGColor": 4294928640,
-      "SearchBarBorderColor": 4278255615,
-      "SearchBarTextColor": 4286578629,
-      "MenuButtonBGColor": 2580557503,
-      "MenuButtonBGHoverColor": 2991387148,
-      "MenuButtonBorderColor": 4294967295,
-      "MenuButtonBorderHoverColor": 4278190080,
-      "MenuButtonTextAndIconColor": 4282908927,
-      "MenuButtonTextAndIconHoverColor": 4278255615,
-      "DividerColor": 4280022536,
-      "CollectionBGColor": 4286526208,
-      "StatusAndBookTypeBGColor": 4241512494,
-      "StatusAndBookTypeBGHoverColor": 4280296237,
-      "StatusAndBookTypeTextColor": 4063046866,
-      "StatusAndBookTypeTextHoverColor": 4292859294,
-      "SeriesCardBGColor": 4278209151,
-      "SeriesCardTitleColor": 4286513207,
-      "SeriesCardStaffColor": 4282850304,
-      "SeriesCardDescColor": 3857113112,
-      "SeriesProgressBGColor": 4282351431,
-      "SeriesProgressBarColor": 4281348144,
-      "SeriesProgressBarBGColor": 4286540288,
-      "SeriesProgressBarBorderColor": 4294934509,
-      "SeriesProgressTextColor": 4286578687,
-      "SeriesProgressButtonsHoverColor": 4294901760,
-      "SeriesSwitchPaneButtonBGColor": 4292542335,
-      "SeriesSwitchPaneButtonBGHoverColor": 4286529371,
-      "SeriesSwitchPaneButtonIconColor": 4278195071,
-      "SeriesSwitchPaneButtonIconHoverColor": 4285366079,
-      "SeriesEditPaneBGColor": 4283891839,
-      "SeriesNotesBGColor": 4286550783,
-      "SeriesNotesBorderColor": 4294957056,
-      "SeriesNotesTextColor": 4283596607,
-      "SeriesEditPaneButtonsBGColor": 4278195071,
-      "SeriesEditPaneButtonsBGHoverColor": 4294934509,
-      "SeriesEditPaneButtonsBorderColor": 4294901870,
-      "SeriesEditPaneButtonsBorderHoverColor": 4278255393,
-      "SeriesEditPaneButtonsIconColor": 4294928896,
-      "SeriesEditPaneButtonsIconHoverColor": 4287720531
     }
   ],
   "UserCollection": [
     {
       "Titles": [
-        "HEART GEAR",
-        "HEART GEAR",
-        "HEART GEAR"
+        "NARUTO",
+        "Naruto",
+        "NARUTO -\u30CA\u30EB\u30C8-"
       ],
       "Staff": [
-        "Tsuyoshi Takaki",
-        "\u30BF\u30AB\u30AD\u30C4\u30E8\u30B7"
+        "Masashi Kishimoto",
+        "\u5CB8\u672C\u6589\u53F2"
       ],
-      "Description": "In a ruined world, a human girl, Roue, and a droid, Zett, live a humble life. Then one day, they encounter a mysterious new droid, Chrome... Now all three of them live together like a family, but then\u2026",
-      "Format": "Manga",
-      "Status": "Ongoing",
-      "Cover": "Assets\\Covers\\HEARTGEAR_MANGA.jpg",
-      "Link": "https://anilist.co/manga/108832",
-      "SeriesNotes": null,
-      "MaxVolumeCount": 5,
-      "CurVolumeCount": 4
-    },
-    {
-      "Titles": [
-        "Yofukashi no Uta",
-        "Call of the Night",
-        "\u3088\u3075\u304B\u3057\u306E\u3046\u305F"
-      ],
-      "Staff": [
-        "Kotoyama",
-        "\u30B3\u30C8\u30E4\u30DE "
-      ],
-      "Description": "One sleepless night, Ko slips out to walk the streets. Life after dark is a revelation! When flirtatious Nazuna invites Ko to spend the night at her place in an abandoned building, he\u2019s stoked! But then he awakens to kisses on his neck with a little too much bite to them... Is it just the delicious taste of his blood that makes her meet him night after night for late-night adventures, conversation and...naps? Or something else? Then, when a cute girl from Ko\u2019s past shows up and competes for his attention, his budding relationship with the undead is put to the test!",
-      "Format": "Manga",
-      "Status": "Ongoing",
-      "Cover": "Assets\\Covers\\YofukashinoUta_MANGA.jpg",
-      "Link": "https://anilist.co/manga/111233",
-      "SeriesNotes": null,
-      "MaxVolumeCount": 15,
-      "CurVolumeCount": 13
-    },
-    {
-      "Titles": [
-        "Shingeki no Kyojin",
-        "Attack on Titan",
-        "\u9032\u6483\u306E\u5DE8\u4EBA"
-      ],
-      "Staff": [
-        "Hajime Isayama",
-        "\u8AEB\u5C71\u5275"
-      ],
-      "Description": "In this post-apocalyptic sci-fi story, humanity has been devastated by the bizarre, giant humanoids known as the Titans. Little is known about where they came from or why they are bent on consuming mankind. Seemingly unintelligent, they have roamed the world for years, killing everyone they see. For the past century, what\u0027s left of man has hidden in a giant, three-walled city. People believe their 50-meter-high walls will protect them from the Titans, but the sudden appearance of an immense Titan is about to change everything.",
+      "Description": "Before Naruto\u0027s birth, a great demon fox had attacked the Hidden Leaf Village. A man known as the 4th Hokage sealed the demon inside the newly born Naruto, causing him to unknowingly grow up detested by his fellow villagers. Despite his lack of talent in many areas of ninjutsu, Naruto strives for only one goal: to gain the title of Hokage, the strongest ninja in his village. Desiring the respect he never received, Naruto works towards his dream with fellow friends Sasuke and Sakura and mentor Kakashi as they go through many trials and battles that come with being a ninja.",
       "Format": "Manga",
       "Status": "Complete",
-      "Cover": "Assets\\Covers\\ShingekinoKyojin_MANGA.jpg",
-      "Link": "https://anilist.co/manga/53390",
-      "SeriesNotes": null,
-      "MaxVolumeCount": 34,
-      "CurVolumeCount": 0
-    },
-    {
-      "Titles": [
-        "Overlord",
-        "Overlord",
-        "\u30AA\u30FC\u30D0\u30FC\u30ED\u30FC\u30C9"
-      ],
-      "Staff": [
-        "Kugane Maruyama | so-bin",
-        "\u4E38\u5C71\u304F\u304C\u306D | so-bin"
-      ],
-      "Description": "For twelve years, the virtual world of Yggdrasil has served as the playground and battlefield for the skeletal lord Momonga and his guild of fellow monsters, Ainz Ooal Gown. But the guild\u0027s glory days are over, and the game is shutting down permanently. When Momonga logs in one last time just to be there when the servers go dark, something happens--and suddenly, fantasy is reality. A rogues\u0027 gallery of fanatically devoted NPCs is ready to obey his every order, but the world Momonga now inhabits is not the one he remembers. The game may be over, but the epic tale of Ainz Ooal Gown is only beginning...",
-      "Format": "Novel",
-      "Status": "Ongoing",
-      "Cover": "Assets\\Covers\\Overlord_NOVEL.png",
-      "Link": "https://anilist.co/manga/85976",
-      "SeriesNotes": "test",
-      "MaxVolumeCount": 18,
-      "CurVolumeCount": 0
-    },
-    {
-      "Titles": [
-        "Vagabond",
-        "Vagabond",
-        "\u30D0\u30AC\u30DC\u30F3\u30C9"
-      ],
-      "Staff": [
-        "Takehiko Inoue | Eiji Yoshikawa",
-        "\u4E95\u4E0A\u96C4\u5F66 | \u5409\u5DDD\u82F1\u6CBB"
-      ],
-      "Description": "At seventeen years of age, Miyamoto Musashi--still known by his childhood name, Shinmen Takezo--was a wild young brute just setting out along the way of the sword.\n\nIn the aftermath of the epic Battle of Sekigahara, Takezo finds himself a fugitive survivor on the losing side of the war. Takezo\u0027s vicious nature has made him an outcast even in his own village, and he is hunted down like an animal. At this crucial crossroads in Takezo\u0027s life, an eccentric monk and a childhood friend are the only ones who can help him find his way.",
-      "Format": "Manga",
-      "Status": "Hiatus",
-      "Cover": "Assets\\Covers\\Vagabond_MANGA.png",
-      "Link": "https://anilist.co/manga/30656",
-      "SeriesNotes": null,
-      "MaxVolumeCount": 36,
-      "CurVolumeCount": 0
-    },
-    {
-      "Titles": [
-        "Gakuen Mokushiroku: HIGHSCHOOL OF THE DEAD",
-        "Highschool of the Dead",
-        "\u5B66\u5712\u9ED9\u793A\u9332 HIGHSCHOOL OF THE DEAD"
-      ],
-      "Staff": [
-        "Daisuke Satou | Shouji Satou",
-        "\u4F50\u85E4\u5927\u8F14 | \u4F50\u85E4\u30B7\u30E7\u30A6\u30B8"
-      ],
-      "Description": "A mysterious illness is spreading rapidly through the halls of Fujimi High School. In a matter of hours, the campus is transformed from a place of learning into a hive of nightmares, as the infected students collapse and are reborn as flesh-hungry zombies! Only a handful of students escape the initial outbreak - among them Takashi Komuro and his childhood friend, Rei. He manages to protect Rei from the initial onslaught, but how long can Takashi and the other students hope to survive when the whole school - maybe the whole town - is out for their blood?!",
-      "Format": "Manga",
-      "Status": "Cancelled",
-      "Cover": "Assets\\Covers\\GakuenMokushirokuHIGHSCHOOLOFTHEDEAD_MANGA.jpg",
-      "Link": "https://anilist.co/manga/30669",
-      "SeriesNotes": null,
-      "MaxVolumeCount": 7,
-      "CurVolumeCount": 0
+      "Cover": "\\Tsundoku\\Covers\\NARUTO_MANGA.jpg",
+      "Link": "https://anilist.co/manga/30011",
+      "SeriesNotes": "This deployment model has been available since .NET Core 3.0 and has been enhanced in .NET 5. Previously in .NET Core 3.0, when a user runs your single file app, .NET Core host first extracts all files to a directory before running the application. .NET 5 improves this experience by directly running the code without the need to extract the files from the app.\r\n\r\nThe size of the single file in a self-contained application is large since it includes the runtime and the framework libraries. In .NET 6, you can publish trimmed to reduce the total size of trim-compatible applications. The single file deployment option can be combined with ReadyToRun and Trim publish options.",
+      "MaxVolumeCount": 47,
+      "CurVolumeCount": 3
     },
     {
       "Titles": [
@@ -224,31 +84,69 @@
       ],
       "Description": "",
       "Format": "Manga",
-      "Status": "Coming Soon",
-      "Cover": "Assets\\Covers\\LycorisRecoilKoushikiComicAnthologyRepeat_MANGA.jpg",
+      "Status": "Ongoing",
+      "Cover": "\\Tsundoku\\Covers\\LycorisRecoilKoushikiComicAnthologyRepeat_MANGA.jpg",
       "Link": "https://anilist.co/manga/157671",
       "SeriesNotes": null,
-      "MaxVolumeCount": 2,
+      "MaxVolumeCount": 1,
       "CurVolumeCount": 1
     },
     {
       "Titles": [
-        "Sekai Saikyou no Kouei: Meikyuukoku no Shinjin Tansakusha",
-        "Sekai Saikyou no Kouei: Meikyuukoku no Shinjin Tansakusha",
-        "\u4E16\u754C\u6700\u5F37\u306E\u5F8C\u885B\u3000\uFF5E\u8FF7\u5BAE\u56FD\u306E\u65B0\u4EBA\u63A2\u7D22\u8005\uFF5E"
+        "HEART GEAR",
+        "HEART GEAR",
+        "HEART GEAR"
       ],
       "Staff": [
-        "Rikizo | Huuka Kazabana | Toowa Akatsuki",
-        "\u529B\u8535 | \u98A8\u82B1\u98A8\u82B1 | \u6731\u6708\u5341\u8A71"
+        "Tsuyoshi Takaki",
+        "\u30BF\u30AB\u30AD\u30C4\u30E8\u30B7"
       ],
-      "Description": "Corporate slave Arihito Atobe\u0027s death in a freak bus accident marks the beginning of his new life as a kind of adventurer called a Seeker. Reborn into a fantasy world, he settles into a previously unknown job class called \u0022rearguard,\u0022 capable of providing his (all-female) party with critical attack, defense, and recovery support. And it comes with an added bonus: Simply being at the back of the party line increases his companions\u0027 fondness for him! Freed from the shackles of corporate life, Arihito is eager to start fresh as a newly minted Seeker!",
+      "Description": "In a ruined world, a human girl, Roue, and a droid, Zett, live a humble life. Then one day, they encounter a mysterious new droid, Chrome... Now all three of them live together like a family, but then\u2026",
       "Format": "Manga",
       "Status": "Ongoing",
-      "Cover": "Assets\\Covers\\SekaiSaikyounoKoueiMeikyuukokunoShinjinTansakusha_MANGA.jpg",
-      "Link": "https://anilist.co/manga/101734",
+      "Cover": "\\Tsundoku\\Covers\\HEARTGEAR_MANGA.jpg",
+      "Link": "https://anilist.co/manga/108832",
+      "SeriesNotes": null,
+      "MaxVolumeCount": 5,
+      "CurVolumeCount": 4
+    },
+    {
+      "Titles": [
+        "BLEACH",
+        "Bleach",
+        "BLEACH"
+      ],
+      "Staff": [
+        "Tite Kubo",
+        "\u4E45\u4FDD\u5E2F\u4EBA"
+      ],
+      "Description": "Ichigo Kurosaki has always been able to see ghosts, but this ability doesn\u0027t change his life nearly as much as his close encounter with Rukia Kuchiki, a Soul Reaper and member of the mysterious Soul Society. While fighting a Hollow, an evil spirit that preys on humans who display psychic energy, Rukia attempts to lend Ichigo some of her powers so that he can save his family; but much to her surprise, Ichigo absorbs every last drop of her energy. Now a full-fledged Soul Reaper himself, Ichigo quickly learns that the world he inhabits is one full of dangerous spirits and, along with Rukia\u2014 who is slowly regaining her powers\u2014 it\u0027s Ichigo\u0027s job to protect the innocent from Hollows and help the spirits themselves find peace.",
+      "Format": "Manga",
+      "Status": "Complete",
+      "Cover": "\\Tsundoku\\Covers\\BLEACH_MANGA.png",
+      "Link": "https://anilist.co/manga/30012",
+      "SeriesNotes": null,
+      "MaxVolumeCount": 999,
+      "CurVolumeCount": 999
+    },
+    {
+      "Titles": [
+        "ONE PIECE",
+        "One Piece",
+        "ONE PIECE"
+      ],
+      "Staff": [
+        "Eiichirou Oda",
+        "\u5C3E\u7530\u6804\u4E00\u90CE"
+      ],
+      "Description": "As a child, Monkey D. Luffy was inspired to become a pirate by listening to the tales of the buccaneer \u0022Red-Haired\u0022 Shanks. But his life changed when Luffy accidentally ate the Gum-Gum Devil Fruit and gained the power to stretch like rubber...at the cost of never being able to swim again! Years later, still vowing to become the king of the pirates, Luffy sets out on his adventure...one guy alone in a rowboat, in search of the legendary \u0022One Piece,\u0022 said to be the greatest treasure in the world...",
+      "Format": "Manga",
+      "Status": "Ongoing",
+      "Cover": "\\Tsundoku\\Covers\\ONEPIECE_MANGA.jpg",
+      "Link": "https://anilist.co/manga/30013",
       "SeriesNotes": null,
       "MaxVolumeCount": 6,
-      "CurVolumeCount": 6
+      "CurVolumeCount": 5
     }
   ]
 }

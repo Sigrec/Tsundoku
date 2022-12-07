@@ -1,7 +1,6 @@
 ﻿using Tsundoku.Models;
 using System.Linq;
 using System.Threading.Tasks;
-using ReactiveUI.Fody.Helpers;
 
 namespace Tsundoku.ViewModels
 {
@@ -12,7 +11,7 @@ namespace Tsundoku.ViewModels
         
         public AddNewSeriesViewModel()
         {
-
+        
         }
 
         public static void GetSeriesData(string title, string bookType, ushort curVolCount, ushort maxVolCount)
@@ -33,18 +32,18 @@ namespace Tsundoku.ViewModels
 
                 if (!duplicateSeriesCheck)
                 {
-                    Logger.Info("New Series JSON\n" + newSeries.ToString());
+                    Logger.Info(newSeries.ToString());
                     MainWindowViewModel.Collection.Add(newSeries);
                     MainWindowViewModel.SortCollection();
                 }
                 else
                 {
-                    Logger.Info("Duplicate Check, Series Already Exists");
+                    Logger.Info("Series Already Exists");
                 }
             }
             else
             {
-                Logger.Info($"{title} | {bookType} | {curVolCount} | {maxVolCount} -> Does Not Exist");
+                Logger.Info($"{title} -> Does Not Exist");
             }
         }
     }

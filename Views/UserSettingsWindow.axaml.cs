@@ -10,7 +10,8 @@ namespace Tsundoku.Views
     public partial class SettingsWindow : Window
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
-        public ViewModelBase UserSettingsVM => DataContext as ViewModelBase;
+        public ViewModelBase? UserSettingsVM => DataContext as ViewModelBase;
+        public bool IsOpen = false;
         
         public SettingsWindow()
         {
@@ -19,11 +20,13 @@ namespace Tsundoku.Views
             Opened += (s, e) =>
             {
                 UserSettingsVM.CurrentTheme = ((MainWindow)((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).MainWindow).CollectionViewModel.CurrentTheme;
+                IsOpen ^= true;
             };
 
             Closing += (s, e) =>
             {
                 ((SettingsWindow)s).Hide();
+                IsOpen ^= true;
                 e.Cancel = true;
             };
         }
@@ -34,6 +37,10 @@ namespace Tsundoku.Views
             {
                 (((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).Windows[0] as MainWindow).CollectionViewModel.UserName = UsernameChange.Text;
                 Logger.Info($"Username Changed To -> {UsernameChange.Text}");
+            }
+            else
+            {
+                Logger.Warn("Change Username Field is Missing Input");
             }
         }  
 
@@ -77,15 +84,15 @@ namespace Tsundoku.Views
                 {
                     case "Native":
                         worksheet.Cells[row + 1, 0].Value = curSeries.Titles[2];
-                        worksheet.Cells[row + 1, 6].Value = curSeries.Staff[1];
+                        worksheet.Cells[row + 1, 6].Value = curSeries.Staff[1].Replace(" | ", "\n");
                         break;
                     case "English":
                         worksheet.Cells[row + 1, 0].Value = curSeries.Titles[1];
-                        worksheet.Cells[row + 1, 6].Value = curSeries.Staff[0];
+                        worksheet.Cells[row + 1, 6].Value = curSeries.Staff[0].Replace(" | ", "\n");
                         break;
                     default:
                         worksheet.Cells[row + 1, 0].Value = curSeries.Titles[0];
-                        worksheet.Cells[row + 1, 6].Value = curSeries.Staff[0];
+                        worksheet.Cells[row + 1, 6].Value = curSeries.Staff[0].Replace(" | ", "\n");
                         break;
                 }
 
@@ -115,16 +122,47 @@ namespace Tsundoku.Views
                 worksheet.Cells[row + 1, 5].Value = curSeries.SeriesNotes;
             }
 
-            worksheet.Columns["A"].AutoFit(); // Title
-            worksheet.Columns["B"].AutoFit(); // Format
-            worksheet.Columns["C"].AutoFit(); // Status
-            worksheet.Columns["D"].AutoFit(); // Cur Volumes
-            worksheet.Columns["E"].AutoFit(); // Max Volumes
-            worksheet.Columns["F"].AutoFit(); // Notes
-            worksheet.Columns["G"].AutoFit(); // Staff
+            // Title
+            worksheet.Columns["A"].SetWidth(40, LengthUnit.CharacterWidth);
+            worksheet.Columns["A"].Style.WrapText = true;
+            worksheet.Columns["A"].Style.VerticalAlignment = VerticalAlignmentStyle.Center;
 
-            workbook.Save($"{MainWindowViewModel.MainUser.UserName}_Collection.xlsx");
-            Logger.Info($"Exported {MainWindowViewModel.MainUser.UserName}'s Data To -> {MainWindowViewModel.MainUser.UserName}_Collection.xlsx");
+            // Format
+            worksheet.Columns["B"].AutoFit();
+            worksheet.Columns["B"].Style.HorizontalAlignment = HorizontalAlignmentStyle.Center;
+            worksheet.Columns["B"].Style.VerticalAlignment = VerticalAlignmentStyle.Center;
+
+            // Status
+            worksheet.Columns["C"].AutoFit();
+            worksheet.Columns["C"].Style.HorizontalAlignment = HorizontalAlignmentStyle.Center;
+            worksheet.Columns["C"].Style.VerticalAlignment = VerticalAlignmentStyle.Center;
+
+            // Cur Volumes
+            worksheet.Columns["D"].AutoFit();
+            worksheet.Columns["D"].Style.HorizontalAlignment = HorizontalAlignmentStyle.Center;
+            worksheet.Columns["D"].Style.VerticalAlignment = VerticalAlignmentStyle.Center;
+
+            // Max Volumes
+            worksheet.Columns["E"].AutoFit();
+            worksheet.Columns["E"].Style.HorizontalAlignment = HorizontalAlignmentStyle.Center;
+            worksheet.Columns["E"].Style.VerticalAlignment = VerticalAlignmentStyle.Center;
+
+            // Notes
+            worksheet.Columns["F"].SetWidth(40, LengthUnit.CharacterWidth);
+            worksheet.Columns["F"].Style.WrapText = true;
+            worksheet.Columns["F"].Style.VerticalAlignment = VerticalAlignmentStyle.Center;
+
+            // Staff
+            worksheet.Columns["G"].AutoFit();
+            worksheet.Columns["G"].Style.VerticalAlignment = VerticalAlignmentStyle.Center;
+    
+#if (!DEBUG)
+            workbook.Save(@$"{System.Environment.CurrentDirectory}\TsundokuCollection.xlsx");
+            Logger.Info(@$"Exported {MainWindowViewModel.MainUser.UserName}'s Data To -> {System.Environment.CurrentDirectory}\TsundokuCollection.xlsx");
+#else
+            workbook.Save(@$"\Tsundoku\TsundokuCollection.xlsx");
+            Logger.Info(@$"Exported {MainWindowViewModel.MainUser.UserName}'s Data To -> \Tsundoku\TsundokuCollection.xlsx");
+#endif
         }
     }
 }

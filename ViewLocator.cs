@@ -1,12 +1,14 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using Tsundoku.ViewModels;
 
 namespace Tsundoku
 {
     public class ViewLocator : IDataTemplate
     {
+        [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "<Pending>")]
         public IControl Build(object data)
         {
             var name = data.GetType().FullName!.Replace("ViewModel", "View");

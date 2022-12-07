@@ -1,20 +1,52 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
-    <!--Avalonia doesen't support TrimMode=link currently,but we are working on that https://github.com/AvaloniaUI/Avalonia/issues/6892 -->
+    <DebugType>embedded</DebugType>
     <TrimMode>copyused</TrimMode>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <AvaloniaNameGeneratorBehavior>InitializeComponent</AvaloniaNameGeneratorBehavior>
     <AvaloniaNameGeneratorFilterByPath>*</AvaloniaNameGeneratorFilterByPath>
     <AvaloniaNameGeneratorFilterByNamespace>*</AvaloniaNameGeneratorFilterByNamespace>
+    <ApplicationIcon>Assets\Icons\Tsundoku-Logo.ico</ApplicationIcon>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <StartupObject>Tsundoku.Program</StartupObject>
+    <PublishSingleFile Condition="'$(Configuration)' == 'Release'">true</PublishSingleFile>
+    <!-- <SelfContained>true</SelfContained> -->
+    <!-- <RuntimeIdentifier>win-x64</RuntimeIdentifier> -->
+    <IsTrimmable>true</IsTrimmable>
+    <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
+	  <PublishReadyToRun>true</PublishReadyToRun>
+    <Optimize>true</Optimize>
+	<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
   </PropertyGroup>
+	<ItemGroup>
+		<AvaloniaResource Include="Assets\**" />
+		<!-- <AvaloniaResource Include="UserData.json" /> -->
+		<!-- <Compile Remove="Assets\Covers\**" /> -->
+		<!-- <EmbeddedResource Remove="Assets\Cover\**" /> -->
+		<None Remove=".gitignore" />
+		<Content Update="lib*.dll">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+			<ExcludeFromSingleFile>false</ExcludeFromSingleFile>
+		</Content>
+	    <Content Update="UserData.json">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+		</Content>
+	    <Content Update="Covers">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+		</Content>
+	</ItemGroup>
   <ItemGroup>
-    <AvaloniaResource Include="Assets\**" />
-    <Compile Remove="Assets\Covers\**" />
-    <EmbeddedResource Remove="Assets\Cover\**" />
-    <None Remove=".gitignore" />
+    <Content Include="Assets\Icons\Tsundoku-Logo.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="NLog.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <!--This helps with theme dll-s trimming.
@@ -32,7 +64,6 @@
     <PackageReference Include="Avalonia.ReactiveUI" Version="11.0.0-preview4" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.0-preview4" />
     <PackageReference Include="Avalonia.Themes.Simple" Version="11.0.0-preview4" />
-    <PackageReference Include="Avalonia.Xaml.Behaviors" Version="11.0.0-preview4" />
     <PackageReference Include="Egorozh.ColorPicker.Avalonia" Version="11.0.0-preview1" />
     <PackageReference Include="Egorozh.ColorPicker.Avalonia.Dialog" Version="11.0.0-preview1" />
     <PackageReference Include="Egorozh.ColorPicker.Core" Version="11.0.0-preview1" />
@@ -41,25 +72,14 @@
     <PackageReference Include="GraphQL.Client.Serializer.Newtonsoft" Version="5.1.0" />
     <PackageReference Include="MessageBox.Avalonia" Version="2.3.1-prev2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
-    <PackageReference Include="NLog" Version="5.0.5" />
+    <PackageReference Include="NLog" Version="5.1.0" />
     <PackageReference Include="Projektanker.Icons.Avalonia.FontAwesome" Version="6.2.0-preview1" />
     <PackageReference Include="ReactiveUI.Fody" Version="18.4.1" />
-    <PackageReference Include="XamlNameReferenceGenerator" Version="1.4.2" />
+	<PackageReference Include="XamlNameReferenceGenerator" Version="1.5.1" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="Views\SettingsWindow.axaml.cs">
-      <DependentUpon>SettingsWindow.axaml</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="NLog.config">
+    <Compile Update="Program.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="UserData.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-	  <None Update="Assets\Covers\**">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
+    </Compile>
   </ItemGroup>
 </Project>

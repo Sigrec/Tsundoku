@@ -102,6 +102,7 @@ namespace Tsundoku.Models
         Color.FromRgb(223, 213, 158).ToUint32(), //SeriesEditPaneButtonsIconColor
         Color.FromRgb(44, 45, 66).ToUint32() //SeriesEditPaneButtonsIconHoverColor
         );
+
         private bool disposedValue;
 
         public TsundokuTheme()

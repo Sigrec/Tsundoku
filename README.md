@@ -15,9 +15,13 @@ C# Avalonia App for Manga &amp; Light Novel Collecting
 - [ ] Seperate out the ItemControl (Collection) to a UserControl
 - [ ] Memory Issues (Resets memory usage when restarting the app) [Memory leak when sorting and searching]
 - [ ] Need some further testing on the async functions (changing volumes for right now)
-- [ ] Switch Pane Button Icon seems like it is slightly misaligned up and not centered
 - [ ] ComboBoxItem styling is not working for some reason or I'm doing something wrong idk
+- [ ] ScrollViewer make it so you have to use scrollbar to scroll whole collection?
+- [ ] Only Enable Button when fields have correct input
+  - [ ] AddNewSeriesWindow Add Button
+  - [ ] UserSettingsWindow Change Username Button
+  - [ ] ThemeSettingsWindow Save Button
 
 ### Other/Random
 - [ ] Figure out TrayIcon
-- [ ] Seperate out the ItemControl (Collection) to a UserControl
+- [ ] ProgressBar issue Fixed track repo for next update and make change (https://github.com/AvaloniaUI/Avalonia/pull/9371)
