@@ -16,7 +16,7 @@ C# Avalonia App for Manga &amp; Light Novel Collecting
 - [ ] Memory Issues (Resets memory usage when restarting the app) [Memory leak when sorting and searching]
 - [ ] Need some further testing on the async functions (changing volumes for right now)
 - [ ] ComboBoxItem styling is not working for some reason or I'm doing something wrong idk
-- [ ] ScrollViewer make it so you have to use scrollbar to scroll whole collection?
+- [ ] ScrollViewer make it so you have to use scrollbar to scroll whole collection & styling
 - [ ] Only Enable Button when fields have correct input
   - [ ] AddNewSeriesWindow Add Button
   - [ ] UserSettingsWindow Change Username Button

@@ -52,9 +52,9 @@ namespace Tsundoku.Models
 				if (seriesData != null)
 				{
 					string romajiTitle = seriesData["title"]["romaji"].ToString();
-					string nativeStaff = GetSeriesStaff(seriesData["staff"]["edges"], "native");
-					string fullStaff = GetSeriesStaff(seriesData["staff"]["edges"], "full");
 					string filteredBookType = bookType.Equals("MANGA") ? GetCorrectComicName(seriesData["countryOfOrigin"].ToString()) : "Novel";
+					string nativeStaff = GetSeriesStaff(seriesData["staff"]["edges"], "native", filteredBookType, romajiTitle);
+					string fullStaff = GetSeriesStaff(seriesData["staff"]["edges"], "full", filteredBookType, romajiTitle);
 					Series _newSeries = new Series(
                         new List<string>()
 						{
@@ -151,12 +151,19 @@ namespace Tsundoku.Models
 			return newPath;
         }
 
-        public static string GetSeriesStaff(JToken staffArray, string nameType) {
+        public static string GetSeriesStaff(JToken staffArray, string nameType, string bookType, string title) {
 			StringBuilder staffList = new StringBuilder();
-			string[] validRoles = { "Story & Art", "Story", "Art", "Original Creator", "Character Design", "Illustration", "Mechanical Design", "Original Story", "Cover Illustration", "Mechanical Design"};
+			string[] validRoles = { "Story & Art", "Story", "Art", "Original Creator", "Character Design", "Illustration", "Mechanical Design", "Original Story"};
 			foreach(JToken name in staffArray)
             {
-				if (validRoles.Contains(Regex.Replace(name["role"].ToString(), @" \(.*\)", "")))
+				string staffRole = Regex.Replace(name["role"].ToString(), @" \(.*\)", "");
+
+				// Don't include staff for manga that are illustrators
+				if (bookType.Equals("Manga") && staffRole.Equals("Illustration") && !title.Contains("Anthology"))
+				{
+					break;
+				}
+				else if (validRoles.Contains(staffRole))
                 {
 					String newStaff = name["node"]["name"][nameType].ToString().Trim();
 					if (!staffList.ToString().Contains(newStaff)) // Check to see if this staff member has multiple roles to only add them once
