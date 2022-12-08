@@ -17,6 +17,7 @@ C# Avalonia App for Manga &amp; Light Novel Collecting
 - [ ] Need some further testing on the async functions (changing volumes for right now)
 - [ ] ComboBoxItem styling is not working for some reason or I'm doing something wrong idk
 - [ ] ScrollViewer make it so you have to use scrollbar to scroll whole collection & styling
+- [ ] Implement IDisposable
 - [ ] Only Enable Button when fields have correct input
   - [ ] AddNewSeriesWindow Add Button
   - [ ] UserSettingsWindow Change Username Button

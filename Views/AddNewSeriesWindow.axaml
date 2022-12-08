@@ -15,16 +15,18 @@
 		CanResize="false">
 	
     <Border BorderBrush="{Binding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" BorderThickness="3">
+	<Border.Styles>
+		<Style Selector="#AddSeriesButton:pointerover /template/ ContentPresenter, #AddSeriesButton:disabled /template/ ContentPresenter">
+			<Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
+			<Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
+			<Setter Property="TextBlock.Foreground" Value="{Binding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
+		</Style>
+	</Border.Styles>
         <StackPanel Margin="20" Spacing="20">
 			<StackPanel.Styles>
 				<Style Selector="TextBox:pointerover /template/ Border#PART_BorderElement, TextBox:focus /template/ Border#PART_BorderElement">
 					<Setter Property="Background" Value="{Binding CurrentTheme.SearchBarBGColor, Converter={StaticResource ConvertColor}}"/>
 					<Setter Property="BorderBrush" Value="{Binding CurrentTheme.SearchBarBorderColor, Converter={StaticResource ConvertColor}}"/>
-				</Style>
-				<Style Selector="Button:pointerover /template/ ContentPresenter">
-					<Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
-					<Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
-					<Setter Property="TextBlock.Foreground" Value="{Binding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
 				</Style>
 			</StackPanel.Styles>
 			<StackPanel>
@@ -33,6 +35,7 @@
 						 Width="400"
 						 FontSize="18"
 						 FontWeight="Bold"
+						 Text="{Binding TitleText}"
 						 Background="{Binding CurrentTheme.SearchBarBGColor, Converter={StaticResource ConvertColor}}"
 						 BorderBrush="{Binding CurrentTheme.SearchBarBorderColor, Converter={StaticResource ConvertColor}}"
 						 Foreground="{Binding CurrentTheme.SearchBarTextColor, Converter={StaticResource ConvertColor}}"
@@ -53,35 +56,35 @@
                 </Grid.RowDefinitions>    
                 <TextBlock Text="Cur Volumes" Margin="2,0,0,0" Grid.Row="0" Grid.Column="0" FontSize="18" FontWeight="Bold" Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}"/>
                 <TextBlock Text="Max Volumes" Margin="12,0,0,0" Grid.Row="0" Grid.Column="1" FontSize="18" FontWeight="Bold" Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}"/>
-                <MaskedTextBox Name="CurVolCount" 
-							   Width="180"
-							   Grid.Row="1" 
-							   Grid.Column="0" 
-							   Margin="0,0,20,0" 
-							   Background="{Binding CurrentTheme.SearchBarBGColor, Converter={StaticResource ConvertColor}}" 
-							   BorderBrush="{Binding CurrentTheme.SearchBarBorderColor, Converter={StaticResource ConvertColor}}" 
-							   Foreground="{Binding CurrentTheme.SearchBarTextColor, Converter={StaticResource ConvertColor}}"
-						 	   SelectionBrush="{Binding CurrentTheme.SearchBarTextColor, Converter={StaticResource ConvertColor}}"
-						 	   SelectionForegroundBrush="{Binding CurrentTheme.SearchBarBGColor, Converter={StaticResource ConvertColor}}"
-							   BorderThickness="2"
-							   Mask="###"
-							   FontWeight="Bold"
-							   FontSize="18"
-							   MaxLength="3"/>
-				<MaskedTextBox Name="MaxVolCount"
-							   Width="180"
-							   Grid.Row="1" 
-							   Grid.Column="1" 
-							   Background="{Binding CurrentTheme.SearchBarBGColor, Converter={StaticResource ConvertColor}}" 
-							   BorderBrush="{Binding CurrentTheme.SearchBarBorderColor, Converter={StaticResource ConvertColor}}" 
-							   Foreground="{Binding CurrentTheme.SearchBarTextColor, Converter={StaticResource ConvertColor}}"
-						 	   SelectionBrush="{Binding CurrentTheme.SearchBarTextColor, Converter={StaticResource ConvertColor}}"
-						 	   SelectionForegroundBrush="{Binding CurrentTheme.SearchBarBGColor, Converter={StaticResource ConvertColor}}"
-							   BorderThickness="2"
-							   Mask="###"
-							   FontWeight="Bold"
-							   FontSize="18"
-							   MaxLength="3"/>
+                <TextBox Name="CurVolCount" 
+						 Width="180"
+						 Grid.Row="1" 
+						 Grid.Column="0" 
+						 Margin="0,0,20,0" 
+						 Background="{Binding CurrentTheme.SearchBarBGColor, Converter={StaticResource ConvertColor}}" 
+						 BorderBrush="{Binding CurrentTheme.SearchBarBorderColor, Converter={StaticResource ConvertColor}}" 
+						 Foreground="{Binding CurrentTheme.SearchBarTextColor, Converter={StaticResource ConvertColor}}"
+						 SelectionBrush="{Binding CurrentTheme.SearchBarTextColor, Converter={StaticResource ConvertColor}}"
+						 SelectionForegroundBrush="{Binding CurrentTheme.SearchBarBGColor, Converter={StaticResource ConvertColor}}"
+						 BorderThickness="2"
+						 FontWeight="Bold"
+						 FontSize="18"
+						 Text="{Binding CurVolumeCount}"
+						 MaxLength="3"/>
+				<TextBox Name="MaxVolCount"
+						 Width="180"
+						 Grid.Row="1" 
+						 Grid.Column="1" 
+						 Background="{Binding CurrentTheme.SearchBarBGColor, Converter={StaticResource ConvertColor}}" 
+						 BorderBrush="{Binding CurrentTheme.SearchBarBorderColor, Converter={StaticResource ConvertColor}}" 
+						 Foreground="{Binding CurrentTheme.SearchBarTextColor, Converter={StaticResource ConvertColor}}"
+						 SelectionBrush="{Binding CurrentTheme.SearchBarTextColor, Converter={StaticResource ConvertColor}}"
+						 SelectionForegroundBrush="{Binding CurrentTheme.SearchBarBGColor, Converter={StaticResource ConvertColor}}"
+						 BorderThickness="2"
+						 Text="{Binding MaxVolumeCount}"
+						 FontWeight="Bold"
+						 FontSize="18"
+						 MaxLength="3"/>
             </Grid>
 			<StackPanel Orientation="Horizontal" Spacing="30">
 				<StackPanel Spacing="5" VerticalAlignment="Center">
@@ -171,14 +174,13 @@
 							</Style>
 						</StackPanel.Styles>
 						<CheckBox Name="MangaButton" 
-								  Checked="MangaCheck"
 								  FontSize="20" 
 								  FontWeight="Bold" 
+								  IsChecked="True"
 								  Foreground="{Binding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}" 
 								  Margin="0,0,20,0" 
 								  Content="Manga"/>
 						<CheckBox Name="NovelButton" 
-								  Checked="NovelCheck"
 								  FontSize="20" 
 								  FontWeight="Bold" 
 								  Foreground="{Binding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}" 
@@ -188,10 +190,20 @@
 				</StackPanel>
 				<StackPanel Spacing="5" VerticalAlignment="Center">
 					<StackPanel.Styles>
-						<Style Selector="ComboBox:pointerover /template/ Border#Background, ComboBox:pressed /template/ Border#Background">
-							<Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
-							<Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
-							<Setter Property="TextBlock.Foreground" Value="{Binding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
+						<Style Selector="ComboBox">
+							<Style Selector="^:pointerover /template/ Border#Background, ^:pressed /template/ Border#Background, ^:disabled /template/ Border#Background">
+								<Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
+								<Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
+							</Style>
+							<Style Selector="^:pointerover /template/ ContentControl#ContentPresenter, ^:pointerover /template/ PathIcon#DropDownGlyph, ^:disabled /template/ PathIcon#DropDownGlyph">
+								<Setter Property="Foreground" Value="{Binding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
+							</Style>
+							<Style Selector="^:disabled /template/ ContentControl#ContentPresenter">
+								<Setter Property="Foreground" Value="{Binding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
+							</Style>
+							<Style Selector="^:disabled /template/ TextBlock#PlaceholderTextBlock">
+								<Setter Property="Foreground" Value="Red" />
+							</Style>
 						</Style>
 					</StackPanel.Styles>
 					<TextBlock HorizontalAlignment="Center" Text="Select Languages" Margin="0,10,0,0" FontSize="18" FontWeight="Bold" Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}"/>
@@ -199,6 +211,7 @@
 						Name="AdditionalLangSelector"
 						Items="{Binding AdditionalLanguages}"
 						SelectedItem="French"
+						IsEnabled="false"
 						Width="150"
 						Height="35" 
 						Background="{Binding CurrentTheme.SearchBarBGColor, Converter={StaticResource ConvertColor}}"
@@ -216,7 +229,9 @@
 					BorderBrush="{Binding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}" 
 					BorderThickness="2" 
 					FontWeight="Bold" 
-					FontSize="20" 
+					FontSize="20"
+					Name="AddSeriesButton"
+					IsEnabled="{Binding IsAddSeriesButtonEnabled}"
 					Foreground="{Binding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}" 
 					HorizontalAlignment="Center"/>
         </StackPanel>

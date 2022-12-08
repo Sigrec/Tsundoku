@@ -39,10 +39,21 @@
 						<Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
 						<Setter Property="TextBlock.Foreground" Value="{Binding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
 					</Style>
-					<Style Selector="ComboBox:pointerover /template/ Border#Background, ComboBox:pressed /template/ Border#Background">
-						<Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
-						<Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
-						<Setter Property="TextBlock.Foreground" Value="{Binding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
+					<Style Selector="ComboBox">
+						<Style Selector="^:pointerover /template/ Border#Background, ^:pressed /template/ Border#Background, ^:disabled /template/ Border#Background">
+							<Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
+							<Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
+						</Style>
+						<Style Selector="^:pointerover /template/ ContentControl#ContentPresenter, ^:pointerover /template/ PathIcon#DropDownGlyph, ^:disabled /template/ PathIcon#DropDownGlyph">
+							<Setter Property="Foreground" Value="{Binding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
+						</Style>
+						<Style Selector="^:disabled /template/ ContentControl#ContentPresenter">
+							<Setter Property="Foreground" Value="{Binding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
+						</Style>
+						<Style Selector="^:focus-visible /template/ Border#HighlightBackground">
+							<Setter Property="IsVisible" Value="True" />
+        					<Setter Property="BorderBrush" Value="Red"/>
+						</Style>
 					</Style>
 				</DockPanel.Styles>
 				<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10" DockPanel.Dock="Top">
@@ -123,6 +134,7 @@
 							   FontWeight="Bold" 
 							   Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}" 
 							   VerticalAlignment="Center"
+							   Width="160"
 							   HorizontalAlignment="Center"/>
 					<StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="5" Width="180">
 						<TextBlock Name="SearchCollectionHeader" VerticalAlignment="Center" Text="Search Collection" HorizontalAlignment="Center" FontSize="21" FontWeight="Bold" Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}"/>
@@ -151,6 +163,7 @@
 							   FontWeight="Bold" 
 							   Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}"
 							   VerticalAlignment= "Center" 
+							   Width="160"
 							   HorizontalAlignment="Center"/>
 					<ComboBox Name="DisplaySelector"
 							  Items="{Binding AvailableDisplays}"

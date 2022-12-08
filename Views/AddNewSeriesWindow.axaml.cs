@@ -3,7 +3,10 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Tsundoku.ViewModels;
 using System;
-using MessageBox.Avalonia.DTO;
+using Avalonia.Input;
+using System.Text.RegularExpressions;
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 
 namespace Tsundoku.Views
 {
@@ -16,14 +19,14 @@ namespace Tsundoku.Views
         public AddNewSeriesWindow()
         {
             InitializeComponent();
-            this.DataContext = new AddNewSeriesViewModel();
+            DataContext = new AddNewSeriesViewModel();
             Opened += (s, e) =>
             {
                 AddNewSeriesVM.CurrentTheme = ((MainWindow)((Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).MainWindow).CollectionViewModel.CurrentTheme;
                 IsOpen ^= true;
             };
             
-            this.Closing += (s, e) =>
+            Closing += (s, e) =>
             {
                 ((AddNewSeriesWindow)s).Hide();
                 IsOpen ^= true;
@@ -35,15 +38,15 @@ namespace Tsundoku.Views
 #endif
         }
 
-        private void MangaCheck(object sender, RoutedEventArgs args)
-        {
-            NovelButton.IsChecked = false;
-        }
+        // private void MangaCheck(object sender, RoutedEventArgs args)
+        // {
+        //     NovelButton.IsChecked = false;
+        // }
 
-        private void NovelCheck(object sender, RoutedEventArgs args)
-        {
-            MangaButton.IsChecked = false;
-        }
+        // private void NovelCheck(object sender, RoutedEventArgs args)
+        // {
+        //     MangaButton.IsChecked = false;
+        // }
 
         public void OnButtonClicked(object sender, RoutedEventArgs args)
         {

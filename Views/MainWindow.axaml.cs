@@ -88,20 +88,20 @@ namespace Tsundoku.Views
 
         private void LanguageChanged(object sender, SelectionChangedEventArgs e)
         {
-            switch (LanguageSelector.SelectedItem)
-            {
-                case "Native":
-                    CollectionViewModel.CurLanguage = "Native";
-                    break;
-                case "English":
-                    CollectionViewModel.CurLanguage = "English";
-                    break;
-                default:
-                    CollectionViewModel.CurLanguage = "Romaji";
-                    break;
-            }
             if ((sender as ComboBox).IsDropDownOpen)
             {
+                switch (LanguageSelector.SelectedItem)
+                {
+                    case "Native":
+                        CollectionViewModel.CurLanguage = "Native";
+                        break;
+                    case "English":
+                        CollectionViewModel.CurLanguage = "English";
+                        break;
+                    default:
+                        CollectionViewModel.CurLanguage = "Romaji";
+                        break;
+                }
                 Logger.Info($"Changed Langauge to {CollectionViewModel.CurLanguage}");
                 MainWindowViewModel.SortCollection();
             }
@@ -109,32 +109,27 @@ namespace Tsundoku.Views
 
         private void DisplayChanged(object sender, SelectionChangedEventArgs e)
         {
-            string display = (sender as ComboBox).SelectedItem as string;
-            if (display.Equals("Card"))
+            if ((sender as ComboBox).IsDropDownOpen)
             {
-                CollectionViewModel.CurDisplay = "Card";
+                string display = (sender as ComboBox).SelectedItem as string;
+                if (display.Equals("Card"))
+                {
+                    CollectionViewModel.CurDisplay = "Card";
+                }
+                else if (display.Equals("Mini-Card"))
+                {
+                    CollectionViewModel.CurDisplay = "Mini-Card";
+                }
+                Logger.Info($"Changed Display To {CollectionViewModel.CurDisplay}");
             }
-            else if (display.Equals("Mini-Card"))
-            {
-                CollectionViewModel.CurDisplay = "Mini-Card";
-            }
-            Logger.Info($"Changed Display To {CollectionViewModel.CurDisplay}");
-        }
-
-        public static string Slice(string source, int start, int end)
-        {
-            if (end < 0) // Keep this for negative end support
-            {
-                end = source.Length + end;
-            }
-            int len = end - start;               // Calculate length
-            return source.Substring(start, len); // Return Substring of length
         }
 
         public void SaveOnCloseTwo()
         {
             Logger.Info("Closing TsundOku");
+            MainWindowViewModel.CleanCoversFolder();
             Src.DiscordRP.Deinitialize();
+
             if (CollectionViewModel.newSeriesWindow != null)
             {
                 CollectionViewModel.newSeriesWindow.Closing += (s, e) => { e.Cancel = false; };
@@ -153,33 +148,6 @@ namespace Tsundoku.Views
                 CollectionViewModel.themeSettingsWindow.Close();
             }
 
-            // Cleans the Covers asset folder of images for series that is not in the users collection on close/save
-            bool removeSeriesCheck = true;
-            if (Directory.Exists(@$"{Environment.CurrentDirectory}\Covers"))
-            {
-                foreach (string coverPath in Directory.GetFiles(@"\Tsundoku\Covers"))
-                {
-                    int underscoreIndex = coverPath.IndexOf("_");
-                    int periodIndex = coverPath.IndexOf(".");
-                    foreach (Series curSeries in MainWindowViewModel.Collection)
-                    {
-                        string curTitle = Regex.Replace(curSeries.Titles[0], @"[^A-Za-z\d]", "");
-                        string coverPathTitleAndFormat = coverPath.Substring(17);
-                        if (Slice(coverPathTitleAndFormat, 0, coverPathTitleAndFormat.IndexOf("_")).Equals(curTitle) && Slice(coverPathTitleAndFormat, coverPathTitleAndFormat.IndexOf("_") + 1, coverPathTitleAndFormat.IndexOf(".")).Equals(curSeries.Format.ToUpper()))
-                        {
-                            removeSeriesCheck = false;
-                            break;
-                        }
-                    }
-
-                    if (removeSeriesCheck)
-                    {
-                        Logger.Info($"Deleted Cover -> {coverPath}");
-                        File.Delete(coverPath);
-                    }
-                    removeSeriesCheck = true;
-                }
-            }
             ThemeSettingsViewModel.UserThemes.Move(ThemeSettingsViewModel.UserThemes.IndexOf(ThemeSettingsViewModel.UserThemes.Single(x => x.ThemeName == MainWindowViewModel.MainUser.MainTheme)), 0);
 
             MainWindowViewModel.SaveUsersData();

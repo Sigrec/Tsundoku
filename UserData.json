@@ -1,56 +1,11 @@
 {
   "UserName": "Prem",
   "NumVolumesCollected": 1015,
-  "NumVolumesToBeCollected": 62,
-  "CurLanguage": "English",
+  "NumVolumesToBeCollected": 72,
+  "CurLanguage": "Native",
   "Display": "Card",
-  "MainTheme": "Test",
+  "MainTheme": "Default",
   "SavedThemes": [
-    {
-      "ThemeName": "Test",
-      "MenuBGColor": 4281085250,
-      "UsernameColor": 4292859294,
-      "MenuTextColor": 4292859294,
-      "SearchBarBGColor": 4279375645,
-      "SearchBarBorderColor": 4292859294,
-      "SearchBarTextColor": 4292859294,
-      "MenuButtonBGColor": 2568099613,
-      "MenuButtonBGHoverColor": 3001013662,
-      "MenuButtonBorderColor": 4292859294,
-      "MenuButtonBorderHoverColor": 4279375645,
-      "MenuButtonTextAndIconColor": 4292859294,
-      "MenuButtonTextAndIconHoverColor": 4279375645,
-      "DividerColor": 4292859294,
-      "CollectionBGColor": 4279375645,
-      "StatusAndBookTypeBGColor": 4229964589,
-      "StatusAndBookTypeBGHoverColor": 4280296237,
-      "StatusAndBookTypeTextColor": 4074755486,
-      "StatusAndBookTypeTextHoverColor": 4292859294,
-      "SeriesCardBGColor": 2949375,
-      "SeriesCardTitleColor": 4292859294,
-      "SeriesCardStaffColor": 4292859294,
-      "SeriesCardDescColor": 3857509612,
-      "SeriesProgressBGColor": 4281085250,
-      "SeriesProgressBarColor": 4292859294,
-      "SeriesProgressBarBGColor": 4279375645,
-      "SeriesProgressBarBorderColor": 4292859294,
-      "SeriesProgressTextColor": 4292859294,
-      "SeriesProgressButtonsHoverColor": 4279375645,
-      "SeriesSwitchPaneButtonBGColor": 4281085250,
-      "SeriesSwitchPaneButtonBGHoverColor": 4292859294,
-      "SeriesSwitchPaneButtonIconColor": 4292859294,
-      "SeriesSwitchPaneButtonIconHoverColor": 4279375645,
-      "SeriesEditPaneBGColor": 4280296237,
-      "SeriesNotesBGColor": 4279375645,
-      "SeriesNotesBorderColor": 4292859294,
-      "SeriesNotesTextColor": 4292859294,
-      "SeriesEditPaneButtonsBGColor": 4281085250,
-      "SeriesEditPaneButtonsBGHoverColor": 4292859294,
-      "SeriesEditPaneButtonsBorderColor": 4292859294,
-      "SeriesEditPaneButtonsBorderHoverColor": 4281085250,
-      "SeriesEditPaneButtonsIconColor": 4292859294,
-      "SeriesEditPaneButtonsIconHoverColor": 4281085250
-    },
     {
       "ThemeName": "Default",
       "MenuBGColor": 4281085250,
@@ -176,25 +131,6 @@
     },
     {
       "Titles": [
-        "Bakemonogatari",
-        "Bakemonogatari",
-        "\u5316\u7269\u8A9E"
-      ],
-      "Staff": [
-        "NISIOISIN | Ito Oogure | VOFAN | Akio Watanabe | Takeshi Kawaguchi | Negi Haruba | Ken Akamatsu | Anashin | Takahiro Oba | nonco | Norihito Sasaki | Kikou Aiba | Hiro Mashima | Atsushi Ookubo | Yousuke Kaneda | Kouji Seo | Nao Emoto | Mochi Shiba | Masanori Miyajima | Nao Akinari | Reiji Miyajima | Kei Sasuga | Miki Yoshikawa",
-        "\u897F\u5C3E\u7DAD\u65B0 | \u5927\u66AE\u7DAD\u4EBA | \u6234\u6E90\u4EA8 | \u6E21\u8FBA\u660E\u592B | \u30AB\u30EF\u30B0\u30C1\u30BF\u30B1\u30B7 | \u6625\u5834\u306D\u304E | \u8D64\u677E\u5065 | \u3042\u306A\u3057\u3093 | \u5927\u7FBD\u9686\u5EE3 | nonco | \u4F50\u3005\u6728\u5BA3\u4EBA | \u76F8\u7FBD\u7D00\u884C | \u771F\u5CF6\u30D2\u30ED | \u5927\u4E45\u4FDD\u7BE4 | \u91D1\u7530\u967D\u4ECB | \u702C\u5C3E\u516C\u6CBB | \u7D75\u672C\u5948\u592E | \u67F4\u3082\u3061 | \u5BAE\u5CF6\u96C5\u61B2 | \u6643\u5FB3\u5948\u592E | \u5BAE\u5CF6\u793C\u540F | \u6D41\u77F3\u666F | \u5409\u6CB3\u7F8E\u5E0C"
-      ],
-      "Description": "One day, high-school student Koyomi Araragi catches a girl named Hitagi Senjougahara when she trips. But\u2014much to his surprise\u2014she doesn\u2019t weigh anything. At all. She says an encounter with a so-called \u201Ccrab\u201D took away all her weight \u2026\n\nMonsters have been here since the beginning.\nAlways.\nEverywhere.",
-      "Format": "Manga",
-      "Status": "Ongoing",
-      "Cover": "\\Tsundoku\\Covers\\Bakemonogatari_MANGA.jpg",
-      "Link": "https://anilist.co/manga/101311",
-      "SeriesNotes": null,
-      "MaxVolumeCount": 10,
-      "CurVolumeCount": 5
-    },
-    {
-      "Titles": [
         "Lycoris Recoil Koushiki Comic Anthology: Repeat",
         "Lycoris Recoil Koushiki Comic Anthology: Repeat",
         "\u30EA\u30B3\u30EA\u30B9\u30FB\u30EA\u30B3\u30A4\u30EB \u516C\u5F0F\u30B3\u30DF\u30C3\u30AF\u30A2\u30F3\u30BD\u30ED\u30B8\u30FC \u30EA\u30D4\u30FC\u30C8"
@@ -211,6 +147,25 @@
       "SeriesNotes": null,
       "MaxVolumeCount": 10,
       "CurVolumeCount": 0
+    },
+    {
+      "Titles": [
+        "Soul Eater",
+        "Soul Eater",
+        "\u30BD\u30A6\u30EB\u30A4\u30FC\u30BF\u30FC"
+      ],
+      "Staff": [
+        "Atsushi Ookubo",
+        "\u5927\u4E45\u4FDD\u7BE4"
+      ],
+      "Description": "In a world where technicians wield the select humans who can turn into weapons, Shinigami-sama created a school to teach young technicians and their shape shifting partners what it means to be a just death god. In order to create the ultimate weapon, the students of the school must collect the souls of 99 evil humans and 1 witch.\nNote: Includes the 3-chapter prologue and 1 extra chapter.",
+      "Format": "Manga",
+      "Status": "Complete",
+      "Cover": "\\Tsundoku\\Covers\\SoulEater_MANGA.jpg",
+      "Link": "https://anilist.co/manga/30908",
+      "SeriesNotes": null,
+      "MaxVolumeCount": 20,
+      "CurVolumeCount": 5
     }
   ]
 }

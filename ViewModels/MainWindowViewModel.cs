@@ -16,6 +16,7 @@ using System.Reactive.Concurrency;
 using System.Diagnostics;
 using Avalonia.Controls;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
 
 namespace Tsundoku.ViewModels
 {
@@ -228,6 +229,47 @@ namespace Tsundoku.ViewModels
             {
                 SearchedCollection.Add(x);
             }
+        }
+
+        public static void CleanCoversFolder()
+        {
+             // Cleans the Covers asset folder of images for series that is not in the users collection on close/save
+            bool removeSeriesCheck = true;
+            if (Directory.Exists(@$"{Environment.CurrentDirectory}\Covers"))
+            {
+                foreach (string coverPath in Directory.GetFiles(@"\Tsundoku\Covers"))
+                {
+                    int underscoreIndex = coverPath.IndexOf("_");
+                    int periodIndex = coverPath.IndexOf(".");
+                    foreach (Series curSeries in MainWindowViewModel.Collection)
+                    {
+                        string curTitle = Regex.Replace(curSeries.Titles[0], @"[^A-Za-z\d]", "");
+                        string coverPathTitleAndFormat = coverPath.Substring(17);
+                        if (Slice(coverPathTitleAndFormat, 0, coverPathTitleAndFormat.IndexOf("_")).Equals(curTitle) && Slice(coverPathTitleAndFormat, coverPathTitleAndFormat.IndexOf("_") + 1, coverPathTitleAndFormat.IndexOf(".")).Equals(curSeries.Format.ToUpper()))
+                        {
+                            removeSeriesCheck = false;
+                            break;
+                        }
+                    }
+
+                    if (removeSeriesCheck)
+                    {
+                        Logger.Info($"Deleted Cover -> {coverPath}");
+                        File.Delete(coverPath);
+                    }
+                    removeSeriesCheck = true;
+                }
+            }
+        }
+
+        public static string Slice(string source, int start, int end)
+        {
+            if (end < 0) // Keep this for negative end support
+            {
+                end = source.Length + end;
+            }
+            int len = end - start;               // Calculate length
+            return source.Substring(start, len); // Return Substring of length
         }
 
         [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "A New file will always be created if it doesn't exist before serialization")]
