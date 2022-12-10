@@ -1,3 +1,4 @@
+using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
@@ -24,6 +25,11 @@ namespace Tsundoku.Views
             Closing += (s, e) =>
             {
                 ((AddNewSeriesWindow)s).Hide();
+                NovelButton.IsChecked = false;
+                MangaButton.IsChecked = false;
+                TitleBox.Text = String.Empty;
+                CurVolCount.Text = String.Empty;
+                MaxVolCount.Text = String.Empty;
                 IsOpen ^= true;
                 e.Cancel = true;
             };
