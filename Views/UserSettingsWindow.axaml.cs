@@ -4,6 +4,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Interactivity;
 using Tsundoku.ViewModels;
 using Avalonia.Controls;
+using System.Diagnostics;
 
 namespace Tsundoku.Views
 {
@@ -12,6 +13,8 @@ namespace Tsundoku.Views
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         public UserSettingsViewModel? UserSettingsVM => DataContext as UserSettingsViewModel;
         public bool IsOpen = false;
+
+        MainWindow CollectionWindow;
         
         public SettingsWindow()
         {
@@ -19,7 +22,8 @@ namespace Tsundoku.Views
             DataContext = new UserSettingsViewModel();
             Opened += (s, e) =>
             {
-                UserSettingsVM.CurrentTheme = ((MainWindow)((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).MainWindow).CollectionViewModel.CurrentTheme;
+                CollectionWindow = (MainWindow)((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).MainWindow;
+                UserSettingsVM.CurrentTheme = CollectionWindow.CollectionViewModel.CurrentTheme;
                 IsOpen ^= true;
             };
 
@@ -29,6 +33,11 @@ namespace Tsundoku.Views
                 IsOpen ^= true;
                 e.Cancel = true;
             };
+        }
+
+        private void OpenCoversFolder(object sender, RoutedEventArgs args)
+        {
+            Process.Start("explorer.exe", @$"Covers");
         }
 
         private void ChangeUsername(object sender, RoutedEventArgs args)
@@ -46,6 +55,7 @@ namespace Tsundoku.Views
 
         private void SaveCollection(object sender, RoutedEventArgs args)
         {
+            CollectionWindow.CollectionViewModel.SearchText = "";
             MainWindowViewModel.CleanCoversFolder();
             MainWindowViewModel.SaveUsersData();
             Logger.Info($"Saving {MainWindowViewModel.MainUser.UserName}'s Collection");

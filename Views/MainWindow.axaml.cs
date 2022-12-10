@@ -1,5 +1,3 @@
-using System.Threading.Tasks;
-using System.Collections.ObjectModel;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -13,11 +11,7 @@ using Tsundoku.Models;
 using Tsundoku.ViewModels;
 using System.Reactive.Linq;
 using Avalonia.ReactiveUI;
-using System.Text.RegularExpressions;
-using System.IO;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
-using System.Reactive;
 
 namespace Tsundoku.Views
 {
@@ -30,7 +24,6 @@ namespace Tsundoku.Views
         {
             InitializeComponent();
         }
-
 
         private void SearchCollection(object sender, KeyEventArgs args)
         {
@@ -124,8 +117,9 @@ namespace Tsundoku.Views
             }
         }
 
-        public void SaveOnCloseTwo()
+        public void SaveOnClose(object sender, CancelEventArgs e)
         {
+            CollectionViewModel.SearchText = "";
             Src.DiscordRP.Deinitialize();
             Logger.Info("Closing TsundOku");
             MainWindowViewModel.CleanCoversFolder();
@@ -151,11 +145,6 @@ namespace Tsundoku.Views
             ThemeSettingsViewModel.UserThemes.Move(ThemeSettingsViewModel.UserThemes.IndexOf(ThemeSettingsViewModel.UserThemes.Single(x => x.ThemeName == MainWindowViewModel.MainUser.MainTheme)), 0);
 
             MainWindowViewModel.SaveUsersData();
-        }
-
-        public void SaveOnClose(object sender, CancelEventArgs e)
-        {
-            SaveOnCloseTwo();
         }
 
         private void OpenSiteLink(object sender, PointerPressedEventArgs args)

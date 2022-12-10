@@ -10,7 +10,7 @@
         FontFamily="Segoe UI"
         SizeToContent="WidthAndHeight"
         WindowStartupLocation="CenterOwner"
-        CanResize="false">
+        CanResize="true">
     
     <Window.Styles>
 		<StyleInclude Source="/Styles/MenuTheme.xaml" />
@@ -52,14 +52,22 @@
                         i:Attached.Icon="fa-check" Click="ExportToSpreadsheet"
                         Content="Export to Spreadsheet"/>
             </StackPanel>
-            <Button FontSize="15" 
-                    FontWeight="Bold" 
-                    BorderThickness="2" 
-                    Classes="menu"
-                    i:Attached.Icon="fa-check" 
-                    Click="DeleteCollection" 
-                    HorizontalAlignment="Center"
-                    Content="Delete Collection"/>
+            <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
+                <Button FontSize="15" 
+                        FontWeight="Bold" 
+                        BorderThickness="2" 
+                        Classes="menu"
+                        Click="DeleteCollection" 
+                        HorizontalAlignment="Center"
+                        Content="Delete Collection"/>
+                <Button FontSize="15" 
+                        FontWeight="Bold" 
+                        BorderThickness="2" 
+                        Classes="menu"
+                        Click="OpenCoversFolder" 
+                        HorizontalAlignment="Center"
+                        Content="Open Covers Folder"/>
+            </StackPanel>
         </StackPanel>
     </Border>
 </Window>

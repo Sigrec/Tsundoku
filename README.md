@@ -2,8 +2,8 @@
 
 ***
 >[**Download** Current Supported Version = V1.0.0](https://www.dropbox.com/sh/4tl9238vg1h6c5x/AAATAEYnSPjm8-n5V6bz5kw8a?dl=0)
->Download the zip and unzip the folder into your desired location, then pin the exe to your taskbar. Other standalone files are for if you only need to update a few things.
-#### Important Info
+>Download the folder into your desired location, then pin the exe to your taskbar. Other standalone files are for if you only need to update a few things.
+### Important Info
 Do not delete or move any files that are inside this zip/folder, instead just pin the TsundOku.exe file to your taskbar
 
 If you lose or delete the UserData.dat file u will lose your entire collection, so do not delete it, u will have to start over again, the Covers folder I also made visible incase u want to change the img shown for a particular series just make sure u copy the EXACT name and extension (either JPG or PNG) from the image file.
@@ -21,7 +21,7 @@ If you lose or delete the UserData.dat file u will lose your entire collection, 
 - [ ] LineHeight Property in TextBlock Control not working
 - [ ] Slight Memory Issues (Resets memory usage when restarting the app) [Memory leak when sorting and searching]
 - [ ] Button & ComboBox disabled styling not working in Theme & AddNewSeries Windows & ComboBoxItem styling -> Need to override style template..
-  
+  https://github.com/Sigrec/TsundokuApp/blob/main/README.mdhttps://github.com/Sigrec/TsundokuApp/blob/main/README.md
 #### Other/Random
 - [ ] Figure out TrayIcon
 - [ ] Implement IDisposable for TsundokuThemes & Series

@@ -24,7 +24,7 @@ namespace Tsundoku.ViewModels
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 #if (!DEBUG)
-        private static string filePath = Environment.CurrentDirectory + @"\UserData.json";
+        private static string filePath = @"UserData.json";
 #else
         private static string filePath = @"\Tsundoku\UserData.json";
 #endif
@@ -171,7 +171,7 @@ namespace Tsundoku.ViewModels
                         SearchedCollection.Add(x);
                     }
                     break;
-                case "English":
+                case "English": 
                     foreach (Series x in Collection.OrderBy(x => x.Titles[1], StringComparer.CurrentCulture))
                     {
                         SearchedCollection.Add(x);
@@ -184,7 +184,7 @@ namespace Tsundoku.ViewModels
                     }
                     break;
             }
-            MainUser.UserCollection = new ObservableCollection<Series>(SearchedCollection);
+            //Collection = new ObservableCollection<Series>(SearchedCollection);
             Logger.Info($"Sorting {MainUser.CurLanguage}");
         }
 
@@ -247,16 +247,16 @@ namespace Tsundoku.ViewModels
         {
              // Cleans the Covers asset folder of images for series that is not in the users collection on close/save
             bool removeSeriesCheck = true;
-            if (Directory.Exists(@$"{Environment.CurrentDirectory}\Covers"))
+            if (Directory.Exists(@$"Covers"))
             {
-                foreach (string coverPath in Directory.GetFiles(@"\Tsundoku\Covers"))
+                foreach (string coverPath in Directory.GetFiles(@"Covers"))
                 {
                     int underscoreIndex = coverPath.IndexOf("_");
                     int periodIndex = coverPath.IndexOf(".");
                     foreach (Series curSeries in MainWindowViewModel.Collection)
                     {
                         string curTitle = Regex.Replace(curSeries.Titles[0], @"[^A-Za-z\d]", "");
-                        string coverPathTitleAndFormat = coverPath.Substring(17);
+                        string coverPathTitleAndFormat = coverPath.Substring(16);
                         if (Slice(coverPathTitleAndFormat, 0, coverPathTitleAndFormat.IndexOf("_")).Equals(curTitle) && Slice(coverPathTitleAndFormat, coverPathTitleAndFormat.IndexOf("_") + 1, coverPathTitleAndFormat.IndexOf(".")).Equals(curSeries.Format.ToUpper()))
                         {
                             removeSeriesCheck = false;
@@ -288,7 +288,7 @@ namespace Tsundoku.ViewModels
         public static void SaveUsersData()
         {
             Logger.Info($"Saving {MainUser.UserName}'s Data");
-            MainUser.UserCollection = Collection;
+            MainUser.UserCollection = new ObservableCollection<Series>(SearchedCollection);
             MainUser.SavedThemes = ThemeSettingsViewModel.UserThemes;
 
             File.WriteAllText(filePath, JsonSerializer.Serialize(MainUser, options));

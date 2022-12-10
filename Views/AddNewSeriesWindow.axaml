@@ -11,14 +11,14 @@
 		SizeToContent="WidthAndHeight"
         Classes="menu"
 		WindowStartupLocation="CenterOwner"
-		KeyboardNavigation.TabNavigation="Continue"
+		KeyboardNavigation.TabNavigation="Once"
 		CanResize="false">
 
 	<Window.Styles>
 		<StyleInclude Source="/Styles/MenuTheme.xaml" />
 	</Window.Styles>
 	
-    <Border BorderBrush="{Binding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" BorderThickness="3">
+    <Border Classes="menu" BorderThickness="3">
 		<Grid ColumnDefinitions="*,*" RowDefinitions="*,*,15,*,*,15,*,*,25,*" Margin="20">
 			<Grid.Styles>
 				<StyleInclude Source="/Styles/MenuTheme.xaml" />

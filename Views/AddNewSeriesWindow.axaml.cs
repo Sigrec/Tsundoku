@@ -2,10 +2,6 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Tsundoku.ViewModels;
-using System;
-using MessageBox.Avalonia.DTO;
-using System.Text.RegularExpressions;
-using Avalonia.Input;
 
 namespace Tsundoku.Views
 {
@@ -31,9 +27,9 @@ namespace Tsundoku.Views
                 IsOpen ^= true;
                 e.Cancel = true;
             };
-#if DEBUG
-            this.AttachDevTools();
-#endif
+// #if DEBUG
+//             this.AttachDevTools();
+// #endif
         }
 
         private void IsMangaButtonClicked(object sender, RoutedEventArgs args)
@@ -54,14 +50,14 @@ namespace Tsundoku.Views
             if (string.IsNullOrWhiteSpace(TitleBox.Text) || (!(bool)MangaButton.IsChecked && !(bool)NovelButton.IsChecked) || string.IsNullOrWhiteSpace(CurVolCount.Text.Replace("_", "")) || string.IsNullOrWhiteSpace(MaxVolCount.Text.Replace("_", "")) || !ushort.TryParse(CurVolCount.Text.Replace("_", ""), out cur) || !ushort.TryParse(MaxVolCount.Text.Replace("_", ""), out max) || cur > max)
             {
                 Logger.Warn("Fields Missing Input");
-                var errorBox = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(
-                new MessageBoxStandardParams
-                {
-                    ContentTitle = "Error!",
-                    ContentMessage = "One or More Fields are Empty or CurVolumes > MaxVolumes\nPlease Enter Data For All Fields",
-                    WindowIcon = new WindowIcon(@"Assets\Icons\Tsundoku-Logo.ico")
-                });
-                errorBox.Show();
+                // var errorBox = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(
+                // new MessageBoxStandardParams
+                // {
+                //     ContentTitle = "Error!",
+                //     ContentMessage = "One or More Fields are Empty or CurVolumes > MaxVolumes\nPlease Enter Data For All Fields",
+                //     WindowIcon = new WindowIcon(@"Assets\Icons\Tsundoku-Logo.ico")
+                // });
+                // errorBox.Show();
             }
             else
             {
