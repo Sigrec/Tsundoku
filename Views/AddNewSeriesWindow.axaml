@@ -8,232 +8,124 @@
 		Icon="\Assets\Icons\Tsundoku-Logo.ico"
         Title="Add New Series"
 		FontFamily="Segoe UI"
-		Width="450"
-		Height="370"
-        Background="{Binding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}"
+		SizeToContent="WidthAndHeight"
+        Classes="menu"
 		WindowStartupLocation="CenterOwner"
+		KeyboardNavigation.TabNavigation="Continue"
 		CanResize="false">
+
+	<Window.Styles>
+		<StyleInclude Source="/Styles/MenuTheme.xaml" />
+	</Window.Styles>
 	
     <Border BorderBrush="{Binding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" BorderThickness="3">
-	<Border.Styles>
-		<Style Selector="#AddSeriesButton:pointerover /template/ ContentPresenter, #AddSeriesButton:disabled /template/ ContentPresenter">
-			<Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
-			<Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
-			<Setter Property="TextBlock.Foreground" Value="{Binding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
-		</Style>
-	</Border.Styles>
-        <StackPanel Margin="20" Spacing="20">
-			<StackPanel.Styles>
-				<Style Selector="TextBox:pointerover /template/ Border#PART_BorderElement, TextBox:focus /template/ Border#PART_BorderElement">
-					<Setter Property="Background" Value="{Binding CurrentTheme.SearchBarBGColor, Converter={StaticResource ConvertColor}}"/>
-					<Setter Property="BorderBrush" Value="{Binding CurrentTheme.SearchBarBorderColor, Converter={StaticResource ConvertColor}}"/>
-				</Style>
-			</StackPanel.Styles>
-			<StackPanel>
-				<TextBlock Margin="2,0,0,0" Text="Enter Title" FontSize="18" FontWeight="Bold" Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}"/>
-				<TextBox Name="TitleBox"
-						 Width="400"
-						 FontSize="18"
-						 FontWeight="Bold"
-						 Text="{Binding TitleText}"
-						 Background="{Binding CurrentTheme.SearchBarBGColor, Converter={StaticResource ConvertColor}}"
-						 BorderBrush="{Binding CurrentTheme.SearchBarBorderColor, Converter={StaticResource ConvertColor}}"
-						 Foreground="{Binding CurrentTheme.SearchBarTextColor, Converter={StaticResource ConvertColor}}"
-						 SelectionBrush="{Binding CurrentTheme.SearchBarTextColor, Converter={StaticResource ConvertColor}}"
-						 SelectionForegroundBrush="{Binding CurrentTheme.SearchBarBGColor, Converter={StaticResource ConvertColor}}"
-						 BorderThickness="2"
-						 TextWrapping="Wrap"
-						 Watermark="Title..."/>
-			</StackPanel>
-			<Grid>
-                <Grid.ColumnDefinitions>    
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>     
-                </Grid.ColumnDefinitions>    
-                <Grid.RowDefinitions>    
-                    <RowDefinition/>  
-                    <RowDefinition/>       
-                </Grid.RowDefinitions>    
-                <TextBlock Text="Cur Volumes" Margin="2,0,0,0" Grid.Row="0" Grid.Column="0" FontSize="18" FontWeight="Bold" Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}"/>
-                <TextBlock Text="Max Volumes" Margin="12,0,0,0" Grid.Row="0" Grid.Column="1" FontSize="18" FontWeight="Bold" Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}"/>
-                <TextBox Name="CurVolCount" 
-						 Width="180"
-						 Grid.Row="1" 
-						 Grid.Column="0" 
-						 Margin="0,0,20,0" 
-						 Background="{Binding CurrentTheme.SearchBarBGColor, Converter={StaticResource ConvertColor}}" 
-						 BorderBrush="{Binding CurrentTheme.SearchBarBorderColor, Converter={StaticResource ConvertColor}}" 
-						 Foreground="{Binding CurrentTheme.SearchBarTextColor, Converter={StaticResource ConvertColor}}"
-						 SelectionBrush="{Binding CurrentTheme.SearchBarTextColor, Converter={StaticResource ConvertColor}}"
-						 SelectionForegroundBrush="{Binding CurrentTheme.SearchBarBGColor, Converter={StaticResource ConvertColor}}"
-						 BorderThickness="2"
-						 FontWeight="Bold"
-						 FontSize="18"
-						 Text="{Binding CurVolumeCount}"
-						 MaxLength="3"/>
-				<TextBox Name="MaxVolCount"
-						 Width="180"
-						 Grid.Row="1" 
-						 Grid.Column="1" 
-						 Background="{Binding CurrentTheme.SearchBarBGColor, Converter={StaticResource ConvertColor}}" 
-						 BorderBrush="{Binding CurrentTheme.SearchBarBorderColor, Converter={StaticResource ConvertColor}}" 
-						 Foreground="{Binding CurrentTheme.SearchBarTextColor, Converter={StaticResource ConvertColor}}"
-						 SelectionBrush="{Binding CurrentTheme.SearchBarTextColor, Converter={StaticResource ConvertColor}}"
-						 SelectionForegroundBrush="{Binding CurrentTheme.SearchBarBGColor, Converter={StaticResource ConvertColor}}"
-						 BorderThickness="2"
-						 Text="{Binding MaxVolumeCount}"
-						 FontWeight="Bold"
-						 FontSize="18"
-						 MaxLength="3"/>
-            </Grid>
-			<StackPanel Orientation="Horizontal" Spacing="30">
-				<StackPanel Spacing="5" VerticalAlignment="Center">
-					<TextBlock HorizontalAlignment="Center" 
-							   Text="Select Book Type" 
-							   Margin="0,10,0,0" 
-							   FontSize="18" 
-							   FontWeight="Bold" 
-							   Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}"/>
-					<StackPanel Orientation="Horizontal">
-						<StackPanel.Styles>
-							<!-- Unchecked Normal State -->
-							<Style Selector="CheckBox /template/ Border#NormalRectangle">
-								<Setter Property="BorderBrush" Value="Aqua"/>
-								<Setter Property="Background" Value="Red"/>
-							</Style>
-
-							<!-- Unchecked PointerOver State -->
-							<Style Selector="CheckBox:pointerover">
-								<Style Selector="^ /template/ ContentPresenter#ContentPresenter">
-									<Setter Property="Foreground" Value="{Binding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}" />
-								</Style>
-								<Style Selector="^ /template/ Border#NormalRectangle">
-									<Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
-									<Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
-								</Style>
-							</Style>
-
-							<!-- Unchecked Pressed State -->
-							<Style Selector="CheckBox:pressed">
-								<Style Selector="^ /template/ ContentPresenter#ContentPresenter">
-									<Setter Property="Foreground" Value="{Binding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}" />
-								</Style>
-								<Style Selector="^ /template/ Border#NormalRectangle">
-									<Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"/>
-									<Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"/>
-								</Style>
-
-								<Style Selector="^ /template/ Path#CheckGlyph">
-									<Setter Property="Fill" Value="{Binding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"/>
-								</Style>
-							</Style>
-
-							<!-- Checked Pressed State -->
-							<Style Selector="CheckBox:checked">
-								<!-- Checked Normal State -->
-								<Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"/>
-
-								<Style Selector="^ /template/ Border#NormalRectangle">
-									<Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"/>
-									<Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"/>
-								</Style>
-
-								<Style Selector="^ /template/ Path#CheckGlyph">
-									<Setter Property="Fill" Value="{Binding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"/>
-								</Style>
-
-								<!-- Checked PointerOver State -->
-								<Style Selector="^:pointerover">
-									<Style Selector="^ /template/ ContentPresenter#ContentPresenter">
-										<Setter Property="Foreground" Value="{Binding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}" />
-									</Style>
-									<Style Selector="^ /template/ Border#NormalRectangle">
-										<Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
-										<Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
-									</Style>
-
-									<Style Selector="^ /template/ Path#CheckGlyph">
-										<Setter Property="Fill" Value="{Binding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}" />
-									</Style>
-								</Style>
-
-								<!-- Checked Pressed State -->
-								<Style Selector="^:pressed">
-									<Style Selector="^ /template/ ContentPresenter#ContentPresenter">
-										<Setter Property="Foreground" Value="{Binding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}" />
-									</Style>
-									<Style Selector="^ /template/ Border#NormalRectangle">
-										<Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"/>
-										<Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"/>
-									</Style>
-
-									<Style Selector="^ /template/ Path#CheckGlyph">
-										<Setter Property="Fill" Value="{Binding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"/>
-									</Style>
-								</Style>
-							</Style>
-						</StackPanel.Styles>
-						<CheckBox Name="MangaButton" 
-								  FontSize="20" 
-								  FontWeight="Bold" 
-								  IsChecked="True"
-								  Foreground="{Binding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}" 
-								  Margin="0,0,20,0" 
-								  Content="Manga"/>
-						<CheckBox Name="NovelButton" 
-								  FontSize="20" 
-								  FontWeight="Bold" 
-								  Foreground="{Binding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}" 
-								  Margin="0,0,20,0" 
-								  Content="Novel"/>
-					</StackPanel>
-				</StackPanel>
-				<StackPanel Spacing="5" VerticalAlignment="Center">
-					<StackPanel.Styles>
-						<Style Selector="ComboBox">
-							<Style Selector="^:pointerover /template/ Border#Background, ^:pressed /template/ Border#Background, ^:disabled /template/ Border#Background">
-								<Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
-								<Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
-							</Style>
-							<Style Selector="^:pointerover /template/ ContentControl#ContentPresenter, ^:pointerover /template/ PathIcon#DropDownGlyph, ^:disabled /template/ PathIcon#DropDownGlyph">
-								<Setter Property="Foreground" Value="{Binding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
-							</Style>
-							<Style Selector="^:disabled /template/ ContentControl#ContentPresenter">
-								<Setter Property="Foreground" Value="{Binding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
-							</Style>
-							<Style Selector="^:disabled /template/ TextBlock#PlaceholderTextBlock">
-								<Setter Property="Foreground" Value="Red" />
-							</Style>
-						</Style>
-					</StackPanel.Styles>
-					<TextBlock HorizontalAlignment="Center" Text="Select Languages" Margin="0,10,0,0" FontSize="18" FontWeight="Bold" Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}"/>
-					<ComboBox
-						Name="AdditionalLangSelector"
-						Items="{Binding AdditionalLanguages}"
-						SelectedItem="French"
-						IsEnabled="false"
-						Width="150"
-						Height="35" 
-						Background="{Binding CurrentTheme.SearchBarBGColor, Converter={StaticResource ConvertColor}}"
-						BorderBrush="{Binding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"
-						BorderThickness="2"
-						FontWeight="Bold"
-						FontSize="18"
-						Foreground="{Binding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"/>
-				</StackPanel>
-			</StackPanel>
-			<Button Margin="0,10,0,0" 
-				    Content="Add" 
+		<Grid ColumnDefinitions="*,*" RowDefinitions="*,*,15,*,*,15,*,*,25,*" Margin="20">
+			<Grid.Styles>
+				<StyleInclude Source="/Styles/MenuTheme.xaml" />
+			</Grid.Styles>
+			<TextBlock Margin="2,0,0,0" Text="Enter Title" Grid.Row="0" Grid.Column="0" FontSize="20" FontWeight="Bold" Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}"/>
+			<TextBox Name="TitleBox"
+					FontSize="18"
+					Grid.Row="1" 
+					Grid.Column="0"
+					Grid.ColumnSpan="2"  
+					FontWeight="Bold"
+					Text="{Binding TitleText}"
+					Classes="menu"
+					BorderThickness="2"
+					TextWrapping="Wrap"
+					Watermark="Title..."/>
+			<TextBlock Text="Cur Volumes" Margin="2,0,0,0" Grid.Row="3" Grid.Column="0" FontSize="20" FontWeight="Bold" Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}"/>
+			<TextBlock Text="Max Volumes" Margin="12,0,0,0" Grid.Row="3" Grid.Column="1" FontSize="20" FontWeight="Bold" Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}"/>
+			<MaskedTextBox Name="CurVolCount" 
+						   Width="180"
+						   Grid.Row="4" 
+						   Grid.Column="0" 
+						   Margin="0,0,20,0" 
+						   Classes="menu"
+						   BorderThickness="2"
+						   FontWeight="Bold"
+						   FontSize="18"
+						   Mask="000"
+						   MaxLength="3"/>
+			<MaskedTextBox Name="MaxVolCount"
+						   PromptChar=' '
+						   Width="180"
+						   Grid.Row="4" 
+						   Grid.Column="1" 
+						   Classes="menu"
+						   BorderThickness="2"
+						   Margin="10,0,0,0" 
+						   FontWeight="Bold"
+						   FontSize="18"
+						   Mask="000"
+						   MaxLength="3"/>
+			<TextBlock HorizontalAlignment="Left" 
+					   Text="Select Book Type"
+					   Grid.Row="6" 
+					   Grid.Column="0" 
+					   Margin="0,8,0,0" 
+					   FontSize="20" 
+					   FontWeight="Bold" 
+					   Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}"/>
+			<Button Name="AddSeriesButton"
+					Content="Add Series" 
 					Click="OnButtonClicked" 
-					Background="{Binding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}" 
-					BorderBrush="{Binding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}" 
-					BorderThickness="2" 
+					Classes="menu"
+					BorderThickness="2"
 					FontWeight="Bold" 
 					FontSize="20"
-					Name="AddSeriesButton"
+					Grid.Row="9" 
+					Grid.Column="0"
+					Grid.ColumnSpan="2" 
+					VerticalAlignment="Center"
 					IsEnabled="{Binding IsAddSeriesButtonEnabled}"
-					Foreground="{Binding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}" 
 					HorizontalAlignment="Center"/>
-        </StackPanel>
+			<StackPanel Orientation="Horizontal" Width="180" Grid.Row="7" Grid.Column="0" Spacing="4" Margin="-22,2,0,0">
+				<StackPanel.Styles>
+					<StyleInclude Source="/Styles/MenuTheme.xaml" />
+				</StackPanel.Styles>
+				<ToggleButton Name="MangaButton"
+							FontSize="15"
+							Height="37" 
+							FontWeight="Bold"
+							Width="88"
+							VerticalAlignment="Center"
+							BorderThickness="2"
+							HorizontalAlignment="Center"
+							VerticalContentAlignment="Center"
+							HorizontalContentAlignment="Center"
+							Checked="IsMangaButtonClicked"
+							Classes="menu"
+							Content="Manga"/>
+				<ToggleButton Name="NovelButton"
+							FontSize="15" 
+							FontWeight="Bold"
+							Width="88"
+							Height="37" 
+							VerticalAlignment="Center"
+							BorderThickness="2"
+							VerticalContentAlignment="Center"
+							HorizontalContentAlignment="Center"
+							HorizontalAlignment="Center"
+							Checked="IsNovelButtonClicked"
+							Classes="menu"
+							Content="Novel"/>
+			</StackPanel>
+			<TextBlock HorizontalAlignment="Left" Grid.Row="6" Grid.Column="1" Text="Select Languages" Margin="12,8,0,0" FontSize="20" FontWeight="Bold" Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}"/>
+			<ComboBox Name="AdditionalLangSelector"
+					Items="{Binding AdditionalLanguages}"
+					SelectedItem="French"
+					Width="180"
+					Height="37"
+					IsEnabled="false"
+					Grid.Row="7" 
+					Grid.Column="1" 
+					Margin="11,0,0,0"
+					BorderThickness="2"
+					FontWeight="Bold"
+					FontSize="18"
+					Classes="menu"/>
+		</Grid>
     </Border>
 </Window>

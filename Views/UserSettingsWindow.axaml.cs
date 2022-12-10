@@ -10,13 +10,13 @@ namespace Tsundoku.Views
     public partial class SettingsWindow : Window
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
-        public ViewModelBase? UserSettingsVM => DataContext as ViewModelBase;
+        public UserSettingsViewModel? UserSettingsVM => DataContext as UserSettingsViewModel;
         public bool IsOpen = false;
         
         public SettingsWindow()
         {
             InitializeComponent();
-            DataContext = new ViewModelBase();
+            DataContext = new UserSettingsViewModel();
             Opened += (s, e) =>
             {
                 UserSettingsVM.CurrentTheme = ((MainWindow)((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).MainWindow).CollectionViewModel.CurrentTheme;

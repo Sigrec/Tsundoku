@@ -31,11 +31,15 @@ namespace Tsundoku.Src
             client.SetPresence(new RichPresence()
             {
                 Details = "Manga & Light Novel Collection App",
-                State = "Editing Collection",
+                State = "Browsing Collection",
                 Timestamps = Timestamps.Now,
                 Buttons = new Button[]
                 {
-                    new Button() { Label = "Download", Url = "https://www.google.com/" }
+                    new Button() 
+                    { 
+                        Label = "Download", 
+                        Url = "https://github.com/Sigrec/TsundokuApp/blob/main/README.md"
+                    }
                 },
                 Assets = new Assets()
                 {

@@ -11,9 +11,9 @@
 		<cp:FluentColorPickerTheme Mode="Dark"/>
     </Application.Styles>
 
-    <Application.Resources>
-        <cv:ColorConverter x:Key="ConvertColor"/>
-    </Application.Resources>
+	<Application.Resources>
+		<cv:ColorConverter x:Key="ConvertColor"/>
+	</Application.Resources>
 
     <TrayIcon.Icons>
 		<TrayIcons>

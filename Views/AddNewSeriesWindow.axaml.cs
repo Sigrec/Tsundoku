@@ -3,10 +3,9 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Tsundoku.ViewModels;
 using System;
-using Avalonia.Input;
+using MessageBox.Avalonia.DTO;
 using System.Text.RegularExpressions;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+using Avalonia.Input;
 
 namespace Tsundoku.Views
 {
@@ -32,39 +31,41 @@ namespace Tsundoku.Views
                 IsOpen ^= true;
                 e.Cancel = true;
             };
-
 #if DEBUG
             this.AttachDevTools();
 #endif
         }
 
-        // private void MangaCheck(object sender, RoutedEventArgs args)
-        // {
-        //     NovelButton.IsChecked = false;
-        // }
+        private void IsMangaButtonClicked(object sender, RoutedEventArgs args)
+        {
+            NovelButton.IsChecked = false;
+        }
 
-        // private void NovelCheck(object sender, RoutedEventArgs args)
-        // {
-        //     MangaButton.IsChecked = false;
-        // }
+
+        private void IsNovelButtonClicked(object sender, RoutedEventArgs args)
+        {
+            MangaButton.IsChecked = false;
+        }
 
         public void OnButtonClicked(object sender, RoutedEventArgs args)
         {
-            if (string.IsNullOrEmpty(TitleBox.Text) || !((bool)MangaButton.IsChecked || (bool)NovelButton.IsChecked) || string.IsNullOrEmpty(MaxVolCount.Text) || string.IsNullOrEmpty(CurVolCount.Text))
+            ushort cur = 0;
+            ushort max = 0;
+            if (string.IsNullOrWhiteSpace(TitleBox.Text) || (!(bool)MangaButton.IsChecked && !(bool)NovelButton.IsChecked) || string.IsNullOrWhiteSpace(CurVolCount.Text.Replace("_", "")) || string.IsNullOrWhiteSpace(MaxVolCount.Text.Replace("_", "")) || !ushort.TryParse(CurVolCount.Text.Replace("_", ""), out cur) || !ushort.TryParse(MaxVolCount.Text.Replace("_", ""), out max) || cur > max)
             {
                 Logger.Warn("Fields Missing Input");
-                // var errorBox = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(
-                // new MessageBoxStandardParams
-                // {
-                //     ContentTitle = "Error!",
-                //     ContentMessage = "One or More Fields are Empty... Please Enter Data For All Fields",
-                //     WindowIcon = new WindowIcon(@"Assets\Icons\Tsundoku-Logo.ico")
-                // });
-                // errorBox.Show();
+                var errorBox = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(
+                new MessageBoxStandardParams
+                {
+                    ContentTitle = "Error!",
+                    ContentMessage = "One or More Fields are Empty or CurVolumes > MaxVolumes\nPlease Enter Data For All Fields",
+                    WindowIcon = new WindowIcon(@"Assets\Icons\Tsundoku-Logo.ico")
+                });
+                errorBox.Show();
             }
             else
             {
-                AddNewSeriesViewModel.GetSeriesData(TitleBox.Text, (bool)MangaButton.IsChecked ? "MANGA" : "NOVEL", Convert.ToUInt16(CurVolCount.Text.Replace("_", "")), Convert.ToUInt16(MaxVolCount.Text.Replace("_", "")));
+                AddNewSeriesViewModel.GetSeriesData(TitleBox.Text, (bool)MangaButton.IsChecked ? "MANGA" : "NOVEL", cur, max);
             }
         }
     }

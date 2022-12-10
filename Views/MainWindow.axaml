@@ -24,176 +24,134 @@
 		<cv:StaffLangConverter x:Key="ConvertStaff"/>
 	</Window.Resources>
 
+	<Window.Styles>
+		<StyleInclude Source="/Styles/MenuTheme.xaml" />
+	</Window.Styles>
+
 	<DockPanel>
 		<!-- Menu -->
 		<Border Name="Navigation" 
 				DockPanel.Dock="Top" 
-				BorderBrush="{Binding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" 
+				Classes="menu"
 				BorderThickness="0,0,0,3"
-				Height="130"
-				Background="{Binding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}">
-			<DockPanel Margin="0,10,0,10">
-				<DockPanel.Styles>
-					<Style Selector="Button:pointerover /template/ ContentPresenter, Button:disabled /template/ ContentPresenter">
-						<Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
-						<Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
-						<Setter Property="TextBlock.Foreground" Value="{Binding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
-					</Style>
-					<Style Selector="ComboBox">
-						<Style Selector="^:pointerover /template/ Border#Background, ^:pressed /template/ Border#Background, ^:disabled /template/ Border#Background">
-							<Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
-							<Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
-						</Style>
-						<Style Selector="^:pointerover /template/ ContentControl#ContentPresenter, ^:pointerover /template/ PathIcon#DropDownGlyph, ^:disabled /template/ PathIcon#DropDownGlyph">
-							<Setter Property="Foreground" Value="{Binding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
-						</Style>
-						<Style Selector="^:disabled /template/ ContentControl#ContentPresenter">
-							<Setter Property="Foreground" Value="{Binding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
-						</Style>
-						<Style Selector="^:focus-visible /template/ Border#HighlightBackground">
-							<Setter Property="IsVisible" Value="True" />
-        					<Setter Property="BorderBrush" Value="Red"/>
-						</Style>
-					</Style>
-				</DockPanel.Styles>
-				<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10" DockPanel.Dock="Top">
-					<StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Right" VerticalAlignment="Center">
-						<Button Name="SettingsButton"
-								FontSize="20" 
-								Background="{Binding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}" 
-								BorderBrush="{Binding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}" 
-								BorderThickness="2" 
-								Foreground="{Binding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}" 
-								i:Attached.Icon="fa-address-book" 
-								Command="{Binding OpenSettingsWindow}"/>
-						<Button Name="ThemeButton" 
-								FontSize="20" 
-								Background="{Binding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}" 
-								BorderBrush="{Binding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}" 
-								BorderThickness="2" 
-								Foreground="{Binding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}" 
-								i:Attached.Icon="fa-swatchbook" 
-								Command="{Binding OpenThemeSettingsWindow}"/>
-					</StackPanel>
-					<TextBlock Name="Username" 
-							   FontSize="25" 
-							   FontWeight="Bold"
-							   TextDecorations="Underline"
-							   TextAlignment="Center"
-							   Margin="10,0,10,0"
-							   HorizontalAlignment="Center"
-							   VerticalAlignment="Center" 
-							   Foreground="{Binding CurrentTheme.UsernameColor, Converter={StaticResource ConvertColor}}">
-						<TextBlock.Text>
-							<MultiBinding StringFormat="{}{0}">
-								<Binding Path="UserName"/>
-							</MultiBinding>
-						</TextBlock.Text>
-					</TextBlock>
-					<StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Right" VerticalAlignment="Center">
-						<Button FontWeight="Bold"
-								Name="AddNewSeriesButton"
-								FontSize="20"
-								Background="{Binding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"
-								BorderBrush="{Binding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"
-								BorderThickness="2"
-								Command="{Binding OpenAddNewSeriesWindow}"
-								i:Attached.Icon="fa-book-medical"
-								Foreground="{Binding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"/>
-						<Button FontWeight="Bold"
-								Name="PriceAnalysisButton"
-								FontSize="20"
-								Background="{Binding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"
-								BorderBrush="{Binding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"
-								BorderThickness="2"
-								Command="{Binding OpenAddNewSeriesWindow}"
-								i:Attached.Icon="fa-chart-bar"
-								IsEnabled="false"
-								Foreground="{Binding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"/>
-					</StackPanel>
-				</StackPanel>
+				Height="130">
+			<DockPanel Margin="0,7,0,12">
+				<TextBlock Name="Username" 
+						   FontSize="25" 
+						   FontWeight="Bold"
+						   TextDecorations="Underline"
+						   TextAlignment="Center"
+						   Margin="10,0,10,0"
+						   HorizontalAlignment="Center"
+						   VerticalAlignment="Center" 
+						   Text="{Binding UserName}"
+						   DockPanel.Dock="Top"
+						   Classes="username"/>
 				<StackPanel Spacing="20" HorizontalAlignment="Center" VerticalAlignment="Center" DockPanel.Dock="Bottom" Orientation="Horizontal">
-					<ComboBox Name="LanguageSelector"
-							  Items="{Binding AvailableLanguages}"
-							  SelectionChanged="LanguageChanged"
-							  SelectedItem="{Binding MainUser.CurLanguage}"
-							  Width="150"
-							  Height="35"
-							  Background="{Binding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"
-							  BorderBrush="{Binding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"
-							  BorderThickness="2"
-							  FontWeight="Bold"
-							  FontSize="15"
-							  VerticalAlignment="Center"
-							  HorizontalAlignment="Center"
-							  Foreground="{Binding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"
-							  AutoScrollToSelectedItem="True"/>
+					<StackPanel Spacing="5" HorizontalAlignment="Center" VerticalAlignment="Center" Width="130">
+						<StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Center" VerticalAlignment="Center">
+							<Button Name="SettingsButton"
+									FontSize="19" 
+									Classes="menu"
+									BorderThickness="2"
+									Width="60"
+									i:Attached.Icon="fa-address-book" 
+									Command="{Binding OpenSettingsWindow}"/>
+							<Button Name="ThemeButton" 
+									FontSize="19" 
+									Width="60"
+									Classes="menu"
+									BorderThickness="2" 
+									i:Attached.Icon="fa-swatchbook" 
+									Command="{Binding OpenThemeSettingsWindow}"/>
+						</StackPanel>
+						<StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Center" VerticalAlignment="Center">
+							<Button FontWeight="Bold"
+									Name="AddNewSeriesButton"
+									FontSize="19"
+									Classes="menu"
+									BorderThickness="2"
+									Width="60"
+									Command="{Binding OpenAddNewSeriesWindow}"
+									i:Attached.Icon="fa-book-medical"/>
+							<Button FontWeight="Bold"
+									Name="PriceAnalysisButton"
+									FontSize="19"
+									Classes="menu"
+									Width="60"
+									BorderThickness="2"
+									i:Attached.Icon="fa-chart-bar"/>
+						</StackPanel>
+					</StackPanel>
 					<TextBlock Name="NumVolumesCollected" 
 							   Text="{Binding UsersNumVolumesCollected, StringFormat='Collected&#x0a;{0} Volumes'}" TextAlignment="Center" 
 							   FontSize="21" 
 							   FontWeight="Bold" 
-							   Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}" 
+							   Classes="menu"
 							   VerticalAlignment="Center"
-							   Width="160"
+							   Width="155"
 							   HorizontalAlignment="Center"/>
 					<StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="5" Width="180">
-						<TextBlock Name="SearchCollectionHeader" VerticalAlignment="Center" Text="Search Collection" HorizontalAlignment="Center" FontSize="21" FontWeight="Bold" Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}"/>
-						<StackPanel.Styles>
-							<Style Selector="#SearchBar:pointerover /template/ Border#PART_BorderElement, #SearchBar:focus /template/ Border#PART_BorderElement">
-								<Setter Property="Background" Value="{Binding CurrentTheme.SearchBarBGColor, Converter={StaticResource ConvertColor}}"/>
-								<Setter Property="BorderBrush" Value="{Binding CurrentTheme.SearchBarBorderColor, Converter={StaticResource ConvertColor}}"/>
-							</Style>
-						</StackPanel.Styles>
+						<TextBlock Name="SearchCollectionHeader" VerticalAlignment="Center" Text="Search Collection" HorizontalAlignment="Center" FontSize="21" FontWeight="Bold" Classes="menu"/>
 						<TextBox Name="SearchBar" 
 								Text="{Binding SearchText}" 
 								KeyUp="SearchCollection"
-								BorderBrush="{Binding CurrentTheme.SearchBarBorderColor, Converter={StaticResource ConvertColor}}" 
-								Foreground="{Binding CurrentTheme.SearchBarTextColor, Converter={StaticResource ConvertColor}}"
-								SelectionBrush="{Binding CurrentTheme.SearchBarTextColor, Converter={StaticResource ConvertColor}}"
-								SelectionForegroundBrush="{Binding CurrentTheme.SearchBarBGColor, Converter={StaticResource ConvertColor}}"
+								Classes="menu"
 								BorderThickness="2" 
 								FontWeight="Bold"
-								VerticalAlignment="Center"
-								Background="{Binding CurrentTheme.SearchBarBGColor, Converter={StaticResource ConvertColor}}"/>
+								VerticalAlignment="Center"/>
 					</StackPanel>
 					<TextBlock Name="NumVolumesToBeCollected" 
 							   Text="{Binding UsersNumVolumesToBeCollected, StringFormat='Need To Collect&#x0a;{0} Volumes'}" 
 							   TextAlignment="Center" 
 							   FontSize="21" 
 							   FontWeight="Bold" 
-							   Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}"
+							   Classes="menu"
 							   VerticalAlignment= "Center" 
-							   Width="160"
+							   Width="155"
 							   HorizontalAlignment="Center"/>
-					<ComboBox Name="DisplaySelector"
-							  Items="{Binding AvailableDisplays}"
-							  SelectionChanged="DisplayChanged"
-							  SelectedItem="{Binding MainUser.Display}"
-							  Width="150"
-							  Height="35"
-							  Background="{Binding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"
-							  BorderBrush="{Binding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"
-							  BorderThickness="2"
-							  VerticalAlignment="Center"
-							  HorizontalAlignment="Center"
-							  Foreground="{Binding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"
-							  AutoScrollToSelectedItem="True">
-						<ComboBox.ItemTemplate>
-							<DataTemplate>
-								<TextBlock FontSize="15" 
-										   FontWeight="Bold"
-										   Background="{Binding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"
-										   Foreground="{Binding CurrentTheme.MenuButtonTextColor, Converter={StaticResource ConvertColor}}"
-										   Text="{Binding}"/>
-							</DataTemplate>
-						</ComboBox.ItemTemplate>
-					</ComboBox>
+					<StackPanel Spacing="5" HorizontalAlignment="Center" VerticalAlignment="Center" Width="130">
+						<ComboBox Name="LanguageSelector"
+								Items="{Binding AvailableLanguages}"
+								SelectionChanged="LanguageChanged"
+								SelectedItem="{Binding MainUser.CurLanguage}"
+								Width="125"
+								Height="35"
+								Classes="menu"
+								BorderThickness="2"
+								FontWeight="Bold"
+								FontSize="15"
+								VerticalAlignment="Center"
+								HorizontalAlignment="Center"
+								AutoScrollToSelectedItem="True"/>
+						<ComboBox Name="DisplaySelector"
+								Items="{Binding AvailableDisplays}"
+								SelectionChanged="DisplayChanged"
+								SelectedItem="{Binding MainUser.Display}"
+								Width="125"
+								Height="35"
+								BorderThickness="2"
+								VerticalAlignment="Center"
+								HorizontalAlignment="Center"
+								Classes="menu"
+								AutoScrollToSelectedItem="True">
+							<ComboBox.ItemTemplate>
+								<DataTemplate>
+									<TextBlock FontSize="15" 
+											FontWeight="Bold"
+											Background="{Binding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"
+											Foreground="{Binding CurrentTheme.MenuButtonTextColor, Converter={StaticResource ConvertColor}}"
+											Text="{Binding}"/>
+								</DataTemplate>
+							</ComboBox.ItemTemplate>
+						</ComboBox>
+					</StackPanel>
 				</StackPanel>
 			</DockPanel>
 		</Border>
 		
 		<!-- Collection -->
-		<ScrollViewer Name="CollectionTheme" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Visible" DockPanel.Dock="Bottom" Background="{Binding CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}">
+		<ScrollViewer Name="CollectionTheme" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden" DockPanel.Dock="Bottom" Background="{Binding CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}">
 			<ItemsControl Margin="50" Items="{Binding SearchedCollection}" HorizontalAlignment="Center">
 				<ItemsControl.ItemsPanel>
 					<ItemsPanelTemplate>
@@ -203,7 +161,7 @@
 
 				<ItemsControl.ItemTemplate>
 					<DataTemplate>
-						<Border Margin="20" BorderBrush="Transparent" CornerRadius="8" BorderThickness="0" BoxShadow="6 6 15 1 #000000">
+						<Border Margin="20" BorderBrush="Transparent" CornerRadius="8" BorderThickness="0" BoxShadow="6 6 15 1 #000000" Background="Transparent">
 							<DockPanel Width="{Binding Source={x:Static local:Constants.CARD_WIDTH}}" Height="{Binding Constants.CARD_HEIGHT}" LastChildFill="True">
 
 								<!-- Left Side Card -->

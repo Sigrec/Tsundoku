@@ -67,9 +67,18 @@ namespace Tsundoku.ViewModels
         [Reactive]
         public string CurDisplay { get; set; }
 
+        // [Reactive]
+        // public uint TestVal { get; set; } = 88888;
+
         public ReactiveCommand<Unit, Unit> OpenAddNewSeriesWindow { get; }
         public ReactiveCommand<Unit, Unit> OpenSettingsWindow { get; }
         public ReactiveCommand<Unit, Unit> OpenThemeSettingsWindow { get; }
+
+        private static JsonSerializerOptions options = new JsonSerializerOptions { 
+                WriteIndented = true,
+                ReadCommentHandling = JsonCommentHandling.Skip,
+                AllowTrailingCommas = true,
+            };
 
         public MainWindowViewModel()
         {
@@ -213,7 +222,10 @@ namespace Tsundoku.ViewModels
                 SaveUsersData();
             }
 
-            MainUser = JsonSerializer.Deserialize<User>(File.ReadAllText(filePath));
+            FileStream fRead = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            MainUser = JsonSerializer.DeserializeAsync<User>(fRead, options).Result;
+            fRead.FlushAsync();
+            fRead.Close();
 
             Logger.Info($"Loading {MainUser.UserName}'s Data");
             UserName = MainUser.UserName;
@@ -278,12 +290,6 @@ namespace Tsundoku.ViewModels
             Logger.Info($"Saving {MainUser.UserName}'s Data");
             MainUser.UserCollection = Collection;
             MainUser.SavedThemes = ThemeSettingsViewModel.UserThemes;
-
-            var options = new JsonSerializerOptions { 
-                WriteIndented = true,
-                ReadCommentHandling = JsonCommentHandling.Skip,
-                AllowTrailingCommas = true,
-            };
 
             File.WriteAllText(filePath, JsonSerializer.Serialize(MainUser, options));
         }

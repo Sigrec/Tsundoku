@@ -126,9 +126,9 @@ namespace Tsundoku.Views
 
         public void SaveOnCloseTwo()
         {
+            Src.DiscordRP.Deinitialize();
             Logger.Info("Closing TsundOku");
             MainWindowViewModel.CleanCoversFolder();
-            Src.DiscordRP.Deinitialize();
 
             if (CollectionViewModel.newSeriesWindow != null)
             {

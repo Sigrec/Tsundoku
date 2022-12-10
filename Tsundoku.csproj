@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <DebugType>embedded</DebugType>
@@ -13,16 +13,17 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <StartupObject>Tsundoku.Program</StartupObject>
     <PublishSingleFile Condition="'$(Configuration)' == 'Release'">true</PublishSingleFile>
-    <!-- <SelfContained>true</SelfContained> -->
-    <!-- <RuntimeIdentifier>win-x64</RuntimeIdentifier> -->
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <IsTrimmable>true</IsTrimmable>
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
-	  <PublishReadyToRun>true</PublishReadyToRun>
+	 <PublishReadyToRun>true</PublishReadyToRun>
     <Optimize>true</Optimize>
 	<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
   </PropertyGroup>
 	<ItemGroup>
-		<AvaloniaResource Include="Assets\**" />
+		<AvaloniaResource Include="Assets/**" />
+    <AvaloniaResource Include="Styles/**" />
 		<!-- <AvaloniaResource Include="UserData.json" /> -->
 		<!-- <Compile Remove="Assets\Covers\**" /> -->
 		<!-- <EmbeddedResource Remove="Assets\Cover\**" /> -->
@@ -81,6 +82,9 @@
   <ItemGroup>
     <Compile Update="Program.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Update="Views\CollectionThemeWindow.axaml.cs">
+      <DependentUpon>CollectionThemeWindow.axaml</DependentUpon>
     </Compile>
   </ItemGroup>
 </Project>
