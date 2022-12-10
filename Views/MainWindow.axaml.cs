@@ -25,6 +25,20 @@ namespace Tsundoku.Views
             InitializeComponent();
         }
 
+        private void PointerEnterColoring(object sender, PointerEventArgs args)
+        {
+            TextBlock statusAndBookType = (sender as Canvas).FindLogicalDescendantOfType<TextBlock>(false);
+            statusAndBookType.Background = new Avalonia.Media.SolidColorBrush(CollectionViewModel.CurrentTheme.StatusAndBookTypeBGHoverColor);
+            statusAndBookType.Foreground = new Avalonia.Media.SolidColorBrush(CollectionViewModel.CurrentTheme.StatusAndBookTypeTextHoverColor);
+        }
+
+        private void PointerLeaveColoring(object sender, PointerEventArgs args)
+        {
+            TextBlock statusAndBookType = (sender as Canvas).FindLogicalDescendantOfType<TextBlock>(false);
+            statusAndBookType.Background = new Avalonia.Media.SolidColorBrush(CollectionViewModel.CurrentTheme.StatusAndBookTypeBGColor);
+            statusAndBookType.Foreground = new Avalonia.Media.SolidColorBrush(CollectionViewModel.CurrentTheme.StatusAndBookTypeTextColor);
+        }
+
         private void SearchCollection(object sender, KeyEventArgs args)
         {
             CollectionViewModel.SearchIsBusy = true;

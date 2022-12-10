@@ -3,6 +3,7 @@ using ReactiveUI;
 using Tsundoku.Models;
 using ReactiveUI.Fody.Helpers;
 using System;
+using Avalonia.Media;
 
 namespace Tsundoku.ViewModels
 {

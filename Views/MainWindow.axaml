@@ -161,18 +161,20 @@
 
 				<ItemsControl.ItemTemplate>
 					<DataTemplate>
-						<Border Margin="20" BorderBrush="Transparent" CornerRadius="8" BorderThickness="0" BoxShadow="6 6 15 1 #000000" Background="Transparent">
+						<Border Margin="20" BorderBrush="Transparent" CornerRadius="8" BorderThickness="0" BoxShadow="6 6 15 1 #B3000000" Background="Transparent">
 							<DockPanel Width="{Binding Source={x:Static local:Constants.CARD_WIDTH}}" Height="{Binding Constants.CARD_HEIGHT}" LastChildFill="True">
 
 								<!-- Left Side Card -->
 								<Border CornerRadius="8,0,0,8" ClipToBounds="True">
-									<Canvas Name="{Binding Link}" PointerPressed="OpenSiteLink" Width="{Binding Source={x:Static local:Constants.LEFT_SIDE_CARD_WIDTH}}" OpacityMask="Black">
-									<Canvas.Styles>
-										<Style Selector="TextBlock:pointerenter /template/ ContentPresenter">
-											<Setter Property="TextBlock.Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.StatusAndBookTypeBGHoverColor, Converter={StaticResource ConvertColor}}"/>
-											<Setter Property="TextBlock.Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.StatusAndBookTypeTextHoverColor, Converter={StaticResource ConvertColor}}"/>
-										</Style>
-									</Canvas.Styles>
+									<Canvas Name="{Binding Link}"
+											PointerPressed="OpenSiteLink"
+											Width="{Binding Source={x:Static local:Constants.LEFT_SIDE_CARD_WIDTH}}">
+										<!-- <Canvas.Styles>
+											<Style Selector="Canvas:pointerover">
+												<Setter Property="#StatusAndFormat.Background" Value="Red"/>
+												<Setter Property="#StatusAndFormat.Foreground" Value="Yellow"/>
+											</Style>
+										</Canvas.Styles> -->
 
 										<!-- Top Left Side Card -->
 										<Image Height="{Binding Source={x:Static local:Constants.IMAGE_HEIGHT}}"

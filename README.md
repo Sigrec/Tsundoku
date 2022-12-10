@@ -1,7 +1,9 @@
 # [Tsundoku](https://en.wikipedia.org/wiki/Tsundoku) (Desktop Manga & Light Novel Collection App) [Follow Me on AL](https://anilist.co/user/Preminence/)
 
 ***
->[**Download** Current Supported Version = V1.0.0](https://www.dropbox.com/sh/4tl9238vg1h6c5x/AAATAEYnSPjm8-n5V6bz5kw8a?dl=0)
+>[**Windows Download** Current Supported Version = V1.0.0](https://www.dropbox.com/sh/szci4jq9zvorlzc/AAAY0oxWl-HZsmsoMgSrcbxka?dl=0)
+[**Mac Download (Not Supported Yet)** Current Supported Version = V1.0.0](https://www.dropbox.com/sh/3e0po3d4l1sv8va/AAAgEbiPM86QQtkTcvvGWEVva?dl=0)
+
 >Download the folder into your desired location (need to keep the executable file in a folder called "Tsundoku"), then pin the exe to your taskbar. Other standalone files are for if you only need to update a few things.
 ## Important
 #### Usage

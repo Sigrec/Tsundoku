@@ -256,7 +256,7 @@ namespace Tsundoku.ViewModels
                     foreach (Series curSeries in MainWindowViewModel.Collection)
                     {
                         string curTitle = Regex.Replace(curSeries.Titles[0], @"[^A-Za-z\d]", "");
-                        string coverPathTitleAndFormat = coverPath.Substring(16);
+                        string coverPathTitleAndFormat = coverPath.Substring(7);
                         if (Slice(coverPathTitleAndFormat, 0, coverPathTitleAndFormat.IndexOf("_")).Equals(curTitle) && Slice(coverPathTitleAndFormat, coverPathTitleAndFormat.IndexOf("_") + 1, coverPathTitleAndFormat.IndexOf(".")).Equals(curSeries.Format.ToUpper()))
                         {
                             removeSeriesCheck = false;
