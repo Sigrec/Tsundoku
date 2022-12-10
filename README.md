@@ -3,12 +3,12 @@
 ***
 >[**Download** Current Supported Version = V1.0.0](https://www.dropbox.com/sh/4tl9238vg1h6c5x/AAATAEYnSPjm8-n5V6bz5kw8a?dl=0)
 >Download the folder into your desired location, then pin the exe to your taskbar. Other standalone files are for if you only need to update a few things.
-### Important Info
+## Important Info
 Do not delete or move any files that are inside this zip/folder, instead just pin the TsundOku.exe file to your taskbar
 
 If you lose or delete the UserData.dat file u will lose your entire collection, so do not delete it, u will have to start over again, the Covers folder I also made visible incase u want to change the img shown for a particular series just make sure u copy the EXACT name and extension (either JPG or PNG) from the image file.
 ***
-### Feature/Bug ToDo List
+## Feature/Bug ToDo List
 #### V1.5.0
 - [ ] Price Analysis Page
 - [ ] Implement IDisposable for TsundokuThemes & Series
@@ -20,8 +20,8 @@ If you lose or delete the UserData.dat file u will lose your entire collection, 
 #### Bugs/Fixes
 - [ ] LineHeight Property in TextBlock Control not working
 - [ ] Slight Memory Issues (Resets memory usage when restarting the app) [Memory leak when sorting and searching]
-- [ ] Button & ComboBox disabled styling not working in Theme & AddNewSeries Windows & ComboBoxItem styling -> Need to override style template..
-  https://github.com/Sigrec/TsundokuApp/blob/main/README.mdhttps://github.com/Sigrec/TsundokuApp/blob/main/README.md
+- [ ] Button & ComboBox disabled styling not working in Theme & AddNewSeries Windows & ComboBoxItem styling -> Need to override style template?
+  
 #### Other/Random
 - [ ] Figure out TrayIcon
 - [ ] Implement IDisposable for TsundokuThemes & Series
@@ -29,7 +29,7 @@ If you lose or delete the UserData.dat file u will lose your entire collection, 
 - [ ] Seperate out the ItemControl (Collection) to a UserControl
 - [ ] ProgressBar issue Fixed track repo for next update and make change (https://github.com/AvaloniaUI/Avalonia/pull/9371)
 ***
-### Useful Links
+## Useful Links
 - [AniList Home](https://anilist.co/hom)
 - [Japanese Publisher Search](https://comic.k-manga.jp/)
 - [Hiatus Chart](https://www.reddit.com/r/HiatusCharts/comments/pfqlbz/all_charts/)
@@ -39,14 +39,14 @@ If you lose or delete the UserData.dat file u will lose your entire collection, 
 - [MangaSee](https://mangasee123.com/)
 
 ***Anime Streaming***
+- [✬9Anime](https://9anime.to/)
 - [✬AniMixPlay](https://animixplay.to/)
-- [9Anime](https://9anime.to/)
 - [4Anime](https://4anime.to/)
 
 ***Others***
 - [PreMID (Discord Anime Extension)](https://premid.app/)
 ***
-### Links to Buy Manga
+## Links to Buy Manga
 ***English***
 - [✬RightStufAnime](https://www.rightstufanime.com/)
 - [✬RobertsAnimeCornerStore](https://www.animecornerstore.com/graphicnovels1.html)
