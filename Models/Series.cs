@@ -166,9 +166,9 @@ namespace Tsundoku.Models
 				else if (validRoles.Contains(staffRole))
                 {
 					String newStaff = name["node"]["name"][nameType].ToString().Trim();
-					if (!staffList.ToString().Contains(newStaff)) // Check to see if this staff member has multiple roles to only add them once
+					if (!staffList.ToString().Contains(newStaff) || string.IsNullOrWhiteSpace(newStaff)) // Check to see if this staff member has multiple roles to only add them once
 					{
-						if (!string.IsNullOrEmpty(newStaff))
+						if (!string.IsNullOrWhiteSpace(newStaff))
 						{
 							staffList.Append(newStaff + " | ");
 						}

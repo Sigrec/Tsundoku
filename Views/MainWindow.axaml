@@ -6,6 +6,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+		xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
         x:Class="Tsundoku.Views.MainWindow"
         Icon="\Assets\Icons\Tsundoku-Logo.ico"
         Title="Tsundoku"
@@ -152,7 +153,7 @@
 		</Border>
 		
 		<!-- Collection -->
-		<ScrollViewer Name="CollectionTheme" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden" DockPanel.Dock="Bottom" Background="{Binding CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}">
+		<ScrollViewer Name="CollectionTheme" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" DockPanel.Dock="Bottom" Background="{Binding CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}">
 			<ItemsControl Margin="50" Items="{Binding SearchedCollection}" HorizontalAlignment="Center">
 				<ItemsControl.ItemsPanel>
 					<ItemsPanelTemplate>
@@ -169,6 +170,7 @@
 								<Border CornerRadius="8,0,0,8" ClipToBounds="True">
 									<Canvas Name="{Binding Link}"
 											PointerPressed="OpenSiteLink"
+											OpacityMask="White"
 											Width="{Binding Source={x:Static local:Constants.LEFT_SIDE_CARD_WIDTH}}">
 										<!-- <Canvas.Styles>
 											<Style Selector="Canvas:pointerover">
@@ -319,7 +321,7 @@
 													   Name="SeriesTitle"
 													   Padding="10,2,0,0"
 													   Cursor="Hand"
-													   LineHeight="15"> <!-- 24.0 -->
+													   LineHeight="3"> <!-- 24.0 -->
 												<TextBlock.Text>
 													<MultiBinding Converter="{StaticResource ConvertTitle}" Mode="OneWay">
 														<Binding Path="Titles[0]"/>

@@ -264,7 +264,7 @@ namespace Tsundoku.ViewModels
                         }
                     }
 
-                    if (removeSeriesCheck)
+                    if (removeSeriesCheck && File.Exists(coverPath))
                     {
                         Logger.Info($"Deleted Cover -> {coverPath}");
                         File.Delete(coverPath);
