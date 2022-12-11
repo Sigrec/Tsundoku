@@ -11,7 +11,7 @@
 		SizeToContent="WidthAndHeight"
         Classes="menu"
 		WindowStartupLocation="CenterOwner"
-		KeyboardNavigation.TabNavigation="Once"
+		KeyboardNavigation.TabNavigation="None"
 		CanResize="false">
 
 	<Window.Styles>
@@ -69,19 +69,6 @@
 					   FontSize="20" 
 					   FontWeight="Bold" 
 					   Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}"/>
-			<Button Name="AddSeriesButton"
-					Content="Add Series" 
-					Click="OnButtonClicked" 
-					Classes="menu"
-					BorderThickness="2"
-					FontWeight="Bold" 
-					FontSize="20"
-					Grid.Row="9" 
-					Grid.Column="0"
-					Grid.ColumnSpan="2" 
-					VerticalAlignment="Center"
-					IsEnabled="{Binding IsAddSeriesButtonEnabled}"
-					HorizontalAlignment="Center"/>
 			<StackPanel Orientation="Horizontal" Width="180" Grid.Row="7" Grid.Column="0" Spacing="4" Margin="-22,2,0,0">
 				<StackPanel.Styles>
 					<StyleInclude Source="/Styles/MenuTheme.xaml" />
@@ -127,6 +114,19 @@
 					FontWeight="Bold"
 					FontSize="18"
 					Classes="menu"/>
+			<Button Name="AddSeriesButton"
+					Content="Add Series" 
+					Click="OnButtonClicked" 
+					Classes="menu"
+					BorderThickness="2"
+					FontWeight="Bold" 
+					FontSize="20"
+					Grid.Row="9" 
+					Grid.Column="0"
+					Grid.ColumnSpan="2" 
+					VerticalAlignment="Center"
+					IsEnabled="{Binding IsAddSeriesButtonEnabled}"
+					HorizontalAlignment="Center"/>
 		</Grid>
     </Border>
 </Window>

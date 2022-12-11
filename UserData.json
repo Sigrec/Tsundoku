@@ -1,56 +1,11 @@
 {
   "UserName": "TEST",
-  "NumVolumesCollected": 4,
-  "NumVolumesToBeCollected": 1,
+  "NumVolumesCollected": 0,
+  "NumVolumesToBeCollected": 0,
   "CurLanguage": "Romaji",
   "Display": "Card",
-  "MainTheme": "Test",
+  "MainTheme": "Default",
   "SavedThemes": [
-    {
-      "ThemeName": "Test",
-      "MenuBGColor": 4281085250,
-      "UsernameColor": 4292859294,
-      "MenuTextColor": 4292859294,
-      "SearchBarBGColor": 4279375645,
-      "SearchBarBorderColor": 4292859294,
-      "SearchBarTextColor": 4292859294,
-      "MenuButtonBGColor": 2568099613,
-      "MenuButtonBGHoverColor": 3001013662,
-      "MenuButtonBorderColor": 4292859294,
-      "MenuButtonBorderHoverColor": 4279375645,
-      "MenuButtonTextAndIconColor": 4292859294,
-      "MenuButtonTextAndIconHoverColor": 4279375645,
-      "DividerColor": 4292859294,
-      "CollectionBGColor": 4285226828,
-      "StatusAndBookTypeBGColor": 4229964589,
-      "StatusAndBookTypeBGHoverColor": 4280296237,
-      "StatusAndBookTypeTextColor": 4074755486,
-      "StatusAndBookTypeTextHoverColor": 4292859294,
-      "SeriesCardBGColor": 4280296237,
-      "SeriesCardTitleColor": 4292859294,
-      "SeriesCardStaffColor": 4292859294,
-      "SeriesCardDescColor": 3857509612,
-      "SeriesProgressBGColor": 4281085250,
-      "SeriesProgressBarColor": 4292859294,
-      "SeriesProgressBarBGColor": 4279375645,
-      "SeriesProgressBarBorderColor": 4292859294,
-      "SeriesProgressTextColor": 4292859294,
-      "SeriesProgressButtonsHoverColor": 4279375645,
-      "SeriesSwitchPaneButtonBGColor": 4281085250,
-      "SeriesSwitchPaneButtonBGHoverColor": 4292859294,
-      "SeriesSwitchPaneButtonIconColor": 4292859294,
-      "SeriesSwitchPaneButtonIconHoverColor": 4279375645,
-      "SeriesEditPaneBGColor": 4280296237,
-      "SeriesNotesBGColor": 4279375645,
-      "SeriesNotesBorderColor": 4292859294,
-      "SeriesNotesTextColor": 4292859294,
-      "SeriesEditPaneButtonsBGColor": 4281085250,
-      "SeriesEditPaneButtonsBGHoverColor": 4292859294,
-      "SeriesEditPaneButtonsBorderColor": 4292859294,
-      "SeriesEditPaneButtonsBorderHoverColor": 4281085250,
-      "SeriesEditPaneButtonsIconColor": 4292859294,
-      "SeriesEditPaneButtonsIconHoverColor": 4281085250
-    },
     {
       "ThemeName": "Default",
       "MenuBGColor": 4281085250,
@@ -97,25 +52,5 @@
       "SeriesEditPaneButtonsIconHoverColor": 4281085250
     }
   ],
-  "UserCollection": [
-    {
-      "Titles": [
-        "BECK",
-        "BECK",
-        "BECK"
-      ],
-      "Staff": [
-        "Harold Sakuishi",
-        "\u30CF\u30ED\u30EB\u30C9\u4F5C\u77F3"
-      ],
-      "Description": "For the first 14 years of his life, Yukio Tanaka has been one heck of a boring guy. He has no hobbies, a weak taste in music, and only a small vestige of a personality. He yearns for an exciting life, but his shy, and somewhat neurotic personality make him his own worst enemy. Little does he know that his life will be forever changed when he meets Ryusuke Minami, a wild and unpredictable 16 year-old fresh from America, who happens to be in a rock-and-roll band named after his Frankenstein-like patched dog\u0026mdash;Beck.",
-      "Format": "Manga",
-      "Status": "Complete",
-      "Cover": "Covers\\BECK_MANGA.png",
-      "Link": "https://anilist.co/manga/30145",
-      "SeriesNotes": null,
-      "MaxVolumeCount": 5,
-      "CurVolumeCount": 4
-    }
-  ]
+  "UserCollection": []
 }

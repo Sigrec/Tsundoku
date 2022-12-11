@@ -10,6 +10,7 @@
         FontFamily="Segoe UI"
         SizeToContent="WidthAndHeight"
         WindowStartupLocation="CenterOwner"
+        KeyboardNavigation.TabNavigation="None"
         CanResize="true">
     
     <Window.Styles>

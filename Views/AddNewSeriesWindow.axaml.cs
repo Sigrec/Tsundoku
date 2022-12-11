@@ -67,7 +67,7 @@ namespace Tsundoku.Views
             }
             else
             {
-                AddNewSeriesViewModel.GetSeriesData(TitleBox.Text, (bool)MangaButton.IsChecked ? "MANGA" : "NOVEL", cur, max);
+                AddNewSeriesViewModel.GetSeriesData(TitleBox.Text.Trim(), (bool)MangaButton.IsChecked ? "MANGA" : "NOVEL", cur, max);
             }
         }
     }

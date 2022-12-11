@@ -16,6 +16,7 @@
 		WindowStartupLocation="1"
 		Topmost="True"
 		WindowState="2"
+		KeyboardNavigation.TabNavigation="None"
 		Closing="SaveOnClose">
 
 	<Window.Resources>

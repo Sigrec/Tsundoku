@@ -25,20 +25,6 @@ namespace Tsundoku.Views
             InitializeComponent();
         }
 
-        private void PointerEnterColoring(object sender, PointerEventArgs args)
-        {
-            TextBlock statusAndBookType = (sender as Canvas).FindLogicalDescendantOfType<TextBlock>(false);
-            statusAndBookType.Background = new Avalonia.Media.SolidColorBrush(CollectionViewModel.CurrentTheme.StatusAndBookTypeBGHoverColor);
-            statusAndBookType.Foreground = new Avalonia.Media.SolidColorBrush(CollectionViewModel.CurrentTheme.StatusAndBookTypeTextHoverColor);
-        }
-
-        private void PointerLeaveColoring(object sender, PointerEventArgs args)
-        {
-            TextBlock statusAndBookType = (sender as Canvas).FindLogicalDescendantOfType<TextBlock>(false);
-            statusAndBookType.Background = new Avalonia.Media.SolidColorBrush(CollectionViewModel.CurrentTheme.StatusAndBookTypeBGColor);
-            statusAndBookType.Foreground = new Avalonia.Media.SolidColorBrush(CollectionViewModel.CurrentTheme.StatusAndBookTypeTextColor);
-        }
-
         private void SearchCollection(object sender, KeyEventArgs args)
         {
             CollectionViewModel.SearchIsBusy = true;
@@ -72,25 +58,31 @@ namespace Tsundoku.Views
             }, RxApp.MainThreadScheduler);
         }
 
-        private void RemoveSeries(object sender, RoutedEventArgs args)
+        private async void RemoveSeries(object sender, RoutedEventArgs args)
         {
-            for (int x = 0; x < MainWindowViewModel.SearchedCollection.Count(); x++)
+            var result = await Observable.Start(() => 
             {
-                Series curSeries = MainWindowViewModel.SearchedCollection[x];
-                if (curSeries.Equals((Series)((Button)sender).DataContext))
+                for (int x = 0; x < MainWindowViewModel.SearchedCollection.Count(); x++)
                 {
-                    CollectionViewModel.UsersNumVolumesCollected -= curSeries.CurVolumeCount;
-                    CollectionViewModel.UsersNumVolumesToBeCollected -= (uint)(curSeries.MaxVolumeCount - curSeries.CurVolumeCount);
-                    MainWindowViewModel.SearchedCollection.Remove(curSeries);
-                    MainWindowViewModel.Collection.Remove(curSeries);
-                    Logger.Info($"Removed {curSeries.Titles[0]} From Collection");
+                    Series curSeries = MainWindowViewModel.SearchedCollection[x];
+                    if (curSeries.Equals((Series)((Button)sender).DataContext))
+                    {
+                        CollectionViewModel.UsersNumVolumesCollected -= curSeries.CurVolumeCount;
+                        CollectionViewModel.UsersNumVolumesToBeCollected -= (uint)(curSeries.MaxVolumeCount - curSeries.CurVolumeCount);
+                        MainWindowViewModel.SearchedCollection.Remove(curSeries);
+                        MainWindowViewModel.Collection.Remove(curSeries);
+                        Logger.Info($"Removed {curSeries.Titles[0]} From Collection");
+                    }
                 }
-            }
+            }, RxApp.MainThreadScheduler);
         }
 
-        private void ShowEditPane(object sender, RoutedEventArgs args)
+        private async void ShowEditPane(object sender, RoutedEventArgs args)
         {
-            ((Button)sender).FindLogicalAncestorOfType<Grid>(false).FindLogicalDescendantOfType<Grid>(false).IsVisible ^= true;
+            var result = await Observable.Start(() => 
+            {
+                ((Button)sender).FindLogicalAncestorOfType<Grid>(false).FindLogicalDescendantOfType<Grid>(false).IsVisible ^= true;
+            }, RxApp.MainThreadScheduler);
         }
 
         private void LanguageChanged(object sender, SelectionChangedEventArgs e)
