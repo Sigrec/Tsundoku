@@ -71,6 +71,7 @@ namespace Tsundoku.Views
                         CollectionViewModel.UsersNumVolumesToBeCollected -= (uint)(curSeries.MaxVolumeCount - curSeries.CurVolumeCount);
                         MainWindowViewModel.SearchedCollection.Remove(curSeries);
                         MainWindowViewModel.Collection.Remove(curSeries);
+                        curSeries.Dispose();
                         Logger.Info($"Removed {curSeries.Titles[0]} From Collection");
                     }
                 }

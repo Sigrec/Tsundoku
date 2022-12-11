@@ -13,21 +13,18 @@ using System.Reactive;
 using System.Collections.Specialized;
 using System.Text.Json;
 using System.Reactive.Concurrency;
-using System.Diagnostics;
 using Avalonia.Controls;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
+using Avalonia.Media.Imaging;
+using DynamicData;
 
 namespace Tsundoku.ViewModels
 {
     public partial class MainWindowViewModel : ViewModelBase
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
-#if (!DEBUG)
         private static string filePath = @"UserData.json";
-#else
-        private static string filePath = @"\Tsundoku\UserData.json";
-#endif
         public static ObservableCollection<Series> SearchedCollection { get; set; } = new();
         public static ObservableCollection<Series> Collection { get; set; } = new();
         public static User MainUser { get; set; }
@@ -84,7 +81,7 @@ namespace Tsundoku.ViewModels
         {
             RxApp.MainThreadScheduler.Schedule(GetUserData);
 
-            this.WhenAnyValue(x => x.SearchText).Throttle(TimeSpan.FromMilliseconds(400)).ObserveOn(RxApp.MainThreadScheduler).Subscribe(SearchCollection!);
+            this.WhenAnyValue(x => x.SearchText).Throttle(TimeSpan.FromMilliseconds(500)).ObserveOn(RxApp.MainThreadScheduler).Subscribe(SearchCollection!);
 
             this.WhenAnyValue(x => x.CurrentTheme).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.MainTheme = x.ThemeName);
             this.WhenAnyValue(x => x.CurDisplay).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.Display = x);
@@ -195,7 +192,7 @@ namespace Tsundoku.ViewModels
             {
                 SearchedCollection.Clear();
                 Logger.Debug($"Searching For {searchText}");
-                foreach (Series series in MainUser.UserCollection.Where(x => x.Titles[0].Contains(searchText, StringComparison.InvariantCultureIgnoreCase) | x.Titles[1].Contains(searchText, StringComparison.InvariantCultureIgnoreCase) | x.Titles[2].Contains(searchText, StringComparison.CurrentCultureIgnoreCase) | x.Staff[0].Contains(searchText, StringComparison.InvariantCultureIgnoreCase) | x.Staff[1].Contains(searchText, StringComparison.CurrentCultureIgnoreCase)))
+                foreach (Series series in Collection.Where(x => x.Titles[0].Contains(searchText, StringComparison.InvariantCultureIgnoreCase) | x.Titles[1].Contains(searchText, StringComparison.InvariantCultureIgnoreCase) | x.Titles[2].Contains(searchText, StringComparison.CurrentCultureIgnoreCase) | x.Staff[0].Contains(searchText, StringComparison.InvariantCultureIgnoreCase) | x.Staff[1].Contains(searchText, StringComparison.CurrentCultureIgnoreCase)))
                 {
                     SearchedCollection.Add(series);
                 }
@@ -240,7 +237,7 @@ namespace Tsundoku.ViewModels
 
             foreach (Series x in Collection)
             {
-                x.CoverBitMap = new Avalonia.Media.Imaging.Bitmap(x.Cover);
+                x.CoverBitMap = new Bitmap(x.Cover).CreateScaledBitmap(new Avalonia.PixelSize( Constants.LEFT_SIDE_CARD_WIDTH, Constants.IMAGE_HEIGHT), BitmapInterpolationMode.MediumQuality);
                 SearchedCollection.Add(x);
             }
         }

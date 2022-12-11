@@ -14,9 +14,11 @@ using System.Text.Json.Serialization;
 
 namespace Tsundoku.Models
 {
-	public class Series
+	public class Series : IDisposable
 	{
 		private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
+		private bool disposedValue;
+
 		public List<string> Titles { get; } //[Romaji, English, Native]
         public List<string> Staff { get; } //[Romaji, Native]
 		public string Description { get; }
@@ -80,7 +82,7 @@ namespace Tsundoku.Models
 						seriesData["siteUrl"].ToString(),
 						maxVolCount,
 						minVolCount,
-						new Bitmap(coverPath));
+						new Bitmap(coverPath).CreateScaledBitmap(new Avalonia.PixelSize( Constants.LEFT_SIDE_CARD_WIDTH, Constants.IMAGE_HEIGHT), BitmapInterpolationMode.MediumQuality));
 					return _newSeries;
 				}
 			}
@@ -211,5 +213,35 @@ namespace Tsundoku.Models
 					"CurVolumeCount = " + CurVolumeCount  + "\n" +
 					'}';
 		}
-    }
+
+		protected virtual void Dispose(bool disposing)
+		{
+			if (!disposedValue)
+			{
+				if (disposing)
+				{
+					// TODO: dispose managed state (managed objects)
+					CoverBitMap.Dispose();
+				}
+
+				// TODO: free unmanaged resources (unmanaged objects) and override finalizer
+				// TODO: set large fields to null
+				disposedValue = true;
+			}
+		}
+
+		// // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
+		// ~Series()
+		// {
+		//     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+		//     Dispose(disposing: false);
+		// }
+
+		public void Dispose()
+		{
+			// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+			Dispose(disposing: true);
+			GC.SuppressFinalize(this);
+		}
+	}
 }

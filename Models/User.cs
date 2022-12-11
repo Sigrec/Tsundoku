@@ -1,5 +1,5 @@
 using System.Collections.ObjectModel;
-using System;
+
 namespace Tsundoku.Models
 {
     public class User

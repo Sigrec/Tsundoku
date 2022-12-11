@@ -156,7 +156,7 @@
 			<ItemsControl Margin="50" Items="{Binding SearchedCollection}" HorizontalAlignment="Center">
 				<ItemsControl.ItemsPanel>
 					<ItemsPanelTemplate>
-						<WrapPanel/>
+						<WrapPanel />
 					</ItemsPanelTemplate>
 				</ItemsControl.ItemsPanel>
 
@@ -182,7 +182,6 @@
 										<Image Height="{Binding Source={x:Static local:Constants.IMAGE_HEIGHT}}"
 											   Width="{Binding Source={x:Static local:Constants.LEFT_SIDE_CARD_WIDTH}}"
 											   Source="{Binding CoverBitMap}"
-											   Stretch="Fill"
 											   Cursor="Hand"
 											   ClipToBounds="True"
 											   RenderTransformOrigin="0,0"

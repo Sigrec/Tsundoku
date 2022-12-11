@@ -42,7 +42,7 @@ namespace Tsundoku.ViewModels
         *      ushort | curVolCount | The current # of volumes the user has collected for this series
         *      ushort | maxVolCount | The max # of volumes this series currently has
         */
-        public static void GetSeriesData(string title, string bookType, ushort curVolCount, ushort maxVolCount)
+        public void GetSeriesData(string title, string bookType, ushort curVolCount, ushort maxVolCount)
         {
             Logger.Info($"Adding New Series -> {title} | {bookType} | {curVolCount} | {maxVolCount}");
             Series newSeries = Series.CreateNewSeriesCard(title, bookType, maxVolCount, curVolCount);

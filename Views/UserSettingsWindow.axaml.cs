@@ -167,13 +167,8 @@ namespace Tsundoku.Views
             worksheet.Columns["G"].AutoFit();
             worksheet.Columns["G"].Style.VerticalAlignment = VerticalAlignmentStyle.Center;
     
-#if (!DEBUG)
-            workbook.Save(@$"{System.Environment.CurrentDirectory}\TsundokuCollection.xlsx");
-            Logger.Info(@$"Exported {MainWindowViewModel.MainUser.UserName}'s Data To -> {System.Environment.CurrentDirectory}\TsundokuCollection.xlsx");
-#else
-            workbook.Save(@$"\Tsundoku\TsundokuCollection.xlsx");
-            Logger.Info(@$"Exported {MainWindowViewModel.MainUser.UserName}'s Data To -> \Tsundoku\TsundokuCollection.xlsx");
-#endif
+            workbook.Save(@$"TsundokuCollection.xlsx");
+            Logger.Info(@$"Exported {MainWindowViewModel.MainUser.UserName}'s Data To -> TsundokuCollection.xlsx");
         }
     }
 }

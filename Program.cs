@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.ReactiveUI;
@@ -24,15 +25,15 @@ namespace Tsundoku
                 .WithIcons(container => container
                     .Register<FontAwesomeIconProvider>())
                 .UseReactiveUI()
-                // .With(new SkiaOptions 
-                // {
-                //     MaxGpuResourceSizeBytes = 1024000000
-                // })
+                .With(new SkiaOptions 
+                {
+                    MaxGpuResourceSizeBytes = 1024000000
+                })
                 .With(new Win32PlatformOptions
                 {
                     UseCompositor = false,
                     UseWgl = true,
-                    AllowEglInitialization = true
+                    UseDeferredRendering = true
                 });
     }
 }
