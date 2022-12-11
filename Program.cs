@@ -33,7 +33,7 @@ namespace Tsundoku
                 {
                     UseCompositor = false,
                     UseWgl = true,
-                    UseDeferredRendering = true
+                    UseDeferredRendering = false
                 });
     }
 }

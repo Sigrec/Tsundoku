@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ReactiveUI.Fody.Helpers;
 using ReactiveUI;
+using DynamicData;
 
 namespace Tsundoku.ViewModels
 {
@@ -62,7 +63,10 @@ namespace Tsundoku.ViewModels
                 {
                     Logger.Info(newSeries.ToString());
                     MainWindowViewModel.Collection.Add(newSeries);
-                    MainWindowViewModel.SortCollection();
+                    int index = MainWindowViewModel.SearchForSort(newSeries);
+
+                    MainWindowViewModel.SearchedCollection.Insert(index < 0 ? ~index : index, newSeries);
+                    MainWindowViewModel.Collection = new System.Collections.ObjectModel.ObservableCollection<Series>(MainWindowViewModel.SearchedCollection);
                 }
                 else
                 {

@@ -18,6 +18,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 using Avalonia.Media.Imaging;
 using DynamicData;
+using System.Collections.Generic;
 
 namespace Tsundoku.ViewModels
 {
@@ -158,6 +159,36 @@ namespace Tsundoku.ViewModels
             };
         }
 
+        public static int SearchForSort(Series series)
+        {
+            int index;
+            switch(MainUser.CurLanguage)
+            {
+                case "Native":
+                    index = Collection.BinarySearch(series, delegate(Series x, Series y)
+                    {
+                        if (x.Titles[2] == null && y.Titles[2] == null) return 0;
+                        else return x.Titles[2].CompareTo(y.Titles[2]);
+                    });
+                    break;
+                case "English":
+                    index = Collection.BinarySearch(series, delegate(Series x, Series y)
+                    {
+                        if (x.Titles[1] == null && y.Titles[1] == null) return 0;
+                        else return x.Titles[1].CompareTo(y.Titles[1]);
+                    });
+                    break;
+                default:
+                    index = Collection.BinarySearch(series, delegate(Series x, Series y)
+                    {
+                        if (x.Titles[0] == null && y.Titles[0] == null) return 0;
+                        else return x.Titles[0].CompareTo(y.Titles[0]);
+                    });
+                    break;
+            }
+            return index;
+        }
+
         public static void SortCollection()
         {
             SearchedCollection.Clear();
@@ -238,8 +269,9 @@ namespace Tsundoku.ViewModels
             foreach (Series x in Collection)
             {
                 x.CoverBitMap = new Bitmap(x.Cover).CreateScaledBitmap(new Avalonia.PixelSize( Constants.LEFT_SIDE_CARD_WIDTH, Constants.IMAGE_HEIGHT), BitmapInterpolationMode.MediumQuality);
-                SearchedCollection.Add(x);
+                //SearchedCollection.Add(x);
             }
+            SearchedCollection = new ObservableCollection<Series>(Collection);
         }
 
         public static void CleanCoversFolder()

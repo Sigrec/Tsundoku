@@ -82,7 +82,7 @@ namespace Tsundoku.Models
 						seriesData["siteUrl"].ToString(),
 						maxVolCount,
 						minVolCount,
-						new Bitmap(coverPath).CreateScaledBitmap(new Avalonia.PixelSize( Constants.LEFT_SIDE_CARD_WIDTH, Constants.IMAGE_HEIGHT), BitmapInterpolationMode.MediumQuality));
+						new Bitmap(coverPath).CreateScaledBitmap(new Avalonia.PixelSize(Constants.LEFT_SIDE_CARD_WIDTH, Constants.IMAGE_HEIGHT), BitmapInterpolationMode.MediumQuality));
 					return _newSeries;
 				}
 			}
@@ -243,5 +243,5 @@ namespace Tsundoku.Models
 			Dispose(disposing: true);
 			GC.SuppressFinalize(this);
 		}
-	}
+    }
 }

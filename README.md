@@ -1,4 +1,5 @@
-# [Tsundoku](https://en.wikipedia.org/wiki/Tsundoku) (Desktop Manga & Light Novel Collection App) [Follow Me on AL](https://anilist.co/user/Preminence/)
+# [Tsundoku](https://en.wikipedia.org/wiki/Tsundoku) (Desktop Manga & Light Novel Collection App) [Follow Me on AL](https://anilist.co/user/Preminence/) 
+# Discord = Prem#4927 (DM me for help)
 
 ***
 >[**Windows Download** Current Supported Version = V1.0.0](https://www.dropbox.com/sh/szci4jq9zvorlzc/AAAY0oxWl-HZsmsoMgSrcbxka?dl=0)

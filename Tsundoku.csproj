@@ -26,10 +26,17 @@
 	<ItemGroup>
 		<AvaloniaResource Include="Assets/**" />
     <AvaloniaResource Include="Styles/**" />
+    <AvaloniaXaml Remove="Covers\**" />
+    <Compile Remove="Covers\**" />
+    <EmbeddedResource Remove="Covers\**" />
+    <None Remove="Covers\**" />
 		<!-- <AvaloniaResource Include="UserData.json" /> -->
 		<!-- <Compile Remove="Assets\Covers\**" /> -->
 		<!-- <EmbeddedResource Remove="Assets\Cover\**" /> -->
 		<None Remove=".gitignore" />
+		<None Remove="README.md" />
+		<None Remove="TsundokuCollection.xlsx" />
+		<None Remove="UserData.json" />
 		<Content Update="lib*.dll">
 			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 			<ExcludeFromSingleFile>false</ExcludeFromSingleFile>
