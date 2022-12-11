@@ -24,10 +24,10 @@ namespace Tsundoku
                 .WithIcons(container => container
                     .Register<FontAwesomeIconProvider>())
                 .UseReactiveUI()
-                .With(new SkiaOptions 
-                {
-                    MaxGpuResourceSizeBytes = 1024000000
-                })
+                // .With(new SkiaOptions 
+                // {
+                //     MaxGpuResourceSizeBytes = 1024000000
+                // })
                 .With(new Win32PlatformOptions
                 {
                     UseCompositor = false,

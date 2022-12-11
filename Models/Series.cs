@@ -9,7 +9,8 @@ using System.Text;
 using System.Linq;
 using System.Diagnostics;
 using System.Collections.Generic;
-using System.Reflection;
+using Avalonia.Media.Imaging;
+using System.Text.Json.Serialization;
 
 namespace Tsundoku.Models
 {
@@ -26,8 +27,11 @@ namespace Tsundoku.Models
 		public string SeriesNotes { get; set; }
 		public ushort MaxVolumeCount { get; set; }
 		public ushort CurVolumeCount { get; set; }
+		 
+		[JsonIgnore]
+		public Bitmap CoverBitMap { get; set; }
 
-        public Series(List<string> titles, List<string> staff, string description, string format, string status, string cover, string link, ushort maxVolumeCount, ushort curVolumeCount)
+        public Series(List<string> titles, List<string> staff, string description, string format, string status, string cover, string link, ushort maxVolumeCount, ushort curVolumeCount, Bitmap coverBitMap)
         {
 			Titles = titles;
 			Staff = staff;
@@ -38,6 +42,7 @@ namespace Tsundoku.Models
             Link = link;
             MaxVolumeCount = maxVolumeCount;
             CurVolumeCount = curVolumeCount;
+			CoverBitMap = coverBitMap;
         }
 
 		public static Series? CreateNewSeriesCard(string title, string bookType, ushort maxVolCount, ushort minVolCount)
@@ -55,6 +60,7 @@ namespace Tsundoku.Models
 					string filteredBookType = bookType.Equals("MANGA") ? GetCorrectComicName(seriesData["countryOfOrigin"].ToString()) : "Novel";
 					string nativeStaff = GetSeriesStaff(seriesData["staff"]["edges"], "native", filteredBookType, romajiTitle);
 					string fullStaff = GetSeriesStaff(seriesData["staff"]["edges"], "full", filteredBookType, romajiTitle);
+					string coverPath = SaveNewCoverImage(seriesData["coverImage"]["extraLarge"].ToString(), romajiTitle, filteredBookType.ToUpper());
 					Series _newSeries = new Series(
                         new List<string>()
 						{
@@ -70,10 +76,11 @@ namespace Tsundoku.Models
 						seriesData["description"] == null ? "" : ConvertUnicodeInDesc(Regex.Replace(seriesData["description"].ToString(), @"\(Source: [\S\s]+|\<.*?\>", "").Trim()),
 						filteredBookType,
 						GetSeriesStatus(seriesData["status"].ToString()),
-						SaveNewCoverImage(seriesData["coverImage"]["extraLarge"].ToString(), romajiTitle, filteredBookType.ToUpper()),
+						coverPath,
 						seriesData["siteUrl"].ToString(),
 						maxVolCount,
-						minVolCount);
+						minVolCount,
+						new Bitmap(coverPath));
 					return _newSeries;
 				}
 			}

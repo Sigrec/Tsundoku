@@ -21,7 +21,6 @@
 		Closing="SaveOnClose">
 
 	<Window.Resources>
-		<cv:BitmapValueConverter x:Key="ConvertImage"/>
 		<cv:TitleLangConverter x:Key="ConvertTitle"/>
 		<cv:StaffLangConverter x:Key="ConvertStaff"/>
 	</Window.Resources>
@@ -182,7 +181,7 @@
 										<!-- Top Left Side Card -->
 										<Image Height="{Binding Source={x:Static local:Constants.IMAGE_HEIGHT}}"
 											   Width="{Binding Source={x:Static local:Constants.LEFT_SIDE_CARD_WIDTH}}"
-											   Source="{Binding Cover, Converter={StaticResource ConvertImage}}"
+											   Source="{Binding CoverBitMap}"
 											   Stretch="Fill"
 											   Cursor="Hand"
 											   ClipToBounds="True"

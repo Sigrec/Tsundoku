@@ -26,6 +26,7 @@ To report a issue please go to the issues link [Tsundoku Issues](https://github.
 #### Bugs/Fixes
 - [ ] LineHeight Property in TextBlock Control not working?
 - [ ] Slight Memory Issues (Resets memory usage when restarting the app) [Memory leak when sorting and searching]
+- [ ] Memory Leak when Scrolling due to Image Caching? & Also When you save Theme (a restart after saving theme fixes that though)
 - [ ] Button & ComboBox disabled styling not working in Theme & AddNewSeries Windows & ComboBoxItem styling -> Need to override style template?
   
 #### Other/Random

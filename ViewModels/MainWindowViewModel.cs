@@ -75,14 +75,15 @@ namespace Tsundoku.ViewModels
         public ReactiveCommand<Unit, Unit> OpenThemeSettingsWindow { get; }
 
         private static JsonSerializerOptions options = new JsonSerializerOptions { 
-                WriteIndented = true,
-                ReadCommentHandling = JsonCommentHandling.Skip,
-                AllowTrailingCommas = true,
-            };
+            WriteIndented = true,
+            ReadCommentHandling = JsonCommentHandling.Skip,
+            AllowTrailingCommas = true,
+        };
 
         public MainWindowViewModel()
         {
             RxApp.MainThreadScheduler.Schedule(GetUserData);
+
             this.WhenAnyValue(x => x.SearchText).Throttle(TimeSpan.FromMilliseconds(400)).ObserveOn(RxApp.MainThreadScheduler).Subscribe(SearchCollection!);
 
             this.WhenAnyValue(x => x.CurrentTheme).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.MainTheme = x.ThemeName);
@@ -184,7 +185,7 @@ namespace Tsundoku.ViewModels
                     }
                     break;
             }
-            //Collection = new ObservableCollection<Series>(SearchedCollection);
+            MainUser.UserCollection = new ObservableCollection<Series>(SearchedCollection);
             Logger.Info($"Sorting {MainUser.CurLanguage}");
         }
 
@@ -239,6 +240,7 @@ namespace Tsundoku.ViewModels
 
             foreach (Series x in Collection)
             {
+                x.CoverBitMap = new Avalonia.Media.Imaging.Bitmap(x.Cover);
                 SearchedCollection.Add(x);
             }
         }
@@ -288,7 +290,7 @@ namespace Tsundoku.ViewModels
         public static void SaveUsersData()
         {
             Logger.Info($"Saving {MainUser.UserName}'s Data");
-            MainUser.UserCollection = new ObservableCollection<Series>(SearchedCollection);
+            //MainUser.UserCollection = Collection;
             MainUser.SavedThemes = ThemeSettingsViewModel.UserThemes;
 
             File.WriteAllText(filePath, JsonSerializer.Serialize(MainUser, options));

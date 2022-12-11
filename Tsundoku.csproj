@@ -14,10 +14,12 @@
     <StartupObject>Tsundoku.Program</StartupObject>
     <PublishSingleFile Condition="'$(Configuration)' == 'Release'">true</PublishSingleFile>
     <SelfContained>true</SelfContained>
+    <ExcludeFoldersFromDeployment>Covers</ExcludeFoldersFromDeployment>
+    <ExcludeFilesFromDeployment>UserData.json</ExcludeFilesFromDeployment>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <IsTrimmable>true</IsTrimmable>
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
-	 <PublishReadyToRun>true</PublishReadyToRun>
+	  <PublishReadyToRun>true</PublishReadyToRun>
     <Optimize>true</Optimize>
 	<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
   </PropertyGroup>
