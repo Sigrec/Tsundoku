@@ -8,11 +8,11 @@
 
 >Download the folder into your desired location (need to keep the executable file in a folder called "Tsundoku"), then pin the exe to your taskbar. Other standalone files are for if you only need to update a few things.
 ## Important
-#### Usage
+### Usage
 Do not delete or move any files that are inside this zip/folder, instead just pin the Tsundoku.exe file to your taskbar
 
 If you lose or delete the UserData.dat file u will lose your entire collection, so do not delete it, u will have to start over again, the Covers folder I also made visible incase u want to change the img shown for a particular series just make sure u copy the EXACT name and extension (either JPG or PNG) from the image file.
-#### Reporting Bugs/Issues
+### Reporting Bugs/Issues
 To report a issue please go to the issues link [Tsundoku Issues](https://github.com/Sigrec/TsundokuApp/issues) and create a issue ticket explaining the problem and how I can reproduce it. You can check back anytime to see if the ticket is completed and what version the change was made in.
 ***
 ## Feature/Fixes ToDo List
@@ -50,8 +50,7 @@ To report a issue please go to the issues link [Tsundoku Issues](https://github.
   
 #### Other/Random
 - [ ] Figure out TrayIcon
-- [ ] Implement IDisposable for TsundokuThemes & Series
-- [ ] Need some further testing on the async functions (changing volumes for right now)
+- [ ] Need some further testing on the async functions
 - [ ] Seperate out the ItemControl (Collection) to a UserControl?
 ***
 ## Useful Links
