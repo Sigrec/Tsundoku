@@ -18,14 +18,21 @@ To report a issue please go to the issues link [Tsundoku Issues](https://github.
 ## Feature/Fixes ToDo List
 #### V1.5.0
 - [ ] File for Additional Series not on AniList (Example Radiant)
-- [ ] Price Analysis Page (Below are the Websites and Whether they can be added or not)
+- [ ] Price Analysis Page (Below are the Websites I thought of and whether they can be added to the Analysis or not)
   &check; RightStufanime
+
   &check; RobertsAnimeCornerStore
+
   &check; Kinokuniya US
+
   ? BarnesAndNoble
+
   ? BooksAMillion
+
   ? Amazon Japan
+
   ? Amazon US
+
   ? CD Japan
 - [ ] Hotkeys
   - [ ] Fullscreen (F11)
