@@ -17,11 +17,23 @@ To report a issue please go to the issues link [Tsundoku Issues](https://github.
 ***
 ## Feature/Fixes ToDo List
 #### V1.5.0
-- [ ] Price Analysis Page
-- [ ] Additional Language Support (German, French, Italian, Spanish)
+- [ ] Price Analysis Page (Below are the Websites and Whether they can be added or not)
+  &check; RightStufanime
+  &check; RobertsAnimeCornerStore
+  &check; Kinokuniya US
+  ? BarnesAndNoble
+  ? BooksAMillion
+  ? Amazon Japan
+  ? Amazon US
+  ? CD Japan
+- [ ] Hotkeys
+  - [ ] Fullscreen (F11)
+  - [ ] Save (Ctrl + S)
+  - [ ] Screenshot (Ctrl + Shift + P ?)
+- [ ] Additional Language Support (German, French, Italian, Spanish) [This is dependant on some things otherwise it will have to be pushed much later]
 
 #### V2.0.0 Features
-- [ ] Changing of Display Format
+- [ ] Changing of Display Layout/Format [I need some inspiration from other people, this could move up to V1.5.0 in place of Language Support if I get some contrete layouts]
   
 #### Bugs/Fixes
 - [ ] LineHeight Property in TextBlock Control not working, unsure why still works when it's really large?
