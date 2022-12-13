@@ -17,6 +17,7 @@ To report a issue please go to the issues link [Tsundoku Issues](https://github.
 ***
 ## Feature/Fixes ToDo List
 #### V1.5.0
+- [ ] File for Additional Series not on AniList (Example Radiant)
 - [ ] Price Analysis Page (Below are the Websites and Whether they can be added or not)
   &check; RightStufanime
   &check; RobertsAnimeCornerStore
