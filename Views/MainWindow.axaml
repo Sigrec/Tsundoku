@@ -315,11 +315,13 @@
 													   Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesCardTitleColor, Converter={StaticResource ConvertColor}}"
 													   FontWeight="Bold"
 													   FontSize="23"
+													   MinHeight="20"
+													   Width="{Binding Source={x:Static local:Constants.RIGHT_SIDE_CARD_WIDTH}}" 
 													   PointerPressed="CopySeriesTitleAsync"
 													   Name="SeriesTitle"
 													   Padding="10,2,0,0"
 													   Cursor="Hand"
-													   LineHeight="3"> <!-- 24.0 -->
+													   LineHeight="10"> <!-- 24.0 -->
 												<TextBlock.Text>
 													<MultiBinding Converter="{StaticResource ConvertTitle}" Mode="OneWay">
 														<Binding Path="Titles[0]"/>

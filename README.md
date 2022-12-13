@@ -8,12 +8,17 @@
 
 >Download the folder into your desired location (need to keep the executable file in a folder called "Tsundoku"), then pin the exe to your taskbar. Other standalone files are for if you only need to update a few things.
 ## Important
+### P.S. This Application is Something I Do For Fun during my Free Time
 ### Usage
 Do not delete or move any files that are inside this zip/folder, instead just pin the Tsundoku.exe file to your taskbar
 
 If you lose or delete the UserData.dat file u will lose your entire collection, so do not delete it, u will have to start over again, the Covers folder I also made visible incase u want to change the img shown for a particular series just make sure u copy the EXACT name and extension (either JPG or PNG) from the image file.
+
 ### Reporting Bugs/Issues
 To report a issue please go to the issues link [Tsundoku Issues](https://github.com/Sigrec/TsundokuApp/issues) and create a issue ticket explaining the problem and how I can reproduce it. You can check back anytime to see if the ticket is completed and what version the change was made in.
+
+### Removing Annoying Windows Defender
+Of course I understand if you do not trust me but I promise there is nothing malicious in the executable. The windows defender should turn off after the first time you run it but in case it does not here is a link to add an exclusion [Windows Security Exclusion](https://support.microsoft.com/en-us/windows/add-an-exclusion-to-windows-security-811816c0-4dfd-af4a-47e4-c301afe13b26)
 ***
 ## Feature/Fixes ToDo List
 #### V1.5.0
