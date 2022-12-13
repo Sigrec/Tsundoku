@@ -12,20 +12,22 @@ namespace Tsundoku.Source
 	{
 		private static readonly string USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.66 Safari/537.36";
 
+		private static GraphQLHttpClient AniListClient = new GraphQLHttpClient("https://graphql.anilist.co", new NewtonsoftJsonSerializer());
+
+
 		public AniListQuery()
 		{
 			
 		}
 
-        public async Task<JObject?> GetSeries(string title, string format)
+        public string GetSeries(string title, string format)
 		{
 			try
 			{
-				GraphQLHttpClient client = new GraphQLHttpClient("https://graphql.anilist.co", new NewtonsoftJsonSerializer());
-				client.HttpClient.DefaultRequestHeaders.Add("RequestType", "POST");
-				client.HttpClient.DefaultRequestHeaders.Add("ContentType", "application/json");
-				client.HttpClient.DefaultRequestHeaders.Add("Accept", "application/json");
-				client.HttpClient.DefaultRequestHeaders.Add("UserAgent", USER_AGENT);
+				AniListClient.HttpClient.DefaultRequestHeaders.Add("RequestType", "POST");
+				AniListClient.HttpClient.DefaultRequestHeaders.Add("ContentType", "application/json");
+				AniListClient.HttpClient.DefaultRequestHeaders.Add("Accept", "application/json");
+				AniListClient.HttpClient.DefaultRequestHeaders.Add("UserAgent", USER_AGENT);
 
 				GraphQLRequest queryRequest = new()
 				{
@@ -63,16 +65,16 @@ namespace Tsundoku.Source
 						type = format
 					}
 				};
-				var response = Task.Run(async () => await client.SendQueryAsync<JObject?>(queryRequest));
+				var response = Task.Run(async () => await AniListClient.SendQueryAsync<JObject?>(queryRequest));
 				response.Wait();
-				return response.Result.Data;
+				return response.Result.Data.ToString();
 			}
 			catch (Exception e)
 			{
 				Debug.WriteLine(e.ToString());
 			}
 
-			return null;
+			return "";
 		}
 	}
 }

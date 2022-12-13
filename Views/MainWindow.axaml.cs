@@ -12,6 +12,7 @@ using Tsundoku.ViewModels;
 using System.Reactive.Linq;
 using Avalonia.ReactiveUI;
 using ReactiveUI;
+using DynamicData;
 
 namespace Tsundoku.Views
 {
@@ -62,19 +63,13 @@ namespace Tsundoku.Views
         {
             var result = await Observable.Start(() => 
             {
-                for (int x = 0; x < MainWindowViewModel.SearchedCollection.Count(); x++)
-                {
-                    Series curSeries = MainWindowViewModel.SearchedCollection[x];
-                    if (curSeries.Equals((Series)((Button)sender).DataContext))
-                    {
-                        CollectionViewModel.UsersNumVolumesCollected -= curSeries.CurVolumeCount;
-                        CollectionViewModel.UsersNumVolumesToBeCollected -= (uint)(curSeries.MaxVolumeCount - curSeries.CurVolumeCount);
-                        MainWindowViewModel.SearchedCollection.Remove(curSeries);
-                        MainWindowViewModel.Collection.Remove(curSeries);
-                        curSeries.Dispose();
-                        Logger.Info($"Removed {curSeries.Titles[0]} From Collection");
-                    }
-                }
+                Series curSeries = (Series)MainWindowViewModel.Collection.Single(series => series == (Series)((Button)sender).DataContext);
+                CollectionViewModel.UsersNumVolumesCollected -= curSeries.CurVolumeCount;
+                CollectionViewModel.UsersNumVolumesToBeCollected -= (uint)(curSeries.MaxVolumeCount - curSeries.CurVolumeCount);
+                MainWindowViewModel.SearchedCollection.Remove(curSeries);
+                MainWindowViewModel.Collection.Remove(curSeries);
+                curSeries.Dispose();
+                Logger.Info($"Removed {curSeries.Titles[0]} From Collection");
             }, RxApp.MainThreadScheduler);
         }
 

@@ -18,24 +18,21 @@ To report a issue please go to the issues link [Tsundoku Issues](https://github.
 ## Feature/Fixes ToDo List
 #### V1.5.0
 - [ ] Price Analysis Page
-- [ ] Implement IDisposable for TsundokuThemes & Series
+- [ ] Additional Language Support (German, French, Italian, Spanish)
 
 #### V2.0.0 Features
-- [ ] Additional Language Support (German, French, Italian, Spanish)
 - [ ] Changing of Display Format
   
 #### Bugs/Fixes
-- [ ] LineHeight Property in TextBlock Control not working?
-- [ ] Slight Memory Issues (Resets memory usage when restarting the app) [Memory leak when sorting and searching]
-- [ ] Memory Leak when you save Theme (a restart after saving theme fixes that though, changing themes doesn't cause this same memory leak...)
+- [ ] LineHeight Property in TextBlock Control not working, unsure why still works when it's really large?
 - [ ] Button & ComboBox disabled styling not working in Theme & AddNewSeries Windows & ComboBoxItem styling -> Need to override style template?
+- [ ] ProgressBar issue Fixed track repo for next update and make change (https://github.com/AvaloniaUI/Avalonia/pull/9371)
   
 #### Other/Random
 - [ ] Figure out TrayIcon
 - [ ] Implement IDisposable for TsundokuThemes & Series
 - [ ] Need some further testing on the async functions (changing volumes for right now)
-- [ ] Seperate out the ItemControl (Collection) to a UserControl
-- [ ] ProgressBar issue Fixed track repo for next update and make change (https://github.com/AvaloniaUI/Avalonia/pull/9371)
+- [ ] Seperate out the ItemControl (Collection) to a UserControl?
 ***
 ## Useful Links
 - [AniList Home](https://anilist.co/hom)

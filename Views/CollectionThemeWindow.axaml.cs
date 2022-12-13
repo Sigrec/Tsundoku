@@ -56,20 +56,23 @@ namespace Tsundoku.Views
                     TsundokuTheme replaceTheme;
                     for (int x = 0; x < ThemeSettingsViewModel.UserThemes.Count; x++)
                     {
+                        // Checks if the new theme already exists (some other theme has the same name as what the theme the user is currently trying to save)
                         if (NewTheme.ThemeName.Equals(ThemeSettingsViewModel.UserThemes[x].ThemeName))
                         {
                             Logger.Info($"{NewTheme.ThemeName} Already Exists Replacing Color Values at {x}");
                             duplicateCheck = true;
                             replaceTheme = NewTheme.Cloning();
 
-                            for (int y = 0; y < ThemeSettingsViewModel.UserThemes.Count(); y++)
+                            for (int y = 0; y < ThemeSettingsViewModel.UserThemes.Count; y++)
                             {
                                 if (y != x)
                                 {
-                                    ThemeSelector.SelectedIndex = y;
+                                    ThemeSelector.SelectedIndex = y; // Set the current theme to the next closet theme so the new theme can be replaced
                                     ThemeSettingsViewModel.UserThemes[x] = replaceTheme;
                                     ThemeSelector.SelectedIndex = x;
                                     replaceTheme = null;
+                                    GC.Collect();
+                                    GC.WaitForPendingFinalizers();
                                     return;
                                 }
                             }
@@ -81,6 +84,8 @@ namespace Tsundoku.Views
                         ThemeSettingsViewModel.UserThemes.Insert(0, NewTheme.Cloning());
                         Logger.Info($"Added New Theme {NewTheme.ThemeName} to Saved Themes");
                         ThemeSelector.SelectedIndex = 0;
+                        GC.Collect();
+                        GC.WaitForPendingFinalizers();
                     }
                 }
             }
@@ -107,6 +112,8 @@ namespace Tsundoku.Views
                     }
                 }
             }
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
         }
 
         private void ChangeMainTheme(object sender, SelectionChangedEventArgs e)
@@ -167,6 +174,8 @@ namespace Tsundoku.Views
             SeriesEditPane_Buttons_Border_Hover.Color = Color.FromUInt32((uint)CollectionWindow.CollectionViewModel.CurrentTheme.SeriesEditPaneButtonsBorderHoverColor);
             SeriesEditPane_Buttons_Icon.Color = Color.FromUInt32((uint)CollectionWindow.CollectionViewModel.CurrentTheme.SeriesEditPaneButtonsIconColor);
             SeriesEditPane_Buttons_Icon_Hover.Color = Color.FromUInt32((uint)CollectionWindow.CollectionViewModel.CurrentTheme.SeriesEditPaneButtonsIconHoverColor);
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
         }
 
         private void MenuColorChanges()

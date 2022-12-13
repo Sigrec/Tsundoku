@@ -92,7 +92,7 @@
 							   VerticalAlignment="Center"
 							   Width="155"
 							   HorizontalAlignment="Center"/>
-					<StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="5" Width="180">
+					<StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="5" Width="175">
 						<TextBlock Name="SearchCollectionHeader" VerticalAlignment="Center" Text="Search Collection" HorizontalAlignment="Center" FontSize="21" FontWeight="Bold" Classes="menu"/>
 						<TextBox Name="SearchBar" 
 								Text="{Binding SearchText}" 
@@ -111,13 +111,13 @@
 							   VerticalAlignment= "Center" 
 							   Width="155"
 							   HorizontalAlignment="Center"/>
-					<StackPanel Spacing="5" HorizontalAlignment="Center" VerticalAlignment="Center" Width="130">
+					<StackPanel Spacing="5" HorizontalAlignment="Center" VerticalAlignment="Center">
 						<ComboBox Name="LanguageSelector"
 								Items="{Binding AvailableLanguages}"
 								SelectionChanged="LanguageChanged"
 								SelectedItem="{Binding MainUser.CurLanguage}"
-								Width="125"
 								Height="35"
+								Width="130"
 								Classes="menu"
 								BorderThickness="2"
 								FontWeight="Bold"
@@ -129,8 +129,8 @@
 								Items="{Binding AvailableDisplays}"
 								SelectionChanged="DisplayChanged"
 								SelectedItem="{Binding MainUser.Display}"
-								Width="125"
 								Height="35"
+								Width="130"
 								BorderThickness="2"
 								VerticalAlignment="Center"
 								HorizontalAlignment="Center"
@@ -162,7 +162,7 @@
 
 				<ItemsControl.ItemTemplate>
 					<DataTemplate>
-						<Border Margin="20" BorderBrush="Transparent" CornerRadius="8" BorderThickness="0" BoxShadow="6 6 15 1 #B3000000" Background="Transparent">
+						<Border Margin="20" BorderBrush="Transparent" CornerRadius="8" BorderThickness="0" BoxShadow="0 0 15 6 #B3000000" Background="Transparent">
 							<DockPanel Width="{Binding Source={x:Static local:Constants.CARD_WIDTH}}" Height="{Binding Constants.CARD_HEIGHT}" LastChildFill="True">
 
 								<!-- Left Side Card -->
@@ -367,7 +367,7 @@
 											</StackPanel.Styles>
 											<Button Name="EditSeriesButton"
 													Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesSwitchPaneButtonBGColor, Converter={StaticResource ConvertColor}}"
-													FontSize="22"
+													FontSize="23"
 													BorderThickness="0"
 													Height="{Binding Source={x:Static local:Constants.BOTTOM_SECTION_CARD_HEIGHT}}"
 													Width="45"

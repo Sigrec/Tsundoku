@@ -52,7 +52,7 @@ namespace Tsundoku.ViewModels
                 bool duplicateSeriesCheck = false;
                 Parallel.ForEach(MainWindowViewModel.Collection, (series, state) =>
                 {
-                    if (Enumerable.SequenceEqual(newSeries.Titles, series.Titles) && newSeries.Format.Equals(series.Format))
+                    if (series == newSeries)
                     {
                         duplicateSeriesCheck = true;
                         state.Break();
@@ -61,12 +61,11 @@ namespace Tsundoku.ViewModels
 
                 if (!duplicateSeriesCheck)
                 {
-                    Logger.Info(newSeries.ToString());
-                    MainWindowViewModel.Collection.Add(newSeries);
+                    Logger.Info(newSeries.ToJsonString(options));
                     int index = MainWindowViewModel.SearchForSort(newSeries);
 
+                    MainWindowViewModel.Collection.Insert(index < 0 ? ~index : index, newSeries);
                     MainWindowViewModel.SearchedCollection.Insert(index < 0 ? ~index : index, newSeries);
-                    MainWindowViewModel.Collection = new System.Collections.ObjectModel.ObservableCollection<Series>(MainWindowViewModel.SearchedCollection);
                 }
                 else
                 {

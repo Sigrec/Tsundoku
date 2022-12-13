@@ -11,6 +11,7 @@ namespace Tsundoku.Views
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         public AddNewSeriesViewModel? AddNewSeriesVM => DataContext as AddNewSeriesViewModel;
         public bool IsOpen = false;
+        MainWindow CollectionWindow;
 
         public AddNewSeriesWindow()
         {
@@ -18,7 +19,8 @@ namespace Tsundoku.Views
             DataContext = new AddNewSeriesViewModel();
             Opened += (s, e) =>
             {
-                AddNewSeriesVM.CurrentTheme = ((MainWindow)((Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).MainWindow).CollectionViewModel.CurrentTheme;
+                CollectionWindow = (MainWindow)((Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).MainWindow;
+                AddNewSeriesVM.CurrentTheme = CollectionWindow.CollectionViewModel.CurrentTheme;
                 IsOpen ^= true;
             };
             
@@ -67,6 +69,8 @@ namespace Tsundoku.Views
             }
             else
             {
+                CollectionWindow.CollectionViewModel.UsersNumVolumesCollected += cur;
+                CollectionWindow.CollectionViewModel.UsersNumVolumesToBeCollected += (uint)(max - cur);
                 AddNewSeriesVM.GetSeriesData(TitleBox.Text.Trim(), (bool)MangaButton.IsChecked ? "MANGA" : "NOVEL", cur, max);
             }
         }

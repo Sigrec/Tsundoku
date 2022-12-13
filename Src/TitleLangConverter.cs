@@ -2,9 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using Tsundoku.Models;
-using Tsundoku.ViewModels;
 
 namespace Tsundoku.Src
 {
@@ -19,7 +16,7 @@ namespace Tsundoku.Src
                 case "Native":
                     return values[2];
                 case "English":
-                    return values[1];
+                    return values[1].Equals("") ? values[0] : values[1];
                 default:
                     return values[0];
             }

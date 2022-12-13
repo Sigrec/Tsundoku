@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
 using Avalonia.Media;
-using Newtonsoft.Json.Linq;
-using ReactiveUI.Fody.Helpers;
 
 namespace Tsundoku.Models
 {
-    public class TsundokuTheme : ICloneable, IDisposable, IEquatable<TsundokuTheme?>
+    public class TsundokuTheme : ICloneable, IEquatable<TsundokuTheme?>
     {
         public string ThemeName { get; set; }
         public uint MenuBGColor { get; set; }
@@ -103,8 +101,6 @@ namespace Tsundoku.Models
         Color.FromRgb(44, 45, 66).ToUint32() //SeriesEditPaneButtonsIconHoverColor
         );
 
-        private bool disposedValue;
-
         public TsundokuTheme()
         {
 
@@ -174,7 +170,7 @@ namespace Tsundoku.Models
         public override int GetHashCode()
         {
             HashCode hash = new HashCode();
-            //hash.Add(ThemeName);
+            hash.Add(ThemeName);
             hash.Add(MenuBGColor);
             hash.Add(UsernameColor);
             hash.Add(MenuTextColor);
@@ -218,35 +214,6 @@ namespace Tsundoku.Models
             hash.Add(SeriesEditPaneButtonsIconColor);
             hash.Add(SeriesEditPaneButtonsIconHoverColor);
             return hash.ToHashCode();
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    // TODO: dispose managed state (managed objects)
-                }
-
-                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
-                // TODO: set large fields to null
-                disposedValue = true;
-            }
-        }
-
-        // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
-        // ~TsundokuTheme()
-        // {
-        //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        //     Dispose(disposing: false);
-        // }
-
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
         }
 
         public override bool Equals(object? obj)

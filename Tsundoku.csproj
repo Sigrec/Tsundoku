@@ -10,16 +10,14 @@
     <AvaloniaNameGeneratorFilterByPath>*</AvaloniaNameGeneratorFilterByPath>
     <AvaloniaNameGeneratorFilterByNamespace>*</AvaloniaNameGeneratorFilterByNamespace>
     <ApplicationIcon>Assets\Icons\Tsundoku-Logo.ico</ApplicationIcon>
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <StartupObject>Tsundoku.Program</StartupObject>
     <PublishSingleFile Condition="'$(Configuration)' == 'Release'">true</PublishSingleFile>
     <SelfContained>true</SelfContained>
-    <ExcludeFoldersFromDeployment>Covers</ExcludeFoldersFromDeployment>
-    <ExcludeFilesFromDeployment>UserData.json</ExcludeFilesFromDeployment>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <IsTrimmable>true</IsTrimmable>
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
-	  <PublishReadyToRun>true</PublishReadyToRun>
+	<PublishReadyToRun>true</PublishReadyToRun>
     <Optimize>true</Optimize>
 	<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
   </PropertyGroup>
@@ -81,7 +79,7 @@
     <PackageReference Include="NLog" Version="5.1.0" />
     <PackageReference Include="Projektanker.Icons.Avalonia.FontAwesome" Version="6.2.0-preview1" />
     <PackageReference Include="ReactiveUI.Fody" Version="18.4.1" />
-	<PackageReference Include="XamlNameReferenceGenerator" Version="1.5.1" />
+	  <PackageReference Include="XamlNameReferenceGenerator" Version="1.5.1" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Program.cs">
