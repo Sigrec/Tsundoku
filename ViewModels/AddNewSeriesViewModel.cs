@@ -43,21 +43,22 @@ namespace Tsundoku.ViewModels
         *      ushort | curVolCount | The current # of volumes the user has collected for this series
         *      ushort | maxVolCount | The max # of volumes this series currently has
         */
-        public void GetSeriesData(string title, string bookType, ushort curVolCount, ushort maxVolCount)
+        public bool GetSeriesData(string title, string bookType, ushort curVolCount, ushort maxVolCount)
         {
             Logger.Info($"Adding New Series -> {title} | {bookType} | {curVolCount} | {maxVolCount}");
             Series newSeries = Series.CreateNewSeriesCard(title, bookType, maxVolCount, curVolCount);
+            bool duplicateSeriesCheck = true;
             if (newSeries!= null)
             {
-                bool duplicateSeriesCheck = false;
-                Parallel.ForEach(MainWindowViewModel.Collection, (series, state) =>
+                duplicateSeriesCheck = false;
+                foreach (Series series in MainWindowViewModel.Collection)
                 {
-                    if (series == newSeries)
+                    if (series.Link.Equals(newSeries.Link))
                     {
                         duplicateSeriesCheck = true;
-                        state.Break();
+                        break;
                     }
-                });
+                }
 
                 if (!duplicateSeriesCheck)
                 {
@@ -76,6 +77,7 @@ namespace Tsundoku.ViewModels
             {
                 Logger.Info($"{title} -> Does Not Exist");
             }
+            return duplicateSeriesCheck;
         }
     }
 }

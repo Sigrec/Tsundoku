@@ -61,14 +61,21 @@ namespace Tsundoku.Views
             Logger.Info($"Saving {MainWindowViewModel.MainUser.UserName}'s Collection");
         }
 
-        private void DeleteCollection(object sender, RoutedEventArgs args)
+        private void ReportBug(object sender, RoutedEventArgs args)
         {
-            MainWindowViewModel.SearchedCollection.Clear();
-            MainWindowViewModel.Collection.Clear();
-            MainWindow userCollectionView = (((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).Windows[0] as MainWindow);
-            userCollectionView.CollectionViewModel.UsersNumVolumesCollected = 0;
-            userCollectionView.CollectionViewModel.UsersNumVolumesToBeCollected = 0;
-            Logger.Info($"Deleting {MainWindowViewModel.MainUser.UserName}'s Collection");
+            Logger.Info(@"Opening Issue Repo https://github.com/Sigrec/TsundokuApp/issues/new");
+            try
+            {
+                Process.Start(new ProcessStartInfo(@"https://github.com/Sigrec/TsundokuApp/issues/new") { UseShellExecute = true });
+            }
+            catch (System.ComponentModel.Win32Exception noBrowser)
+            {
+                Logger.Error(noBrowser.Message);
+            }
+            catch (System.Exception other)
+            {
+                Logger.Error(other.Message);
+            }
         }
 
         private void ExportToSpreadsheet(object sender, RoutedEventArgs args)

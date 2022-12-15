@@ -69,9 +69,11 @@ namespace Tsundoku.Views
             }
             else
             {
-                CollectionWindow.CollectionViewModel.UsersNumVolumesCollected += cur;
-                CollectionWindow.CollectionViewModel.UsersNumVolumesToBeCollected += (uint)(max - cur);
-                AddNewSeriesVM.GetSeriesData(TitleBox.Text.Trim(), (bool)MangaButton.IsChecked ? "MANGA" : "NOVEL", cur, max);
+                if (!AddNewSeriesVM.GetSeriesData(TitleBox.Text.Trim(), (bool)MangaButton.IsChecked ? "MANGA" : "NOVEL", cur, max))
+                {
+                    CollectionWindow.CollectionViewModel.UsersNumVolumesCollected += cur;
+                    CollectionWindow.CollectionViewModel.UsersNumVolumesToBeCollected += (uint)(max - cur);
+                }
             }
         }
     }

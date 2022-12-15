@@ -14,7 +14,7 @@ using System.Text.Json;
 
 namespace Tsundoku.Models
 {
-	public class Series : IDisposable, IEquatable<Series?>
+	public class Series : IDisposable
 	{
 		private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 		[JsonIgnore]
@@ -94,7 +94,7 @@ namespace Tsundoku.Models
 			{
 				seriesDesc = seriesDesc.Replace(unicodeMatch.Groups[1].Value, Convert.ToChar(Convert.ToUInt16(unicodeMatch.Groups[2].Value)).ToString());
 			}
-			return seriesDesc;
+			return seriesDesc.Replace(@"\n", @"\n\n");;
 		}
 
 		public static string GetCorrectComicName(string jsonCountryOfOrigin)
@@ -227,54 +227,6 @@ namespace Tsundoku.Models
 			// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
 			Dispose(disposing: true);
 			GC.SuppressFinalize(this);
-		}
-
-		public override bool Equals(object? obj)
-		{
-			return Equals(obj as Series);
-		}
-
-		public bool Equals(Series? other)
-		{
-			return other is not null &&
-				   disposedValue == other.disposedValue &&
-				   EqualityComparer<List<string>>.Default.Equals(Titles, other.Titles) &&
-				   EqualityComparer<List<string>>.Default.Equals(Staff, other.Staff) &&
-				   Description == other.Description &&
-				   Format == other.Format &&
-				   Status == other.Status &&
-				   Cover == other.Cover &&
-				   Link == other.Link &&
-				   SeriesNotes == other.SeriesNotes &&
-				   MaxVolumeCount == other.MaxVolumeCount &&
-				   CurVolumeCount == other.CurVolumeCount;
-		}
-
-		public override int GetHashCode()
-		{
-			HashCode hash = new HashCode();
-			hash.Add(disposedValue);
-			hash.Add(Titles);
-			hash.Add(Staff);
-			hash.Add(Description);
-			hash.Add(Format);
-			hash.Add(Status);
-			hash.Add(Cover);
-			hash.Add(Link);
-			hash.Add(SeriesNotes);
-			hash.Add(MaxVolumeCount);
-			hash.Add(CurVolumeCount);
-			return hash.ToHashCode();
-		}
-
-		public static bool operator ==(Series? left, Series? right)
-		{
-			return EqualityComparer<Series>.Default.Equals(left, right);
-		}
-
-		public static bool operator !=(Series? left, Series? right)
-		{
-			return !(left == right);
 		}
 	}
 

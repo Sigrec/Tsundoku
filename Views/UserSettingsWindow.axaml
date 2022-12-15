@@ -58,9 +58,9 @@
                         FontWeight="Bold" 
                         BorderThickness="2" 
                         Classes="menu"
-                        Click="DeleteCollection" 
+                        Click="ReportBug" 
                         HorizontalAlignment="Center"
-                        Content="Delete Collection"/>
+                        Content="Report Issue/Bug"/>
                 <Button FontSize="15" 
                         FontWeight="Bold" 
                         BorderThickness="2" 
