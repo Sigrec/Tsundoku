@@ -71,7 +71,7 @@ namespace Tsundoku.Models
 						fullStaff,
 						nativeStaff.Equals(" | ") ? fullStaff : nativeStaff,
 					},
-					seriesData.GetProperty("description").ValueKind == JsonValueKind.Null ? "" : ConvertUnicodeInDesc(Regex.Replace(seriesData.GetProperty("description").ToString(), @"\(Source: [\S\s]+|\<.*?\>", "").Trim()),
+					seriesData.GetProperty("description").ValueKind == JsonValueKind.Null ? "" : ConvertUnicodeInDesc(Regex.Replace(seriesData.GetProperty("description").ToString(), @"\(Source: [\S\s]+|(\<[^br].*?\>)", "")),
 					filteredBookType,
 					GetSeriesStatus(seriesData.GetProperty("status").ToString()),
 					coverPath,
@@ -94,7 +94,7 @@ namespace Tsundoku.Models
 			{
 				seriesDesc = seriesDesc.Replace(unicodeMatch.Groups[1].Value, Convert.ToChar(Convert.ToUInt16(unicodeMatch.Groups[2].Value)).ToString());
 			}
-			return seriesDesc.Replace(@"\n", @"\n\n");;
+			return seriesDesc.Replace("<br><br>", "\n").Trim().TrimEnd('\n');
 		}
 
 		public static string GetCorrectComicName(string jsonCountryOfOrigin)

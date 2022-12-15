@@ -311,7 +311,7 @@
 												   Width="{Binding Source={x:Static local:Constants.RIGHT_SIDE_CARD_WIDTH}}" 
 												   Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesCardBGColor, Converter={StaticResource ConvertColor}}">
 											<TextBlock DockPanel.Dock="Top"
-													   TextWrapping="WrapWithOverflow"
+													   TextWrapping="Wrap"
 													   Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesCardTitleColor, Converter={StaticResource ConvertColor}}"
 													   FontWeight="Bold"
 													   FontSize="23"

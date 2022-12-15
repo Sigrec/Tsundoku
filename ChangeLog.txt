@@ -1,0 +1,4 @@
+V1.0.2 - Dec 15th, 2022 @ 12:08AM PST
+✓ Theme name now clears when closing the theme editing window
+✓ Fixed issue where if you add a series while you are searching it crashes
+✓ Fixed line break in description so it correctly double line breaks when it is supposed to

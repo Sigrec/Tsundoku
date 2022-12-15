@@ -37,6 +37,7 @@ namespace Tsundoku.Views
             Closing += (s, e) =>
             {
                 ((CollectionThemeWindow)s).Hide();
+                NewThemeName.Text = "";
                 IsOpen ^= true;
                 e.Cancel = true;
             };
@@ -45,6 +46,7 @@ namespace Tsundoku.Views
             CollectionColorChanges();
         }
 
+        // TODO : test and see if forced garbage collection is actually necassary
         private void SaveNewTheme(object sender, RoutedEventArgs args)
         {
             if (!string.IsNullOrWhiteSpace(NewThemeName.Text) && !NewThemeName.Text.Equals("Default"))
@@ -71,8 +73,8 @@ namespace Tsundoku.Views
                                     ThemeSettingsViewModel.UserThemes[x] = replaceTheme;
                                     ThemeSelector.SelectedIndex = x;
                                     replaceTheme = null;
-                                    GC.Collect();
-                                    GC.WaitForPendingFinalizers();
+                                    // GC.Collect();
+                                    // GC.WaitForPendingFinalizers();
                                     return;
                                 }
                             }
@@ -84,8 +86,8 @@ namespace Tsundoku.Views
                         ThemeSettingsViewModel.UserThemes.Insert(0, NewTheme.Cloning());
                         Logger.Info($"Added New Theme {NewTheme.ThemeName} to Saved Themes");
                         ThemeSelector.SelectedIndex = 0;
-                        GC.Collect();
-                        GC.WaitForPendingFinalizers();
+                        // GC.Collect();
+                        // GC.WaitForPendingFinalizers();
                     }
                 }
             }

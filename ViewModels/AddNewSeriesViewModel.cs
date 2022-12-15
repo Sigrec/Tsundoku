@@ -63,6 +63,14 @@ namespace Tsundoku.ViewModels
                 if (!duplicateSeriesCheck)
                 {
                     Logger.Info(newSeries.ToJsonString(options));
+
+                    // If the user is currently searching need to "refresh" the SearchedCollection so it can insert at correct index
+                    if (MainWindowViewModel.SearchedCollection.Count != MainWindowViewModel.Collection.Count)
+                    {
+                        Logger.Info("Refreshing Searched Collection");
+                        MainWindowViewModel.SortCollection();
+                    }
+
                     int index = MainWindowViewModel.SearchForSort(newSeries);
 
                     MainWindowViewModel.Collection.Insert(index < 0 ? ~index : index, newSeries);
