@@ -31,6 +31,8 @@ Of course I understand if you do not trust me but I promise there is nothing mal
   &check; RobertsAnimeCornerStore
 
   &check; Kinokuniya US
+  
+  &check; InStoackTrades
 
   ? BarnesAndNoble
 

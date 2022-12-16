@@ -53,23 +53,22 @@ namespace Tsundoku.ViewModels
                 duplicateSeriesCheck = false;
                 foreach (Series series in MainWindowViewModel.Collection)
                 {
-                    if (series.Link.Equals(newSeries.Link))
+                    if (!duplicateSeriesCheck && series.Link.Equals(newSeries.Link))
                     {
                         duplicateSeriesCheck = true;
-                        break;
                     }
                 }
 
                 if (!duplicateSeriesCheck)
                 {
-                    Logger.Info(newSeries.ToJsonString(options));
-
                     // If the user is currently searching need to "refresh" the SearchedCollection so it can insert at correct index
                     if (MainWindowViewModel.SearchedCollection.Count != MainWindowViewModel.Collection.Count)
                     {
                         Logger.Info("Refreshing Searched Collection");
                         MainWindowViewModel.SortCollection();
                     }
+
+                    Logger.Info(newSeries.ToJsonString(options));
 
                     int index = MainWindowViewModel.SearchForSort(newSeries);
 

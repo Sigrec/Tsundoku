@@ -13,6 +13,7 @@ using System.Reactive.Linq;
 using Avalonia.ReactiveUI;
 using ReactiveUI;
 using DynamicData;
+using System.IO;
 
 namespace Tsundoku.Views
 {
@@ -66,6 +67,8 @@ namespace Tsundoku.Views
                 Series curSeries = (Series)MainWindowViewModel.Collection.Single(series => series == (Series)((Button)sender).DataContext);
                 CollectionViewModel.UsersNumVolumesCollected -= curSeries.CurVolumeCount;
                 CollectionViewModel.UsersNumVolumesToBeCollected -= (uint)(curSeries.MaxVolumeCount - curSeries.CurVolumeCount);
+                File.Delete(curSeries.Cover);
+                Logger.Info($"Deleted Cover -> {curSeries.Cover}");
                 MainWindowViewModel.SearchedCollection.Remove(curSeries);
                 MainWindowViewModel.Collection.Remove(curSeries);
                 curSeries.Dispose();
@@ -124,7 +127,6 @@ namespace Tsundoku.Views
             CollectionViewModel.SearchText = "";
             Src.DiscordRP.Deinitialize();
             Logger.Info("Closing TsundOku");
-            MainWindowViewModel.CleanCoversFolder();
 
             if (CollectionViewModel.newSeriesWindow != null)
             {

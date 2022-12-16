@@ -40,7 +40,8 @@ namespace Tsundoku.Source
 							  english
 							  native
 							}
-							staff {
+							synonyms
+							staff(sort: RELEVANCE) {
 							  edges {
 								role
 								node {

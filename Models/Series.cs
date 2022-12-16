@@ -16,6 +16,7 @@ namespace Tsundoku.Models
 {
 	public class Series : IDisposable
 	{
+		[JsonIgnore]
 		private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 		[JsonIgnore]
 		private bool disposedValue;
@@ -29,7 +30,10 @@ namespace Tsundoku.Models
 		public string SeriesNotes { get; set; }
 		public ushort MaxVolumeCount { get; set; }
 		public ushort CurVolumeCount { get; set; }
-		 
+
+		[JsonIgnore]
+		public string Synonyms { get; }
+
 		[JsonIgnore]
 		public Bitmap CoverBitMap { get; set; }
 
@@ -54,11 +58,13 @@ namespace Tsundoku.Models
 			if (!string.IsNullOrWhiteSpace(seriesDataQuery))
             {
 				JsonElement seriesData = JsonDocument.Parse(seriesDataQuery).RootElement.GetProperty("Media"); // "Media"
+
 				string romajiTitle = seriesData.GetProperty("title").GetProperty("romaji").ToString();
 				string filteredBookType = bookType.Equals("MANGA") ? GetCorrectComicName(seriesData.GetProperty("countryOfOrigin").ToString()) : "Novel";
 				string nativeStaff = GetSeriesStaff(seriesData.GetProperty("staff").GetProperty("edges"), "native", filteredBookType, romajiTitle);
 				string fullStaff = GetSeriesStaff(seriesData.GetProperty("staff").GetProperty("edges"), "full", filteredBookType, romajiTitle);
-				string coverPath = SaveNewCoverImage(seriesData.GetProperty("coverImage").GetProperty("extraLarge").ToString(), romajiTitle, filteredBookType.ToUpper());
+				JsonElement synonyms = seriesData.GetProperty("synonyms");
+				string coverPath = SaveNewCoverImage(seriesData.GetProperty("coverImage").GetProperty("extraLarge").ToString(), romajiTitle, filteredBookType.ToUpper(), synonyms);
 				Series _newSeries = new Series(
 					new List<string>()
 					{
@@ -128,33 +134,6 @@ namespace Tsundoku.Models
 			}
 		}
 
-        public static string SaveNewCoverImage(String coverLink, String title, String bookType)
-        {
-            string newPath = @$"Covers\{Regex.Replace(title, @"[^A-Za-z\d]", "")}_{bookType}.{coverLink.Substring(coverLink.Length - 3)}";
-            Directory.CreateDirectory(@$"Covers");
-
-            if (!File.Exists(newPath))
-            {
-                try
-                {
-                    HttpClient client = new HttpClient();
-                    Task<HttpResponseMessage> response = Task.Run(async () => await client.GetAsync(new Uri(coverLink)));
-                    response.Wait();
-                    HttpResponseMessage clientResponse = response.Result;
-                    using (FileStream fs = new FileStream(newPath, FileMode.OpenOrCreate, FileAccess.Write))
-                    {
-                        Task fileResponse = Task.Run(async () => await clientResponse.Content.CopyToAsync(fs));
-                        fileResponse.Wait();
-                    }
-                }
-                catch (Exception e)
-                {
-                    Debug.WriteLine(e.ToString());
-                }
-            }
-			return newPath;
-        }
-
         public static string GetSeriesStaff(JsonElement staffArray, string nameType, string bookType, string title) {
 			StringBuilder staffList = new StringBuilder();
 			string[] validRoles = { "Story & Art", "Story", "Art", "Original Creator", "Character Design", "Illustration", "Mechanical Design", "Original Story"};
@@ -193,6 +172,43 @@ namespace Tsundoku.Models
             }
 			return staffList.ToString(0, staffList.Length - 3);
 		}
+
+		public static string SaveNewCoverImage(string coverLink, string title, string bookType, JsonElement synonyms)
+        {
+            string newPath = @$"Covers\{Src.ExtensionMethods.RemoveInPlaceCharArray(string.Concat(title.Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries)))}_{bookType}.{coverLink.Substring(coverLink.Length - 3)}";
+            Directory.CreateDirectory(@$"Covers");
+
+			// Check and see if the series will generate a duplicate file name
+            if (File.Exists(newPath))
+            {
+                foreach (JsonElement newTitle in synonyms.EnumerateArray())
+                {
+                    if (Regex.IsMatch(newTitle.ToString(), @"[\w]"))
+                    {
+                        newPath = @$"Covers\{Src.ExtensionMethods.RemoveInPlaceCharArray(string.Concat(newTitle.ToString().Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries)))}_{bookType}.{coverLink.Substring(coverLink.Length - 3)}";
+                        break;
+                    }
+                }
+            }
+
+            try
+            {
+                HttpClient client = new HttpClient();
+                Task<HttpResponseMessage> response = Task.Run(async () => await client.GetAsync(new Uri(coverLink)));
+                response.Wait();
+                HttpResponseMessage clientResponse = response.Result;
+                using (FileStream fs = new FileStream(newPath, FileMode.Create, FileAccess.Write))
+                {
+                    Task fileResponse = Task.Run(async () => await clientResponse.Content.CopyToAsync(fs));
+                    fileResponse.Wait();
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Debug(e.ToString());
+            }
+			return newPath;
+        }
 
 		public string ToJsonString(JsonSerializerOptions options)
 		{

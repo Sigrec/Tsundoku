@@ -1,4 +1,5 @@
-﻿using ReactiveUI;
+﻿using System.Security.Cryptography.X509Certificates;
+using ReactiveUI;
 using Tsundoku.Models;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -230,42 +231,33 @@ namespace Tsundoku.ViewModels
             UsersNumVolumesCollected = MainUser.NumVolumesCollected;
             UsersNumVolumesToBeCollected = MainUser.NumVolumesToBeCollected;
 
+            uint testUsersNumVolumesCollected = 0, testUsersNumVolumesToBeCollected = 0;
+
             // Pre allocate the bitmaps for every image so it is not remade every pass.
             foreach (Series x in Collection)
             {
-                x.CoverBitMap = new Bitmap(x.Cover).CreateScaledBitmap(new Avalonia.PixelSize(Constants.LEFT_SIDE_CARD_WIDTH, Constants.IMAGE_HEIGHT), BitmapInterpolationMode.HighQuality);
+                testUsersNumVolumesCollected += x.CurVolumeCount;
+                testUsersNumVolumesToBeCollected += (uint)(x.MaxVolumeCount - x.CurVolumeCount);
+                // If the image does not exist in the covers folder then don't create a bitmap for it
+                if (File.Exists(x.Cover))
+                {
+                    x.CoverBitMap = new Bitmap(x.Cover).CreateScaledBitmap(new Avalonia.PixelSize(Constants.LEFT_SIDE_CARD_WIDTH, Constants.IMAGE_HEIGHT), BitmapInterpolationMode.HighQuality);
+                }
                 SearchedCollection.Add(x);
             }
-        }
+            Logger.Debug(testUsersNumVolumesCollected + " | " + testUsersNumVolumesToBeCollected);
 
-        public static void CleanCoversFolder()
-        {
-             // Cleans the Covers asset folder of images for series that is not in the users collection on close/save
-            bool removeSeriesCheck = true;
-            if (Directory.Exists(@$"Covers"))
+            if (testUsersNumVolumesCollected == MainUser.NumVolumesCollected && testUsersNumVolumesToBeCollected == MainUser.NumVolumesToBeCollected)
             {
-                foreach (string coverPath in Directory.GetFiles(@"Covers"))
-                {
-                    int underscoreIndex = coverPath.IndexOf("_");
-                    int periodIndex = coverPath.IndexOf(".");
-                    foreach (Series curSeries in Collection)
-                    {
-                        string curTitle = Regex.Replace(curSeries.Titles[0], @"[^A-Za-z\d]", "");
-                        string coverPathTitleAndFormat = coverPath.Substring(7);
-                        if (Slice(coverPathTitleAndFormat, 0, coverPathTitleAndFormat.IndexOf("_")).Equals(curTitle) && Slice(coverPathTitleAndFormat, coverPathTitleAndFormat.IndexOf("_") + 1, coverPathTitleAndFormat.IndexOf(".")).Equals(curSeries.Format.ToUpper()))
-                        {
-                            removeSeriesCheck = false;
-                            break;
-                        }
-                    }
-
-                    if (removeSeriesCheck && File.Exists(coverPath))
-                    {
-                        Logger.Info($"Deleted Cover -> {coverPath}");
-                        File.Delete(coverPath);
-                    }
-                    removeSeriesCheck = true;
-                }
+                Logger.Info("No Collection Num Revision");
+                UsersNumVolumesCollected = MainUser.NumVolumesCollected;
+                UsersNumVolumesToBeCollected = MainUser.NumVolumesToBeCollected;
+            }
+            else
+            {
+                Logger.Info("Collection Num Revision");
+                UsersNumVolumesCollected = testUsersNumVolumesCollected;
+                UsersNumVolumesToBeCollected = testUsersNumVolumesToBeCollected;
             }
         }
 

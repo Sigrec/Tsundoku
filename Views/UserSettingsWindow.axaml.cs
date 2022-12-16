@@ -56,7 +56,6 @@ namespace Tsundoku.Views
         private void SaveCollection(object sender, RoutedEventArgs args)
         {
             CollectionWindow.CollectionViewModel.SearchText = "";
-            MainWindowViewModel.CleanCoversFolder();
             MainWindowViewModel.SaveUsersData();
             Logger.Info($"Saving {MainWindowViewModel.MainUser.UserName}'s Collection");
         }
