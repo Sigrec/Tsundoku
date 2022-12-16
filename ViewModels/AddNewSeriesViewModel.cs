@@ -48,7 +48,7 @@ namespace Tsundoku.ViewModels
             Logger.Info($"Adding New Series -> {title} | {bookType} | {curVolCount} | {maxVolCount}");
             Series newSeries = Series.CreateNewSeriesCard(title, bookType, maxVolCount, curVolCount);
             bool duplicateSeriesCheck = true;
-            if (newSeries!= null)
+            if (newSeries != null)
             {
                 duplicateSeriesCheck = false;
                 foreach (Series series in MainWindowViewModel.Collection)

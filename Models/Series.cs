@@ -57,20 +57,51 @@ namespace Tsundoku.Models
 
 			if (!string.IsNullOrWhiteSpace(seriesDataQuery))
             {
-				JsonElement seriesData = JsonDocument.Parse(seriesDataQuery).RootElement.GetProperty("Media"); // "Media"
-
+				bool extraSeriesCheck = false;
+				JsonElement seriesData = JsonDocument.Parse(seriesDataQuery).RootElement.GetProperty("Media");
 				string romajiTitle = seriesData.GetProperty("title").GetProperty("romaji").ToString();
+				string nativeTitle = seriesData.GetProperty("title").GetProperty("native").ToString();
+				JsonElement englishTitle = seriesData.GetProperty("title").GetProperty("english");
+				JsonElement synonyms = seriesData.GetProperty("synonyms");
+
+				// Checks to see if the series is available on AniList if not check ExtraSeries json
+				if (!romajiTitle.Equals(title, StringComparison.OrdinalIgnoreCase) && !nativeTitle.Equals(title, StringComparison.OrdinalIgnoreCase) && !englishTitle.ToString().Equals(title, StringComparison.OrdinalIgnoreCase))
+				{
+					Logger.Info($"AniList Does Not Have {title}");
+					JsonElement.ArrayEnumerator extraSeriesList = JsonDocument.Parse(File.ReadAllText(@"ExtraSeries.json")).RootElement.GetProperty("ExtraSeries").EnumerateArray();
+
+					// Traverse ExtraSeries
+					foreach (JsonElement series in extraSeriesList)
+					{
+						seriesData = series.GetProperty("Media");
+						romajiTitle = seriesData.GetProperty("title").GetProperty("romaji").ToString();
+						nativeTitle = seriesData.GetProperty("title").GetProperty("native").ToString();
+						englishTitle = seriesData.GetProperty("title").GetProperty("english");
+
+						// Check to see if the title is a valid entry in the ExtraSeries.json
+						if (romajiTitle.Equals(title, StringComparison.OrdinalIgnoreCase) || nativeTitle.Equals(title, StringComparison.OrdinalIgnoreCase) || englishTitle.ToString().Equals(title, StringComparison.OrdinalIgnoreCase))
+						{
+							extraSeriesCheck = true;
+							break;
+						}
+					}
+
+					if (!extraSeriesCheck)
+					{
+						Logger.Warn($"Need To Add Series {title} To ExtraSeries Json");
+					}
+				}
+
 				string filteredBookType = bookType.Equals("MANGA") ? GetCorrectComicName(seriesData.GetProperty("countryOfOrigin").ToString()) : "Novel";
 				string nativeStaff = GetSeriesStaff(seriesData.GetProperty("staff").GetProperty("edges"), "native", filteredBookType, romajiTitle);
 				string fullStaff = GetSeriesStaff(seriesData.GetProperty("staff").GetProperty("edges"), "full", filteredBookType, romajiTitle);
-				JsonElement synonyms = seriesData.GetProperty("synonyms");
-				string coverPath = SaveNewCoverImage(seriesData.GetProperty("coverImage").GetProperty("extraLarge").ToString(), romajiTitle, filteredBookType.ToUpper(), synonyms);
+				string coverPath = SaveNewCoverImage(seriesData.GetProperty("coverImage").GetProperty("extraLarge").ToString(), romajiTitle, filteredBookType.ToUpper(), synonyms, extraSeriesCheck);
 				Series _newSeries = new Series(
 					new List<string>()
 					{
 						romajiTitle,
-						string.IsNullOrWhiteSpace(seriesData.GetProperty("title").GetProperty("english").ToString().ToString()) ? romajiTitle : seriesData.GetProperty("title").GetProperty("english").ToString(),
-						seriesData.GetProperty("title").GetProperty("native").ToString()
+						englishTitle.ValueKind == JsonValueKind.Null ? romajiTitle : englishTitle.ToString(),
+						nativeTitle
 					},
 					new List<string>()
 					{
@@ -89,7 +120,7 @@ namespace Tsundoku.Models
 			}
             else
             {
-				Debug.WriteLine("Invalid Series Type And/OR BookType");
+				Logger.Warn("User Input Invalid Series Type And/Or BookType");
             }
             return null;
         }
@@ -173,13 +204,13 @@ namespace Tsundoku.Models
 			return staffList.ToString(0, staffList.Length - 3);
 		}
 
-		public static string SaveNewCoverImage(string coverLink, string title, string bookType, JsonElement synonyms)
+		public static string SaveNewCoverImage(string coverLink, string title, string bookType, JsonElement synonyms, bool extraSeriesCheck)
         {
             string newPath = @$"Covers\{Src.ExtensionMethods.RemoveInPlaceCharArray(string.Concat(title.Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries)))}_{bookType}.{coverLink.Substring(coverLink.Length - 3)}";
             Directory.CreateDirectory(@$"Covers");
 
 			// Check and see if the series will generate a duplicate file name
-            if (File.Exists(newPath))
+            if (!extraSeriesCheck && File.Exists(newPath))
             {
                 foreach (JsonElement newTitle in synonyms.EnumerateArray())
                 {

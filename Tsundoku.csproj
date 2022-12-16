@@ -43,6 +43,8 @@
 		<!-- <Compile Remove="Assets\Covers\**" /> -->
 		<!-- <EmbeddedResource Remove="Assets\Cover\**" /> -->
 		<None Remove=".gitignore" />
+		<None Remove="ExtraSeries.json" />
+		<None Remove="README.md" />
 		<None Remove="TsundokuCollection.xlsx" />
 		<None Remove="UserData.json" />
 		<Content Update="lib*.dll">
@@ -92,17 +94,14 @@
 	  <PackageReference Include="XamlNameReferenceGenerator" Version="1.5.1" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="ExtraSeries.json" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Update="Program.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Update="Views\CollectionThemeWindow.axaml.cs">
       <DependentUpon>CollectionThemeWindow.axaml</DependentUpon>
     </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="README.md">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
   </ItemGroup>
 </Project>

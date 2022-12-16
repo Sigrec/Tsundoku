@@ -33,7 +33,7 @@ namespace Tsundoku.Source
 				{
 					Query = @"
 						query ($title: String, $type: MediaFormat) {
-						  Media(search: $title, format: $type) {
+						  Media(search: $title, format: $type, sort: TITLE_NATIVE) {
 							countryOfOrigin
 							title {
 							  romaji

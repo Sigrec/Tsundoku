@@ -194,7 +194,6 @@ namespace Tsundoku.ViewModels
                 SearchIsBusy = false;
                 Logger.Info($"No Longer Searching");
                 SearchedCollection.AddRange(Collection);
-                //SortCollection();
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
             }
@@ -245,17 +244,14 @@ namespace Tsundoku.ViewModels
                 }
                 SearchedCollection.Add(x);
             }
-            Logger.Debug(testUsersNumVolumesCollected + " | " + testUsersNumVolumesToBeCollected);
 
             if (testUsersNumVolumesCollected == MainUser.NumVolumesCollected && testUsersNumVolumesToBeCollected == MainUser.NumVolumesToBeCollected)
             {
-                Logger.Info("No Collection Num Revision");
                 UsersNumVolumesCollected = MainUser.NumVolumesCollected;
                 UsersNumVolumesToBeCollected = MainUser.NumVolumesToBeCollected;
             }
             else
             {
-                Logger.Info("Collection Num Revision");
                 UsersNumVolumesCollected = testUsersNumVolumesCollected;
                 UsersNumVolumesToBeCollected = testUsersNumVolumesToBeCollected;
             }

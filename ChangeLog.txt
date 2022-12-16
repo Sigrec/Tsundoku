@@ -1,8 +1,12 @@
-V1.0.2 - Dec 15th, 2022 @ 12:08AM PST
-✓ Theme name now clears when closing the theme editing window
-✓ Fixed issue where if you add a series while you are searching it crashes
-✓ Fixed line break in description so it correctly double line breaks when it is supposed to
+V1.0.3 - Dec 16th, 2022 @ PM PST
+✓ Implented a way to add series that do not exist on AniList for example Radiant (french manga) can now be added [Link for Submissions]
+✓ 
 
 V1.0.3 - Dec 15th, 2022 @ 7:52PM PST
 ✓ Fixed issue where 2 series could have the same file extension so they used the same image
 ✓ Made it so incase there is some error and the collection numbers are messed up it re-calculates the numbers based on current series in collection
+
+V1.0.2 - Dec 15th, 2022 @ 12:08AM PST
+✓ Theme name now clears when closing the theme editing window
+✓ Fixed issue where if you add a series while you are searching it crashes
+✓ Fixed line break in description so it correctly double line breaks when it is supposed to
