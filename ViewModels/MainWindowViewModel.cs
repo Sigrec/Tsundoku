@@ -257,16 +257,6 @@ namespace Tsundoku.ViewModels
             }
         }
 
-        public static string Slice(string source, int start, int end)
-        {
-            if (end < 0) // Keep this for negative end support
-            {
-                end = source.Length + end;
-            }
-            int len = end - start;               // Calculate length
-            return source.Substring(start, len); // Return Substring of length
-        }
-
         [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "A New file will always be created if it doesn't exist before serialization")]
         public static void SaveUsersData()
         {

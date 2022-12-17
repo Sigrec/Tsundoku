@@ -12,8 +12,8 @@ using Tsundoku.ViewModels;
 using System.Reactive.Linq;
 using Avalonia.ReactiveUI;
 using ReactiveUI;
-using DynamicData;
 using System.IO;
+using Avalonia.Media.Imaging;
 
 namespace Tsundoku.Views
 {
@@ -25,6 +25,43 @@ namespace Tsundoku.Views
         public MainWindow()
         {
             InitializeComponent();
+            this.KeyDown += (s, e) => 
+            {
+                if (e.Key == Key.F11) 
+                {
+                    if (this.WindowState != WindowState.FullScreen)
+                    {
+                        this.WindowState = WindowState.FullScreen;
+                    }
+                    else if (this.WindowState == WindowState.FullScreen)
+                    {
+                        this.WindowState = WindowState.Maximized;
+                    }
+                }
+                else if (e.KeyModifiers == KeyModifiers.Control && e.Key == Key.P)
+                {
+                    Logger.Info("Saving Screenshot of Collection");
+                    ScreenCaptureWindows();
+                }
+                else if (e.KeyModifiers == KeyModifiers.Control && e.Key == Key.S)
+                {
+                    Logger.Info("Saving Collection");
+                    MainWindowViewModel.SaveUsersData();
+                }
+            };
+
+        }
+
+        private void ScreenCaptureWindows()
+        {
+            using (System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap((int)this.Width, (int)this.Height))
+            {
+                using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(bitmap))
+                {
+                    g.CopyFromScreen(new System.Drawing.Point((int)this.Bounds.Left, (int)this.Bounds.Top), System.Drawing.Point.Empty, new System.Drawing.Size((int)this.Width, (int)this.Height));
+                }
+                bitmap.Save(@$"{MainWindowViewModel.MainUser.UserName}-Collection-ScreenShot.jpg", System.Drawing.Imaging.ImageFormat.Jpeg);
+            }
         }
 
         private void SearchCollection(object sender, KeyEventArgs args)
@@ -126,7 +163,7 @@ namespace Tsundoku.Views
         {
             CollectionViewModel.SearchText = "";
             Src.DiscordRP.Deinitialize();
-            Logger.Info("Closing TsundOku");
+            Logger.Info("Closing Tsundoku");
 
             if (CollectionViewModel.newSeriesWindow != null)
             {
@@ -146,6 +183,7 @@ namespace Tsundoku.Views
                 CollectionViewModel.themeSettingsWindow.Close();
             }
 
+            // Move the users current theme to the front of the list so when opening again it applies the correct theme
             ThemeSettingsViewModel.UserThemes.Move(ThemeSettingsViewModel.UserThemes.IndexOf(ThemeSettingsViewModel.UserThemes.Single(x => x.ThemeName == MainWindowViewModel.MainUser.MainTheme)), 0);
 
             MainWindowViewModel.SaveUsersData();

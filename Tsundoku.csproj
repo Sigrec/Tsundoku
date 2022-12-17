@@ -25,12 +25,7 @@
     <FileVersion>1.0.2.0</FileVersion>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <Version>1.0.0</Version>
-    <FileVersion>1.0.3.0</FileVersion>
-    <PackageReleaseNotes>V1.0.2 Release</PackageReleaseNotes>
-    <PackageReleaseNotes>V1.0.2 - Dec 15th, 2022 @ 12:08AM PST
-  ✓ Theme name now clears when closing the theme editing window
-  ✓ Fixed issue where if you add a series while you are searching it crashes
-  ✓ Fixed line break in description so it correctly double line breaks when it is supposed to</PackageReleaseNotes>
+    <FileVersion>1.1.0.0</FileVersion>
   </PropertyGroup>
 	<ItemGroup>
 		<AvaloniaResource Include="Assets/**" />
@@ -43,7 +38,9 @@
 		<!-- <Compile Remove="Assets\Covers\**" /> -->
 		<!-- <EmbeddedResource Remove="Assets\Cover\**" /> -->
 		<None Remove=".gitignore" />
+		<None Remove="ChangeLog.txt" />
 		<None Remove="ExtraSeries.json" />
+		<None Remove="LICENSE" />
 		<None Remove="README.md" />
 		<None Remove="TsundokuCollection.xlsx" />
 		<None Remove="UserData.json" />
@@ -92,9 +89,6 @@
     <PackageReference Include="Projektanker.Icons.Avalonia.FontAwesome" Version="6.2.0-preview1" />
     <PackageReference Include="ReactiveUI.Fody" Version="18.4.1" />
 	  <PackageReference Include="XamlNameReferenceGenerator" Version="1.5.1" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="ExtraSeries.json" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="Program.cs">

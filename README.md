@@ -23,8 +23,8 @@ Of course I understand if you do not trust me but I promise there is nothing mal
 ## Feature/Fixes ToDo List
 #### ToDo
 - [ ] Implement Actual Testing to run for Changes
-- [ ] File for Additional Series not on AniList (Example Radiant)
-#### V1.5.0
+  
+#### V1.X.0 Features
 - [ ] Price Analysis Page (Below are the Websites I thought of and whether they can be added to the Analysis or not)
   - &check; RightStufanime
   - &check; RobertsAnimeCornerStore
@@ -35,13 +35,7 @@ Of course I understand if you do not trust me but I promise there is nothing mal
   - ? Amazon Japan
   - ? Amazon US
   - ? CD Japan
-- [ ] Hotkeys
-  - [ ] Fullscreen (F11)
-  - [ ] Save (Ctrl + S)
-  - [ ] Screenshot (Ctrl + Shift + P ?)
 - [ ] Additional Language Support (German, French, Italian, Spanish) [This is dependant on some things otherwise it will have to be pushed much later]
-
-#### V2.0.0 Features
 - [ ] Changing of Display Layout/Format [I need some inspiration from other people, this could move up to V1.5.0 in place of Language Support if I get some contrete layouts]
   
 #### Bugs/Fixes

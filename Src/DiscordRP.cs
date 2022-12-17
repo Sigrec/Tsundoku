@@ -19,11 +19,6 @@ namespace Tsundoku.Src
                 Logger.Info("Connected To Discord With User {0}", msg.User.Username);
             };
 
-            client.OnClose += (sender, msg) =>
-            {
-                Logger.Info("Removing Connection to Discord for {0}", msg.Reason);
-            };
-
             // == Initialize
             client.Initialize();
 

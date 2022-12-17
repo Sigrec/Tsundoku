@@ -170,11 +170,12 @@
 									<Canvas Name="{Binding Link}"
 											PointerPressed="OpenSiteLink"
 											OpacityMask="White"
+											DockPanel.Dock="Left"
 											Width="{Binding Source={x:Static local:Constants.LEFT_SIDE_CARD_WIDTH}}">
 										<!-- <Canvas.Styles>
-											<Style Selector="Canvas:pointerover">
-												<Setter Property="#StatusAndFormat.Background" Value="Red"/>
-												<Setter Property="#StatusAndFormat.Foreground" Value="Yellow"/>
+											<Style Selector="#StatusAndFormat:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+												<Setter Property="Background" Value="Red"/>
+												<Setter Property="Foreground" Value="Yellow"/>
 											</Style>
 										</Canvas.Styles> -->
 
@@ -184,13 +185,11 @@
 											   Source="{Binding CoverBitMap}"
 											   Cursor="Hand"
 											   ClipToBounds="True"
-											   RenderTransformOrigin="0,0"
-											   UseLayoutRounding="true"
-											   DockPanel.Dock="Left"/>
+											   UseLayoutRounding="true">
+										</Image>
 
 										<!-- Bottom Left Side Card -->
-										<TextBlock Canvas.Left="0"
-												   Name="StatusAndFormat"
+										<TextBlock Name="StatusAndFormat"
 												   Canvas.Bottom="0"
 												   Cursor="Hand"
 												   UseLayoutRounding="true"
