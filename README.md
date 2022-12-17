@@ -1,12 +1,12 @@
-# [Tsundoku](https://en.wikipedia.org/wiki/Tsundoku) (Desktop Manga & Light Novel Collection App) [Follow Me on AL](https://anilist.co/user/Preminence/) 
-# Discord = Prem#4927 (DM me for help)
+# [Tsundoku](https://en.wikipedia.org/wiki/Tsundoku) (Desktop Manga & Light Novel Collection App)
 
+## [Follow Me on AL](https://anilist.co/user/Preminence/) → My Discord is Prem#4927 (DM me for help)
 ***
 >[**Windows Download** Current Supported Version = V1.1.0.1](https://www.dropbox.com/sh/szci4jq9zvorlzc/AAAY0oxWl-HZsmsoMgSrcbxka?dl=0)
-
->[**Mac Download (Not Supported Yet)** Current Supported Version = X](https://www.dropbox.com/sh/3e0po3d4l1sv8va/AAAgEbiPM86QQtkTcvvGWEVva?dl=0)
-
->Download the folder into your desired location (need to keep the executable file in a folder called "Tsundoku"), then pin the exe to your taskbar. Other standalone files are for if you only need to update a few things.
+[**Mac Download (Not Supported Yet)** Current Supported Version = X](https://www.dropbox.com/sh/3e0po3d4l1sv8va/AAAgEbiPM86QQtkTcvvGWEVva?dl=0)
+[**How To Follow a Dropbox Folder for Updates**](https://help.dropbox.com/organize/follow-folder)
+Download the folder into your desired location (need to keep the executable folder with your UserData.json and Covers folder otherwise it will generate new ones), then pin the exe to your taskbar. Make sure to keep the ExtraSeries.json file in the same folder as well otherwise it will crash if you try and add any series in it like "Radiant"
+***
 ## Important
 ### P.S. This Application is Something I Do For Fun during my Free Time
 ### Usage

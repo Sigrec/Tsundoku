@@ -68,7 +68,7 @@ namespace Tsundoku.Models
 				JsonElement synonyms = seriesData.GetProperty("synonyms");
 
 				// Checks to see if the series is available on AniList if not check ExtraSeries json
-				if (ExtraSeriesList.Contains(Src.ExtensionMethods.RemoveInPlaceCharArray(title.ToUpper())))
+				if (ExtraSeriesList.Contains(Src.ExtensionMethods.RemoveInPlaceCharArray(title.ToUpper())) && File.Exists(@"ExtraSeries.json"))
 				{
 					Logger.Info($"AniList Does Not Have {title}");
 					JsonElement.ArrayEnumerator extraSeriesList = JsonDocument.Parse(File.ReadAllText(@"ExtraSeries.json")).RootElement.GetProperty("ExtraSeries").EnumerateArray();

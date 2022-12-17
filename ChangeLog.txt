@@ -1,3 +1,6 @@
+V - Dec , 2022 @ PST
+✓ No longer crashes when a user doesn't have the "ExtraSeries.json" file in there executables folder/directory
+
 V1.1.0.1 - Dec 17th, 2022 @ 11:00AMPST
 ✓ Fixed description encoding not converting ampersand (if you see some text like "&rsquo;" then this fixes that you just need to delete and re-add the series)
 
