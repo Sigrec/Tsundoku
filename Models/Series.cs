@@ -99,6 +99,8 @@ namespace Tsundoku.Models
 				string nativeStaff = GetSeriesStaff(seriesData.GetProperty("staff").GetProperty("edges"), "native", filteredBookType, romajiTitle);
 				string fullStaff = GetSeriesStaff(seriesData.GetProperty("staff").GetProperty("edges"), "full", filteredBookType, romajiTitle);
 				string coverPath = SaveNewCoverImage(seriesData.GetProperty("coverImage").GetProperty("extraLarge").ToString(), romajiTitle, filteredBookType.ToUpper(), synonyms, extraSeriesCheck);
+
+				//Logger.Debug(seriesData.GetProperty("description").ToString());
 				Series _newSeries = new Series(
 					new List<string>()
 					{
@@ -111,7 +113,7 @@ namespace Tsundoku.Models
 						fullStaff,
 						nativeStaff.Equals(" | ") ? fullStaff : nativeStaff,
 					},
-					seriesData.GetProperty("description").ValueKind == JsonValueKind.Null ? "" : ConvertUnicodeInDesc(Regex.Replace(seriesData.GetProperty("description").ToString(), @"\(Source: [\S\s]+|(\<[^br].*?\>)", "")),
+					seriesData.GetProperty("description").ValueKind == JsonValueKind.Null ? "" : Regex.Replace(System.Web.HttpUtility.HtmlDecode(seriesData.GetProperty("description").ToString()).Replace("<br><br>", "\n").Trim().TrimEnd('\n'), @"\(Source: [\S\s]+|\<.*?\>", ""),
 					filteredBookType,
 					GetSeriesStatus(seriesData.GetProperty("status").ToString()),
 					coverPath,
@@ -127,15 +129,6 @@ namespace Tsundoku.Models
             }
             return null;
         }
-
-		private static string ConvertUnicodeInDesc(string seriesDesc)
-		{
-			foreach (Match unicodeMatch in Regex.Matches(seriesDesc, @"(&#(\d+);)"))
-			{
-				seriesDesc = seriesDesc.Replace(unicodeMatch.Groups[1].Value, Convert.ToChar(Convert.ToUInt16(unicodeMatch.Groups[2].Value)).ToString());
-			}
-			return Regex.Replace(seriesDesc.Replace("<br><br>", "\n").Trim().TrimEnd('\n'), @"\<.*?\>", "");
-		}
 
 		public static string GetCorrectComicName(string jsonCountryOfOrigin)
 		{
