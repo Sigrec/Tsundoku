@@ -2,7 +2,7 @@
 # Discord = Prem#4927 (DM me for help)
 
 ***
->[**Windows Download** Current Supported Version = V1.0.2](https://www.dropbox.com/sh/szci4jq9zvorlzc/AAAY0oxWl-HZsmsoMgSrcbxka?dl=0)
+>[**Windows Download** Current Supported Version = V1.1.0.1](https://www.dropbox.com/sh/szci4jq9zvorlzc/AAAY0oxWl-HZsmsoMgSrcbxka?dl=0)
 
 >[**Mac Download (Not Supported Yet)** Current Supported Version = X](https://www.dropbox.com/sh/3e0po3d4l1sv8va/AAAgEbiPM86QQtkTcvvGWEVva?dl=0)
 
