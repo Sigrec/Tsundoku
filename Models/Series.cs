@@ -37,6 +37,9 @@ namespace Tsundoku.Models
 		[JsonIgnore]
 		public Bitmap CoverBitMap { get; set; }
 
+		[JsonIgnore]
+		private static string[] ExtraSeriesList = { "RADIANT" };
+
         public Series(List<string> titles, List<string> staff, string description, string format, string status, string cover, string link, ushort maxVolumeCount, ushort curVolumeCount, Bitmap coverBitMap)
         {
 			Titles = titles;
@@ -65,7 +68,7 @@ namespace Tsundoku.Models
 				JsonElement synonyms = seriesData.GetProperty("synonyms");
 
 				// Checks to see if the series is available on AniList if not check ExtraSeries json
-				if (!romajiTitle.Equals(title, StringComparison.OrdinalIgnoreCase) && !nativeTitle.Equals(title, StringComparison.OrdinalIgnoreCase) && !englishTitle.ToString().Equals(title, StringComparison.OrdinalIgnoreCase))
+				if (ExtraSeriesList.Contains(Src.ExtensionMethods.RemoveInPlaceCharArray(title.ToUpper())))
 				{
 					Logger.Info($"AniList Does Not Have {title}");
 					JsonElement.ArrayEnumerator extraSeriesList = JsonDocument.Parse(File.ReadAllText(@"ExtraSeries.json")).RootElement.GetProperty("ExtraSeries").EnumerateArray();
@@ -131,7 +134,7 @@ namespace Tsundoku.Models
 			{
 				seriesDesc = seriesDesc.Replace(unicodeMatch.Groups[1].Value, Convert.ToChar(Convert.ToUInt16(unicodeMatch.Groups[2].Value)).ToString());
 			}
-			return seriesDesc.Replace("<br><br>", "\n").Trim().TrimEnd('\n');
+			return Regex.Replace(seriesDesc.Replace("<br><br>", "\n").Trim().TrimEnd('\n'), @"\<.*?\>", "");
 		}
 
 		public static string GetCorrectComicName(string jsonCountryOfOrigin)
