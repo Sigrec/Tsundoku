@@ -1,5 +1,10 @@
-V - Dec , 2022 @ PST
+V1.1.0.3 - Dec 17th, 2022 @ 8:35PM PST
+✓ Changed edit pane icon
+✓ Fixed description from having excessive line breaks at the end
+
+V1.1.0.2 - Dec 17th, 2022 @ 2:30PM PST
 ✓ No longer crashes when a user doesn't have the "ExtraSeries.json" file in there executables folder/directory
+✓ Fixed divider color taking from button color and not the divider color
 
 V1.1.0.1 - Dec 17th, 2022 @ 11:00AMPST
 ✓ Fixed description encoding not converting ampersand (if you see some text like "&rsquo;" then this fixes that you just need to delete and re-add the series)

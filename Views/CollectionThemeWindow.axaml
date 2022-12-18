@@ -156,7 +156,7 @@
 							<TextBlock Text="Status And BookType BG (Hover)" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
 								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<cp:ColorPickerButton Margin="2" Name="Status_And_BookType_BG_Hover" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210">
+									<cp:ColorPickerButton Margin="2" Name="Status_And_BookType_BG_Hover" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" IsEnabled="false">
 										<TextBlock Text="Doesn't Work Right Now" FontWeight="Bold" Foreground="Red" TextAlignment="Center"/>
 									</cp:ColorPickerButton>
 								</Border>

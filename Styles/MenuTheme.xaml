@@ -4,9 +4,11 @@
 		<Setter Property="Background" Value="{Binding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}"/>
 	</Style>
 
-	<Style Selector="Border.menu">
-		<Setter Property="Background" Value="{Binding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}"/>
-		<Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"/>
+	<Style Selector="Border">
+		<Style Selector="^.menu">
+			<Setter Property="Background" Value="{Binding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}"/>
+			<Setter Property="BorderBrush" Value="{Binding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}"/>
+		</Style>
 	</Style>
 
 	<Style Selector="TextBlock">

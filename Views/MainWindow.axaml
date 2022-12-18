@@ -374,7 +374,7 @@
 													Width="45"
 													CornerRadius="0"
 													Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesSwitchPaneButtonIconColor, Converter={StaticResource ConvertColor}}"
-													i:Attached.Icon="fa-pen-to-square"
+													i:Attached.Icon="fa-regular fa-pen-to-square"
 													Click="ShowEditPane"/>
 											<Border BorderBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressBarBorderColor, Converter={StaticResource ConvertColor}}" 
 													BorderThickness="1" 

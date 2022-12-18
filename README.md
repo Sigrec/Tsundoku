@@ -22,7 +22,9 @@ Of course I understand if you do not trust me but I promise there is nothing mal
 ***
 ## Feature/Fixes ToDo List
 #### ToDo
-- [ ] Implement Actual Testing to run for Changes
+- [ ] Implement Actual Testing to run for future Changes
+- [ ] Exporting/Importing Themes
+- [ ] Add themeing to scrollbar
   
 #### V1.X.0 Features
 - [ ] Price Analysis Page (Below are the Websites I thought of and whether they can be added to the Analysis or not)
