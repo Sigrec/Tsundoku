@@ -38,6 +38,7 @@ namespace Tsundoku.Views
             {
                 ((CollectionThemeWindow)s).Hide();
                 NewThemeName.Text = "";
+                Topmost = false;
                 IsOpen ^= true;
                 e.Cancel = true;
             };

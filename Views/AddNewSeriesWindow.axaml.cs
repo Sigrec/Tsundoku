@@ -33,6 +33,7 @@ namespace Tsundoku.Views
                 CurVolCount.Text = String.Empty;
                 MaxVolCount.Text = String.Empty;
                 IsOpen ^= true;
+                Topmost = false;
                 e.Cancel = true;
             };
 // #if DEBUG

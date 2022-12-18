@@ -35,7 +35,7 @@ namespace Tsundoku.Views
                     }
                     else if (this.WindowState == WindowState.FullScreen)
                     {
-                        this.WindowState = WindowState.Maximized;
+                        this.WindowState = WindowState.Normal;
                     }
                 }
                 else if (e.KeyModifiers == KeyModifiers.Control && e.Key == Key.P)
@@ -60,7 +60,7 @@ namespace Tsundoku.Views
                 {
                     g.CopyFromScreen(new System.Drawing.Point((int)this.Bounds.Left, (int)this.Bounds.Top), System.Drawing.Point.Empty, new System.Drawing.Size((int)this.Width, (int)this.Height));
                 }
-                bitmap.Save(@$"{MainWindowViewModel.MainUser.UserName}-Collection-ScreenShot.jpg", System.Drawing.Imaging.ImageFormat.Jpeg);
+                bitmap.Save(@$"{CollectionViewModel.UserName}-Collection-ScreenShot-{CollectionViewModel.CurrentTheme.ThemeName}.jpg", System.Drawing.Imaging.ImageFormat.Jpeg);
             }
         }
 

@@ -1,3 +1,8 @@
+V1.1.0.4 - Dec 18th, 2022 @ 2:15PM PST
+✓ Screenshot now also includes the theme name in the file name
+✓ Keeps previous window state after exiting fullscreen with F11 instead of going to maximized state
+✓ Color wheels no longer stuck/hidden when window moves to the front (seconadry windwos no longer topmost)
+
 V1.1.0.3 - Dec 17th, 2022 @ 8:35PM PST
 ✓ Changed edit pane icon
 ✓ Fixed description from having excessive line breaks at the end

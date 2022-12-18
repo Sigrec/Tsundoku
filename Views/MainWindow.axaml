@@ -153,6 +153,13 @@
 		
 		<!-- Collection -->
 		<ScrollViewer Name="CollectionTheme" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" DockPanel.Dock="Bottom" Background="{Binding CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}">
+			<!-- <ScrollViewer.Styles>
+				<Style Selector="#CollectionTheme /template/ ContentPresenter#PART_VerticalScrollBar /template/ ContentPresenter">
+					<Style Selector="^:vertical /template/ ContentPresenter#VerticalRoot">
+						<Setter Property="Background" Value="Red" />
+					</Style>
+				</Style>
+			</ScrollViewer.Styles> -->
 			<ItemsControl Margin="50" Items="{Binding SearchedCollection}" HorizontalAlignment="Center">
 				<ItemsControl.ItemsPanel>
 					<ItemsPanelTemplate>

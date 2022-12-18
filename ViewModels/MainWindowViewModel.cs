@@ -91,9 +91,9 @@ namespace Tsundoku.ViewModels
                 {
                     newSeriesWindow.WindowState = WindowState.Normal;
                 }
-                else if(newSeriesWindow.Topmost == false && newSeriesWindow.IsOpen)
+                else if(!newSeriesWindow.IsActive && newSeriesWindow.IsOpen)
                 {
-                    newSeriesWindow.Topmost = true;
+                    newSeriesWindow.Activate();
                 }
                 else
                 {
@@ -109,9 +109,9 @@ namespace Tsundoku.ViewModels
                 {
                     settingsWindow.WindowState = WindowState.Normal;
                 }
-                else if(settingsWindow.Topmost == false && settingsWindow.IsOpen)
+                else if(!settingsWindow.IsActive && settingsWindow.IsOpen)
                 {
-                    settingsWindow.Topmost = true;
+                    settingsWindow.Activate();
                 }
                 else
                 {
@@ -127,9 +127,9 @@ namespace Tsundoku.ViewModels
                 {
                     themeSettingsWindow.WindowState = WindowState.Normal;
                 }
-                else if(themeSettingsWindow.Topmost == false && themeSettingsWindow.IsOpen)
+                else if(!themeSettingsWindow.IsActive && themeSettingsWindow.IsOpen)
                 {
-                    themeSettingsWindow.Topmost = true;
+                    themeSettingsWindow.Activate();
                 }
                 else
                 {
