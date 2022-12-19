@@ -50,6 +50,7 @@ namespace Tsundoku.Views
         // TODO : test and see if forced garbage collection is actually necassary
         private void SaveNewTheme(object sender, RoutedEventArgs args)
         {
+            NewThemeName.Text = NewThemeName.Text.Trim();
             if (!string.IsNullOrWhiteSpace(NewThemeName.Text) && !NewThemeName.Text.Equals("Default"))
             {
                 NewTheme.ThemeName = NewThemeName.Text;

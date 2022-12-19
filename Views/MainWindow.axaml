@@ -45,7 +45,7 @@
 						   Margin="10,0,10,0"
 						   HorizontalAlignment="Center"
 						   VerticalAlignment="Center" 
-						   Text="{Binding UserName}"
+						   Text="{Binding UserName, Mode=OneWay}"
 						   DockPanel.Dock="Top"
 						   Classes="username"/>
 				<StackPanel Spacing="20" HorizontalAlignment="Center" VerticalAlignment="Center" DockPanel.Dock="Bottom" Orientation="Horizontal">
@@ -85,7 +85,7 @@
 						</StackPanel>
 					</StackPanel>
 					<TextBlock Name="NumVolumesCollected" 
-							   Text="{Binding UsersNumVolumesCollected, StringFormat='Collected&#x0a;{0} Volumes'}" TextAlignment="Center" 
+							   Text="{Binding UsersNumVolumesCollected, StringFormat='Collected&#x0a;{0} Volumes', Mode=OneWay}" TextAlignment="Center" 
 							   FontSize="21" 
 							   FontWeight="Bold" 
 							   Classes="menu"
@@ -95,7 +95,7 @@
 					<StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="5" Width="175">
 						<TextBlock Name="SearchCollectionHeader" VerticalAlignment="Center" Text="Search Collection" HorizontalAlignment="Center" FontSize="21" FontWeight="Bold" Classes="menu"/>
 						<TextBox Name="SearchBar" 
-								Text="{Binding SearchText}" 
+								Text="{Binding SearchText, Mode=TwoWay}" 
 								KeyUp="SearchCollection"
 								Classes="menu"
 								BorderThickness="2" 
@@ -103,7 +103,7 @@
 								VerticalAlignment="Center"/>
 					</StackPanel>
 					<TextBlock Name="NumVolumesToBeCollected" 
-							   Text="{Binding UsersNumVolumesToBeCollected, StringFormat='Need To Collect&#x0a;{0} Volumes'}" 
+							   Text="{Binding UsersNumVolumesToBeCollected, StringFormat='Need To Collect&#x0a;{0} Volumes', Mode=OneWay}" 
 							   TextAlignment="Center" 
 							   FontSize="21" 
 							   FontWeight="Bold" 
@@ -113,7 +113,7 @@
 							   HorizontalAlignment="Center"/>
 					<StackPanel Spacing="5" HorizontalAlignment="Center" VerticalAlignment="Center">
 						<ComboBox Name="LanguageSelector"
-								Items="{Binding AvailableLanguages}"
+								Items="{Binding AvailableLanguages, Mode=OneWay}"
 								SelectionChanged="LanguageChanged"
 								SelectedItem="{Binding MainUser.CurLanguage}"
 								Height="35"
@@ -126,7 +126,7 @@
 								HorizontalAlignment="Center"
 								AutoScrollToSelectedItem="True"/>
 						<ComboBox Name="DisplaySelector"
-								Items="{Binding AvailableDisplays}"
+								Items="{Binding AvailableDisplays, Mode=OneWay}"
 								SelectionChanged="DisplayChanged"
 								SelectedItem="{Binding MainUser.Display}"
 								Height="35"
@@ -177,33 +177,37 @@
 									<Canvas Name="{Binding Link}"
 											PointerPressed="OpenSiteLink"
 											OpacityMask="White"
+											Cursor="Hand"
 											DockPanel.Dock="Left"
 											Width="{Binding Source={x:Static local:Constants.LEFT_SIDE_CARD_WIDTH}}">
-										<!-- <Canvas.Styles>
-											<Style Selector="#StatusAndFormat:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-												<Setter Property="Background" Value="Red"/>
-												<Setter Property="Foreground" Value="Yellow"/>
+										<Canvas.Styles>
+											<Style Selector="TextBlock.mouseover">
+												<Setter Property="Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.StatusAndBookTypeBGHoverColor, Converter={StaticResource ConvertColor}}"/>
+												<Setter Property="Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.StatusAndBookTypeTextHoverColor, Converter={StaticResource ConvertColor}}"/>
 											</Style>
-										</Canvas.Styles> -->
+											<Style Selector="TextBlock.nomouseover">
+												<Setter Property="Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.StatusAndBookTypeBGColor, Converter={StaticResource ConvertColor}}"/>
+												<Setter Property="Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.StatusAndBookTypeTextColor, Converter={StaticResource ConvertColor}}"/>
+											</Style>
+										</Canvas.Styles>
 
 										<!-- Top Left Side Card -->
 										<Image Height="{Binding Source={x:Static local:Constants.IMAGE_HEIGHT}}"
 											   Width="{Binding Source={x:Static local:Constants.LEFT_SIDE_CARD_WIDTH}}"
 											   Source="{Binding CoverBitMap}"
-											   Cursor="Hand"
 											   ClipToBounds="True"
+											   Name="SeriesCover"
 											   UseLayoutRounding="true">
 										</Image>
 
 										<!-- Bottom Left Side Card -->
 										<TextBlock Name="StatusAndFormat"
 												   Canvas.Bottom="0"
-												   Cursor="Hand"
+												   Classes.mouseover="{Binding $parent.IsPointerOver}"
+												   Classes.nomouseover="{Binding !$parent.IsPointerOver}"
 												   UseLayoutRounding="true"
 												   Width="{Binding Source={x:Static local:Constants.LEFT_SIDE_CARD_WIDTH}}"
 												   Height="{Binding Source={x:Static local:Constants.BOTTOM_SECTION_CARD_HEIGHT}}"
-												   Background="{Binding #CollectionTheme.DataContext.CurrentTheme.StatusAndBookTypeBGColor, Converter={StaticResource ConvertColor}}"
-												   Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.StatusAndBookTypeTextColor, Converter={StaticResource ConvertColor}}"
 												   FontWeight="Bold"
 												   FontSize="18"
 												   TextAlignment="Center"

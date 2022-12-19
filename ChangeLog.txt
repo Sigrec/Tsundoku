@@ -1,4 +1,8 @@
-V1.1.0.4 - Dec 18th, 2022 @ 2:15PM PST
+V1.2.0.0 - Dec 18th, 2022 @ 4:57PM PST
+✓ StatusAndBookType (left side bottom of a series card) hover colors now work as intended
+✓ Fixed Menu Dropdown controls (language and display change) background taking from search bar background color
+
+V1.1.0.4 - Dec 18th, 2022 @ 2:37PM PST
 ✓ Screenshot now also includes the theme name in the file name
 ✓ Keeps previous window state after exiting fullscreen with F11 instead of going to maximized state
 ✓ Color wheels no longer stuck/hidden when window moves to the front (seconadry windwos no longer topmost)
