@@ -25,6 +25,7 @@ Of course I understand if you do not trust me but I promise there is nothing mal
 - [ ] Implement Actual Testing to run for future Changes
 - [ ] Exporting/Importing Themes
 - [ ] Add themeing to scrollbar
+- [ ] Have screenshots go into a "Screenshots" folder
   
 #### V1.X.0 Features
 - [ ] Price Analysis Page (Below are the Websites I thought of and whether they can be added to the Analysis or not)
