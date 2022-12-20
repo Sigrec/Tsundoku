@@ -1,17 +1,8 @@
-using System.Text.RegularExpressions;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Text.Json;
-using System.Threading.Tasks;
 
-namespace Tsundoku.Src
+namespace Tsundoku.Helpers
 {
     public class ExtensionMethods
     {    
-        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 		public static string RemoveInPlaceCharArray(string input)
 		{
 			var len = input.Length;

@@ -1,0 +1,424 @@
+<Window xmlns="https://github.com/avaloniaui"
+	xmlns:vm="using:Tsundoku.ViewModels"
+	xmlns:c="using:Tsundoku.CustomControls"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+	xmlns:cp="clr-namespace:Egorozh.ColorPicker.Dialog;assembly=Egorozh.ColorPicker.Avalonia.Dialog"
+	x:Class="Tsundoku.Views.CollectionThemeWindow"
+	Icon="\Assets\Icons\Tsundoku-Logo.ico"
+	Title="Theme Settings"
+	FontFamily="Segoe UI"
+	Width="900"
+	Height="800"
+	Classes="menu"
+	WindowStartupLocation="CenterOwner"
+	KeyboardNavigation.TabNavigation="None"
+	CanResize="true">
+
+	<Window.Styles>
+		<StyleInclude Source="/Styles/MenuTheme.xaml" />
+	</Window.Styles>
+
+	<Border Classes="menu" BorderThickness="3">
+		<ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden">
+			<StackPanel Spacing="50" Margin="20">
+				<StackPanel HorizontalAlignment="Center">
+					<TextBlock Text="Menu / Nav Bar" FontSize="30" FontWeight="Bold" Classes="menu" HorizontalAlignment="Center" TextDecorations="Underline"/>
+					<WrapPanel>
+						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
+							<TextBlock Text="Menu BG" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<Border Classes="menu" BorderThickness="2">
+								<Border Classes="menu" BorderThickness="2" Margin="2">	
+									<cp:ColorPickerButton Margin="2" Name="Menu_BG" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+								</Border>
+							</Border>
+						</StackPanel>
+						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
+							<TextBlock Text="Username" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<Border Classes="menu" BorderThickness="2">
+								<Border Classes="menu" BorderThickness="2" Margin="2">	
+									<cp:ColorPickerButton Margin="2" Name="Username" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+								</Border>
+							</Border>
+						</StackPanel>
+						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
+							<TextBlock Text="Menu Text" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<Border Classes="menu" BorderThickness="2">
+								<Border Classes="menu" BorderThickness="2" Margin="2">	
+									<cp:ColorPickerButton Margin="2" Name="Menu_Text" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+								</Border>
+							</Border>
+						</StackPanel>
+						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
+							<TextBlock Text="Search Bar BG" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<Border Classes="menu" BorderThickness="2">
+								<Border Classes="menu" BorderThickness="2" Margin="2">	
+									<cp:ColorPickerButton Margin="2" Name="SearchBar_BG" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+								</Border>
+							</Border>
+						</StackPanel>
+						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
+							<TextBlock Text="Search Bar Border" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<Border Classes="menu" BorderThickness="2">
+								<Border Classes="menu" BorderThickness="2" Margin="2">	
+									<cp:ColorPickerButton Margin="2" Name="SearchBar_Border" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+								</Border>
+							</Border>
+						</StackPanel>
+						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
+							<TextBlock Text="Search Bar Text" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<Border Classes="menu" BorderThickness="2">
+								<Border Classes="menu" BorderThickness="2" Margin="2">	
+									<cp:ColorPickerButton Margin="2" Name="SearchBar_Text" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+								</Border>
+							</Border>
+						</StackPanel>
+						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
+							<TextBlock Text="Divider" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<Border Classes="menu" BorderThickness="2">
+								<Border Classes="menu" BorderThickness="2" Margin="2">	
+									<cp:ColorPickerButton Margin="2" Name="Divider" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+								</Border>
+							</Border>
+						</StackPanel>
+						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
+							<TextBlock Text="Menu Button BG" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<Border Classes="menu" BorderThickness="2">
+								<Border Classes="menu" BorderThickness="2" Margin="2">	
+									<cp:ColorPickerButton Margin="2" Name="MenuButton_BG" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+								</Border>
+							</Border>
+						</StackPanel>
+						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
+							<TextBlock Text="Menu Button BG (Hover)" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<Border Classes="menu" BorderThickness="2">
+								<Border Classes="menu" BorderThickness="2" Margin="2">	
+									<cp:ColorPickerButton Margin="2" Name="MenuButton_BG_Hover" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+								</Border>
+							</Border>
+						</StackPanel>
+						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
+							<TextBlock Text="Menu Button Border" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<Border Classes="menu" BorderThickness="2">
+								<Border Classes="menu" BorderThickness="2" Margin="2">	
+									<cp:ColorPickerButton Margin="2" Name="MenuButton_Border" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+								</Border>
+							</Border>
+						</StackPanel>
+						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
+							<TextBlock Text="Menu Button Border (Hover)" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<Border Classes="menu" BorderThickness="2">
+								<Border Classes="menu" BorderThickness="2" Margin="2">	
+									<cp:ColorPickerButton Margin="2" Name="MenuButton_Border_Hover" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+								</Border>
+							</Border>
+						</StackPanel>
+						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
+							<TextBlock Text="Menu Button Icon/Text" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<Border Classes="menu" BorderThickness="2">
+								<Border Classes="menu" BorderThickness="2" Margin="2">	
+									<cp:ColorPickerButton Margin="2" Name="MenuButton_IconAndText" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+								</Border>
+							</Border>
+						</StackPanel>
+						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
+							<TextBlock Text="Menu Button Icon/Text (Hover)" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<Border Classes="menu" BorderThickness="2">
+								<Border Classes="menu" BorderThickness="2" Margin="2">	
+									<cp:ColorPickerButton Margin="2" Name="MenuButton_IconAndText_Hover" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+								</Border>
+							</Border>
+						</StackPanel>
+					</WrapPanel>
+				</StackPanel>
+				<StackPanel HorizontalAlignment="Center">
+					<TextBlock Text="Collection" FontSize="30" FontWeight="Bold" Classes="menu" HorizontalAlignment="Center" TextDecorations="Underline"/>
+					<WrapPanel>
+						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
+							<TextBlock Text="Collection BG" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<Border Classes="menu" BorderThickness="2">
+								<Border Classes="menu" BorderThickness="2" Margin="2">	
+									<cp:ColorPickerButton Margin="2" Name="Collection_BG" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+								</Border>
+							</Border>
+						</StackPanel>
+						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
+							<TextBlock Text="Status And BookType BG" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<Border Classes="menu" BorderThickness="2">
+								<Border Classes="menu" BorderThickness="2" Margin="2">	
+									<cp:ColorPickerButton Margin="2" Name="Status_And_BookType_BG" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+								</Border>
+							</Border>
+						</StackPanel>
+						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
+							<TextBlock Text="Status And BookType BG (Hover)" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<Border Classes="menu" BorderThickness="2">
+								<Border Classes="menu" BorderThickness="2" Margin="2">	
+									<cp:ColorPickerButton Margin="2" Name="Status_And_BookType_BG_Hover" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+								</Border>
+							</Border>
+						</StackPanel>
+						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
+							<TextBlock Text="Status And BookType Text" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<Border Classes="menu" BorderThickness="2">
+								<Border Classes="menu" BorderThickness="2" Margin="2">	
+									<cp:ColorPickerButton Margin="2" Name="Status_And_BookType_Text" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+								</Border>
+							</Border>
+						</StackPanel>
+						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
+							<TextBlock Text="Status And BookType Text (Hover)" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<Border Classes="menu" BorderThickness="2">
+								<Border Classes="menu" BorderThickness="2" Margin="2">	
+									<cp:ColorPickerButton Margin="2" Name="Status_And_BookType_Text_Hover" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+								</Border>
+							</Border>
+						</StackPanel>
+						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
+							<TextBlock Text="Series Card BG" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<Border Classes="menu" BorderThickness="2">
+								<Border Classes="menu" BorderThickness="2" Margin="2">	
+									<cp:ColorPickerButton Margin="2" Name="SeriesCard_BG" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+								</Border>
+							</Border>
+						</StackPanel>
+						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
+							<TextBlock Text="Series Title" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<Border Classes="menu" BorderThickness="2">
+								<Border Classes="menu" BorderThickness="2" Margin="2">	
+									<cp:ColorPickerButton Margin="2" Name="SeriesCard_Title" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+								</Border>
+							</Border>
+						</StackPanel>
+						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
+							<TextBlock Text="Series Staff" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<Border Classes="menu" BorderThickness="2">
+								<Border Classes="menu" BorderThickness="2" Margin="2">	
+									<cp:ColorPickerButton Margin="2" Name="SeriesCard_Staff" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+								</Border>
+							</Border>
+						</StackPanel>
+						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
+							<TextBlock Text="Series Description" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<Border Classes="menu" BorderThickness="2">
+								<Border Classes="menu" BorderThickness="2" Margin="2">	
+									<cp:ColorPickerButton Margin="2" Name="SeriesCard_Desc" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+								</Border>
+							</Border>
+						</StackPanel>
+						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
+							<TextBlock Text="Series Progress BG" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<Border Classes="menu" BorderThickness="2">
+								<Border Classes="menu" BorderThickness="2" Margin="2">	
+									<cp:ColorPickerButton Margin="2" Name="SeriesProgress_BG" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+								</Border>
+							</Border>
+						</StackPanel>
+						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
+							<TextBlock Text="Series Progress Bar" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<Border Classes="menu" BorderThickness="2">
+								<Border Classes="menu" BorderThickness="2" Margin="2">	
+									<cp:ColorPickerButton Margin="2" Name="SeriesProgress_Bar" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+								</Border>
+							</Border>
+						</StackPanel>
+						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
+							<TextBlock Text="Series Progress Bar BG" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<Border Classes="menu" BorderThickness="2">
+								<Border Classes="menu" BorderThickness="2" Margin="2">	
+									<cp:ColorPickerButton Margin="2" Name="SeriesProgress_Bar_BG" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+								</Border>
+							</Border>
+						</StackPanel>
+						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
+							<TextBlock Text="Series Progress Bar Border" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<Border Classes="menu" BorderThickness="2">
+								<Border Classes="menu" BorderThickness="2" Margin="2">	
+									<cp:ColorPickerButton Margin="2" Name="SeriesProgress_Bar_Border" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+								</Border>
+							</Border>
+						</StackPanel>
+						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
+							<TextBlock Text="Series Progress Text" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<Border Classes="menu" BorderThickness="2">
+								<Border Classes="menu" BorderThickness="2" Margin="2">	
+									<cp:ColorPickerButton Margin="2" Name="SeriesProgress_Text" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+								</Border>
+							</Border>
+						</StackPanel>
+						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
+							<TextBlock Text="Series Progress Buttons (Hover)" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<Border Classes="menu" BorderThickness="2">
+								<Border Classes="menu" BorderThickness="2" Margin="2">	
+									<cp:ColorPickerButton Margin="2" Name="SeriesProgress_Buttons_Hover" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+								</Border>
+							</Border>
+						</StackPanel>
+						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
+							<TextBlock Text="Series Switch Pane Button BG" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<Border Classes="menu" BorderThickness="2">
+								<Border Classes="menu" BorderThickness="2" Margin="2">	
+									<cp:ColorPickerButton Margin="2" Name="SeriesSwitchPaneButton_BG" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+								</Border>
+							</Border>
+						</StackPanel>
+						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
+							<TextBlock Text="Series Switch Pane Button BG (Hover)" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<Border Classes="menu" BorderThickness="2">
+								<Border Classes="menu" BorderThickness="2" Margin="2">	
+									<cp:ColorPickerButton Margin="2" Name="SeriesSwitchPaneButton_BG_Hover" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+								</Border>
+							</Border>
+						</StackPanel>
+						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
+							<TextBlock Text="Series Switch Pane Button Icon" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<Border Classes="menu" BorderThickness="2">
+								<Border Classes="menu" BorderThickness="2" Margin="2">	
+									<cp:ColorPickerButton Margin="2" Name="SeriesSwitchPaneButton_Icon" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+								</Border>
+							</Border>
+						</StackPanel>
+						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
+							<TextBlock Text="Series Switch Pane Button Icon (Hover)" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<Border Classes="menu" BorderThickness="2">
+								<Border Classes="menu" BorderThickness="2" Margin="2">	
+									<cp:ColorPickerButton Margin="2" Name="SeriesSwitchPaneButton_Icon_Hover" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+								</Border>
+							</Border>
+						</StackPanel>
+						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
+							<TextBlock Text="Series Edit Pane BG" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<Border Classes="menu" BorderThickness="2">
+								<Border Classes="menu" BorderThickness="2" Margin="2">	
+									<cp:ColorPickerButton Margin="2" Name="SeriesEditPane_BG" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+								</Border>
+							</Border>
+						</StackPanel>
+						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
+							<TextBlock Text="Series Notes BG" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<Border Classes="menu" BorderThickness="2">
+								<Border Classes="menu" BorderThickness="2" Margin="2">	
+									<cp:ColorPickerButton Margin="2" Name="SeriesNotes_BG" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+								</Border>
+							</Border>
+						</StackPanel>
+						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
+							<TextBlock Text="Series Notes Border" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<Border Classes="menu" BorderThickness="2">
+								<Border Classes="menu" BorderThickness="2" Margin="2">	
+									<cp:ColorPickerButton Margin="2" Name="SeriesNotes_Border" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+								</Border>
+							</Border>
+						</StackPanel>
+						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
+							<TextBlock Text="Series Notes Text" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<Border Classes="menu" BorderThickness="2">
+								<Border Classes="menu" BorderThickness="2" Margin="2">	
+									<cp:ColorPickerButton Margin="2" Name="SeriesNotes_Text" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+								</Border>
+							</Border>
+						</StackPanel>
+						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
+							<TextBlock Text="Series Edit Pane Buttons BG" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<Border Classes="menu" BorderThickness="2">
+								<Border Classes="menu" BorderThickness="2" Margin="2">	
+									<cp:ColorPickerButton Margin="2" Name="SeriesEditPane_Buttons_BG" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+								</Border>
+							</Border>
+						</StackPanel>
+						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
+							<TextBlock Text="Series Edit Button BG (Hover)" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<Border Classes="menu" BorderThickness="2">
+								<Border Classes="menu" BorderThickness="2" Margin="2">	
+									<cp:ColorPickerButton Margin="2" Name="SeriesEditPane_Buttons_BG_Hover" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+								</Border>
+							</Border>
+						</StackPanel>
+						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
+							<TextBlock Text="Series Edit Pane Buttons Border" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<Border Classes="menu" BorderThickness="2">
+								<Border Classes="menu" BorderThickness="2" Margin="2">	
+									<cp:ColorPickerButton Margin="2" Name="SeriesEditPane_Buttons_Border" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+								</Border>
+							</Border>
+						</StackPanel>
+						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
+							<TextBlock Text="Series Edit Pane Buttons Border (Hover)" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<Border Classes="menu" BorderThickness="2">
+								<Border Classes="menu" BorderThickness="2" Margin="2">	
+									<cp:ColorPickerButton Margin="2" Name="SeriesEditPane_Buttons_Border_Hover" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+								</Border>
+							</Border>
+						</StackPanel>
+						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
+							<TextBlock Text="Series Edit Pane Button Icon" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<Border Classes="menu" BorderThickness="2">
+								<Border Classes="menu" BorderThickness="2" Margin="2">	
+									<cp:ColorPickerButton Margin="2" Name="SeriesEditPane_Buttons_Icon" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+								</Border>
+							</Border>
+						</StackPanel>
+						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
+							<TextBlock Text="Series Edit Pane Button Icon (Hover)" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<Border Classes="menu" BorderThickness="2">
+								<Border Classes="menu" BorderThickness="2" Margin="2">	
+									<cp:ColorPickerButton Margin="2" Name="SeriesEditPane_Buttons_Icon_Hover" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+								</Border>
+							</Border>
+						</StackPanel>
+					</WrapPanel>
+				</StackPanel>
+				<StackPanel HorizontalAlignment="Center">
+					<TextBlock Text="Save/Change Theme" FontSize="30" HorizontalAlignment="Center" FontWeight="Bold" Classes="menu"  TextDecorations="Underline"/>
+					<StackPanel Orientation="Horizontal" Spacing="5" Margin="0,10,0,0">
+						<TextBox Name="NewThemeName"
+								Width="250"
+								FontSize="15"
+								Classes="menu"
+								FontWeight="Bold"
+								Text="{Binding ThemeName}"
+								BorderThickness="2"/>
+						<Button FontSize="15" 
+								FontWeight="Bold" 
+								Name="SaveThemeButton"
+								BorderThickness="2" 
+								HorizontalAlignment="Center" 
+								Content="Save" 
+								Classes="menu"
+								IsEnabled="{Binding IsSaveThemeButtonEnabled}"
+								Click="SaveNewTheme"/>
+						<ComboBox Name="ThemeSelector"
+								SelectionChanged="ChangeMainTheme"
+								Items="{Binding UserThemes}"
+								Width="150"
+								Height="35"
+								SelectedIndex="0"
+								BorderThickness="2"
+								Classes="menu"
+								AutoScrollToSelectedItem="True"
+								Margin="10,0,0,0">
+							<ComboBox.ItemTemplate>
+								<DataTemplate>
+									<TextBlock FontSize="15" 
+											FontWeight="Bold" 
+											Foreground="{Binding #ThemeSelector.CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}" 
+											Text="{Binding ThemeName}">
+									</TextBlock>
+								</DataTemplate>
+							</ComboBox.ItemTemplate>
+						</ComboBox>
+						<Button FontSize="20" 
+								FontWeight="Bold" 
+								BorderThickness="2"
+								Classes="menu"
+								HorizontalAlignment="Center" 
+								i:Attached.Icon="fa-xmark" 
+								Click="RemoveSavedTheme"/>
+					</StackPanel>
+				</StackPanel>
+			</StackPanel>
+		</ScrollViewer>
+	</Border>
+</Window>

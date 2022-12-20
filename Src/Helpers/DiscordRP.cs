@@ -1,6 +1,6 @@
 ﻿using DiscordRPC;
 
-namespace Tsundoku.Src
+namespace Tsundoku.Helpers
 {
     internal class DiscordRP
     {

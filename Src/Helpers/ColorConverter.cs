@@ -2,7 +2,7 @@ using System;
 using System.Globalization;
 using Avalonia.Data.Converters;
 
-namespace Tsundoku.Src
+namespace Tsundoku.Helpers
 {
     public class ColorConverter : IValueConverter
     {
