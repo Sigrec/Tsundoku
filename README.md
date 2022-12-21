@@ -1,9 +1,11 @@
 # [Tsundoku](https://en.wikipedia.org/wiki/Tsundoku) (Desktop Manga & Light Novel Collection App)
 
 ## [Follow Me on AL](https://anilist.co/user/Preminence/) → My Discord is Prem#4927 (DM me for help)
+
+## [ChangeLog](https://github.com/Sigrec/TsundokuApp/blob/main/ChangeLog.txt) (Right Click Exe → Properties → Details to see current File Version)
 ***
 >[**How To Follow a Dropbox Folder for Updates**](https://help.dropbox.com/organize/follow-folder)\
-[**Windows Download** (Current Supported Version = V1.2.0.0)](https://www.dropbox.com/sh/szci4jq9zvorlzc/AAAY0oxWl-HZsmsoMgSrcbxka?dl=0)\
+[**Windows Download** (Current Supported Version = V1.2.1.0)](https://www.dropbox.com/sh/szci4jq9zvorlzc/AAAY0oxWl-HZsmsoMgSrcbxka?dl=0)\
 [**Mac Download (Not Supported Yet)** (Current Supported Version = X)](https://www.dropbox.com/sh/3e0po3d4l1sv8va/AAAgEbiPM86QQtkTcvvGWEVva?dl=0)\
 Download the folder into your desired location (need to keep the executable folder with your UserData.json and Covers folder otherwise it will generate new ones), then pin the exe to your taskbar. Make sure to keep the ExtraSeries.json file in the same folder as well otherwise it will crash if you try and add any series in it like "Radiant"
 ***
@@ -21,11 +23,6 @@ To report a issue please go to the issues link [Tsundoku Issues](https://github.
 Of course I understand if you do not trust me but I promise there is nothing malicious in the executable. The windows defender should turn off after the first time you run it but in case it does not here is a link to add an exclusion [Windows Security Exclusion](https://support.microsoft.com/en-us/windows/add-an-exclusion-to-windows-security-811816c0-4dfd-af4a-47e4-c301afe13b26)
 ***
 ## Feature/Fixes ToDo List
-#### ToDo
-- [ ] Implement Actual Testing to run for future Changes
-- [ ] Exporting/Importing Themes
-- [ ] Add themeing to scrollbar
-- [ ] Have screenshots go into a "Screenshots" folder
   
 #### V1.X.0 Features
 - [ ] Price Analysis Page (Below are the Websites I thought of and whether they can be added to the Analysis or not)

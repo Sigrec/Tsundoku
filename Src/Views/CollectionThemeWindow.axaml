@@ -17,6 +17,10 @@
 	KeyboardNavigation.TabNavigation="None"
 	CanResize="true">
 
+	<Design.DataContext>
+		<vm:ThemeSettingsViewModel/>
+	</Design.DataContext>
+
 	<Window.Styles>
 		<StyleInclude Source="/Styles/MenuTheme.xaml" />
 	</Window.Styles>

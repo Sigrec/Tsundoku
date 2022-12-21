@@ -48,6 +48,7 @@ namespace Tsundoku.Helpers
 								  name {
 									full
 									native
+									alternative
 								  }
 								}
 							  }

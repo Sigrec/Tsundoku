@@ -54,13 +54,14 @@ namespace Tsundoku.Views
 
         private void ScreenCaptureWindows()
         {
+            Directory.CreateDirectory(@"Screenshots");
             using (System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap((int)this.Width, (int)this.Height))
             {
                 using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(bitmap))
                 {
                     g.CopyFromScreen(new System.Drawing.Point((int)this.Bounds.Left, (int)this.Bounds.Top), System.Drawing.Point.Empty, new System.Drawing.Size((int)this.Width, (int)this.Height));
                 }
-                bitmap.Save(@$"{CollectionViewModel.UserName}-Collection-ScreenShot-{CollectionViewModel.CurrentTheme.ThemeName}.jpg", System.Drawing.Imaging.ImageFormat.Jpeg);
+                bitmap.Save(@$"Screenshots\{CollectionViewModel.UserName}-Collection-ScreenShot-{CollectionViewModel.CurrentTheme.ThemeName}.jpg", System.Drawing.Imaging.ImageFormat.Jpeg);
             }
         }
 

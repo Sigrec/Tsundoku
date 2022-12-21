@@ -19,6 +19,9 @@
 		WindowState="2"
 		KeyboardNavigation.TabNavigation="None"
 		Closing="SaveOnClose">
+	<Design.DataContext>
+		<vm:MainWindowViewModel/>
+	</Design.DataContext>
 
 	<Window.Resources>
 		<cv:TitleLangConverter x:Key="ConvertTitle"/>
@@ -153,13 +156,28 @@
 		
 		<!-- Collection -->
 		<ScrollViewer Name="CollectionTheme" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" DockPanel.Dock="Bottom" Background="{Binding CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}">
-			<!-- <ScrollViewer.Styles>
-				<Style Selector="#CollectionTheme /template/ ContentPresenter#PART_VerticalScrollBar /template/ ContentPresenter">
-					<Style Selector="^:vertical /template/ ContentPresenter#VerticalRoot">
-						<Setter Property="Background" Value="Red" />
+			<ScrollViewer.Styles>
+				<Style Selector="ScrollBar:vertical">
+					<Style Selector="^ /template/ Rectangle#TrackRect">
+						<Setter Property="Fill" Value="{Binding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}" />
+					</Style>
+					<Style Selector="^ /template/ Thumb">
+						<Setter Property="Background" Value="{Binding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" />
 					</Style>
 				</Style>
-			</ScrollViewer.Styles> -->
+				<Style Selector="Thumb:pointerover /template/ Border">
+					<Setter Property="Background" Value="{Binding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" />
+				</Style>
+				<Style Selector="RepeatButton">
+					<Setter Property="TextElement.Foreground" Value="{Binding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}"/>
+
+					<Style Selector="^:pressed /template/ ContentPresenter, ^:pointerover /template/ ContentPresenter">
+						<Setter Property="Background" Value="{Binding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" />
+						<Setter Property="BorderBrush" Value="Red" />
+						<Setter Property="TextElement.Foreground" Value="{Binding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}"/>
+					</Style>
+				</Style>
+			</ScrollViewer.Styles>
 			<ItemsControl Margin="50" Items="{Binding SearchedCollection}" HorizontalAlignment="Center">
 				<ItemsControl.ItemsPanel>
 					<ItemsPanelTemplate>

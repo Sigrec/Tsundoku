@@ -1,5 +1,8 @@
-V -
-✓ Fixed Default theme coloring
+V1.2.1.0 - Dec 20th, 2022 @ 4:25PM
+✓ Added color theme styling to scrollbar
+✓ Screenshots now go into a "Screenshots" folder
+✓ Fixed Default theme color scheme
+✓ Added AniList Support for Taiwanese Manga (Will show up as Manhua since Chinese and Taiwanese use Mandarin)
 
 V1.2.0.0 - Dec 18th, 2022 @ 4:57PM PST
 ✓ StatusAndBookType (left side bottom of a series card) hover colors now work as intended

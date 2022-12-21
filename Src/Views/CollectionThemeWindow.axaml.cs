@@ -6,6 +6,7 @@ using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
 using Avalonia.Media;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Tsundoku.Models;
 using Tsundoku.ViewModels;

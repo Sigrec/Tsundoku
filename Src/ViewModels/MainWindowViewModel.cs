@@ -256,18 +256,6 @@ namespace Tsundoku.ViewModels
                 UsersNumVolumesCollected = testUsersNumVolumesCollected;
                 UsersNumVolumesToBeCollected = testUsersNumVolumesToBeCollected;
             }
-
-            // Fix Default Theme
-            if (currentVersion <= 1.2)
-            {
-                for (int x = 0; x < ThemeSettingsViewModel.UserThemes.Count; x++)
-                {
-                    if (ThemeSettingsViewModel.UserThemes[x].ThemeName.Equals("Default") && !ThemeSettingsViewModel.UserThemes[x].Equals(TsundokuTheme.DEFAULT_THEME))
-                    {
-                        ThemeSettingsViewModel.UserThemes[x] = TsundokuTheme.DEFAULT_THEME;
-                    }
-                }
-            }
         }
 
         [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "A New file will always be created if it doesn't exist before serialization")]

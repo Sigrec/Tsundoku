@@ -36,9 +36,6 @@ namespace Tsundoku.Models
 		[JsonIgnore]
 		public Bitmap CoverBitMap { get; set; }
 
-		[JsonIgnore]
-		private static string[] ExtraSeriesList = { "RADIANT" };
-
         public Series(List<string> titles, List<string> staff, string description, string format, string status, string cover, string link, ushort maxVolumeCount, ushort curVolumeCount, Bitmap coverBitMap)
         {
 			Titles = titles;
@@ -67,6 +64,7 @@ namespace Tsundoku.Models
 				JsonElement synonyms = seriesData.GetProperty("synonyms");
 
 				// Checks to see if the series is available on AniList if not check ExtraSeries json
+				string[] ExtraSeriesList = { "RADIANT" };
 				if (ExtraSeriesList.Contains(Helpers.ExtensionMethods.RemoveInPlaceCharArray(title.ToUpper())) && File.Exists(@"ExtraSeries.json"))
 				{
 					Logger.Info($"AniList Does Not Have {title}");
@@ -97,31 +95,33 @@ namespace Tsundoku.Models
 				string filteredBookType = bookType.Equals("MANGA") ? GetCorrectComicName(seriesData.GetProperty("countryOfOrigin").ToString()) : "Novel";
 				string nativeStaff = GetSeriesStaff(seriesData.GetProperty("staff").GetProperty("edges"), "native", filteredBookType, romajiTitle);
 				string fullStaff = GetSeriesStaff(seriesData.GetProperty("staff").GetProperty("edges"), "full", filteredBookType, romajiTitle);
-				string coverPath = SaveNewCoverImage(seriesData.GetProperty("coverImage").GetProperty("extraLarge").ToString(), romajiTitle, filteredBookType.ToUpper(), synonyms, extraSeriesCheck);
+				string coverPath = SaveNewCoverImage(CreateCoverFilePath(seriesData.GetProperty("coverImage").GetProperty("extraLarge").ToString(), romajiTitle, filteredBookType.ToUpper(), synonyms, extraSeriesCheck), seriesData.GetProperty("coverImage").GetProperty("extraLarge").ToString());
 
+				Logger.Debug(nativeStaff);
+				Logger.Debug(fullStaff);
 				//Logger.Debug(seriesData.GetProperty("description").ToString());
 
-				Series _newSeries = new Series(
-					new List<string>()
-					{
-						romajiTitle,
-						englishTitle.ValueKind == JsonValueKind.Null ? romajiTitle : englishTitle.ToString(),
-						nativeTitle
-					},
-					new List<string>()
-					{
-						fullStaff,
-						nativeStaff.Equals(" | ") ? fullStaff : nativeStaff,
-					},
-					ParseDescription(seriesData.GetProperty("description").ToString()),
-					filteredBookType,
-					GetSeriesStatus(seriesData.GetProperty("status").ToString()),
-					coverPath,
-					seriesData.GetProperty("siteUrl").ToString(),
-					maxVolCount,
-					minVolCount,
-					new Bitmap(coverPath).CreateScaledBitmap(new Avalonia.PixelSize(Constants.LEFT_SIDE_CARD_WIDTH, Constants.IMAGE_HEIGHT), BitmapInterpolationMode.HighQuality));
-				return _newSeries;
+				return new Series(
+						new List<string>()
+						{
+							romajiTitle,
+							englishTitle.ValueKind == JsonValueKind.Null ? romajiTitle : englishTitle.ToString(),
+							nativeTitle
+						},
+						new List<string>()
+						{
+							fullStaff,
+							nativeStaff.Equals(" | ") ? fullStaff : nativeStaff,
+						},
+						ParseDescription(seriesData.GetProperty("description").ToString()),
+						filteredBookType,
+						GetSeriesStatus(seriesData.GetProperty("status").ToString()),
+						coverPath,
+						seriesData.GetProperty("siteUrl").ToString(),
+						maxVolCount,
+						minVolCount,
+						new Bitmap(coverPath).CreateScaledBitmap(new Avalonia.PixelSize(Constants.LEFT_SIDE_CARD_WIDTH, Constants.IMAGE_HEIGHT), BitmapInterpolationMode.HighQuality)
+						);
 			}
             else
             {
@@ -139,71 +139,74 @@ namespace Tsundoku.Models
 		{
 			return jsonCountryOfOrigin switch
 			{
-				"KR" => "Manhwa",
-				"CN" => "Manhua",
-				"FR" => "Manfra",
 				"JP" => "Manga",
+				"KR" => "Manhwa",
+				"CN" or "TW" => "Manhua",
+				"FR" => "Manfra",
 				_ => "Error"
 			};
 		}
 
 		public static String GetSeriesStatus(String jsonStatus)
 		{
-			switch(jsonStatus)
+			return jsonStatus switch
 			{
-				case "RELEASING":
-				case "NOT_YET_RELEASED" :
-					return "Ongoing";
-				case "FINISHED":
-					return "Complete";
-				case "CANCELLED":
-					return "Cancelled";
-				case "HIATUS":
-					return "Hiatus";
-				default:
-					return "Error";
-			}
+				"RELEASING" or "NOT_YET_RELEASED" => "Ongoing",
+				"FINISHED" => "Complete",
+				"CANCELLED" => "Cancelled",
+				"HIATUS" => "Hiatus",
+				_  => "Error"
+			};
 		}
 
         public static string GetSeriesStaff(JsonElement staffArray, string nameType, string bookType, string title) {
 			StringBuilder staffList = new StringBuilder();
-			string[] validRoles = { "Story & Art", "Story", "Art", "Original Creator", "Character Design", "Illustration", "Mechanical Design", "Original Story"};
+			string[] validRoles = { "Story & Art", "Story", "Art", "Original Creator", "Character Design", "Illustration", "Mechanical Design", "Original Story", "Original Character Design", "Original Story"};
 			foreach(JsonElement name in staffArray.EnumerateArray())
             {
 				string staffRole = Regex.Replace(name.GetProperty("role").ToString(), @" \(.*\)", "");
 
 				// Don't include "Illustration" staff for manga that are not anthologies
-				if (validRoles.Contains(staffRole) && (!bookType.Equals("Manga") && !staffRole.Equals("Illustration") && title.Contains("Anthology")))
+				if (validRoles.Contains(staffRole) && !(bookType.Equals("Manga") && staffRole.Equals("Illustration") && !title.Contains("Anthology")))
                 {
-					String newStaff = name.GetProperty("node").GetProperty("name").GetProperty(nameType).ToString().Trim();
-					if (!staffList.ToString().Contains(newStaff) || string.IsNullOrWhiteSpace(newStaff)) // Check to see if this staff member has multiple roles to only add them once
+					if (name.GetProperty("node").GetProperty("name").GetProperty("native").ValueKind == JsonValueKind.Null && name.GetProperty("node").GetProperty("name").GetProperty("full").ValueKind == JsonValueKind.Null)
 					{
-						if (!string.IsNullOrWhiteSpace(newStaff))
-						{
-							staffList.Append(newStaff + " | ");
-						}
-						else if (nameType.Equals("native"))
-						{
-							staffList.Append(name.GetProperty("node").GetProperty("name").GetProperty("full").ToString().Trim() + " | ");
-						}
-						else // If the staff member does not have a full name entry
-						{
-							staffList.Append(name.GetProperty("node").GetProperty("name").GetProperty("native").ToString().Trim() + " | ");
-						}
+						staffList.Append("Error" + " | ");
 					}
 					else
 					{
-						Logger.Info($"Duplicate Staff Entry For {newStaff}");
+						string newStaff = name.GetProperty("node").GetProperty("name").GetProperty(nameType).ToString().Trim();
+						string newStaffOther = name.GetProperty("node").GetProperty("name").GetProperty(nameType.Equals("native") ? "full" : "native").ToString().Trim();
+						bool hasAlternatives = (name.GetProperty("node").GetProperty("name").GetProperty("alternative").GetArrayLength() > 0);
+						if (!staffList.ToString().Contains(newStaff) || string.IsNullOrWhiteSpace(newStaff)) // Check to see if this staff member has multiple roles to only add them once
+						{
+							if (!string.IsNullOrWhiteSpace(newStaff))
+							{
+								staffList.Append(newStaff + " | ");
+							}
+							else if (!string.IsNullOrWhiteSpace(newStaffOther))
+							{
+								staffList.Append(newStaffOther + " | ");
+							}
+							else if (hasAlternatives) // If the staff member does not have a full name entry
+							{
+								staffList.Append(name.GetProperty("node").GetProperty("name").GetProperty("alternative")[0].ToString().Trim() + " | ");
+							}
+						}
+						else
+						{
+							Logger.Info($"Duplicate Staff Entry For {newStaff}");
+						}
 					}
                 }
             }
 			return staffList.ToString(0, staffList.Length - 3);
 		}
 
-		public static string SaveNewCoverImage(string coverLink, string title, string bookType, JsonElement synonyms, bool extraSeriesCheck)
-        {
-            string newPath = @$"Covers\{Helpers.ExtensionMethods.RemoveInPlaceCharArray(string.Concat(title.Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries)))}_{bookType}.{coverLink.Substring(coverLink.Length - 3)}";
-            Directory.CreateDirectory(@$"Covers");
+		public static string CreateCoverFilePath(string coverLink, string title, string bookType, JsonElement synonyms, bool extraSeriesCheck)
+		{
+			string newPath = @$"Covers\{Helpers.ExtensionMethods.RemoveInPlaceCharArray(string.Concat(title.Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries)))}_{bookType}.{coverLink.Substring(coverLink.Length - 3)}";
+            Directory.CreateDirectory(@"Covers");
 
 			// Check and see if the series will generate a duplicate file name
             if (!extraSeriesCheck && File.Exists(newPath))
@@ -217,7 +220,10 @@ namespace Tsundoku.Models
                     }
                 }
             }
-
+			return newPath;
+		}
+		public static string SaveNewCoverImage(string newPath, string coverLink)
+        {
             try
             {
                 HttpClient client = new HttpClient();
