@@ -13,6 +13,7 @@ namespace Tsundoku
 
         public override void OnFrameworkInitializationCompleted()
         {
+            
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 Helpers.DiscordRP.Initialize();

@@ -1,3 +1,6 @@
+V1.2.1.1 - 
+✓ Added donation button for those who wanna support
+
 V1.2.1.0 - Dec 20th, 2022 @ 4:25PM
 ✓ Added color theme styling to scrollbar
 ✓ Screenshots now go into a "Screenshots" folder

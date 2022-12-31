@@ -84,7 +84,8 @@
 									Classes="menu"
 									Width="60"
 									BorderThickness="2"
-									i:Attached.Icon="fa-chart-bar"/>
+									Click="OpenDonationLink"
+									i:Attached.Icon="fa-circle-dollar-to-slot"/>
 						</StackPanel>
 					</StackPanel>
 					<TextBlock Name="NumVolumesCollected" 
@@ -187,11 +188,11 @@
 
 				<ItemsControl.ItemTemplate>
 					<DataTemplate>
-						<Border Margin="20" BorderBrush="Transparent" CornerRadius="8" BorderThickness="0" BoxShadow="0 0 15 6 #B3000000" Background="Transparent">
+						<Border Margin="20" BorderBrush="Transparent" CornerRadius="8" BorderThickness="0" BoxShadow="0 0 15 6 #B3000000">
 							<DockPanel Width="{Binding Source={x:Static local:Constants.CARD_WIDTH}}" Height="{Binding Constants.CARD_HEIGHT}" LastChildFill="True">
 
 								<!-- Left Side Card -->
-								<Border CornerRadius="8,0,0,8" ClipToBounds="True">
+								<Border CornerRadius="8,0,0,8" ClipToBounds="true">
 									<Canvas Name="{Binding Link}"
 											PointerPressed="OpenSiteLink"
 											OpacityMask="White"
@@ -214,8 +215,7 @@
 											   Width="{Binding Source={x:Static local:Constants.LEFT_SIDE_CARD_WIDTH}}"
 											   Source="{Binding CoverBitMap}"
 											   ClipToBounds="True"
-											   Name="SeriesCover"
-											   UseLayoutRounding="true">
+											   Name="SeriesCover">
 										</Image>
 
 										<!-- Bottom Left Side Card -->
@@ -223,7 +223,6 @@
 												   Canvas.Bottom="0"
 												   Classes.mouseover="{Binding $parent.IsPointerOver}"
 												   Classes.nomouseover="{Binding !$parent.IsPointerOver}"
-												   UseLayoutRounding="true"
 												   Width="{Binding Source={x:Static local:Constants.LEFT_SIDE_CARD_WIDTH}}"
 												   Height="{Binding Source={x:Static local:Constants.BOTTOM_SECTION_CARD_HEIGHT}}"
 												   FontWeight="Bold"
@@ -241,7 +240,7 @@
 								</Border>
 
 								<!-- Right Side Series Card -->
-								<Border CornerRadius="0,8,8,0" ClipToBounds="True">
+								<Border CornerRadius="0,8,8,0" ClipToBounds="true">
 									<Grid Width="{Binding Source={x:Static local:Constants.RIGHT_SIDE_CARD_WIDTH}}" DockPanel.Dock="Right" RowDefinitions="*, 40">
 										<!-- Top Right Side Card Series Edit-->
 										<Grid Name="EditPane" 
@@ -436,54 +435,52 @@
 														 	  Minimum="0"
 														 	  Maximum="{Binding MaxVolumeCount}"
 														 	  Name="VolumeProgress"/> -->
-											<Border CornerRadius="0,0,10,0" ClipToBounds="true">
-												<StackPanel Width="68" VerticalAlignment="Center">
-													<TextBlock Name="VolumeCount" 
-															   Grid.Row="0" 
-															   Grid.Column="0" 
-															   TextAlignment="Center" 
-															   FontSize="15" 
-															   FontWeight="Bold" 
-															   Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressTextColor, Converter={StaticResource ConvertColor}}" Margin="-8,2,0,0">
-														<TextBlock.Text>
-															<MultiBinding StringFormat="{}{0}/{1}">
-																<Binding Path="CurVolumeCount"/>
-																<Binding Path="MaxVolumeCount"/>
-															</MultiBinding>
-														</TextBlock.Text>
-													</TextBlock>
-													<StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-														<StackPanel.Styles>
-															<Style Selector="Button:pointerover /template/ ContentPresenter">
-																<Setter Property="TextBlock.Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressButtonsHoverColor, Converter={StaticResource ConvertColor}}"/>
-																<Setter Property="Background" Value="Transparent"/>
-															</Style>
-														</StackPanel.Styles>
-														<Button Background="Transparent"
-																Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressTextColor, Converter={StaticResource ConvertColor}}"
-																FontWeight="Bold"
-																FontSize="30"
-																MaxHeight="15"
-																MaxWidth="30"
-																Margin="-7,0,0,0"
-																Padding="0,-19,0,0"
-																Click="SubtractVolume"
-																Name="DecrementButton"
-																Content="-"/>
-														<Button Background="Transparent"
-																Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressTextColor, Converter={StaticResource ConvertColor}}"
-																FontWeight="Bold"
-																FontSize="27"
-																MaxHeight="20"
-																MaxWidth="21"
-																Margin="3,0,0,0"
-																Click="AddVolume"
-																Name="IncrementButton"
-																Padding="0,-15,0,0"
-																Content="+"/>
-													</StackPanel>
+											<StackPanel Width="68" VerticalAlignment="Center">
+												<TextBlock Name="VolumeCount" 
+															Grid.Row="0" 
+															Grid.Column="0" 
+															TextAlignment="Center" 
+															FontSize="15" 
+															FontWeight="Bold" 
+															Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressTextColor, Converter={StaticResource ConvertColor}}" Margin="-8,2,0,0">
+													<TextBlock.Text>
+														<MultiBinding StringFormat="{}{0}/{1}">
+															<Binding Path="CurVolumeCount"/>
+															<Binding Path="MaxVolumeCount"/>
+														</MultiBinding>
+													</TextBlock.Text>
+												</TextBlock>
+												<StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+													<StackPanel.Styles>
+														<Style Selector="Button:pointerover /template/ ContentPresenter">
+															<Setter Property="TextBlock.Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressButtonsHoverColor, Converter={StaticResource ConvertColor}}"/>
+															<Setter Property="Background" Value="Transparent"/>
+														</Style>
+													</StackPanel.Styles>
+													<Button Background="Transparent"
+															Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressTextColor, Converter={StaticResource ConvertColor}}"
+															FontWeight="Bold"
+															FontSize="30"
+															MaxHeight="15"
+															MaxWidth="30"
+															Margin="-7,0,0,0"
+															Padding="0,-19,0,0"
+															Click="SubtractVolume"
+															Name="DecrementButton"
+															Content="-"/>
+													<Button Background="Transparent"
+															Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressTextColor, Converter={StaticResource ConvertColor}}"
+															FontWeight="Bold"
+															FontSize="27"
+															MaxHeight="20"
+															MaxWidth="21"
+															Margin="3,0,0,0"
+															Click="AddVolume"
+															Name="IncrementButton"
+															Padding="0,-15,0,0"
+															Content="+"/>
 												</StackPanel>
-											</Border>
+											</StackPanel>
 										</StackPanel>
 									</Grid>
 								</Border>

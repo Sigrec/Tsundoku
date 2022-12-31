@@ -1,6 +1,6 @@
 # [Tsundoku](https://en.wikipedia.org/wiki/Tsundoku) (Desktop Manga & Light Novel Collection App)
 
-## [Join The Discord](https://discord.gg/QcZ5jcFPeU) | [Follow Me on AL](https://anilist.co/user/Preminence/)
+## [Donate](https://www.paypal.com/donate/?business=JAYCVEJGDF4GY&no_recurring=0&item_name=Anyone+amount+helps+and+keeps+the+app+going.&currency_code=USD) | [Join The Discord](https://discord.gg/QcZ5jcFPeU) | [Follow Me on AL](https://anilist.co/user/Preminence/)
 
 ## [ChangeLog](https://github.com/Sigrec/TsundokuApp/blob/main/ChangeLog.txt) (Right Click Exe → Properties → Details to see current File Version)
 ***
@@ -26,15 +26,15 @@ Of course I understand if you do not trust me but I promise there is nothing mal
   
 #### V1.X.0 Features
 - [ ] Price Analysis Page (Below are the Websites I thought of and whether they can be added to the Analysis or not)
-  - &check; RightStufanime
-  - &check; RobertsAnimeCornerStore
-  - &check; Kinokuniya US
-  - &check; InStoackTrades
-  - ? BarnesAndNoble
-  - ? BooksAMillion
-  - ? Amazon Japan
-  - ? Amazon US
-  - ? CD Japan
+  - [x] RightStufanime
+  - [x] RobertsAnimeCornerStore
+  - [ ] Kinokuniya USA
+  - [x] InStoackTrades
+  - [ ] BarnesAndNoble
+  - [ ] BooksAMillion
+  - [ ] Amazon Japan
+  - [ ] Amazon USA
+  - [ ] CD Japan
 - [ ] Additional Language Support (German, French, Italian, Spanish) [This is dependant on some things otherwise it will have to be pushed much later]
 - [ ] Changing of Display Layout/Format [I need some inspiration from other people, this could move up to V1.5.0 in place of Language Support if I get some contrete layouts]
   

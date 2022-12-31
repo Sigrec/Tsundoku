@@ -208,6 +208,23 @@ namespace Tsundoku.Views
             }
         }
 
+        private void OpenDonationLink(object sender, RoutedEventArgs args)
+        {
+            Logger.Info($"Opening PayPal Donation Lionk");
+            try
+            {
+                Process.Start(new ProcessStartInfo("https://www.paypal.com/donate/?business=JAYCVEJGDF4GY&no_recurring=0&item_name=Anyone+amount+helps+and+keeps+the+app+going.&currency_code=USD") { UseShellExecute = true });
+            }
+            catch (Win32Exception noBrowser)
+            {
+                Logger.Error(noBrowser.Message);
+            }
+            catch (Exception other)
+            {
+                Logger.Error(other.Message);
+            }
+        }
+
         private async void CopySeriesTitleAsync(object sender, PointerPressedEventArgs args)
         {
             string title = ((TextBlock)sender).Text;
