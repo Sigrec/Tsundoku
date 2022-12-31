@@ -1,4 +1,4 @@
-V1.2.1.1 - 
+V1.2.1.1 - Dec 31st, 2022 @ 10:47AM
 ✓ Added donation button for those who wanna support
 
 V1.2.1.0 - Dec 20th, 2022 @ 4:25PM
