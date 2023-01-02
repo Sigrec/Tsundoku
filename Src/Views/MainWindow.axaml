@@ -182,7 +182,7 @@
 			<ItemsControl Margin="50" Items="{Binding SearchedCollection}" HorizontalAlignment="Center">
 				<ItemsControl.ItemsPanel>
 					<ItemsPanelTemplate>
-						<WrapPanel />
+						<WrapPanel/>
 					</ItemsPanelTemplate>
 				</ItemsControl.ItemsPanel>
 

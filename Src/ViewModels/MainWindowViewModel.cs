@@ -165,13 +165,13 @@ namespace Tsundoku.ViewModels
             switch (MainUser.CurLanguage)
             {
                 case "Native":
-                    SearchedCollection.AddRange(Collection.AsParallel().OrderBy(x => x.Titles[2], StringComparer.CurrentCulture));
+                    SearchedCollection.AddRange(Collection.AsParallel().OrderBy(x => x.Titles[2], StringComparer.Create(new System.Globalization.CultureInfo("ja-JP"), true)));
                     break;
                 case "English": 
-                    SearchedCollection.AddRange(Collection.AsParallel().OrderBy(x => x.Titles[1], StringComparer.CurrentCulture));
+                    SearchedCollection.AddRange(Collection.AsParallel().OrderBy(x => x.Titles[1], StringComparer.Ordinal));
                     break;
                 default:
-                    SearchedCollection.AddRange(Collection.AsParallel().OrderBy(x => x.Titles[0], StringComparer.CurrentCulture));
+                    SearchedCollection.AddRange(Collection.AsParallel().OrderBy(x => x.Titles[0], StringComparer.Ordinal));
                     break;
             }
             Collection = new ObservableCollection<Series>(SearchedCollection);

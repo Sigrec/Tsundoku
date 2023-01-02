@@ -1,7 +1,10 @@
-V1.2.1.1 - Dec 31st, 2022 @ 10:47AM
+V1.2.2.0 - Jan 1st, 2023 @ 4:41PM PST
+✓ Fixed Native sorting to use japanese culture
+
+V1.2.1.1 - Dec 31st, 2022 @ 10:47AM PST
 ✓ Added donation button for those who wanna support
 
-V1.2.1.0 - Dec 20th, 2022 @ 4:25PM
+V1.2.1.0 - Dec 20th, 2022 @ 4:25PM PST
 ✓ Added color theme styling to scrollbar
 ✓ Screenshots now go into a "Screenshots" folder
 ✓ Fixed Default theme color scheme
