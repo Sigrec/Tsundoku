@@ -1,3 +1,7 @@
+V1.2.3.0 - Jan 7th, 2023 @ 3:38PM PST
+✓ Fixed padding in title text on the left
+✓ Slightly lowered title text font size
+
 V1.2.2.0 - Jan 1st, 2023 @ 4:41PM PST
 ✓ Fixed Native sorting to use japanese culture
 

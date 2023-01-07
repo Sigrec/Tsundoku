@@ -341,14 +341,14 @@
 													   TextWrapping="Wrap"
 													   Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesCardTitleColor, Converter={StaticResource ConvertColor}}"
 													   FontWeight="Bold"
-													   FontSize="23"
+													   FontSize="21"
 													   MinHeight="20"
 													   Width="{Binding Source={x:Static local:Constants.RIGHT_SIDE_CARD_WIDTH}}" 
 													   PointerPressed="CopySeriesTitleAsync"
 													   Name="SeriesTitle"
-													   Padding="10,2,0,0"
+													   Padding="10,2,5,0"
 													   Cursor="Hand"
-													   LineHeight="10"> <!-- 24.0 -->
+													   LineHeight="24"> <!-- 24.0 --> <!-- old font size was 23 -->
 												<TextBlock.Text>
 													<MultiBinding Converter="{StaticResource ConvertTitle}" Mode="OneWay">
 														<Binding Path="Titles[0]"/>
