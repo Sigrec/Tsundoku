@@ -52,7 +52,17 @@ namespace Tsundoku.Models
 
 		public static Series? CreateNewSeriesCard(string title, string bookType, ushort maxVolCount, ushort minVolCount)
         {
-			string seriesDataQuery = new AniListQuery().GetSeries(title, bookType);
+			int seriesId;
+			string seriesDataQuery;
+			if (int.TryParse(title, out seriesId))
+			{
+				seriesDataQuery = new AniListQuery().GetSeriesID(seriesId, bookType);
+			}
+			else
+			{
+				seriesDataQuery = new AniListQuery().GetSeriesTitle(title, bookType);
+			}
+
 
 			if (!string.IsNullOrWhiteSpace(seriesDataQuery))
             {

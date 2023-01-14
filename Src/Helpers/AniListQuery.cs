@@ -20,7 +20,7 @@ namespace Tsundoku.Helpers
 			
 		}
 
-        public string GetSeries(string title, string format)
+        public string GetSeriesTitle(string title, string format)
 		{
 			try
 			{
@@ -64,6 +64,65 @@ namespace Tsundoku.Helpers
 					Variables = new
 					{
 						title = title,
+						type = format
+					}
+				};
+				var response = Task.Run(async () => await AniListClient.SendQueryAsync<JObject?>(queryRequest));
+				response.Wait();
+				return response.Result.Data.ToString();
+			}
+			catch (Exception e)
+			{
+				Debug.WriteLine(e.ToString());
+			}
+
+			return "";
+		}
+
+		public string GetSeriesID(int seriesId, string format)
+		{
+			try
+			{
+				AniListClient.HttpClient.DefaultRequestHeaders.Add("RequestType", "POST");
+				AniListClient.HttpClient.DefaultRequestHeaders.Add("ContentType", "application/json");
+				AniListClient.HttpClient.DefaultRequestHeaders.Add("Accept", "application/json");
+				AniListClient.HttpClient.DefaultRequestHeaders.Add("UserAgent", USER_AGENT);
+
+				GraphQLRequest queryRequest = new()
+				{
+					Query = @"
+						query ($seriesId: Int, $type: MediaFormat) {
+						  Media(id: $seriesId, format: $type) {
+							countryOfOrigin
+							title {
+							  romaji
+							  english
+							  native
+							}
+							synonyms
+							staff(sort: RELEVANCE) {
+							  edges {
+								role
+								node {
+								  name {
+									full
+									native
+									alternative
+								  }
+								}
+							  }
+							}
+							description
+							status(version: 2)
+							siteUrl
+							coverImage {
+							  extraLarge
+							}
+						  }
+						}",
+					Variables = new
+					{
+						seriesId = seriesId,
 						type = format
 					}
 				};

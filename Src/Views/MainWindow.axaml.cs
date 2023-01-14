@@ -21,6 +21,7 @@ namespace Tsundoku.Views
     {
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         public MainWindowViewModel? CollectionViewModel => DataContext as MainWindowViewModel;
+        private WindowState previousWindowState; 
 
         public MainWindow()
         {
@@ -31,11 +32,12 @@ namespace Tsundoku.Views
                 {
                     if (this.WindowState != WindowState.FullScreen)
                     {
+                        previousWindowState = this.WindowState;
                         this.WindowState = WindowState.FullScreen;
                     }
                     else if (this.WindowState == WindowState.FullScreen)
                     {
-                        this.WindowState = WindowState.Normal;
+                        this.WindowState = previousWindowState;
                     }
                 }
                 else if (e.KeyModifiers == KeyModifiers.Control && e.Key == Key.P)

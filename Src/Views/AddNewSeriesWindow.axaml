@@ -23,7 +23,7 @@
 			<Grid.Styles>
 				<StyleInclude Source="/Styles/MenuTheme.xaml" />
 			</Grid.Styles>
-			<TextBlock Margin="2,0,0,0" Text="Enter Title" Grid.Row="0" Grid.Column="0" FontSize="20" FontWeight="Bold" Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}"/>
+			<TextBlock Margin="2,0,0,0" Text="Enter Title or ID" Grid.Row="0" Grid.Column="0" FontSize="20" FontWeight="Bold" Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}"/>
 			<TextBox Name="TitleBox"
 					FontSize="18"
 					Grid.Row="1"

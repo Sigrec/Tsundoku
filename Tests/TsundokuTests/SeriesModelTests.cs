@@ -1,7 +1,6 @@
 using Tsundoku.Models;
 using Tsundoku.Helpers;
 using System.Text.Json;
-using Avalonia.Media.Imaging;
 
 [assembly: Description("Testing the Series class, mainly ensuring data validity.")]
 namespace TsundokuTests
@@ -23,9 +22,18 @@ namespace TsundokuTests
         [Test]
         public void CreateCoverFilePath_Test()
         {
-            JsonElement narutoQuery = JsonDocument.Parse(new AniListQuery().GetSeries("Naruto", "MANGA")).RootElement.GetProperty("Media");
+            JsonElement narutoQuery = JsonDocument.Parse(new AniListQuery().GetSeriesTitle("Naruto", "MANGA")).RootElement.GetProperty("Media");
 
             Assert.That("Covers\\NARUTO_MANGA.jpg", Is.EqualTo(Series.CreateCoverFilePath(narutoQuery.GetProperty("coverImage").GetProperty("extraLarge").ToString(), narutoQuery.GetProperty("title").GetProperty("romaji").ToString(), "MANGA", narutoQuery.GetProperty("synonyms"), false)));
+        }
+
+        [Test]
+        public void IdenticalSeriesNames_Test()
+        {
+            Assert.Multiple(() => {
+                Assert.That("Getsuyoubi no Tawawa", Is.EqualTo(JsonDocument.Parse(new AniListQuery().GetSeriesID(98282, "MANGA")).RootElement.GetProperty("Media").GetProperty("title").GetProperty("romaji").ToString()));
+                Assert.That("Getsuyoubi no Tawawa", Is.EqualTo(JsonDocument.Parse(new AniListQuery().GetSeriesID(125854, "MANGA")).RootElement.GetProperty("Media").GetProperty("title").GetProperty("romaji").ToString()));
+            });
         }
 
         [Test]
@@ -36,7 +44,7 @@ namespace TsundokuTests
                 File.Create("Covers\\OnePunchMan_MANGA.jpg");
             }
 
-            JsonElement onePunchManQuery = JsonDocument.Parse(new AniListQuery().GetSeries("One-Punch Man (Original)", "MANGA")).RootElement.GetProperty("Media");
+            JsonElement onePunchManQuery = JsonDocument.Parse(new AniListQuery().GetSeriesTitle("One-Punch Man (Original)", "MANGA")).RootElement.GetProperty("Media");
 
             Assert.That("Covers\\One-PunchMan(Original)_MANGA.jpg", Is.EqualTo(Series.CreateCoverFilePath(onePunchManQuery.GetProperty("coverImage").GetProperty("extraLarge").ToString(), onePunchManQuery.GetProperty("title").GetProperty("romaji").ToString(), "MANGA", onePunchManQuery.GetProperty("synonyms"), false)));
         }
@@ -100,7 +108,7 @@ namespace TsundokuTests
         [Test] // Testing with Bakemonogatari
         public void GetSeriesStaff_ToManyIllustrators_Test()
         {
-            JsonElement bakemonogatariStaffQuery = JsonDocument.Parse(new AniListQuery().GetSeries("化物語", "MANGA")).RootElement.GetProperty("Media").GetProperty("staff").GetProperty("edges");
+            JsonElement bakemonogatariStaffQuery = JsonDocument.Parse(new AniListQuery().GetSeriesTitle("化物語", "MANGA")).RootElement.GetProperty("Media").GetProperty("staff").GetProperty("edges");
 
             Assert.That(Series.GetSeriesStaff(bakemonogatariStaffQuery, "full", "Manga", "Bakemonogatari"), Is.EqualTo("Ito Oogure | NISIOISIN | VOFAN | Akio Watanabe"));
         }
@@ -108,7 +116,7 @@ namespace TsundokuTests
         [Test]
         public void GetSeriesStaff_MultplieStaffForValidRole_Test()
         {
-            JsonElement soloLevelingQuery = JsonDocument.Parse(new AniListQuery().GetSeries("나 혼자만 레벨업", "MANGA")).RootElement.GetProperty("Media").GetProperty("staff").GetProperty("edges");
+            JsonElement soloLevelingQuery = JsonDocument.Parse(new AniListQuery().GetSeriesTitle("나 혼자만 레벨업", "MANGA")).RootElement.GetProperty("Media").GetProperty("staff").GetProperty("edges");
 
             Assert.That(Series.GetSeriesStaff(soloLevelingQuery, "full", "Manga", "Na Honjaman Level Up"), Is.EqualTo("Seong-Rak Jang | Chu-Gong | So-Ryeong Gi | Hyeon-Gun"));
         }
@@ -117,7 +125,7 @@ namespace TsundokuTests
         public void GetSeriesStaff_Anthology_Test()
         {
             //Lycoris Recoil Koushiki Comic Anthology: Repeat
-            JsonElement anthologyQuery = JsonDocument.Parse(new AniListQuery().GetSeries("リコリス・リコイル 公式コミックアンソロジー リピート", "MANGA")).RootElement.GetProperty("Media").GetProperty("staff").GetProperty("edges");
+            JsonElement anthologyQuery = JsonDocument.Parse(new AniListQuery().GetSeriesTitle("リコリス・リコイル 公式コミックアンソロジー リピート", "MANGA")).RootElement.GetProperty("Media").GetProperty("staff").GetProperty("edges");
 
             Assert.That(Series.GetSeriesStaff(anthologyQuery, "full", "Manga", "Lycoris Recoil Koushiki Comic Anthology: Repeat"), Is.EqualTo("Takeshi Kojima | Mekimeki | Nyoijizai | GUNP | Itsuki Takano | Ren Sakuragi | sometime | Ryou Niina | Ginmoku | Mikaduchi | Nikomi Wakadori | Miki Morinaga | Raika Suzumi | Ree | Atto | Tiv | Sou Hamayumiba | Kanari Abe | Nachi Aono"));
         }
