@@ -48,6 +48,7 @@ namespace Tsundoku.Views
                 else if (e.KeyModifiers == KeyModifiers.Control && e.Key == Key.S)
                 {
                     Logger.Info("Saving Collection");
+                    CollectionViewModel.SearchText = "";
                     MainWindowViewModel.SaveUsersData();
                 }
             };

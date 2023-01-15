@@ -10,8 +10,8 @@
 	Icon="\Assets\Icons\Tsundoku-Logo.ico"
 	Title="Theme Settings"
 	FontFamily="Segoe UI"
-	Width="900"
-	Height="800"
+	Width="1300"
+	Height="910"
 	Classes="menu"
 	WindowStartupLocation="CenterOwner"
 	KeyboardNavigation.TabNavigation="None"
@@ -25,12 +25,22 @@
 		<StyleInclude Source="/Styles/MenuTheme.xaml" />
 	</Window.Styles>
 
+	<!-- <Window.Resources>
+		<StyleInclude x:Key="ColorPickerFluent" Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml" />
+	</Window.Resources> -->
+
 	<Border Classes="menu" BorderThickness="3">
 		<ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden">
-			<StackPanel Spacing="50" Margin="20">
+			<StackPanel Spacing="30" Margin="20">
 				<StackPanel HorizontalAlignment="Center">
 					<TextBlock Text="Menu / Nav Bar" FontSize="30" FontWeight="Bold" Classes="menu" HorizontalAlignment="Center" TextDecorations="Underline"/>
 					<WrapPanel>
+						<!-- <WrapPanel.Styles>
+							<Style Selector="ColorPicker /template/ DropDownButton.Border">
+								<Setter Property="Background" Value="Green"/>
+							</Style>
+						</WrapPanel.Styles>
+						<ColorPicker Color="Red" Height="20" Width="210" IsColorPaletteVisible="false"/> -->
 						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
 							<TextBlock Text="Menu BG" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">

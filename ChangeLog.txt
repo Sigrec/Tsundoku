@@ -1,3 +1,9 @@
+V1.3.2.0 - Jan 15th, 2023 @ 3:08PM PST
+✓ QoL changes to User Settings Windows (Added Controls Section and New Formatting)
+
+V1.3.1.0 - Jan 14th, 2023 @ 12:PM PST
+✓ Fixed triple line break issue with some series description
+
 V1.3.0.0 - Jan 13th, 2023 @ 6:53PM PST
 ✓ Fixed issue where series where all of the names are identical (Getsuyoubi no Tawawa Example) you could only add 1 of them -> Fix is to use the series AL ID #
 ✓ Made Toggling OFF/Disabling FullScreen keep the previous window size/state before user toggled ON FullScreen

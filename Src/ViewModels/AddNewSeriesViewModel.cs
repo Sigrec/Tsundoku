@@ -45,7 +45,6 @@ namespace Tsundoku.ViewModels
         */
         public bool GetSeriesData(string title, string bookType, ushort curVolCount, ushort maxVolCount)
         {
-            Logger.Info($"Adding New Series -> {title} | {bookType} | {curVolCount} | {maxVolCount}");
             Series newSeries = Series.CreateNewSeriesCard(title, bookType, maxVolCount, curVolCount);
             bool duplicateSeriesCheck = true;
             if (newSeries != null)
@@ -67,13 +66,14 @@ namespace Tsundoku.ViewModels
                         Logger.Info("Refreshing Searched Collection");
                         MainWindowViewModel.SortCollection();
                     }
-
-                    Logger.Info(newSeries.ToJsonString(options));
+                    Logger.Info($"\nAdding New Series -> {title} | {bookType} | {curVolCount} | {maxVolCount}{newSeries.ToJsonString(options)}");
 
                     int index = MainWindowViewModel.SearchForSort(newSeries);
+                    index = index < 0 ? ~index : index;
 
-                    MainWindowViewModel.Collection.Insert(index < 0 ? ~index : index, newSeries);
-                    MainWindowViewModel.SearchedCollection.Insert(index < 0 ? ~index : index, newSeries);
+                    MainWindowViewModel.Collection.Insert(index, newSeries);
+                    MainWindowViewModel.SearchedCollection.Insert(index, newSeries);
+
                 }
                 else
                 {

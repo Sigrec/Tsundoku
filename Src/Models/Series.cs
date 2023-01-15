@@ -107,9 +107,9 @@ namespace Tsundoku.Models
 				string fullStaff = GetSeriesStaff(seriesData.GetProperty("staff").GetProperty("edges"), "full", filteredBookType, romajiTitle);
 				string coverPath = SaveNewCoverImage(CreateCoverFilePath(seriesData.GetProperty("coverImage").GetProperty("extraLarge").ToString(), romajiTitle, filteredBookType.ToUpper(), synonyms, extraSeriesCheck), seriesData.GetProperty("coverImage").GetProperty("extraLarge").ToString());
 
-				Logger.Debug(nativeStaff);
-				Logger.Debug(fullStaff);
-				//Logger.Debug(seriesData.GetProperty("description").ToString());
+				//Logger.Debug(nativeStaff);
+				//Logger.Debug(fullStaff);
+				//Logger.Debug(Microsoft.CodeAnalysis.CSharp.SymbolDisplay.FormatLiteral(seriesData.GetProperty("description").ToString(), false));
 
 				return new Series(
 						new List<string>()
@@ -142,7 +142,7 @@ namespace Tsundoku.Models
 
 		public static string ParseDescription(string seriesDescription)
 		{
-			return string.IsNullOrWhiteSpace(seriesDescription) ? "" : Regex.Replace(System.Web.HttpUtility.HtmlDecode(seriesDescription).Replace("<br><br>", "\n"), @"\(Source: [\S\s]+|\<.*?\>", "").Trim().TrimEnd('\n');
+			return string.IsNullOrWhiteSpace(seriesDescription) ? "" : Regex.Replace(System.Web.HttpUtility.HtmlDecode(seriesDescription).Replace("\n<br><br>\n", "\n\n").Replace("<br><br>", "\n"), @"\(Source: [\S\s]+|\<.*?\>", "").Trim().TrimEnd('\n');
 		}
 
 		public static string GetCorrectComicName(string jsonCountryOfOrigin)

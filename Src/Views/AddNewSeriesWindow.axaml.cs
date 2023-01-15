@@ -36,9 +36,9 @@ namespace Tsundoku.Views
                 Topmost = false;
                 e.Cancel = true;
             };
-// #if DEBUG
-//             this.AttachDevTools();
-// #endif
+#if DEBUG
+            this.AttachDevTools();
+#endif
         }
 
         private void IsMangaButtonClicked(object sender, RoutedEventArgs args)
@@ -74,6 +74,7 @@ namespace Tsundoku.Views
                 {
                     CollectionWindow.CollectionViewModel.UsersNumVolumesCollected += cur;
                     CollectionWindow.CollectionViewModel.UsersNumVolumesToBeCollected += (uint)(max - cur);
+                    CollectionWindow.CollectionViewModel.SearchText = "";
                 }
             }
         }

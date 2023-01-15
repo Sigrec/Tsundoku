@@ -28,6 +28,12 @@ namespace TsundokuTests
         }
 
         [Test]
+        public void UnnecessaryBreakRemoval_Test()
+        {
+            Assert.That(Series.ParseDescription("After a fierce battle between humans and vampires, a temporary peace was established, but Kaname continued to sleep within a coffin of ice… Yuki gave Kaname her heart to revive him as a human being.\n<br><br>\nThese are the stories of what happened during those 1,000 years of Kaname’s slumber and at the start of his human life.\n<br><br>\n(Source: Viz Media)"), Is.EqualTo("After a fierce battle between humans and vampires, a temporary peace was established, but Kaname continued to sleep within a coffin of ice\u2026 Yuki gave Kaname her heart to revive him as a human being.\n\nThese are the stories of what happened during those 1,000 years of Kaname\u2019s slumber and at the start of his human life."));
+        }
+
+        [Test]
         public void IdenticalSeriesNames_Test()
         {
             Assert.Multiple(() => {

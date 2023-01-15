@@ -54,11 +54,21 @@ namespace Tsundoku.Views
             }
         }  
 
-        private void SaveCollection(object sender, RoutedEventArgs args)
+        private void JoinDiscord(object sender, RoutedEventArgs args)
         {
-            CollectionWindow.CollectionViewModel.SearchText = "";
-            MainWindowViewModel.SaveUsersData();
-            Logger.Info($"Saving {MainWindowViewModel.MainUser.UserName}'s Collection");
+            Logger.Info(@"Opening Issue Repo https://discord.gg/QcZ5jcFPeU");
+            try
+            {
+                Process.Start(new ProcessStartInfo(@"https://discord.gg/QcZ5jcFPeU") { UseShellExecute = true });
+            }
+            catch (System.ComponentModel.Win32Exception noBrowser)
+            {
+                Logger.Error(noBrowser.Message);
+            }
+            catch (System.Exception other)
+            {
+                Logger.Error(other.Message);
+            }
         }
 
         private void ReportBug(object sender, RoutedEventArgs args)

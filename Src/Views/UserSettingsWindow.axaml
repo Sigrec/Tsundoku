@@ -11,7 +11,7 @@
         SizeToContent="WidthAndHeight"
         WindowStartupLocation="CenterOwner"
         KeyboardNavigation.TabNavigation="None"
-        CanResize="true">
+        CanResize="false">
     
     <Window.Styles>
 		<StyleInclude Source="/Styles/MenuTheme.xaml" />
@@ -38,36 +38,47 @@
                             IsEnabled="{Binding IsChangeUsernameButtonEnabled}"/>
                 </StackPanel>
             </StackPanel>
-            <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
-                <Button FontSize="15" 
-                        FontWeight="Bold" 
-                        BorderThickness="2" 
-                        Classes="menu"
-                        i:Attached.Icon="fa-check" 
-                        Click="SaveCollection"
-                        Content="Save Collection"/>
-                <Button FontSize="15" 
-                        FontWeight="Bold" 
-                        Classes="menu"
-                        BorderThickness="2"  
-                        i:Attached.Icon="fa-check" Click="ExportToSpreadsheet"
-                        Content="Export to Spreadsheet"/>
+            <StackPanel Spacing="5">
+                <TextBlock Text="Settings" FontSize="20" FontWeight="Bold" Classes="menu"/>
+                <WrapPanel Margin="-35,-3,0,0" Width="420">
+                    <WrapPanel.Styles>
+                        <Style Selector="Button">
+                            <Setter Property="Margin" Value="5"/>
+                        </Style>
+                    </WrapPanel.Styles>
+                    <Button FontSize="15" 
+                            FontWeight="Bold" 
+                            BorderThickness="2" 
+                            Classes="menu"
+                            Click="JoinDiscord"
+                            Content="Join Discord"/>
+                    <Button FontSize="15" 
+                            FontWeight="Bold" 
+                            BorderThickness="2" 
+                            Classes="menu"
+                            Click="ReportBug" 
+                            HorizontalAlignment="Center"
+                            Content="Report Issue/Bug"/>
+                    <Button FontSize="15" 
+                            FontWeight="Bold" 
+                            BorderThickness="2" 
+                            Classes="menu"
+                            Click="OpenCoversFolder" 
+                            HorizontalAlignment="Center"
+                            Content="Open Covers Folder"/>
+                    <Button FontSize="15" 
+                            FontWeight="Bold"
+                            Classes="menu"
+                            BorderThickness="2"
+                            Click="ExportToSpreadsheet"
+                            Content="Export to Spreadsheet"/>
+                </WrapPanel>
             </StackPanel>
-            <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
-                <Button FontSize="15" 
-                        FontWeight="Bold" 
-                        BorderThickness="2" 
-                        Classes="menu"
-                        Click="ReportBug" 
-                        HorizontalAlignment="Center"
-                        Content="Report Issue/Bug"/>
-                <Button FontSize="15" 
-                        FontWeight="Bold" 
-                        BorderThickness="2" 
-                        Classes="menu"
-                        Click="OpenCoversFolder" 
-                        HorizontalAlignment="Center"
-                        Content="Open Covers Folder"/>
+            <StackPanel Spacing="5">
+                <TextBlock Text="Controls" FontSize="20" FontWeight="Bold" Classes="menu"/>
+                <TextBlock Text="Toggle Fullscreen → F11" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
+                <TextBlock Text="Screenshot Collection → CTRL+P" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
+                <TextBlock Text="Save Collection → CTRL+S" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
             </StackPanel>
         </StackPanel>
     </Border>

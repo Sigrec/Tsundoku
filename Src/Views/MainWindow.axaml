@@ -117,39 +117,31 @@
 							   HorizontalAlignment="Center"/>
 					<StackPanel Spacing="5" HorizontalAlignment="Center" VerticalAlignment="Center">
 						<ComboBox Name="LanguageSelector"
-								Items="{Binding AvailableLanguages, Mode=OneWay}"
-								SelectionChanged="LanguageChanged"
-								SelectedItem="{Binding MainUser.CurLanguage}"
-								Height="35"
-								Width="130"
-								Classes="menu"
-								BorderThickness="2"
-								FontWeight="Bold"
-								FontSize="15"
-								VerticalAlignment="Center"
-								HorizontalAlignment="Center"
-								AutoScrollToSelectedItem="True"/>
+								  Items="{Binding AvailableLanguages, Mode=OneWay}"
+								  SelectionChanged="LanguageChanged"
+								  SelectedItem="{Binding MainUser.CurLanguage}"
+								  Height="35"
+								  Width="130"
+								  Classes="menu"
+								  BorderThickness="2"
+								  FontWeight="Bold"
+								  FontSize="15"
+								  VerticalAlignment="Center"
+								  HorizontalAlignment="Center"
+								  AutoScrollToSelectedItem="True"/>
 						<ComboBox Name="DisplaySelector"
-								Items="{Binding AvailableDisplays, Mode=OneWay}"
-								SelectionChanged="DisplayChanged"
-								SelectedItem="{Binding MainUser.Display}"
-								Height="35"
-								Width="130"
-								BorderThickness="2"
-								VerticalAlignment="Center"
-								HorizontalAlignment="Center"
-								Classes="menu"
-								AutoScrollToSelectedItem="True">
-							<ComboBox.ItemTemplate>
-								<DataTemplate>
-									<TextBlock FontSize="15" 
-											FontWeight="Bold"
-											Background="{Binding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"
-											Foreground="{Binding CurrentTheme.MenuButtonTextColor, Converter={StaticResource ConvertColor}}"
-											Text="{Binding}"/>
-								</DataTemplate>
-							</ComboBox.ItemTemplate>
-						</ComboBox>
+								  SelectionChanged="DisplayChanged"
+								  Height="35"
+								  FontWeight="Bold"
+								  FontSize="15"
+								  SelectedItem="{Binding MainUser.Display}"
+								  Items="{Binding AvailableDisplays, Mode=OneWay}"
+								  Width="130"
+								  BorderThickness="2"
+								  VerticalAlignment="Center"
+								  HorizontalAlignment="Center"
+								  Classes="menu"
+								  AutoScrollToSelectedItem="True"/>
 					</StackPanel>
 				</StackPanel>
 			</DockPanel>
@@ -179,7 +171,7 @@
 					</Style>
 				</Style>
 			</ScrollViewer.Styles>
-			<ItemsControl Margin="50" Items="{Binding SearchedCollection}" HorizontalAlignment="Center">
+			<ItemsControl Margin="0,50,0,50" Items="{Binding SearchedCollection}" HorizontalAlignment="Center">
 				<ItemsControl.ItemsPanel>
 					<ItemsPanelTemplate>
 						<WrapPanel/>
