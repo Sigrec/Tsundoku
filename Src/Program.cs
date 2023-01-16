@@ -1,3 +1,6 @@
+using System.Xml.Linq;
+using System.Runtime.CompilerServices;
+using System.Data;
 using Avalonia;
 using Avalonia.ReactiveUI;
 using Projektanker.Icons.Avalonia;
@@ -23,6 +26,8 @@ namespace Tsundoku
                 .WithIcons(container => container
                     .Register<FontAwesomeIconProvider>())
                 .UseReactiveUI()
+                .With(LoaderOptimization.MultiDomainHost)
+                .With(LoadHint.Sometimes)
                 .With(new SkiaOptions 
                 {
                     MaxGpuResourceSizeBytes = 1024000000
@@ -31,7 +36,8 @@ namespace Tsundoku
                 {
                     UseCompositor = false,
                     UseWgl = true,
-                    UseDeferredRendering = false
+                    UseDeferredRendering = false,
+                    AllowEglInitialization = true
                 });
     }
 }

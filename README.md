@@ -5,7 +5,7 @@
 ## [ChangeLog](https://github.com/Sigrec/TsundokuApp/blob/main/ChangeLog.txt) (Right Click Exe → Properties → Details to see current File Version)
 ***
 >[**How To Follow a Dropbox Folder for Updates**](https://help.dropbox.com/organize/follow-folder)\
-[**Windows Download** (Current Supported Version = V1.3.2.0)](https://www.dropbox.com/sh/szci4jq9zvorlzc/AAAY0oxWl-HZsmsoMgSrcbxka?dl=0)\
+[**Windows Download** (Current Supported Version = V1.3.3.0)](https://www.dropbox.com/sh/szci4jq9zvorlzc/AAAY0oxWl-HZsmsoMgSrcbxka?dl=0)\
 [**Mac Download (Not Supported Yet Need Someone To Test For Me Add me on Discord if Interested & DM)** (Current Supported Version = X)](https://www.dropbox.com/sh/3e0po3d4l1sv8va/AAAgEbiPM86QQtkTcvvGWEVva?dl=0)\
 Download the folder into your desired location (need to keep the executable folder with your UserData.json and Covers folder otherwise it will generate new ones), then pin the exe to your taskbar. Make sure to keep the ExtraSeries.json file in the same folder as well otherwise it will crash if you try and add any series in it like "Radiant"
 ***

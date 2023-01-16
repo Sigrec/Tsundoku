@@ -1,3 +1,8 @@
+V1.3.3.0 - Jan 16th, 2023 @ 11:48AM PST
+✓ Slightly increased title font size
+✓ Fixed English & Romaji Sorting to be case insensitive (Refresh your sort)
+✓ Fixed series description scrolling, no longer scrolls collection if user scrolls to end of description
+
 V1.3.2.0 - Jan 15th, 2023 @ 3:08PM PST
 ✓ QoL changes to User Settings Windows (Added Controls Section and New Formatting)
 
