@@ -1,3 +1,9 @@
+V1.4.0.0 - Jan 16th, 2023 @ 5:14PM PST
+✓ Changed "Complete" Status to "Finished" for series
+✓ Can now filter your collection using the dropdown under the language dropdown
+✓ Can TavbNavigate in "AddNewSeriesWindow" (Was crashing before if it does crash for you let me know ASAP so I can make the change)
+✓ Changes to window state behavior to fix a bug (might not fix issue can't reproduce issue on my machine)
+
 V1.3.3.0 - Jan 16th, 2023 @ 11:48AM PST
 ✓ Slightly increased title font size
 ✓ Fixed English & Romaji Sorting to be case insensitive (Refresh your sort)

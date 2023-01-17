@@ -28,11 +28,10 @@ namespace Tsundoku.ViewModels
         public AddNewSeriesWindow newSeriesWindow;
         public SettingsWindow settingsWindow;
         public CollectionThemeWindow themeSettingsWindow;
-        public static double currentVersion = 1.2;
         public static string _curDisplay;
         public static uint _curVolumesCollected, _curVolumesToBeCollected;
         public string[] AvailableLanguages { get; } = new string[] { "Romaji", "English", "Native" };
-        public string[] AvailableDisplays { get; } = new string[] { "Card" };
+        public string[] AvailableCollectionFilters { get; } = new string[] { "None", "Ongoing", "Finished", "Hiatus", "Cancelled", "Complete", "Incomplete", "Manga", "Novel" };
 
         [Reactive]
         public string SearchText { get; set; }
@@ -175,7 +174,44 @@ namespace Tsundoku.ViewModels
                     break;
             }
             Collection = new ObservableCollection<Series>(SearchedCollection);
-            Logger.Info($"Sorting {MainUser.CurLanguage}");
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+        }
+
+        public static void FilterCollection(string filter)
+        {
+            SearchedCollection.Clear();
+            switch (filter)
+            {
+                case "Ongoing":
+                    SearchedCollection.AddRange(Collection.Where(series => series.Status.Equals("Ongoing")));
+                    break;
+                case "Finished":
+                    SearchedCollection.AddRange(Collection.Where(series => series.Status.Equals("Finished")));
+                    break;
+                case "Hiatus":
+                    SearchedCollection.AddRange(Collection.Where(series => series.Status.Equals("Hiatus")));
+                    break;
+                case "Cancelled":
+                    SearchedCollection.AddRange(Collection.Where(series => series.Status.Equals("Cancelled")));
+                    break;
+                case "Complete":
+                    SearchedCollection.AddRange(Collection.Where(series => series.CurVolumeCount == series.MaxVolumeCount));
+                    break;
+                case "Incomplete":
+                    SearchedCollection.AddRange(Collection.Where(series => series.CurVolumeCount != series.MaxVolumeCount));
+                    break;
+                case "Manga":
+                    SearchedCollection.AddRange(Collection.Where(series => series.Format.Equals("Manga") || series.Format.Equals("Manhwa") || series.Format.Equals("Manhua") || series.Format.Equals("Manfra")));
+                    break;
+                case "Novel":
+                    SearchedCollection.AddRange(Collection.Where(series => series.Format.Equals("Novel")));
+                    break;
+                case "None":
+                default:
+                    SearchedCollection.AddRange(Collection);
+                    break;
+            }
             GC.Collect();
             GC.WaitForPendingFinalizers();
         }
@@ -208,6 +244,7 @@ namespace Tsundoku.ViewModels
                 Logger.Info("Creating New User");
                 ThemeSettingsViewModel.UserThemes = new ObservableCollection<TsundokuTheme>() { TsundokuTheme.DEFAULT_THEME };
                 MainUser = new User("UserName", "Romaji", "Default", "Card", ThemeSettingsViewModel.UserThemes, Collection);
+                MainUser.CurDataVersion = 1.4;
                 UserName = MainUser.UserName;
                 Collection = MainUser.UserCollection;
                 CurLanguage = MainUser.CurLanguage;
@@ -227,8 +264,6 @@ namespace Tsundoku.ViewModels
             CurLanguage = MainUser.CurLanguage;
             CurDisplay = MainUser.Display;
             CurrentTheme = ThemeSettingsViewModel.UserThemes.Single(x => x.ThemeName == MainUser.MainTheme).Cloning();
-            UsersNumVolumesCollected = MainUser.NumVolumesCollected;
-            UsersNumVolumesToBeCollected = MainUser.NumVolumesToBeCollected;
 
             uint testUsersNumVolumesCollected = 0, testUsersNumVolumesToBeCollected = 0;
 
@@ -255,6 +290,20 @@ namespace Tsundoku.ViewModels
             {
                 UsersNumVolumesCollected = testUsersNumVolumesCollected;
                 UsersNumVolumesToBeCollected = testUsersNumVolumesToBeCollected;
+            }
+
+            // Updating series data from for Version 1.4.0.0
+            if (MainUser.CurDataVersion < 1.4)
+            {
+                MainUser.CurDataVersion = 1.4;
+                foreach (Series x in Collection)
+                {
+                    if (x.Status.Equals("Complete"))
+                    {
+                        x.Status = "Finished";
+                    }
+                }
+                Logger.Info("Updated Users Data for version 1.4.0.0");
             }
         }
 

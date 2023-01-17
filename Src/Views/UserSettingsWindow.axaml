@@ -9,7 +9,7 @@
         Title="Settings"
         FontFamily="Segoe UI"
         SizeToContent="WidthAndHeight"
-        WindowStartupLocation="CenterOwner"
+        WindowStartupLocation="CenterScreen"
         KeyboardNavigation.TabNavigation="None"
         CanResize="false">
     

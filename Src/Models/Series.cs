@@ -23,7 +23,7 @@ namespace Tsundoku.Models
         public List<string> Staff { get; } //[Romaji, Native]
 		public string Description { get; }
 		public string Format { get; }
-		public string Status { get; }
+		public string Status { get; set; }
 		public string Cover { get; set; }
 		public string Link { get; }
 		public string SeriesNotes { get; set; }
@@ -162,7 +162,7 @@ namespace Tsundoku.Models
 			return jsonStatus switch
 			{
 				"RELEASING" or "NOT_YET_RELEASED" => "Ongoing",
-				"FINISHED" => "Complete",
+				"FINISHED" => "Finished",
 				"CANCELLED" => "Cancelled",
 				"HIATUS" => "Hiatus",
 				_  => "Error"

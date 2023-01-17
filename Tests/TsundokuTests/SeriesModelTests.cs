@@ -104,7 +104,7 @@ namespace TsundokuTests
             Assert.Multiple(() => {
                 Assert.That(Series.GetSeriesStatus("RELEASING"), Is.EqualTo("Ongoing"));
                 Assert.That(Series.GetSeriesStatus("NOT_YET_RELEASED"), Is.EqualTo("Ongoing"));
-                Assert.That(Series.GetSeriesStatus("FINISHED"), Is.EqualTo("Complete"));
+                Assert.That(Series.GetSeriesStatus("FINISHED"), Is.EqualTo("Finished"));
                 Assert.That(Series.GetSeriesStatus("CANCELLED"), Is.EqualTo("Cancelled"));
                 Assert.That(Series.GetSeriesStatus("HIATUS"), Is.EqualTo("Hiatus"));
                 Assert.That(Series.GetSeriesStatus("UNICORN"), Is.EqualTo("Error"));

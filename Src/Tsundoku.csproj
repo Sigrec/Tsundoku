@@ -22,10 +22,9 @@
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
     <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
     <IncludeSymbols>False</IncludeSymbols>
-    <FileVersion>1.0.2.0</FileVersion>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <Version>1.0.0</Version>
-    <FileVersion>1.3.3.0</FileVersion>
+    <Version>1.4.0</Version>
+    <FileVersion>1.4.0.0</FileVersion>
   </PropertyGroup>
 	<ItemGroup>
 	<AvaloniaResource Include="Assets/**" />

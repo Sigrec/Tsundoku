@@ -11,6 +11,7 @@ namespace Tsundoku.Models
         public string CurLanguage { get; set; }
         public string Display { get; set; }
         public string MainTheme { get; set; }
+        public double CurDataVersion { get; set; }
         public ObservableCollection<TsundokuTheme> SavedThemes { get; set; }
         public ObservableCollection<Series> UserCollection { get; set; }
 

@@ -10,10 +10,9 @@
 	Icon="\Assets\Icons\Tsundoku-Logo.ico"
 	Title="Theme Settings"
 	FontFamily="Segoe UI"
-	Width="1300"
-	Height="910"
+	WindowState="Maximized"
 	Classes="menu"
-	WindowStartupLocation="CenterOwner"
+	WindowStartupLocation="CenterScreen"
 	KeyboardNavigation.TabNavigation="None"
 	CanResize="true">
 

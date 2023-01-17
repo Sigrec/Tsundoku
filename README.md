@@ -5,7 +5,7 @@
 ## [ChangeLog](https://github.com/Sigrec/TsundokuApp/blob/main/ChangeLog.txt) (Right Click Exe → Properties → Details to see current File Version)
 ***
 >[**How To Follow a Dropbox Folder for Updates**](https://help.dropbox.com/organize/follow-folder)\
-[**Windows Download** (Current Supported Version = V1.3.3.0)](https://www.dropbox.com/sh/szci4jq9zvorlzc/AAAY0oxWl-HZsmsoMgSrcbxka?dl=0)\
+[**Windows Download** (Current Supported Version = V1.4.0.0)](https://www.dropbox.com/sh/szci4jq9zvorlzc/AAAY0oxWl-HZsmsoMgSrcbxka?dl=0)
 [**Mac Download (Not Supported Yet Need Someone To Test For Me Add me on Discord if Interested & DM)** (Current Supported Version = X)](https://www.dropbox.com/sh/3e0po3d4l1sv8va/AAAgEbiPM86QQtkTcvvGWEVva?dl=0)\
 Download the folder into your desired location (need to keep the executable folder with your UserData.json and Covers folder otherwise it will generate new ones), then pin the exe to your taskbar. Make sure to keep the ExtraSeries.json file in the same folder as well otherwise it will crash if you try and add any series in it like "Radiant"
 ***
@@ -29,7 +29,6 @@ Of course I understand if you do not trust me but I promise there is nothing mal
   
 #### V1.X.0 Features
 - [ ] Add Join Discord Button
-- [ ] Add unit test for checking duplicate series when using title or ID in search
 - [ ] Price Analysis Page (Below are the Websites I thought of and whether they can be added to the Analysis or not)
   - [x] RightStufanime
   - [x] RobertsAnimeCornerStore
@@ -41,7 +40,6 @@ Of course I understand if you do not trust me but I promise there is nothing mal
   - [ ] Amazon USA
   - [ ] CD Japan
 - [ ] Additional Language Support (German, French, Italian, Spanish) [This is dependant on some things otherwise it will have to be pushed much later]
-- [ ] Changing of Display Layout/Format [I need some inspiration from other people, this could move up to V1.5.0 in place of Language Support if I get some contrete layouts]
   
 #### Bugs/Fixes
 - [ ] LineHeight Property in TextBlock Control not working, unsure why still works when it's really large?
@@ -52,6 +50,7 @@ Of course I understand if you do not trust me but I promise there is nothing mal
 - [ ] Figure out TrayIcon
 - [ ] Need some further testing on the async functions
 - [ ] Seperate out the ItemControl (Collection) to a UserControl?
+- [ ] Changing of Display Layout/Format
 ***
 ## Useful Links
 - [AniList Home](https://anilist.co/hom)

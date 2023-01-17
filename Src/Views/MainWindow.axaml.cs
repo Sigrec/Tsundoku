@@ -127,6 +127,7 @@ namespace Tsundoku.Views
 
         private void LanguageChanged(object sender, SelectionChangedEventArgs e)
         {
+            //Logger.Debug(((sender as ComboBox).GetLogicalSiblings().ElementAt(1) as ComboBox).Name);
             if ((sender as ComboBox).IsDropDownOpen)
             {
                 switch (LanguageSelector.SelectedItem)
@@ -141,8 +142,19 @@ namespace Tsundoku.Views
                         CollectionViewModel.CurLanguage = "Romaji";
                         break;
                 }
+                ((sender as ComboBox).GetLogicalSiblings().ElementAt(1) as ComboBox).SelectedItem = "None";
                 Logger.Info($"Changed Langauge to {CollectionViewModel.CurLanguage}");
                 MainWindowViewModel.SortCollection();
+            }
+        }
+
+        private void CollectionFilterChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if ((sender as ComboBox).IsDropDownOpen)
+            {
+                string collectionFilter = (sender as ComboBox).SelectedItem as string;
+                MainWindowViewModel.FilterCollection(collectionFilter);
+                Logger.Info($"Changed Collection Filter To {collectionFilter}");
             }
         }
 
