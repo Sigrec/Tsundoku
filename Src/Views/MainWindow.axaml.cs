@@ -13,7 +13,6 @@ using System.Reactive.Linq;
 using Avalonia.ReactiveUI;
 using ReactiveUI;
 using System.IO;
-using Avalonia.Media.Imaging;
 
 namespace Tsundoku.Views
 {
@@ -55,6 +54,7 @@ namespace Tsundoku.Views
 
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "<Pending>")]
         private void ScreenCaptureWindows()
         {
             Directory.CreateDirectory(@"Screenshots");

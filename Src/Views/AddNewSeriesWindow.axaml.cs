@@ -36,9 +36,9 @@ namespace Tsundoku.Views
                 Topmost = false;
                 e.Cancel = true;
             };
-#if DEBUG
-            this.AttachDevTools();
-#endif
+// #if DEBUG
+//             this.AttachDevTools();
+// #endif
         }
 
         private void IsMangaButtonClicked(object sender, RoutedEventArgs args)
@@ -56,7 +56,7 @@ namespace Tsundoku.Views
         {
             ushort cur = 0;
             ushort max = 0;
-            if (string.IsNullOrWhiteSpace(TitleBox.Text) || (!(bool)MangaButton.IsChecked && !(bool)NovelButton.IsChecked) || string.IsNullOrWhiteSpace(CurVolCount.Text.Replace("_", "")) || string.IsNullOrWhiteSpace(MaxVolCount.Text.Replace("_", "")) || !ushort.TryParse(CurVolCount.Text.Replace("_", ""), out cur) || !ushort.TryParse(MaxVolCount.Text.Replace("_", ""), out max) || cur > max)
+            if (string.IsNullOrWhiteSpace(TitleBox.Text) || (!MangaButton.IsChecked & !NovelButton.IsChecked) == true || string.IsNullOrWhiteSpace(CurVolCount.Text.Replace("_", "")) || string.IsNullOrWhiteSpace(MaxVolCount.Text.Replace("_", "")) || !ushort.TryParse(CurVolCount.Text.Replace("_", ""), out cur) || !ushort.TryParse(MaxVolCount.Text.Replace("_", ""), out max) || cur > max)
             {
                 Logger.Warn("Fields Missing Input");
                 // var errorBox = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(

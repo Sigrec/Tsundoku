@@ -2,15 +2,14 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 		xmlns:vm="clr-namespace:Tsundoku.ViewModels"
 		x:DataType="vm:ViewModelBase">
+
 	<Style Selector="Window.menu">
 		<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}"/>
 	</Style>
 
-	<Style Selector="Border">
-		<Style Selector="^.menu">
-			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}"/>
-			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}"/>
-		</Style>
+	<Style Selector="Border.menu">
+		<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}"/>
+		<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}"/>
 	</Style>
 
 	<Style Selector="TextBlock">
@@ -73,7 +72,7 @@
 		</Style>
 	</Style>
 
-	<Style Selector="TextBox.menu">
+	<Style Selector="TextBox.menu, MaskedTextBox.menu">
 		<Setter Property="Background" Value="{CompiledBinding CurrentTheme.SearchBarBGColor, Converter={StaticResource ConvertColor}}"/>
 		<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.SearchBarBorderColor, Converter={StaticResource ConvertColor}}"/>
 		<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.SearchBarTextColor, Converter={StaticResource ConvertColor}}"/>
@@ -96,8 +95,20 @@
 		<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"/>
 		<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"/>
 
-		<Style Selector="^#Background">
-			<Setter Property="Background" Value="Green"/>
+		<!-- <Style Selector="^ > ComboBoxItem">
+			<Setter Property="TextBlock.Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"/>
+
+			<Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter, ^:selected /template/ ContentPresenter#PART_ContentPresenter, ^:pressed /template/ ContentPresenter#PART_ContentPresenter" x:DataType="vm:ViewModelBase">
+				<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
+				<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
+				<Setter Property="TextBlock.Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
+			</Style>
+		</Style> -->
+
+		<Style Selector="^ /template/ Border#PopupBorder">
+			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"/>
+			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"/>
+			<Setter Property="BorderThickness" Value="2"/>
 		</Style>
 
 		<Style Selector="^:pointerover /template/ Border#Background">

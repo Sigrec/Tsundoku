@@ -41,6 +41,11 @@ namespace Tsundoku.Views
             Process.Start("explorer.exe", @$"Covers");
         }
 
+        private void OpenScreenshotsFolder(object sender, RoutedEventArgs args)
+        {
+            Process.Start("explorer.exe", @$"Screenshots");
+        }
+
         private void ChangeUsername(object sender, RoutedEventArgs args)
         {
             if (!string.IsNullOrWhiteSpace(UsernameChange.Text))
@@ -53,6 +58,23 @@ namespace Tsundoku.Views
                 Logger.Warn("Change Username Field is Missing Input");
             }
         }  
+
+        private void OpenCoolorsSite(object sender, RoutedEventArgs args)
+        {
+            Logger.Info(@"Opening Coolors Website https://coolors.co/generate");
+            try
+            {
+                Process.Start(new ProcessStartInfo(@"https://coolors.co/generate") { UseShellExecute = true });
+            }
+            catch (System.ComponentModel.Win32Exception noBrowser)
+            {
+                Logger.Error(noBrowser.Message);
+            }
+            catch (System.Exception other)
+            {
+                Logger.Error(other.Message);
+            }
+        }
 
         private void JoinDiscord(object sender, RoutedEventArgs args)
         {

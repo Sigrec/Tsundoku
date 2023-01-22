@@ -63,6 +63,20 @@
                             FontWeight="Bold" 
                             BorderThickness="2" 
                             Classes="menu"
+                            Click="OpenCoolorsSite" 
+                            HorizontalAlignment="Center"
+                            Content="Open Coolors"/>
+                    <Button FontSize="15" 
+                            FontWeight="Bold" 
+                            BorderThickness="2" 
+                            Classes="menu"
+                            Click="OpenScreenshotsFolder" 
+                            HorizontalAlignment="Center"
+                            Content="Open Screenshots Folder"/>
+                    <Button FontSize="15" 
+                            FontWeight="Bold" 
+                            BorderThickness="2" 
+                            Classes="menu"
                             Click="OpenCoversFolder" 
                             HorizontalAlignment="Center"
                             Content="Open Covers Folder"/>
@@ -78,7 +92,9 @@
                 <TextBlock Text="Controls" FontSize="20" FontWeight="Bold" Classes="menu"/>
                 <TextBlock Text="Toggle Fullscreen → F11" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
                 <TextBlock Text="Screenshot Collection → CTRL+P" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
-                <TextBlock Text="Save Collection → CTRL+S" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
+                <TextBlock Text="Save Collection (Auto Saves on Close) → CTRL+S" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
+                <TextBlock Text="Copy Title → Click Title on Series Card" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
+                <TextBlock Text="Open AL Page → Click Series Image" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
             </StackPanel>
         </StackPanel>
     </Border>

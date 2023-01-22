@@ -1,8 +1,17 @@
+V1.4.1.0 - Jan 22nd, 2023 @ 12:11PM PST
+✓ Added tooltips to menu/nav bar buttons and dropdown
+✓ Added more controls info to "User Settings" window
+✓ Added button in "User Settings" Window to open Screenshots Folder
+✓ Added button in "User Settings" Window to open Coolors Website
+✓ Added a theme generator to Theme Window (Will Add More Theme Types Later)
+✓ Applied some themeing to dropdown buttons
+
 V1.4.0.0 - Jan 16th, 2023 @ 5:14PM PST
 ✓ Changed "Complete" Status to "Finished" for series
+✓ Added join discord button to "User Settings" window
 ✓ Can now filter your collection using the dropdown under the language dropdown
-✓ Can TavbNavigate in "AddNewSeriesWindow" (Was crashing before if it does crash for you let me know ASAP so I can make the change)
-✓ Changes to window state behavior to fix a bug (might not fix issue can't reproduce issue on my machine)
+✓ Can TavbNavigate in "AddNewSeriesWindow" (Was crashing before if it does crash for you let me know ASAP so I revert if needed)
+✓ Changes to window state behavior to fix a bug
 
 V1.3.3.0 - Jan 16th, 2023 @ 11:48AM PST
 ✓ Slightly increased title font size

@@ -14,7 +14,6 @@ namespace Tsundoku.Helpers
             {
                 return new Avalonia.Media.SolidColorBrush((uint)value);
             }
-
             throw new NotSupportedException();
         }
 

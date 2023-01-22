@@ -22,16 +22,16 @@
 
 	<Design.DataContext>
 		<vm:MainWindowViewModel/>
-	</Design.DataContext>	
+	</Design.DataContext>
+
+	<Window.Styles>
+		<StyleInclude Source="/Styles/MenuTheme.xaml" />
+	</Window.Styles>
 
 	<Window.Resources>
 		<cv:TitleLangConverter x:Key="ConvertTitle"/>
 		<cv:StaffLangConverter x:Key="ConvertStaff"/>
 	</Window.Resources>
-
-	<Window.Styles>
-		<StyleInclude Source="/Styles/MenuTheme.xaml" />
-	</Window.Styles>
 
 	<DockPanel>
 		<!-- Menu -->
@@ -59,6 +59,7 @@
 									FontSize="19" 
 									Classes="menu"
 									BorderThickness="2"
+									ToolTip.Tip="User Settings"
 									Width="60"
 									i:Attached.Icon="fa-address-book" 
 									Command="{CompiledBinding OpenSettingsWindow}"/>
@@ -66,7 +67,8 @@
 									FontSize="19" 
 									Width="60"
 									Classes="menu"
-									BorderThickness="2" 
+									BorderThickness="2"
+									ToolTip.Tip="Themes"
 									i:Attached.Icon="fa-swatchbook" 
 									Command="{CompiledBinding OpenThemeSettingsWindow}"/>
 						</StackPanel>
@@ -75,15 +77,17 @@
 									Name="AddNewSeriesButton"
 									FontSize="19"
 									Classes="menu"
+									ToolTip.Tip="Add New Series"
 									BorderThickness="2"
 									Width="60"
 									Command="{CompiledBinding OpenAddNewSeriesWindow}"
 									i:Attached.Icon="fa-book-medical"/>
 							<Button FontWeight="Bold"
-									Name="PriceAnalysisButton"
+									Name="DonateButton"
 									FontSize="19"
 									Classes="menu"
 									Width="60"
+									ToolTip.Tip="Donate"
 									BorderThickness="2"
 									Click="OpenDonationLink"
 									i:Attached.Icon="fa-circle-dollar-to-slot"/>
@@ -127,15 +131,28 @@
 								  BorderThickness="2"
 								  FontWeight="Bold"
 								  FontSize="15"
+								  ToolTip.Tip="Language"
 								  VerticalAlignment="Center"
-								  HorizontalAlignment="Center"
-								  AutoScrollToSelectedItem="True"/>
+								  HorizontalAlignment="Center">
+							<!-- <ComboBox.Styles>
+								<Style Selector="ComboBoxItem">
+									<Setter Property="TextBlock.Foreground" Value="{DynamicResource MenuButtonTextAndIconColor}"/>
+
+									<Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter, ^:selected /template/ ContentPresenter#PART_ContentPresenter, ^:pressed /template/ ContentPresenter#PART_ContentPresenter" x:DataType="vm:ViewModelBase">
+										<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}, Mode=TwoWay}"/>
+										<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
+										<Setter Property="TextBlock.Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
+									</Style>
+								</Style>
+							</ComboBox.Styles> -->
+						</ComboBox>
 						<ComboBox Name="CollectionFilterSelector"
 								  SelectionChanged="CollectionFilterChanged"
 								  Height="35"
 								  FontWeight="Bold"
 								  FontSize="15"
 								  SelectedItem="None"
+								  ToolTip.Tip="Filter"
 								  Items="{CompiledBinding AvailableCollectionFilters, Mode=OneWay}"
 								  Width="130"
 								  BorderThickness="2"
@@ -172,7 +189,7 @@
 					</Style>
 				</Style>
 			</ScrollViewer.Styles>
-			<ItemsControl Margin="0,50,0,50" Items="{Binding SearchedCollection}" HorizontalAlignment="Center" VerticalAlignment="Center">
+			<ItemsControl Name="CollectionItems" Margin="0,50,0,50" Items="{Binding SearchedCollection}" HorizontalAlignment="Center" VerticalAlignment="Center">
 				<ItemsControl.ItemsPanel>
 					<ItemsPanelTemplate>
 						<WrapPanel/>
