@@ -20,6 +20,12 @@ namespace TsundokuTests
         }
 
         [Test]
+        public void Test()
+        {
+            Assert.That(Series.ParseDescription("<i>Serialisation of the original doujin</i><br><br>\n\nSaito's never been anyone special, but his unremarkable path takes a turn when he wakes up in another world. After all, who other than the handyman could be trusted to open locked treasure chests or to repair equipment?\n<br><br>\n(Source: Yen Press)"), Is.EqualTo("Serialisation of the original doujin\n\nSaito's never been anyone special, but his unremarkable path takes a turn when he wakes up in another world. After all, who other than the handyman could be trusted to open locked treasure chests or to repair equipment?"));
+        }
+
+        [Test]
         public void CreateCoverFilePath_Test()
         {
             JsonElement narutoQuery = JsonDocument.Parse(new AniListQuery().GetSeriesTitle("Naruto", "MANGA")).RootElement.GetProperty("Media");

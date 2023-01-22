@@ -1,3 +1,6 @@
+V1.4.1.1 - Jan 22nd, 2023 @ PM PST
+✓ HotFix for another description parsing issue
+
 V1.4.1.0 - Jan 22nd, 2023 @ 12:11PM PST
 ✓ Added tooltips to menu/nav bar buttons and dropdown
 ✓ Added more controls info to "User Settings" window

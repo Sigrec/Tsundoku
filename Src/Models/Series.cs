@@ -142,7 +142,7 @@ namespace Tsundoku.Models
 
 		public static string ParseDescription(string seriesDescription)
 		{
-			return string.IsNullOrWhiteSpace(seriesDescription) ? "" : Regex.Replace(new StringBuilder(System.Web.HttpUtility.HtmlDecode(seriesDescription)).Replace("<b>", "<Bold>").Replace("</b>", "</Bold>").Replace("<i>", "<Italic>").Replace("</i>", "</Italic>").Replace("<u>", "<Underline>").Replace("</u>", "</Underline>").Replace("\n<br><br>\n", "\n\n").Replace("<br><br>", "\n").ToString(), @"\(Source: [\S\s]+|\<.*?\>", "").Trim().TrimEnd('\n');
+			return string.IsNullOrWhiteSpace(seriesDescription) ? "" : Regex.Replace(new StringBuilder(System.Web.HttpUtility.HtmlDecode(seriesDescription)).Replace("\n<br><br>\n", "\n\n").Replace("<br><br>\n\n", "\n\n").Replace("<br><br>", "\n").ToString(), @"\(Source: [\S\s]+|\<.*?\>", "").Trim().TrimEnd('\n');
 		}
 
 		public static string GetCorrectComicName(string jsonCountryOfOrigin)
