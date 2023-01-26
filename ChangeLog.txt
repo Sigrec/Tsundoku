@@ -1,4 +1,7 @@
-V1.4.1.1 - Jan 22nd, 2023 @ PM PST
+V1.4.1.2 - Jan 25th, 2023 @ 5:49PM PST
+✓ HotFix for series staff parsing issue where a role is untrimmed (found when adding Bungou Stray Dogs manga)
+
+V1.4.1.1 - Jan 22nd, 2023 @ 1:33PM PST
 ✓ HotFix for another description parsing issue
 
 V1.4.1.0 - Jan 22nd, 2023 @ 12:11PM PST

@@ -174,7 +174,7 @@ namespace Tsundoku.Models
 			string[] validRoles = { "Story & Art", "Story", "Art", "Original Creator", "Character Design", "Illustration", "Mechanical Design", "Original Story", "Original Character Design", "Original Story"};
 			foreach(JsonElement name in staffArray.EnumerateArray())
             {
-				string staffRole = Regex.Replace(name.GetProperty("role").ToString(), @" \(.*\)", "");
+				string staffRole = Regex.Replace(name.GetProperty("role").ToString(), @" \(.*\)", "").Trim();
 
 				// Don't include "Illustration" staff for manga that are not anthologies
 				if (validRoles.Contains(staffRole) && !(bookType.Equals("Manga") && staffRole.Equals("Illustration") && !title.Contains("Anthology")))

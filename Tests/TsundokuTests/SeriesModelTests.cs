@@ -20,23 +20,11 @@ namespace TsundokuTests
         }
 
         [Test]
-        public void Test()
-        {
-            Assert.That(Series.ParseDescription("<i>Serialisation of the original doujin</i><br><br>\n\nSaito's never been anyone special, but his unremarkable path takes a turn when he wakes up in another world. After all, who other than the handyman could be trusted to open locked treasure chests or to repair equipment?\n<br><br>\n(Source: Yen Press)"), Is.EqualTo("Serialisation of the original doujin\n\nSaito's never been anyone special, but his unremarkable path takes a turn when he wakes up in another world. After all, who other than the handyman could be trusted to open locked treasure chests or to repair equipment?"));
-        }
-
-        [Test]
         public void CreateCoverFilePath_Test()
         {
             JsonElement narutoQuery = JsonDocument.Parse(new AniListQuery().GetSeriesTitle("Naruto", "MANGA")).RootElement.GetProperty("Media");
 
             Assert.That("Covers\\NARUTO_MANGA.jpg", Is.EqualTo(Series.CreateCoverFilePath(narutoQuery.GetProperty("coverImage").GetProperty("extraLarge").ToString(), narutoQuery.GetProperty("title").GetProperty("romaji").ToString(), "MANGA", narutoQuery.GetProperty("synonyms"), false)));
-        }
-
-        [Test]
-        public void UnnecessaryBreakRemoval_Test()
-        {
-            Assert.That(Series.ParseDescription("After a fierce battle between humans and vampires, a temporary peace was established, but Kaname continued to sleep within a coffin of ice… Yuki gave Kaname her heart to revive him as a human being.\n<br><br>\nThese are the stories of what happened during those 1,000 years of Kaname’s slumber and at the start of his human life.\n<br><br>\n(Source: Viz Media)"), Is.EqualTo("After a fierce battle between humans and vampires, a temporary peace was established, but Kaname continued to sleep within a coffin of ice\u2026 Yuki gave Kaname her heart to revive him as a human being.\n\nThese are the stories of what happened during those 1,000 years of Kaname\u2019s slumber and at the start of his human life."));
         }
 
         [Test]
@@ -59,6 +47,16 @@ namespace TsundokuTests
             JsonElement onePunchManQuery = JsonDocument.Parse(new AniListQuery().GetSeriesTitle("One-Punch Man (Original)", "MANGA")).RootElement.GetProperty("Media");
 
             Assert.That("Covers\\One-PunchMan(Original)_MANGA.jpg", Is.EqualTo(Series.CreateCoverFilePath(onePunchManQuery.GetProperty("coverImage").GetProperty("extraLarge").ToString(), onePunchManQuery.GetProperty("title").GetProperty("romaji").ToString(), "MANGA", onePunchManQuery.GetProperty("synonyms"), false)));
+        }
+
+        [Test]
+        public void ParseDescription_UnnecessaryBreakRemoval_Test()
+        {
+            Assert.Multiple(() => {
+                Assert.That(Series.ParseDescription("<i>Serialisation of the original doujin</i><br><br>\n\nSaito's never been anyone special, but his unremarkable path takes a turn when he wakes up in another world. After all, who other than the handyman could be trusted to open locked treasure chests or to repair equipment?\n<br><br>\n(Source: Yen Press)"), Is.EqualTo("Serialisation of the original doujin\n\nSaito's never been anyone special, but his unremarkable path takes a turn when he wakes up in another world. After all, who other than the handyman could be trusted to open locked treasure chests or to repair equipment?"));
+
+                Assert.That(Series.ParseDescription("After a fierce battle between humans and vampires, a temporary peace was established, but Kaname continued to sleep within a coffin of ice… Yuki gave Kaname her heart to revive him as a human being.\n<br><br>\nThese are the stories of what happened during those 1,000 years of Kaname’s slumber and at the start of his human life.\n<br><br>\n(Source: Viz Media)"), Is.EqualTo("After a fierce battle between humans and vampires, a temporary peace was established, but Kaname continued to sleep within a coffin of ice\u2026 Yuki gave Kaname her heart to revive him as a human being.\n\nThese are the stories of what happened during those 1,000 years of Kaname\u2019s slumber and at the start of his human life."));
+            });
         }
 
         [Test]
@@ -115,6 +113,14 @@ namespace TsundokuTests
                 Assert.That(Series.GetSeriesStatus("HIATUS"), Is.EqualTo("Hiatus"));
                 Assert.That(Series.GetSeriesStatus("UNICORN"), Is.EqualTo("Error"));
             });
+        }
+
+        [Test] // Testing with Bungou Stray Dogs
+        public void GetSeriesStaff_UntrimmedRole_Test()
+        {
+            JsonElement bungouStrayDogsQuery = JsonDocument.Parse(new AniListQuery().GetSeriesTitle("文豪ストレイドッグス", "MANGA")).RootElement.GetProperty("Media").GetProperty("staff").GetProperty("edges");
+
+            Assert.That(Series.GetSeriesStaff(bungouStrayDogsQuery, "full", "Manga", "Bungou Stray Dogs"), Is.EqualTo("Kafka Asagiri | Harukawa35"));
         }
 
         [Test] // Testing with Bakemonogatari

@@ -12,7 +12,7 @@
 	FontFamily="Segoe UI"
 	WindowState="Maximized"
 	Classes="menu"
-	WindowStartupLocation="CenterScreen"
+	WindowStartupLocation="2"
 	KeyboardNavigation.TabNavigation="None"
 	CanResize="true">
 
