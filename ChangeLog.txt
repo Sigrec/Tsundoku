@@ -1,3 +1,7 @@
+V1.4.2.1 - Jan 30th, 2023 @ 10:30AM PST
+✓ Added error message popups for generating a new theme and adding a new series when user inputs invalid values into the fields or is missing values
+✓ Fixed crash issue when exporting to Spreadsheet when user has more than 149 series in their collection
+
 V1.4.1.2 - Jan 25th, 2023 @ 5:49PM PST
 ✓ HotFix for series staff parsing issue where a role is untrimmed (found when adding Bungou Stray Dogs manga) [Re-add series if you think it has this issue or any other previous parsing issue]
 

@@ -5,6 +5,8 @@ using Avalonia.Interactivity;
 using Tsundoku.ViewModels;
 using Avalonia.Controls;
 using System.Diagnostics;
+using System.Text;
+using System;
 
 namespace Tsundoku.Views
 {
@@ -112,102 +114,39 @@ namespace Tsundoku.Views
 
         private void ExportToSpreadsheet(object sender, RoutedEventArgs args)
         {
-            SpreadsheetInfo.SetLicense("FREE-LIMITED-KEY");
+            string file = @"TsundokuCollection.csv";
+            StringBuilder output = new StringBuilder();
+            string[] headers = new string[] { "Title", "Staff", "Format", "Status", "Cur Volumes", "Max Volumes", "Notes" };
+            output.AppendLine(string.Join(",", headers));
 
-            // Create new empty workbook.
-            ExcelFile workbook = new ExcelFile();
-
-            // Add new sheet and add headers to spreadsheet
-            ExcelWorksheet worksheet = workbook.Worksheets.Add("Collection");
-            string[] headers = new string[] { "Title", "Format", "Status", "Cur Volumes", "Max Volumes", "Notes", "Staff" };
-            worksheet.Rows["1"].Style.Font.Weight = ExcelFont.BoldWeight;
-            for (int col = 0; col < headers.Length; col++)
+            foreach (Models.Series curSeries in MainWindowViewModel.Collection)
             {
-                worksheet.Cells[0, col].Value = headers[col];
-            }
-
-            // Add the users collection data to the spreadsheet
-            for (int row = 0; row < MainWindowViewModel.Collection.Count; row++)
-            {
-                Models.Series curSeries = MainWindowViewModel.Collection[row];
                 switch(MainWindowViewModel.MainUser.CurLanguage)
                 {
                     case "Native":
-                        worksheet.Cells[row + 1, 0].Value = curSeries.Titles[2];
-                        worksheet.Cells[row + 1, 6].Value = curSeries.Staff[1].Replace(" | ", "\n");
+                        String[] nativeLine = { curSeries.Titles[2], curSeries.Staff[1], curSeries.Format, curSeries.Status, curSeries.CurVolumeCount.ToString(), curSeries.MaxVolumeCount.ToString(), $"\"{curSeries.SeriesNotes}\"" };
+                        output.AppendLine(string.Join(",", nativeLine));
                         break;
                     case "English":
-                        worksheet.Cells[row + 1, 0].Value = curSeries.Titles[1];
-                        worksheet.Cells[row + 1, 6].Value = curSeries.Staff[0].Replace(" | ", "\n");
+                        String[] englishLine = { curSeries.Titles[1], curSeries.Staff[0], curSeries.Format, curSeries.Status, curSeries.CurVolumeCount.ToString(), curSeries.MaxVolumeCount.ToString(), $"\"{curSeries.SeriesNotes}\"" };
+                        output.AppendLine(string.Join(",", englishLine));
                         break;
                     default:
-                        worksheet.Cells[row + 1, 0].Value = curSeries.Titles[0];
-                        worksheet.Cells[row + 1, 6].Value = curSeries.Staff[0].Replace(" | ", "\n");
+                        String[] romajiLine = { curSeries.Titles[0], curSeries.Staff[0], curSeries.Format, curSeries.Status, curSeries.CurVolumeCount.ToString(), curSeries.MaxVolumeCount.ToString(), $"\"{curSeries.SeriesNotes}\"" };
+                        output.AppendLine(string.Join(",", romajiLine));
                         break;
                 }
-
-                switch (curSeries.Status)
-                {
-                    case "Ongoing":
-                        worksheet.Cells[row + 1, 2].Style.FillPattern.SetSolid(SpreadsheetColor.FromArgb(255, 163, 63)); // Orange
-                        break;
-                    case "Complete":
-                        worksheet.Cells[row + 1, 2].Style.FillPattern.SetSolid(SpreadsheetColor.FromArgb(182, 238, 86)); // Green
-                        break;
-                    case "Cancelled":
-                        worksheet.Cells[row + 1, 2].Style.FillPattern.SetSolid(SpreadsheetColor.FromArgb(254, 107, 95)); // Red
-                        break;
-                    case "Hiatus":
-                        worksheet.Cells[row + 1, 2].Style.FillPattern.SetSolid(SpreadsheetColor.FromArgb(250, 218, 94)); // Yellow
-                        break;
-                    case "Coming Soon":
-                        worksheet.Cells[row + 1, 2].Style.FillPattern.SetSolid(SpreadsheetColor.FromArgb(134, 135, 217)); // Blue
-                        break;
-                }
-
-                worksheet.Cells[row + 1, 1].Value = curSeries.Format;
-                worksheet.Cells[row + 1, 2].Value = curSeries.Status;
-                worksheet.Cells[row + 1, 3].Value = curSeries.CurVolumeCount;
-                worksheet.Cells[row + 1, 4].Value = curSeries.MaxVolumeCount;
-                worksheet.Cells[row + 1, 5].Value = curSeries.SeriesNotes;
             }
 
-            // Title
-            worksheet.Columns["A"].SetWidth(40, LengthUnit.CharacterWidth);
-            worksheet.Columns["A"].Style.WrapText = true;
-            worksheet.Columns["A"].Style.VerticalAlignment = VerticalAlignmentStyle.Center;
-
-            // Format
-            worksheet.Columns["B"].AutoFit();
-            worksheet.Columns["B"].Style.HorizontalAlignment = HorizontalAlignmentStyle.Center;
-            worksheet.Columns["B"].Style.VerticalAlignment = VerticalAlignmentStyle.Center;
-
-            // Status
-            worksheet.Columns["C"].AutoFit();
-            worksheet.Columns["C"].Style.HorizontalAlignment = HorizontalAlignmentStyle.Center;
-            worksheet.Columns["C"].Style.VerticalAlignment = VerticalAlignmentStyle.Center;
-
-            // Cur Volumes
-            worksheet.Columns["D"].AutoFit();
-            worksheet.Columns["D"].Style.HorizontalAlignment = HorizontalAlignmentStyle.Center;
-            worksheet.Columns["D"].Style.VerticalAlignment = VerticalAlignmentStyle.Center;
-
-            // Max Volumes
-            worksheet.Columns["E"].AutoFit();
-            worksheet.Columns["E"].Style.HorizontalAlignment = HorizontalAlignmentStyle.Center;
-            worksheet.Columns["E"].Style.VerticalAlignment = VerticalAlignmentStyle.Center;
-
-            // Notes
-            worksheet.Columns["F"].SetWidth(40, LengthUnit.CharacterWidth);
-            worksheet.Columns["F"].Style.WrapText = true;
-            worksheet.Columns["F"].Style.VerticalAlignment = VerticalAlignmentStyle.Center;
-
-            // Staff
-            worksheet.Columns["G"].AutoFit();
-            worksheet.Columns["G"].Style.VerticalAlignment = VerticalAlignmentStyle.Center;
-    
-            workbook.Save(@$"TsundokuCollection.xlsx");
-            Logger.Info(@$"Exported {MainWindowViewModel.MainUser.UserName}'s Data To -> TsundokuCollection.xlsx");
+            try
+            {
+                System.IO.File.WriteAllText(file, output.ToString(), Encoding.UTF8);
+                Logger.Info($"Exported {MainWindowViewModel.MainUser.UserName}'s Data To -> TsundokuCollection.csv");
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn($"Could not Export {MainWindowViewModel.MainUser.UserName}'s Data To -> TsundokuCollection.csv");
+            }
         }
     }
 }

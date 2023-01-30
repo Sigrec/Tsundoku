@@ -16,7 +16,7 @@ namespace Tsundoku.ViewModels
 
         public ThemeSettingsViewModel()
         {
-            // this.WhenAnyValue(x => x.ThemeName, x => !string.IsNullOrWhiteSpace(x) && !x.Equals("Default")).Subscribe(x => IsSaveThemeButtonEnabled = x);
+            //this.WhenAnyValue(x => x.ThemeName, x => !string.IsNullOrWhiteSpace(x) && !x.Equals("Default")).Subscribe(x => IsSaveThemeButtonEnabled = x);
         }
     }
 }

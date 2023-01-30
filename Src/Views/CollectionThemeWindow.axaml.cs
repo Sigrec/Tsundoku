@@ -44,123 +44,191 @@ namespace Tsundoku.Views
             CollectionColorChanges();
         }
 
+        private string GenerateThemeValidation()
+        {
+            string errorMessage = "";
+
+            if(string.IsNullOrWhiteSpace(NewThemeName.Text))
+            {
+                errorMessage += "No Title for the Theme was Entered\n";
+            }
+
+            if (!string.IsNullOrWhiteSpace(NewThemeName.Text) && NewThemeName.Text.Equals("Default"))
+            {
+                errorMessage += "Title Entered Cannot be Default\n";
+            }
+
+            if (MainColor1.MaskCompleted == false)
+            {
+                errorMessage += "MainColor1 has a Invalid Hex Color Value\n";
+            }
+
+            if (MainColor2.MaskCompleted == false)
+            {
+                errorMessage += "MainColor2 has a Invalid Hex Color Value\n";
+            }
+
+            if (TextColor1.MaskCompleted == false)
+            {
+                errorMessage += "TextColor1 has a Invalid Hex Color Value\n";
+            }
+
+            if (TextColor2.MaskCompleted == false)
+            {
+                errorMessage += "TextColor2 has a Invalid Hex Color Value\n";
+            }
+
+            if (AccentColor1.MaskCompleted == false)
+            {
+                errorMessage += "AccentColor1 has a Invalid Hex Color Value\n";
+            }
+
+            if (AccentColor2.MaskCompleted == false)
+            {
+                errorMessage += "AccentColor2 has a Invalid Hex Color Value\n";
+            }
+            return errorMessage;
+        }
+
         private void GenerateThemeType1(object sender, RoutedEventArgs args)
         {
-            if (!string.IsNullOrWhiteSpace(NewThemeName.Text) && !NewThemeName.Text.Equals("Default"))
+            string errorMessage = GenerateThemeValidation();
+            if (string.IsNullOrWhiteSpace(errorMessage))
             {
+                Logger.Info("Generating New Theme");
+
                 NewTheme.ThemeName = NewThemeName.Text;
-                if ((MainColor1.MaskCompleted & MainColor2.MaskCompleted & TextColor1.MaskCompleted & TextColor2.MaskCompleted & AccentColor1.MaskCompleted & AccentColor2.MaskCompleted) == true)
+
+                // Apply menu colors
+                NewTheme.MenuBGColor = Color.Parse(MainColor1.Text).ToUint32();
+                NewTheme.UsernameColor = Color.Parse(TextColor1.Text).ToUint32();
+                NewTheme.MenuTextColor = Color.Parse(TextColor1.Text).ToUint32();
+                NewTheme.SearchBarBGColor = Color.Parse(AccentColor2.Text).ToUint32();
+                NewTheme.SearchBarBorderColor = Color.Parse(AccentColor1.Text).ToUint32();
+                NewTheme.SearchBarTextColor = Color.Parse(TextColor1.Text).ToUint32();
+                NewTheme.DividerColor = Color.Parse(AccentColor1.Text).ToUint32();
+                NewTheme.MenuButtonBGColor = Color.Parse(AccentColor2.Text).ToUint32();
+                NewTheme.MenuButtonBGHoverColor = Color.Parse(MainColor2.Text).ToUint32();
+                NewTheme.MenuButtonBorderColor = Color.Parse(AccentColor1.Text).ToUint32();
+                NewTheme.MenuButtonBorderHoverColor = Color.Parse(AccentColor1.Text).ToUint32();
+                NewTheme.MenuButtonTextAndIconColor = Color.Parse(TextColor1.Text).ToUint32();
+                NewTheme.MenuButtonTextAndIconHoverColor = Color.Parse(AccentColor2.Text).ToUint32();
+
+                // Apply Colleciton Colors
+                NewTheme.CollectionBGColor = Color.Parse(MainColor2.Text).ToUint32();
+                NewTheme.StatusAndBookTypeBGColor = Color.Parse(AccentColor2.Text).ToUint32();
+                NewTheme.StatusAndBookTypeBGHoverColor = Color.Parse(AccentColor1.Text).ToUint32();
+                NewTheme.StatusAndBookTypeTextColor = Color.Parse(TextColor2.Text).ToUint32();
+                NewTheme.StatusAndBookTypeTextHoverColor = Color.Parse(AccentColor2.Text).ToUint32();
+                NewTheme.SeriesCardBGColor = Color.Parse(MainColor1.Text).ToUint32();
+                NewTheme.SeriesCardTitleColor = Color.Parse(AccentColor1.Text).ToUint32();
+                NewTheme.SeriesCardStaffColor = Color.Parse(TextColor1.Text).ToUint32();
+                NewTheme.SeriesCardDescColor = Color.Parse(TextColor2.Text).ToUint32();
+                NewTheme.SeriesProgressBGColor = Color.Parse(AccentColor2.Text).ToUint32();
+                NewTheme.SeriesProgressBarColor = Color.Parse(AccentColor1.Text).ToUint32();
+                NewTheme.SeriesProgressBarBGColor = Color.Parse(MainColor1.Text).ToUint32();
+                NewTheme.SeriesProgressBarBorderColor = Color.Parse(TextColor2.Text).ToUint32();
+                NewTheme.SeriesProgressTextColor = Color.Parse(TextColor2.Text).ToUint32();
+                NewTheme.SeriesProgressButtonsHoverColor = Color.Parse(MainColor1.Text).ToUint32(); 
+                NewTheme.SeriesSwitchPaneButtonBGColor = Color.Parse(AccentColor2.Text).ToUint32();
+                NewTheme.SeriesSwitchPaneButtonBGHoverColor = Color.Parse(AccentColor2.Text).ToUint32();
+                NewTheme.SeriesSwitchPaneButtonIconColor = Color.Parse(TextColor2.Text).ToUint32();
+                NewTheme.SeriesSwitchPaneButtonIconHoverColor = Color.Parse(AccentColor1.Text).ToUint32();
+                NewTheme.SeriesEditPaneBGColor = Color.Parse(MainColor1.Text).ToUint32();
+                NewTheme.SeriesNotesBGColor = Color.Parse(AccentColor2.Text).ToUint32();
+                NewTheme.SeriesNotesBorderColor = Color.Parse(AccentColor1.Text).ToUint32();
+                NewTheme.SeriesNotesTextColor = Color.Parse(TextColor1.Text).ToUint32();
+                NewTheme.SeriesEditPaneButtonsBGColor = Color.Parse(MainColor2.Text).ToUint32();
+                NewTheme.SeriesEditPaneButtonsBGHoverColor = Color.Parse(AccentColor2.Text).ToUint32();
+                NewTheme.SeriesEditPaneButtonsBorderColor = Color.Parse(AccentColor1.Text).ToUint32();
+                NewTheme.SeriesEditPaneButtonsBorderHoverColor = Color.Parse(AccentColor1.Text).ToUint32();
+                NewTheme.SeriesEditPaneButtonsIconColor = Color.Parse(AccentColor2.Text).ToUint32();
+                NewTheme.SeriesEditPaneButtonsIconHoverColor = Color.Parse(TextColor1.Text).ToUint32();
+
+                // Generate Theme
+                ApplyTheme();    
+            }
+            else
+            {
+                Logger.Warn("User Input to Generate Theme is Invalid");
+                var errorBox = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(
+                new MessageBox.Avalonia.DTO.MessageBoxStandardParams
                 {
-                    Logger.Info("Generating New Theme");
-                    // Apply menu colors
-                    NewTheme.MenuBGColor = Color.Parse(MainColor1.Text).ToUint32();
-                    NewTheme.UsernameColor = Color.Parse(TextColor1.Text).ToUint32();
-                    NewTheme.MenuTextColor = Color.Parse(TextColor1.Text).ToUint32();
-                    NewTheme.SearchBarBGColor = Color.Parse(AccentColor2.Text).ToUint32();
-                    NewTheme.SearchBarBorderColor = Color.Parse(AccentColor1.Text).ToUint32();
-                    NewTheme.SearchBarTextColor = Color.Parse(TextColor1.Text).ToUint32();
-                    NewTheme.DividerColor = Color.Parse(AccentColor1.Text).ToUint32();
-                    NewTheme.MenuButtonBGColor = Color.Parse(AccentColor2.Text).ToUint32();
-                    NewTheme.MenuButtonBGHoverColor = Color.Parse(MainColor2.Text).ToUint32();
-                    NewTheme.MenuButtonBorderColor = Color.Parse(AccentColor1.Text).ToUint32();
-                    NewTheme.MenuButtonBorderHoverColor = Color.Parse(AccentColor1.Text).ToUint32();
-                    NewTheme.MenuButtonTextAndIconColor = Color.Parse(TextColor1.Text).ToUint32();
-                    NewTheme.MenuButtonTextAndIconHoverColor = Color.Parse(AccentColor2.Text).ToUint32();
-
-                    // Apply Colleciton Colors
-                    NewTheme.CollectionBGColor = Color.Parse(MainColor2.Text).ToUint32();
-                    NewTheme.StatusAndBookTypeBGColor = Color.Parse(AccentColor2.Text).ToUint32();
-                    NewTheme.StatusAndBookTypeBGHoverColor = Color.Parse(AccentColor1.Text).ToUint32();
-                    NewTheme.StatusAndBookTypeTextColor = Color.Parse(TextColor2.Text).ToUint32();
-                    NewTheme.StatusAndBookTypeTextHoverColor = Color.Parse(AccentColor2.Text).ToUint32();
-                    NewTheme.SeriesCardBGColor = Color.Parse(MainColor1.Text).ToUint32();
-                    NewTheme.SeriesCardTitleColor = Color.Parse(AccentColor1.Text).ToUint32();
-                    NewTheme.SeriesCardStaffColor = Color.Parse(TextColor1.Text).ToUint32();
-                    NewTheme.SeriesCardDescColor = Color.Parse(TextColor2.Text).ToUint32();
-                    NewTheme.SeriesProgressBGColor = Color.Parse(AccentColor2.Text).ToUint32();
-                    NewTheme.SeriesProgressBarColor = Color.Parse(AccentColor1.Text).ToUint32();
-                    NewTheme.SeriesProgressBarBGColor = Color.Parse(MainColor1.Text).ToUint32();
-                    NewTheme.SeriesProgressBarBorderColor = Color.Parse(TextColor2.Text).ToUint32();
-                    NewTheme.SeriesProgressTextColor = Color.Parse(TextColor2.Text).ToUint32();
-                    NewTheme.SeriesProgressButtonsHoverColor = Color.Parse(MainColor1.Text).ToUint32(); 
-                    NewTheme.SeriesSwitchPaneButtonBGColor = Color.Parse(AccentColor2.Text).ToUint32();
-                    NewTheme.SeriesSwitchPaneButtonBGHoverColor = Color.Parse(AccentColor2.Text).ToUint32();
-                    NewTheme.SeriesSwitchPaneButtonIconColor = Color.Parse(TextColor2.Text).ToUint32();
-                    NewTheme.SeriesSwitchPaneButtonIconHoverColor = Color.Parse(AccentColor1.Text).ToUint32();
-                    NewTheme.SeriesEditPaneBGColor = Color.Parse(MainColor1.Text).ToUint32();
-                    NewTheme.SeriesNotesBGColor = Color.Parse(AccentColor2.Text).ToUint32();
-                    NewTheme.SeriesNotesBorderColor = Color.Parse(AccentColor1.Text).ToUint32();
-                    NewTheme.SeriesNotesTextColor = Color.Parse(TextColor1.Text).ToUint32();
-                    NewTheme.SeriesEditPaneButtonsBGColor = Color.Parse(MainColor2.Text).ToUint32();
-                    NewTheme.SeriesEditPaneButtonsBGHoverColor = Color.Parse(AccentColor2.Text).ToUint32();
-                    NewTheme.SeriesEditPaneButtonsBorderColor = Color.Parse(AccentColor1.Text).ToUint32();
-                    NewTheme.SeriesEditPaneButtonsBorderHoverColor = Color.Parse(AccentColor1.Text).ToUint32();
-                    NewTheme.SeriesEditPaneButtonsIconColor = Color.Parse(AccentColor2.Text).ToUint32();
-                    NewTheme.SeriesEditPaneButtonsIconHoverColor = Color.Parse(TextColor1.Text).ToUint32();
-
-                    // Generate Theme
-                    ApplyTheme();    
-                }
+                    ContentTitle = "Error Generating Theme",
+                    ContentMessage = errorMessage
+                });
+                errorBox.Show();
             }
         }
 
         private void GenerateThemeType2(object sender, RoutedEventArgs args)
         {
-            if (!string.IsNullOrWhiteSpace(NewThemeName.Text) && !NewThemeName.Text.Equals("Default"))
+            string errorMessage = GenerateThemeValidation();
+            if (string.IsNullOrWhiteSpace(errorMessage))
             {
+                Logger.Info("Generating New Theme");
+
                 NewTheme.ThemeName = NewThemeName.Text;
-                if ((MainColor1.MaskCompleted & MainColor2.MaskCompleted & TextColor1.MaskCompleted & TextColor2.MaskCompleted & AccentColor1.MaskCompleted & AccentColor2.MaskCompleted) == true)
+
+                // Apply menu colors
+                NewTheme.MenuBGColor = Color.Parse(MainColor1.Text).ToUint32();
+                NewTheme.UsernameColor = Color.Parse(TextColor1.Text).ToUint32();
+                NewTheme.MenuTextColor = Color.Parse(TextColor1.Text).ToUint32();
+                NewTheme.SearchBarBGColor = Color.Parse(AccentColor2.Text).ToUint32();
+                NewTheme.SearchBarBorderColor = Color.Parse(AccentColor1.Text).ToUint32();
+                NewTheme.SearchBarTextColor = Color.Parse(TextColor1.Text).ToUint32();
+                NewTheme.DividerColor = Color.Parse(AccentColor1.Text).ToUint32();
+                NewTheme.MenuButtonBGColor = Color.Parse(AccentColor2.Text).ToUint32();
+                NewTheme.MenuButtonBGHoverColor = Color.Parse(MainColor2.Text).ToUint32();
+                NewTheme.MenuButtonBorderColor = Color.Parse(AccentColor1.Text).ToUint32();
+                NewTheme.MenuButtonBorderHoverColor = Color.Parse(AccentColor1.Text).ToUint32();
+                NewTheme.MenuButtonTextAndIconColor = Color.Parse(TextColor1.Text).ToUint32();
+                NewTheme.MenuButtonTextAndIconHoverColor = Color.Parse(MainColor1.Text).ToUint32();
+
+                // Apply Colleciton Colors
+                NewTheme.CollectionBGColor = Color.Parse(MainColor2.Text).ToUint32();
+                NewTheme.StatusAndBookTypeBGColor = Color.Parse(AccentColor2.Text).ToUint32();
+                NewTheme.StatusAndBookTypeBGHoverColor = Color.Parse(TextColor2.Text).ToUint32();
+                NewTheme.StatusAndBookTypeTextColor = Color.Parse(TextColor2.Text).ToUint32();
+                NewTheme.StatusAndBookTypeTextHoverColor = Color.Parse(AccentColor2.Text).ToUint32();
+                NewTheme.SeriesCardBGColor = Color.Parse(MainColor1.Text).ToUint32();
+                NewTheme.SeriesCardTitleColor = Color.Parse(AccentColor1.Text).ToUint32();
+                NewTheme.SeriesCardStaffColor = Color.Parse(TextColor1.Text).ToUint32();
+                NewTheme.SeriesCardDescColor = Color.Parse(TextColor2.Text).ToUint32();
+                NewTheme.SeriesProgressBGColor = Color.Parse(AccentColor2.Text).ToUint32();
+                NewTheme.SeriesProgressBarColor = Color.Parse(TextColor1.Text).ToUint32();
+                NewTheme.SeriesProgressBarBGColor = Color.Parse(MainColor1.Text).ToUint32();
+                NewTheme.SeriesProgressBarBorderColor = Color.Parse(TextColor2.Text).ToUint32();
+                NewTheme.SeriesProgressTextColor = Color.Parse(TextColor2.Text).ToUint32();
+                NewTheme.SeriesProgressButtonsHoverColor = Color.Parse(MainColor1.Text).ToUint32();
+                NewTheme.SeriesSwitchPaneButtonBGColor = Color.Parse(AccentColor2.Text).ToUint32();
+                NewTheme.SeriesSwitchPaneButtonBGHoverColor = Color.Parse(AccentColor2.Text).ToUint32();
+                NewTheme.SeriesSwitchPaneButtonIconColor = Color.Parse(TextColor2.Text).ToUint32();
+                NewTheme.SeriesSwitchPaneButtonIconHoverColor = Color.Parse(MainColor1.Text).ToUint32();
+                NewTheme.SeriesEditPaneBGColor = Color.Parse(MainColor1.Text).ToUint32();
+                NewTheme.SeriesNotesBGColor = Color.Parse(AccentColor2.Text).ToUint32();
+                NewTheme.SeriesNotesBorderColor = Color.Parse(AccentColor1.Text).ToUint32();
+                NewTheme.SeriesNotesTextColor = Color.Parse(TextColor2.Text).ToUint32();
+                NewTheme.SeriesEditPaneButtonsBGColor = Color.Parse(MainColor2.Text).ToUint32();
+                NewTheme.SeriesEditPaneButtonsBGHoverColor = Color.Parse(TextColor1.Text).ToUint32();
+                NewTheme.SeriesEditPaneButtonsBorderColor = Color.Parse(AccentColor1.Text).ToUint32();
+                NewTheme.SeriesEditPaneButtonsBorderHoverColor = Color.Parse(AccentColor1.Text).ToUint32();
+                NewTheme.SeriesEditPaneButtonsIconColor = Color.Parse(TextColor2.Text).ToUint32();
+                NewTheme.SeriesEditPaneButtonsIconHoverColor = Color.Parse(MainColor1.Text).ToUint32();
+
+                // Generate Theme
+                ApplyTheme();    
+            }
+            else
+            {
+                Logger.Warn("User Input to Generate Theme is Invalid");
+                var errorBox = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(
+                new MessageBox.Avalonia.DTO.MessageBoxStandardParams
                 {
-                    Logger.Info("Generating New Theme");
-                    // Apply menu colors
-                    NewTheme.MenuBGColor = Color.Parse(MainColor1.Text).ToUint32();
-                    NewTheme.UsernameColor = Color.Parse(TextColor1.Text).ToUint32();
-                    NewTheme.MenuTextColor = Color.Parse(TextColor1.Text).ToUint32();
-                    NewTheme.SearchBarBGColor = Color.Parse(AccentColor2.Text).ToUint32();
-                    NewTheme.SearchBarBorderColor = Color.Parse(AccentColor1.Text).ToUint32();
-                    NewTheme.SearchBarTextColor = Color.Parse(TextColor1.Text).ToUint32();
-                    NewTheme.DividerColor = Color.Parse(AccentColor1.Text).ToUint32();
-                    NewTheme.MenuButtonBGColor = Color.Parse(AccentColor2.Text).ToUint32();
-                    NewTheme.MenuButtonBGHoverColor = Color.Parse(MainColor2.Text).ToUint32();
-                    NewTheme.MenuButtonBorderColor = Color.Parse(AccentColor1.Text).ToUint32();
-                    NewTheme.MenuButtonBorderHoverColor = Color.Parse(AccentColor1.Text).ToUint32();
-                    NewTheme.MenuButtonTextAndIconColor = Color.Parse(TextColor1.Text).ToUint32();
-                    NewTheme.MenuButtonTextAndIconHoverColor = Color.Parse(MainColor1.Text).ToUint32();
-
-                    // Apply Colleciton Colors
-                    NewTheme.CollectionBGColor = Color.Parse(MainColor2.Text).ToUint32();
-                    NewTheme.StatusAndBookTypeBGColor = Color.Parse(AccentColor2.Text).ToUint32();
-                    NewTheme.StatusAndBookTypeBGHoverColor = Color.Parse(TextColor2.Text).ToUint32();
-                    NewTheme.StatusAndBookTypeTextColor = Color.Parse(TextColor2.Text).ToUint32();
-                    NewTheme.StatusAndBookTypeTextHoverColor = Color.Parse(AccentColor2.Text).ToUint32();
-                    NewTheme.SeriesCardBGColor = Color.Parse(MainColor1.Text).ToUint32();
-                    NewTheme.SeriesCardTitleColor = Color.Parse(AccentColor1.Text).ToUint32();
-                    NewTheme.SeriesCardStaffColor = Color.Parse(TextColor1.Text).ToUint32();
-                    NewTheme.SeriesCardDescColor = Color.Parse(TextColor2.Text).ToUint32();
-                    NewTheme.SeriesProgressBGColor = Color.Parse(AccentColor2.Text).ToUint32();
-                    NewTheme.SeriesProgressBarColor = Color.Parse(TextColor1.Text).ToUint32();
-                    NewTheme.SeriesProgressBarBGColor = Color.Parse(MainColor1.Text).ToUint32();
-                    NewTheme.SeriesProgressBarBorderColor = Color.Parse(TextColor2.Text).ToUint32();
-                    NewTheme.SeriesProgressTextColor = Color.Parse(TextColor2.Text).ToUint32();
-                    NewTheme.SeriesProgressButtonsHoverColor = Color.Parse(MainColor1.Text).ToUint32();
-                    NewTheme.SeriesSwitchPaneButtonBGColor = Color.Parse(AccentColor2.Text).ToUint32();
-                    NewTheme.SeriesSwitchPaneButtonBGHoverColor = Color.Parse(AccentColor2.Text).ToUint32();
-                    NewTheme.SeriesSwitchPaneButtonIconColor = Color.Parse(TextColor2.Text).ToUint32();
-                    NewTheme.SeriesSwitchPaneButtonIconHoverColor = Color.Parse(MainColor1.Text).ToUint32();
-                    NewTheme.SeriesEditPaneBGColor = Color.Parse(MainColor1.Text).ToUint32();
-                    NewTheme.SeriesNotesBGColor = Color.Parse(AccentColor2.Text).ToUint32();
-                    NewTheme.SeriesNotesBorderColor = Color.Parse(AccentColor1.Text).ToUint32();
-                    NewTheme.SeriesNotesTextColor = Color.Parse(TextColor2.Text).ToUint32();
-                    NewTheme.SeriesEditPaneButtonsBGColor = Color.Parse(MainColor2.Text).ToUint32();
-                    NewTheme.SeriesEditPaneButtonsBGHoverColor = Color.Parse(TextColor1.Text).ToUint32();
-                    NewTheme.SeriesEditPaneButtonsBorderColor = Color.Parse(AccentColor1.Text).ToUint32();
-                    NewTheme.SeriesEditPaneButtonsBorderHoverColor = Color.Parse(AccentColor1.Text).ToUint32();
-                    NewTheme.SeriesEditPaneButtonsIconColor = Color.Parse(TextColor2.Text).ToUint32();
-                    NewTheme.SeriesEditPaneButtonsIconHoverColor = Color.Parse(MainColor1.Text).ToUint32();
-
-                    // Generate Theme
-                    ApplyTheme();    
-                }
+                    ContentTitle = "Error Generating Theme",
+                    ContentMessage = errorMessage
+                });
+                errorBox.Show();
             }
         }
 

@@ -24,7 +24,7 @@
     <IncludeSymbols>False</IncludeSymbols>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <Version>1.4.0</Version>
-    <FileVersion>1.4.1.2</FileVersion>
+    <FileVersion>1.4.2.1</FileVersion>
   </PropertyGroup>
 	<ItemGroup>
 	<AvaloniaResource Include="Assets/**" />
@@ -70,7 +70,6 @@
 	If you will publish your application in self-contained mode with p:PublishTrimmed=true and it will use Fluent theme Default theme will be trimmed from the output and vice versa.
 	https://github.com/AvaloniaUI/Avalonia/issues/5593 -->
 	<TrimmableAssembly Include="Avalonia.Themes.Fluent" />
-    <TrimmableAssembly Include="Avalonia.Themes.Default" />
   </ItemGroup>
   <ItemGroup>
     <!-- <PackageReference Include="Avalonia.Controls.ColorPicker" Version="11.0.0-preview4" /> -->
@@ -83,9 +82,9 @@
     <PackageReference Include="Egorozh.ColorPicker.Avalonia.Dialog" Version="11.0.0-preview1" />
     <PackageReference Include="Egorozh.ColorPicker.Core" Version="11.0.0-preview1" />
     <PackageReference Include="GemBox.Spreadsheet" Version="49.0.1225" />
-    <PackageReference Include="GraphQL.Client" Version="5.1.0" />
-    <PackageReference Include="GraphQL.Client.Serializer.Newtonsoft" Version="5.1.0" />
-    <!-- <PackageReference Include="MessageBox.Avalonia" Version="2.3.1-prev2" /> -->
+    <PackageReference Include="GraphQL.Client" Version="5.1.1" />
+    <PackageReference Include="GraphQL.Client.Serializer.Newtonsoft" Version="5.1.1" />
+    <PackageReference Include="MessageBox.Avalonia" Version="2.3.1-prev2" />
     <PackageReference Include="NLog" Version="5.1.1" />
     <PackageReference Include="Projektanker.Icons.Avalonia.FontAwesome" Version="6.3.0-preview4" />
     <PackageReference Include="ReactiveUI.Fody" Version="18.4.1" />

@@ -54,28 +54,68 @@ namespace Tsundoku.Views
 
         public void OnButtonClicked(object sender, RoutedEventArgs args)
         {
+            bool validResponse = true;
+            string errorMessage = "";
+            if (string.IsNullOrWhiteSpace(TitleBox.Text))
+            {
+                errorMessage += "Title Field is Empty\n";
+                validResponse = false;
+            }
+            
+            if ((!MangaButton.IsChecked & !NovelButton.IsChecked) == true)
+            {
+                errorMessage += "Series Book Type (Manga or Novel) Not Checked\n";
+                validResponse = false;
+            }
+
+            if (string.IsNullOrWhiteSpace(CurVolCount.Text.Replace("_", "")))
+            {
+                errorMessage += "Series Current Volume Count is Empty\n";
+                validResponse = false;
+            }
+
+            if (string.IsNullOrWhiteSpace(MaxVolCount.Text.Replace("_", "")))
+            {
+                errorMessage += "Series Current Max Volume Count is Empty\n";
+                validResponse = false;
+            }
+
             ushort cur = 0;
             ushort max = 0;
-            if (string.IsNullOrWhiteSpace(TitleBox.Text) || (!MangaButton.IsChecked & !NovelButton.IsChecked) == true || string.IsNullOrWhiteSpace(CurVolCount.Text.Replace("_", "")) || string.IsNullOrWhiteSpace(MaxVolCount.Text.Replace("_", "")) || !ushort.TryParse(CurVolCount.Text.Replace("_", ""), out cur) || !ushort.TryParse(MaxVolCount.Text.Replace("_", ""), out max) || cur > max)
+            if (!ushort.TryParse(CurVolCount.Text.Replace("_", ""), out cur))
             {
-                Logger.Warn("Fields Missing Input");
-                // var errorBox = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(
-                // new MessageBoxStandardParams
-                // {
-                //     ContentTitle = "Error!",
-                //     ContentMessage = "One or More Fields are Empty or CurVolumes > MaxVolumes\nPlease Enter Data For All Fields",
-                //     WindowIcon = new WindowIcon(@"Assets\Icons\Tsundoku-Logo.ico")
-                // });
-                // errorBox.Show();
+                errorMessage += "Current Volume Count Inputted is not a Number\n";
+                validResponse = false;
             }
-            else
+
+            if (!ushort.TryParse(MaxVolCount.Text.Replace("_", ""), out max))
             {
-                if (!AddNewSeriesVM.GetSeriesData(TitleBox.Text.Trim(), (bool)MangaButton.IsChecked ? "MANGA" : "NOVEL", cur, max))
+                errorMessage += "Max Volumes Count Inpuuted is not a Number\n";
+                validResponse = false;
+            }
+
+            if (cur > max)
+            {
+                errorMessage += "Current Volume Count is Greater than the Max Volume Count\n";
+                validResponse = false;
+            }
+
+            if (!validResponse)
+            {
+                Logger.Warn("User Input to Add New Series is Invalid");
+                var errorBox = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(
+                new MessageBox.Avalonia.DTO.MessageBoxStandardParams
                 {
-                    CollectionWindow.CollectionViewModel.UsersNumVolumesCollected += cur;
-                    CollectionWindow.CollectionViewModel.UsersNumVolumesToBeCollected += (uint)(max - cur);
-                    CollectionWindow.CollectionViewModel.SearchText = "";
-                }
+                    ContentTitle = "Error Adding Series",
+                    ContentMessage = errorMessage
+                });
+                errorBox.Show();
+            }
+            else if(!AddNewSeriesVM.GetSeriesData(TitleBox.Text.Trim(), (MangaButton.IsChecked == true) ? "MANGA" : "NOVEL", cur, max)) // Boolean returns whether the series added is a duplicate
+            {
+                CollectionWindow.CollectionViewModel.UsersNumVolumesCollected += cur;
+                CollectionWindow.CollectionViewModel.UsersNumVolumesToBeCollected += (uint)(max - cur);
+                CollectionWindow.CollectionViewModel.SearchText = "";
             }
         }
     }
