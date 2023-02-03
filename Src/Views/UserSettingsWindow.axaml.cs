@@ -61,6 +61,40 @@ namespace Tsundoku.Views
             }
         }  
 
+        private void OpenSite(object sender, RoutedEventArgs args)
+        {
+            Logger.Info(@$"Opening Coolors Website https://{(sender as Button).Name}");
+            try
+            {
+                Process.Start(new ProcessStartInfo(@$"https://{(sender as Button).Name}") { UseShellExecute = true });
+            }
+            catch (System.ComponentModel.Win32Exception noBrowser)
+            {
+                Logger.Error(noBrowser.Message);
+            }
+            catch (System.Exception other)
+            {
+                Logger.Error(other.Message);
+            }
+        }
+
+        private void OpenYoutuberSite(object sender, RoutedEventArgs args)
+        {
+            Logger.Info(@$"Opening Coolors Website https://www.youtube.com/@{(sender as Button).Name}");
+            try
+            {
+                Process.Start(new ProcessStartInfo(@$"https://www.youtube.com/@{(sender as Button).Name}") { UseShellExecute = true });
+            }
+            catch (System.ComponentModel.Win32Exception noBrowser)
+            {
+                Logger.Error(noBrowser.Message);
+            }
+            catch (System.Exception other)
+            {
+                Logger.Error(other.Message);
+            }
+        }
+
         private void OpenCoolorsSite(object sender, RoutedEventArgs args)
         {
             Logger.Info(@"Opening Coolors Website https://coolors.co/generate");

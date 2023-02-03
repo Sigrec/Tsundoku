@@ -56,29 +56,25 @@
                             FontWeight="Bold" 
                             BorderThickness="2" 
                             Classes="menu"
-                            Click="ReportBug" 
-                            HorizontalAlignment="Center"
+                            Click="ReportBug"
                             Content="Report Issue/Bug"/>
                     <Button FontSize="15" 
                             FontWeight="Bold" 
                             BorderThickness="2" 
                             Classes="menu"
-                            Click="OpenCoolorsSite" 
-                            HorizontalAlignment="Center"
+                            Click="OpenCoolorsSite"
                             Content="Open Coolors"/>
                     <Button FontSize="15" 
                             FontWeight="Bold" 
                             BorderThickness="2" 
                             Classes="menu"
                             Click="OpenScreenshotsFolder" 
-                            HorizontalAlignment="Center"
                             Content="Open Screenshots Folder"/>
                     <Button FontSize="15" 
                             FontWeight="Bold" 
                             BorderThickness="2" 
                             Classes="menu"
                             Click="OpenCoversFolder" 
-                            HorizontalAlignment="Center"
                             Content="Open Covers Folder"/>
                     <Button FontSize="15" 
                             FontWeight="Bold"
@@ -86,6 +82,70 @@
                             BorderThickness="2"
                             Click="ExportToSpreadsheet"
                             Content="Export to Spreadsheet"/>
+                </WrapPanel>
+            </StackPanel>
+            <StackPanel Spacing="5">
+                <TextBlock Text="Manga Youtubers" FontSize="20" FontWeight="Bold" Classes="menu"/>
+                <WrapPanel Margin="-35,-3,0,0" Width="420">
+                    <WrapPanel.Styles>
+                        <Style Selector="Button">
+                            <Setter Property="Margin" Value="5"/>
+                        </Style>
+                    </WrapPanel.Styles>
+                    <Button FontSize="15" 
+                            FontWeight="Bold" 
+                            BorderThickness="2" 
+                            Classes="menu"
+                            Click="OpenYoutuberSite"
+                            Name="EastCoastManga"
+                            Content="EastCoastManga"/>
+                    <Button FontSize="15" 
+                            FontWeight="Bold" 
+                            BorderThickness="2" 
+                            Classes="menu"
+                            Click="OpenYoutuberSite" 
+                            Name="PlasmsManga"
+                            Content="Plasm's Manga"/>
+                    <Button FontSize="15" 
+                            FontWeight="Bold" 
+                            BorderThickness="2" 
+                            Classes="menu"
+                            Click="OpenYoutuberSite" 
+                            HorizontalAlignment="Center"
+                            Name="hvlmanga"
+                            Content="hvlmanga"/>
+                    <Button FontSize="15"
+                            FontWeight="Bold" 
+                            BorderThickness="2" 
+                            Classes="menu"
+                            Click="OpenYoutuberSite" 
+                            HorizontalAlignment="Center"
+                            Name="JakeThePog"
+                            Content="Jake The Pog"/>
+                    <Button FontSize="15"
+                            FontWeight="Bold" 
+                            BorderThickness="2" 
+                            Classes="menu"
+                            Click="OpenYoutuberSite" 
+                            HorizontalAlignment="Center"
+                            Name="BasedSempai"
+                            Content="Based Sempai"/>
+                    <Button FontSize="15"
+                            FontWeight="Bold" 
+                            BorderThickness="2" 
+                            Classes="menu"
+                            Click="OpenYoutuberSite" 
+                            HorizontalAlignment="Center"
+                            Name="Ararawgi"
+                            Content="Ararawgi"/>
+                    <Button FontSize="15"
+                            FontWeight="Bold" 
+                            BorderThickness="2" 
+                            Classes="menu"
+                            Click="OpenYoutuberSite" 
+                            HorizontalAlignment="Center"
+                            Name="MangaHunter"
+                            Content="Sam's Sidequest"/>
                 </WrapPanel>
             </StackPanel>
             <StackPanel Spacing="5">

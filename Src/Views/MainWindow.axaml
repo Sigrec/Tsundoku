@@ -356,7 +356,7 @@
 													   Name="SeriesTitle"
 													   Padding="10,2,5,0"
 													   Cursor="Hand"
-													   LineHeight="24"> <!-- 24.0 --> <!-- old font size was 23 -->
+													   LineHeight="24.0"> <!-- 24.0 --> <!-- old font size was 23 -->
 												<TextBlock.Text>
 													<MultiBinding Converter="{StaticResource ConvertTitle}" Mode="OneWay">
 														<Binding Path="Titles[0]"/>
