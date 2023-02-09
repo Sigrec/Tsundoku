@@ -28,8 +28,6 @@ namespace Tsundoku.ViewModels
         public AddNewSeriesWindow newSeriesWindow;
         public SettingsWindow settingsWindow;
         public CollectionThemeWindow themeSettingsWindow;
-        public static string _curDisplay;
-        public static uint _curVolumesCollected, _curVolumesToBeCollected;
         public string[] AvailableLanguages { get; } = new string[] { "Romaji", "English", "Native" };
         public string[] AvailableCollectionFilters { get; } = new string[] { "None", "Ongoing", "Finished", "Hiatus", "Cancelled", "Complete", "Incomplete", "Manga", "Novel" };
 

@@ -94,12 +94,13 @@
 						</StackPanel>
 					</StackPanel>
 					<TextBlock Name="NumVolumesCollected" 
-							   Text="{CompiledBinding UsersNumVolumesCollected, StringFormat='Collected&#x0a;{0} Volumes', Mode=OneWay}" TextAlignment="Center" 
+							   Text="{CompiledBinding UsersNumVolumesCollected, StringFormat='Collected&#x0a;{0} Volumes', Mode=OneWay}"
+							   TextAlignment="Center" 
 							   FontSize="21" 
 							   FontWeight="Bold" 
 							   Classes="menu"
-							   VerticalAlignment="Center"
 							   Width="155"
+							   VerticalAlignment="Center"
 							   HorizontalAlignment="Center"/>
 					<StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="5" Width="175">
 						<TextBlock Name="SearchCollectionHeader" VerticalAlignment="Center" Text="Search Collection" HorizontalAlignment="Center" FontSize="21" FontWeight="Bold" Classes="menu"/>
@@ -117,8 +118,8 @@
 							   FontSize="21" 
 							   FontWeight="Bold" 
 							   Classes="menu"
-							   VerticalAlignment= "Center" 
 							   Width="155"
+							   VerticalAlignment= "Center" 
 							   HorizontalAlignment="Center"/>
 					<StackPanel Spacing="5" HorizontalAlignment="Center" VerticalAlignment="Center">
 						<ComboBox Name="LanguageSelector"

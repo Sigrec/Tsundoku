@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Src\Tsundoku.csproj" />
+    <ProjectReference Include="..\Src\Tsundoku.csproj" />
   </ItemGroup>
 
 </Project>

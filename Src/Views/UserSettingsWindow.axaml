@@ -10,8 +10,7 @@
         FontFamily="Segoe UI"
         SizeToContent="WidthAndHeight"
         WindowStartupLocation="2"
-        KeyboardNavigation.TabNavigation="None"
-        CanResize="false">
+        KeyboardNavigation.TabNavigation="None">
     
     <Window.Styles>
 		<StyleInclude Source="/Styles/MenuTheme.xaml" />

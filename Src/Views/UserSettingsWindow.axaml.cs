@@ -1,5 +1,3 @@
-using Avalonia;
-using GemBox.Spreadsheet;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Interactivity;
 using Tsundoku.ViewModels;
@@ -7,6 +5,7 @@ using Avalonia.Controls;
 using System.Diagnostics;
 using System.Text;
 using System;
+using Avalonia;
 
 namespace Tsundoku.Views
 {

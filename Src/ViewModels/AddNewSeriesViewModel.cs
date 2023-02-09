@@ -32,16 +32,16 @@ namespace Tsundoku.ViewModels
         }
         
         /**
-        * Modified On: 08 December 2022
+        * Last Modified: 08 December 2022
         *  by: Sean Njenga
         * Desc: Recieves the call from the AddNewSeriesWindow Button "Add" press which sends the data to this method which calls for
         *       the method to get the series data and create a new series object. Then it checks to see if it's a valid series and
         *       whether the series already exists in the users collection if not then it adds.
         * Params:
-        *      title | string | The titles of the new series to add
-        *      bookType | string | The book type or format of the series to add either a Manga(Comic) or Novel
-        *      ushort | curVolCount | The current # of volumes the user has collected for this series
-        *      ushort | maxVolCount | The max # of volumes this series currently has
+        *      title    | string      | The titles of the new series to add
+        *      bookType | string      | The book type or format of the series to add either a Manga(Comic) or Novel
+        *      ushort   | curVolCount | The current # of volumes the user has collected for this series
+        *      ushort   | maxVolCount | The max # of volumes this series currently has
         */
         public bool GetSeriesData(string title, string bookType, ushort curVolCount, ushort maxVolCount)
         {

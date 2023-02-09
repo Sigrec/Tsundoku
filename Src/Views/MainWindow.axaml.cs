@@ -108,8 +108,11 @@ namespace Tsundoku.Views
                 Series curSeries = (Series)MainWindowViewModel.Collection.Single(series => series == (Series)((Button)sender).DataContext);
                 CollectionViewModel.UsersNumVolumesCollected -= curSeries.CurVolumeCount;
                 CollectionViewModel.UsersNumVolumesToBeCollected -= (uint)(curSeries.MaxVolumeCount - curSeries.CurVolumeCount);
+
+                File.SetAttributes(curSeries.Cover, FileAttributes.Normal);
                 File.Delete(curSeries.Cover);
                 Logger.Info($"Deleted Cover -> {curSeries.Cover}");
+                
                 MainWindowViewModel.SearchedCollection.Remove(curSeries);
                 MainWindowViewModel.Collection.Remove(curSeries);
                 curSeries.Dispose();

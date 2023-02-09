@@ -32,7 +32,7 @@ namespace Tsundoku.Helpers
                 {
                     new Button() 
                     { 
-                        Label = "Download", 
+                        Label = "Download Tsundoku", 
                         Url = "https://github.com/Sigrec/TsundokuApp/blob/main/README.md"
                     }
                 },

@@ -151,7 +151,7 @@ namespace TsundokuTests
         [Test] // Tests if only native = null, onyl full = null, and both native and full are null
         public void GetSeriesStaff_AllNullStaffScenarios_Name_Test()
         {
-            JsonElement testALQuery = JsonDocument.Parse(File.ReadAllText(@"\Tsundoku\Tests\TsundokuTests\SeriesTestData\staffNameTest.json")).RootElement.GetProperty("data").GetProperty("Media").GetProperty("staff").GetProperty("edges");
+            JsonElement testALQuery = JsonDocument.Parse(File.ReadAllText(@"\Tsundoku\Tests\SeriesTests\SeriesTestData\staffNameTest.json")).RootElement.GetProperty("data").GetProperty("Media").GetProperty("staff").GetProperty("edges");
 
             Assert.That(Series.GetSeriesStaff(testALQuery, "full", "Novel", "86: Eighty Six"), Is.EqualTo("Asato Asato | しらび | Error"));
         }
