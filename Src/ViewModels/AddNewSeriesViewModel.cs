@@ -54,6 +54,7 @@ namespace Tsundoku.ViewModels
                 {
                     if (!duplicateSeriesCheck && series.Link.Equals(newSeries.Link))
                     {
+                        Logger.Debug($"{series.Link} | {newSeries.Link}");
                         duplicateSeriesCheck = true;
                     }
                 }

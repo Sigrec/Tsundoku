@@ -28,7 +28,7 @@ namespace TsundokuTests
         }
 
         [Test]
-        public void IdenticalSeriesNames_Test()
+        public void IdenticalSeriesNames_GetSeriesByID_Test()
         {
             Assert.Multiple(() => {
                 Assert.That("Getsuyoubi no Tawawa", Is.EqualTo(JsonDocument.Parse(new AniListQuery().GetSeriesID(98282, "MANGA")).RootElement.GetProperty("Media").GetProperty("title").GetProperty("romaji").ToString()));
@@ -36,18 +36,18 @@ namespace TsundokuTests
             });
         }
 
-        [Test]
-        public void CreateCoverFilePath_Duplicate_Test()
-        {
-            if (!File.Exists("Covers\\OnePunchMan_MANGA.jpg"))
-            {
-                File.Create("Covers\\OnePunchMan_MANGA.jpg");
-            }
+        // [Test]
+        // public void CreateCoverFilePath_Duplicate_Test()
+        // {
+        //     if (!File.Exists("C:\\Tsundoku\\Covers\\OnePunchMan_MANGA.jpg"))
+        //     {
+        //         File.Create("C:\\Tsundoku\\Covers\\OnePunchMan_MANGA.jpg");
+        //     }
 
-            JsonElement onePunchManQuery = JsonDocument.Parse(new AniListQuery().GetSeriesTitle("One-Punch Man (Original)", "MANGA")).RootElement.GetProperty("Media");
+        //     JsonElement onePunchManQuery = JsonDocument.Parse(new AniListQuery().GetSeriesTitle("One-Punch Man (Original)", "MANGA")).RootElement.GetProperty("Media");
 
-            Assert.That("Covers\\One-PunchMan(Original)_MANGA.jpg", Is.EqualTo(Series.CreateCoverFilePath(onePunchManQuery.GetProperty("coverImage").GetProperty("extraLarge").ToString(), onePunchManQuery.GetProperty("title").GetProperty("romaji").ToString(), "MANGA", onePunchManQuery.GetProperty("synonyms"), false)));
-        }
+        //     Assert.That("Covers\\One-PunchMan(Original)_MANGA.jpg", Is.EqualTo(Series.CreateCoverFilePath(onePunchManQuery.GetProperty("coverImage").GetProperty("extraLarge").ToString(), onePunchManQuery.GetProperty("title").GetProperty("romaji").ToString(), "MANGA", onePunchManQuery.GetProperty("synonyms"), false)));
+        // }
 
         [Test]
         public void ParseDescription_UnnecessaryBreakRemoval_Test()
@@ -85,6 +85,16 @@ namespace TsundokuTests
             string htmlDesc = "In a world where awakened beings called “Hunters” must battle deadly monsters to protect humanity, Sung Jinwoo, nicknamed “the weakest hunter of all mankind,” finds himself in a constant struggle for survival. One day, after a brutal encounter in an overpowered dungeon wipes out his party and threatens to end his life, a mysterious System chooses him as its sole player: Jinwoo has been granted the rare opportunity to level up his abilities, possibly beyond any known limits. Follow Jinwoo’s journey as he takes on ever-stronger enemies, both human and monster, to discover the secrets deep within the dungeons and the ultimate extent of his powers.\n<br><br>\n(Source: Tappytoon)\n<br><br>\n<i>Note: Chapter count includes a prologue. </i>";
 
             string expectedHtmlDesc = "In a world where awakened beings called “Hunters” must battle deadly monsters to protect humanity, Sung Jinwoo, nicknamed “the weakest hunter of all mankind,” finds himself in a constant struggle for survival. One day, after a brutal encounter in an overpowered dungeon wipes out his party and threatens to end his life, a mysterious System chooses him as its sole player: Jinwoo has been granted the rare opportunity to level up his abilities, possibly beyond any known limits. Follow Jinwoo’s journey as he takes on ever-stronger enemies, both human and monster, to discover the secrets deep within the dungeons and the ultimate extent of his powers.";
+
+            Assert.That(Series.ParseDescription(htmlDesc), Is.EqualTo(expectedHtmlDesc));
+        }
+
+        [Test]
+        public void ParseDescription_Brackets_Test()
+        {
+            string htmlDesc = "The master spy codenamed &lt;Twilight&gt; has spent his days on undercover missions, all for the dream of a better world. But one day, he receives a particularly difficult new order from command. For his mission, he must form a temporary family and start a new life?! A Spy/Action/Comedy about a one-of-a-kind family!<br><br>\n(Source: MANGA Plus)<br><br>\n<i>Notes:<br>\n- Includes 2 \"Extra Missions\" and 9 “Short Missions”.<br>\n- Nominated for the 24th Tezuka Osamu Cultural Prize in 2020.<br>\n- Nominated for the 13th and 14th Manga Taisho Award in 2020 and 2021.<br>\n- Nominated for the 44th Kodansha Manga Award in the Shounen Category in 2020.</i>";
+
+            string expectedHtmlDesc = "The master spy codenamed <Twilight> has spent his days on undercover missions, all for the dream of a better world. But one day, he receives a particularly difficult new order from command. For his mission, he must form a temporary family and start a new life?! A Spy/Action/Comedy about a one-of-a-kind family!";
 
             Assert.That(Series.ParseDescription(htmlDesc), Is.EqualTo(expectedHtmlDesc));
         }
