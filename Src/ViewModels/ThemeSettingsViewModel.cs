@@ -1,6 +1,8 @@
+using System;
 using System.Collections.ObjectModel;
 using Tsundoku.Models;
 using ReactiveUI.Fody.Helpers;
+using ReactiveUI;
 
 namespace Tsundoku.ViewModels
 {
@@ -12,11 +14,11 @@ namespace Tsundoku.ViewModels
         public string ThemeName { get; set; }
 
         [Reactive]
-        public bool IsSaveThemeButtonEnabled { get; set; } = true;
+        public bool IsSaveThemeButtonEnabled { get; set; }
 
         public ThemeSettingsViewModel()
         {
-            //this.WhenAnyValue(x => x.ThemeName, x => !string.IsNullOrWhiteSpace(x) && !x.Equals("Default")).Subscribe(x => IsSaveThemeButtonEnabled = x);
+            this.WhenAnyValue(x => x.ThemeName, x => !string.IsNullOrWhiteSpace(x) && !x.Equals("Default", StringComparison.OrdinalIgnoreCase)).Subscribe(x => IsSaveThemeButtonEnabled = x);
         }
     }
 }

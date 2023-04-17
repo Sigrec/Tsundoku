@@ -337,11 +337,18 @@ namespace Tsundoku.ViewModels
         private bool VersionUpdate()
         {
             string json = File.ReadAllText(filePath);
-            if (Convert.ToDouble(JsonDocument.Parse(json).RootElement.GetProperty("CurDataVersion").ToString()) < 1.5)
+            JsonNode userData = JsonNode.Parse(json);
+            if (!userData.AsObject().ContainsKey("CurDataVersion"))
             {
-                JsonNode userData = JsonNode.Parse(json), series;
+                userData.AsObject().Add("CurDataVersion", "1.0");
+                Constants.Logger.Info("Added CurDataVersion Data");
+            }
+
+            double curVersion = Double.Parse(userData["CurDataVersion"].ToString());
+            if (curVersion < 1.5)
+            {
+                JsonNode series;
                 JsonArray collectionJsonArray = userData["UserCollection"].AsArray();
-                double curVersion = Double.Parse(userData["CurDataVersion"].ToString());
                 userData.AsObject().Add("Currency", "$");
                 userData.AsObject().Add("MeanScore", 0);
                 userData.AsObject().Add("VolumesRead", 0);
@@ -394,7 +401,7 @@ namespace Tsundoku.ViewModels
 
                 return true;        
             }
-            return false;
+            return true;
         }
 
         [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "A New file will always be created if it doesn't exist before serialization")]

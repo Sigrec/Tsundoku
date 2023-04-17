@@ -1,4 +1,4 @@
-V1.5.0.0 - Apr 17th, 2023 @ 2:29PM PST
+V1.5.0.0 - Apr 17th, 2023 @ 4:51PM PST
 ✅ Added Collection Stats window, Can View Various Stats of your Collection! (Currently only 4 basic stats more stuff like graphs will be added in a later release)
 ✅ Added Price, Volumes Read, Demographic, and Score stats to Series Card (click bottom right icon)
 ✅ Added Favorite Option to Series w/ "Favorites" Filter
@@ -16,6 +16,7 @@ V1.5.0.0 - Apr 17th, 2023 @ 2:29PM PST
 ✅ Non-Japanese series now also grab there respective Japanese titles (ex Solo Leveling) [Need to Re-Add these series to get them]
 ✅ Lowered the font size of "Status | Format" to accomdate longer text
 ✅ Fixed Issue when # of Staff exceeds 25 and the others do not get pulled
+✅ Fixed crash when trying to Save Theme w/out a Name
 
 V1.4.4.2 - Feb 9th, 2023 @ 11:28AM PST
 ✅ HotFix for another description parsing issue (found with SPYxFAMILY description) [Re-add series if you think it has this issue or any other previous parsing issue]
