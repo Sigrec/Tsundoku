@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 
 namespace Tsundoku.Helpers
 {
@@ -9,17 +10,15 @@ namespace Tsundoku.Helpers
     {
         public static readonly TitleLangConverter Instance = new();
 
-        public object? Convert(IList<object?> values, Type targetType, object? parameter, CultureInfo culture)
+        public object? Convert(IList<object?> values, Type type, object? parameter, CultureInfo culture)
         {
-            switch (values[3])
+            if (values.Any(x => x is Avalonia.UnsetValueType)) return false;
+            var titles = (values[0] as Dictionary<string, string>);
+            if (titles.ContainsKey((values[1] as string)))
             {
-                case "Native":
-                    return values[2];
-                case "English":
-                    return values[1];
-                default:
-                    return values[0];
+                return titles[(values[1] as string)];
             }
+            return titles["Romaji"];
         }
     }
 }

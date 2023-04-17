@@ -2,19 +2,20 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="using:Tsundoku"
 			 xmlns:vm="using:Tsundoku.ViewModels.MainWindowViewModel"
-			 xmlns:cp="clr-namespace:Egorozh.ColorPicker.Dialog;assembly=Egorozh.ColorPicker.Avalonia.Dialog"
              xmlns:cv="clr-namespace:Tsundoku.Helpers"
              x:Class="Tsundoku.App">
-
-    <Application.Styles>
-        <FluentTheme Mode="Dark"/>
-		<cp:FluentColorPickerTheme Mode="Dark"/>
-		<!-- <StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml" /> -->
-    </Application.Styles>
 
 	<Application.Resources>
 		<cv:ColorConverter x:Key="ConvertColor"/>
 	</Application.Resources>
+
+    <Application.Styles>
+		<FluentTheme Mode="Dark"/>
+		<!-- <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/> -->
+		<!-- <StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml" /> -->
+		<StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml" />
+		<StyleInclude Source="/Styles/MenuTheme.xaml" />
+    </Application.Styles>
 
     <TrayIcon.Icons>
 		<TrayIcons>

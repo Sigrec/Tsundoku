@@ -1,0 +1,121 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:vm="using:Tsundoku.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="Tsundoku.Views.PriceAnalysisWindow"
+        Icon="\Assets\Icons\Tsundoku-Logo.ico"
+        Title="Price Analysis"
+		FontFamily="Segoe UI"
+		SizeToContent="WidthAndHeight"
+        Classes="menu"
+		WindowStartupLocation="2"
+		KeyboardNavigation.TabNavigation="Cycle"
+		x:DataType="vm:PriceAnalysisViewModel">
+
+	<Window.Styles>
+		<StyleInclude Source="/Styles/MenuTheme.xaml" />
+	</Window.Styles>
+
+	<Grid ColumnDefinitions="*,*,*" RowDefinitions="*,*,10,*,*,10,*,10,*" Margin="20">
+		<Grid.Styles>
+			<StyleInclude Source="/Styles/MenuTheme.xaml" />
+			<Style Selector="Button:focus /template/ ContentPresenter#PART_ContentPresenter">
+				<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
+				<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
+				<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
+			</Style>
+		</Grid.Styles>
+		<TextBlock Grid.ColumnSpan="2" Grid.Column="0" Grid.Row="0" Margin="0,0,0,0" Text="Enter Title" FontSize="20" FontWeight="Bold" Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+		<TextBox Watermark="Title..."
+				 Grid.ColumnSpan="2"
+				 Grid.Column="0"
+				 Grid.Row="1"
+				 Classes="menu"
+				 Width="390"
+				 FontSize="18"
+				 FontWeight="Bold"
+				 TextWrapping="Wrap"
+				 VerticalAlignment="Center"
+				 HorizontalAlignment="Center"
+				 BorderThickness="2"/>
+		<TextBlock Grid.Column="0" Grid.Row="3" HorizontalAlignment="Center" Text="Select Browser" Margin="0,0,0,0" FontSize="20" FontWeight="Bold" Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}" VerticalAlignment="Center"/>
+		<ComboBox Name="BrowserSelector"
+				  Grid.Column="0"
+				  Grid.Row="4"
+				  SelectedItem="Edge"
+				  Height="37"
+				  VerticalAlignment="Center"
+				  HorizontalAlignment="Center"
+				  Items="{Binding AvailableBrowsers, Mode=OneWay}"
+				  FontWeight="Bold"
+				  BorderThickness="2"
+				  Width="130"
+				  Classes="menu"/>
+		<TextBlock HorizontalAlignment="Center" 
+				   VerticalAlignment="Center"
+				   Text="Select Book Type"
+				   Grid.Row="3" 
+				   Grid.Column="1" 
+				   Margin="0,8,0,0" 
+				   FontSize="20" 
+				   FontWeight="Bold" 
+				   Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}"/>
+		<StackPanel Orientation="Horizontal" Width="180" Grid.Column="1" Grid.Row="4" Spacing="4" Margin="0,0,0,0">
+			<StackPanel.Styles>
+				<StyleInclude Source="/Styles/MenuTheme.xaml" />
+			</StackPanel.Styles>
+			<ToggleButton Name="MangaButton"
+						FontSize="15"
+						Height="37" 
+						FontWeight="Bold"
+						Width="88"
+						BorderThickness="2"
+						VerticalContentAlignment="Center"
+						HorizontalContentAlignment="Center"
+						Classes="menu"
+						Content="Manga"/>
+			<ToggleButton Name="NovelButton"
+						FontSize="15" 
+						FontWeight="Bold"
+						Width="88"
+						Height="37" 
+						BorderThickness="2"
+						VerticalContentAlignment="Center"
+						HorizontalContentAlignment="Center"
+						Classes="menu"
+						Content="Novel"/>
+		</StackPanel>
+		<TextBlock Grid.Column="2" Grid.Row="3" HorizontalAlignment="Center" Text="Select Browser" Margin="0,0,0,0" FontSize="20" FontWeight="Bold" Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}" VerticalAlignment="Center"/>
+		<ComboBox Name="WebsiteSelector"
+				  Grid.Column="2"
+				  Grid.Row="4"
+				  SelectedItem="Edge"
+				  Height="37"
+				  VerticalAlignment="Center"
+				  HorizontalAlignment="Center"
+				  Items="{Binding AvailableWebsites, Mode=OneWay}"
+				  FontWeight="Bold"
+				  BorderThickness="2"
+				  Width="130"
+				  Classes="menu"/>
+		<!-- <DataGrid Classes="menu"
+				  Name="AnalysisDataGrid"
+				  BorderThickness="2"
+				  Grid.ColumnSpan="2"
+				  Grid.Column="0"
+				  Grid.Row="6"
+				  BorderBrush="Red"/> -->
+		<Button Classes="Menu"
+				BorderThickness="2"
+				FontWeight="Bold"
+				Grid.ColumnSpan="2"
+				Grid.Column="0"
+				Grid.Row="8"
+				FontSize="16"
+				VerticalAlignment="Center"
+				HorizontalAlignment="Center"
+				Content="Analyze"/>
+	</Grid>
+</Window>

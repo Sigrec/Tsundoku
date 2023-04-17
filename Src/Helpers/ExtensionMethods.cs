@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
 
 namespace Tsundoku.Helpers
 {
@@ -46,5 +50,33 @@ namespace Tsundoku.Helpers
 			}
 			return new string(src, 0, dstIdx);
 		}
+
+		private void PrintCultures()
+        {
+            List<string> list = new List<string>();
+            foreach (CultureInfo ci in CultureInfo.GetCultures(CultureTypes.AllCultures))
+            {
+                string specName = "(none)";
+                try
+                { 
+                    specName = CultureInfo.CreateSpecificCulture(ci.Name).Name; 
+                } 
+                catch { }
+                list.Add(String.Format("{0,-12}{1,-12}{2}", ci.Name, specName, ci.EnglishName));
+            }
+
+            list.Sort();  // sort by name
+
+            using (StreamWriter outputFile = new StreamWriter(@"CurrentCultures.txt"))
+            {
+                // write to console
+                outputFile.WriteLine("CULTURE   SPEC.CULTURE  ENGLISH NAME");
+                outputFile.WriteLine("--------------------------------------------------------------");
+                foreach (string str in list)
+                {
+                    outputFile.WriteLine(str);
+                }
+            } 
+        }
     }
 }

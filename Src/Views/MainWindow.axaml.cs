@@ -13,12 +13,12 @@ using System.Reactive.Linq;
 using Avalonia.ReactiveUI;
 using ReactiveUI;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace Tsundoku.Views
 {
     public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
     {
-        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         public MainWindowViewModel? CollectionViewModel => DataContext as MainWindowViewModel;
         private WindowState previousWindowState; 
 
@@ -41,17 +41,87 @@ namespace Tsundoku.Views
                 }
                 else if (e.KeyModifiers == KeyModifiers.Control && e.Key == Key.P)
                 {
-                    Logger.Info("Saving Screenshot of Collection");
+                    Constants.Logger.Info("Saving Screenshot of Collection");
                     ScreenCaptureWindows();
                 }
                 else if (e.KeyModifiers == KeyModifiers.Control && e.Key == Key.S)
                 {
-                    Logger.Info("Saving Collection");
+                    Constants.Logger.Info("Saving Collection");
                     CollectionViewModel.SearchText = "";
                     MainWindowViewModel.SaveUsersData();
                 }
             };
 
+            Closing += (s, e) =>
+            {
+                SaveOnClose();
+            };
+        }
+
+        public void SaveStats(object sender, RoutedEventArgs args)
+        {
+            Series curSeries = (Series)((Button)sender).DataContext;
+            var stackPanels = ((Button)sender).GetLogicalSiblings();
+            string volumesRead = ((MaskedTextBox)stackPanels.ElementAt(0).GetLogicalChildren().ElementAt(1)).Text.Replace("_", "");
+            if (!string.IsNullOrWhiteSpace(volumesRead))
+            {
+                uint volumesReadVal = Convert.ToUInt32(volumesRead), countVolumesRead = 0;
+                curSeries.VolumesRead = volumesReadVal;
+                ((TextBlock)stackPanels.ElementAt(0).GetLogicalChildren().ElementAt(0)).Text = $"Read {volumesReadVal}";
+                Constants.Logger.Info($"Updated # of Volumes Read for {curSeries.Titles["Romaji"]} to {volumesReadVal}");
+                volumesReadVal = 0;
+                foreach (Series x in CollectionsMarshal.AsSpan(MainWindowViewModel.Collection.ToList()))
+                {
+                    volumesReadVal += x.VolumesRead;
+                    if (x.VolumesRead != 0)
+                    {
+                        countVolumesRead++;
+                    }
+                }
+                CollectionViewModel.collectionStatsWindow.CollectionStatsVM.VolumesRead = volumesReadVal;
+            }
+
+            string cost = ((MaskedTextBox)stackPanels.ElementAt(1).GetLogicalChildren().ElementAt(1)).Text.Replace("_", "");
+            if (!cost.Equals("."))
+            {
+                decimal costVal = Convert.ToDecimal(cost);
+                curSeries.Cost = costVal;
+                ((TextBlock)stackPanels.ElementAt(1).GetLogicalChildren().ElementAt(0)).Text = $"Cost {costVal}";
+                Constants.Logger.Info($"Updated Cost for {curSeries.Titles["Romaji"]} to {CollectionViewModel.CurCurrency}{costVal}");
+                costVal = 0;
+                foreach (Series x in CollectionsMarshal.AsSpan(MainWindowViewModel.Collection.ToList()))
+                {
+                    costVal += x.Cost;
+                }
+                CollectionViewModel.collectionStatsWindow.CollectionStatsVM.CollectionPrice = $"{CollectionViewModel.CurCurrency}{Decimal.Round(costVal, 2)}";
+            }
+
+            string score = ((MaskedTextBox)stackPanels.ElementAt(2).GetLogicalChildren().ElementAt(1)).Text.Substring(0, 4).Replace("_", "");
+            if (!score.Equals("."))
+            {
+                decimal scoreVal = Convert.ToDecimal(score);
+                if (Decimal.Compare(scoreVal, new Decimal(10.0)) <= 0)
+                {
+                    int countScore = 0;
+                    curSeries.Score = scoreVal;
+                    ((TextBlock)stackPanels.ElementAt(2).GetLogicalChildren().ElementAt(0)).Text = $"Score {scoreVal}/10.0";
+                    Constants.Logger.Info($"Updated Score for {curSeries.Titles["Romaji"]} to {scoreVal}/10.0");
+                    scoreVal = 0;
+                    foreach (Series x in CollectionsMarshal.AsSpan(MainWindowViewModel.Collection.ToList()))
+                    {
+                        scoreVal += x.Score;
+                        if (x.Score != 0)
+                        {
+                            countScore++;
+                        }
+                    }
+                    CollectionViewModel.collectionStatsWindow.CollectionStatsVM.MeanScore = Decimal.Round(scoreVal / countScore, 1);
+                }
+                else
+                {
+                    Constants.Logger.Warn($"Score Value {scoreVal} larger than 10.0");
+                }
+            }
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "<Pending>")]
@@ -85,7 +155,7 @@ namespace Tsundoku.Views
                 {
                     CollectionViewModel.UsersNumVolumesCollected = CollectionViewModel.UsersNumVolumesCollected - curSeries.CurVolumeCount + curVolumeChange;
                     CollectionViewModel.UsersNumVolumesToBeCollected = CollectionViewModel.UsersNumVolumesToBeCollected - (uint)(curSeries.MaxVolumeCount - curSeries.CurVolumeCount) + (uint)(maxVolumeChange - curVolumeChange);
-                    Logger.Info($"Changed Series Values For {curSeries.Titles[0]} From {curSeries.CurVolumeCount}/{curSeries.MaxVolumeCount} -> {curVolumeChange}/{maxVolumeChange}");
+                    Constants.Logger.Info($"Changed Series Values For {curSeries.Titles["Rmoaji"]} From {curSeries.CurVolumeCount}/{curSeries.MaxVolumeCount} -> {curVolumeChange}/{maxVolumeChange}");
                     curSeries.CurVolumeCount = curVolumeChange;
                     curSeries.MaxVolumeCount = maxVolumeChange;
                     
@@ -109,14 +179,33 @@ namespace Tsundoku.Views
                 CollectionViewModel.UsersNumVolumesCollected -= curSeries.CurVolumeCount;
                 CollectionViewModel.UsersNumVolumesToBeCollected -= (uint)(curSeries.MaxVolumeCount - curSeries.CurVolumeCount);
 
+                // Update Stats Window
+                CollectionViewModel.collectionStatsWindow.CollectionStatsVM.VolumesRead -= curSeries.VolumesRead;
+                CollectionViewModel.collectionStatsWindow.CollectionStatsVM.CollectionPrice = $"{CollectionViewModel.CurCurrency}{Decimal.Round(Convert.ToDecimal(CollectionViewModel.collectionStatsWindow.CollectionStatsVM.CollectionPrice.Substring(CollectionViewModel.CurCurrency.Length)) - curSeries.Cost, 2)}";
+
                 File.SetAttributes(curSeries.Cover, FileAttributes.Normal);
                 File.Delete(curSeries.Cover);
-                Logger.Info($"Deleted Cover -> {curSeries.Cover}");
+                Constants.Logger.Info($"Deleted Cover -> {curSeries.Cover}");
                 
                 MainWindowViewModel.SearchedCollection.Remove(curSeries);
                 MainWindowViewModel.Collection.Remove(curSeries);
                 curSeries.Dispose();
-                Logger.Info($"Removed {curSeries.Titles[0]} From Collection");
+
+                // Update Mean Score
+                int countScore = 0;
+                decimal scoreVal = 0;
+                foreach (Series x in CollectionsMarshal.AsSpan(MainWindowViewModel.Collection.ToList()))
+                {
+                    scoreVal += x.Score;
+                    if (x.Score != 0)
+                    {
+                        countScore++;
+                    }
+                }
+                CollectionViewModel.collectionStatsWindow.CollectionStatsVM.MeanScore = Decimal.Round(scoreVal / countScore, 1);
+                
+                Constants.Logger.Info($"Removed {curSeries.Titles["Romaji"]} From Collection");
+                CollectionViewModel.collectionStatsWindow.CollectionStatsVM.SeriesCount = (uint)MainWindowViewModel.Collection.Count;
             }, RxApp.MainThreadScheduler);
         }
 
@@ -124,29 +213,33 @@ namespace Tsundoku.Views
         {
             var result = await Observable.Start(() => 
             {
+                if ((((sender as Button).FindLogicalAncestorOfType<Grid>(false).GetLogicalChildren().ElementAt(1)) as Grid).IsVisible == true)
+                {
+                    (((sender as Button).FindLogicalAncestorOfType<Grid>(false).GetLogicalChildren().ElementAt(1)) as Grid).IsVisible = false;
+                }
                 ((Button)sender).FindLogicalAncestorOfType<Grid>(false).FindLogicalDescendantOfType<Grid>(false).IsVisible ^= true;
+            }, RxApp.MainThreadScheduler);
+        }
+
+        private async void ShowStatsPane(object sender, RoutedEventArgs args)
+        {
+            var result = await Observable.Start(() => 
+            {
+                if (((Button)sender).FindLogicalAncestorOfType<Grid>(false).FindLogicalDescendantOfType<Grid>(false).IsVisible == true)
+                {
+                    ((Button)sender).FindLogicalAncestorOfType<Grid>(false).FindLogicalDescendantOfType<Grid>(false).IsVisible = false;
+                }
+                (((sender as Button).FindLogicalAncestorOfType<Grid>(false).GetLogicalChildren().ElementAt(1)) as Grid).IsVisible ^= true;
             }, RxApp.MainThreadScheduler);
         }
 
         private void LanguageChanged(object sender, SelectionChangedEventArgs e)
         {
-            //Logger.Debug(((sender as ComboBox).GetLogicalSiblings().ElementAt(1) as ComboBox).Name);
             if ((sender as ComboBox).IsDropDownOpen)
             {
-                switch (LanguageSelector.SelectedItem)
-                {
-                    case "Native":
-                        CollectionViewModel.CurLanguage = "Native";
-                        break;
-                    case "English":
-                        CollectionViewModel.CurLanguage = "English";
-                        break;
-                    default:
-                        CollectionViewModel.CurLanguage = "Romaji";
-                        break;
-                }
-                ((sender as ComboBox).GetLogicalSiblings().ElementAt(1) as ComboBox).SelectedItem = "None";
-                Logger.Info($"Changed Langauge to {CollectionViewModel.CurLanguage}");
+                CollectionViewModel.CurLanguage = LanguageSelector.SelectedItem.ToString();
+                // ((sender as ComboBox).GetLogicalSiblings().ElementAt(1) as ComboBox).SelectedItem = "None";
+                Constants.Logger.Info($"Changed Langauge to {CollectionViewModel.CurLanguage}");
                 MainWindowViewModel.SortCollection();
             }
         }
@@ -157,32 +250,43 @@ namespace Tsundoku.Views
             {
                 string collectionFilter = (sender as ComboBox).SelectedItem as string;
                 MainWindowViewModel.FilterCollection(collectionFilter);
-                Logger.Info($"Changed Collection Filter To {collectionFilter}");
+                Constants.Logger.Info($"Changed Collection Filter To {collectionFilter}");
             }
         }
 
-        private void DisplayChanged(object sender, SelectionChangedEventArgs e)
+        private void DemographicChanged(object sender, SelectionChangedEventArgs e)
         {
             if ((sender as ComboBox).IsDropDownOpen)
             {
-                string display = (sender as ComboBox).SelectedItem as string;
-                if (display.Equals("Card"))
-                {
-                    CollectionViewModel.CurDisplay = "Card";
-                }
-                else if (display.Equals("Mini-Card"))
-                {
-                    CollectionViewModel.CurDisplay = "Mini-Card";
-                }
-                Logger.Info($"Changed Display To {CollectionViewModel.CurDisplay}");
+                Series curSeries = (Series)((ComboBox)sender).DataContext;
+                string demographic = (sender as ComboBox).SelectedItem as string;
+                curSeries.Demographic = demographic;
+                Constants.Logger.Info($"Changed Demographic for {curSeries.Titles["Romaji"]} to {demographic}");
             }
         }
 
-        public void SaveOnClose(object sender, CancelEventArgs e)
+        // private void DisplayChanged(object sender, SelectionChangedEventArgs e)
+        // {
+        //     if ((sender as ComboBox).IsDropDownOpen)
+        //     {
+        //         string display = (sender as ComboBox).SelectedItem as string;
+        //         if (display.Equals("Card"))
+        //         {
+        //             CollectionViewModel.CurDisplay = "Card";
+        //         }
+        //         else if (display.Equals("Mini-Card"))
+        //         {
+        //             CollectionViewModel.CurDisplay = "Mini-Card";
+        //         }
+        //         Constants.Logger.Info($"Changed Display To {CollectionViewModel.CurDisplay}");
+        //     }
+        // }
+
+        public void SaveOnClose()
         {
             CollectionViewModel.SearchText = "";
             Helpers.DiscordRP.Deinitialize();
-            Logger.Info("Closing Tsundoku");
+            Constants.Logger.Info("Closing Tsundoku");
 
             if (CollectionViewModel.newSeriesWindow != null)
             {
@@ -202,6 +306,18 @@ namespace Tsundoku.Views
                 CollectionViewModel.themeSettingsWindow.Close();
             }
 
+            if (CollectionViewModel.priceAnalysisWindow != null)
+            {
+                CollectionViewModel.priceAnalysisWindow.Closing += (s, e) => { e.Cancel = false; };
+                CollectionViewModel.priceAnalysisWindow.Close();
+            }
+
+            if (CollectionViewModel.collectionStatsWindow != null)
+            {
+                CollectionViewModel.collectionStatsWindow.Closing += (s, e) => { e.Cancel = false; };
+                CollectionViewModel.collectionStatsWindow.Close();
+            }
+
             // Move the users current theme to the front of the list so when opening again it applies the correct theme
             ThemeSettingsViewModel.UserThemes.Move(ThemeSettingsViewModel.UserThemes.IndexOf(ThemeSettingsViewModel.UserThemes.Single(x => x.ThemeName == MainWindowViewModel.MainUser.MainTheme)), 0);
 
@@ -211,42 +327,42 @@ namespace Tsundoku.Views
         private void OpenSiteLink(object sender, PointerPressedEventArgs args)
         {
             string link = ((Canvas)sender).Name;
-            Logger.Info($"Opening Link {link}");
+            Constants.Logger.Info($"Opening Link {link}");
             try
             {
                 Process.Start(new ProcessStartInfo(link) { UseShellExecute = true });
             }
             catch (Win32Exception noBrowser)
             {
-                Logger.Error(noBrowser.Message);
+                Constants.Logger.Error(noBrowser.Message);
             }
             catch (Exception other)
             {
-                Logger.Error(other.Message);
+                Constants.Logger.Error(other.Message);
             }
         }
 
         private void OpenDonationLink(object sender, RoutedEventArgs args)
         {
-            Logger.Info($"Opening PayPal Donation Lionk");
+            Constants.Logger.Info($"Opening PayPal Donation Lionk");
             try
             {
                 Process.Start(new ProcessStartInfo("https://www.paypal.com/donate/?business=JAYCVEJGDF4GY&no_recurring=0&item_name=Anyone+amount+helps+and+keeps+the+app+going.&currency_code=USD") { UseShellExecute = true });
             }
             catch (Win32Exception noBrowser)
             {
-                Logger.Error(noBrowser.Message);
+                Constants.Logger.Error(noBrowser.Message);
             }
             catch (Exception other)
             {
-                Logger.Error(other.Message);
+                Constants.Logger.Error(other.Message);
             }
         }
 
         private async void CopySeriesTitleAsync(object sender, PointerPressedEventArgs args)
         {
             string title = ((TextBlock)sender).Text;
-            Logger.Info($"Copying {title} to Clipboard");
+            Constants.Logger.Info($"Copying {title} to Clipboard");
             await Application.Current.Clipboard.SetTextAsync(title);
         }
 
@@ -261,10 +377,10 @@ namespace Tsundoku.Views
                 CollectionViewModel.UsersNumVolumesCollected++;
                 CollectionViewModel.UsersNumVolumesToBeCollected--;
                 curSeries.CurVolumeCount += 1;
-                TextBlock volumeDisplay = (TextBlock)((Button)sender).Parent.GetLogicalSiblings().ElementAt(0);
-                string log = "Adding 1 Volume To " + curSeries.Titles[0] + " : " + volumeDisplay.Text + " -> ";
+                TextBlock volumeDisplay = (TextBlock)((Button)sender).GetLogicalSiblings().ElementAt(1);
+                string log = "Adding 1 Volume To " + curSeries.Titles["Romaji"] + " : " + volumeDisplay.Text + " -> ";
                 volumeDisplay.Text = curSeries.CurVolumeCount + "/" + curSeries.MaxVolumeCount;
-                Logger.Info(log + volumeDisplay.Text);
+                Constants.Logger.Info(log + volumeDisplay.Text);
 
                 (sender as Button).FindLogicalAncestorOfType<Grid>(false).FindLogicalDescendantOfType<ProgressBar>(false).Value = curSeries.CurVolumeCount;
             }
@@ -281,10 +397,10 @@ namespace Tsundoku.Views
                 CollectionViewModel.UsersNumVolumesCollected--;
                 CollectionViewModel.UsersNumVolumesToBeCollected++;
                 curSeries.CurVolumeCount -= 1;
-                TextBlock volumeDisplay = (TextBlock)((Button)sender).Parent.GetLogicalSiblings().ElementAt(0);
-                string log = "Removing 1 Volume From " + curSeries.Titles[0] + " : " + volumeDisplay.Text + " -> ";
+                TextBlock volumeDisplay = (TextBlock)((Button)sender).GetLogicalSiblings().ElementAt(1);
+                string log = "Removing 1 Volume From " + curSeries.Titles["Romaji"] + " : " + volumeDisplay.Text + " -> ";
                 volumeDisplay.Text = curSeries.CurVolumeCount + "/" + curSeries.MaxVolumeCount;
-                Logger.Info(log + volumeDisplay.Text);
+                Constants.Logger.Info(log + volumeDisplay.Text);
 
                 (sender as Button).FindLogicalAncestorOfType<Grid>(false).FindLogicalDescendantOfType<ProgressBar>(false).Value = curSeries.CurVolumeCount;
             }

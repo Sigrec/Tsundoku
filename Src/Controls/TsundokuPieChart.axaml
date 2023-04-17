@@ -1,0 +1,23 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:lvc="using:LiveChartsCore.SkiaSharpView.Avalonia"
+        xmlns:controls="using:Tsundoku.Controls">
+	<!-- <Design.PreviewWith>
+		<controls:TsundokuPieChart />
+	</Design.PreviewWith> -->
+
+	<Style Selector="controls|TsundokuPieChart">
+		<!-- Set Defaults -->
+		<!-- <Setter Property="Series" Value="{Binding Series}"/> -->
+
+		<Setter Property="Template">
+			<ControlTemplate>
+				<Border Background="Transparent" Margin="20" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 15 6 #B3000000">
+					<Border CornerRadius="8" ClipToBounds="True">
+						<lvc:PieChart Series="{Binding Series}" LegendPosition="Bottom" Width="250" Height="250"/>
+					</Border>
+				</Border>
+			</ControlTemplate>
+		</Setter>
+	</Style>
+</Styles>

@@ -23,8 +23,7 @@ namespace Tsundoku
             => AppBuilder.Configure<App>()
                 .UsePlatformDetect()
                 .LogToTrace()
-                .WithIcons(container => container
-                    .Register<FontAwesomeIconProvider>())
+                .WithIcons(container => container.Register<FontAwesomeIconProvider>())
                 .UseReactiveUI()
                 .With(LoaderOptimization.MultiDomainHost)
                 .With(LoadHint.Sometimes)

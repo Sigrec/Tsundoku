@@ -3,9 +3,9 @@
 	xmlns:c="using:Tsundoku.CustomControls"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:h="clr-namespace:Tsundoku.Helpers"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
-	xmlns:cp="clr-namespace:Egorozh.ColorPicker.Dialog;assembly=Egorozh.ColorPicker.Avalonia.Dialog"
 	x:Class="Tsundoku.Views.CollectionThemeWindow"
 	Icon="\Assets\Icons\Tsundoku-Logo.ico"
 	Title="Theme Settings"
@@ -14,6 +14,7 @@
 	Classes="menu"
 	WindowStartupLocation="2"
 	KeyboardNavigation.TabNavigation="None"
+	x:DataType="vm:ThemeSettingsViewModel"
 	CanResize="true">
 
 	<Design.DataContext>
@@ -21,12 +22,13 @@
 	</Design.DataContext>
 
 	<Window.Styles>
-		<StyleInclude Source="/Styles/MenuTheme.xaml" />
+		<!-- <StyleInclude Source="/Styles/MenuTheme.xaml" /> -->
+		<!-- <StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml" /> -->
 	</Window.Styles>
 
-	<!-- <Window.Resources>
-		<StyleInclude x:Key="ColorPickerFluent" Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml" />
-	</Window.Resources> -->
+	<Window.Resources>
+		<h:ColorConverter x:Key="ConvertColor"/>
+	</Window.Resources>
 
 	<Border Classes="menu" BorderThickness="3">
 		<ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden">
@@ -34,17 +36,27 @@
 				<StackPanel HorizontalAlignment="Center">
 					<TextBlock Text="Menu / Nav Bar" FontSize="30" FontWeight="Bold" Classes="menu" HorizontalAlignment="Center" TextDecorations="Underline"/>
 					<WrapPanel>
-						<!-- <WrapPanel.Styles>
-							<Style Selector="ColorPicker /template/ DropDownButton.Border">
-								<Setter Property="Background" Value="Green"/>
+						<WrapPanel.Styles>
+							<Style Selector="Button">
+								<!-- <Style Selector="^:pointerover /template/ ContentPresenter, ^:pressed /template/ ContentPresenter">
+									<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}"/>
+								</Style> -->
+								<Style Selector="^:pressed">
+									<Setter Property="RenderTransform" Value="scale(1)" />
+								</Style>
 							</Style>
 						</WrapPanel.Styles>
-						<ColorPicker Color="Red" Height="20" Width="210" IsColorPaletteVisible="false"/> -->
 						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
 							<TextBlock Text="Menu BG" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
-								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<cp:ColorPickerButton Margin="2" Name="Menu_BG" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+								<Border Classes="menu" BorderThickness="2" Margin="2">
+									<Button Name="Menu_BG_Button" Background="{CompiledBinding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+										<Button.Flyout>
+											<Flyout Placement="Bottom">  
+												<ColorView Name="Menu_BG"/>
+											</Flyout>
+										</Button.Flyout>
+									</Button>
 								</Border>
 							</Border>
 						</StackPanel>
@@ -52,7 +64,13 @@
 							<TextBlock Text="Username" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
 								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<cp:ColorPickerButton Margin="2" Name="Username" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+									<Button Name="Username_Button" Background="{CompiledBinding CurrentTheme.UsernameColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+										<Button.Flyout>
+											<Flyout Placement="Bottom">
+												<ColorView Name="Username"/>
+											</Flyout>
+										</Button.Flyout>
+									</Button>
 								</Border>
 							</Border>
 						</StackPanel>
@@ -60,7 +78,13 @@
 							<TextBlock Text="Menu Text" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
 								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<cp:ColorPickerButton Margin="2" Name="Menu_Text" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+									<Button Name="Menu_Text_Button" Background="{CompiledBinding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+										<Button.Flyout>
+											<Flyout Placement="Bottom">
+												<ColorView Name="Menu_Text"/>
+											</Flyout>
+										</Button.Flyout>
+									</Button>
 								</Border>
 							</Border>
 						</StackPanel>
@@ -68,7 +92,13 @@
 							<TextBlock Text="Search Bar BG" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
 								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<cp:ColorPickerButton Margin="2" Name="SearchBar_BG" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+									<Button Name="SearchBar_BG_Button" Background="{CompiledBinding CurrentTheme.SearchBarBGColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+										<Button.Flyout>
+											<Flyout Placement="Bottom">
+												<ColorView Name="SearchBar_BG"/>
+											</Flyout>
+										</Button.Flyout>
+									</Button>
 								</Border>
 							</Border>
 						</StackPanel>
@@ -76,7 +106,13 @@
 							<TextBlock Text="Search Bar Border" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
 								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<cp:ColorPickerButton Margin="2" Name="SearchBar_Border" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+									<Button Name="SearchBar_Border_Button" Background="{CompiledBinding CurrentTheme.SearchBarBorderColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+										<Button.Flyout>
+											<Flyout Placement="Bottom">
+												<ColorView Name="SearchBar_Border"/>
+											</Flyout>
+										</Button.Flyout>
+									</Button>
 								</Border>
 							</Border>
 						</StackPanel>
@@ -84,7 +120,13 @@
 							<TextBlock Text="Search Bar Text" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
 								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<cp:ColorPickerButton Margin="2" Name="SearchBar_Text" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+									<Button Name="SearchBar_Text_Button" Background="{CompiledBinding CurrentTheme.SearchBarTextColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+										<Button.Flyout>
+											<Flyout Placement="Bottom">
+												<ColorView Name="SearchBar_Text"/>
+											</Flyout>
+										</Button.Flyout>
+									</Button>
 								</Border>
 							</Border>
 						</StackPanel>
@@ -92,7 +134,13 @@
 							<TextBlock Text="Divider" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
 								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<cp:ColorPickerButton Margin="2" Name="Divider" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+									<Button Name="Divider_Button" Background="{CompiledBinding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+										<Button.Flyout>
+											<Flyout Placement="Bottom">
+												<ColorView Name="Divider"/>
+											</Flyout>
+										</Button.Flyout>
+									</Button>
 								</Border>
 							</Border>
 						</StackPanel>
@@ -100,7 +148,13 @@
 							<TextBlock Text="Menu Button BG" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
 								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<cp:ColorPickerButton Margin="2" Name="MenuButton_BG" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+									<Button Name="MenuButton_BG_Button" Background="{CompiledBinding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+										<Button.Flyout>
+											<Flyout Placement="Bottom">
+												<ColorView Name="MenuButton_BG"/>
+											</Flyout>
+										</Button.Flyout>
+									</Button>
 								</Border>
 							</Border>
 						</StackPanel>
@@ -108,7 +162,13 @@
 							<TextBlock Text="Menu Button BG (Hover)" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
 								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<cp:ColorPickerButton Margin="2" Name="MenuButton_BG_Hover" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+									<Button Name="MenuButton_BG_Hover_Button" Background="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+										<Button.Flyout>
+											<Flyout Placement="Bottom">
+												<ColorView Name="MenuButton_BG_Hover"/>
+											</Flyout>
+										</Button.Flyout>
+									</Button>
 								</Border>
 							</Border>
 						</StackPanel>
@@ -116,7 +176,13 @@
 							<TextBlock Text="Menu Button Border" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
 								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<cp:ColorPickerButton Margin="2" Name="MenuButton_Border" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+									<Button Name="MenuButton_Border_Button" Background="{CompiledBinding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+										<Button.Flyout>
+											<Flyout Placement="Bottom">
+												<ColorView Name="MenuButton_Border"/>
+											</Flyout>
+										</Button.Flyout>
+									</Button>
 								</Border>
 							</Border>
 						</StackPanel>
@@ -124,7 +190,13 @@
 							<TextBlock Text="Menu Button Border (Hover)" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
 								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<cp:ColorPickerButton Margin="2" Name="MenuButton_Border_Hover" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+									<Button Name="MenuButton_Border_Hover_Button" Background="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+										<Button.Flyout>
+											<Flyout Placement="Bottom">
+												<ColorView Name="MenuButton_Border_Hover"/>
+											</Flyout>
+										</Button.Flyout>
+									</Button>
 								</Border>
 							</Border>
 						</StackPanel>
@@ -132,7 +204,13 @@
 							<TextBlock Text="Menu Button Icon/Text" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
 								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<cp:ColorPickerButton Margin="2" Name="MenuButton_IconAndText" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+									<Button Name="MenuButton_IconAndText_Button" Background="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+										<Button.Flyout>
+											<Flyout Placement="Bottom">
+												<ColorView Name="MenuButton_IconAndText"/>
+											</Flyout>
+										</Button.Flyout>
+									</Button>
 								</Border>
 							</Border>
 						</StackPanel>
@@ -140,7 +218,13 @@
 							<TextBlock Text="Menu Button Icon/Text (Hover)" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
 								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<cp:ColorPickerButton Margin="2" Name="MenuButton_IconAndText_Hover" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+									<Button Name="MenuButton_IconAndText_Hover_Button" Background="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+										<Button.Flyout>
+											<Flyout Placement="Bottom">
+												<ColorView Name="MenuButton_IconAndText_Hover"/>
+											</Flyout>
+										</Button.Flyout>
+									</Button>
 								</Border>
 							</Border>
 						</StackPanel>
@@ -149,19 +233,41 @@
 				<StackPanel HorizontalAlignment="Center">
 					<TextBlock Text="Collection" FontSize="30" FontWeight="Bold" Classes="menu" HorizontalAlignment="Center" TextDecorations="Underline"/>
 					<WrapPanel>
+						<WrapPanel.Styles>
+							<Style Selector="Button">
+								<!-- <Style Selector="^:pointerover /template/ ContentPresenter, ^:pressed /template/ ContentPresenter">
+									<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}"/>
+								</Style> -->
+								<Style Selector="^:pressed">
+									<Setter Property="RenderTransform" Value="scale(1)" />
+								</Style>
+							</Style>
+						</WrapPanel.Styles>
 						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
 							<TextBlock Text="Collection BG" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
 								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<cp:ColorPickerButton Margin="2" Name="Collection_BG" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+									<Button Name="Collection_BG_Button" Background="{CompiledBinding CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+										<Button.Flyout>
+											<Flyout Placement="Bottom">
+												<ColorView Name="Collection_BG"/>
+											</Flyout>
+										</Button.Flyout>
+									</Button>
 								</Border>
 							</Border>
 						</StackPanel>
 						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
 							<TextBlock Text="Status And BookType BG" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
-								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<cp:ColorPickerButton Margin="2" Name="Status_And_BookType_BG" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+								<Border Classes="menu" BorderThickness="2" Margin="2">
+									<Button Name="Status_And_BookType_BG_Button" Background="{CompiledBinding CurrentTheme.StatusAndBookTypeBGColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+										<Button.Flyout>
+											<Flyout Placement="Bottom">
+												<ColorView Name="Status_And_BookType_BG"/>
+											</Flyout>
+										</Button.Flyout>
+									</Button>
 								</Border>
 							</Border>
 						</StackPanel>
@@ -169,7 +275,13 @@
 							<TextBlock Text="Status And BookType BG (Hover)" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
 								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<cp:ColorPickerButton Margin="2" Name="Status_And_BookType_BG_Hover" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+									<Button Name="Status_And_BookType_BG_Hover_Button" Background="{CompiledBinding CurrentTheme.StatusAndBookTypeBGHoverColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+										<Button.Flyout>
+											<Flyout Placement="Bottom">
+												<ColorView Name="Status_And_BookType_BG_Hover"/>
+											</Flyout>
+										</Button.Flyout>
+									</Button>
 								</Border>
 							</Border>
 						</StackPanel>
@@ -177,7 +289,13 @@
 							<TextBlock Text="Status And BookType Text" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
 								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<cp:ColorPickerButton Margin="2" Name="Status_And_BookType_Text" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+									<Button Name="Status_And_BookType_Text_Button" Background="{CompiledBinding CurrentTheme.StatusAndBookTypeTextColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+										<Button.Flyout>
+											<Flyout Placement="Bottom">
+												<ColorView Name="Status_And_BookType_Text"/>
+											</Flyout>
+										</Button.Flyout>
+									</Button>
 								</Border>
 							</Border>
 						</StackPanel>
@@ -185,7 +303,13 @@
 							<TextBlock Text="Status And BookType Text (Hover)" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
 								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<cp:ColorPickerButton Margin="2" Name="Status_And_BookType_Text_Hover" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+									<Button Name="Status_And_BookType_Text_Hover_Button" Background="{CompiledBinding CurrentTheme.StatusAndBookTypeTextHoverColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+										<Button.Flyout>
+											<Flyout Placement="Bottom">
+												<ColorView Name="Status_And_BookType_Text_Hover"/>
+											</Flyout>
+										</Button.Flyout>
+									</Button>
 								</Border>
 							</Border>
 						</StackPanel>
@@ -193,7 +317,13 @@
 							<TextBlock Text="Series Card BG" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
 								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<cp:ColorPickerButton Margin="2" Name="SeriesCard_BG" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+									<Button Name="SeriesCard_BG_Button"  Background="{CompiledBinding CurrentTheme.SeriesCardBGColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+										<Button.Flyout>
+											<Flyout Placement="Bottom">
+												<ColorView Name="SeriesCard_BG"/>
+											</Flyout>
+										</Button.Flyout>
+									</Button>
 								</Border>
 							</Border>
 						</StackPanel>
@@ -201,7 +331,13 @@
 							<TextBlock Text="Series Title" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
 								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<cp:ColorPickerButton Margin="2" Name="SeriesCard_Title" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+									<Button Name="SeriesCard_Title_Button" Background="{CompiledBinding CurrentTheme.SeriesCardTitleColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+										<Button.Flyout>
+											<Flyout Placement="Bottom">
+												<ColorView Name="SeriesCard_Title"/>
+											</Flyout>
+										</Button.Flyout>
+									</Button>
 								</Border>
 							</Border>
 						</StackPanel>
@@ -209,7 +345,13 @@
 							<TextBlock Text="Series Staff" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
 								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<cp:ColorPickerButton Margin="2" Name="SeriesCard_Staff" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+									<Button Name="SeriesCard_Staff_Button" Background="{CompiledBinding CurrentTheme.SeriesCardStaffColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+										<Button.Flyout>
+											<Flyout Placement="Bottom">
+												<ColorView Name="SeriesCard_Staff"/>
+											</Flyout>
+										</Button.Flyout>
+									</Button>
 								</Border>
 							</Border>
 						</StackPanel>
@@ -217,7 +359,13 @@
 							<TextBlock Text="Series Description" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
 								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<cp:ColorPickerButton Margin="2" Name="SeriesCard_Desc" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+									<Button Name="SeriesCard_Desc_Button" Background="{CompiledBinding CurrentTheme.SeriesCardDescColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+										<Button.Flyout>
+											<Flyout Placement="Bottom">
+												<ColorView Name="SeriesCard_Desc"/>
+											</Flyout>
+										</Button.Flyout>
+									</Button>
 								</Border>
 							</Border>
 						</StackPanel>
@@ -225,7 +373,13 @@
 							<TextBlock Text="Series Progress BG" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
 								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<cp:ColorPickerButton Margin="2" Name="SeriesProgress_BG" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+									<Button Name="SeriesProgress_BG_Button" Background="{CompiledBinding CurrentTheme.SeriesProgressBGColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+										<Button.Flyout>
+											<Flyout Placement="Bottom">
+												<ColorView Name="SeriesProgress_BG"/>
+											</Flyout>
+										</Button.Flyout>
+									</Button>
 								</Border>
 							</Border>
 						</StackPanel>
@@ -233,7 +387,13 @@
 							<TextBlock Text="Series Progress Bar" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
 								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<cp:ColorPickerButton Margin="2" Name="SeriesProgress_Bar" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+									<Button Name="SeriesProgress_Bar_Button" Background="{CompiledBinding CurrentTheme.SeriesProgressBarColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+										<Button.Flyout>
+											<Flyout Placement="Bottom">
+												<ColorView Name="SeriesProgress_Bar"/>
+											</Flyout>
+										</Button.Flyout>
+									</Button>
 								</Border>
 							</Border>
 						</StackPanel>
@@ -241,7 +401,13 @@
 							<TextBlock Text="Series Progress Bar BG" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
 								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<cp:ColorPickerButton Margin="2" Name="SeriesProgress_Bar_BG" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+									<Button Name="SeriesProgress_Bar_BG_Button" Background="{CompiledBinding CurrentTheme.SeriesProgressBarBGColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+										<Button.Flyout>
+											<Flyout Placement="Bottom">
+												<ColorView Name="SeriesProgress_Bar_BG"/>
+											</Flyout>
+										</Button.Flyout>
+									</Button>
 								</Border>
 							</Border>
 						</StackPanel>
@@ -249,7 +415,13 @@
 							<TextBlock Text="Series Progress Bar Border" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
 								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<cp:ColorPickerButton Margin="2" Name="SeriesProgress_Bar_Border" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+									<Button Name="SeriesProgress_Bar_Border_Button" Background="{CompiledBinding CurrentTheme.SeriesProgressBarBorderColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+										<Button.Flyout>
+											<Flyout Placement="Bottom">
+												<ColorView Name="SeriesProgress_Bar_Border"/>
+											</Flyout>
+										</Button.Flyout>
+									</Button>
 								</Border>
 							</Border>
 						</StackPanel>
@@ -257,7 +429,13 @@
 							<TextBlock Text="Series Progress Text" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
 								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<cp:ColorPickerButton Margin="2" Name="SeriesProgress_Text" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+									<Button Name="SeriesProgress_Text_Button" Background="{CompiledBinding CurrentTheme.SeriesProgressTextColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+										<Button.Flyout>
+											<Flyout Placement="Bottom">
+												<ColorView Name="SeriesProgress_Text"/>
+											</Flyout>
+										</Button.Flyout>
+									</Button>
 								</Border>
 							</Border>
 						</StackPanel>
@@ -265,7 +443,13 @@
 							<TextBlock Text="Series Progress Buttons (Hover)" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
 								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<cp:ColorPickerButton Margin="2" Name="SeriesProgress_Buttons_Hover" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+									<Button Name="SeriesProgress_Buttons_Hover_Button" Background="{CompiledBinding CurrentTheme.SeriesProgressButtonsHoverColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+										<Button.Flyout>
+											<Flyout Placement="Bottom">
+												<ColorView Name="SeriesProgress_Buttons_Hover"/>
+											</Flyout>
+										</Button.Flyout>
+									</Button>
 								</Border>
 							</Border>
 						</StackPanel>
@@ -273,7 +457,13 @@
 							<TextBlock Text="Series Switch Pane Button BG" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
 								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<cp:ColorPickerButton Margin="2" Name="SeriesSwitchPaneButton_BG" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+									<Button Name="SeriesSwitchPaneButton_BG_Button" Background="{CompiledBinding CurrentTheme.SeriesSwitchPaneButtonBGColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+										<Button.Flyout>
+											<Flyout Placement="Bottom">
+												<ColorView Name="SeriesSwitchPaneButton_BG"/>
+											</Flyout>
+										</Button.Flyout>
+									</Button>
 								</Border>
 							</Border>
 						</StackPanel>
@@ -281,7 +471,13 @@
 							<TextBlock Text="Series Switch Pane Button BG (Hover)" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
 								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<cp:ColorPickerButton Margin="2" Name="SeriesSwitchPaneButton_BG_Hover" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+									<Button Name="SeriesSwitchPaneButton_BG_Hover_Button" Background="{CompiledBinding CurrentTheme.SeriesSwitchPaneButtonBGHoverColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+										<Button.Flyout>
+											<Flyout Placement="Bottom">
+												<ColorView Name="SeriesSwitchPaneButton_BG_Hover"/>
+											</Flyout>
+										</Button.Flyout>
+									</Button>
 								</Border>
 							</Border>
 						</StackPanel>
@@ -289,7 +485,13 @@
 							<TextBlock Text="Series Switch Pane Button Icon" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
 								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<cp:ColorPickerButton Margin="2" Name="SeriesSwitchPaneButton_Icon" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+									<Button Name="SeriesSwitchPaneButton_Icon_Button" Background="{CompiledBinding CurrentTheme.SeriesSwitchPaneButtonIconColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+										<Button.Flyout>
+											<Flyout Placement="Bottom">
+												<ColorView Name="SeriesSwitchPaneButton_Icon"/>
+											</Flyout>
+										</Button.Flyout>
+									</Button>
 								</Border>
 							</Border>
 						</StackPanel>
@@ -297,7 +499,13 @@
 							<TextBlock Text="Series Switch Pane Button Icon (Hover)" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
 								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<cp:ColorPickerButton Margin="2" Name="SeriesSwitchPaneButton_Icon_Hover" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+									<Button Name="SeriesSwitchPaneButton_Icon_Hover_Button" Background="{CompiledBinding CurrentTheme.SeriesSwitchPaneButtonIconHoverColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+										<Button.Flyout>
+											<Flyout Placement="Bottom">
+												<ColorView Name="SeriesSwitchPaneButton_Icon_Hover"/>
+											</Flyout>
+										</Button.Flyout>
+									</Button>
 								</Border>
 							</Border>
 						</StackPanel>
@@ -305,7 +513,13 @@
 							<TextBlock Text="Series Edit Pane BG" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
 								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<cp:ColorPickerButton Margin="2" Name="SeriesEditPane_BG" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+									<Button Name="SeriesEditPane_BG_Button" Background="{CompiledBinding CurrentTheme.SeriesEditPaneBGColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+										<Button.Flyout>
+											<Flyout Placement="Bottom">
+												<ColorView Name="SeriesEditPane_BG"/>
+											</Flyout>
+										</Button.Flyout>
+									</Button>
 								</Border>
 							</Border>
 						</StackPanel>
@@ -313,7 +527,13 @@
 							<TextBlock Text="Series Notes BG" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
 								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<cp:ColorPickerButton Margin="2" Name="SeriesNotes_BG" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+									<Button Name="SeriesNotes_BG_Button" Background="{CompiledBinding CurrentTheme.SeriesNotesBGColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+										<Button.Flyout>
+											<Flyout Placement="Bottom">
+												<ColorView Name="SeriesNotes_BG"/>
+											</Flyout>
+										</Button.Flyout>
+									</Button>
 								</Border>
 							</Border>
 						</StackPanel>
@@ -321,7 +541,13 @@
 							<TextBlock Text="Series Notes Border" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
 								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<cp:ColorPickerButton Margin="2" Name="SeriesNotes_Border" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+									<Button Name="SeriesNotes_Border_Button" Background="{CompiledBinding CurrentTheme.SeriesNotesBorderColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+										<Button.Flyout>
+											<Flyout Placement="Bottom">
+												<ColorView Name="SeriesNotes_Border"/>
+											</Flyout>
+										</Button.Flyout>
+									</Button>
 								</Border>
 							</Border>
 						</StackPanel>
@@ -329,7 +555,13 @@
 							<TextBlock Text="Series Notes Text" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
 								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<cp:ColorPickerButton Margin="2" Name="SeriesNotes_Text" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+									<Button Name="SeriesNotes_Text_Button" Background="{CompiledBinding CurrentTheme.SeriesNotesTextColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+										<Button.Flyout>
+											<Flyout Placement="Bottom">
+												<ColorView Name="SeriesNotes_Text"/>
+											</Flyout>
+										</Button.Flyout>
+									</Button>
 								</Border>
 							</Border>
 						</StackPanel>
@@ -337,7 +569,13 @@
 							<TextBlock Text="Series Edit Pane Buttons BG" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
 								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<cp:ColorPickerButton Margin="2" Name="SeriesEditPane_Buttons_BG" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+									<Button Name="SeriesEditPane_Buttons_BG_Button" Background="{CompiledBinding CurrentTheme.SeriesEditPaneButtonsBGColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+										<Button.Flyout>
+											<Flyout Placement="Bottom">
+												<ColorView Name="SeriesEditPane_Buttons_BG"/>
+											</Flyout>
+										</Button.Flyout>
+									</Button>
 								</Border>
 							</Border>
 						</StackPanel>
@@ -345,7 +583,13 @@
 							<TextBlock Text="Series Edit Button BG (Hover)" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
 								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<cp:ColorPickerButton Margin="2" Name="SeriesEditPane_Buttons_BG_Hover" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+									<Button Name="SeriesEditPane_Buttons_BG_Hover_Button" Background="{CompiledBinding CurrentTheme.SeriesEditPaneButtonsBGHoverColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+										<Button.Flyout>
+											<Flyout Placement="Bottom">
+												<ColorView Name="SeriesEditPane_Buttons_BG_Hover"/>
+											</Flyout>
+										</Button.Flyout>
+									</Button>
 								</Border>
 							</Border>
 						</StackPanel>
@@ -353,7 +597,13 @@
 							<TextBlock Text="Series Edit Pane Buttons Border" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
 								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<cp:ColorPickerButton Margin="2" Name="SeriesEditPane_Buttons_Border" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+									<Button Name="SeriesEditPane_Buttons_Border_Button" Background="{CompiledBinding CurrentTheme.SeriesEditPaneButtonsBorderColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+										<Button.Flyout>
+											<Flyout Placement="Bottom">
+												<ColorView Name="SeriesEditPane_Buttons_Border"/>
+											</Flyout>
+										</Button.Flyout>
+									</Button>
 								</Border>
 							</Border>
 						</StackPanel>
@@ -361,7 +611,13 @@
 							<TextBlock Text="Series Edit Pane Buttons Border (Hover)" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
 								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<cp:ColorPickerButton Margin="2" Name="SeriesEditPane_Buttons_Border_Hover" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+									<Button Name="SeriesEditPane_Buttons_Border_Hover_Button" Background="{CompiledBinding CurrentTheme.SeriesEditPaneButtonsBorderHoverColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+										<Button.Flyout>
+											<Flyout Placement="Bottom">
+												<ColorView Name="SeriesEditPane_Buttons_Border_Hover"/>
+											</Flyout>
+										</Button.Flyout>
+									</Button>
 								</Border>
 							</Border>
 						</StackPanel>
@@ -369,7 +625,13 @@
 							<TextBlock Text="Series Edit Pane Button Icon" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
 								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<cp:ColorPickerButton Margin="2" Name="SeriesEditPane_Buttons_Icon" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+									<Button Name="SeriesEditPane_Buttons_Icon_Button" Background="{CompiledBinding CurrentTheme.SeriesEditPaneButtonsIconColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+										<Button.Flyout>
+											<Flyout Placement="Bottom">
+												<ColorView Name="SeriesEditPane_Buttons_Icon"/>
+											</Flyout>
+										</Button.Flyout>
+									</Button>
 								</Border>
 							</Border>
 						</StackPanel>
@@ -377,7 +639,13 @@
 							<TextBlock Text="Series Edit Pane Button Icon (Hover)" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
 								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<cp:ColorPickerButton Margin="2" Name="SeriesEditPane_Buttons_Icon_Hover" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210"/>
+									<Button Name="SeriesEditPane_Buttons_Icon_Hover_Button" Background="{CompiledBinding CurrentTheme.SeriesEditPaneButtonsIconHoverColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+										<Button.Flyout>
+											<Flyout Placement="Bottom">
+												<ColorView Name="SeriesEditPane_Buttons_Icon_Hover"/>
+											</Flyout>
+										</Button.Flyout>
+									</Button>
 								</Border>
 							</Border>
 						</StackPanel>
@@ -403,21 +671,21 @@
 								IsEnabled="{Binding IsSaveThemeButtonEnabled}"
 								Click="SaveNewTheme"/>
 						<ComboBox Name="ThemeSelector"
-								SelectionChanged="ChangeMainTheme"
-								Items="{Binding UserThemes}"
-								Width="150"
-								Height="35"
-								SelectedIndex="0"
-								BorderThickness="2"
-								Classes="menu"
-								AutoScrollToSelectedItem="True"
-								Margin="10,0,0,0">
+								  SelectionChanged="ChangeMainTheme"
+								  Items="{Binding UserThemes}"
+								  Width="150"
+								  Height="35"
+								  BorderThickness="2"
+								  Classes="menu"
+								  SelectedIndex="0"
+								  AutoScrollToSelectedItem="True"
+								  Margin="10,0,0,0">
 							<ComboBox.ItemTemplate>
 								<DataTemplate>
 									<TextBlock FontSize="15" 
-											FontWeight="Bold" 
-											Foreground="{Binding #ThemeSelector.CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}" 
-											Text="{Binding ThemeName}">
+											   FontWeight="Bold" 
+											   Classes="menu"
+											   Text="{Binding ThemeName}">
 									</TextBlock>
 								</DataTemplate>
 							</ComboBox.ItemTemplate>

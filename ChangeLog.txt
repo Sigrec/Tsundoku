@@ -1,100 +1,119 @@
+V1.5.0.0 - Apr 14th, 2023 @ 5:XXPM PST
+✅ Added Collection Stats window, Can View Various Stats of your Collection! (Currently only 4 basic stats more stuff like graphs will be added in a later release)
+✅ Added Price, Volumes Read, Demographic, and Score stats to Series Card (click bottom right icon)
+✅ Added Favorite Option to Series
+✅ Changed Layout of the Progress section of a Series Card to Accommodate Future Change for Stats
+✅ Fixed Default Theme to Accommodate Layout Changes
+✅ Fixed crash and bug related to the color pickers in theme settings window
+✅ Changed Theme window to use a Dif Library for the ColorPicker (Fixed bugs & Can now copy paste hex colors in!)
+✅ Added Meet the Weeb Family to Channel List
+✅ Added "Comic" BookType
+✅ Added Credits section to User Settings Window
+✅ Added New Languages to Query and get Data For [Need to Re-Add Series to get New Title Data]
+✅ Added New Languages to Display Your Collection In
+✅ Added MangaDex endpoint to get series AL does not have and for additional language data (You can get TBATE & Radiant for example)
+✅ Removed ExtraSeries.json as no longer needed with MangadexQuery
+✅ Non-Japanese series now also grab there respective Japanese titles (ex Solo Leveling) [Need to Re-Add these series to get them]
+✅ Lowered the font size of "Status | Format"
+✅ Fixed Crash when # of Staff for a Series is Large
+
 V1.4.4.2 - Feb 9th, 2023 @ 11:28AM PST
-✓ HotFix for another description parsing issue (found with SPYxFAMILY description) [Re-add series if you think it has this issue or any other previous parsing issue]
+✅ HotFix for another description parsing issue (found with SPYxFAMILY description) [Re-add series if you think it has this issue or any other previous parsing issue]
 
 V1.4.4.1 - Feb 9th, 2023 @ 8:19AM PST
-✓ Fixed possible crash when deleting a series with weird permissions
-✓ Updated some libraries
+✅ Fixed possible crash when deleting a series with weird permissions
+✅ Updated some libraries
 
 V1.4.3.1 - Feb 3rd, 2023 @ 12:38PM PST
-✓ Added manga youtubers tab to settings window with 6 manga youtubers
+✅ Added manga youtubers tab to settings window with 6 manga youtubers
 
 V1.4.2.1 - Jan 30th, 2023 @ 10:30AM PST
-✓ Added error message popups for generating a new theme and adding a new series when user inputs invalid values into the fields or is missing values
-✓ Fixed crash issue when exporting to Spreadsheet when user has more than 149 series in their collection
+✅ Added error message popups for generating a new theme and adding a new series when user inputs invalid values into the fields or is missing values
+✅ Fixed crash issue when exporting to Spreadsheet when user has more than 149 series in their collection
 
 V1.4.1.2 - Jan 25th, 2023 @ 5:49PM PST
-✓ HotFix for series staff parsing issue where a role is untrimmed (found when adding Bungou Stray Dogs manga) [Re-add series if you think it has this issue or any other previous parsing issue]
+✅ HotFix for series staff parsing issue where a role is untrimmed (found when adding Bungou Stray Dogs manga) [Re-add series if you think it has this issue or any other previous parsing issue]
 
 V1.4.1.1 - Jan 22nd, 2023 @ 1:33PM PST
-✓ HotFix for another description parsing issue
+✅ HotFix for another description parsing issue
 
 V1.4.1.0 - Jan 22nd, 2023 @ 12:11PM PST
-✓ Added tooltips to menu/nav bar buttons and dropdown
-✓ Added more controls info to "User Settings" window
-✓ Added button in "User Settings" Window to open Screenshots Folder
-✓ Added button in "User Settings" Window to open Coolors Website
-✓ Added a theme generator to Theme Window (Will Add More Theme Types Later)
-✓ Applied some themeing to dropdown buttons
+✅ Added tooltips to menu/nav bar buttons and dropdown
+✅ Added more controls info to "User Settings" window
+✅ Added button in "User Settings" Window to open Screenshots Folder
+✅ Added button in "User Settings" Window to open Coolors Website
+✅ Added a theme generator to Theme Window (Will Add More Theme Types Later)
+✅ Applied some themeing to dropdown buttons
 
 V1.4.0.0 - Jan 16th, 2023 @ 5:14PM PST
-✓ Changed "Complete" Status to "Finished" for series
-✓ Added join discord button to "User Settings" window
-✓ Can now filter your collection using the dropdown under the language dropdown
-✓ Can TavbNavigate in "AddNewSeriesWindow" (Was crashing before if it does crash for you let me know ASAP so I revert if needed)
-✓ Changes to window state behavior to fix a bug
+✅ Changed "Complete" Status to "Finished" for series
+✅ Added join discord button to "User Settings" window
+✅ Can now filter your collection using the dropdown under the language dropdown
+✅ Can TavbNavigate in "AddNewSeriesWindow" (Was crashing before if it does crash for you let me know ASAP so I revert if needed)
+✅ Changes to window state behavior to fix a bug
 
 V1.3.3.0 - Jan 16th, 2023 @ 11:48AM PST
-✓ Slightly increased title font size
-✓ Fixed English & Romaji Sorting to be case insensitive (Refresh your sort)
-✓ Fixed series description scrolling, no longer scrolls collection if user scrolls to end of description
+✅ Slightly increased title font size
+✅ Fixed English & Romaji Sorting to be case insensitive (Refresh your sort)
+✅ Fixed series description scrolling, no longer scrolls collection if user scrolls to end of description
 
 V1.3.2.0 - Jan 15th, 2023 @ 3:08PM PST
-✓ QoL changes to User Settings Windows (Added Controls Section and New Formatting)
+✅ QoL changes to User Settings Windows (Added Controls Section and New Formatting)
 
 V1.3.1.0 - Jan 14th, 2023 @ 12:PM PST
-✓ Fixed triple line break issue with some series description
+✅ Fixed triple line break issue with some series description
 
 V1.3.0.0 - Jan 13th, 2023 @ 6:53PM PST
-✓ Fixed issue where series where all of the names are identical (Getsuyoubi no Tawawa Example) you could only add 1 of them -> Fix is to use the series AL ID #
-✓ Made Toggling OFF/Disabling FullScreen keep the previous window size/state before user toggled ON FullScreen
+✅ Fixed issue where series where all of the names are identical (Getsuyoubi no Tawawa Example) you could only add 1 of them -> Fix is to use the series AL ID #
+✅ Made Toggling OFF/Disabling FullScreen keep the previous window size/state before user toggled ON FullScreen
 
 V1.2.3.0 - Jan 7th, 2023 @ 3:38PM PST
-✓ Fixed padding in title text on the left
-✓ Slightly lowered title text font size
+✅ Fixed padding in title text on the left
+✅ Slightly lowered title text font size
 
 V1.2.2.0 - Jan 1st, 2023 @ 4:41PM PST
-✓ Fixed Native sorting to use japanese culture
+✅ Fixed Native sorting to use japanese culture
 
 V1.2.1.1 - Dec 31st, 2022 @ 10:47AM PST
-✓ Added donation button for those who wanna support
+✅ Added donation button for those who wanna support
 
 V1.2.1.0 - Dec 20th, 2022 @ 4:25PM PST
-✓ Added color theme styling to scrollbar
-✓ Screenshots now go into a "Screenshots" folder
-✓ Fixed Default theme color scheme
-✓ Added AniList Support for Taiwanese Manga (Will show up as Manhua since Chinese and Taiwanese use Mandarin)
+✅ Added color theme styling to scrollbar
+✅ Screenshots now go into a "Screenshots" folder
+✅ Fixed Default theme color scheme
+✅ Added AniList Support for Taiwanese Manga (Will show up as Manhua since Chinese and Taiwanese use Mandarin)
 
 V1.2.0.0 - Dec 18th, 2022 @ 4:57PM PST
-✓ StatusAndBookType (left side bottom of a series card) hover colors now work as intended
-✓ Fixed Menu Dropdown controls (language and display change) background taking from search bar background color
+✅ StatusAndBookType (left side bottom of a series card) hover colors now work as intended
+✅ Fixed Menu Dropdown controls (language and display change) background taking from search bar background color
 
 V1.1.0.4 - Dec 18th, 2022 @ 2:37PM PST
-✓ Screenshot now also includes the theme name in the file name
-✓ Keeps previous window state after exiting fullscreen with F11 instead of going to maximized state
-✓ Color wheels no longer stuck/hidden when window moves to the front (seconadry windwos no longer topmost)
+✅ Screenshot now also includes the theme name in the file name
+✅ Keeps previous window state after exiting fullscreen with F11 instead of going to maximized state
+✅ Color wheels no longer stuck/hidden when window moves to the front (seconadry windwos no longer topmost)
 
 V1.1.0.3 - Dec 17th, 2022 @ 8:35PM PST
-✓ Changed edit pane icon
-✓ Fixed description from having excessive line breaks at the end
+✅ Changed edit pane icon
+✅ Fixed description from having excessive line breaks at the end
 
 V1.1.0.2 - Dec 17th, 2022 @ 2:30PM PST
-✓ No longer crashes when a user doesn't have the "ExtraSeries.json" file in there executables folder/directory
-✓ Fixed divider color taking from button color and not the divider color
+✅ No longer crashes when a user doesn't have the "ExtraSeries.json" file in there executables folder/directory
+✅ Fixed divider color taking from button color and not the divider color
 
 V1.1.0.1 - Dec 17th, 2022 @ 11:00AMPST
-✓ Fixed description encoding not converting ampersand (if you see some text like "&rsquo;" then this fixes that you just need to delete and re-add the series)
+✅ Fixed description encoding not converting ampersand (if you see some text like "&rsquo;" then this fixes that you just need to delete and re-add the series)
 
 V1.1.0.0 - Dec 16th, 2022 @ 5:45PM PST
-✓ Implented a way to add series that do not exist on AniList for example Radiant (french manga) can now be added [Requests are through github issues -> https://github.com/Sigrec/TsundokuApp/issues]
-✓ Can now Toggle Fullscreen with "F11"
-✓ Can now Capture a Screenshot of your Collection with "CTRL+P" (Better to go fullscreen first)
-✓ Can now Save Collection with "CTRL+S"
+✅ Implented a way to add series that do not exist on AniList for example Radiant (french manga) can now be added [Requests are through github issues -> https://github.com/Sigrec/TsundokuApp/issues]
+✅ Can now Toggle Fullscreen with "F11"
+✅ Can now Capture a Screenshot of your Collection with "CTRL+P" (Better to go fullscreen first)
+✅ Can now Save Collection with "CTRL+S"
 
 V1.0.3.0 - Dec 15th, 2022 @ 7:52PM PST
-✓ Fixed issue where 2 series could have the same file extension so they used the same image
-✓ Made it so incase there is some error and the collection numbers are messed up it re-calculates the numbers based on current series in collection
+✅ Fixed issue where 2 series could have the same file extension so they used the same image
+✅ Made it so incase there is some error and the collection numbers are messed up it re-calculates the numbers based on current series in collection
 
 V1.0.2.0 - Dec 15th, 2022 @ 12:08AM PST
-✓ Theme name now clears when closing the theme editing window
-✓ Fixed issue where if you add a series while you are searching it crashes
-✓ Fixed line break in description so it correctly double line breaks when it is supposed to
+✅ Theme name now clears when closing the theme editing window
+✅ Fixed issue where if you add a series while you are searching it crashes
+✅ Fixed line break in description so it correctly double line breaks when it is supposed to

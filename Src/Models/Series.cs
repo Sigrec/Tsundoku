@@ -1,4 +1,6 @@
-﻿using System;
+﻿using System.Runtime.CompilerServices;
+using System.Collections.ObjectModel;
+using System;
 using System.Threading.Tasks;
 using System.IO;
 using System.Net.Http;
@@ -16,11 +18,16 @@ namespace Tsundoku.Models
 	public class Series : IDisposable
 	{
 		[JsonIgnore]
-		private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
-		[JsonIgnore]
 		private bool disposedValue;
-		public List<string> Titles { get; } //[Romaji, English, Native]
-        public List<string> Staff { get; } //[Romaji, Native]
+
+		[JsonIgnore]
+		public string Synonyms { get; }
+
+		[JsonIgnore]
+		public Bitmap CoverBitMap { get; set; }
+	
+		public Dictionary<string, string> Titles { get; }
+        public Dictionary<string, string> Staff { get; }
 		public string Description { get; }
 		public string Format { get; }
 		public string Status { get; set; }
@@ -29,14 +36,13 @@ namespace Tsundoku.Models
 		public string SeriesNotes { get; set; }
 		public ushort MaxVolumeCount { get; set; }
 		public ushort CurVolumeCount { get; set; }
+		public uint VolumesRead { get; set; }
+		public decimal Cost { get; set; }
+		public decimal Score { get; set; }
+		public string Demographic { get; set; }
+		public bool IsFavorite { get; set; } = false;
 
-		[JsonIgnore]
-		public string Synonyms { get; }
-
-		[JsonIgnore]
-		public Bitmap CoverBitMap { get; set; }
-
-        public Series(List<string> titles, List<string> staff, string description, string format, string status, string cover, string link, ushort maxVolumeCount, ushort curVolumeCount, Bitmap coverBitMap)
+		public Series(Dictionary<string, string> titles, Dictionary<string, string> staff, string description, string format, string status, string cover, string link, ushort maxVolumeCount, ushort curVolumeCount, string demographic)
         {
 			Titles = titles;
 			Staff = staff;
@@ -47,111 +53,381 @@ namespace Tsundoku.Models
             Link = link;
             MaxVolumeCount = maxVolumeCount;
             CurVolumeCount = curVolumeCount;
-			CoverBitMap = coverBitMap;
+			Demographic = demographic;
         }
 
-		public static Series? CreateNewSeriesCard(string title, string bookType, ushort maxVolCount, ushort minVolCount)
+		/*
+		* All Chinese or Taiwanese series use "Chinese (Simplified)" and go to "Chinese"
+		*/
+		public static Series? CreateNewSeriesCard(string title, string bookType, ushort maxVolCount, ushort minVolCount, AniListQuery AL_Query, MangadexQuery MD_Query, ObservableCollection<string> additionalLanguages)
         {
 			int seriesId;
-			string seriesDataQuery;
+			string seriesDataQuery = "";
+			int pageNum = 1;
 			if (int.TryParse(title, out seriesId))
 			{
-				seriesDataQuery = new AniListQuery().GetSeriesID(seriesId, bookType);
+				seriesDataQuery = AL_Query.GetSeriesID(seriesId, bookType, pageNum);
 			}
 			else
 			{
-				seriesDataQuery = new AniListQuery().GetSeriesTitle(title, bookType);
+				seriesDataQuery = AL_Query.GetSeriesTitle(title, bookType, pageNum);
 			}
 
+			string countryOfOrigin = "", nativeTitle = "", japaneseTitle = "", romajiTitle = "", englishTitle = "", filteredBookType = "", nativeStaff = "", fullStaff = "", coverPath = "";
+			JsonDocument seriesJson;
+			List<JsonElement> mangaDexAltTitles = new List<JsonElement>();
+			Dictionary<string, string> newTitles = new Dictionary<string, string>();
 
+			// AniList Query Check
+			Restart:
 			if (!string.IsNullOrWhiteSpace(seriesDataQuery))
-            {
-				bool extraSeriesCheck = false;
-				JsonElement seriesData = JsonDocument.Parse(seriesDataQuery).RootElement.GetProperty("Media");
-				string romajiTitle = seriesData.GetProperty("title").GetProperty("romaji").ToString();
-				string nativeTitle = seriesData.GetProperty("title").GetProperty("native").ToString();
-				JsonElement englishTitle = seriesData.GetProperty("title").GetProperty("english");
-				JsonElement synonyms = seriesData.GetProperty("synonyms");
-
-				// Checks to see if the series is available on AniList if not check ExtraSeries json
-				string[] ExtraSeriesList = { "RADIANT" };
-				if (ExtraSeriesList.Contains(Helpers.ExtensionMethods.RemoveInPlaceCharArray(title.ToUpper())) && File.Exists(@"ExtraSeries.json"))
+			{
+				seriesJson = JsonDocument.Parse(seriesDataQuery);
+				JsonElement seriesData = seriesJson.RootElement.GetProperty("Media");
+				bool hasNextPage = seriesData.GetProperty("staff").GetProperty("pageInfo").GetProperty("hasNextPage").GetBoolean();
+				countryOfOrigin = seriesData.GetProperty("countryOfOrigin").ToString();
+				nativeTitle = seriesData.GetProperty("title").GetProperty("native").ToString();
+				romajiTitle = seriesData.GetProperty("title").GetProperty("romaji").ToString();
+				englishTitle = seriesData.GetProperty("title").GetProperty("english").ToString();
+				if (!nativeTitle.Equals(title, StringComparison.OrdinalIgnoreCase) && !englishTitle.Equals(title, StringComparison.OrdinalIgnoreCase) && !romajiTitle.Equals(title, StringComparison.OrdinalIgnoreCase))
 				{
-					Logger.Info($"AniList Does Not Have {title}");
-					JsonElement.ArrayEnumerator extraSeriesList = JsonDocument.Parse(File.ReadAllText(@"ExtraSeries.json")).RootElement.GetProperty("ExtraSeries").EnumerateArray();
+					Constants.Logger.Debug("Not on AniList -> Trying Mangadex");
+					seriesDataQuery = "";
+					goto Restart;
+				}
 
-					// Traverse ExtraSeries
-					foreach (JsonElement series in extraSeriesList)
+				japaneseTitle = "";
+
+				// If available on AniList and is not a Japanese series get the Japanese title from Mangadex
+				if (!bookType.Equals("NOVEL") && (countryOfOrigin.Equals("KR") || countryOfOrigin.Equals("CW") || countryOfOrigin.Equals("TW")))
+				{
+					mangaDexAltTitles = GetAdditionalMangaDexTitleList(MD_Query.GetSeriesTitleAsync(romajiTitle).RootElement.GetProperty("data"));
+					japaneseTitle = GetAltTitle("ja", mangaDexAltTitles);
+				}
+
+				filteredBookType = bookType.Equals("MANGA") ? GetCorrectComicName(countryOfOrigin) : "Novel";
+				nativeStaff = GetSeriesStaff(seriesData.GetProperty("staff").GetProperty("edges"), "native", filteredBookType, romajiTitle, new StringBuilder());
+				fullStaff = GetSeriesStaff(seriesData.GetProperty("staff").GetProperty("edges"), "full", filteredBookType, romajiTitle, new StringBuilder());
+				if (hasNextPage)
+				{
+					Constants.Logger.Info($"{romajiTitle} has More Staff");
+					string moreStaffQuery;
+					if (int.TryParse(title, out seriesId))
 					{
-						seriesData = series.GetProperty("Media");
-						romajiTitle = seriesData.GetProperty("title").GetProperty("romaji").ToString();
-						nativeTitle = seriesData.GetProperty("title").GetProperty("native").ToString();
-						englishTitle = seriesData.GetProperty("title").GetProperty("english");
-
-						// Check to see if the title is a valid entry in the ExtraSeries.json
-						if (romajiTitle.Equals(title, StringComparison.OrdinalIgnoreCase) || nativeTitle.Equals(title, StringComparison.OrdinalIgnoreCase) || englishTitle.ToString().Equals(title, StringComparison.OrdinalIgnoreCase))
-						{
-							extraSeriesCheck = true;
-							break;
-						}
+						moreStaffQuery = AL_Query.GetSeriesID(seriesId, bookType, ++pageNum);
 					}
-
-					if (!extraSeriesCheck)
+					else
 					{
-						Logger.Warn($"Need To Add Series {title} To ExtraSeries Json");
+						moreStaffQuery = AL_Query.GetSeriesTitle(title, bookType, ++pageNum);
+					}
+					JsonElement moreStaff = JsonDocument.Parse(moreStaffQuery).RootElement.GetProperty("Media").GetProperty("staff").GetProperty("edges");
+					nativeStaff = GetSeriesStaff(moreStaff, "native", filteredBookType, romajiTitle, new StringBuilder(nativeStaff + " | "));
+					fullStaff = GetSeriesStaff(moreStaff, "full", filteredBookType, romajiTitle, new StringBuilder(fullStaff + " | "));
+				}
+				coverPath = SaveNewCoverImage(CreateCoverFilePath(seriesData.GetProperty("coverImage").GetProperty("extraLarge").ToString(), romajiTitle, filteredBookType.ToUpper(), seriesData.GetProperty("synonyms").EnumerateArray().ToList(), Constants.Site.AniList), seriesData.GetProperty("coverImage").GetProperty("extraLarge").ToString());
+
+
+				newTitles = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
+				if (!string.IsNullOrWhiteSpace(romajiTitle))
+				{
+					newTitles.Add("Romaji", romajiTitle);
+				}
+				if (!string.IsNullOrWhiteSpace(englishTitle))
+				{
+					newTitles.Add("English", englishTitle);
+				}
+				if (!string.IsNullOrWhiteSpace(japaneseTitle))
+				{
+					newTitles.Add("Japanese", japaneseTitle);
+				}
+				if (!string.IsNullOrWhiteSpace(nativeTitle))
+				{
+					newTitles.Add(Constants.ANILIST_LANG_CODES[countryOfOrigin], nativeTitle);
+				}
+
+				if (additionalLanguages.Count != 0)
+				{
+					if (mangaDexAltTitles.Count == 0)
+					{
+						AddAdditionalLanguages(newTitles, additionalLanguages, romajiTitle, GetAdditionalMangaDexTitleList(MD_Query.GetSeriesTitleAsync(romajiTitle).RootElement.GetProperty("data")));
+					}
+					else
+					{
+						AddAdditionalLanguages(newTitles, additionalLanguages, romajiTitle, mangaDexAltTitles);
 					}
 				}
 
-				string filteredBookType = bookType.Equals("MANGA") ? GetCorrectComicName(seriesData.GetProperty("countryOfOrigin").ToString()) : "Novel";
-				string nativeStaff = GetSeriesStaff(seriesData.GetProperty("staff").GetProperty("edges"), "native", filteredBookType, romajiTitle);
-				string fullStaff = GetSeriesStaff(seriesData.GetProperty("staff").GetProperty("edges"), "full", filteredBookType, romajiTitle);
-				string coverPath = SaveNewCoverImage(CreateCoverFilePath(seriesData.GetProperty("coverImage").GetProperty("extraLarge").ToString(), romajiTitle, filteredBookType.ToUpper(), synonyms, extraSeriesCheck), seriesData.GetProperty("coverImage").GetProperty("extraLarge").ToString());
-
-				//Logger.Debug(Microsoft.CodeAnalysis.CSharp.SymbolDisplay.FormatLiteral(seriesData.GetProperty("description").ToString(), false));
-
+				Dictionary<string, string> newStaff = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
+				if (!string.IsNullOrWhiteSpace(fullStaff))
+				{
+					newStaff.Add("Romaji", fullStaff);
+				}
+				if (nativeStaff != " | " && !string.IsNullOrWhiteSpace(nativeStaff))
+				{
+					newStaff.Add(Constants.ANILIST_LANG_CODES[countryOfOrigin], nativeStaff);
+				}
+				
 				return new Series(
-						new List<string>()
+					newTitles,
+					newStaff,
+					ParseDescription(seriesData.GetProperty("description").ToString()),
+					filteredBookType,
+					GetSeriesStatus(seriesData.GetProperty("status").ToString()),
+					coverPath,
+					seriesData.GetProperty("siteUrl").ToString(),
+					maxVolCount,
+					minVolCount,
+					""
+				);
+			}
+			else if (bookType.Equals("MANGA")) // MangadexQuery
+			{
+				string curId = "";
+				if (Regex.IsMatch(title, @"[a-z\d]{8}-[a-z\d]{4}-[a-z\d]{4}-[a-z\d]{4}-[a-z\d]{11,}"))
+				{
+					seriesJson = MD_Query.GetSeriesIdAsync(title);
+					curId = title;
+				}
+				else
+				{
+					seriesJson = MD_Query.GetSeriesTitleAsync(title);
+				}
+
+				if (!string.IsNullOrWhiteSpace(seriesJson.ToString()))
+				{
+					JsonElement data = seriesJson.RootElement.GetProperty("data");
+					JsonElement attributes;
+					string description = "", seriesStatus = "", link = "", demographic = "";
+					List<JsonElement> altTitles = new List<JsonElement>();
+					List<JsonElement> relationships = null;
+					if (data.ValueKind == JsonValueKind.Array) // Collection
+					{
+						foreach (JsonElement series in data.EnumerateArray())
 						{
-							romajiTitle,
-							englishTitle.ValueKind == JsonValueKind.Null ? romajiTitle : englishTitle.ToString(),
-							nativeTitle
-						},
-						new List<string>()
+							attributes = series.GetProperty("attributes");
+							if (attributes.GetProperty("title").GetProperty("en").ToString().Equals(title, StringComparison.OrdinalIgnoreCase) || data.GetArrayLength() == 1)
+							{
+								altTitles = attributes.GetProperty("altTitles").EnumerateArray().ToList();
+								relationships = series.GetProperty("relationships").EnumerateArray().ToList();
+								curId = series.GetProperty("id").ToString();
+								romajiTitle = attributes.GetProperty("title").GetProperty("en").ToString();
+								description = ParseMangadexDescription(attributes.GetProperty("description").GetProperty("en").ToString());
+								seriesStatus = GetSeriesStatus(attributes.GetProperty("status").ToString());
+								link = @$"https://mangadex.org/title/{series.GetProperty("id").ToString()}";
+								countryOfOrigin = attributes.GetProperty("originalLanguage").ToString();
+								demographic = attributes.GetProperty("publicationDemographic").ToString();
+								if (!string.IsNullOrWhiteSpace(demographic))
+								{
+									demographic = $"{Char.ToUpper(demographic[0])}{demographic.Substring(1, demographic.Length - 1)}";
+								}
+								break;
+							}
+						}
+					}
+					else // Entity
+					{
+						attributes = data.GetProperty("attributes");
+						curId = data.GetProperty("id").ToString();
+						altTitles = attributes.GetProperty("altTitles").EnumerateArray().ToList();
+						romajiTitle = attributes.GetProperty("title").GetProperty("en").ToString();
+						description = ParseMangadexDescription(attributes.GetProperty("description").GetProperty("en").ToString());
+						seriesStatus = GetSeriesStatus(attributes.GetProperty("status").ToString());
+						link = @$"https://mangadex.org/title/{data.GetProperty("id").ToString()}";
+						countryOfOrigin = attributes.GetProperty("originalLanguage").ToString();
+						relationships = data.GetProperty("relationships").EnumerateArray().ToList();
+						demographic = attributes.GetProperty("publicationDemographic").ToString();
+						if (!string.IsNullOrWhiteSpace(demographic))
 						{
-							fullStaff,
-							nativeStaff.Equals(" | ") ? fullStaff : nativeStaff,
-						},
-						ParseDescription(seriesData.GetProperty("description").ToString()),
-						filteredBookType,
-						GetSeriesStatus(seriesData.GetProperty("status").ToString()),
+							demographic = $"{Char.ToUpper(demographic[0])}{demographic.Substring(1, demographic.Length - 1)}";
+						}
+					}
+
+					if (altTitles.Count == 0)
+					{
+						Constants.Logger.Warn("Series has no Alternate Titles");
+					}
+
+					string coverLink = @$"https://uploads.mangadex.org/covers/{curId}/{MD_Query.GetCover(relationships.Single(x => x.GetProperty("type").ToString().Equals("cover_art")).GetProperty("id").ToString())}";
+					coverPath = SaveNewCoverImage(CreateCoverFilePath(coverLink, romajiTitle, bookType, altTitles, Constants.Site.MangaDex), coverLink);
+					
+					newTitles = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase)
+					{
+						{ "Romaji", romajiTitle },
+						{ "English", !countryOfOrigin.Equals("en") ? GetAltTitle("en", altTitles) : romajiTitle }
+					};
+
+					if (additionalLanguages.Count != 0)
+					{
+						AddAdditionalLanguages(newTitles, additionalLanguages, romajiTitle, altTitles);
+					}
+
+					string staffName = "", staffType = "";
+					foreach(JsonElement staff in relationships)
+					{
+						staffType = staff.GetProperty("type").ToString();
+						if (staffType.Equals("author") || staffType.Equals("artist"))
+						{
+							staffName = MD_Query.GetAuthor(staff.GetProperty("id").ToString());
+							if (Regex.IsMatch(staffName, @"\(.*\)"))
+							{
+								string native = Regex.Match(staffName, @"\((.*)\)").Groups[1].ToString();
+								string full = Regex.Match(staffName, @"^.*(?= \(.*\))").Value;
+								if (fullStaff.Contains(full, StringComparison.OrdinalIgnoreCase) || nativeStaff.Contains(native, StringComparison.OrdinalIgnoreCase))
+								{
+									continue;
+								}
+								nativeStaff += native + " | ";
+								fullStaff += full + " | ";
+							}
+							else if (!fullStaff.Contains(staffName, StringComparison.OrdinalIgnoreCase))
+							{
+								fullStaff += staffName + " | ";
+							}
+						}
+					}
+					nativeStaff = !string.IsNullOrWhiteSpace(nativeStaff) ? nativeStaff.Substring(0, nativeStaff.Length - 3) : "";
+					fullStaff = fullStaff.Substring(0, fullStaff.Length - 3);
+
+					Dictionary<string, string> newStaff = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase)
+					{
+						{ "Romaji", fullStaff }
+					};
+
+					if (!countryOfOrigin.Equals("ja"))
+					{
+						newTitles.Add("Japanese", GetAltTitle("ja", altTitles));
+					}
+
+					if (!countryOfOrigin.Equals("en"))
+					{
+						newTitles.Add(Constants.MANGADEX_LANG_CODES[countryOfOrigin], GetAltTitle(countryOfOrigin, altTitles));
+						newStaff.Add(Constants.MANGADEX_LANG_CODES[countryOfOrigin], nativeStaff);
+					}
+
+					// Remove empty titles
+					foreach (var x in newTitles)
+					{
+						// Constants.Logger.Debug(x.Key + " | " + x.Value);
+						if (string.IsNullOrWhiteSpace(x.Value))
+						{
+							newTitles.Remove(x.Key);
+						}
+					}
+
+					// Remove empty titles
+					foreach (var x in newStaff)
+					{
+						// Constants.Logger.Debug(x.Key + " | " + x.Value);
+						if (string.IsNullOrWhiteSpace(x.Value))
+						{
+							newStaff.Remove(x.Key);
+						}
+					}
+
+					return new Series(
+						newTitles,
+						newStaff,
+						description,
+						GetCorrectComicName(countryOfOrigin),
+						seriesStatus,
 						coverPath,
-						seriesData.GetProperty("siteUrl").ToString(),
+						link,
 						maxVolCount,
 						minVolCount,
-						new Bitmap(coverPath).CreateScaledBitmap(new Avalonia.PixelSize(Constants.LEFT_SIDE_CARD_WIDTH, Constants.IMAGE_HEIGHT), BitmapInterpolationMode.HighQuality)
-						);
+						demographic
+					);
+				}
 			}
-            else
-            {
-				Logger.Warn("User Input Invalid Series Type And/Or BookType");
-            }
-            return null;
+
+			Constants.Logger.Warn("User Input Invalid Series Title or ID or Need to add to ExtraSeries JSON");
+			return null;
         }
+
+		private static List<JsonElement> GetAdditionalMangaDexTitleList(JsonElement data)
+		{
+			if (data.ValueKind == JsonValueKind.Array) // Collection
+			{
+				return data.EnumerateArray().ElementAt(0).GetProperty("attributes").GetProperty("altTitles").EnumerateArray().ToList();
+			}
+			else
+			{
+				return data.GetProperty("attributes").GetProperty("altTitles").EnumerateArray().ToList();
+			}
+		}
+
+		private static void AddAdditionalLanguages(Dictionary<string, string> newTitles, ObservableCollection<string> additionalLanguages, string romajiTitle, List<JsonElement> altTitles)
+		{
+			JsonElement foundTitle;
+			foreach (string language in additionalLanguages)
+			{
+				Restart:
+				if (language.Equals("Chinese") || language.Equals("Spanish") || language.Equals("Portugese")) // If a language has multiple codes need to loop again
+				{
+					var mangaDexLang = Constants.MANGADEX_LANG_CODES.Where(lang => lang.Value.Equals(language)).Select(lang => lang.Key);
+					for (int x = 0; x < altTitles.Count; x++)
+					{
+						if (!newTitles.ContainsKey(language))
+						{
+							foreach (string lang in mangaDexLang)
+							{
+								if (altTitles[x].TryGetProperty(lang, out foundTitle))
+								{
+									// Constants.Logger.Debug($"Added [{language} : {foundTitle.ToString()}]");
+									newTitles.Add(language, foundTitle.ToString());
+									goto Restart;
+								}
+							}
+						}
+					}
+				}
+				else
+				{
+					var mangaDexLang = Constants.MANGADEX_LANG_CODES.FirstOrDefault(lang => lang.Value.Equals(language)).Key;
+					for (int x = 0; x < altTitles.Count; x++)
+					{
+						if (!newTitles.ContainsKey(language) && altTitles[x].TryGetProperty(mangaDexLang, out foundTitle))
+						{
+							// Constants.Logger.Debug($"Added [{language} : {foundTitle.ToString()}]");
+							newTitles.Add(language, foundTitle.ToString());
+							break;
+						}
+					}
+				}
+			}
+		}
+
+		public static string ParseMangadexDescription(string seriesDescription)
+		{
+			return Regex.Replace(seriesDescription, @"\n\n\n---[\S\s.]*|\n\n\*\*[\S\s.]*", "").Trim();
+		}
 
 		public static string ParseDescription(string seriesDescription)
 		{
 			return string.IsNullOrWhiteSpace(seriesDescription) ? "" : System.Web.HttpUtility.HtmlDecode(Regex.Replace(new StringBuilder(seriesDescription).Replace("\n<br><br>\n", "\n\n").Replace("<br><br>\n\n", "\n\n").Replace("<br><br>", "\n").ToString(), @"\(Source: [\S\s]+|\<.*?\>", "").Trim().TrimEnd('\n'));
 		}
 
+		public static string GetAltTitle(string country, List<JsonElement> altTitles)
+		{
+			JsonElement altTitle;
+			foreach (JsonElement titles in altTitles)
+			{
+				if (titles.TryGetProperty(country, out altTitle))
+				{
+					return altTitle.ToString();
+				}
+			}
+			return "";
+		}
+
 		public static string GetCorrectComicName(string jsonCountryOfOrigin)
 		{
 			return jsonCountryOfOrigin switch
 			{
-				"JP" => "Manga",
-				"KR" => "Manhwa",
-				"CN" or "TW" => "Manhua",
-				"FR" => "Manfra",
-				_ => "Error"
+				"KR" or "ko" => "Manhwa",
+				"CN" or "TW" or "zh" or "zh-hk"=> "Manhua",
+				"FR" or "fr" => "Manfra",
+				"EN" or "en" => "Comic",
+				_ or "JP" or "ja" => "Manga"
 			};
 		}
 
@@ -159,23 +435,22 @@ namespace Tsundoku.Models
 		{
 			return jsonStatus switch
 			{
-				"RELEASING" or "NOT_YET_RELEASED" => "Ongoing",
-				"FINISHED" => "Finished",
-				"CANCELLED" => "Cancelled",
-				"HIATUS" => "Hiatus",
+				"RELEASING" or "NOT_YET_RELEASED" or "ongoing" => "Ongoing",
+				"FINISHED"  or "completed" => "Finished",
+				"CANCELLED" or "cancelled" => "Cancelled",
+				"HIATUS" or "hiatus" => "Hiatus",
 				_  => "Error"
 			};
 		}
 
-        public static string GetSeriesStaff(JsonElement staffArray, string nameType, string bookType, string title) {
-			StringBuilder staffList = new StringBuilder();
-			string[] validRoles = { "Story & Art", "Story", "Art", "Original Creator", "Character Design", "Illustration", "Mechanical Design", "Original Story", "Original Character Design", "Original Story"};
+        public static string GetSeriesStaff(JsonElement staffArray, string nameType, string bookType, string title, StringBuilder staffList) {
+			string[] validRoles = { "Story & Art", "Story", "Art", "Original Creator", "Character Design", "Cover Illustration", "Illustration", "Mechanical Design", "Original Story", "Original Character Design", "Original Story"};
 			foreach(JsonElement name in staffArray.EnumerateArray())
             {
 				string staffRole = Regex.Replace(name.GetProperty("role").ToString(), @" \(.*\)", "").Trim();
 
 				// Don't include "Illustration" staff for manga that are not anthologies
-				if (validRoles.Contains(staffRole) && !(bookType.Equals("Manga") && staffRole.Equals("Illustration") && !title.Contains("Anthology")))
+				if (validRoles.Contains(staffRole, StringComparer.OrdinalIgnoreCase) && !(bookType.Equals("Manga") && (staffRole.Equals("Illustration") || staffRole.Equals("Cover Illustration")) && !title.Contains("Anthology")))
                 {
 					if (name.GetProperty("node").GetProperty("name").GetProperty("native").ValueKind == JsonValueKind.Null && name.GetProperty("node").GetProperty("name").GetProperty("full").ValueKind == JsonValueKind.Null)
 					{
@@ -203,7 +478,7 @@ namespace Tsundoku.Models
 						}
 						else
 						{
-							Logger.Info($"Duplicate Staff Entry For {newStaff}");
+							Constants.Logger.Info($"Duplicate Staff Entry For {newStaff}");
 						}
 					}
                 }
@@ -211,22 +486,39 @@ namespace Tsundoku.Models
 			return staffList.ToString(0, staffList.Length - 3);
 		}
 
-		public static string CreateCoverFilePath(string coverLink, string title, string bookType, JsonElement synonyms, bool extraSeriesCheck)
+		public static string CreateCoverFilePath(string coverLink, string title, string bookType, List<JsonElement> synonyms, Constants.Site queryType)
 		{
-			string newPath = @$"Covers\{Helpers.ExtensionMethods.RemoveInPlaceCharArray(string.Concat(title.Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries)))}_{bookType}.{coverLink.Substring(coverLink.Length - 3)}";
+			string newPath = @$"Covers\{Helpers.ExtensionMethods.RemoveInPlaceCharArray(string.Concat(title.Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries))).Replace(",", "")}_{bookType}.{coverLink.Substring(coverLink.Length - 3)}";
             Directory.CreateDirectory(@"Covers");
 
 			// Check and see if the series will generate a duplicate file name
-            if (!extraSeriesCheck && File.Exists(newPath))
+            if (File.Exists(newPath))
             {
-                foreach (JsonElement newTitle in synonyms.EnumerateArray())
-                {
-                    if (Regex.IsMatch(newTitle.ToString(), @"[\w]"))
-                    {
-                        newPath = @$"Covers\{Helpers.ExtensionMethods.RemoveInPlaceCharArray(string.Concat(newTitle.ToString().Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries)))}_{bookType}.{coverLink.Substring(coverLink.Length - 3)}";
-                        break;
-                    }
-                }
+                switch (queryType)
+				{
+					case Constants.Site.AniList:
+						foreach (JsonElement newTitle in synonyms)
+						{
+							if (Regex.IsMatch(newTitle.ToString(), @"[\w]"))
+							{
+								newPath = @$"Covers\{Helpers.ExtensionMethods.RemoveInPlaceCharArray(string.Concat(newTitle.ToString().Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries))).Replace(",", "")}_{bookType}.{coverLink.Substring(coverLink.Length - 3)}";
+								break;
+							}
+						}
+						break;
+					case Constants.Site.MangaDex:
+						Constants.Logger.Debug("Check #1");
+						JsonElement altTitle;
+						foreach (JsonElement newTitle in synonyms)
+						{
+							if (newTitle.TryGetProperty("en", out altTitle))
+							{
+								newPath = @$"Covers\{Helpers.ExtensionMethods.RemoveInPlaceCharArray(string.Concat(altTitle.ToString().Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries))).Replace(",", "")}_{bookType}.{coverLink.Substring(coverLink.Length - 3)}";
+								break;
+							}
+						}
+						break;
+				}
             }
 			return newPath;
 		}
@@ -246,14 +538,14 @@ namespace Tsundoku.Models
             }
             catch (Exception e)
             {
-                Logger.Debug(e.ToString());
+                Constants.Logger.Debug(e.ToString());
             }
 			return newPath;
         }
 
 		public string ToJsonString(JsonSerializerOptions options)
 		{
-			return "\n" + JsonSerializer.Serialize(this, options);
+			return JsonSerializer.Serialize(this, options);
 		}
 
 		protected virtual void Dispose(bool disposing)
@@ -262,20 +554,20 @@ namespace Tsundoku.Models
 			{
 				if (disposing)
 				{
-					// TODO: dispose managed state (managed objects)
+					// dispose managed state (managed objects)
 					CoverBitMap.Dispose();
 				}
 
-				// TODO: free unmanaged resources (unmanaged objects) and override finalizer
-				// TODO: set large fields to null
+				// free unmanaged resources (unmanaged objects) and override finalizer
+				// set large fields to null
 				disposedValue = true;
 			}
 		}
 
-		// // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
+		// Override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
 		// ~Series()
 		// {
-		//     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
 		//     Dispose(disposing: false);
 		// }
 
@@ -287,47 +579,33 @@ namespace Tsundoku.Models
 		}
 	}
 
-    class RomajiComparer : IComparer<Series>
+    class SeriesComparer : IComparer<Series>
     {
-        public int Compare(Series? x, Series? y)
-        {
-            if (x.Titles[0] == null && y.Titles[0] == null)
-			{
-				return 0;
-			}
-			else
-			{
-				return x.Titles[0].CompareTo(y.Titles[0]);
-			}
-        }
-    }
+		string curLang;
+        System.Globalization.CultureInfo curCul;
 
-	class EnglishComparer : IComparer<Series>
-    {
-        public int Compare(Series? x, Series? y)
+        public SeriesComparer(string curLang)
         {
-            if (x.Titles[1] == null && y.Titles[1] == null)
-			{
-				return 0;
-			}
-			else
-			{
-				return x.Titles[1].CompareTo(y.Titles[1]);
-			}
+            this.curLang = curLang;
+			curCul = System.Globalization.CultureInfo.CurrentCulture = new System.Globalization.CultureInfo(Constants.CULTURE_LANG_CODES[curLang], false);
         }
-    }
-
-	class NativeComparer : IComparer<Series>
-    {
         public int Compare(Series? x, Series? y)
         {
-            if (x.Titles[2] == null && y.Titles[2] == null)
+            if (!x.Titles.ContainsKey(curLang) && !y.Titles.ContainsKey(curLang))
 			{
-				return 0;
+				return x.Titles["Romaji"].CompareTo(y.Titles["Romaji"]);
+			}
+			else if (x.Titles.ContainsKey(curLang) && !y.Titles.ContainsKey(curLang))
+			{
+				return x.Titles[curLang].CompareTo(y.Titles["Romaji"]);
+			}
+			else if (!x.Titles.ContainsKey(curLang) && y.Titles.ContainsKey(curLang))
+			{
+				return x.Titles["Romaji"].CompareTo(y.Titles[curLang]);
 			}
 			else
 			{
-				return x.Titles[2].CompareTo(y.Titles[2]);
+				return x.Titles[curLang].CompareTo(y.Titles[curLang]);
 			}
         }
     }

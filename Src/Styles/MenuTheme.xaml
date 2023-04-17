@@ -3,6 +3,13 @@
 		xmlns:vm="clr-namespace:Tsundoku.ViewModels"
 		x:DataType="vm:ViewModelBase">
 
+	<!-- TODO ListBox & ComboBox Items not styling correctly in menu -->
+	<!-- <Styles.Resources>
+		<SolidColorBrush x:Key="ToggleButtonBackgroundPointerOver" Color="{Binding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
+		<SolidColorBrush x:Key="ToggleButtonBorderBrushPointerOver" Color="{Binding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
+		<SolidColorBrush x:Key="ToggleButtonForegroundPointerOver" Color="{Binding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
+	</Styles.Resources> -->
+
 	<Style Selector="Window.menu">
 		<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}"/>
 	</Style>
@@ -39,7 +46,7 @@
 			<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
 		</Style>
 	</Style>
-
+	
 	<Style Selector="ToggleButton.menu">
 		<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"/>
 		<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"/>
@@ -90,24 +97,35 @@
 		</Style>
 	</Style>
 
-	<Style Selector="ComboBox.menu">
+	<Style Selector="ComboBox.menu, ListBox.menu">
 		<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"/>
 		<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"/>
 		<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"/>
 
-		<!-- <Style Selector="^ > ComboBoxItem">
-			<Setter Property="TextBlock.Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"/>
-
-			<Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter, ^:selected /template/ ContentPresenter#PART_ContentPresenter, ^:pressed /template/ ContentPresenter#PART_ContentPresenter" x:DataType="vm:ViewModelBase">
-				<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
-				<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
-				<Setter Property="TextBlock.Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
+		<Style Selector="^ ScrollBar:vertical">
+			<Style Selector="^ /template/ Rectangle#TrackRect">
+				<Setter Property="Fill" Value="{Binding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}" />
 			</Style>
-		</Style> -->
+			<Style Selector="^ /template/ Thumb">
+				<Setter Property="Background" Value="{Binding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" />
+			</Style>
+		</Style>
+
+		<Style Selector="^ Thumb:pointerover /template/ Border">
+			<Setter Property="Background" Value="{Binding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" />
+		</Style>
+		
+		<Style Selector="^ RepeatButton">
+			<Setter Property="TextElement.Foreground" Value="{Binding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}"/>
+
+			<Style Selector="^:pressed /template/ ContentPresenter, ^:pointerover /template/ ContentPresenter">
+				<Setter Property="Background" Value="{Binding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" />
+				<Setter Property="TextElement.Foreground" Value="{Binding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}"/>
+			</Style>
+		</Style>
 
 		<Style Selector="^ /template/ Border#PopupBorder">
 			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"/>
-			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"/>
 			<Setter Property="BorderThickness" Value="2"/>
 		</Style>
 
@@ -143,39 +161,60 @@
 		</Style>
 	</Style>
 
-	<!-- <Style Selector="ComboBoxItem.menu">
+	<Style Selector="ComboBox.menu > ComboBoxItem">
 		<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"/>
 		<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"/>
 		<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"/>
 
-		<Style Selector="^:pressed /template/ ContentPresenter">
-			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
+		<Style Selector="^:pressed /template/ ContentPresenter#PART_ContentPresenter">
+			<Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
 			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
 			<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
 		</Style>
 
-		<Style Selector="^:pointerover /template/ ContentPresenter">
+		<Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
 			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
 			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
 			<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
 		</Style>
 
 		<Style Selector="^:selected">
-			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"/>
-			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"/>
-			<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"/>
+			<Style Selector="^ /template/ ContentPresenter">
+				<Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"/>
+				<Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"/>
+				<Setter Property="Foreground" Value="{Binding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"/>
+			</Style>
 
 			<Style Selector="^:pressed /template/ ContentPresenter">
-				<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
-				<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
-				<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
+				<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"/>
+				<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"/>
+				<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"/>
 			</Style>
 
 			<Style Selector="^:pointerover /template/ ContentPresenter">
-				<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
-				<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
-				<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
+				<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"/>
+				<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"/>
+				<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"/>
 			</Style>
 		</Style>
-	</Style> -->
+	</Style>
+
+	<Style Selector="ListBox > ListBoxItem">
+		<Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter, ^:pressed /template/ ContentPresenter#PART_ContentPresenter">
+			<Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
+			<Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
+		</Style>
+
+		<Style Selector="^:selected">
+			<Style Selector="^ /template/ ContentPresenter#PART_ContentPresenter, ^:not(:focus) /template/ ContentPresenter#PART_ContentPresenter">
+				<Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
+				<Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
+			</Style>
+
+			<Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter, ^:pressed /template/ ContentPresenter#PART_ContentPresenter">
+				<Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"/>
+				<Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"/>
+			</Style>
+		</Style>
+	</Style>
 </Styles>

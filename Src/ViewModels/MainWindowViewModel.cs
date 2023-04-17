@@ -1,5 +1,4 @@
-﻿using System.Security.Cryptography.X509Certificates;
-using ReactiveUI;
+﻿using ReactiveUI;
 using Tsundoku.Models;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -15,21 +14,24 @@ using Avalonia.Controls;
 using System.Diagnostics.CodeAnalysis;
 using Avalonia.Media.Imaging;
 using DynamicData;
+using System.Text.Json.Nodes;
+/*
+    Issues
+    ❌ Button hovering Styling is not working in other windows
+    ❌ LineHeight doesn't work with lower LineHeight values
+    ❌ Fix Theme Generators due to layout change
+    ❌ ComboBoxItem text color not applying
+*/
 
 namespace Tsundoku.ViewModels
 {
     public partial class MainWindowViewModel : ViewModelBase
     {
-        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         private static string filePath = @"UserData.json";
         public static ObservableCollection<Series> SearchedCollection { get; set; } = new();
         public static ObservableCollection<Series> Collection { get; set; } = new();
-        public static User MainUser { get; set; }
-        public AddNewSeriesWindow newSeriesWindow;
-        public SettingsWindow settingsWindow;
-        public CollectionThemeWindow themeSettingsWindow;
-        public string[] AvailableLanguages { get; } = new string[] { "Romaji", "English", "Native" };
-        public string[] AvailableCollectionFilters { get; } = new string[] { "None", "Ongoing", "Finished", "Hiatus", "Cancelled", "Complete", "Incomplete", "Manga", "Novel" };
+        public string[] AvailableLanguages { get; } = new string[] { "Romaji", "English", "Japanese", "Korean", "Arabic", "Azerbaijan", "Bengali", "Bulgarian", "Burmese", "Catalan", "Chinese", "Croatian", "Czech", "Danish", "Dutch", "Esperanto", "Estonian", "Filipino", "Finnish", "French", "German", "Greek", "Hebrew", "Hindi", "Hungarian", "Indonesian", "Italian", "Kazakh", "Latin", "Lithuanian", "Malay", "Mongolian", "Nepali", "Norwegian", "Persian", "Polish", "Portuguese", "Romanian", "Russian", "Serbian", "Slovak", "Spanish", "Swedish", "Tamil", "Thai", "Turkish", "Ukrainian", "Vietnamese" };
+        public string[] AvailableCollectionFilters { get; } = new string[] { "None", "Favorites", "Ongoing", "Finished", "Hiatus", "Cancelled", "Complete", "Incomplete", "Manga", "Novel" };
 
         [Reactive]
         public string SearchText { get; set; }
@@ -39,10 +41,6 @@ namespace Tsundoku.ViewModels
 
         [Reactive]
         public uint UsersNumVolumesToBeCollected { get; set; }
-        
-        [Reactive]
-        public bool SeriesEditPaneIsOpen { get; set; } = false;
-        private ReactiveCommand<Unit, bool> SeriesEditPaneButtonPressed { get; }
         
         [Reactive]
         public string CurLanguage { get; set; }
@@ -62,25 +60,39 @@ namespace Tsundoku.ViewModels
         // [Reactive]
         // public uint TestVal { get; set; } = 88888;
 
-        public ReactiveCommand<Unit, Unit> OpenAddNewSeriesWindow { get; }
-        public ReactiveCommand<Unit, Unit> OpenSettingsWindow { get; }
-        public ReactiveCommand<Unit, Unit> OpenThemeSettingsWindow { get; }
+        public AddNewSeriesWindow newSeriesWindow;
+        public ReactiveCommand<Unit, Unit> OpenAddNewSeriesWindow { get; set; }
+
+        public SettingsWindow settingsWindow;
+        public ReactiveCommand<Unit, Unit> OpenSettingsWindow { get; set; }
+
+        public CollectionThemeWindow themeSettingsWindow;
+        public ReactiveCommand<Unit, Unit> OpenThemeSettingsWindow { get; set; }
+
+        public PriceAnalysisWindow priceAnalysisWindow;
+        public ReactiveCommand<Unit, Unit> OpenPriceAnalysisWindow { get; set; }
+
+        public CollectionStatsWindow collectionStatsWindow;
+        public ReactiveCommand<Unit, Unit> OpenCollectionStatsWindow { get; set; }
 
         public MainWindowViewModel()
         {
+            // Helpers.ExtensionMethods.PrintCultures();
+            Constants.Logger.Info("Starting TsundOku");
             GetUserData();
+            ConfigureWindows();
 
             this.WhenAnyValue(x => x.SearchText).Throttle(TimeSpan.FromMilliseconds(600)).ObserveOn(RxApp.MainThreadScheduler).Subscribe(SearchCollection);
-
             this.WhenAnyValue(x => x.CurrentTheme).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.MainTheme = x.ThemeName);
             this.WhenAnyValue(x => x.CurDisplay).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.Display = x);
-
             this.WhenAnyValue(x => x.UsersNumVolumesCollected).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.NumVolumesCollected = x);
             this.WhenAnyValue(x => x.UsersNumVolumesToBeCollected).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.NumVolumesToBeCollected = x);
-
             this.WhenAnyValue(x => x.CurLanguage).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.CurLanguage = x);
             this.WhenAnyValue(x => x.UserName).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.UserName = x);
+        }
 
+        private void ConfigureWindows()
+        {
             newSeriesWindow = new AddNewSeriesWindow();
             OpenAddNewSeriesWindow = ReactiveCommand.CreateFromTask(() =>
             {
@@ -135,42 +147,47 @@ namespace Tsundoku.ViewModels
                 return Task.CompletedTask;
             });
 
-            SeriesEditPaneButtonPressed = ReactiveCommand.Create(() => SeriesEditPaneIsOpen ^= true);
-        }
-
-        public static int SearchForSort(Series series)
-        {
-            int index;
-            switch(MainUser.CurLanguage)
+            priceAnalysisWindow = new PriceAnalysisWindow();
+            OpenPriceAnalysisWindow = ReactiveCommand.CreateFromTask(() =>
             {
-                case "Native":
-                    index = Collection.BinarySearch<Series>(series, new NativeComparer());
-                    break;
-                case "English":
-                    index = Collection.BinarySearch<Series>(series, new EnglishComparer());
-                    break;
-                default:
-                    index = Collection.BinarySearch<Series>(series, new RomajiComparer());
-                    break;
-            }
-            return index;
+                if (priceAnalysisWindow.WindowState == WindowState.Minimized) 
+                {
+                    priceAnalysisWindow.WindowState = WindowState.Normal;
+                }
+                else if(!priceAnalysisWindow.IsActive && priceAnalysisWindow.IsOpen)
+                {
+                    priceAnalysisWindow.Activate();
+                }
+                else
+                {
+                    priceAnalysisWindow.Show();
+                }
+                return Task.CompletedTask;
+            });
+
+            collectionStatsWindow = new CollectionStatsWindow();
+            OpenCollectionStatsWindow = ReactiveCommand.CreateFromTask(() =>
+            {
+                if (collectionStatsWindow.WindowState == WindowState.Minimized) 
+                {
+                    collectionStatsWindow.WindowState = WindowState.Normal;
+                }
+                else if(!collectionStatsWindow.IsActive && collectionStatsWindow.IsOpen)
+                {
+                    collectionStatsWindow.Activate();
+                }
+                else
+                {
+                    collectionStatsWindow.Show();
+                }
+                return Task.CompletedTask;
+            });
         }
 
         public static void SortCollection()
         {
             SearchedCollection.Clear();
-            switch (MainUser.CurLanguage)
-            {
-                case "Native":
-                    SearchedCollection.AddRange(Collection.AsParallel().OrderBy(x => x.Titles[2], StringComparer.Create(new System.Globalization.CultureInfo("ja-JP"), true)));
-                    break;
-                case "English": 
-                    SearchedCollection.AddRange(Collection.AsParallel().OrderBy(x => x.Titles[1], StringComparer.OrdinalIgnoreCase));
-                    break;
-                default:
-                    SearchedCollection.AddRange(Collection.AsParallel().OrderBy(x => x.Titles[0], StringComparer.OrdinalIgnoreCase));
-                    break;
-            }
+            SearchedCollection.AddRange(Collection.AsParallel().OrderBy(x => x.Titles.ContainsKey(MainUser.CurLanguage) ? x.Titles[MainUser.CurLanguage] : x.Titles["Romaji"], StringComparer.Create(new System.Globalization.CultureInfo(Constants.CULTURE_LANG_CODES[MainUser.CurLanguage]), false)));
             Collection = new ObservableCollection<Series>(SearchedCollection);
             GC.Collect();
             GC.WaitForPendingFinalizers();
@@ -182,28 +199,31 @@ namespace Tsundoku.ViewModels
             switch (filter)
             {
                 case "Ongoing":
-                    SearchedCollection.AddRange(Collection.Where(series => series.Status.Equals("Ongoing")));
+                    SearchedCollection.AddRange(Collection.AsParallel().Where(series => series.Status.Equals("Ongoing")));
                     break;
                 case "Finished":
-                    SearchedCollection.AddRange(Collection.Where(series => series.Status.Equals("Finished")));
+                    SearchedCollection.AddRange(Collection.AsParallel().Where(series => series.Status.Equals("Finished")));
                     break;
                 case "Hiatus":
-                    SearchedCollection.AddRange(Collection.Where(series => series.Status.Equals("Hiatus")));
+                    SearchedCollection.AddRange(Collection.AsParallel().Where(series => series.Status.Equals("Hiatus")));
                     break;
                 case "Cancelled":
-                    SearchedCollection.AddRange(Collection.Where(series => series.Status.Equals("Cancelled")));
+                    SearchedCollection.AddRange(Collection.AsParallel().Where(series => series.Status.Equals("Cancelled")));
                     break;
                 case "Complete":
-                    SearchedCollection.AddRange(Collection.Where(series => series.CurVolumeCount == series.MaxVolumeCount));
+                    SearchedCollection.AddRange(Collection.AsParallel().Where(series => series.CurVolumeCount == series.MaxVolumeCount));
                     break;
                 case "Incomplete":
-                    SearchedCollection.AddRange(Collection.Where(series => series.CurVolumeCount != series.MaxVolumeCount));
+                    SearchedCollection.AddRange(Collection.AsParallel().Where(series => series.CurVolumeCount != series.MaxVolumeCount));
+                    break;
+                case "Favorites":
+                    SearchedCollection.AddRange(Collection.AsParallel().Where(series => series.IsFavorite));
                     break;
                 case "Manga":
-                    SearchedCollection.AddRange(Collection.Where(series => series.Format.Equals("Manga") || series.Format.Equals("Manhwa") || series.Format.Equals("Manhua") || series.Format.Equals("Manfra")));
+                    SearchedCollection.AddRange(Collection.AsParallel().Where(series => series.Format.Equals("Manga") || series.Format.Equals("Manhwa") || series.Format.Equals("Manhua") || series.Format.Equals("Manfra")));
                     break;
                 case "Novel":
-                    SearchedCollection.AddRange(Collection.Where(series => series.Format.Equals("Novel")));
+                    SearchedCollection.AddRange(Collection.AsParallel().Where(series => series.Format.Equals("Novel")));
                     break;
                 case "None":
                 default:
@@ -219,14 +239,14 @@ namespace Tsundoku.ViewModels
             if (!string.IsNullOrWhiteSpace(searchText))
             {
                 SearchedCollection.Clear();
-                Logger.Info($"Searching For {searchText}");
-                SearchedCollection.AddRange(Collection.AsParallel().Where(x => x.Titles[0].Contains(searchText, StringComparison.InvariantCultureIgnoreCase) || x.Titles[1].Contains(searchText, StringComparison.InvariantCultureIgnoreCase) || x.Titles[2].Contains(searchText, StringComparison.CurrentCultureIgnoreCase) || x.Staff[0].Contains(searchText, StringComparison.InvariantCultureIgnoreCase) || x.Staff[1].Contains(searchText, StringComparison.CurrentCultureIgnoreCase)));
+                //Constants.Logger.Info($"Searching For {searchText}");
+                SearchedCollection.AddRange(Collection.AsParallel().Where(x => x.Titles.AsParallel().Any(text => text.Value.Contains(searchText, StringComparison.OrdinalIgnoreCase)) || x.Staff.AsParallel().Any(text => text.Value.Contains(searchText, StringComparison.OrdinalIgnoreCase))));
             }
             else if (SearchIsBusy)
             {
                 SearchedCollection.Clear();
                 SearchIsBusy = false;
-                Logger.Info($"No Longer Searching");
+                //Constants.Logger.Info($"No Longer Searching");
                 SearchedCollection.AddRange(Collection);
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
@@ -234,33 +254,35 @@ namespace Tsundoku.ViewModels
         }
 
         [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "A New file will always be created if it doesn't exist before deserialization")]
-        public void GetUserData()
+        private void GetUserData()
         {
-            Logger.Info("Starting TsundOku");
             if (!File.Exists(filePath))
             {
-                Logger.Info("Creating New User");
+                Constants.Logger.Info("Creating New User");
                 ThemeSettingsViewModel.UserThemes = new ObservableCollection<TsundokuTheme>() { TsundokuTheme.DEFAULT_THEME };
-                MainUser = new User("UserName", "Romaji", "Default", "Card", ThemeSettingsViewModel.UserThemes, Collection);
-                MainUser.CurDataVersion = 1.4;
+                MainUser = new User("UserName", "Romaji", "Default", "Card", "$", ThemeSettingsViewModel.UserThemes, Collection);
+                MainUser.CurDataVersion = 1.5;
                 UserName = MainUser.UserName;
                 Collection = MainUser.UserCollection;
                 CurLanguage = MainUser.CurLanguage;
                 CurDisplay = MainUser.Display;
                 SaveUsersData();
             }
+            
+            bool save = VersionUpdate();
 
             FileStream fRead = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-            MainUser = JsonSerializer.DeserializeAsync<User>(fRead, options).Result;
-            fRead.FlushAsync();
+            MainUser = JsonSerializer.Deserialize<User>(fRead, options);
+            fRead.Flush();
             fRead.Close();
 
-            Logger.Info($"Loading {MainUser.UserName}'s Data");
+            Constants.Logger.Info($"Loading {MainUser.UserName}'s Data");
             UserName = MainUser.UserName;
             Collection = MainUser.UserCollection;
             ThemeSettingsViewModel.UserThemes = MainUser.SavedThemes;
             CurLanguage = MainUser.CurLanguage;
             CurDisplay = MainUser.Display;
+            CurCurrency = MainUser.Currency;
             CurrentTheme = ThemeSettingsViewModel.UserThemes.Single(x => x.ThemeName == MainUser.MainTheme).Cloning();
 
             uint testUsersNumVolumesCollected = 0, testUsersNumVolumesToBeCollected = 0;
@@ -270,6 +292,7 @@ namespace Tsundoku.ViewModels
             {
                 testUsersNumVolumesCollected += x.CurVolumeCount;
                 testUsersNumVolumesToBeCollected += (uint)(x.MaxVolumeCount - x.CurVolumeCount);
+
                 // If the image does not exist in the covers folder then don't create a bitmap for it
                 if (File.Exists(x.Cover))
                 {
@@ -278,7 +301,10 @@ namespace Tsundoku.ViewModels
                 SearchedCollection.Add(x);
             }
 
-            // Crash protection for series count
+            // Crash protection for aggregate values
+            UsersNumVolumesCollected = testUsersNumVolumesCollected;
+            UsersNumVolumesToBeCollected = testUsersNumVolumesToBeCollected;
+    
             if (testUsersNumVolumesCollected == MainUser.NumVolumesCollected && testUsersNumVolumesToBeCollected == MainUser.NumVolumesToBeCollected)
             {
                 UsersNumVolumesCollected = MainUser.NumVolumesCollected;
@@ -290,25 +316,93 @@ namespace Tsundoku.ViewModels
                 UsersNumVolumesToBeCollected = testUsersNumVolumesToBeCollected;
             }
 
-            // Updating series data from for Version 1.4.0.0
-            if (MainUser.CurDataVersion < 1.4)
+            if (save) { UpdateDefaultTheme(); SaveUsersData(); }
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+        }
+
+        private void UpdateDefaultTheme()
+        {
+            for(int x = 0; x < MainUser.SavedThemes.Count; x++)
             {
-                MainUser.CurDataVersion = 1.4;
-                foreach (Series x in Collection)
+                if (MainUser.SavedThemes[x].ThemeName.Equals("Default"))
                 {
-                    if (x.Status.Equals("Complete"))
+                    MainUser.SavedThemes[x] = TsundokuTheme.DEFAULT_THEME;
+                    Constants.Logger.Info("Updated Default Theme");
+                    break;
+                }
+            }
+        }
+
+        // TODO: Need to update Currency as well prob?
+        private bool VersionUpdate()
+        {
+            string json = File.ReadAllText(filePath);
+            if (Convert.ToDouble(JsonDocument.Parse(json).RootElement.GetProperty("CurDataVersion").ToString()) < 1.5)
+            {
+                JsonNode userData = JsonNode.Parse(json), series;
+                JsonArray collectionJsonArray = userData["UserCollection"].AsArray();
+                double curVersion = Double.Parse(userData["CurDataVersion"].ToString());
+                userData.AsObject().Add("Currency", "$");
+                userData.AsObject().Add("MeanScore", 0);
+                userData.AsObject().Add("VolumesRead", 0);
+                userData.AsObject().Add("CollectionPrice", "");
+
+                if (userData["CurLanguage"].ToString().Equals("Native"))
+                {
+                    userData["CurLanguage"] = "Japanese";
+                }
+
+                for (int x = 0; x < collectionJsonArray.Count(); x++)
+                {
+                    series = collectionJsonArray.ElementAt(x);
+                    series["Titles"] = new JsonObject
+					{
+						["Romaji"] = series["Titles"][0].ToString(),
+                        ["English"] = series["Titles"][1].ToString(),
+                        [series["Format"].ToString() switch
+                        {
+                            "Manhwa" => "Korean",
+                            "Manhua" => "Chinese",
+                            _ => "Japanese"            
+                        }] = series["Titles"][2].ToString()
+                    };
+
+                    series["Staff"] = new JsonObject
+					{
+						["Romaji"] = series["Staff"][0].ToString(),
+                        [series["Format"].ToString() switch
+                        {
+                            "Manhwa" => "Korean",
+                            "Manhua" => "Chinese",
+                            _ => "Japanese"            
+                        }] = series["Staff"][1].ToString()
+                    };
+                    
+                    if (series["Titles"]["Romaji"].ToString().Equals(series["Titles"]["English"].ToString()))
                     {
-                        x.Status = "Finished";
+                        series["Titles"].AsObject().Remove("English");
+                    }
+
+                    if (curVersion < 1.4 && series["Status"].ToString().Equals("Complete"))
+                    {
+                        series["Status"] = "Finished";
                     }
                 }
-                Logger.Info("Updated Users Data for version 1.4.0.0");
+                userData["CurDataVersion"] = 1.5;
+                File.WriteAllText(filePath, JsonSerializer.Serialize(userData, options));
+                Constants.Logger.Info("Updated Users Data to v1.5");
+
+                return true;        
             }
+            return false;
         }
 
         [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "A New file will always be created if it doesn't exist before serialization")]
         public static void SaveUsersData()
         {
-            Logger.Info($"Saving {MainUser.UserName}'s Data");
+            Constants.Logger.Info($"Saving {MainUser.UserName}'s Data");
             MainUser.UserCollection = Collection;
             MainUser.SavedThemes = ThemeSettingsViewModel.UserThemes;
 

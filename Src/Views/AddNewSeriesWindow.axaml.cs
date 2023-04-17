@@ -2,13 +2,13 @@ using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Tsundoku.Models;
 using Tsundoku.ViewModels;
 
 namespace Tsundoku.Views
 {
     public partial class AddNewSeriesWindow : Window
     {
-        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         public AddNewSeriesViewModel? AddNewSeriesVM => DataContext as AddNewSeriesViewModel;
         public bool IsOpen = false;
         MainWindow CollectionWindow;
@@ -23,7 +23,7 @@ namespace Tsundoku.Views
                 AddNewSeriesVM.CurrentTheme = CollectionWindow.CollectionViewModel.CurrentTheme;
                 IsOpen ^= true;
             };
-            
+
             Closing += (s, e) =>
             {
                 ((AddNewSeriesWindow)s).Hide();
@@ -36,9 +36,9 @@ namespace Tsundoku.Views
                 Topmost = false;
                 e.Cancel = true;
             };
-// #if DEBUG
-//             this.AttachDevTools();
-// #endif
+            // #if DEBUG
+            //             this.AttachDevTools();
+            // #endif
         }
 
         private void IsMangaButtonClicked(object sender, RoutedEventArgs args)
@@ -54,6 +54,10 @@ namespace Tsundoku.Views
 
         public void OnButtonClicked(object sender, RoutedEventArgs args)
         {
+            foreach (var x in AddNewSeriesVM.SelectedAdditionalLanguages)
+            {
+                Constants.Logger.Debug(x);
+            }
             bool validResponse = true;
             string errorMessage = "";
             if (string.IsNullOrWhiteSpace(TitleBox.Text))
@@ -61,7 +65,7 @@ namespace Tsundoku.Views
                 errorMessage += "Title Field is Empty\n";
                 validResponse = false;
             }
-            
+
             if ((!MangaButton.IsChecked & !NovelButton.IsChecked) == true)
             {
                 errorMessage += "Series Book Type (Manga or Novel) Not Checked\n";
@@ -102,7 +106,7 @@ namespace Tsundoku.Views
 
             if (!validResponse)
             {
-                Logger.Warn("User Input to Add New Series is Invalid");
+                Constants.Logger.Warn("User Input to Add New Series is Invalid");
                 var errorBox = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(
                 new MessageBox.Avalonia.DTO.MessageBoxStandardParams
                 {
@@ -111,11 +115,12 @@ namespace Tsundoku.Views
                 });
                 errorBox.Show();
             }
-            else if(!AddNewSeriesVM.GetSeriesData(TitleBox.Text.Trim(), (MangaButton.IsChecked == true) ? "MANGA" : "NOVEL", cur, max)) // Boolean returns whether the series added is a duplicate
+            else if (!AddNewSeriesVM.GetSeriesData(TitleBox.Text.Trim(), (MangaButton.IsChecked == true) ? "MANGA" : "NOVEL", cur, max, AddNewSeriesVM.SelectedAdditionalLanguages)) // Boolean returns whether the series added is a duplicate
             {
                 CollectionWindow.CollectionViewModel.UsersNumVolumesCollected += cur;
                 CollectionWindow.CollectionViewModel.UsersNumVolumesToBeCollected += (uint)(max - cur);
                 CollectionWindow.CollectionViewModel.SearchText = "";
+                CollectionWindow.CollectionViewModel.collectionStatsWindow.CollectionStatsVM.SeriesCount = (uint)MainWindowViewModel.Collection.Count;
             }
         }
     }

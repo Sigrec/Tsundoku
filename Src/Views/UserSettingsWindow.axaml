@@ -1,22 +1,21 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:vm="using:Tsundoku.ViewModels"
+        xmlns:model="clr-namespace:Tsundoku.Models"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
         x:Class="Tsundoku.Views.SettingsWindow"
+        x:DataType="vm:UserSettingsViewModel"
         Icon="\Assets\Icons\Tsundoku-Logo.ico"
         Title="Settings"
         FontFamily="Segoe UI"
         SizeToContent="WidthAndHeight"
         WindowStartupLocation="2"
-        KeyboardNavigation.TabNavigation="None">
-    
-    <Window.Styles>
-		<StyleInclude Source="/Styles/MenuTheme.xaml" />
-	</Window.Styles>
+        KeyboardNavigation.TabNavigation="None"
+        CanResize="false">
 
-    <Border Classes="menu" BorderThickness="3">
+    <Border Classes="menu" BorderThickness="3" CornerRadius="0,0,8,8" ClipToBounds="True">
         <StackPanel Margin="20" Spacing="20">
             <StackPanel Spacing="5">
                 <TextBlock Text="Change Username" FontSize="20" FontWeight="Bold" Classes="menu"/>
@@ -38,8 +37,21 @@
                 </StackPanel>
             </StackPanel>
             <StackPanel Spacing="5">
+                <TextBlock Text="Change Currency" FontSize="20" FontWeight="Bold" Classes="menu"/>
+                <ComboBox Name="CurrencySelector"
+                          SelectionChanged="CurrencyChanged"
+                          Items="{Binding Source={x:Static model:Constants.CURRENCY_SYMBOLS}}"
+                          FontWeight="Bold"
+                          SelectedItem="{Binding CurCurrency}"
+                          FontSize="15"
+                          Width="80"
+                          Classes="menu"
+                          BorderThickness="2"
+                          AutoScrollToSelectedItem="True"/>
+            </StackPanel>
+            <StackPanel Spacing="5">
                 <TextBlock Text="Settings" FontSize="20" FontWeight="Bold" Classes="menu"/>
-                <WrapPanel Margin="-35,-3,0,0" Width="420">
+                <WrapPanel Width="450" Margin="-5,0,0,0">
                     <WrapPanel.Styles>
                         <Style Selector="Button">
                             <Setter Property="Margin" Value="5"/>
@@ -84,8 +96,8 @@
                 </WrapPanel>
             </StackPanel>
             <StackPanel Spacing="5">
-                <TextBlock Text="Manga Youtubers" FontSize="20" FontWeight="Bold" Classes="menu"/>
-                <WrapPanel Margin="-35,-3,0,0" Width="420">
+                <TextBlock Text="Youtubers" FontSize="20" FontWeight="Bold" Classes="menu"/>
+                <WrapPanel Width="450" Margin="-5,0,0,0">
                     <WrapPanel.Styles>
                         <Style Selector="Button">
                             <Setter Property="Margin" Value="5"/>
@@ -143,6 +155,14 @@
                             Classes="menu"
                             Click="OpenYoutuberSite" 
                             HorizontalAlignment="Center"
+                            Name="meettheweebfamily1202"
+                            Content="Meet the Weeb Family"/>
+                    <Button FontSize="15"
+                            FontWeight="Bold" 
+                            BorderThickness="2" 
+                            Classes="menu"
+                            Click="OpenYoutuberSite" 
+                            HorizontalAlignment="Center"
                             Name="MangaHunter"
                             Content="Sam's Sidequest"/>
                 </WrapPanel>
@@ -155,6 +175,32 @@
                 <TextBlock Text="Copy Title → Click Title on Series Card" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
                 <TextBlock Text="Open AL Page → Click Series Image" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
             </StackPanel>
+            <StackPanel Spacing="5">
+                <TextBlock Text="Credits" FontSize="20" FontWeight="Bold" Classes="menu"/>
+				<WrapPanel Width="450" Margin="-5,0,0,0">
+                    <WrapPanel.Styles>
+                        <Style Selector="Button">
+                            <Setter Property="Margin" Value="5"/>
+                        </Style>
+                    </WrapPanel.Styles>
+					<Button FontSize="15"
+							FontWeight="Bold" 
+							BorderThickness="2" 
+							Classes="menu"
+							Click="OpenAniListLink"
+							HorizontalAlignment="Center"
+							Name="AniListCredit"
+							Content="AniList"/>
+					<Button FontSize="15"
+							FontWeight="Bold" 
+							BorderThickness="2" 
+							Classes="menu"
+							Click="OpenMangadexLink" 
+							HorizontalAlignment="Center"
+							Name="MangadexCredit"
+							Content="Mangadex"/>
+				</WrapPanel>
+			</StackPanel>
         </StackPanel>
     </Border>
 </Window>

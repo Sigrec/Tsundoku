@@ -5,7 +5,7 @@
 ## [ChangeLog](https://github.com/Sigrec/TsundokuApp/blob/main/ChangeLog.txt) (Right Click Exe → Properties → Details to see current File Version)
 ***
 >[**How To Follow a Dropbox Folder for Updates**](https://help.dropbox.com/organize/follow-folder)\
-[**Windows Download** (Current Supported Version = V1.4.4.2)](https://www.dropbox.com/sh/szci4jq9zvorlzc/AAAY0oxWl-HZsmsoMgSrcbxka?dl=0)\
+[**Windows Download** (Current Supported Version = V1.5.0.0](https://www.dropbox.com/sh/szci4jq9zvorlzc/AAAY0oxWl-HZsmsoMgSrcbxka?dl=0)\
 [**Mac Download (Not Supported Yet Need Someone To Test For Me Add me on Discord if Interested & DM)** (Current Supported Version = X)](https://www.dropbox.com/sh/3e0po3d4l1sv8va/AAAgEbiPM86QQtkTcvvGWEVva?dl=0)\
 Download the folder into your desired location (need to keep the executable folder with your UserData.json and Covers folder otherwise it will generate new ones), then pin the exe to your taskbar. Make sure to keep the ExtraSeries.json file in the same folder as well otherwise it will crash if you try and add any series in it like "Radiant"
 ***
@@ -25,32 +25,7 @@ Of course I understand if you do not trust me but I promise there is nothing mal
 ### Here is one of my theme's titled "Electric Rose", showcasing what the app looks like when run
 ![Tsundoku Example App](https://github.com/Sigrec/TsundokuApp/blob/main/Src/Assets/TsundokuExample.jpg)
 ***
-## Feature/Fixes ToDo List
-  
-#### V1.X.0 Features
-- [ ] Price Analysis Page (Below are the Websites I thought of and whether they can be added to the Analysis or not)
-  - [x] RightStufanime
-  - [x] RobertsAnimeCornerStore
-  - [ ] Kinokuniya USA
-  - [x] InStoackTrades
-  - [ ] BarnesAndNoble
-  - [ ] BooksAMillion
-  - [ ] Amazon Japan
-  - [ ] Amazon USA
-  - [ ] CD Japan
-- [ ] Additional Language Support (German, French, Italian, Spanish) [This is dependant on some things otherwise it will have to be pushed much later]
-  
-#### Bugs/Fixes
-- [ ] LineHeight Property in TextBlock Control not working, unsure why still works when it's really large?
-- [ ] Button & ComboBox disabled styling not working in Theme & AddNewSeries Windows & ComboBoxItem styling -> Need to override style template?
-- [ ] ProgressBar issue Fixed track repo for next update and make change (https://github.com/AvaloniaUI/Avalonia/pull/9371)
-  
-#### Other/Random
-- [ ] Figure out TrayIcon
-- [ ] Need some further testing on the async functions
-- [ ] Seperate out the ItemControl (Collection) to a UserControl?
-- [ ] Changing of Display Layout/Format
-***
+
 ## Useful Links
 - [AniList Home](https://anilist.co/hom)
 - [Japanese Publisher Search](https://comic.k-manga.jp/)

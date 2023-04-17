@@ -10,6 +10,11 @@ namespace Tsundoku.ViewModels
         [Reactive]
         public TsundokuTheme CurrentTheme { get; set; }
 
+        [Reactive]
+        public string CurCurrency { get; set; }
+
+        public static User MainUser { get; set; }
+
         public static readonly JsonSerializerOptions options = new JsonSerializerOptions { 
             WriteIndented = true,
             ReadCommentHandling = JsonCommentHandling.Skip,

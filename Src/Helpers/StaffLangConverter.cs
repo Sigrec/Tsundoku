@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 
 namespace Tsundoku.Helpers
 {
@@ -11,13 +12,13 @@ namespace Tsundoku.Helpers
 
         public object? Convert(IList<object?> values, Type targetType, object? parameter, CultureInfo culture)
         {
-            switch (values[2])
+            if (values.Any(x => x is Avalonia.UnsetValueType)) return false;
+            var staff = (values[0] as Dictionary<string, string>);
+            if (staff.ContainsKey((values[1] as string)))
             {
-                case "Native":
-                    return values[1];
-                default:
-                    return values[0];
+                return staff[(values[1] as string)];
             }
+            return staff["Romaji"];
         }
     }
 }

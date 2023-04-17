@@ -1,6 +1,7 @@
 using System;
 using ReactiveUI.Fody.Helpers;
 using ReactiveUI;
+using System.Reactive.Linq;
 
 namespace Tsundoku.ViewModels
 {
@@ -14,6 +15,8 @@ namespace Tsundoku.ViewModels
 
         public UserSettingsViewModel()
         {
+            CurCurrency = MainUser.Currency;
+            this.WhenAnyValue(x => x.CurCurrency).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.Currency = x);
             this.WhenAnyValue(x => x.UsernameText, x => !string.IsNullOrWhiteSpace(x)).Subscribe(x => IsChangeUsernameButtonEnabled = x);
         }
     }

@@ -12,14 +12,19 @@ namespace Tsundoku.Models
         public string Display { get; set; }
         public string MainTheme { get; set; }
         public double CurDataVersion { get; set; }
+        public string Currency { get; set; }
+        public decimal MeanScore { get; set; }
+        public uint VolumesRead { get; set; }
+        public string CollectionPrice { get; set; }
         public ObservableCollection<TsundokuTheme> SavedThemes { get; set; }
         public ObservableCollection<Series> UserCollection { get; set; }
 
-        public User(string userName, string curLanguage, string mainTheme, string display, ObservableCollection<TsundokuTheme> savedThemes, ObservableCollection<Series> userCollection)
+        public User(string userName, string curLanguage, string mainTheme, string display, string currency, ObservableCollection<TsundokuTheme> savedThemes, ObservableCollection<Series> userCollection)
         {
             UserName = userName;
             CurLanguage = curLanguage;
             Display = display;
+            Currency = currency;
             MainTheme = mainTheme;
             SavedThemes = savedThemes;
             UserCollection = userCollection;

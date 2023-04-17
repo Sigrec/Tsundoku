@@ -12,14 +12,14 @@ namespace Tsundoku.Models
         public uint MenuTextColor { get; set; }
         public uint SearchBarBGColor { get; set; }
         public uint SearchBarBorderColor { get; set; }
-        public uint SearchBarTextColor { get; set; } 
+        public uint SearchBarTextColor { get; set; }
+        public uint DividerColor { get; set; }
         public uint MenuButtonBGColor { get; set; } 
         public uint MenuButtonBGHoverColor { get; set; }
         public uint MenuButtonBorderColor { get; set; }
         public uint MenuButtonBorderHoverColor { get; set; }
         public uint MenuButtonTextAndIconColor { get; set; }
         public uint MenuButtonTextAndIconHoverColor { get; set; }
-        public uint DividerColor { get; set; }
         public uint CollectionBGColor { get; set; }
         public uint StatusAndBookTypeBGColor { get; set; }
         public uint StatusAndBookTypeBGHoverColor { get; set; }
@@ -50,55 +50,50 @@ namespace Tsundoku.Models
         public uint SeriesEditPaneButtonsIconColor { get; set; }
         public uint SeriesEditPaneButtonsIconHoverColor { get; set; }
 
-
-        //public static final TsundOkuTheme DEFAULT_THEME = new TsundOkuTheme(1"Default Theme", 2"rgb(44,45,66); ", 3"rgb(223,213,158); ", 4"rgb(223,213,158); ", 5"rgb(223,213,158); ", 6"rgb(18,23,29); ", 7"rgb(18,23,29); ", 8"rgb(223,213,158); ", 9"rgb(18,23,29); ", 10"rgb(223,213,158); ", 11"rgb(223,213,158); ", 12"rgb(223,213,158); ", 13"rgba(18,23,29,0.6); ", 14"rgba(223,213,158,0.70); ", 15"rgb(223,213,158); ", 16"rgb(18,23,29); ", 17"rgb(223,213,158); ", 18"rgb(18,23,29); ", 19"rgb(18,23,29); ", 20"rgb(223,213,158); ", 21"rgb(44,45,66); ", 22"rgba(32,35,45,0.95); ", 23"rgba(223,213,158,0.95); ", 24"rgb(32, 35, 45); ", 25"rgb(223,213,158); ", 26"rgb(223,213,158); ", 27"rgb(223,213,158); ",  28"rgba(236,236,236,0.9); ", 29"rgb(44,45,66); ", 30"rgb(44, 45, 66); ",31"rgb(223,213,158); ", 32"rgb(44,45,66); ", 33"rgb(223,213,158); ", 34"rgb(223,213,158); ", 35"rgb(18, 23, 29); ", 36"rgb(223,213,158); ", 37"rgb(18, 23, 29); ", 38"rgb(18,23,29); ", 39"rgb(223,213,158); ", 40"rgb(223,213,158); ");
-
-
-
         public static readonly TsundokuTheme DEFAULT_THEME = new TsundokuTheme(
-        "Default", 
-        Color.FromRgb(44, 45, 66).ToUint32(), 
-        Color.FromRgb(223, 213, 158).ToUint32(), 
-        Color.FromRgb(223, 213, 158).ToUint32(), 
-        Color.FromRgb(18, 23, 29).ToUint32(), 
-        Color.FromRgb(223, 213, 158).ToUint32(), //SearchBarBGColor
-        Color.FromRgb(223, 213, 158).ToUint32(), 
-        Color.FromArgb((byte)Math.Floor(0.6 * 255), 18, 23, 29).ToUint32(), 
-        Color.FromArgb((byte)Math.Floor(0.7 * 255), 223, 213, 158).ToUint32(), 
-        Color.FromRgb(223, 213, 158).ToUint32(), 
-        Color.FromRgb(18, 23, 29).ToUint32(), //MenuButtonBorderHoverColor
-        Color.FromRgb(223, 213, 158).ToUint32(), 
-        Color.FromRgb(18, 23, 29).ToUint32(), 
-        Color.FromRgb(223, 213, 158).ToUint32(), 
-        Color.FromRgb(18, 23, 29).ToUint32(), 
-        Color.FromRgb(32, 35, 45).ToUint32(), //StatusAndBookTypeBGColor
-        Color.FromRgb(223, 213, 158).ToUint32(), //StatusAndBookTypeBGHoverColor
-        Color.FromRgb(223, 213, 158).ToUint32(), //StatusAndBookTypeTextColor
-        Color.FromRgb(32, 35, 45).ToUint32(), //StatusAndBookTypeTextHoverColor
-        Color.FromRgb(32, 35, 45).ToUint32(), //SeriesCardBGColor
-        Color.FromRgb(223, 213, 158).ToUint32(), //20
-        Color.FromRgb(223, 213, 158).ToUint32(), 
-        Color.FromArgb((byte)Math.Floor(0.9 * 255), 236, 236, 236).ToUint32(), 
-        Color.FromRgb(44, 45, 66).ToUint32(), //SeriesProgressBGColor
-        Color.FromRgb(223, 213, 158).ToUint32(), //SeriesProgressBarColor
-        Color.FromRgb(18, 23, 29).ToUint32(), //SeriesProgressBarBGColor
-        Color.FromRgb(223, 213, 158).ToUint32(), //SeriesProgressBarBorderColor
-        Color.FromRgb(223, 213, 158).ToUint32(), //SeriesProgressTextColor
-        Color.FromRgb(18, 23, 29).ToUint32(), //SeriesProgressButtonsHoverColor
-        Color.FromRgb(44, 45, 66).ToUint32(), //SeriesSwitchPaneButtonBGColor
-        Color.FromRgb(223, 213, 158).ToUint32(), //SeriesSwitchPaneButtonBGHoverColor
-        Color.FromRgb(223, 213, 158).ToUint32(), //SeriesSwitchPaneButtonIconColor
-        Color.FromRgb(18, 23, 29).ToUint32(), //SeriesSwitchPaneButtonIconHoverColor
-        Color.FromRgb(32, 35, 45).ToUint32(), //SeriesEditPaneBGColor 
-        Color.FromRgb(18, 23, 29).ToUint32(), //SeriesNotesBGColor
-        Color.FromRgb(223, 213, 158).ToUint32(), //SeriesNotesBorderColor
-        Color.FromRgb(223, 213, 158).ToUint32(), //SeriesNotesTextColor
-        Color.FromRgb(44, 45, 66).ToUint32(), //SeriesEditPaneButtonsBGColor
-        Color.FromRgb(223, 213, 158).ToUint32(), //SeriesEditPaneButtonsBGHoverColor 
-        Color.FromRgb(223, 213, 158).ToUint32(), //SeriesEditPaneButtonsBorderColor
-        Color.FromRgb(44, 45, 66).ToUint32(), //SeriesEditPaneButtonsBorderHoverColor
-        Color.FromRgb(223, 213, 158).ToUint32(), //SeriesEditPaneButtonsIconColor
-        Color.FromRgb(44, 45, 66).ToUint32() //SeriesEditPaneButtonsIconHoverColor
+            "Default", //ThemeName
+            Color.FromRgb(44, 45, 66).ToUint32(), //MenuBGColor
+            Color.FromRgb(223, 213, 158).ToUint32(), //UsernameColor
+            Color.FromRgb(223, 213, 158).ToUint32(), //MenuTextColor
+            Color.FromRgb(18, 23, 29).ToUint32(), //SearchBarBGColor
+            Color.FromRgb(223, 213, 158).ToUint32(), //SearchBarBorderColor
+            Color.FromRgb(223, 213, 158).ToUint32(), //SearchBarTextColor
+            Color.FromArgb((byte)Math.Floor(0.6 * 255), 18, 23, 29).ToUint32(), //MenuButtonBGColor
+            Color.FromArgb((byte)Math.Floor(0.7 * 255), 223, 213, 158).ToUint32(), //MenuButtonBGHoverColor
+            Color.FromRgb(223, 213, 158).ToUint32(), //MenuButtonBorderColor
+            Color.FromRgb(18, 23, 29).ToUint32(), //MenuButtonBorderHoverColor
+            Color.FromRgb(223, 213, 158).ToUint32(), //MenuButtonTextAndIconColor
+            Color.FromRgb(18, 23, 29).ToUint32(), //MenuButtonTextAndIconHoverColor
+            Color.FromRgb(223, 213, 158).ToUint32(), //DividerColor
+            Color.FromRgb(18, 23, 29).ToUint32(), //CollectionBGColor
+            Color.FromRgb(32, 35, 45).ToUint32(), //StatusAndBookTypeBGColor
+            Color.FromRgb(223, 213, 158).ToUint32(), //StatusAndBookTypeBGHoverColor
+            Color.FromRgb(223, 213, 158).ToUint32(), //StatusAndBookTypeTextColor
+            Color.FromRgb(32, 35, 45).ToUint32(), //StatusAndBookTypeTextHoverColor
+            Color.FromRgb(32, 35, 45).ToUint32(), //SeriesCardBGColor
+            Color.FromRgb(223, 213, 158).ToUint32(), //SeriesCardTitleColor
+            Color.FromRgb(223, 213, 158).ToUint32(), //SeriesCardStaffColor
+            Color.FromArgb((byte)Math.Floor(0.9 * 255), 236, 236, 236).ToUint32(), //SeriesCardDescColor
+            Color.FromRgb(44, 45, 66).ToUint32(), //SeriesProgressBGColor
+            Color.FromArgb((byte)Math.Floor(0.9 * 255), 223, 213, 158).ToUint32(), //SeriesProgressBarColor
+            Color.FromRgb(32, 35, 45).ToUint32(), //SeriesProgressBarBGColor
+            Color.FromArgb((byte)Math.Floor(0.9 * 255), 236, 236, 236).ToUint32(), //SeriesProgressBarBorderColor
+            Color.FromArgb((byte)Math.Floor(0.9 * 255), 236, 236, 236).ToUint32(), //SeriesProgressTextColor
+            Color.FromRgb(18, 23, 29).ToUint32(), //SeriesProgressButtonsHoverColor
+            Color.FromRgb(44, 45, 66).ToUint32(), //SeriesSwitchPaneButtonBGColor
+            Color.FromRgb(223, 213, 158).ToUint32(), //SeriesSwitchPaneButtonBGHoverColor
+            Color.FromRgb(223, 213, 158).ToUint32(), //SeriesSwitchPaneButtonIconColor
+            Color.FromRgb(18, 23, 29).ToUint32(), //SeriesSwitchPaneButtonIconHoverColor
+            Color.FromRgb(32, 35, 45).ToUint32(), //SeriesEditPaneBGColor 
+            Color.FromRgb(18, 23, 29).ToUint32(), //SeriesNotesBGColor
+            Color.FromRgb(223, 213, 158).ToUint32(), //SeriesNotesBorderColor
+            Color.FromRgb(223, 213, 158).ToUint32(), //SeriesNotesTextColor
+            Color.FromRgb(44, 45, 66).ToUint32(), //SeriesEditPaneButtonsBGColor
+            Color.FromRgb(223, 213, 158).ToUint32(), //SeriesEditPaneButtonsBGHoverColor 
+            Color.FromRgb(223, 213, 158).ToUint32(), //SeriesEditPaneButtonsBorderColor
+            Color.FromRgb(44, 45, 66).ToUint32(), //SeriesEditPaneButtonsBorderHoverColor
+            Color.FromRgb(223, 213, 158).ToUint32(), //SeriesEditPaneButtonsIconColor
+            Color.FromRgb(44, 45, 66).ToUint32() //SeriesEditPaneButtonsIconHoverColor
         );
 
         public TsundokuTheme()

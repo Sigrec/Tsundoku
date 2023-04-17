@@ -1,0 +1,39 @@
+<Window xmlns="https://github.com/avaloniaui"
+		xmlns:vm="using:Tsundoku.ViewModels"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:controls="clr-namespace:Tsundoku.Controls"
+		xmlns:charts="clr-namespace:Tsundoku.Views"
+        x:Class="Tsundoku.Views.CollectionStatsWindow"
+		Icon="\Assets\Icons\Tsundoku-Logo.ico"
+        Title="Stats"
+		FontFamily="Segoe UI"
+        Classes="menu"
+		SizeToContent="WidthAndHeight"
+		WindowStartupLocation="1"
+		KeyboardNavigation.TabNavigation="None"
+		CanResize="false">
+
+	<Window.DataContext>
+		<vm:CollectionStatsViewModel />
+	</Window.DataContext>
+
+	<Window.Styles>
+		<!-- <StyleInclude Source="/Controls/TsundokuPieChart.axaml"/> -->
+		<StyleInclude Source="/Controls/ValueStat.axaml"/>
+	</Window.Styles>
+
+	<Border Classes="menu" BorderThickness="3" CornerRadius="0,0,8,8" ClipToBounds="True">
+		<Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="Auto" Margin="20">
+			<TextBlock Text="Stats" FontSize="25" FontWeight="Bold" Classes="menu" Grid.Row="0" Grid.Column="0" Margin="5,0,0,0"/>
+			<WrapPanel Grid.Row="1" Grid.Column="0" Margin="-5,0,0,0">
+				<controls:ValueStat Text="{Binding MeanScore}" Title="Mean Score" Icon="fa-solid fa-gauge-simple"/>
+				<controls:ValueStat Text="{Binding VolumesRead}" Title="Volumes Read" Icon="fa-solid fa-book-open-reader"/>
+				<controls:ValueStat Text="{Binding SeriesCount}" Title="Series Count" Icon="fa-solid fa-globe"/>
+			</WrapPanel>
+			<controls:ValueStat Grid.Row="2" Grid.Column="0" HorizontalAlignment="Center" Text="{Binding CollectionPrice}" Title="Collection Price" Icon="fa-solid fa-sack-dollar"/>
+			<!-- <controls:TsundokuPieChart Grid.Row="3" Grid.Column="0"/> -->
+		</Grid>
+	</Border>
+</Window>

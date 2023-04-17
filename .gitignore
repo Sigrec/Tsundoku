@@ -1,6 +1,9 @@
 Covers/
 UserData.json
 TsundokuCollection.xlsx
+CurrentCultures.txt
+OldUserData.json
+UserData.json
 Screenshots/
 
 ## Ignore Visual Studio temporary files, build results, and

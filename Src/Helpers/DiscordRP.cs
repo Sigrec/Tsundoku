@@ -1,22 +1,21 @@
-﻿using DiscordRPC;
+﻿using Microsoft.VisualBasic;
+using DiscordRPC;
 
 namespace Tsundoku.Helpers
 {
     internal class DiscordRP
     {
-        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         private static DiscordRpcClient client;
 
         public static void Initialize()
         {
-
             // == Create the client
             client = new DiscordRpcClient("1050229234674696252");
 
             // == Subscribe to some events
             client.OnReady += (sender, msg) =>
             {
-                Logger.Info("Connected To Discord With User {0}", msg.User.Username);
+                Tsundoku.Models.Constants.Logger.Info("Connected To Discord With User {0}", msg.User.Username);
             };
 
             // == Initialize

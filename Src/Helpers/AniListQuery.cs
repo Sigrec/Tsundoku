@@ -14,13 +14,12 @@ namespace Tsundoku.Helpers
 
 		private static GraphQLHttpClient AniListClient = new GraphQLHttpClient("https://graphql.anilist.co", new NewtonsoftJsonSerializer());
 
-
-		public AniListQuery()
+		public void Dispose()
 		{
-			
+			AniListClient.Dispose();
 		}
 
-        public string GetSeriesTitle(string title, string format)
+        public string GetSeriesTitle(string title, string format, int pageNum)
 		{
 			try
 			{
@@ -32,7 +31,7 @@ namespace Tsundoku.Helpers
 				GraphQLRequest queryRequest = new()
 				{
 					Query = @"
-						query ($title: String, $type: MediaFormat) {
+						query ($title: String, $type: MediaFormat, $pageNum: Int) {
 						  Media(search: $title, format: $type) {
 							countryOfOrigin
 							title {
@@ -41,7 +40,10 @@ namespace Tsundoku.Helpers
 							  native
 							}
 							synonyms
-							staff(sort: RELEVANCE) {
+							staff(sort: RELEVANCE, perPage: 25, page: $pageNum) {
+							  pageInfo {
+								hasNextPage
+							  }
 							  edges {
 								role
 								node {
@@ -64,7 +66,8 @@ namespace Tsundoku.Helpers
 					Variables = new
 					{
 						title = title,
-						type = format
+						type = format,
+						pageNum = pageNum
 					}
 				};
 				var response = Task.Run(async () => await AniListClient.SendQueryAsync<JObject?>(queryRequest));
@@ -79,7 +82,7 @@ namespace Tsundoku.Helpers
 			return "";
 		}
 
-		public string GetSeriesID(int seriesId, string format)
+		public string GetSeriesID(int seriesId, string format, int pageNum)
 		{
 			try
 			{
@@ -91,7 +94,7 @@ namespace Tsundoku.Helpers
 				GraphQLRequest queryRequest = new()
 				{
 					Query = @"
-						query ($seriesId: Int, $type: MediaFormat) {
+						query ($seriesId: Int, $type: MediaFormat, $pageNum: Int) {
 						  Media(id: $seriesId, format: $type) {
 							countryOfOrigin
 							title {
@@ -100,7 +103,10 @@ namespace Tsundoku.Helpers
 							  native
 							}
 							synonyms
-							staff(sort: RELEVANCE) {
+							staff(sort: RELEVANCE, perPage: 25, page: $pageNum) {
+							  pageInfo {
+								hasNextPage
+							  }
 							  edges {
 								role
 								node {
@@ -123,7 +129,8 @@ namespace Tsundoku.Helpers
 					Variables = new
 					{
 						seriesId = seriesId,
-						type = format
+						type = format,
+						pageNum = pageNum
 					}
 				};
 				var response = Task.Run(async () => await AniListClient.SendQueryAsync<JObject?>(queryRequest));
