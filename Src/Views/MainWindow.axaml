@@ -13,7 +13,7 @@
 		Name="TsundokuWindow"
 		FontFamily="Segoe UI" 
 		MinWidth="1040"
-		MinHeight="500"
+		MinHeight="475"
 		WindowStartupLocation="1"
 		WindowState="2"
 		KeyboardNavigation.TabNavigation="None"
@@ -635,11 +635,12 @@
 													   Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesCardTitleColor, Converter={StaticResource ConvertColor}}"
 													   FontWeight="Bold"
 													   FontSize="22"
+													   MaxHeight="{CompiledBinding Source={x:Static local:Constants.TOP_SECTION_CARD_HEIGHT}}"
 													   PointerPressed="CopySeriesTitleAsync"
 													   Name="SeriesTitle"
 													   Padding="10,2,5,0"
 													   Cursor="Hand"
-													   LineHeight="24.0"> <!-- Ideal Line Height 24.0 --> <!-- old font size was 23 -->
+													   LineHeight="22.0"> <!-- Ideal Line Height 24.0 --> <!-- old font size was 23 -->
 												<TextBlock.Text>
 													<MultiBinding Converter="{StaticResource ConvertTitle}">
 														<Binding Path="Titles"/>

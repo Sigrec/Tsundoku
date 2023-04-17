@@ -148,25 +148,38 @@ namespace Tsundoku.Views
             var result = await Observable.Start(() => 
             {
                 var textBoxes = ((Button)sender).GetLogicalSiblings();
-                ushort curVolumeChange = Convert.ToUInt16(((MaskedTextBox)textBoxes.ElementAt(1)).Text.Replace("_", ""));
-                ushort maxVolumeChange = Convert.ToUInt16(((MaskedTextBox)textBoxes.ElementAt(2)).Text.Replace("_", ""));
+                string curVolumeString = ((MaskedTextBox)textBoxes.ElementAt(1)).Text.Replace("_", "");
+                string maxVolumeString = ((MaskedTextBox)textBoxes.ElementAt(2)).Text.Replace("_", "");
                 Series curSeries = (Series)((Button)sender).DataContext;
-                if (maxVolumeChange >= curVolumeChange)
+                if (!string.IsNullOrWhiteSpace(curVolumeString) || !string.IsNullOrWhiteSpace(maxVolumeString))
                 {
-                    CollectionViewModel.UsersNumVolumesCollected = CollectionViewModel.UsersNumVolumesCollected - curSeries.CurVolumeCount + curVolumeChange;
-                    CollectionViewModel.UsersNumVolumesToBeCollected = CollectionViewModel.UsersNumVolumesToBeCollected - (uint)(curSeries.MaxVolumeCount - curSeries.CurVolumeCount) + (uint)(maxVolumeChange - curVolumeChange);
-                    Constants.Logger.Info($"Changed Series Values For {curSeries.Titles["Rmoaji"]} From {curSeries.CurVolumeCount}/{curSeries.MaxVolumeCount} -> {curVolumeChange}/{maxVolumeChange}");
-                    curSeries.CurVolumeCount = curVolumeChange;
-                    curSeries.MaxVolumeCount = maxVolumeChange;
-                    
-                    var parentControl = (sender as Button).FindLogicalAncestorOfType<Border>(false).GetLogicalChildren().ElementAt(0).GetLogicalChildren().ElementAt(2);
-                    parentControl.FindLogicalDescendantOfType<TextBlock>(false).Text = curSeries.CurVolumeCount + "/" + curSeries.MaxVolumeCount;
-                    
-                    ProgressBar seriesProgressBar = parentControl.FindLogicalDescendantOfType<ProgressBar>(false);
-                    seriesProgressBar.Maximum = maxVolumeChange;
-                    seriesProgressBar.Value = curVolumeChange;
-                    parentControl = null;
-                    seriesProgressBar = null;  
+                    ushort curVolumeChange = Convert.ToUInt16(curVolumeString);
+                    ushort maxVolumeChange = Convert.ToUInt16(maxVolumeString);
+                    if (maxVolumeChange >= curVolumeChange)
+                    {
+                        CollectionViewModel.UsersNumVolumesCollected = CollectionViewModel.UsersNumVolumesCollected - curSeries.CurVolumeCount + curVolumeChange;
+                        CollectionViewModel.UsersNumVolumesToBeCollected = CollectionViewModel.UsersNumVolumesToBeCollected - (uint)(curSeries.MaxVolumeCount - curSeries.CurVolumeCount) + (uint)(maxVolumeChange - curVolumeChange);
+                        Constants.Logger.Info($"Changed Series Values For {curSeries.Titles["Romaji"]} From {curSeries.CurVolumeCount}/{curSeries.MaxVolumeCount} -> {curVolumeChange}/{maxVolumeChange}");
+                        curSeries.CurVolumeCount = curVolumeChange;
+                        curSeries.MaxVolumeCount = maxVolumeChange;
+
+                        var parentControl = (sender as Button).FindLogicalAncestorOfType<DockPanel>(false).GetLogicalChildren().ElementAt(1).GetLogicalChildren().ElementAt(3);
+                        ((TextBlock)parentControl.FindLogicalDescendantOfType<StackPanel>(false).GetLogicalChildren().ElementAt(1)).Text = curSeries.CurVolumeCount + "/" + curSeries.MaxVolumeCount;
+                        
+                        ProgressBar seriesProgressBar = parentControl.FindLogicalDescendantOfType<ProgressBar>(false);
+                        seriesProgressBar.Maximum = maxVolumeChange;
+                        seriesProgressBar.Value = curVolumeChange;
+                        parentControl = null;
+                        seriesProgressBar = null;  
+                    }
+                    else
+                    {
+                        Constants.Logger.Warn($"{curVolumeChange} Is Not Less Than or Equal To {maxVolumeChange}");
+                    }
+                }
+                else
+                {
+                    Constants.Logger.Warn("Change Series Volume Count has Empty Input");
                 }
             }, RxApp.MainThreadScheduler);
         }
@@ -183,13 +196,16 @@ namespace Tsundoku.Views
                 CollectionViewModel.collectionStatsWindow.CollectionStatsVM.VolumesRead -= curSeries.VolumesRead;
                 CollectionViewModel.collectionStatsWindow.CollectionStatsVM.CollectionPrice = $"{CollectionViewModel.CurCurrency}{Decimal.Round(Convert.ToDecimal(CollectionViewModel.collectionStatsWindow.CollectionStatsVM.CollectionPrice.Substring(CollectionViewModel.CurCurrency.Length)) - curSeries.Cost, 2)}";
 
-                File.SetAttributes(curSeries.Cover, FileAttributes.Normal);
-                File.Delete(curSeries.Cover);
-                Constants.Logger.Info($"Deleted Cover -> {curSeries.Cover}");
-                
                 MainWindowViewModel.SearchedCollection.Remove(curSeries);
                 MainWindowViewModel.Collection.Remove(curSeries);
-                curSeries.Dispose();
+
+                if (File.Exists(curSeries.Cover))
+                {
+                    File.SetAttributes(curSeries.Cover, FileAttributes.Normal);
+                    File.Delete(curSeries.Cover);
+                    curSeries.Dispose();
+                    Constants.Logger.Info($"Deleted Cover -> {curSeries.Cover}");
+                }
 
                 // Update Mean Score
                 int countScore = 0;
@@ -202,7 +218,7 @@ namespace Tsundoku.Views
                         countScore++;
                     }
                 }
-                CollectionViewModel.collectionStatsWindow.CollectionStatsVM.MeanScore = Decimal.Round(scoreVal / countScore, 1);
+                CollectionViewModel.collectionStatsWindow.CollectionStatsVM.MeanScore = countScore != 0 ? Decimal.Round(scoreVal / countScore, 1) : 0;
                 
                 Constants.Logger.Info($"Removed {curSeries.Titles["Romaji"]} From Collection");
                 CollectionViewModel.collectionStatsWindow.CollectionStatsVM.SeriesCount = (uint)MainWindowViewModel.Collection.Count;

@@ -17,9 +17,7 @@ using DynamicData;
 using System.Text.Json.Nodes;
 /*
     Issues
-    ❌ Button hovering Styling is not working in other windows
     ❌ LineHeight doesn't work with lower LineHeight values
-    ❌ Fix Theme Generators due to layout change
     ❌ ComboBoxItem text color not applying
 */
 

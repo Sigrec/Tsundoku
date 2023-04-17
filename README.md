@@ -5,7 +5,7 @@
 ## [ChangeLog](https://github.com/Sigrec/TsundokuApp/blob/main/ChangeLog.txt) (Right Click Exe → Properties → Details to see current File Version)
 ***
 >[**How To Follow a Dropbox Folder for Updates**](https://help.dropbox.com/organize/follow-folder)\
-[**Windows Download** (Current Supported Version = V1.4.4.2](https://www.dropbox.com/sh/szci4jq9zvorlzc/AAAY0oxWl-HZsmsoMgSrcbxka?dl=0)\
+[**Windows Download** (Current Supported Version = V1.5.0.0](https://www.dropbox.com/sh/szci4jq9zvorlzc/AAAY0oxWl-HZsmsoMgSrcbxka?dl=0)\
 [**Mac Download (Not Supported Yet Need Someone To Test For Me Add me on Discord if Interested & DM)** (Current Supported Version = X)](https://www.dropbox.com/sh/3e0po3d4l1sv8va/AAAgEbiPM86QQtkTcvvGWEVva?dl=0)\
 Download the folder into your desired location (need to keep the executable folder with your UserData.json and Covers folder otherwise it will generate new ones), then pin the exe to your taskbar. Make sure to keep the ExtraSeries.json file in the same folder as well otherwise it will crash if you try and add any series in it like "Radiant"
 ***
@@ -27,38 +27,34 @@ Of course I understand if you do not trust me but I promise there is nothing mal
 ***
 
 ## Useful Links
-- [AniList Home](https://anilist.co/hom)
+- [AniList](https://anilist.co/hom)
 - [Japanese Publisher Search](https://comic.k-manga.jp/)
 - [Hiatus Chart](https://www.reddit.com/r/HiatusCharts/comments/pfqlbz/all_charts/)
+- [PreMID (Discord Anime Extension)](https://premid.app/)
+- [MAL Sync](https://malsync.moe/)
 
 ***Manga Streaming***
-- [✬MangaDex](https://mangadex.org/)
+- [MangaDex](https://mangadex.org/)
 - [MangaSee](https://mangasee123.com/)
 
 ***Anime Streaming***
-- [✬9Anime](https://9anime.to/)
-- [✬AniMixPlay](https://animixplay.to/)
-- [4Anime](https://4anime.to/)
-
-***Others***
-- [PreMID (Discord Anime Extension)](https://premid.app/)
+- [9Anime](https://9anime.to/)
 ***
-## Links to Buy Manga
+## Links to Buy Manga (List in Order of Value Proposition)
 ***English***
-- [✬RightStufAnime](https://www.rightstufanime.com/)
-- [✬RobertsAnimeCornerStore](https://www.animecornerstore.com/graphicnovels1.html)
+- [RightStufAnime](https://www.rightstufanime.com/)
+- [RobertsAnimeCornerStore](https://www.animecornerstore.com/graphicnovels1.html)
 - [InStockTrades](https://www.instocktrades.com/)
-- [BookDepository (International)](https://www.bookdepository.com/manga-store/)
 - [Barnes & Noble](https://www.barnesandnoble.com/b/books/graphic-novels-comics/manga/_/N-1sZ29Z8q8Zucc)
 - [Books A Million](https://www.booksamillion.com/manga)
 - [Amazon](https://www.amazon.com/Manga-Comics-Graphic-Novels-Books/b?node=4367)
 - [Indigo (Canada)](https://www.chapters.indigo.ca/en-ca/comic-book-shop/manga/)
 
 ***English & Japanese***
-- [✬Kinokuniya](https://united-states.kinokuniya.com/)
+- [Kinokuniya](https://united-states.kinokuniya.com/)
 
 ***Japanese***
-- [✬CD Japan](https://www.cdjapan.co.jp/)
+- [CD Japan](https://www.cdjapan.co.jp/)
 - [Amazon Japan](https://www.amazon.co.jp/)
 - [Honto](https://honto.jp/)
 ***

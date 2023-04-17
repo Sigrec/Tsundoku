@@ -19,8 +19,8 @@ namespace Tsundoku.Models
 		public static readonly string[] CURRENCY_SYMBOLS = CultureInfo.GetCultures(CultureTypes.SpecificCultures).Select(ci => ci.LCID).Distinct().Select(id => new RegionInfo(id)).Select(r => r.CurrencySymbol).Distinct().ToArray();
 
 		// TODO: Fix Logging so it actually logs to a file
-		// public static readonly NLog.Logger Logger = NLog.LogManager.GetLogger("TsundOku");
-		public static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
+		public static readonly NLog.Logger Logger = NLog.LogManager.GetLogger("TsundOkuLogs");
+		// public static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 
         public enum Site
         {

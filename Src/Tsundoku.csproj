@@ -27,6 +27,8 @@
 		<DebugType>None</DebugType>
 		<Version>1.5.0</Version>
 		<FileVersion>1.5.0.0</FileVersion>
+		<PackageIcon>Assets\Icons\Tsundoku-Logo.png</PackageIcon>
+		<RepositoryUrl>https://github.com/Sigrec/TsundokuApp</RepositoryUrl>
 	</PropertyGroup>
 	<ItemGroup>
 	    <AvaloniaResource Include="Assets/**" />
@@ -100,5 +102,11 @@
     <Compile Update=".\Views\CollectionThemeWindow.axaml.cs">
       <DependentUpon>CollectionThemeWindow.axaml</DependentUpon>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Assets\Icons\Tsundoku-Logo.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 </Project>

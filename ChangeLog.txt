@@ -1,7 +1,7 @@
-V1.5.0.0 - Apr 14th, 2023 @ 5:XXPM PST
+V1.5.0.0 - Apr 17th, 2023 @ 2:29PM PST
 ✅ Added Collection Stats window, Can View Various Stats of your Collection! (Currently only 4 basic stats more stuff like graphs will be added in a later release)
 ✅ Added Price, Volumes Read, Demographic, and Score stats to Series Card (click bottom right icon)
-✅ Added Favorite Option to Series
+✅ Added Favorite Option to Series w/ "Favorites" Filter
 ✅ Changed Layout of the Progress section of a Series Card to Accommodate Future Change for Stats
 ✅ Fixed Default Theme to Accommodate Layout Changes
 ✅ Fixed crash and bug related to the color pickers in theme settings window
@@ -14,8 +14,8 @@ V1.5.0.0 - Apr 14th, 2023 @ 5:XXPM PST
 ✅ Added MangaDex endpoint to get series AL does not have and for additional language data (You can get TBATE & Radiant for example)
 ✅ Removed ExtraSeries.json as no longer needed with MangadexQuery
 ✅ Non-Japanese series now also grab there respective Japanese titles (ex Solo Leveling) [Need to Re-Add these series to get them]
-✅ Lowered the font size of "Status | Format"
-✅ Fixed Crash when # of Staff for a Series is Large
+✅ Lowered the font size of "Status | Format" to accomdate longer text
+✅ Fixed Issue when # of Staff exceeds 25 and the others do not get pulled
 
 V1.4.4.2 - Feb 9th, 2023 @ 11:28AM PST
 ✅ HotFix for another description parsing issue (found with SPYxFAMILY description) [Re-add series if you think it has this issue or any other previous parsing issue]

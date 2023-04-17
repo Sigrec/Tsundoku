@@ -39,13 +39,6 @@ namespace Tests.SeriesTests
         }
 
         [Test]
-        public void NoDemographic_Test()
-        {
-            // https://mangadex.org/title/99cdec37-4ca5-4cf8-9031-1ed4a6158a13/mata-kite-ne-shitami-san
-            Assert.That(Series.CreateNewSeriesCard("99cdec37-4ca5-4cf8-9031-1ed4a6158a13", "MANGA", 5, 0, AL_Query, MD_Query, new ObservableCollection<string>() { "Arabic", "Chinese", "French", "Korean", "Russian", "Spanish" }).ToJsonString(options), Is.EqualTo(File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesTests\SeriesTestData\MangaDex_Missing_Items.json").Result));
-        }
-
-        [Test]
         public void MultipleAdditionalLangTitle_MangaDexID_Test()
         {
             Assert.That(Series.CreateNewSeriesCard("32fdfe9b-6e11-4a13-9e36-dcd8ea77b4e4", "MANGA", 18, 0, AL_Query, MD_Query, new ObservableCollection<string>() { "Arabic", "Chinese", "French", "Korean", "Russian", "Spanish" }).ToJsonString(options), Is.EqualTo(File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesTests\SeriesTestData\Rent-A-Girlfriend.json").Result));
@@ -58,7 +51,7 @@ namespace Tests.SeriesTests
         }
 
         [Test]
-        public void TheBeginningAfterTheEnd_MangaDexTitle_Test()
+        public void TheBeginningAfterTheEnd_NoDemographic_MangaDexTitle_Test()
         {
             Assert.That(Series.CreateNewSeriesCard("The Beginning After The End", "MANGA", 5, 0, AL_Query, MD_Query, new ObservableCollection<string>()).ToJsonString(options), Is.EqualTo(File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesTests\SeriesTestData\TBATE.json").Result));
         }

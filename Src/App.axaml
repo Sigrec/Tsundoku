@@ -4,7 +4,7 @@
 			 xmlns:vm="using:Tsundoku.ViewModels.MainWindowViewModel"
              xmlns:cv="clr-namespace:Tsundoku.Helpers"
              x:Class="Tsundoku.App">
-
+	<!-- TODO: Figure out a way to prevent other windows from hiding under main window when open and clicking main window -->
 	<Application.Resources>
 		<cv:ColorConverter x:Key="ConvertColor"/>
 	</Application.Resources>
