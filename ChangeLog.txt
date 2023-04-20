@@ -1,3 +1,8 @@
+V1.5.1.0 - April 20th, 2023 @ 12:11PM
+✅ Series Stats TextBoxes now clear After Saving Besides Score
+✅ Series Volume Count TextBoxes now clear After Saving
+✅ Fixed Crash Bug When Adding a Series that is not on MangaDex or AniList or Is not Specific Enough to Determine Correct Series
+
 V1.5.0.0 - Apr 17th, 2023 @ 4:51PM PST
 ✅ Added Collection Stats window, Can View Various Stats of your Collection! (Currently only 4 basic stats more stuff like graphs will be added in a later release)
 ✅ Added Price, Volumes Read, Demographic, and Score stats to Series Card (click bottom right icon)

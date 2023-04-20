@@ -401,7 +401,7 @@ namespace Tsundoku.ViewModels
 
                 return true;        
             }
-            return true;
+            return false;
         }
 
         [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "A New file will always be created if it doesn't exist before serialization")]

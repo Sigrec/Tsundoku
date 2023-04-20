@@ -185,6 +185,7 @@ namespace Tsundoku.Models
 			else if (bookType.Equals("MANGA")) // MangadexQuery
 			{
 				string curId = "";
+				bool notFoundCondition = false;
 				if (Regex.IsMatch(title, @"[a-z\d]{8}-[a-z\d]{4}-[a-z\d]{4}-[a-z\d]{4}-[a-z\d]{11,}"))
 				{
 					seriesJson = MD_Query.GetSeriesIdAsync(title);
@@ -210,13 +211,24 @@ namespace Tsundoku.Models
 							if (attributes.GetProperty("title").GetProperty("en").ToString().Equals(title, StringComparison.OrdinalIgnoreCase) || data.GetArrayLength() == 1)
 							{
 								data = series;
+								notFoundCondition = false;
 								break;
+							}
+							else
+							{
+								notFoundCondition = true;
 							}
 						}
 					}
 					else
 					{
 						attributes = data.GetProperty("attributes");
+					}
+
+					if(notFoundCondition)
+					{
+						Constants.Logger.Warn("User Input Invalid Series Title or ID or Can't Determine Series Needs to be more Specific");
+						return null;
 					}
 
 					altTitles = attributes.GetProperty("altTitles").EnumerateArray().ToList();
@@ -328,7 +340,7 @@ namespace Tsundoku.Models
 				}
 			}
 
-			Constants.Logger.Warn("User Input Invalid Series Title or ID or Need to add to ExtraSeries JSON");
+			Constants.Logger.Warn("User Input Invalid Series Title or ID or Can't Determine Series Needs to be more Specific");
 			return null;
         }
 

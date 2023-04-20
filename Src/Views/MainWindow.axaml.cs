@@ -79,6 +79,7 @@ namespace Tsundoku.Views
                     }
                 }
                 CollectionViewModel.collectionStatsWindow.CollectionStatsVM.VolumesRead = volumesReadVal;
+                ((MaskedTextBox)stackPanels.ElementAt(0).GetLogicalChildren().ElementAt(1)).Text = "";
             }
 
             string cost = ((MaskedTextBox)stackPanels.ElementAt(1).GetLogicalChildren().ElementAt(1)).Text.Replace("_", "");
@@ -94,6 +95,7 @@ namespace Tsundoku.Views
                     costVal += x.Cost;
                 }
                 CollectionViewModel.collectionStatsWindow.CollectionStatsVM.CollectionPrice = $"{CollectionViewModel.CurCurrency}{Decimal.Round(costVal, 2)}";
+                ((MaskedTextBox)stackPanels.ElementAt(1).GetLogicalChildren().ElementAt(1)).Text = "";
             }
 
             string score = ((MaskedTextBox)stackPanels.ElementAt(2).GetLogicalChildren().ElementAt(1)).Text.Substring(0, 4).Replace("_", "");
@@ -116,6 +118,7 @@ namespace Tsundoku.Views
                         }
                     }
                     CollectionViewModel.collectionStatsWindow.CollectionStatsVM.MeanScore = Decimal.Round(scoreVal / countScore, 1);
+                    ((MaskedTextBox)stackPanels.ElementAt(1).GetLogicalChildren().ElementAt(1)).Text = ""; 
                 }
                 else
                 {
@@ -170,7 +173,9 @@ namespace Tsundoku.Views
                         seriesProgressBar.Maximum = maxVolumeChange;
                         seriesProgressBar.Value = curVolumeChange;
                         parentControl = null;
-                        seriesProgressBar = null;  
+                        seriesProgressBar = null; 
+                        ((MaskedTextBox)textBoxes.ElementAt(1)).Text = "";
+                        ((MaskedTextBox)textBoxes.ElementAt(2)).Text = ""; 
                     }
                     else
                     {
