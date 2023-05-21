@@ -14,9 +14,9 @@
 			<ControlTemplate>
 				<Border Background="Transparent" Margin="10" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000">
 					<Border CornerRadius="8" ClipToBounds="True">
-						<Grid Height="50" MinWidth="175" RowDefinitions="25,15" ColumnDefinitions="45,Auto" Background="{CompiledBinding CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}">
+						<Grid Height="50" MinWidth="175" RowDefinitions="25,15" ColumnDefinitions="45,Auto" Background="{CompiledBinding CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}" Cursor="Hand">
 							<icon:Icon Value="{TemplateBinding Icon}" Foreground="{CompiledBinding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" FontSize="25" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,8,0,0"/>
-							<TextBlock Text="{TemplateBinding Text}" Foreground="{CompiledBinding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}" Grid.Row="0" Grid.Column="1" FontSize="22" FontWeight="Bold" VerticalAlignment="Bottom" HorizontalAlignment="Left" Padding="0,5,5,0"/>
+							<TextBlock Name="ValueText" Text="{TemplateBinding Text}" Foreground="{CompiledBinding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}" Grid.Row="0" Grid.Column="1" FontSize="22" FontWeight="Bold" VerticalAlignment="Bottom" HorizontalAlignment="Left" Padding="0,5,5,0"/>
 							<TextBlock Text="{TemplateBinding Title}" Foreground="{CompiledBinding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}" Grid.Row="1" Grid.Column="1" FontSize="15" VerticalAlignment="Center" HorizontalAlignment="Left"/>
 						</Grid>
 					</Border>

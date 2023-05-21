@@ -19,13 +19,14 @@ namespace Tsundoku.Models
         public ObservableCollection<TsundokuTheme> SavedThemes { get; set; }
         public ObservableCollection<Series> UserCollection { get; set; }
 
-        public User(string userName, string curLanguage, string mainTheme, string display, string currency, ObservableCollection<TsundokuTheme> savedThemes, ObservableCollection<Series> userCollection)
+        public User(string userName, string curLanguage, string mainTheme, string display, string currency, string collectionPrice, ObservableCollection<TsundokuTheme> savedThemes, ObservableCollection<Series> userCollection)
         {
             UserName = userName;
             CurLanguage = curLanguage;
             Display = display;
             Currency = currency;
             MainTheme = mainTheme;
+            CollectionPrice = collectionPrice;
             SavedThemes = savedThemes;
             UserCollection = userCollection;
             NumVolumesCollected = 0;

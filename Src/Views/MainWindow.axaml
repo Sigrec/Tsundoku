@@ -41,7 +41,7 @@
 						   FontWeight="Bold"
 						   TextDecorations="Underline"
 						   TextAlignment="Center"
-						   Margin="10,0,10,0"
+						   Margin="30,0,0,0"
 						   HorizontalAlignment="Center"
 						   VerticalAlignment="Center" 
 						   Text="{CompiledBinding UserName, Mode=OneWay}"
@@ -399,7 +399,7 @@
 												</Style>
 											</Grid.Styles>
 											<StackPanel Margin="10,7,0,0" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="1">
-												<TextBlock Text="{Binding VolumesRead, StringFormat='Read {0}'}"
+												<TextBlock Text="{Binding VolumesRead, StringFormat='Read {0} Volumes'}"
 														   Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesCardTitleColor, Converter={StaticResource ConvertColor}}"
 													   	   FontWeight="Bold"
 														   HorizontalAlignment="Center"
@@ -424,8 +424,8 @@
 														   HorizontalAlignment="Center"
 													   	   FontSize="15">
 													<TextBlock.Text>
-														<MultiBinding StringFormat="Cost {0}">
-															<!-- <Binding Path="#CollectionTheme.DataContext.CurCurrency"/> -->
+														<MultiBinding StringFormat="Cost {0}{1}">
+															<Binding Path="#CollectionTheme.DataContext.CurCurrency"/>
 															<Binding Path="Cost"/>
 														</MultiBinding>
 													</TextBlock.Text>

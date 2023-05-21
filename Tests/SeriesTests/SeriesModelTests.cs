@@ -1,13 +1,13 @@
 using System.Text.Json;
 using Tsundoku.Models;
-using Tsundoku.Helpers;
 using System.Collections.ObjectModel;
 
-[assembly: Description("Testing the Series class, mainly ensuring data validity.")]
+[assembly: Description("Testing Tsundoku")]
 namespace Tests.SeriesTests
 {
     [Author("Sean (Alias -> Prem or Sigrec)")]
     [TestOf(typeof(Series))]
+    [Description("Testing Series Model")]
     public class SeriesModelTests
     {
         

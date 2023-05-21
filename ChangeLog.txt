@@ -1,3 +1,11 @@
+V1.5.2.0 - May 20th, 2023 @ 9:29PM
+✅ Changed "Read X" to "Read X Volumes" in series stats save panel
+✅ Cost text now shows the currency symbol above the input textbox in series stats panel
+✅ Can now copy any of the stats to clipboard by clicking on the stats box
+✅ Fixed crash for new users (Need to delete current UserData.json file)
+✅ Realigned Username so it's centered
+✅ Fixed issue with MangaDexQuery when querying for Covers
+
 V1.5.1.0 - April 20th, 2023 @ 12:11PM
 ✅ Series Stats TextBoxes now clear After Saving Besides Score
 ✅ Series Volume Count TextBoxes now clear After Saving

@@ -25,7 +25,17 @@ namespace Tsundoku.ViewModels
     public partial class CollectionStatsViewModel : ViewModelBase
     {
         // private ObservableCollection<int> countryCounts = new ObservableCollection<int>();
-        public ObservableCollection<ISeries> CountryDistribution { get; set; }
+        // public ObservableCollection<ISeries> CountryDistribution { get; set; }
+
+        // public ISeries[] Series { get; set; }
+        //     = new ISeries[]
+        //     {
+        //         new PieSeries<double> { Values = new double[] { 2 } },
+        //         new PieSeries<double> { Values = new double[] { 4 } },
+        //         new PieSeries<double> { Values = new double[] { 1 } },
+        //         new PieSeries<double> { Values = new double[] { 4 } },
+        //         new PieSeries<double> { Values = new double[] { 3 } }
+        //     };
 
         [Reactive]
         public decimal MeanScore { get; set; }
@@ -45,38 +55,31 @@ namespace Tsundoku.ViewModels
             // {
             //     new PieSeries<double> 
             //     { 
-            //         Values = new double[] { 1 }, 
-            //         Name = "Japan",
-            //         Fill = new SolidColorPaint(new SkiaSharp.SKColor(CurrentTheme.MenuButtonBGColor))
+            //         Values = new ObservableCollection<double> { 2 }, 
+            //         Name = "Japan"
             //     },
             //     new PieSeries<double>
             //     { 
-            //         Values = new double[] { 1 }, 
-            //         Name = "Korea",
-            //         Fill = new SolidColorPaint(new SkiaSharp.SKColor(CurrentTheme.MenuButtonBorderColor))
+            //         Values = new ObservableCollection<double> { 4 }, 
+            //         Name = "Korea"
             //     },
             //     new PieSeries<double>
             //     { 
-            //         Values = new double[] { 1 }, 
-            //         Name = "America",
-            //         Fill = new SolidColorPaint(new SkiaSharp.SKColor(CurrentTheme.MenuButtonTextAndIconColor))
+            //         Values = new ObservableCollection<double> { 1 }, 
+            //         Name = "America"
             //     },
             //     new PieSeries<double>
             //     { 
-            //         Values = new double[] { 1 }, 
-            //         Name = "China",
-            //         Fill = new SolidColorPaint(new SkiaSharp.SKColor(CurrentTheme.CollectionBGColor))
+            //         Values = new ObservableCollection<double> { 4 }, 
+            //         Name = "China"
             //     },
             //     new PieSeries<double>
             //     { 
-            //         Values = new double[] { 1 }, 
-            //         Name = "France",
-            //         Fill = new SolidColorPaint(new SkiaSharp.SKColor(CurrentTheme.MenuTextColor))
+            //         Values = new ObservableCollection<double> { 3 }, 
+            //         Name = "France"
             //     }
             // };
-
             GenerateStats();
-            //SeriesCount = (uint)MainUser.UserCollection.Count;
 
             this.WhenAnyValue(x => x.MeanScore).Subscribe(x => MainUser.MeanScore = x);
             this.WhenAnyValue(x => x.VolumesRead).Subscribe(x => MainUser.VolumesRead = x);

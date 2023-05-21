@@ -17,7 +17,7 @@ namespace Tsundoku.Helpers
         public JsonDocument GetSeriesTitleAsync(string title)
         {
             JsonDocument data = JsonDocument.Parse(MangadexClient.GetStringAsync(@$"https://api.mangadex.org/manga?title='{title}'").Result);
-           // File.WriteAllText(@"MangadexTitleTest.json", JsonSerializer.Serialize(data, options));
+            // File.WriteAllText(@"MangadexTitleTest.json", JsonSerializer.Serialize(data, options));
             return data;
         }
 
@@ -37,7 +37,7 @@ namespace Tsundoku.Helpers
 
         public string GetCover(string id)
         {
-            JsonElement data = JsonDocument.Parse(MangadexClient.GetStringAsync(@$"https://api.mangadex.org/cover/// {id}").Result).RootElement.GetProperty("data");
+            JsonElement data = JsonDocument.Parse(MangadexClient.GetStringAsync(@$"https://api.mangadex.org/cover/{id}").Result).RootElement.GetProperty("data");
             File.WriteAllText(@"MangadexCoverTest.json", JsonSerializer.Serialize(data, options));
             if (data.ValueKind == JsonValueKind.Array)
             {

@@ -3,7 +3,11 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using LiveChartsCore;
+using LiveChartsCore.SkiaSharpView;
+using LiveChartsCore.SkiaSharpView.Painting;
 using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Tsundoku.Models;
 using Tsundoku.ViewModels;
@@ -320,11 +324,10 @@ namespace Tsundoku.Views
                 
                 Constants.Logger.Info($"Theme Changed To {(ThemeSelector.SelectedItem as TsundokuTheme).ThemeName}");
                 ApplyColors();
-                //UpdateChartColors();
             }
         }
 
-        // private void UpdateChartColors()
+        // private static void UpdateChartColors()
         // {
         //     // CollectionWindow.CollectionViewModel.collectionStatsWindow.CollectionStatsVM.CountryDistribution.Clear();
         //     Constants.Logger.Debug("Updating Chart Colors");
@@ -407,6 +410,7 @@ namespace Tsundoku.Views
             SeriesEditPane_Buttons_Border_Hover.Color = Color.FromUInt32((uint)CollectionWindow.CollectionViewModel.CurrentTheme.SeriesEditPaneButtonsBorderHoverColor);
             SeriesEditPane_Buttons_Icon.Color = Color.FromUInt32((uint)CollectionWindow.CollectionViewModel.CurrentTheme.SeriesEditPaneButtonsIconColor);
             SeriesEditPane_Buttons_Icon_Hover.Color = Color.FromUInt32((uint)CollectionWindow.CollectionViewModel.CurrentTheme.SeriesEditPaneButtonsIconHoverColor);
+            // UpdateChartColors();
             GC.Collect();
             GC.WaitForPendingFinalizers();
         }

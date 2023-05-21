@@ -1,7 +1,5 @@
 using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
-using Avalonia.Media;
 
 namespace Tsundoku.Controls
 {
@@ -29,6 +27,14 @@ namespace Tsundoku.Controls
         {
             get => GetValue(IconProperty);
             set => SetValue(IconProperty, value);
+        }
+
+        public static readonly StyledProperty<string> CopyTextProperty = AvaloniaProperty.Register<ValueStat, string>(nameof(CopyText), "VSCopyText Error");
+
+        public string CopyText
+        {
+            get => GetValue(CopyTextProperty);
+            set => SetValue(CopyTextProperty, value);
         }
     }
 }

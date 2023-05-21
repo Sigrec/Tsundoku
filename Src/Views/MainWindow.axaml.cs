@@ -87,7 +87,7 @@ namespace Tsundoku.Views
             {
                 decimal costVal = Convert.ToDecimal(cost);
                 curSeries.Cost = costVal;
-                ((TextBlock)stackPanels.ElementAt(1).GetLogicalChildren().ElementAt(0)).Text = $"Cost {costVal}";
+                ((TextBlock)stackPanels.ElementAt(1).GetLogicalChildren().ElementAt(0)).Text = $"Cost {CollectionViewModel.CurCurrency}{costVal}";
                 Constants.Logger.Info($"Updated Cost for {curSeries.Titles["Romaji"]} to {CollectionViewModel.CurCurrency}{costVal}");
                 costVal = 0;
                 foreach (Series x in CollectionsMarshal.AsSpan(MainWindowViewModel.Collection.ToList()))

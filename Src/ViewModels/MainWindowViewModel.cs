@@ -258,7 +258,7 @@ namespace Tsundoku.ViewModels
             {
                 Constants.Logger.Info("Creating New User");
                 ThemeSettingsViewModel.UserThemes = new ObservableCollection<TsundokuTheme>() { TsundokuTheme.DEFAULT_THEME };
-                MainUser = new User("UserName", "Romaji", "Default", "Card", "$", ThemeSettingsViewModel.UserThemes, Collection);
+                MainUser = new User("UserName", "Romaji", "Default", "Card", "$", "$0.00", ThemeSettingsViewModel.UserThemes, Collection);
                 MainUser.CurDataVersion = 1.5;
                 UserName = MainUser.UserName;
                 Collection = MainUser.UserCollection;

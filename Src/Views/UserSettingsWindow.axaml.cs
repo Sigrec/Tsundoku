@@ -184,7 +184,18 @@ namespace Tsundoku.Views
 
             foreach (Models.Series curSeries in MainWindowViewModel.Collection)
             {
-                output.AppendLine(string.Join(",", new string[] { curSeries.Titles.ContainsKey(MainWindowViewModel.MainUser.CurLanguage) ? curSeries.Titles[MainWindowViewModel.MainUser.CurLanguage] : curSeries.Titles["Romaji"], curSeries.Staff.ContainsKey(MainWindowViewModel.MainUser.CurLanguage) ? curSeries.Staff[MainWindowViewModel.MainUser.CurLanguage] : curSeries.Staff["Romaji"], curSeries.Format, curSeries.Status, curSeries.CurVolumeCount.ToString(), curSeries.MaxVolumeCount.ToString(), curSeries.Demographic, $"{MainWindowViewModel.MainUser.Currency}{curSeries.Cost.ToString()}", curSeries.Score.ToString(), curSeries.VolumesRead.ToString(), curSeries.SeriesNotes }));
+                output.AppendLine(string.Join(",", new string[] { 
+                    curSeries.Titles.ContainsKey(MainWindowViewModel.MainUser.CurLanguage) ? curSeries.Titles[MainWindowViewModel.MainUser.CurLanguage] : curSeries.Titles["Romaji"], 
+                    curSeries.Staff.ContainsKey(MainWindowViewModel.MainUser.CurLanguage) ? curSeries.Staff[MainWindowViewModel.MainUser.CurLanguage] : curSeries.Staff["Romaji"], 
+                    curSeries.Format, 
+                    curSeries.Status, 
+                    curSeries.CurVolumeCount.ToString(), 
+                    curSeries.MaxVolumeCount.ToString(), 
+                    curSeries.Demographic, 
+                    $"{MainWindowViewModel.MainUser.Currency}{curSeries.Cost.ToString()}", 
+                    curSeries.Score.ToString(), 
+                    $"{curSeries.VolumesRead.ToString()}", 
+                    curSeries.SeriesNotes }));
             }
 
             try
