@@ -1,10 +1,8 @@
-﻿using Tsundoku.Models;
+﻿using System.Threading.Tasks;
+using Tsundoku.Models;
 using ReactiveUI.Fody.Helpers;
 using DynamicData;
-using System.IO;
 using Avalonia.Media.Imaging;
-using ReactiveUI;
-using System.Reactive.Linq;
 using System.Collections.ObjectModel;
 
 namespace Tsundoku.ViewModels
@@ -27,7 +25,7 @@ namespace Tsundoku.ViewModels
 
         public ObservableCollection<string> SelectedAdditionalLanguages { get; } = new ObservableCollection<string>();
 
-        Helpers.AniListQuery AL_Query = new Helpers.AniListQuery();
+        Helpers.AniListQuery ALQuery = new Helpers.AniListQuery();
         Helpers.MangadexQuery MD_Query = new Helpers.MangadexQuery();
 
         public AddNewSeriesViewModel()
@@ -51,7 +49,10 @@ namespace Tsundoku.ViewModels
         */
         public bool GetSeriesData(string title, string bookType, ushort curVolCount, ushort maxVolCount, ObservableCollection<string> additionalLanguages)
         {
-            Series newSeries = Series.CreateNewSeriesCard(title, bookType, maxVolCount, curVolCount, AL_Query, MD_Query, additionalLanguages);
+            var getNewSeries = Task.Run(async () => await Series.CreateNewSeriesCard(title, bookType, maxVolCount, curVolCount, ALQuery, MD_Query, additionalLanguages));
+            getNewSeries.Wait();
+            Series? newSeries = getNewSeries.Result;
+            
             bool duplicateSeriesCheck = true;
             if (newSeries != null)
             {

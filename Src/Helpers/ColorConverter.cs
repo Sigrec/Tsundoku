@@ -1,6 +1,8 @@
+using System.Reflection.Metadata;
 using System;
 using System.Globalization;
 using Avalonia.Data.Converters;
+using Tsundoku.Models;
 
 namespace Tsundoku.Helpers
 {

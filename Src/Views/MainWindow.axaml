@@ -41,26 +41,28 @@
 						   FontWeight="Bold"
 						   TextDecorations="Underline"
 						   TextAlignment="Center"
-						   Margin="30,0,0,0"
+						   Margin="0,0,0,0"
 						   HorizontalAlignment="Center"
 						   VerticalAlignment="Center" 
 						   Text="{CompiledBinding UserName, Mode=OneWay}"
 						   DockPanel.Dock="Top"
 						   Classes="username"/>
-				<StackPanel Spacing="20" HorizontalAlignment="Center" VerticalAlignment="Center" DockPanel.Dock="Bottom" Orientation="Horizontal">
+				<StackPanel Spacing="15" HorizontalAlignment="Center" VerticalAlignment="Center" DockPanel.Dock="Bottom" Orientation="Horizontal">
 					<StackPanel Spacing="5" HorizontalAlignment="Center" VerticalAlignment="Center" Width="165">
 						<StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Center" VerticalAlignment="Center">
 							<Button Name="SettingsButton"
-									FontSize="16" 
+									FontSize="18" 
 									Classes="menu"
 									BorderThickness="2"
 									ToolTip.Tip="User Settings"
 									Width="50"
+									Height="35"
 									i:Attached.Icon="fa-address-book" 
 									Command="{CompiledBinding OpenSettingsWindow}"/>
 							<Button Name="ThemeButton" 
-									FontSize="16" 
+									FontSize="18" 
 									Width="50"
+									Height="35"
 									Classes="menu"
 									BorderThickness="2"
 									ToolTip.Tip="Themes"
@@ -68,10 +70,11 @@
 									Command="{CompiledBinding OpenThemeSettingsWindow}"/>
 							<Button FontWeight="Bold"
 									Name="AnalysisButton"
-									FontSize="16"
+									FontSize="18"
 									IsEnabled="False"
 									Classes="menu"
 									Width="50"
+									Height="35"
 									ToolTip.Tip="Price Analysis"
 									BorderThickness="2"
 									Command="{CompiledBinding OpenPriceAnalysisWindow}"
@@ -80,27 +83,30 @@
 						<StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Center" VerticalAlignment="Center">
 							<Button FontWeight="Bold"
 									Name="AddNewSeriesButton"
-									FontSize="16"
+									FontSize="18"
 									Classes="menu"
 									ToolTip.Tip="Add New Series"
 									BorderThickness="2"
 									Width="50"
+									Height="35"
 									Command="{CompiledBinding OpenAddNewSeriesWindow}"
 									i:Attached.Icon="fa-book-medical"/>
 							<Button FontWeight="Bold"
 									Name="DonateButton"
-									FontSize="16"
+									FontSize="18"
 									Classes="menu"
 									Width="50"
+									Height="35"
 									ToolTip.Tip="Donate"
 									BorderThickness="2"
 									Click="OpenDonationLink"
 									i:Attached.Icon="fa-circle-dollar-to-slot"/>
 							<Button FontWeight="Bold"
 									Name="StatsButton"
-									FontSize="16"
+									FontSize="18"
 									Classes="menu"
 									Width="50"
+									Height="35"
 									ToolTip.Tip="Collection Stats"
 									BorderThickness="2"
 									Command="{CompiledBinding OpenCollectionStatsWindow}"
@@ -113,16 +119,16 @@
 							   FontSize="21" 
 							   FontWeight="Bold" 
 							   Classes="menu"
-							   Width="155"
 							   VerticalAlignment="Center"
 							   HorizontalAlignment="Center"/>
-					<StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="5" Width="175">
-						<TextBlock Name="SearchCollectionHeader" VerticalAlignment="Center" Text="Search Collection" HorizontalAlignment="Center" FontSize="21" FontWeight="Bold" Classes="menu"/>
+					<StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="5">
+						<TextBlock Name="SearchCollectionHeader" VerticalAlignment="Center" Text="Search Collection" TextAlignment="Center" HorizontalAlignment="Center" FontSize="21" FontWeight="Bold" Classes="menu"/>
 						<TextBox Name="SearchBar" 
 								Text="{CompiledBinding SearchText, Mode=TwoWay}" 
 								KeyUp="SearchCollection"
 								Classes="menu"
-								BorderThickness="2" 
+								BorderThickness="2"
+								Width="185"
 								FontWeight="Bold"
 								VerticalAlignment="Center"/>
 					</StackPanel>
@@ -132,7 +138,6 @@
 							   FontSize="21" 
 							   FontWeight="Bold" 
 							   Classes="menu"
-							   Width="155"
 							   VerticalAlignment= "Center" 
 							   HorizontalAlignment="Center"/>
 					<StackPanel Spacing="5" HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -775,7 +780,7 @@
 															FontWeight="Bold"
 															Height="20"
 															Width="21"
-															FontSize="26"
+															FontSize="25.5"
 															Cursor="Hand"
 															Click="AddVolume"
 															Padding="-5,-11,0,0"

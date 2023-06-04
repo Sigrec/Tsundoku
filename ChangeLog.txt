@@ -1,4 +1,13 @@
-V1.5.2.0 - May 20th, 2023 @ 9:29PM
+V1.6.0.0 - June 4th, 2023 @ 1:36PM PST
+✅ Added 2 new pie charts to the stats window showing distribution for demograhics and status for a series
+✅ Added bar/cartesian chart to the stats window showing distribution of scores in collection
+✅ Slight Changes to Menu Layout
+✅ Changed default (when you haven't entered in) score from 0 to -1 to allow for users to rate series as 0. If you rated a series as a 0 previously you will need to re-enter it
+✅ Can now clear the theme generator values
+✅ Refactoring AniList & MangaDex Requests to increase performance
+✅ Refactored a bunch of methods to prevent them from running on the UI Thread to increase performance
+
+V1.5.2.0 - May 20th, 2023 @ 9:29PM PST
 ✅ Changed "Read X" to "Read X Volumes" in series stats save panel
 ✅ Cost text now shows the currency symbol above the input textbox in series stats panel
 ✅ Can now copy any of the stats to clipboard by clicking on the stats box
@@ -6,7 +15,7 @@ V1.5.2.0 - May 20th, 2023 @ 9:29PM
 ✅ Realigned Username so it's centered
 ✅ Fixed issue with MangaDexQuery when querying for Covers
 
-V1.5.1.0 - April 20th, 2023 @ 12:11PM
+V1.5.1.0 - April 20th, 2023 @ 12:11PM PST
 ✅ Series Stats TextBoxes now clear After Saving Besides Score
 ✅ Series Volume Count TextBoxes now clear After Saving
 ✅ Fixed Crash Bug When Adding a Series that is not on MangaDex or AniList or Is not Specific Enough to Determine Correct Series

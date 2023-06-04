@@ -12,7 +12,7 @@ namespace Tsundoku.ViewModels
 
         private string[] AvailableBrowsers { get; } = new string[] { "Edge", "Chrome", "FireFox" };
 
-        private string[] AvailableWebsites { get; } = new string[] { "RightStufAnime", "RobertsAnimeCornerStore", "InStockTrades", "Kinokuniya USA", "Barnes & Noble", "Books-A-Million", "Amazon USA" };
+        private string[] AvailableWebsites { get; } = new string[] { "RightStufAnime", "RobertsAnimeCornerStore", "InStockTrades", "Kinokuniya USA", "Barnes & Noble", "Books-A-Million" };
 
         public PriceAnalysisViewModel()
         {

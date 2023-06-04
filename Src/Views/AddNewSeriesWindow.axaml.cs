@@ -36,9 +36,6 @@ namespace Tsundoku.Views
                 Topmost = false;
                 e.Cancel = true;
             };
-            // #if DEBUG
-            //             this.AttachDevTools();
-            // #endif
         }
 
         private void IsMangaButtonClicked(object sender, RoutedEventArgs args)
@@ -121,6 +118,14 @@ namespace Tsundoku.Views
                 CollectionWindow.CollectionViewModel.UsersNumVolumesToBeCollected += (uint)(max - cur);
                 CollectionWindow.CollectionViewModel.SearchText = "";
                 CollectionWindow.CollectionViewModel.collectionStatsWindow.CollectionStatsVM.SeriesCount = (uint)MainWindowViewModel.Collection.Count;
+
+                CollectionWindow.CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UpdateStatusChartValues();
+                CollectionWindow.CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UpdateStatusPercentages();
+
+                CollectionWindow.CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UpdateDemographicChartValues();
+                CollectionWindow.CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UpdateDemographicPercentages();
+
+                CollectionWindow.CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UpdateScoreChartValues();
             }
         }
     }

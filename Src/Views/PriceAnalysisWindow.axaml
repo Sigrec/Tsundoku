@@ -100,13 +100,14 @@
 				  BorderThickness="2"
 				  Width="130"
 				  Classes="menu"/>
-		<!-- <DataGrid Classes="menu"
+		<DataGrid Classes="menu"
 				  Name="AnalysisDataGrid"
+				  AutoGenerateColumns="True"
 				  BorderThickness="2"
 				  Grid.ColumnSpan="2"
 				  Grid.Column="0"
 				  Grid.Row="6"
-				  BorderBrush="Red"/> -->
+				  BorderBrush="Red"/>
 		<Button Classes="Menu"
 				BorderThickness="2"
 				FontWeight="Bold"
@@ -116,6 +117,7 @@
 				FontSize="16"
 				VerticalAlignment="Center"
 				HorizontalAlignment="Center"
+				Click="PerformAnalysis"
 				Content="Analyze"/>
 	</Grid>
 </Window>

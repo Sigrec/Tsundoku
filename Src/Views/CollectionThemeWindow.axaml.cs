@@ -3,11 +3,8 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Interactivity;
 using Avalonia.Media;
-using LiveChartsCore;
-using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
 using System;
-using System.Collections.ObjectModel;
 using System.Linq;
 using Tsundoku.Models;
 using Tsundoku.ViewModels;
@@ -44,6 +41,16 @@ namespace Tsundoku.Views
             };
             MenuColorChanges();
             CollectionColorChanges();
+        }
+
+        private void ClearThemeValues(object sender, RoutedEventArgs args)
+        {
+            MainColor1.Clear();
+            MainColor2.Clear();
+            TextColor1.Clear();
+            TextColor2.Clear();
+            AccentColor1.Clear();
+            AccentColor2.Clear();
         }
 
         private string GenerateThemeValidation()
@@ -282,7 +289,7 @@ namespace Tsundoku.Views
             else
             {
                 Constants.Logger.Debug($"{NewTheme.ThemeName} | {ThemeSettingsVM.CurrentTheme.ThemeName} | {NewTheme.MenuBGColor} | {ThemeSettingsVM.CurrentTheme.MenuBGColor}");
-                Constants.Logger.Debug($"CAN'T SAVE THEME {!string.IsNullOrWhiteSpace(NewThemeName.Text) && !NewThemeName.Text.Equals("Default")} | {NewTheme != ThemeSettingsVM.CurrentTheme}");
+                Constants.Logger.Error($"CAN'T SAVE THEME {!string.IsNullOrWhiteSpace(NewThemeName.Text) && !NewThemeName.Text.Equals("Default")} | {NewTheme != ThemeSettingsVM.CurrentTheme}");
             }
         }
 
@@ -324,47 +331,9 @@ namespace Tsundoku.Views
                 
                 Constants.Logger.Info($"Theme Changed To {(ThemeSelector.SelectedItem as TsundokuTheme).ThemeName}");
                 ApplyColors();
+                CollectionWindow.CollectionViewModel.collectionStatsWindow.UpdateChartColors();
             }
         }
-
-        // private static void UpdateChartColors()
-        // {
-        //     // CollectionWindow.CollectionViewModel.collectionStatsWindow.CollectionStatsVM.CountryDistribution.Clear();
-        //     Constants.Logger.Debug("Updating Chart Colors");
-        //     CollectionWindow.CollectionViewModel.collectionStatsWindow.CollectionStatsVM.CountryDistribution = new ObservableCollection<ISeries>
-        //     {
-        //         new PieSeries<double> 
-        //         { 
-        //             Values = new double[] { 1 }, 
-        //             Name = "Japan",
-        //             Fill = new SolidColorPaint(new SkiaSharp.SKColor(CollectionWindow.CollectionViewModel.CurrentTheme.MenuButtonBGColor))
-        //         },
-        //         new PieSeries<double>
-        //         { 
-        //             Values = new double[] { 1 }, 
-        //             Name = "Korea",
-        //             Fill = new SolidColorPaint(new SkiaSharp.SKColor(CollectionWindow.CollectionViewModel.CurrentTheme.MenuButtonBorderColor))
-        //         },
-        //         new PieSeries<double>
-        //         { 
-        //             Values = new double[] { 1 }, 
-        //             Name = "America",
-        //             Fill = new SolidColorPaint(new SkiaSharp.SKColor(CollectionWindow.CollectionViewModel.CurrentTheme.MenuButtonTextAndIconColor))
-        //         },
-        //         new PieSeries<double>
-        //         { 
-        //             Values = new double[] { 1 }, 
-        //             Name = "China",
-        //             Fill = new SolidColorPaint(new SkiaSharp.SKColor(CollectionWindow.CollectionViewModel.CurrentTheme.CollectionBGColor))
-        //         },
-        //         new PieSeries<double>
-        //         { 
-        //             Values = new double[] { 1 }, 
-        //             Name = "France",
-        //             Fill = new SolidColorPaint(new SkiaSharp.SKColor(CollectionWindow.CollectionViewModel.CurrentTheme.MenuTextColor))
-        //         }
-        //     };
-        // }
 
         private void ApplyColors()
         {
@@ -410,7 +379,6 @@ namespace Tsundoku.Views
             SeriesEditPane_Buttons_Border_Hover.Color = Color.FromUInt32((uint)CollectionWindow.CollectionViewModel.CurrentTheme.SeriesEditPaneButtonsBorderHoverColor);
             SeriesEditPane_Buttons_Icon.Color = Color.FromUInt32((uint)CollectionWindow.CollectionViewModel.CurrentTheme.SeriesEditPaneButtonsIconColor);
             SeriesEditPane_Buttons_Icon_Hover.Color = Color.FromUInt32((uint)CollectionWindow.CollectionViewModel.CurrentTheme.SeriesEditPaneButtonsIconHoverColor);
-            // UpdateChartColors();
             GC.Collect();
             GC.WaitForPendingFinalizers();
         }

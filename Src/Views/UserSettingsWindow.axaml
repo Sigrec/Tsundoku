@@ -91,7 +91,7 @@
                             FontWeight="Bold"
                             Classes="menu"
                             BorderThickness="2"
-                            Click="ExportToSpreadsheet"
+                            Command="{Binding ExportToSpreadsheetCommand}"
                             Content="Export to Spreadsheet"/>
                 </WrapPanel>
             </StackPanel>

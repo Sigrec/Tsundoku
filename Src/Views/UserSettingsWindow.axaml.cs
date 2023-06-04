@@ -8,6 +8,7 @@ using System;
 using Avalonia;
 using System.ComponentModel;
 using Tsundoku.Models;
+using System.Threading.Tasks;
 
 namespace Tsundoku.Views
 {
@@ -52,46 +53,54 @@ namespace Tsundoku.Views
 
         private void OpenAniListLink(object sender, RoutedEventArgs args)
         {
-            Constants.Logger.Info(@"Opening Link https://anilist.co/");
-            try
-            {
-                Process.Start(new ProcessStartInfo(@"https://anilist.co/") { UseShellExecute = true });
-            }
-            catch (Win32Exception noBrowser)
-            {
-                Constants.Logger.Error(noBrowser.Message);
-            }
-            catch (Exception other)
-            {
-                Constants.Logger.Error(other.Message);
-            }
+            Task.Run(() =>{
+                Constants.Logger.Info(@"Opening Link https://anilist.co/");
+                try
+                {
+                    Process.Start(new ProcessStartInfo(@"https://anilist.co/") { UseShellExecute = true });
+                }
+                catch (Win32Exception noBrowser)
+                {
+                    Constants.Logger.Error(noBrowser.Message);
+                }
+                catch (Exception other)
+                {
+                    Constants.Logger.Error(other.Message);
+                }
+            });
         }
 
         private void OpenMangadexLink(object sender, RoutedEventArgs args)
         {
-            Constants.Logger.Info(@"Opening Link https://mangadex.org/");
-            try
-            {
-                Process.Start(new ProcessStartInfo(@"https://mangadex.org/") { UseShellExecute = true });
-            }
-            catch (Win32Exception noBrowser)
-            {
-                Constants.Logger.Error(noBrowser.Message);
-            }
-            catch (Exception other)
-            {
-                Constants.Logger.Error(other.Message);
-            }
+            Task.Run(() =>{
+                Constants.Logger.Info(@"Opening Link https://mangadex.org/");
+                try
+                {
+                    Process.Start(new ProcessStartInfo(@"https://mangadex.org/") { UseShellExecute = true });
+                }
+                catch (Win32Exception noBrowser)
+                {
+                    Constants.Logger.Error(noBrowser.Message);
+                }
+                catch (Exception other)
+                {
+                    Constants.Logger.Error(other.Message);
+                }
+            });
         }
 
         private void OpenCoversFolder(object sender, RoutedEventArgs args)
         {
-            Process.Start("explorer.exe", @$"Covers");
+            Task.Run(() =>{
+                Process.Start("explorer.exe", @$"Covers");
+            });
         }
 
         private void OpenScreenshotsFolder(object sender, RoutedEventArgs args)
         {
-            Process.Start("explorer.exe", @$"Screenshots");
+            Task.Run(() =>{
+                Process.Start("explorer.exe", @$"Screenshots");
+            });
         }
 
         private void ChangeUsername(object sender, RoutedEventArgs args)
@@ -109,104 +118,78 @@ namespace Tsundoku.Views
 
         private void OpenYoutuberSite(object sender, RoutedEventArgs args)
         {
-            Constants.Logger.Info(@$"Opening Coolors Website https://www.youtube.com/@{(sender as Button).Name}");
-            try
-            {
-                Process.Start(new ProcessStartInfo(@$"https://www.youtube.com/@{(sender as Button).Name}") { UseShellExecute = true });
-            }
-            catch (System.ComponentModel.Win32Exception noBrowser)
-            {
-                Constants.Logger.Error(noBrowser.Message);
-            }
-            catch (System.Exception other)
-            {
-                Constants.Logger.Error(other.Message);
-            }
+            Task.Run(() =>{
+                Constants.Logger.Info(@$"Opening Coolors Website https://www.youtube.com/@{(sender as Button).Name}");
+                try
+                {
+                    Process.Start(new ProcessStartInfo(@$"https://www.youtube.com/@{(sender as Button).Name}") { UseShellExecute = true });
+                }
+                catch (System.ComponentModel.Win32Exception noBrowser)
+                {
+                    Constants.Logger.Error(noBrowser.Message);
+                }
+                catch (System.Exception other)
+                {
+                    Constants.Logger.Error(other.Message);
+                }
+            });
         }
 
         private void OpenCoolorsSite(object sender, RoutedEventArgs args)
         {
-            Constants.Logger.Info(@"Opening Coolors Website https://coolors.co/generate");
-            try
-            {
-                Process.Start(new ProcessStartInfo(@"https://coolors.co/generate") { UseShellExecute = true });
-            }
-            catch (System.ComponentModel.Win32Exception noBrowser)
-            {
-                Constants.Logger.Error(noBrowser.Message);
-            }
-            catch (System.Exception other)
-            {
-                Constants.Logger.Error(other.Message);
-            }
+            Task.Run(() =>{
+                Constants.Logger.Info(@"Opening Coolors Website https://coolors.co/generate");
+                try
+                {
+                    Process.Start(new ProcessStartInfo(@"https://coolors.co/generate") { UseShellExecute = true });
+                }
+                catch (System.ComponentModel.Win32Exception noBrowser)
+                {
+                    Constants.Logger.Error(noBrowser.Message);
+                }
+                catch (System.Exception other)
+                {
+                    Constants.Logger.Error(other.Message);
+                }
+            });
         }
 
         private void JoinDiscord(object sender, RoutedEventArgs args)
         {
-            Constants.Logger.Info(@"Opening Issue Repo https://discord.gg/QcZ5jcFPeU");
-            try
-            {
-                Process.Start(new ProcessStartInfo(@"https://discord.gg/QcZ5jcFPeU") { UseShellExecute = true });
-            }
-            catch (System.ComponentModel.Win32Exception noBrowser)
-            {
-                Constants.Logger.Error(noBrowser.Message);
-            }
-            catch (System.Exception other)
-            {
-                Constants.Logger.Error(other.Message);
-            }
+            Task.Run(() =>{
+                Constants.Logger.Info(@"Opening Issue Repo https://discord.gg/QcZ5jcFPeU");
+                try
+                {
+                    Process.Start(new ProcessStartInfo(@"https://discord.gg/QcZ5jcFPeU") { UseShellExecute = true });
+                }
+                catch (System.ComponentModel.Win32Exception noBrowser)
+                {
+                    Constants.Logger.Error(noBrowser.Message);
+                }
+                catch (System.Exception other)
+                {
+                    Constants.Logger.Error(other.Message);
+                }
+            });
         }
 
         private void ReportBug(object sender, RoutedEventArgs args)
         {
-            Constants.Logger.Info(@"Opening Issue Repo https://github.com/Sigrec/TsundokuApp/issues/new");
-            try
-            {
-                Process.Start(new ProcessStartInfo(@"https://github.com/Sigrec/TsundokuApp/issues/new") { UseShellExecute = true });
-            }
-            catch (System.ComponentModel.Win32Exception noBrowser)
-            {
-                Constants.Logger.Error(noBrowser.Message);
-            }
-            catch (System.Exception other)
-            {
-                Constants.Logger.Error(other.Message);
-            }
-        }
-
-        private void ExportToSpreadsheet(object sender, RoutedEventArgs args)
-        {
-            string file = @"TsundokuCollection.csv";
-            StringBuilder output = new StringBuilder();
-            string[] headers = new string[] { "Title", "Staff", "Format", "Status", "Cur Volumes", "Max Volumes", "Demographic", "Cost", "Score", "Volumes Read", "Notes" };
-            output.AppendLine(string.Join(",", headers));
-
-            foreach (Models.Series curSeries in MainWindowViewModel.Collection)
-            {
-                output.AppendLine(string.Join(",", new string[] { 
-                    curSeries.Titles.ContainsKey(MainWindowViewModel.MainUser.CurLanguage) ? curSeries.Titles[MainWindowViewModel.MainUser.CurLanguage] : curSeries.Titles["Romaji"], 
-                    curSeries.Staff.ContainsKey(MainWindowViewModel.MainUser.CurLanguage) ? curSeries.Staff[MainWindowViewModel.MainUser.CurLanguage] : curSeries.Staff["Romaji"], 
-                    curSeries.Format, 
-                    curSeries.Status, 
-                    curSeries.CurVolumeCount.ToString(), 
-                    curSeries.MaxVolumeCount.ToString(), 
-                    curSeries.Demographic, 
-                    $"{MainWindowViewModel.MainUser.Currency}{curSeries.Cost.ToString()}", 
-                    curSeries.Score.ToString(), 
-                    $"{curSeries.VolumesRead.ToString()}", 
-                    curSeries.SeriesNotes }));
-            }
-
-            try
-            {
-                System.IO.File.WriteAllText(file, output.ToString(), Encoding.UTF8);
-                Constants.Logger.Info($"Exported {MainWindowViewModel.MainUser.UserName}'s Data To -> TsundokuCollection.csv");
-            }
-            catch (Exception ex)
-            {
-                Constants.Logger.Warn($"Could not Export {MainWindowViewModel.MainUser.UserName}'s Data To -> TsundokuCollection.csv \n{ex}");
-            }
+            Task.Run(() =>{
+                Constants.Logger.Info(@"Opening Issue Repo https://github.com/Sigrec/TsundokuApp/issues/new");
+                try
+                {
+                    Process.Start(new ProcessStartInfo(@"https://github.com/Sigrec/TsundokuApp/issues/new") { UseShellExecute = true });
+                }
+                catch (System.ComponentModel.Win32Exception noBrowser)
+                {
+                    Constants.Logger.Error(noBrowser.Message);
+                }
+                catch (System.Exception other)
+                {
+                    Constants.Logger.Error(other.Message);
+                }
+            });
         }
     }
 }

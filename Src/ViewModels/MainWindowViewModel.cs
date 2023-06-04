@@ -15,10 +15,12 @@ using System.Diagnostics.CodeAnalysis;
 using Avalonia.Media.Imaging;
 using DynamicData;
 using System.Text.Json.Nodes;
+using System.Windows.Input;
 /*
-    Issues
-    ❌ LineHeight doesn't work with lower LineHeight values
-    ❌ ComboBoxItem text color not applying
+Issues
+❌ LineHeight doesn't work with lower LineHeight values
+❌ ComboBoxItem text color not applying
+❌ Users can run multiple instances of the application
 */
 
 namespace Tsundoku.ViewModels
@@ -26,6 +28,7 @@ namespace Tsundoku.ViewModels
     public partial class MainWindowViewModel : ViewModelBase
     {
         private static string filePath = @"UserData.json";
+        private const double SCHEMA_VERSION = 1.6;
         public static ObservableCollection<Series> SearchedCollection { get; set; } = new();
         public static ObservableCollection<Series> Collection { get; set; } = new();
         public string[] AvailableLanguages { get; } = new string[] { "Romaji", "English", "Japanese", "Korean", "Arabic", "Azerbaijan", "Bengali", "Bulgarian", "Burmese", "Catalan", "Chinese", "Croatian", "Czech", "Danish", "Dutch", "Esperanto", "Estonian", "Filipino", "Finnish", "French", "German", "Greek", "Hebrew", "Hindi", "Hungarian", "Indonesian", "Italian", "Kazakh", "Latin", "Lithuanian", "Malay", "Mongolian", "Nepali", "Norwegian", "Persian", "Polish", "Portuguese", "Romanian", "Russian", "Serbian", "Slovak", "Spanish", "Swedish", "Tamil", "Thai", "Turkish", "Ukrainian", "Vietnamese" };
@@ -81,12 +84,12 @@ namespace Tsundoku.ViewModels
             ConfigureWindows();
 
             this.WhenAnyValue(x => x.SearchText).Throttle(TimeSpan.FromMilliseconds(600)).ObserveOn(RxApp.MainThreadScheduler).Subscribe(SearchCollection);
-            this.WhenAnyValue(x => x.CurrentTheme).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.MainTheme = x.ThemeName);
-            this.WhenAnyValue(x => x.CurDisplay).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.Display = x);
-            this.WhenAnyValue(x => x.UsersNumVolumesCollected).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.NumVolumesCollected = x);
-            this.WhenAnyValue(x => x.UsersNumVolumesToBeCollected).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.NumVolumesToBeCollected = x);
-            this.WhenAnyValue(x => x.CurLanguage).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.CurLanguage = x);
-            this.WhenAnyValue(x => x.UserName).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.UserName = x);
+            this.WhenAnyValue(x => x.CurrentTheme).Subscribe(x => MainUser.MainTheme = x.ThemeName);
+            this.WhenAnyValue(x => x.CurDisplay).Subscribe(x => MainUser.Display = x);
+            this.WhenAnyValue(x => x.UsersNumVolumesCollected).Subscribe(x => MainUser.NumVolumesCollected = x);
+            this.WhenAnyValue(x => x.UsersNumVolumesToBeCollected).Subscribe(x => MainUser.NumVolumesToBeCollected = x);
+            this.WhenAnyValue(x => x.CurLanguage).Subscribe(x => MainUser.CurLanguage = x);
+            this.WhenAnyValue(x => x.UserName).Subscribe(x => MainUser.UserName = x);
         }
 
         private void ConfigureWindows()
@@ -228,8 +231,8 @@ namespace Tsundoku.ViewModels
                     SearchedCollection.AddRange(Collection);
                     break;
             }
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
+            // GC.Collect();
+            // GC.WaitForPendingFinalizers();
         }
 
         private void SearchCollection(string searchText)
@@ -259,7 +262,7 @@ namespace Tsundoku.ViewModels
                 Constants.Logger.Info("Creating New User");
                 ThemeSettingsViewModel.UserThemes = new ObservableCollection<TsundokuTheme>() { TsundokuTheme.DEFAULT_THEME };
                 MainUser = new User("UserName", "Romaji", "Default", "Card", "$", "$0.00", ThemeSettingsViewModel.UserThemes, Collection);
-                MainUser.CurDataVersion = 1.5;
+                MainUser.CurDataVersion = SCHEMA_VERSION;
                 UserName = MainUser.UserName;
                 Collection = MainUser.UserCollection;
                 CurLanguage = MainUser.CurLanguage;
@@ -314,7 +317,7 @@ namespace Tsundoku.ViewModels
                 UsersNumVolumesToBeCollected = testUsersNumVolumesToBeCollected;
             }
 
-            if (save) { UpdateDefaultTheme(); SaveUsersData(); }
+            if (save) { SaveUsersData(); }
 
             GC.Collect();
             GC.WaitForPendingFinalizers();
@@ -338,17 +341,21 @@ namespace Tsundoku.ViewModels
         {
             string json = File.ReadAllText(filePath);
             JsonNode userData = JsonNode.Parse(json);
+            JsonArray collectionJsonArray = userData["UserCollection"].AsArray();
+            JsonNode series;
+            bool updatedVersion = false;
+            
+            // For users who did not get the older update
             if (!userData.AsObject().ContainsKey("CurDataVersion"))
             {
                 userData.AsObject().Add("CurDataVersion", "1.0");
                 Constants.Logger.Info("Added CurDataVersion Data");
             }
 
+            // 1.5 Data Update
             double curVersion = Double.Parse(userData["CurDataVersion"].ToString());
             if (curVersion < 1.5)
             {
-                JsonNode series;
-                JsonArray collectionJsonArray = userData["UserCollection"].AsArray();
                 userData.AsObject().Add("Currency", "$");
                 userData.AsObject().Add("MeanScore", 0);
                 userData.AsObject().Add("VolumesRead", 0);
@@ -396,12 +403,30 @@ namespace Tsundoku.ViewModels
                     }
                 }
                 userData["CurDataVersion"] = 1.5;
-                File.WriteAllText(filePath, JsonSerializer.Serialize(userData, options));
+                UpdateDefaultTheme(); 
                 Constants.Logger.Info("Updated Users Data to v1.5");
-
-                return true;        
+                updatedVersion = true;        
             }
-            return false;
+
+            // Update to 1.6 schema
+            if (curVersion < 1.6)
+            {
+                for (int x = 0; x < collectionJsonArray.Count(); x++)
+                {
+                    series = collectionJsonArray.ElementAt(x);
+                    if (Double.Parse(series["Score"].ToString()) == 0)
+                    {
+                        series["Score"] = -1;
+                    }
+                }
+
+                userData["CurDataVersion"] = 1.6;
+                Constants.Logger.Info("Updated Users Data to v1.6");
+                updatedVersion = true;  
+            }
+
+            File.WriteAllText(filePath, JsonSerializer.Serialize(userData, options));
+            return updatedVersion;
         }
 
         [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "A New file will always be created if it doesn't exist before serialization")]

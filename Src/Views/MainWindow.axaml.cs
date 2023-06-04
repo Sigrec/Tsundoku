@@ -14,6 +14,7 @@ using Avalonia.ReactiveUI;
 using ReactiveUI;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace Tsundoku.Views
 {
@@ -107,18 +108,23 @@ namespace Tsundoku.Views
                     int countScore = 0;
                     curSeries.Score = scoreVal;
                     ((TextBlock)stackPanels.ElementAt(2).GetLogicalChildren().ElementAt(0)).Text = $"Score {scoreVal}/10.0";
+                    
+                    // Update Score Distribution Chart
+                    MainWindowViewModel.Collection.First(series => series == curSeries).Score = scoreVal;
+                    CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UpdateScoreChartValues();
+
                     Constants.Logger.Info($"Updated Score for {curSeries.Titles["Romaji"]} to {scoreVal}/10.0");
                     scoreVal = 0;
                     foreach (Series x in CollectionsMarshal.AsSpan(MainWindowViewModel.Collection.ToList()))
                     {
-                        scoreVal += x.Score;
-                        if (x.Score != 0)
+                        if (x.Score >= 0)
                         {
+                            scoreVal += x.Score;
                             countScore++;
                         }
                     }
                     CollectionViewModel.collectionStatsWindow.CollectionStatsVM.MeanScore = Decimal.Round(scoreVal / countScore, 1);
-                    ((MaskedTextBox)stackPanels.ElementAt(1).GetLogicalChildren().ElementAt(1)).Text = ""; 
+                    ((MaskedTextBox)stackPanels.ElementAt(1).GetLogicalChildren().ElementAt(1)).Text = "";
                 }
                 else
                 {
@@ -217,9 +223,9 @@ namespace Tsundoku.Views
                 decimal scoreVal = 0;
                 foreach (Series x in CollectionsMarshal.AsSpan(MainWindowViewModel.Collection.ToList()))
                 {
-                    scoreVal += x.Score;
-                    if (x.Score != 0)
+                    if (x.Score >= 0)
                     {
+                        scoreVal += x.Score;
                         countScore++;
                     }
                 }
@@ -227,6 +233,14 @@ namespace Tsundoku.Views
                 
                 Constants.Logger.Info($"Removed {curSeries.Titles["Romaji"]} From Collection");
                 CollectionViewModel.collectionStatsWindow.CollectionStatsVM.SeriesCount = (uint)MainWindowViewModel.Collection.Count;
+
+                CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UpdateDemographicChartValues();
+                CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UpdateDemographicPercentages();
+
+                CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UpdateStatusChartValues();
+                CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UpdateStatusPercentages();
+
+                CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UpdateScoreChartValues();
             }, RxApp.MainThreadScheduler);
         }
 
@@ -281,6 +295,12 @@ namespace Tsundoku.Views
             {
                 Series curSeries = (Series)((ComboBox)sender).DataContext;
                 string demographic = (sender as ComboBox).SelectedItem as string;
+                
+                // Update Demographic Chart Values
+                MainWindowViewModel.Collection.First(series => series == curSeries).Demographic = demographic;
+                CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UpdateDemographicChartValues();
+                CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UpdateDemographicPercentages();
+                
                 curSeries.Demographic = demographic;
                 Constants.Logger.Info($"Changed Demographic for {curSeries.Titles["Romaji"]} to {demographic}");
             }
@@ -384,7 +404,8 @@ namespace Tsundoku.Views
         {
             string title = ((TextBlock)sender).Text;
             Constants.Logger.Info($"Copying {title} to Clipboard");
-            await Application.Current.Clipboard.SetTextAsync(title);
+            await TextCopy.ClipboardService.SetTextAsync(title);
+            // await Application.Current.Clipboard.SetTextAsync(title);
         }
 
         /*
