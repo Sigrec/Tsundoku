@@ -50,7 +50,7 @@ namespace Tsundoku.Views
                     col.FontWeight = Avalonia.Media.FontWeight.Bold;
                     AnalysisDataGrid.Columns.Add(col);
                 }
-                AnalysisDataGrid.Items = PriceAnalysisViewModel.testData;
+                AnalysisDataGrid.ItemsSource = PriceAnalysisViewModel.testData;
             };
 
             Closing += (s, e) =>
@@ -90,7 +90,7 @@ namespace Tsundoku.Views
                 ((DataGridTextColumn)AnalysisDataGrid.Columns[idx]).FontSize = 18;
             }
 
-            AnalysisDataGrid.Items = masterData;
+            AnalysisDataGrid.ItemsSource = masterData;
             AnalysisDataGrid.AutoGenerateColumns = false;
         }
 

@@ -1,6 +1,4 @@
-using System.Xml.Linq;
 using System.Runtime.CompilerServices;
-using System.Data;
 using Avalonia;
 using Avalonia.ReactiveUI;
 using Projektanker.Icons.Avalonia;
@@ -27,15 +25,15 @@ namespace Tsundoku
                 .UseReactiveUI()
                 .With(LoaderOptimization.MultiDomainHost)
                 .With(LoadHint.Sometimes)
-                .With(new SkiaOptions 
-                {
-                    MaxGpuResourceSizeBytes = 1024000000
-                })
+                // .With(new SkiaOptions 
+                // {
+                //     MaxGpuResourceSizeBytes = 1024000000
+                // })
                 .With(new Win32PlatformOptions
                 {
-                    UseCompositor = false,
+                    // UseCompositor = false,
                     UseWgl = true,
-                    UseDeferredRendering = false,
+                    // UseDeferredRendering = false,
                     AllowEglInitialization = true
                 });
     }

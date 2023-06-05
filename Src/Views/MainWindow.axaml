@@ -142,7 +142,7 @@
 							   HorizontalAlignment="Center"/>
 					<StackPanel Spacing="5" HorizontalAlignment="Center" VerticalAlignment="Center">
 						<ComboBox Name="LanguageSelector"
-								  Items="{CompiledBinding AvailableLanguages, Mode=OneWay}"
+								  ItemsSource="{CompiledBinding AvailableLanguages, Mode=OneWay}"
 								  SelectionChanged="LanguageChanged"
 								  SelectedItem="{Binding CurLanguage}"
 								  Height="35"
@@ -173,7 +173,7 @@
 								  FontSize="15"
 								  SelectedItem="None"
 								  ToolTip.Tip="Filter"
-								  Items="{CompiledBinding AvailableCollectionFilters, Mode=OneWay}"
+								  ItemsSource="{CompiledBinding AvailableCollectionFilters, Mode=OneWay}"
 								  Width="130"
 								  BorderThickness="2"
 								  VerticalAlignment="Center"
@@ -209,7 +209,7 @@
 					</Style>
 				</Style>
 			</ScrollViewer.Styles>
-			<ItemsControl Name="CollectionItems" Margin="0,50,0,50" Items="{Binding SearchedCollection}" HorizontalAlignment="Center" VerticalAlignment="Center">
+			<ItemsControl Name="CollectionItems" Margin="0,50,0,50" ItemsSource="{Binding SearchedCollection}" HorizontalAlignment="Center" VerticalAlignment="Center">
 				<ItemsControl.ItemsPanel>
 					<ItemsPanelTemplate>
 						<WrapPanel/>
@@ -586,7 +586,7 @@
 														  FontSize="15"
 														  Width="145"
 														  SelectedItem="{Binding Demographic}"
-														  Items="{Binding Source={x:Static local:Constants.DEMOGRAPHICS}}"
+														  ItemsSource="{Binding Source={x:Static local:Constants.DEMOGRAPHICS}}"
 														  BorderThickness="2"
 														  VerticalAlignment="Center"
 														  HorizontalAlignment="Center"

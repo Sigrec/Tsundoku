@@ -667,7 +667,7 @@
 								Click="SaveNewTheme"/>
 						<ComboBox Name="ThemeSelector"
 								  SelectionChanged="ChangeMainTheme"
-								  Items="{Binding UserThemes}"
+								  ItemsSource="{Binding UserThemes}"
 								  Width="150"
 								  Height="35"
 								  BorderThickness="2"

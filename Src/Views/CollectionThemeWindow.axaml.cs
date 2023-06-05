@@ -109,50 +109,50 @@ namespace Tsundoku.Views
                 NewTheme.ThemeName = NewThemeName.Text;
 
                 // Apply menu colors
-                NewTheme.MenuBGColor = Color.Parse(MainColor1.Text).ToUint32();
-                NewTheme.UsernameColor = Color.Parse(TextColor1.Text).ToUint32();
-                NewTheme.MenuTextColor = Color.Parse(TextColor1.Text).ToUint32();
-                NewTheme.SearchBarBGColor = Color.Parse(AccentColor2.Text).ToUint32();
-                NewTheme.SearchBarBorderColor = Color.Parse(AccentColor1.Text).ToUint32();
-                NewTheme.SearchBarTextColor = Color.Parse(TextColor1.Text).ToUint32();
-                NewTheme.DividerColor = Color.Parse(AccentColor1.Text).ToUint32();
-                NewTheme.MenuButtonBGColor = Color.Parse(AccentColor2.Text).ToUint32();
-                NewTheme.MenuButtonBGHoverColor = Color.Parse(MainColor2.Text).ToUint32();
-                NewTheme.MenuButtonBorderColor = Color.Parse(AccentColor1.Text).ToUint32();
-                NewTheme.MenuButtonBorderHoverColor = Color.Parse(AccentColor1.Text).ToUint32();
-                NewTheme.MenuButtonTextAndIconColor = Color.Parse(TextColor1.Text).ToUint32();
-                NewTheme.MenuButtonTextAndIconHoverColor = Color.Parse(AccentColor2.Text).ToUint32();
+                NewTheme.MenuBGColor = Color.Parse(MainColor1.Text).ToUInt32();
+                NewTheme.UsernameColor = Color.Parse(TextColor1.Text).ToUInt32();
+                NewTheme.MenuTextColor = Color.Parse(TextColor1.Text).ToUInt32();
+                NewTheme.SearchBarBGColor = Color.Parse(AccentColor2.Text).ToUInt32();
+                NewTheme.SearchBarBorderColor = Color.Parse(AccentColor1.Text).ToUInt32();
+                NewTheme.SearchBarTextColor = Color.Parse(TextColor1.Text).ToUInt32();
+                NewTheme.DividerColor = Color.Parse(AccentColor1.Text).ToUInt32();
+                NewTheme.MenuButtonBGColor = Color.Parse(AccentColor2.Text).ToUInt32();
+                NewTheme.MenuButtonBGHoverColor = Color.Parse(MainColor2.Text).ToUInt32();
+                NewTheme.MenuButtonBorderColor = Color.Parse(AccentColor1.Text).ToUInt32();
+                NewTheme.MenuButtonBorderHoverColor = Color.Parse(AccentColor1.Text).ToUInt32();
+                NewTheme.MenuButtonTextAndIconColor = Color.Parse(TextColor1.Text).ToUInt32();
+                NewTheme.MenuButtonTextAndIconHoverColor = Color.Parse(AccentColor2.Text).ToUInt32();
 
                 // Apply Colleciton Colors
-                NewTheme.CollectionBGColor = Color.Parse(MainColor2.Text).ToUint32();
-                NewTheme.StatusAndBookTypeBGColor = Color.Parse(AccentColor2.Text).ToUint32();
-                NewTheme.StatusAndBookTypeBGHoverColor = Color.Parse(AccentColor1.Text).ToUint32();
-                NewTheme.StatusAndBookTypeTextColor = Color.Parse(TextColor2.Text).ToUint32();
-                NewTheme.StatusAndBookTypeTextHoverColor = Color.Parse(AccentColor2.Text).ToUint32();
-                NewTheme.SeriesCardBGColor = Color.Parse(MainColor1.Text).ToUint32();
-                NewTheme.SeriesCardTitleColor = Color.Parse(AccentColor1.Text).ToUint32();
-                NewTheme.SeriesCardStaffColor = Color.Parse(TextColor1.Text).ToUint32();
-                NewTheme.SeriesCardDescColor = Color.Parse(TextColor2.Text).ToUint32();
-                NewTheme.SeriesProgressBGColor = Color.Parse(AccentColor2.Text).ToUint32();
-                NewTheme.SeriesProgressBarColor = Color.Parse(AccentColor1.Text).ToUint32();
-                NewTheme.SeriesProgressBarBGColor = Color.Parse(MainColor1.Text).ToUint32();
-                NewTheme.SeriesProgressBarBorderColor = Color.Parse(TextColor2.Text).ToUint32();
-                NewTheme.SeriesProgressTextColor = Color.Parse(TextColor2.Text).ToUint32();
-                NewTheme.SeriesProgressButtonsHoverColor = Color.Parse(MainColor1.Text).ToUint32(); 
-                NewTheme.SeriesSwitchPaneButtonBGColor = Color.Parse(AccentColor2.Text).ToUint32();
-                NewTheme.SeriesSwitchPaneButtonBGHoverColor = Color.Parse(AccentColor2.Text).ToUint32();
-                NewTheme.SeriesSwitchPaneButtonIconColor = Color.Parse(TextColor2.Text).ToUint32();
-                NewTheme.SeriesSwitchPaneButtonIconHoverColor = Color.Parse(AccentColor1.Text).ToUint32();
-                NewTheme.SeriesEditPaneBGColor = Color.Parse(MainColor1.Text).ToUint32();
-                NewTheme.SeriesNotesBGColor = Color.Parse(AccentColor2.Text).ToUint32();
-                NewTheme.SeriesNotesBorderColor = Color.Parse(AccentColor1.Text).ToUint32();
-                NewTheme.SeriesNotesTextColor = Color.Parse(TextColor1.Text).ToUint32();
-                NewTheme.SeriesEditPaneButtonsBGColor = Color.Parse(MainColor2.Text).ToUint32();
-                NewTheme.SeriesEditPaneButtonsBGHoverColor = Color.Parse(AccentColor2.Text).ToUint32();
-                NewTheme.SeriesEditPaneButtonsBorderColor = Color.Parse(AccentColor1.Text).ToUint32();
-                NewTheme.SeriesEditPaneButtonsBorderHoverColor = Color.Parse(AccentColor1.Text).ToUint32();
-                NewTheme.SeriesEditPaneButtonsIconColor = Color.Parse(AccentColor2.Text).ToUint32();
-                NewTheme.SeriesEditPaneButtonsIconHoverColor = Color.Parse(TextColor1.Text).ToUint32();
+                NewTheme.CollectionBGColor = Color.Parse(MainColor2.Text).ToUInt32();
+                NewTheme.StatusAndBookTypeBGColor = Color.Parse(AccentColor2.Text).ToUInt32();
+                NewTheme.StatusAndBookTypeBGHoverColor = Color.Parse(AccentColor1.Text).ToUInt32();
+                NewTheme.StatusAndBookTypeTextColor = Color.Parse(TextColor2.Text).ToUInt32();
+                NewTheme.StatusAndBookTypeTextHoverColor = Color.Parse(AccentColor2.Text).ToUInt32();
+                NewTheme.SeriesCardBGColor = Color.Parse(MainColor1.Text).ToUInt32();
+                NewTheme.SeriesCardTitleColor = Color.Parse(AccentColor1.Text).ToUInt32();
+                NewTheme.SeriesCardStaffColor = Color.Parse(TextColor1.Text).ToUInt32();
+                NewTheme.SeriesCardDescColor = Color.Parse(TextColor2.Text).ToUInt32();
+                NewTheme.SeriesProgressBGColor = Color.Parse(AccentColor2.Text).ToUInt32();
+                NewTheme.SeriesProgressBarColor = Color.Parse(AccentColor1.Text).ToUInt32();
+                NewTheme.SeriesProgressBarBGColor = Color.Parse(MainColor1.Text).ToUInt32();
+                NewTheme.SeriesProgressBarBorderColor = Color.Parse(TextColor2.Text).ToUInt32();
+                NewTheme.SeriesProgressTextColor = Color.Parse(TextColor2.Text).ToUInt32();
+                NewTheme.SeriesProgressButtonsHoverColor = Color.Parse(MainColor1.Text).ToUInt32(); 
+                NewTheme.SeriesSwitchPaneButtonBGColor = Color.Parse(AccentColor2.Text).ToUInt32();
+                NewTheme.SeriesSwitchPaneButtonBGHoverColor = Color.Parse(AccentColor2.Text).ToUInt32();
+                NewTheme.SeriesSwitchPaneButtonIconColor = Color.Parse(TextColor2.Text).ToUInt32();
+                NewTheme.SeriesSwitchPaneButtonIconHoverColor = Color.Parse(AccentColor1.Text).ToUInt32();
+                NewTheme.SeriesEditPaneBGColor = Color.Parse(MainColor1.Text).ToUInt32();
+                NewTheme.SeriesNotesBGColor = Color.Parse(AccentColor2.Text).ToUInt32();
+                NewTheme.SeriesNotesBorderColor = Color.Parse(AccentColor1.Text).ToUInt32();
+                NewTheme.SeriesNotesTextColor = Color.Parse(TextColor1.Text).ToUInt32();
+                NewTheme.SeriesEditPaneButtonsBGColor = Color.Parse(MainColor2.Text).ToUInt32();
+                NewTheme.SeriesEditPaneButtonsBGHoverColor = Color.Parse(AccentColor2.Text).ToUInt32();
+                NewTheme.SeriesEditPaneButtonsBorderColor = Color.Parse(AccentColor1.Text).ToUInt32();
+                NewTheme.SeriesEditPaneButtonsBorderHoverColor = Color.Parse(AccentColor1.Text).ToUInt32();
+                NewTheme.SeriesEditPaneButtonsIconColor = Color.Parse(AccentColor2.Text).ToUInt32();
+                NewTheme.SeriesEditPaneButtonsIconHoverColor = Color.Parse(TextColor1.Text).ToUInt32();
 
                 // Generate Theme
                 ApplyTheme();    
@@ -180,50 +180,50 @@ namespace Tsundoku.Views
                 NewTheme.ThemeName = NewThemeName.Text;
 
                 // Apply menu colors
-                NewTheme.MenuBGColor = Color.Parse(MainColor1.Text).ToUint32();
-                NewTheme.UsernameColor = Color.Parse(TextColor1.Text).ToUint32();
-                NewTheme.MenuTextColor = Color.Parse(TextColor1.Text).ToUint32();
-                NewTheme.SearchBarBGColor = Color.Parse(AccentColor2.Text).ToUint32();
-                NewTheme.SearchBarBorderColor = Color.Parse(AccentColor1.Text).ToUint32();
-                NewTheme.SearchBarTextColor = Color.Parse(TextColor1.Text).ToUint32();
-                NewTheme.DividerColor = Color.Parse(AccentColor1.Text).ToUint32();
-                NewTheme.MenuButtonBGColor = Color.Parse(AccentColor2.Text).ToUint32();
-                NewTheme.MenuButtonBGHoverColor = Color.Parse(MainColor2.Text).ToUint32();
-                NewTheme.MenuButtonBorderColor = Color.Parse(AccentColor1.Text).ToUint32();
-                NewTheme.MenuButtonBorderHoverColor = Color.Parse(AccentColor1.Text).ToUint32();
-                NewTheme.MenuButtonTextAndIconColor = Color.Parse(TextColor1.Text).ToUint32();
-                NewTheme.MenuButtonTextAndIconHoverColor = Color.Parse(MainColor1.Text).ToUint32();
+                NewTheme.MenuBGColor = Color.Parse(MainColor1.Text).ToUInt32();
+                NewTheme.UsernameColor = Color.Parse(TextColor1.Text).ToUInt32();
+                NewTheme.MenuTextColor = Color.Parse(TextColor1.Text).ToUInt32();
+                NewTheme.SearchBarBGColor = Color.Parse(AccentColor2.Text).ToUInt32();
+                NewTheme.SearchBarBorderColor = Color.Parse(AccentColor1.Text).ToUInt32();
+                NewTheme.SearchBarTextColor = Color.Parse(TextColor1.Text).ToUInt32();
+                NewTheme.DividerColor = Color.Parse(AccentColor1.Text).ToUInt32();
+                NewTheme.MenuButtonBGColor = Color.Parse(AccentColor2.Text).ToUInt32();
+                NewTheme.MenuButtonBGHoverColor = Color.Parse(MainColor2.Text).ToUInt32();
+                NewTheme.MenuButtonBorderColor = Color.Parse(AccentColor1.Text).ToUInt32();
+                NewTheme.MenuButtonBorderHoverColor = Color.Parse(AccentColor1.Text).ToUInt32();
+                NewTheme.MenuButtonTextAndIconColor = Color.Parse(TextColor1.Text).ToUInt32();
+                NewTheme.MenuButtonTextAndIconHoverColor = Color.Parse(MainColor1.Text).ToUInt32();
 
                 // Apply Colleciton Colors
-                NewTheme.CollectionBGColor = Color.Parse(MainColor2.Text).ToUint32();
-                NewTheme.StatusAndBookTypeBGColor = Color.Parse(AccentColor2.Text).ToUint32();
-                NewTheme.StatusAndBookTypeBGHoverColor = Color.Parse(TextColor2.Text).ToUint32();
-                NewTheme.StatusAndBookTypeTextColor = Color.Parse(TextColor2.Text).ToUint32();
-                NewTheme.StatusAndBookTypeTextHoverColor = Color.Parse(AccentColor2.Text).ToUint32();
-                NewTheme.SeriesCardBGColor = Color.Parse(MainColor1.Text).ToUint32();
-                NewTheme.SeriesCardTitleColor = Color.Parse(AccentColor1.Text).ToUint32();
-                NewTheme.SeriesCardStaffColor = Color.Parse(TextColor1.Text).ToUint32();
-                NewTheme.SeriesCardDescColor = Color.Parse(TextColor2.Text).ToUint32();
-                NewTheme.SeriesProgressBGColor = Color.Parse(AccentColor2.Text).ToUint32();
-                NewTheme.SeriesProgressBarColor = Color.Parse(TextColor1.Text).ToUint32();
-                NewTheme.SeriesProgressBarBGColor = Color.Parse(MainColor1.Text).ToUint32();
-                NewTheme.SeriesProgressBarBorderColor = Color.Parse(TextColor2.Text).ToUint32();
-                NewTheme.SeriesProgressTextColor = Color.Parse(TextColor2.Text).ToUint32();
-                NewTheme.SeriesProgressButtonsHoverColor = Color.Parse(MainColor1.Text).ToUint32();
-                NewTheme.SeriesSwitchPaneButtonBGColor = Color.Parse(AccentColor2.Text).ToUint32();
-                NewTheme.SeriesSwitchPaneButtonBGHoverColor = Color.Parse(AccentColor2.Text).ToUint32();
-                NewTheme.SeriesSwitchPaneButtonIconColor = Color.Parse(TextColor2.Text).ToUint32();
-                NewTheme.SeriesSwitchPaneButtonIconHoverColor = Color.Parse(MainColor1.Text).ToUint32();
-                NewTheme.SeriesEditPaneBGColor = Color.Parse(MainColor1.Text).ToUint32();
-                NewTheme.SeriesNotesBGColor = Color.Parse(AccentColor2.Text).ToUint32();
-                NewTheme.SeriesNotesBorderColor = Color.Parse(AccentColor1.Text).ToUint32();
-                NewTheme.SeriesNotesTextColor = Color.Parse(TextColor2.Text).ToUint32();
-                NewTheme.SeriesEditPaneButtonsBGColor = Color.Parse(MainColor2.Text).ToUint32();
-                NewTheme.SeriesEditPaneButtonsBGHoverColor = Color.Parse(TextColor1.Text).ToUint32();
-                NewTheme.SeriesEditPaneButtonsBorderColor = Color.Parse(AccentColor1.Text).ToUint32();
-                NewTheme.SeriesEditPaneButtonsBorderHoverColor = Color.Parse(AccentColor1.Text).ToUint32();
-                NewTheme.SeriesEditPaneButtonsIconColor = Color.Parse(TextColor2.Text).ToUint32();
-                NewTheme.SeriesEditPaneButtonsIconHoverColor = Color.Parse(MainColor1.Text).ToUint32();
+                NewTheme.CollectionBGColor = Color.Parse(MainColor2.Text).ToUInt32();
+                NewTheme.StatusAndBookTypeBGColor = Color.Parse(AccentColor2.Text).ToUInt32();
+                NewTheme.StatusAndBookTypeBGHoverColor = Color.Parse(TextColor2.Text).ToUInt32();
+                NewTheme.StatusAndBookTypeTextColor = Color.Parse(TextColor2.Text).ToUInt32();
+                NewTheme.StatusAndBookTypeTextHoverColor = Color.Parse(AccentColor2.Text).ToUInt32();
+                NewTheme.SeriesCardBGColor = Color.Parse(MainColor1.Text).ToUInt32();
+                NewTheme.SeriesCardTitleColor = Color.Parse(AccentColor1.Text).ToUInt32();
+                NewTheme.SeriesCardStaffColor = Color.Parse(TextColor1.Text).ToUInt32();
+                NewTheme.SeriesCardDescColor = Color.Parse(TextColor2.Text).ToUInt32();
+                NewTheme.SeriesProgressBGColor = Color.Parse(AccentColor2.Text).ToUInt32();
+                NewTheme.SeriesProgressBarColor = Color.Parse(TextColor1.Text).ToUInt32();
+                NewTheme.SeriesProgressBarBGColor = Color.Parse(MainColor1.Text).ToUInt32();
+                NewTheme.SeriesProgressBarBorderColor = Color.Parse(TextColor2.Text).ToUInt32();
+                NewTheme.SeriesProgressTextColor = Color.Parse(TextColor2.Text).ToUInt32();
+                NewTheme.SeriesProgressButtonsHoverColor = Color.Parse(MainColor1.Text).ToUInt32();
+                NewTheme.SeriesSwitchPaneButtonBGColor = Color.Parse(AccentColor2.Text).ToUInt32();
+                NewTheme.SeriesSwitchPaneButtonBGHoverColor = Color.Parse(AccentColor2.Text).ToUInt32();
+                NewTheme.SeriesSwitchPaneButtonIconColor = Color.Parse(TextColor2.Text).ToUInt32();
+                NewTheme.SeriesSwitchPaneButtonIconHoverColor = Color.Parse(MainColor1.Text).ToUInt32();
+                NewTheme.SeriesEditPaneBGColor = Color.Parse(MainColor1.Text).ToUInt32();
+                NewTheme.SeriesNotesBGColor = Color.Parse(AccentColor2.Text).ToUInt32();
+                NewTheme.SeriesNotesBorderColor = Color.Parse(AccentColor1.Text).ToUInt32();
+                NewTheme.SeriesNotesTextColor = Color.Parse(TextColor2.Text).ToUInt32();
+                NewTheme.SeriesEditPaneButtonsBGColor = Color.Parse(MainColor2.Text).ToUInt32();
+                NewTheme.SeriesEditPaneButtonsBGHoverColor = Color.Parse(TextColor1.Text).ToUInt32();
+                NewTheme.SeriesEditPaneButtonsBorderColor = Color.Parse(AccentColor1.Text).ToUInt32();
+                NewTheme.SeriesEditPaneButtonsBorderHoverColor = Color.Parse(AccentColor1.Text).ToUInt32();
+                NewTheme.SeriesEditPaneButtonsIconColor = Color.Parse(TextColor2.Text).ToUInt32();
+                NewTheme.SeriesEditPaneButtonsIconHoverColor = Color.Parse(MainColor1.Text).ToUInt32();
 
                 // Generate Theme
                 ApplyTheme();    
@@ -391,7 +391,7 @@ namespace Tsundoku.Views
                 {
                     //CollectionWindow.Navigation.Background = new SolidColorBrush(Menu_BG.Color);
                     Menu_BG_Button.Background = new SolidColorBrush(Menu_BG.Color);
-                    NewTheme.MenuBGColor = Menu_BG.Color.ToUint32();
+                    NewTheme.MenuBGColor = Menu_BG.Color.ToUInt32();
                 }
             };
 
@@ -401,7 +401,7 @@ namespace Tsundoku.Views
                 {
                     // CollectionWindow.Username.Foreground = new SolidColorBrush(Username.Color);
                     Username_Button.Background = new SolidColorBrush(Username.Color);
-                    NewTheme.UsernameColor = Username.Color.ToUint32();
+                    NewTheme.UsernameColor = Username.Color.ToUInt32();
                 }
             };
 
@@ -413,7 +413,7 @@ namespace Tsundoku.Views
                     // CollectionWindow.NumVolumesToBeCollected.Foreground = new SolidColorBrush(Menu_Text.Color);
                     // CollectionWindow.SearchCollectionHeader.Foreground = new SolidColorBrush(Menu_Text.Color);
                     Menu_Text_Button.Background = new SolidColorBrush(Menu_Text.Color);
-                    NewTheme.MenuTextColor = Menu_Text.Color.ToUint32();
+                    NewTheme.MenuTextColor = Menu_Text.Color.ToUInt32();
                 }
             };
 
@@ -423,7 +423,7 @@ namespace Tsundoku.Views
                 {
                     // CollectionWindow.SearchBar.Background = new SolidColorBrush(SearchBar_BG.Color);
                     SearchBar_BG_Button.Background = new SolidColorBrush(SearchBar_BG.Color);
-                    NewTheme.SearchBarBGColor = SearchBar_BG.Color.ToUint32();
+                    NewTheme.SearchBarBGColor = SearchBar_BG.Color.ToUInt32();
                 }
             };
 
@@ -433,7 +433,7 @@ namespace Tsundoku.Views
                 {
                     // CollectionWindow.SearchBar.BorderBrush = new SolidColorBrush(SearchBar_Border.Color);
                     SearchBar_Border_Button.Background = new SolidColorBrush(SearchBar_Border.Color);
-                    NewTheme.SearchBarBorderColor = SearchBar_Border.Color.ToUint32();
+                    NewTheme.SearchBarBorderColor = SearchBar_Border.Color.ToUInt32();
                 }
             };
 
@@ -443,7 +443,7 @@ namespace Tsundoku.Views
                 {
                     // CollectionWindow.SearchBar.Foreground = new SolidColorBrush(SearchBar_Text.Color);
                     SearchBar_Text_Button.Background = new SolidColorBrush(SearchBar_Text.Color);
-                    NewTheme.SearchBarTextColor = SearchBar_Text.Color.ToUint32();
+                    NewTheme.SearchBarTextColor = SearchBar_Text.Color.ToUInt32();
                 }
             };
 
@@ -453,7 +453,7 @@ namespace Tsundoku.Views
                 {
                     // CollectionWindow.Navigation.BorderBrush = new SolidColorBrush(Divider.Color);
                     Divider_Button.Background = new SolidColorBrush(Divider.Color);
-                    NewTheme.DividerColor = Divider.Color.ToUint32();
+                    NewTheme.DividerColor = Divider.Color.ToUInt32();
                 }
             };
 
@@ -468,7 +468,7 @@ namespace Tsundoku.Views
                     // CollectionWindow.DisplaySelector.Background = menuButtonBG;
                     // CollectionWindow.LanguageSelector.Background = menuButtonBG;
                     MenuButton_BG_Button.Background = new SolidColorBrush(MenuButton_BG.Color);
-                    NewTheme.MenuButtonBGColor = MenuButton_BG.Color.ToUint32();
+                    NewTheme.MenuButtonBGColor = MenuButton_BG.Color.ToUInt32();
                 }
             };
 
@@ -477,7 +477,7 @@ namespace Tsundoku.Views
                 if (e.Property == ColorPicker.ColorProperty)
                 {
                     MenuButton_BG_Hover_Button.Background = new SolidColorBrush(MenuButton_BG_Hover.Color);
-                    NewTheme.MenuButtonBGHoverColor = MenuButton_BG_Hover.Color.ToUint32();
+                    NewTheme.MenuButtonBGHoverColor = MenuButton_BG_Hover.Color.ToUInt32();
                 }
             };
 
@@ -492,7 +492,7 @@ namespace Tsundoku.Views
                     // CollectionWindow.DisplaySelector.BorderBrush = menuButtonBorder;
                     // CollectionWindow.LanguageSelector.BorderBrush = menuButtonBorder;
                     MenuButton_Border_Button.Background = new SolidColorBrush(MenuButton_Border.Color);
-                    NewTheme.MenuButtonBorderColor = MenuButton_Border.Color.ToUint32();
+                    NewTheme.MenuButtonBorderColor = MenuButton_Border.Color.ToUInt32();
                 }
             };
 
@@ -501,7 +501,7 @@ namespace Tsundoku.Views
                 if (e.Property == ColorPicker.ColorProperty)
                 {
                     MenuButton_Border_Hover_Button.Background = new SolidColorBrush(MenuButton_Border_Hover.Color);
-                    NewTheme.MenuButtonBorderHoverColor = MenuButton_Border_Hover.Color.ToUint32();
+                    NewTheme.MenuButtonBorderHoverColor = MenuButton_Border_Hover.Color.ToUInt32();
                 }
             };
 
@@ -516,7 +516,7 @@ namespace Tsundoku.Views
                     // CollectionWindow.DisplaySelector.Foreground = menuButtonTextAndIconColor;
                     // CollectionWindow.LanguageSelector.Foreground = menuButtonTextAndIconColor;
                     MenuButton_IconAndText_Button.Background = new SolidColorBrush(MenuButton_IconAndText.Color);
-                    NewTheme.MenuButtonTextAndIconColor = MenuButton_IconAndText.Color.ToUint32();
+                    NewTheme.MenuButtonTextAndIconColor = MenuButton_IconAndText.Color.ToUInt32();
                 }
             };
 
@@ -526,7 +526,7 @@ namespace Tsundoku.Views
                 {
                     //CollectionWindow.SettingsButton.PointerEntered += new EventHandler<Avalonia.Input.PointerEventArgs>(Button_PointerEnter);
                     MenuButton_IconAndText_Hover_Button.Background = new SolidColorBrush(MenuButton_IconAndText_Hover.Color);
-                    NewTheme.MenuButtonTextAndIconHoverColor = MenuButton_IconAndText_Hover.Color.ToUint32();
+                    NewTheme.MenuButtonTextAndIconHoverColor = MenuButton_IconAndText_Hover.Color.ToUInt32();
                 }
             };
         }
@@ -539,7 +539,7 @@ namespace Tsundoku.Views
                 {
                     // CollectionWindow.CollectionTheme.Background = new SolidColorBrush(Collection_BG.Color);
                     Collection_BG_Button.Background = new SolidColorBrush(Collection_BG.Color);
-                    NewTheme.CollectionBGColor = Collection_BG.Color.ToUint32();
+                    NewTheme.CollectionBGColor = Collection_BG.Color.ToUInt32();
                 }
             };
 
@@ -548,10 +548,10 @@ namespace Tsundoku.Views
                 if (e.Property == ColorPicker.ColorProperty)
                 {
                     //CollectionWindow.CollectionTheme.FindLogicalDescendantOfType<TextBlock>(false).Background = new SolidColorBrush(Status_And_BookType_BG.Color);
-                    //((MainWindowViewModel)CollectionWindow.CollectionTheme.DataContext).CurrentTheme.StatusAndBookTypeBGColor = Status_And_BookType_BG.Color.ToUint32();
-                    //ThemeSettingsVM.CurrentTheme.StatusAndBookTypeBGColor = Status_And_BookType_BG.Color.ToUint32();
+                    //((MainWindowViewModel)CollectionWindow.CollectionTheme.DataContext).CurrentTheme.StatusAndBookTypeBGColor = Status_And_BookType_BG.Color.ToUInt32();
+                    //ThemeSettingsVM.CurrentTheme.StatusAndBookTypeBGColor = Status_And_BookType_BG.Color.ToUInt32();
                     Status_And_BookType_BG_Button.Background = new SolidColorBrush(Status_And_BookType_BG.Color);
-                    NewTheme.StatusAndBookTypeBGColor = Status_And_BookType_BG.Color.ToUint32();
+                    NewTheme.StatusAndBookTypeBGColor = Status_And_BookType_BG.Color.ToUInt32();
                 }
             };
 
@@ -561,7 +561,7 @@ namespace Tsundoku.Views
                 {
                     //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(Status_And_BookType_BG_Hover.Color);
                     Status_And_BookType_BG_Hover_Button.Background = new SolidColorBrush(Status_And_BookType_BG_Hover.Color);
-                    NewTheme.StatusAndBookTypeBGHoverColor = Status_And_BookType_BG_Hover.Color.ToUint32();
+                    NewTheme.StatusAndBookTypeBGHoverColor = Status_And_BookType_BG_Hover.Color.ToUInt32();
                 }
             };
 
@@ -571,7 +571,7 @@ namespace Tsundoku.Views
                 {
                     //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(Status_And_BookType_Text.Color);
                     Status_And_BookType_Text_Button.Background = new SolidColorBrush(Status_And_BookType_Text.Color);
-                    NewTheme.StatusAndBookTypeTextColor = Status_And_BookType_Text.Color.ToUint32();
+                    NewTheme.StatusAndBookTypeTextColor = Status_And_BookType_Text.Color.ToUInt32();
                 }
             };
 
@@ -581,7 +581,7 @@ namespace Tsundoku.Views
                 {
                     //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(Status_And_BookType_Text_Hover.Color);
                     Status_And_BookType_Text_Hover_Button.Background = new SolidColorBrush(Status_And_BookType_Text_Hover.Color);
-                    NewTheme.StatusAndBookTypeTextHoverColor = Status_And_BookType_Text_Hover.Color.ToUint32();
+                    NewTheme.StatusAndBookTypeTextHoverColor = Status_And_BookType_Text_Hover.Color.ToUInt32();
                 }
             };
 
@@ -590,9 +590,9 @@ namespace Tsundoku.Views
                 if (e.Property == ColorPicker.ColorProperty)
                 {
                     //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesCard_BG.Color);
-                    //ThemeSettingsVM.CurrentTheme.SeriesCardBGColor = SeriesCard_BG.Color.ToUint32();
+                    //ThemeSettingsVM.CurrentTheme.SeriesCardBGColor = SeriesCard_BG.Color.ToUInt32();
                     SeriesCard_BG_Button.Background = new SolidColorBrush(SeriesCard_BG.Color);
-                    NewTheme.SeriesCardBGColor = SeriesCard_BG.Color.ToUint32();
+                    NewTheme.SeriesCardBGColor = SeriesCard_BG.Color.ToUInt32();
                     //ApplyThemeChanges("SeriesCardData", "DockPanel");
                 }
             };
@@ -603,7 +603,7 @@ namespace Tsundoku.Views
                 {
                     //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesCard_Title.Color);
                     SeriesCard_Title_Button.Background = new SolidColorBrush(SeriesCard_Title.Color);
-                    NewTheme.SeriesCardTitleColor = SeriesCard_Title.Color.ToUint32();
+                    NewTheme.SeriesCardTitleColor = SeriesCard_Title.Color.ToUInt32();
                 }
             };
 
@@ -613,7 +613,7 @@ namespace Tsundoku.Views
                 {
                     //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesCard_Staff.Color);
                     SeriesCard_Staff_Button.Background = new SolidColorBrush(SeriesCard_Staff.Color);
-                    NewTheme.SeriesCardStaffColor = SeriesCard_Staff.Color.ToUint32();
+                    NewTheme.SeriesCardStaffColor = SeriesCard_Staff.Color.ToUInt32();
                 }
             };
 
@@ -623,7 +623,7 @@ namespace Tsundoku.Views
                 {
                     //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesCard_Desc.Color);
                     SeriesCard_Desc_Button.Background = new SolidColorBrush(SeriesCard_Desc.Color);
-                    NewTheme.SeriesCardDescColor = SeriesCard_Desc.Color.ToUint32();
+                    NewTheme.SeriesCardDescColor = SeriesCard_Desc.Color.ToUInt32();
                 }
             };
 
@@ -633,7 +633,7 @@ namespace Tsundoku.Views
                 {
                     //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesProgress_BG.Color);
                     SeriesProgress_BG_Button.Background = new SolidColorBrush(SeriesProgress_BG.Color);
-                    NewTheme.SeriesProgressBGColor = SeriesProgress_BG.Color.ToUint32();
+                    NewTheme.SeriesProgressBGColor = SeriesProgress_BG.Color.ToUInt32();
                 }
             };
 
@@ -643,7 +643,7 @@ namespace Tsundoku.Views
                 {
                     //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesProgress_Bar.Color);
                     SeriesProgress_Bar_Button.Background = new SolidColorBrush(SeriesProgress_Bar.Color);
-                    NewTheme.SeriesProgressBarColor = SeriesProgress_Bar.Color.ToUint32();
+                    NewTheme.SeriesProgressBarColor = SeriesProgress_Bar.Color.ToUInt32();
                 }
             };
 
@@ -653,7 +653,7 @@ namespace Tsundoku.Views
                 {
                     //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesProgress_Bar_BG.Color);
                     SeriesProgress_Bar_BG_Button.Background = new SolidColorBrush(SeriesProgress_Bar_BG.Color);
-                    NewTheme.SeriesProgressBarBGColor = SeriesProgress_Bar_BG.Color.ToUint32();
+                    NewTheme.SeriesProgressBarBGColor = SeriesProgress_Bar_BG.Color.ToUInt32();
                 }
             };
 
@@ -663,7 +663,7 @@ namespace Tsundoku.Views
                 {
                     //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesProgress_Bar_Border.Color);
                     SeriesProgress_Bar_Border_Button.Background = new SolidColorBrush(SeriesProgress_Bar_Border.Color);
-                    NewTheme.SeriesProgressBarBorderColor = SeriesProgress_Bar_Border.Color.ToUint32();
+                    NewTheme.SeriesProgressBarBorderColor = SeriesProgress_Bar_Border.Color.ToUInt32();
                 }
             };
 
@@ -673,7 +673,7 @@ namespace Tsundoku.Views
                 {
                     //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesProgress_Text.Color);
                     SeriesProgress_Text_Button.Background = new SolidColorBrush(SeriesProgress_Text.Color);
-                    NewTheme.SeriesProgressTextColor = SeriesProgress_Text.Color.ToUint32();
+                    NewTheme.SeriesProgressTextColor = SeriesProgress_Text.Color.ToUInt32();
                 }
             };
 
@@ -683,7 +683,7 @@ namespace Tsundoku.Views
                 {
                     //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesProgress_Buttons_Hover.Color);
                     SeriesProgress_Buttons_Hover_Button.Background = new SolidColorBrush(SeriesProgress_Buttons_Hover.Color);
-                    NewTheme.SeriesProgressButtonsHoverColor = SeriesProgress_Buttons_Hover.Color.ToUint32();
+                    NewTheme.SeriesProgressButtonsHoverColor = SeriesProgress_Buttons_Hover.Color.ToUInt32();
                 }
             };
 
@@ -693,7 +693,7 @@ namespace Tsundoku.Views
                 {
                     //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesSwitchPaneButton_BG.Color);
                     SeriesSwitchPaneButton_BG_Button.Background = new SolidColorBrush(SeriesSwitchPaneButton_BG.Color);
-                    NewTheme.SeriesSwitchPaneButtonBGColor = SeriesSwitchPaneButton_BG.Color.ToUint32();
+                    NewTheme.SeriesSwitchPaneButtonBGColor = SeriesSwitchPaneButton_BG.Color.ToUInt32();
                 }
             };
 
@@ -703,7 +703,7 @@ namespace Tsundoku.Views
                 {
                     //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesSwitchPaneButton_BG_Hover.Color);
                     SeriesSwitchPaneButton_BG_Hover_Button.Background = new SolidColorBrush(SeriesSwitchPaneButton_BG_Hover.Color);
-                    NewTheme.SeriesSwitchPaneButtonBGHoverColor = SeriesSwitchPaneButton_BG_Hover.Color.ToUint32();
+                    NewTheme.SeriesSwitchPaneButtonBGHoverColor = SeriesSwitchPaneButton_BG_Hover.Color.ToUInt32();
                 }
             };
 
@@ -713,7 +713,7 @@ namespace Tsundoku.Views
                 {
                     //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesSwitchPaneButton_Icon.Color);
                     SeriesSwitchPaneButton_Icon_Button.Background = new SolidColorBrush(SeriesSwitchPaneButton_Icon.Color);
-                    NewTheme.SeriesSwitchPaneButtonIconColor = SeriesSwitchPaneButton_Icon.Color.ToUint32();
+                    NewTheme.SeriesSwitchPaneButtonIconColor = SeriesSwitchPaneButton_Icon.Color.ToUInt32();
                 }
             };
 
@@ -723,7 +723,7 @@ namespace Tsundoku.Views
                 {
                     //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesSwitchPaneButton_Icon_Hover.Color);
                     SeriesSwitchPaneButton_Icon_Hover_Button.Background = new SolidColorBrush(SeriesSwitchPaneButton_Icon_Hover.Color);
-                    NewTheme.SeriesSwitchPaneButtonIconHoverColor = SeriesSwitchPaneButton_Icon_Hover.Color.ToUint32();
+                    NewTheme.SeriesSwitchPaneButtonIconHoverColor = SeriesSwitchPaneButton_Icon_Hover.Color.ToUInt32();
                 }
             };
 
@@ -733,7 +733,7 @@ namespace Tsundoku.Views
                 {
                     //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesEditPane_BG.Color);
                     SeriesEditPane_BG_Button.Background = new SolidColorBrush(SeriesEditPane_BG.Color);
-                    NewTheme.SeriesEditPaneBGColor = SeriesEditPane_BG.Color.ToUint32();
+                    NewTheme.SeriesEditPaneBGColor = SeriesEditPane_BG.Color.ToUInt32();
                 }
             };
 
@@ -743,7 +743,7 @@ namespace Tsundoku.Views
                 {
                     //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesNotes_BG.Color);
                     SeriesNotes_BG_Button.Background = new SolidColorBrush(SeriesNotes_BG.Color);
-                    NewTheme.SeriesNotesBGColor = SeriesNotes_BG.Color.ToUint32();
+                    NewTheme.SeriesNotesBGColor = SeriesNotes_BG.Color.ToUInt32();
                 }
             };
 
@@ -753,7 +753,7 @@ namespace Tsundoku.Views
                 {
                     //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesNotes_Border.Color);
                     SeriesNotes_Border_Button.Background = new SolidColorBrush(SeriesNotes_Border.Color);
-                    NewTheme.SeriesNotesBorderColor = SeriesNotes_Border.Color.ToUint32();
+                    NewTheme.SeriesNotesBorderColor = SeriesNotes_Border.Color.ToUInt32();
                 }
             };
 
@@ -763,7 +763,7 @@ namespace Tsundoku.Views
                 {
                     //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesNotes_Text.Color);
                     SeriesNotes_Text_Button.Background = new SolidColorBrush(SeriesNotes_Text.Color);
-                    NewTheme.SeriesNotesTextColor = SeriesNotes_Text.Color.ToUint32();
+                    NewTheme.SeriesNotesTextColor = SeriesNotes_Text.Color.ToUInt32();
                 }
             };
 
@@ -773,7 +773,7 @@ namespace Tsundoku.Views
                 {
                     //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesEditPane_Buttons_BG.Color);
                     SeriesEditPane_Buttons_BG_Button.Background = new SolidColorBrush(SeriesEditPane_Buttons_BG.Color);
-                    NewTheme.SeriesEditPaneButtonsBGColor = SeriesEditPane_Buttons_BG.Color.ToUint32();
+                    NewTheme.SeriesEditPaneButtonsBGColor = SeriesEditPane_Buttons_BG.Color.ToUInt32();
                 }
             };
 
@@ -783,7 +783,7 @@ namespace Tsundoku.Views
                 {
                     //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesEditPane_Buttons_BG_Hover.Color);
                     SeriesEditPane_Buttons_BG_Hover_Button.Background = new SolidColorBrush(SeriesEditPane_Buttons_BG_Hover.Color);
-                    NewTheme.SeriesEditPaneButtonsBGHoverColor = SeriesEditPane_Buttons_BG_Hover.Color.ToUint32();
+                    NewTheme.SeriesEditPaneButtonsBGHoverColor = SeriesEditPane_Buttons_BG_Hover.Color.ToUInt32();
                 }
             };
 
@@ -793,7 +793,7 @@ namespace Tsundoku.Views
                 {
                     //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesEditPane_Buttons_Border.Color);
                     SeriesEditPane_Buttons_Border_Button.Background = new SolidColorBrush(SeriesEditPane_Buttons_Border.Color);
-                    NewTheme.SeriesEditPaneButtonsBorderColor = SeriesEditPane_Buttons_Border.Color.ToUint32();
+                    NewTheme.SeriesEditPaneButtonsBorderColor = SeriesEditPane_Buttons_Border.Color.ToUInt32();
                 }
             };
 
@@ -803,7 +803,7 @@ namespace Tsundoku.Views
                 {
                     //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesEditPane_Buttons_Border_Hover.Color);
                     SeriesEditPane_Buttons_Border_Hover_Button.Background = new SolidColorBrush(SeriesEditPane_Buttons_Border_Hover.Color);
-                    NewTheme.SeriesEditPaneButtonsBorderHoverColor = SeriesEditPane_Buttons_Border_Hover.Color.ToUint32();
+                    NewTheme.SeriesEditPaneButtonsBorderHoverColor = SeriesEditPane_Buttons_Border_Hover.Color.ToUInt32();
                 }
             };
 
@@ -813,7 +813,7 @@ namespace Tsundoku.Views
                 {
                     //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesEditPane_Buttons_Icon.Color);
                     SeriesEditPane_Buttons_Icon_Button.Background = new SolidColorBrush(SeriesEditPane_Buttons_Icon.Color);
-                    NewTheme.SeriesEditPaneButtonsIconColor = SeriesEditPane_Buttons_Icon.Color.ToUint32();
+                    NewTheme.SeriesEditPaneButtonsIconColor = SeriesEditPane_Buttons_Icon.Color.ToUInt32();
                 }
             };
 
@@ -823,7 +823,7 @@ namespace Tsundoku.Views
                 {
                     //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesEditPane_Buttons_Icon_Hover.Color);
                     SeriesEditPane_Buttons_Icon_Hover_Button.Background = new SolidColorBrush(SeriesEditPane_Buttons_Icon_Hover.Color);
-                    NewTheme.SeriesEditPaneButtonsIconHoverColor = SeriesEditPane_Buttons_Icon_Hover.Color.ToUint32();
+                    NewTheme.SeriesEditPaneButtonsIconHoverColor = SeriesEditPane_Buttons_Icon_Hover.Color.ToUInt32();
                 }
             };
         }

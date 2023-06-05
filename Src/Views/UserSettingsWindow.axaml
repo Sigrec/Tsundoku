@@ -40,7 +40,7 @@
                 <TextBlock Text="Change Currency" FontSize="20" FontWeight="Bold" Classes="menu"/>
                 <ComboBox Name="CurrencySelector"
                           SelectionChanged="CurrencyChanged"
-                          Items="{Binding Source={x:Static model:Constants.CURRENCY_SYMBOLS}}"
+                          ItemsSource="{Binding Source={x:Static model:Constants.CURRENCY_SYMBOLS}}"
                           FontWeight="Bold"
                           SelectedItem="{Binding CurCurrency}"
                           FontSize="15"
