@@ -34,32 +34,15 @@ namespace Tsundoku.ViewModels
         public string[] AvailableLanguages { get; } = new string[] { "Romaji", "English", "Japanese", "Korean", "Arabic", "Azerbaijan", "Bengali", "Bulgarian", "Burmese", "Catalan", "Chinese", "Croatian", "Czech", "Danish", "Dutch", "Esperanto", "Estonian", "Filipino", "Finnish", "French", "German", "Greek", "Hebrew", "Hindi", "Hungarian", "Indonesian", "Italian", "Kazakh", "Latin", "Lithuanian", "Malay", "Mongolian", "Nepali", "Norwegian", "Persian", "Polish", "Portuguese", "Romanian", "Russian", "Serbian", "Slovak", "Spanish", "Swedish", "Tamil", "Thai", "Turkish", "Ukrainian", "Vietnamese" };
         public string[] AvailableCollectionFilters { get; } = new string[] { "None", "Favorites", "Ongoing", "Finished", "Hiatus", "Cancelled", "Complete", "Incomplete", "Manga", "Novel" };
 
-        [Reactive]
-        public string SearchText { get; set; }
-
-        [Reactive]
-        public uint UsersNumVolumesCollected { get; set; }
-
-        [Reactive]
-        public uint UsersNumVolumesToBeCollected { get; set; }
-        
-        [Reactive]
-        public string CurLanguage { get; set; }
-
-        [Reactive]
-        public bool LanguageChanged { get; set; } = false;
-
-        [Reactive]
-        public bool SearchIsBusy { get; set; } = false;
-
-        [Reactive]
-        public string UserName { get; set; }
-
-        [Reactive]
-        public string CurDisplay { get; set; }
-
-        // [Reactive]
-        // public uint TestVal { get; set; } = 88888;
+        [Reactive] public string SearchText { get; set; }
+        [Reactive] public uint UsersNumVolumesCollected { get; set; }
+        [Reactive] public uint UsersNumVolumesToBeCollected { get; set; }
+        [Reactive] public string CurLanguage { get; set; }
+        [Reactive] public bool LanguageChanged { get; set; } = false;
+        [Reactive] public bool SearchIsBusy { get; set; } = false;
+        [Reactive] public string UserName { get; set; }
+        [Reactive] public string CurDisplay { get; set; }
+        // [Reactive] public uint TestVal { get; set; } = 88888;
 
         public AddNewSeriesWindow newSeriesWindow;
         public ReactiveCommand<Unit, Unit> OpenAddNewSeriesWindow { get; set; }

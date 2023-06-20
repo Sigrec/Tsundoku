@@ -185,30 +185,30 @@ namespace Tsundoku.ViewModels
             EightScoreCount.Value = MainWindowViewModel.Collection.Count(series => series.Score >= 8 && series.Score < 9);
             NineScoreCount.Value = MainWindowViewModel.Collection.Count(series => series.Score >= 9 && series.Score < 10);
             TenScoreCount.Value = MainWindowViewModel.Collection.Count(series => series.Score == 10);
-            MaxScoreCount.Value = GetMaxScoreCount();
+            // MaxScoreCount.Value = GetMaxScoreCount();
         }
 
         public void UpdateStatusPercentages()
         {
-            FinishedPercentage = Math.Round((decimal)(FinishedCount.Value / MainWindowViewModel.Collection.Count * 100), 2);
-            OngoingPercentage = Math.Round((decimal)(OngoingCount.Value / MainWindowViewModel.Collection.Count * 100), 2);
-            CancelledPercentage = Math.Round((decimal)(CancelledCount.Value / MainWindowViewModel.Collection.Count * 100), 2);
-            HiatusPercentage = Math.Round((decimal)(HiatusCount.Value / MainWindowViewModel.Collection.Count * 100), 2);
+            FinishedPercentage = Math.Round(Convert.ToDecimal((MainWindowViewModel.Collection.Count != 0 && FinishedCount.Value != Double.NaN ? FinishedCount.Value / MainWindowViewModel.Collection.Count * 100 : 0)), 2);
+            OngoingPercentage = Math.Round(Convert.ToDecimal((MainWindowViewModel.Collection.Count != 0 && OngoingCount.Value != Double.NaN ? OngoingCount.Value / MainWindowViewModel.Collection.Count * 100 : 0)), 2);
+            CancelledPercentage = Math.Round(Convert.ToDecimal((MainWindowViewModel.Collection.Count != 0 && CancelledCount.Value != Double.NaN ? CancelledCount.Value / MainWindowViewModel.Collection.Count * 100 : 0)), 2);
+            HiatusPercentage = Math.Round(Convert.ToDecimal((MainWindowViewModel.Collection.Count != 0 && HiatusCount.Value != Double.NaN ? HiatusCount.Value / MainWindowViewModel.Collection.Count * 100 : 0)), 2);
         }
 
         public void UpdateDemographicPercentages()
         {
             int actualCount = MainWindowViewModel.Collection.Count(series => !string.IsNullOrWhiteSpace(series.Demographic));
-            ShounenPercentage = Math.Round((decimal)(ShounenCount.Value / actualCount * 100), 2);
-            SeinenPercentage = Math.Round((decimal)(SeinenCount.Value / actualCount * 100), 2);
-            ShoujoPercentage = Math.Round((decimal)(ShoujoCount.Value / actualCount * 100), 2);
-            JoseiPercentage = Math.Round((decimal)(JoseiCount.Value / actualCount * 100), 2);
+            ShounenPercentage = Math.Round(Convert.ToDecimal((actualCount != 0 && ShounenCount.Value != Double.NaN ? ShounenCount.Value / actualCount * 100 : 0)), 2);
+            SeinenPercentage = Math.Round(Convert.ToDecimal((actualCount != 0 && SeinenCount.Value != Double.NaN ? SeinenCount.Value / actualCount * 100 : 0)), 2);
+            ShoujoPercentage = Math.Round(Convert.ToDecimal((actualCount != 0 && ShoujoCount.Value != Double.NaN ? ShoujoCount.Value / actualCount * 100 : 0)), 2);
+            JoseiPercentage = Math.Round(Convert.ToDecimal((actualCount != 0 && JoseiCount.Value != Double.NaN ? JoseiCount.Value / actualCount * 100 : 0)), 2);
         }
 
-        private uint GetMaxScoreCount()
-        {
-            return (uint)Math.Max((uint)OneScoreCount.Value, Math.Max((uint)TwoScoreCount.Value, Math.Max((uint)ThreeScoreCount.Value, Math.Max((uint)FourScoreCount.Value, Math.Max((uint)FiveScoreCount.Value, Math.Max((uint)SixScoreCount.Value, Math.Max((uint)SevenScoreCount.Value, Math.Max((uint)EightScoreCount.Value, Math.Max((uint)NineScoreCount.Value, (uint)TenScoreCount.Value)))))))));
-        }
+        // private uint GetMaxScoreCount()
+        // {
+        //     return (uint)Math.Max((uint)OneScoreCount.Value, Math.Max((uint)TwoScoreCount.Value, Math.Max((uint)ThreeScoreCount.Value, Math.Max((uint)FourScoreCount.Value, Math.Max((uint)FiveScoreCount.Value, Math.Max((uint)SixScoreCount.Value, Math.Max((uint)SevenScoreCount.Value, Math.Max((uint)EightScoreCount.Value, Math.Max((uint)NineScoreCount.Value, (uint)TenScoreCount.Value)))))))));
+        // }
 
         public void GenerateStats()
         {

@@ -26,6 +26,7 @@ namespace Tsundoku.Views
         public MainWindow()
         {
             InitializeComponent();
+
             this.KeyDown += (s, e) => 
             {
                 if (e.Key == Key.F11) 

@@ -80,7 +80,7 @@ namespace Tsundoku.Views
             BarObject.Fill = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.MenuBGColor));
             BarObject.DataLabelsPaint =new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.UsernameColor));
             BarObject.Stroke = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.MenuTextColor));
-            Color test = Color.FromArgb((int)CollectionStatsVM.CurrentTheme.UsernameColor);
+            // Color test = Color.FromArgb((int)CollectionStatsVM.CurrentTheme.UsernameColor);
             // ((ColumnSeries<ObservableValue>)CollectionStatsVM.ScoreDistribution[0]).Fill = new SolidColorPaint(new SkiaSharp.SKColor(test.R, test.B, test.G, 30));
 
             Axis XAxisObject = ((Axis)CollectionStatsVM.ScoreXAxes[0]);

@@ -209,7 +209,7 @@ namespace Tests.SeriesTests
         [Test]
         public async Task GetSeriesStaff_MultplieStaffForValidRole_Test()
         {
-            Assert.That(Series.GetSeriesStaff((await ALQuery.GetSeriesByTitleAsync("나 혼자만 레벨업", "MANGA", 1)).RootElement.GetProperty("Media").GetProperty("staff").GetProperty("edges"), "full", "Manga", "Na Honjaman Level Up", new System.Text.StringBuilder()), Is.EqualTo("Seong-Rak Jang | Chu-Gong | So-Ryeong Gi | Hyeon-Gun"));
+            Assert.That(Series.GetSeriesStaff((await ALQuery.GetSeriesByTitleAsync("나 혼자만 레벨업", "MANGA", 1)).RootElement.GetProperty("Media").GetProperty("staff").GetProperty("edges"), "full", "Manga", "Na Honjaman Level Up", new System.Text.StringBuilder()), Is.EqualTo("Chu-Gong | So-Ryeong Gi | Hyeon-Gun | Seong-Rak Jang"));
         }
 
         [Test]
