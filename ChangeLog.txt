@@ -1,3 +1,6 @@
+V1.6.1.0 - 
+✅ Avalonia Lib Upgrade + Other Lib Upgrades
+
 V1.6.0.0 - June 4th, 2023 @ 1:36PM PST
 ✅ Added 2 new pie charts to the stats window showing distribution for demograhics and status for a series
 ✅ Added bar/cartesian chart to the stats window showing distribution of scores in collection

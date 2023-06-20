@@ -90,19 +90,19 @@
 	<PackageReference Include="GraphQL.Client.Serializer.SystemTextJson" Version="6.0.0" />
     <PackageReference Include="MessageBox.Avalonia" Version="2.3.1-rc1" />
     <PackageReference Include="NLog" Version="5.2.0" />
-    <PackageReference Include="Projektanker.Icons.Avalonia.FontAwesome" Version="6.6.0-preview6" />
+    <PackageReference Include="Projektanker.Icons.Avalonia.FontAwesome" Version="6.6.0-rc1.1" />
 	<PackageReference Include="TextCopy" Version="6.2.1" />
     <PackageReference Include="ReactiveUI.Fody" Version="19.2.1" />
-	<PackageReference Include="LiveChartsCore.SkiaSharpView.Avalonia" Version="2.0.0-beta.700-11.0.0-rc1.1" />
+	<PackageReference Include="LiveChartsCore.SkiaSharpView.Avalonia" Version="2.0.0-beta.800-11.0.0-rc1.1" />
   </ItemGroup>
-  <ItemGroup>
+  <!-- <ItemGroup>
     <Compile Update="Program.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Update=".\Views\CollectionThemeWindow.axaml.cs">
       <DependentUpon>CollectionThemeWindow.axaml</DependentUpon>
     </Compile>
-  </ItemGroup>
+  </ItemGroup> -->
   <ItemGroup>
     <None Update="Assets\Icons\Tsundoku-Logo.png">
       <Pack>True</Pack>

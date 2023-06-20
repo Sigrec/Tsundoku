@@ -405,7 +405,6 @@ namespace Tsundoku.Views
             string title = ((TextBlock)sender).Text;
             Constants.Logger.Info($"Copying {title} to Clipboard");
             await TextCopy.ClipboardService.SetTextAsync(title);
-            // await Application.Current.Clipboard.SetTextAsync(title);
         }
 
         /*

@@ -1,9 +1,9 @@
 using System.Runtime.CompilerServices;
 using Avalonia;
 using Avalonia.ReactiveUI;
-using Projektanker.Icons.Avalonia;
 using Projektanker.Icons.Avalonia.FontAwesome;
 using System;
+using Projektanker.Icons.Avalonia;
 
 namespace Tsundoku
 {
@@ -18,10 +18,13 @@ namespace Tsundoku
 
         // Avalonia configuration, don't remove; also used by visual designer.
         public static AppBuilder BuildAvaloniaApp()
-            => AppBuilder.Configure<App>()
+        {
+            IconProvider.Current
+                .Register<FontAwesomeIconProvider>();
+
+            return AppBuilder.Configure<App>()
                 .UsePlatformDetect()
                 .LogToTrace()
-                .WithIcons(container => container.Register<FontAwesomeIconProvider>())
                 .UseReactiveUI()
                 .With(LoaderOptimization.MultiDomainHost)
                 .With(LoadHint.Sometimes)
@@ -31,10 +34,9 @@ namespace Tsundoku
                 // })
                 .With(new Win32PlatformOptions
                 {
-                    // UseCompositor = false,
                     UseWgl = true,
-                    // UseDeferredRendering = false,
                     AllowEglInitialization = true
                 });
+        }
     }
 }
