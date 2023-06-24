@@ -1,8 +1,9 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="using:Tsundoku"
-			 xmlns:vm="using:Tsundoku.ViewModels.MainWindowViewModel"
+			 xmlns:vm="using:Tsundoku.ViewModels"
              xmlns:cv="clr-namespace:Tsundoku.Helpers"
+			 x:DataType="vm:MainWindowViewModel"
              x:Class="Tsundoku.App">
 	<!-- TODO: Figure out a way to prevent other windows from hiding under main window when open and clicking main window -->
 	<Application.Resources>
@@ -10,7 +11,7 @@
 	</Application.Resources>
 
     <Application.Styles>
-		<FluentTheme Mode="Dark"/>
+		<FluentTheme/>
 		<!-- <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/> -->
 		<StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml" />
 		<StyleInclude Source="/Styles/MenuTheme.xaml" />
@@ -18,16 +19,7 @@
 
     <TrayIcon.Icons>
 		<TrayIcons>
-			<TrayIcon Icon="\Assets\Icons\Tsundoku-Logo.ico" ToolTipText="Tsundoku">
-				<!-- <TrayIcon.Menu>
-					<NativeMenu>
-						<NativeMenuItem Header="Open User Settings" ToggleType="Radio" IsChecked="False" Command="{Binding ToggleCommand}" />
-						<NativeMenuItem Header="Open Theme Settings" ToggleType="Radio" IsChecked="True" Command="{Binding OpenThemeSettingsWindow}" />
-						<NativeMenuItem Header="Open Add New Series Window" ToggleType="CheckBox" IsChecked="True" Command="{Binding ToggleCommand}" />
-						<NativeMenuItem Header="Exit" Command="{Binding SaveOnClose}" />
-					</NativeMenu>
-				</TrayIcon.Menu> -->
-			</TrayIcon>
+			<TrayIcon Icon="\Assets\Icons\Tsundoku-Logo.ico" ToolTipText="Tsundoku"/>
 		</TrayIcons>
   	</TrayIcon.Icons>
 </Application>

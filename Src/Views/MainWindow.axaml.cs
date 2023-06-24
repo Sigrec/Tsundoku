@@ -1,4 +1,3 @@
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -14,7 +13,6 @@ using Avalonia.ReactiveUI;
 using ReactiveUI;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 
 namespace Tsundoku.Views
 {
@@ -60,6 +58,9 @@ namespace Tsundoku.Views
             };
         }
 
+        /// <summary>
+        /// Saves the stats for the series when the button is clicked
+        /// </summary>
         public void SaveStats(object sender, RoutedEventArgs args)
         {
             Series curSeries = (Series)((Button)sender).DataContext;
@@ -96,15 +97,15 @@ namespace Tsundoku.Views
                 {
                     costVal += x.Cost;
                 }
-                CollectionViewModel.collectionStatsWindow.CollectionStatsVM.CollectionPrice = $"{CollectionViewModel.CurCurrency}{Decimal.Round(costVal, 2)}";
+                CollectionViewModel.collectionStatsWindow.CollectionStatsVM.CollectionPrice = $"{CollectionViewModel.CurCurrency}{decimal.Round(costVal, 2)}";
                 ((MaskedTextBox)stackPanels.ElementAt(1).GetLogicalChildren().ElementAt(1)).Text = "";
             }
 
-            string score = ((MaskedTextBox)stackPanels.ElementAt(2).GetLogicalChildren().ElementAt(1)).Text.Substring(0, 4).Replace("_", "");
+            string score = ((MaskedTextBox)stackPanels.ElementAt(2).GetLogicalChildren().ElementAt(1)).Text[..4].Replace("_", "");
             if (!score.Equals("."))
             {
                 decimal scoreVal = Convert.ToDecimal(score);
-                if (Decimal.Compare(scoreVal, new Decimal(10.0)) <= 0)
+                if (decimal.Compare(scoreVal, new decimal(10.0)) <= 0)
                 {
                     int countScore = 0;
                     curSeries.Score = scoreVal;
@@ -124,7 +125,7 @@ namespace Tsundoku.Views
                             countScore++;
                         }
                     }
-                    CollectionViewModel.collectionStatsWindow.CollectionStatsVM.MeanScore = Decimal.Round(scoreVal / countScore, 1);
+                    CollectionViewModel.collectionStatsWindow.CollectionStatsVM.MeanScore = decimal.Round(scoreVal / countScore, 1);
                     ((MaskedTextBox)stackPanels.ElementAt(1).GetLogicalChildren().ElementAt(1)).Text = "";
                 }
                 else
@@ -134,11 +135,14 @@ namespace Tsundoku.Views
             }
         }
 
+        /// <summary>
+        /// Takes a screenshot of the current collection window
+        /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1416:Validate platform compatibility", Justification = "<Pending>")]
         private void ScreenCaptureWindows()
         {
             Directory.CreateDirectory(@"Screenshots");
-            using (System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap((int)this.Width, (int)this.Height))
+            using (System.Drawing.Bitmap bitmap = new((int)this.Width, (int)this.Height))
             {
                 using (System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(bitmap))
                 {
@@ -200,13 +204,13 @@ namespace Tsundoku.Views
         {
             var result = await Observable.Start(() => 
             {
-                Series curSeries = (Series)MainWindowViewModel.Collection.Single(series => series == (Series)((Button)sender).DataContext);
+                Series curSeries = MainWindowViewModel.Collection.Single(series => series == (Series)((Button)sender).DataContext);
                 CollectionViewModel.UsersNumVolumesCollected -= curSeries.CurVolumeCount;
                 CollectionViewModel.UsersNumVolumesToBeCollected -= (uint)(curSeries.MaxVolumeCount - curSeries.CurVolumeCount);
 
                 // Update Stats Window
                 CollectionViewModel.collectionStatsWindow.CollectionStatsVM.VolumesRead -= curSeries.VolumesRead;
-                CollectionViewModel.collectionStatsWindow.CollectionStatsVM.CollectionPrice = $"{CollectionViewModel.CurCurrency}{Decimal.Round(Convert.ToDecimal(CollectionViewModel.collectionStatsWindow.CollectionStatsVM.CollectionPrice.Substring(CollectionViewModel.CurCurrency.Length)) - curSeries.Cost, 2)}";
+                CollectionViewModel.collectionStatsWindow.CollectionStatsVM.CollectionPrice = $"{CollectionViewModel.CurCurrency}{decimal.Round(Convert.ToDecimal(CollectionViewModel.collectionStatsWindow.CollectionStatsVM.CollectionPrice[CollectionViewModel.CurCurrency.Length..]) - curSeries.Cost, 2)}";
 
                 MainWindowViewModel.SearchedCollection.Remove(curSeries);
                 MainWindowViewModel.Collection.Remove(curSeries);
@@ -230,7 +234,7 @@ namespace Tsundoku.Views
                         countScore++;
                     }
                 }
-                CollectionViewModel.collectionStatsWindow.CollectionStatsVM.MeanScore = countScore != 0 ? Decimal.Round(scoreVal / countScore, 1) : 0;
+                CollectionViewModel.collectionStatsWindow.CollectionStatsVM.MeanScore = countScore != 0 ? decimal.Round(scoreVal / countScore, 1) : 0;
                 
                 Constants.Logger.Info($"Removed {curSeries.Titles["Romaji"]} From Collection");
                 CollectionViewModel.collectionStatsWindow.CollectionStatsVM.SeriesCount = (uint)MainWindowViewModel.Collection.Count;
@@ -249,9 +253,9 @@ namespace Tsundoku.Views
         {
             var result = await Observable.Start(() => 
             {
-                if ((((sender as Button).FindLogicalAncestorOfType<Grid>(false).GetLogicalChildren().ElementAt(1)) as Grid).IsVisible == true)
+                if (((sender as Button).FindLogicalAncestorOfType<Grid>(false).GetLogicalChildren().ElementAt(1) as Grid).IsVisible == true)
                 {
-                    (((sender as Button).FindLogicalAncestorOfType<Grid>(false).GetLogicalChildren().ElementAt(1)) as Grid).IsVisible = false;
+                    ((sender as Button).FindLogicalAncestorOfType<Grid>(false).GetLogicalChildren().ElementAt(1) as Grid).IsVisible = false;
                 }
                 ((Button)sender).FindLogicalAncestorOfType<Grid>(false).FindLogicalDescendantOfType<Grid>(false).IsVisible ^= true;
             }, RxApp.MainThreadScheduler);
@@ -265,7 +269,7 @@ namespace Tsundoku.Views
                 {
                     ((Button)sender).FindLogicalAncestorOfType<Grid>(false).FindLogicalDescendantOfType<Grid>(false).IsVisible = false;
                 }
-                (((sender as Button).FindLogicalAncestorOfType<Grid>(false).GetLogicalChildren().ElementAt(1)) as Grid).IsVisible ^= true;
+                ((sender as Button).FindLogicalAncestorOfType<Grid>(false).GetLogicalChildren().ElementAt(1) as Grid).IsVisible ^= true;
             }, RxApp.MainThreadScheduler);
         }
 
@@ -361,7 +365,7 @@ namespace Tsundoku.Views
             }
 
             // Move the users current theme to the front of the list so when opening again it applies the correct theme
-            ThemeSettingsViewModel.UserThemes.Move(ThemeSettingsViewModel.UserThemes.IndexOf(ThemeSettingsViewModel.UserThemes.Single(x => x.ThemeName == MainWindowViewModel.MainUser.MainTheme)), 0);
+            ThemeSettingsViewModel.UserThemes.Move(ThemeSettingsViewModel.UserThemes.IndexOf(ThemeSettingsViewModel.UserThemes.Single(x => x.ThemeName == ViewModelBase.MainUser.MainTheme)), 0);
 
             MainWindowViewModel.SaveUsersData();
         }
@@ -406,7 +410,6 @@ namespace Tsundoku.Views
             string title = ((TextBlock)sender).Text;
             Constants.Logger.Info($"Copying {title} to Clipboard");
             await TextCopy.ClipboardService.SetTextAsync(title);
-            // await Application.Current.Clipboard.SetTextAsync(title);
         }
 
         /*

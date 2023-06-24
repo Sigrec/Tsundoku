@@ -8,6 +8,7 @@ using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
 using Tsundoku.ViewModels;
 using Tsundoku.Models;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Tsundoku.Views
 {
@@ -50,7 +51,7 @@ namespace Tsundoku.Views
                     col.FontWeight = Avalonia.Media.FontWeight.Bold;
                     AnalysisDataGrid.Columns.Add(col);
                 }
-                AnalysisDataGrid.Items = PriceAnalysisViewModel.testData;
+                AnalysisDataGrid.ItemsSource = PriceAnalysisViewModel.testData;
             };
 
             Closing += (s, e) =>
@@ -82,6 +83,7 @@ namespace Tsundoku.Views
             AddDataPoints(PriceAnalysisViewModel.testData);
         }
 
+        [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "No Issue Right Now 6/22/2023")]
         public void AddDataPoints(ObservableCollection<string[]> masterData)
         {
             for (int idx = 0; idx < 4; idx++)
@@ -90,7 +92,7 @@ namespace Tsundoku.Views
                 ((DataGridTextColumn)AnalysisDataGrid.Columns[idx]).FontSize = 18;
             }
 
-            AnalysisDataGrid.Items = masterData;
+            AnalysisDataGrid.ItemsSource = masterData;
             AnalysisDataGrid.AutoGenerateColumns = false;
         }
 

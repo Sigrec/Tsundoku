@@ -3,8 +3,7 @@
 					xmlns:vm="clr-namespace:Tsundoku.ViewModels"
 					x:DataType="vm:ViewModelBase">
 
-	<!-- TODO ListBox & ComboBox Items not styling correctly in menu
-	<!-- <SolidColorBrush x:Key="ToggleButtonBackgroundPointerOver" Color="{Binding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
+	<SolidColorBrush x:Key="ToggleButtonBackgroundPointerOver" Color="{Binding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
 	<SolidColorBrush x:Key="ToggleButtonBorderBrushPointerOver" Color="{Binding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
 	<SolidColorBrush x:Key="ToggleButtonForegroundPointerOver" Color="{Binding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
 

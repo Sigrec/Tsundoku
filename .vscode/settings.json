@@ -1,3 +1,4 @@
 {
-    "testing.alwaysRevealTestOnStateChange": false
+    "testing.alwaysRevealTestOnStateChange": false,
+    "dotnet.defaultSolution": "Tsundoku.sln"
 }

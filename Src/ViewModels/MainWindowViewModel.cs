@@ -15,7 +15,7 @@ using System.Diagnostics.CodeAnalysis;
 using Avalonia.Media.Imaging;
 using DynamicData;
 using System.Text.Json.Nodes;
-using System.Windows.Input;
+
 /*
 Issues
 ❌ LineHeight doesn't work with lower LineHeight values
@@ -27,7 +27,7 @@ namespace Tsundoku.ViewModels
 {
     public partial class MainWindowViewModel : ViewModelBase
     {
-        private static string filePath = @"UserData.json";
+        private static readonly string filePath = @"C:\Tsundoku\UserData.json"; //@"UserData.json";
         private const double SCHEMA_VERSION = 1.6;
         public static ObservableCollection<Series> SearchedCollection { get; set; } = new();
         public static ObservableCollection<Series> Collection { get; set; } = new();
@@ -42,7 +42,10 @@ namespace Tsundoku.ViewModels
         [Reactive] public bool SearchIsBusy { get; set; } = false;
         [Reactive] public string UserName { get; set; }
         [Reactive] public string CurDisplay { get; set; }
-        // [Reactive] public uint TestVal { get; set; } = 88888;
+        [Reactive] public string CurFilter { get; set; } = "None";
+
+        // [Reactive]
+        // public uint TestVal { get; set; } = 88888;
 
         public AddNewSeriesWindow newSeriesWindow;
         public ReactiveCommand<Unit, Unit> OpenAddNewSeriesWindow { get; set; }

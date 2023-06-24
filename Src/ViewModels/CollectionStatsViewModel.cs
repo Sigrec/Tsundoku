@@ -7,28 +7,17 @@ using System.Reactive.Linq;
 using ReactiveUI.Fody.Helpers;
 using LiveChartsCore.Defaults;
 using LiveChartsCore.SkiaSharpView;
-using LiveChartsCore.SkiaSharpView.Painting;
 using Tsundoku.Models;
-
-/*
-    Country Distribution (Pie)
-    Score Distribution (Bar)
-    Status Distribution (Pie)
-    Mean Score (Value)
-    Volumes Read (Value)
-    Series Count (Value)
-    Total Price(Value)
-*/
 
 namespace Tsundoku.ViewModels
 {
     public partial class CollectionStatsViewModel : ViewModelBase
     {
+        public ObservableCollection<ISeries> Demographics { get; set; } = new ObservableCollection<ISeries>();
         public ObservableValue ShounenCount { get; set; } = new ObservableValue(MainWindowViewModel.Collection.Count(series => !string.IsNullOrWhiteSpace(series.Demographic) && series.Demographic.Equals("Shounen")));
         public ObservableValue SeinenCount { get; set; } = new ObservableValue(MainWindowViewModel.Collection.Count(series => !string.IsNullOrWhiteSpace(series.Demographic) && series.Demographic.Equals("Seinen")));
         public ObservableValue ShoujoCount { get; set; } = new ObservableValue(MainWindowViewModel.Collection.Count(series => !string.IsNullOrWhiteSpace(series.Demographic) && series.Demographic.Equals("Shoujo")));
         public ObservableValue JoseiCount { get; set; } = new ObservableValue(MainWindowViewModel.Collection.Count(series => !string.IsNullOrWhiteSpace(series.Demographic) && series.Demographic.Equals("Josei")));
-        public ObservableCollection<ISeries> Demographics { get; set; } = new ObservableCollection<ISeries>();
 
         public ObservableCollection<ISeries> StatusDistribution { get; set; } = new ObservableCollection<ISeries>();
         public ObservableValue OngoingCount { get; set; } = new ObservableValue(MainWindowViewModel.Collection.Count(series => !series.Status.Equals("Error") && series.Status.Equals("Ongoing")));
@@ -74,6 +63,9 @@ namespace Tsundoku.ViewModels
             this.WhenAnyValue(x => x.CollectionPrice).Subscribe(x => MainUser.CollectionPrice = x);
         }
 
+        /// <summary>
+        /// Updates the values in the demographic pie chart
+        /// </summary>
         public void UpdateDemographicChartValues()
         {
             ShounenCount.Value = MainWindowViewModel.Collection.Count(series => !string.IsNullOrWhiteSpace(series.Demographic) && series.Demographic.Equals("Shounen"));
@@ -85,6 +77,9 @@ namespace Tsundoku.ViewModels
             JoseiCount.Value = MainWindowViewModel.Collection.Count(series => !string.IsNullOrWhiteSpace(series.Demographic) && series.Demographic.Equals("Josei"));
         }
 
+        /// <summary>
+        /// Initial Generation of the charts used in the stats window
+        /// </summary>
         public void GenerateCharts()
         {
             Demographics.Add(new PieSeries<ObservableValue> 
@@ -129,7 +124,6 @@ namespace Tsundoku.ViewModels
                 Name = "Hiatus"
             });
 
-            Constants.Logger.Debug(MaxScoreCount.Value);
             // ScoreDistribution.Add(new ColumnSeries<ObservableValue> 
             // { 
             //     IsHoverable = false,
@@ -156,11 +150,14 @@ namespace Tsundoku.ViewModels
             });
             ScoreYAxes.Add(new Axis
             {
-                Labels = new string[] {  },
+                Labels = Array.Empty<string>(),
                 MinLimit = 0
             });
         }
 
+        /// <summary>
+        /// Updates the values in the status pie chart
+        /// </summary>
         public void UpdateStatusChartValues()
         {
             OngoingCount.Value = MainWindowViewModel.Collection.Count(series => !series.Status.Equals("Error") && series.Status.Equals("Ongoing"));
@@ -172,6 +169,9 @@ namespace Tsundoku.ViewModels
             HiatusCount.Value = MainWindowViewModel.Collection.Count(series => !series.Status.Equals("Error") && series.Status.Equals("Hiatus"));
         }
 
+        /// <summary>
+        /// Updates the values in the score bar/cartersian chart
+        /// </summary>
         public void UpdateScoreChartValues()
         {
             ZeroScoreCount.Value = MainWindowViewModel.Collection.Count(series => series.Score >= 0 && series.Score < 1);
@@ -188,21 +188,27 @@ namespace Tsundoku.ViewModels
             // MaxScoreCount.Value = GetMaxScoreCount();
         }
 
+        /// <summary>
+        /// Updates the percentages for the status pie chart legend
+        /// </summary>
         public void UpdateStatusPercentages()
         {
-            FinishedPercentage = Math.Round(Convert.ToDecimal((MainWindowViewModel.Collection.Count != 0 && FinishedCount.Value != Double.NaN ? FinishedCount.Value / MainWindowViewModel.Collection.Count * 100 : 0)), 2);
-            OngoingPercentage = Math.Round(Convert.ToDecimal((MainWindowViewModel.Collection.Count != 0 && OngoingCount.Value != Double.NaN ? OngoingCount.Value / MainWindowViewModel.Collection.Count * 100 : 0)), 2);
-            CancelledPercentage = Math.Round(Convert.ToDecimal((MainWindowViewModel.Collection.Count != 0 && CancelledCount.Value != Double.NaN ? CancelledCount.Value / MainWindowViewModel.Collection.Count * 100 : 0)), 2);
-            HiatusPercentage = Math.Round(Convert.ToDecimal((MainWindowViewModel.Collection.Count != 0 && HiatusCount.Value != Double.NaN ? HiatusCount.Value / MainWindowViewModel.Collection.Count * 100 : 0)), 2);
+            FinishedPercentage = Math.Round(Convert.ToDecimal(MainWindowViewModel.Collection.Count != 0 && FinishedCount.Value != double.NaN ? FinishedCount.Value / MainWindowViewModel.Collection.Count * 100 : 0), 2);
+            OngoingPercentage = Math.Round(Convert.ToDecimal(MainWindowViewModel.Collection.Count != 0 && OngoingCount.Value != double.NaN ? OngoingCount.Value / MainWindowViewModel.Collection.Count * 100 : 0), 2);
+            CancelledPercentage = Math.Round(Convert.ToDecimal(MainWindowViewModel.Collection.Count != 0 && CancelledCount.Value != double.NaN ? CancelledCount.Value / MainWindowViewModel.Collection.Count * 100 : 0), 2);
+            HiatusPercentage = Math.Round(Convert.ToDecimal(MainWindowViewModel.Collection.Count != 0 && HiatusCount.Value != double.NaN ? HiatusCount.Value / MainWindowViewModel.Collection.Count * 100 : 0), 2);
         }
 
+        /// <summary>
+        /// Updates the percentages for the demographic pie chart legend
+        /// </summary>
         public void UpdateDemographicPercentages()
         {
             int actualCount = MainWindowViewModel.Collection.Count(series => !string.IsNullOrWhiteSpace(series.Demographic));
-            ShounenPercentage = Math.Round(Convert.ToDecimal((actualCount != 0 && ShounenCount.Value != Double.NaN ? ShounenCount.Value / actualCount * 100 : 0)), 2);
-            SeinenPercentage = Math.Round(Convert.ToDecimal((actualCount != 0 && SeinenCount.Value != Double.NaN ? SeinenCount.Value / actualCount * 100 : 0)), 2);
-            ShoujoPercentage = Math.Round(Convert.ToDecimal((actualCount != 0 && ShoujoCount.Value != Double.NaN ? ShoujoCount.Value / actualCount * 100 : 0)), 2);
-            JoseiPercentage = Math.Round(Convert.ToDecimal((actualCount != 0 && JoseiCount.Value != Double.NaN ? JoseiCount.Value / actualCount * 100 : 0)), 2);
+            ShounenPercentage = Math.Round(Convert.ToDecimal(actualCount != 0 && ShounenCount.Value != double.NaN ? ShounenCount.Value / actualCount * 100 : 0), 2);
+            SeinenPercentage = Math.Round(Convert.ToDecimal(actualCount != 0 && SeinenCount.Value != double.NaN ? SeinenCount.Value / actualCount * 100 : 0), 2);
+            ShoujoPercentage = Math.Round(Convert.ToDecimal(actualCount != 0 && ShoujoCount.Value != double.NaN ? ShoujoCount.Value / actualCount * 100 : 0), 2);
+            JoseiPercentage = Math.Round(Convert.ToDecimal(actualCount != 0 && JoseiCount.Value != double.NaN ? JoseiCount.Value / actualCount * 100 : 0), 2);
         }
 
         // private uint GetMaxScoreCount()
@@ -210,6 +216,9 @@ namespace Tsundoku.ViewModels
         //     return (uint)Math.Max((uint)OneScoreCount.Value, Math.Max((uint)TwoScoreCount.Value, Math.Max((uint)ThreeScoreCount.Value, Math.Max((uint)FourScoreCount.Value, Math.Max((uint)FiveScoreCount.Value, Math.Max((uint)SixScoreCount.Value, Math.Max((uint)SevenScoreCount.Value, Math.Max((uint)EightScoreCount.Value, Math.Max((uint)NineScoreCount.Value, (uint)TenScoreCount.Value)))))))));
         // }
 
+        /// <summary>
+        /// Generates all of the values for the users stats
+        /// </summary>
         public void GenerateStats()
         {
             UpdateStatusPercentages();
@@ -219,8 +228,7 @@ namespace Tsundoku.ViewModels
             // Constants.Logger.Debug("Generate Stats");
             uint testVolumesRead = 0;
             decimal testCollectionPrice = 0, testMeanScore = 0, countMeanScore = 0;
-            string testCollectionPriceString = "";
-            foreach (Models.Series x in MainWindowViewModel.Collection)
+            foreach (Series x in MainWindowViewModel.Collection)
             {
                 testVolumesRead += x.VolumesRead;
                 testCollectionPrice += x.Cost;
@@ -232,8 +240,8 @@ namespace Tsundoku.ViewModels
                 }
             }
 
-            testMeanScore = countMeanScore == 0 ? 0 : Decimal.Round(testMeanScore / countMeanScore, 1);
-            testCollectionPriceString = $"{MainUser.Currency}{Decimal.Round(testCollectionPrice, 2)}";
+            testMeanScore = countMeanScore == 0 ? 0 : decimal.Round(testMeanScore / countMeanScore, 1);
+            string testCollectionPriceString = $"{MainUser.Currency}{decimal.Round(testCollectionPrice, 2)}";
 
             // Crash protection for aggregate values
             if (MainUser.VolumesRead == testVolumesRead && MainUser.MeanScore == testMeanScore && MainUser.CollectionPrice.Equals(testCollectionPriceString))
@@ -248,6 +256,8 @@ namespace Tsundoku.ViewModels
                 VolumesRead = testVolumesRead;
                 CollectionPrice = testCollectionPriceString;
             }
+
+            GenerateCharts();
         }
     }
 }
