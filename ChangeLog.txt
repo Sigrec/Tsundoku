@@ -1,4 +1,4 @@
-V1.6.2.0 - 
+V1.6.2.0 - June 24th, 2023 @ 3:17PM PST
 🔥 Fixed crash when creating a new theme
 ✅ Avalonia Lib Upgrade + Other Lib Upgrades
 ✅ Upgrade to .NET 7.0 Framework
