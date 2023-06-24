@@ -16,9 +16,9 @@ namespace Tsundoku.Models
         public const ushort USER_NOTES_HEIGHT = TOP_SECTION_CARD_HEIGHT - 16;
         public const ushort IMAGE_HEIGHT = CARD_HEIGHT - BOTTOM_SECTION_CARD_HEIGHT;
 		public static readonly string[] DEMOGRAPHICS = new string[] { "Shounen", "Shoujo", "Seinen", "Josei", "Unknown" };
-		public static readonly string[] CURRENCY_SYMBOLS = CultureInfo.GetCultures(CultureTypes.SpecificCultures).Select(ci => ci.LCID).Distinct().Select(id => new RegionInfo(id)).Select(r => r.CurrencySymbol).Distinct().ToArray();
+		public static readonly string[] CURRENCY_SYMBOLS = CultureInfo.GetCultures(CultureTypes.SpecificCultures).Select(ci => ci.Name).Distinct().Select(id => new RegionInfo(id)).Select(r => r.CurrencySymbol).Distinct().ToArray();
 
-		// TODO: Fix Logging so it actually logs to a file
+		// TODO: Fix Logging so it actually logs to a external file
 		public static readonly NLog.Logger Logger = NLog.LogManager.GetLogger("TsundOkuLogs");
 		// public static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 
@@ -28,7 +28,7 @@ namespace Tsundoku.Models
             MangaDex
         }
 
-        public readonly static Dictionary<string, string> ANILIST_LANG_CODES = new Dictionary<string, string>()
+        public readonly static Dictionary<string, string> ANILIST_LANG_CODES = new()
 		{
 			{ "JP", "Japanese" },
 			{ "FR" , "French" },
@@ -38,7 +38,7 @@ namespace Tsundoku.Models
 			{ "TW" , "Chinese" }
 		};
 
-		public readonly static Dictionary<string, string> CULTURE_LANG_CODES = new Dictionary<string, string>()
+		public readonly static Dictionary<string, string> CULTURE_LANG_CODES = new()
 		{
 				{ "Japanese" , "ja-JP" },
                 { "Korean" , "ko-kr" },
@@ -89,7 +89,7 @@ namespace Tsundoku.Models
 				{ "Romaji" , "en-US" }
 		};
 
-		public readonly static Dictionary<string, string> MANGADEX_LANG_CODES = new Dictionary<string, string>()
+		public readonly static Dictionary<string, string> MANGADEX_LANG_CODES = new()
 		{
 			{ "ja", "Japanese" },
 			{ "ko" , "Korean" },

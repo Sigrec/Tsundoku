@@ -41,7 +41,6 @@
 						   FontWeight="Bold"
 						   TextDecorations="Underline"
 						   TextAlignment="Center"
-						   Margin="0,0,0,0"
 						   HorizontalAlignment="Center"
 						   VerticalAlignment="Center" 
 						   Text="{CompiledBinding UserName, Mode=OneWay}"
@@ -138,7 +137,7 @@
 							   FontSize="21" 
 							   FontWeight="Bold" 
 							   Classes="menu"
-							   VerticalAlignment= "Center" 
+							   VerticalAlignment="Center" 
 							   HorizontalAlignment="Center"/>
 					<StackPanel Spacing="5" HorizontalAlignment="Center" VerticalAlignment="Center">
 						<ComboBox Name="LanguageSelector"
@@ -151,7 +150,6 @@
 								  BorderThickness="2"
 								  FontWeight="Bold"
 								  FontSize="15"
-								  ToolTip.Tip="Language"
 								  VerticalAlignment="Center"
 								  HorizontalAlignment="Center">
 							<!-- <ComboBox.Styles>
@@ -171,8 +169,7 @@
 								  Height="35"
 								  FontWeight="Bold"
 								  FontSize="15"
-								  SelectedItem="None"
-								  ToolTip.Tip="Filter"
+								  SelectedItem="{Binding CurFilter}"
 								  ItemsSource="{CompiledBinding AvailableCollectionFilters, Mode=OneWay}"
 								  Width="130"
 								  BorderThickness="2"
@@ -708,27 +705,7 @@
 														</Style>
 													</Style>
 												</Grid.Styles>
-												<Border BorderBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressBarBorderColor, Converter={StaticResource ConvertColor}}" 
-														BorderThickness="1.5" 
-														CornerRadius="4" 
-														ClipToBounds="True" 
-														Height="27" 
-														Grid.Row="0"
-														Grid.Column="0"
-														Width="250" 
-														Margin="8,0.75,8,0" 
-														Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressBarBGColor, Converter={StaticResource ConvertColor}}">
-													<ProgressBar Height="27"
-																 Width="242"
-																 Value="{CompiledBinding CurVolumeCount}"
-																 Background="Transparent"
-																 Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressBarColor, Converter={StaticResource ConvertColor}}"
-																 Padding="0,3.5,0,3.5"
-																 Minimum="0"
-																 Maximum="{CompiledBinding MaxVolumeCount}"
-																 Name="VolumeProgress"/>
-												</Border>
-												<!-- <ProgressBar Height="27"
+												<ProgressBar Height="27"
 															 Width="250"
 															 Grid.Row="0"
 															 Grid.Column="0"
@@ -746,7 +723,7 @@
 															 CornerRadius="4"
 															 Margin="7,0.5,0,0"
 															 Maximum="{CompiledBinding MaxVolumeCount}"
-															 Name="VolumeProgress"/> -->
+															 Name="VolumeProgress"/>
 												<StackPanel Orientation="Horizontal" Grid.Column="0" Grid.Row="0" Spacing="5" HorizontalAlignment="Center" Margin="10,0,0,0">
 													<Button Background="Transparent"
 														Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressTextColor, Converter={StaticResource ConvertColor}}"

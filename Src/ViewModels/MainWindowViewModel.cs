@@ -15,7 +15,7 @@ using System.Diagnostics.CodeAnalysis;
 using Avalonia.Media.Imaging;
 using DynamicData;
 using System.Text.Json.Nodes;
-using System.Windows.Input;
+
 /*
 Issues
 ❌ LineHeight doesn't work with lower LineHeight values
@@ -27,36 +27,22 @@ namespace Tsundoku.ViewModels
 {
     public partial class MainWindowViewModel : ViewModelBase
     {
-        private static string filePath = @"UserData.json";
+        private static readonly string filePath = @"C:\Tsundoku\UserData.json"; //@"UserData.json";
         private const double SCHEMA_VERSION = 1.6;
         public static ObservableCollection<Series> SearchedCollection { get; set; } = new();
         public static ObservableCollection<Series> Collection { get; set; } = new();
         public string[] AvailableLanguages { get; } = new string[] { "Romaji", "English", "Japanese", "Korean", "Arabic", "Azerbaijan", "Bengali", "Bulgarian", "Burmese", "Catalan", "Chinese", "Croatian", "Czech", "Danish", "Dutch", "Esperanto", "Estonian", "Filipino", "Finnish", "French", "German", "Greek", "Hebrew", "Hindi", "Hungarian", "Indonesian", "Italian", "Kazakh", "Latin", "Lithuanian", "Malay", "Mongolian", "Nepali", "Norwegian", "Persian", "Polish", "Portuguese", "Romanian", "Russian", "Serbian", "Slovak", "Spanish", "Swedish", "Tamil", "Thai", "Turkish", "Ukrainian", "Vietnamese" };
         public string[] AvailableCollectionFilters { get; } = new string[] { "None", "Favorites", "Ongoing", "Finished", "Hiatus", "Cancelled", "Complete", "Incomplete", "Manga", "Novel" };
 
-        [Reactive]
-        public string SearchText { get; set; }
-
-        [Reactive]
-        public uint UsersNumVolumesCollected { get; set; }
-
-        [Reactive]
-        public uint UsersNumVolumesToBeCollected { get; set; }
-        
-        [Reactive]
-        public string CurLanguage { get; set; }
-
-        [Reactive]
-        public bool LanguageChanged { get; set; } = false;
-
-        [Reactive]
-        public bool SearchIsBusy { get; set; } = false;
-
-        [Reactive]
-        public string UserName { get; set; }
-
-        [Reactive]
-        public string CurDisplay { get; set; }
+        [Reactive] public string SearchText { get; set; }
+        [Reactive] public uint UsersNumVolumesCollected { get; set; }
+        [Reactive] public uint UsersNumVolumesToBeCollected { get; set; }
+        [Reactive] public string CurLanguage { get; set; }
+        [Reactive] public bool LanguageChanged { get; set; } = false;
+        [Reactive] public bool SearchIsBusy { get; set; } = false;
+        [Reactive] public string UserName { get; set; }
+        [Reactive] public string CurDisplay { get; set; }
+        [Reactive] public string CurFilter { get; set; } = "None";
 
         // [Reactive]
         // public uint TestVal { get; set; } = 88888;

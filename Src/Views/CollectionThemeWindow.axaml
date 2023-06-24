@@ -663,7 +663,6 @@
 								HorizontalAlignment="Center" 
 								Content="Save" 
 								Classes="menu"
-								IsEnabled="{Binding IsSaveThemeButtonEnabled}"
 								Click="SaveNewTheme"/>
 						<ComboBox Name="ThemeSelector"
 								  SelectionChanged="ChangeMainTheme"
@@ -671,8 +670,8 @@
 								  Width="150"
 								  Height="35"
 								  BorderThickness="2"
-								  Classes="menu"
 								  SelectedIndex="0"
+								  Classes="menu"
 								  AutoScrollToSelectedItem="True"
 								  Margin="10,0,0,0">
 							<ComboBox.ItemTemplate>
@@ -684,6 +683,7 @@
 									</TextBlock>
 								</DataTemplate>
 							</ComboBox.ItemTemplate>
+
 						</ComboBox>
 						<Button FontSize="20" 
 								FontWeight="Bold" 
