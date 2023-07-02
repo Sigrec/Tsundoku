@@ -27,7 +27,7 @@ namespace Tsundoku.ViewModels
 {
     public partial class MainWindowViewModel : ViewModelBase
     {
-        private static readonly string filePath = @"C:\Tsundoku\UserData.json"; //@"UserData.json";
+        private static readonly string filePath = @"UserData.json";
         private const double SCHEMA_VERSION = 1.6;
         public static ObservableCollection<Series> SearchedCollection { get; set; } = new();
         public static ObservableCollection<Series> Collection { get; set; } = new();
@@ -217,8 +217,6 @@ namespace Tsundoku.ViewModels
                     SearchedCollection.AddRange(Collection);
                     break;
             }
-            // GC.Collect();
-            // GC.WaitForPendingFinalizers();
         }
 
         private void SearchCollection(string searchText)
@@ -226,14 +224,12 @@ namespace Tsundoku.ViewModels
             if (!string.IsNullOrWhiteSpace(searchText))
             {
                 SearchedCollection.Clear();
-                //Constants.Logger.Info($"Searching For {searchText}");
                 SearchedCollection.AddRange(Collection.AsParallel().Where(x => x.Titles.AsParallel().Any(text => text.Value.Contains(searchText, StringComparison.OrdinalIgnoreCase)) || x.Staff.AsParallel().Any(text => text.Value.Contains(searchText, StringComparison.OrdinalIgnoreCase))));
             }
             else if (SearchIsBusy)
             {
                 SearchedCollection.Clear();
                 SearchIsBusy = false;
-                //Constants.Logger.Info($"No Longer Searching");
                 SearchedCollection.AddRange(Collection);
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
@@ -247,8 +243,10 @@ namespace Tsundoku.ViewModels
             {
                 Constants.Logger.Info("Creating New User");
                 ThemeSettingsViewModel.UserThemes = new ObservableCollection<TsundokuTheme>() { TsundokuTheme.DEFAULT_THEME };
-                MainUser = new User("UserName", "Romaji", "Default", "Card", "$", "$0.00", ThemeSettingsViewModel.UserThemes, Collection);
-                MainUser.CurDataVersion = SCHEMA_VERSION;
+                MainUser = new User("UserName", "Romaji", "Default", "Card", "$", "$0.00", ThemeSettingsViewModel.UserThemes, Collection)
+                {
+                    CurDataVersion = SCHEMA_VERSION
+                };
                 UserName = MainUser.UserName;
                 Collection = MainUser.UserCollection;
                 CurLanguage = MainUser.CurLanguage;
@@ -258,7 +256,7 @@ namespace Tsundoku.ViewModels
             
             bool save = VersionUpdate();
 
-            FileStream fRead = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            FileStream fRead = new(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
             MainUser = JsonSerializer.Deserialize<User>(fRead, options);
             fRead.Flush();
             fRead.Close();
@@ -303,13 +301,13 @@ namespace Tsundoku.ViewModels
                 UsersNumVolumesToBeCollected = testUsersNumVolumesToBeCollected;
             }
 
-            if (save) { SaveUsersData(); }
+            if (save) { SaveUsersData(); UpdateDefaultTheme(); }
 
             GC.Collect();
             GC.WaitForPendingFinalizers();
         }
 
-        private void UpdateDefaultTheme()
+        private static void UpdateDefaultTheme()
         {
             for(int x = 0; x < MainUser.SavedThemes.Count; x++)
             {
@@ -323,7 +321,7 @@ namespace Tsundoku.ViewModels
         }
 
         // TODO: Need to update Currency as well prob?
-        private bool VersionUpdate()
+        private static bool VersionUpdate()
         {
             string json = File.ReadAllText(filePath);
             JsonNode userData = JsonNode.Parse(json);
@@ -339,7 +337,7 @@ namespace Tsundoku.ViewModels
             }
 
             // 1.5 Data Update
-            double curVersion = Double.Parse(userData["CurDataVersion"].ToString());
+            double curVersion = double.Parse(userData["CurDataVersion"].ToString());
             if (curVersion < 1.5)
             {
                 userData.AsObject().Add("Currency", "$");
@@ -352,7 +350,7 @@ namespace Tsundoku.ViewModels
                     userData["CurLanguage"] = "Japanese";
                 }
 
-                for (int x = 0; x < collectionJsonArray.Count(); x++)
+                for (int x = 0; x < collectionJsonArray.Count; x++)
                 {
                     series = collectionJsonArray.ElementAt(x);
                     series["Titles"] = new JsonObject
@@ -377,6 +375,7 @@ namespace Tsundoku.ViewModels
                             _ => "Japanese"            
                         }] = series["Staff"][1].ToString()
                     };
+                    series.AsObject().Add("Score", 0);
                     
                     if (series["Titles"]["Romaji"].ToString().Equals(series["Titles"]["English"].ToString()))
                     {
@@ -389,7 +388,6 @@ namespace Tsundoku.ViewModels
                     }
                 }
                 userData["CurDataVersion"] = 1.5;
-                UpdateDefaultTheme(); 
                 Constants.Logger.Info("Updated Users Data to v1.5");
                 updatedVersion = true;        
             }
@@ -397,10 +395,10 @@ namespace Tsundoku.ViewModels
             // Update to 1.6 schema
             if (curVersion < 1.6)
             {
-                for (int x = 0; x < collectionJsonArray.Count(); x++)
+                for (int x = 0; x < collectionJsonArray.Count; x++)
                 {
                     series = collectionJsonArray.ElementAt(x);
-                    if (Double.Parse(series["Score"].ToString()) == 0)
+                    if (double.Parse(series["Score"].ToString()) == 0)
                     {
                         series["Score"] = -1;
                     }
