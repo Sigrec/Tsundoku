@@ -1,5 +1,6 @@
-V1.6.3.0 - July 2nd, 2023 @ 2:40PM PST
-🔥HotFix for users who's current version is less than 1.5, app now starts as expected
+V1.6.3.0 - July 2nd, 2023 @ 4:40PM PST
+🔥HotFix for users whose current version is less than 1.5, app now starts as expected
+🔥HotFix can now scroll in stats window and resize up to a set size
 
 V1.6.2.0 - June 24th, 2023 @ 3:17PM PST
 🔥 Fixed crash when creating a new theme

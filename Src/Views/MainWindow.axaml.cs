@@ -25,18 +25,18 @@ namespace Tsundoku.Views
         {
             InitializeComponent();
 
-            this.KeyDown += (s, e) => 
+            KeyDown += (s, e) => 
             {
                 if (e.Key == Key.F11) 
                 {
-                    if (this.WindowState != WindowState.FullScreen)
+                    if (WindowState != WindowState.FullScreen)
                     {
-                        previousWindowState = this.WindowState;
-                        this.WindowState = WindowState.FullScreen;
+                        previousWindowState = WindowState;
+                        WindowState = WindowState.FullScreen;
                     }
-                    else if (this.WindowState == WindowState.FullScreen)
+                    else if (WindowState == WindowState.FullScreen)
                     {
-                        this.WindowState = previousWindowState;
+                        WindowState = previousWindowState;
                     }
                 }
                 else if (e.KeyModifiers == KeyModifiers.Control && e.Key == Key.P)

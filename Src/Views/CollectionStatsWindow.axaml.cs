@@ -1,19 +1,17 @@
 using System.Drawing;
-using System.Collections.ObjectModel;
-using System.Linq;
 using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Input;
-using LiveChartsCore;
 using LiveChartsCore.Defaults;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
 using Tsundoku.Models;
 using Tsundoku.ViewModels;
+using Avalonia.ReactiveUI;
+using System;
 
 namespace Tsundoku.Views
 {
-    public partial class CollectionStatsWindow : Window
+    public partial class CollectionStatsWindow : ReactiveWindow<CollectionStatsViewModel>
     {
         public CollectionStatsViewModel? CollectionStatsVM => DataContext as CollectionStatsViewModel;
         public bool IsOpen = false;
