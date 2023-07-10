@@ -1,20 +1,16 @@
-using System.Reflection.Metadata;
 using System;
 using System.Globalization;
 using Avalonia.Data.Converters;
-using Tsundoku.Models;
 
 namespace Tsundoku.Helpers
 {
     public class ColorConverter : IValueConverter
     {
-        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
-
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is UInt32)
+            if (value is uint v)
             {
-                return new Avalonia.Media.SolidColorBrush((uint)value);
+                return new Avalonia.Media.SolidColorBrush(v);
             }
             throw new NotSupportedException();
         }

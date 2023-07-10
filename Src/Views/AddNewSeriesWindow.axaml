@@ -20,50 +20,69 @@
 		<vm:AddNewSeriesViewModel/>
 	</Window.DataContext>
 
-	<!-- <Window.Styles>
-		<StyleInclude Source="/Styles/MenuTheme.xaml"/>
-	</Window.Styles> -->
-
-	<!-- <Window.Resources>
+	<Window.Resources>
 		<ResourceDictionary>
-			<ResourceDictionary.ThemeDictionaries>
-				<ResourceDictionary x:Key='Dark'>
-					<SolidColorBrush x:Key="ToggleButtonBackgroundPointerOver" Color="{Binding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
-					<SolidColorBrush x:Key="ToggleButtonBorderBrushPointerOver" Color="{Binding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
-					<SolidColorBrush x:Key="ToggleButtonForegroundPointerOver" Color="{Binding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
-				</ResourceDictionary>
-			</ResourceDictionary.ThemeDictionaries>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceInclude Source="/Styles/AddNewSeriesControlThemes.xaml"/>
+			</ResourceDictionary.MergedDictionaries>
 		</ResourceDictionary>
-	</Window.Resources> -->
+	</Window.Resources>
 
 	<Border Classes="menu" BorderThickness="3" CornerRadius="0,0,8,8" ClipToBounds="True">
 		<Grid ColumnDefinitions="*,15,*,15,*" RowDefinitions="Auto,Auto,15,Auto,Auto,15,Auto,Auto" Margin="15">
-			<Grid.Styles>
-				<!-- <StyleInclude Source="/Styles/MenuTheme.xaml" /> -->
-				<Style Selector="Button:focus /template/ ContentPresenter#PART_ContentPresenter">
-					<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
-					<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
-					<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
-				</Style>
-			</Grid.Styles>
 			<TextBlock HorizontalAlignment="Left" Grid.Row="0" Grid.Column="4" Text="Additional Languages" FontSize="20" FontWeight="Bold" Classes="menu" Margin="0,0,0,1"/>
 			<ListBox Name="AdditionalLangSelector"
 					 SelectedItems="{Binding SelectedAdditionalLanguages}"
-					 ItemsSource="{Binding AvailableLanguages}"
 					 SelectionMode="Multiple,Toggle"
-					 Width="206"
-					 Height="220"
 					 Grid.Row="1"
 					 Grid.RowSpan="10"
-					 CornerRadius="2" 
 					 Grid.Column="4"
-					 BorderThickness="2"
-					 Classes="menu">
-				<ListBox.ItemTemplate>
-					<DataTemplate>
-						<TextBlock Text="{Binding}" Classes="menu" FontSize="15" FontWeight="Bold"/>
-					</DataTemplate>
-    			</ListBox.ItemTemplate>
+					 Theme="{StaticResource QueryListBox}">
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Arabic</ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Azerbaijan</ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Bengali</ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Bulgarian</ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Burmese</ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Catalan</ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Chinese</ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Croatian</ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Czech</ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Danish</ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Dutch</ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Esperanto</ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Estonian</ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Filipino</ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Finnish</ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">French</ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">German</ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Greek</ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Hewbrew</ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Hindi</ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Hungarian</ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Indonesian</ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Italian</ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Kazakh</ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Korean</ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Latin</ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Lithuanian</ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Malay</ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Mongolian</ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Nepali</ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Norwegian</ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Persian</ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Polish</ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Portugese</ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Romanian</ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Russian</ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Serbian</ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Slovak</ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Spanish</ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Swedish</ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Tamil</ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Thai</ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Turkish</ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Ukranian</ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Vietnamese</ListBoxItem>
 			</ListBox>
 			<TextBlock Text="Enter Title or ID" Grid.Row="0" Grid.Column="0" FontSize="20" FontWeight="Bold" Classes="menu" Margin="0,0,0,1"/>
 			<TextBox Name="TitleBox"
@@ -112,31 +131,13 @@
 					   Classes="menu"/>
 			<StackPanel Orientation="Horizontal" Width="180" Grid.Row="7" Grid.Column="0" Spacing="5" Margin="0,0,10,0">
 				<ToggleButton Name="MangaButton"
-							FontSize="15"
-							Height="37"
-							FontWeight="Bold"
-							Width="87.5"
-							VerticalAlignment="Center"
-							BorderThickness="2"
-							HorizontalAlignment="Center"
-							VerticalContentAlignment="Center"
-							HorizontalContentAlignment="Center"
-							Checked="IsMangaButtonClicked"
-							Classes="menu"
-							Content="Manga"/>
+							  Checked="IsMangaButtonClicked"
+							  Theme="{StaticResource QueryToggleButton}"
+							  Content="Manga"/>
 				<ToggleButton Name="NovelButton"
-							FontSize="15"
-							FontWeight="Bold"
-							Width="87.5"
-							Height="37"
-							VerticalAlignment="Center"
-							BorderThickness="2"
-							VerticalContentAlignment="Center"
-							HorizontalContentAlignment="Center"
-							HorizontalAlignment="Center"
-							Checked="IsNovelButtonClicked"
-							Classes="menu"
-							Content="Novel"/>
+							  Checked="IsNovelButtonClicked"
+							  Theme="{StaticResource QueryToggleButton}"
+							  Content="Novel"/>
 			</StackPanel>
 			<TextBlock HorizontalAlignment="Left"
 					   Text="Query"
@@ -149,19 +150,13 @@
 			<Button Name="AddSeriesButton"
 					Content="Add New Series"
 					Click="OnButtonClicked"
-					Classes="menu"
-					BorderThickness="2"
+					Theme="{StaticResource MenuButton}"
 					Width="182"
 					Height="37"
-					FontWeight="Bold"
+					IsEnabled="{CompiledBinding IsAddSeriesButtonEnabled}"
 					FontSize="18"
 					Grid.Row="7"
-					Grid.Column="2"
-					VerticalAlignment="Center"
-					VerticalContentAlignment="Center"
-					HorizontalContentAlignment="Center"
-					IsEnabled="{Binding IsAddSeriesButtonEnabled}"
-					HorizontalAlignment="Center">
+					Grid.Column="2">
 			</Button>
 		</Grid>
 	</Border>

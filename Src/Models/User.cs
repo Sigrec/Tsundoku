@@ -1,10 +1,11 @@
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Text.Json.Serialization;
 
 namespace Tsundoku.Models
 {
     public class User
     {
-        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         public string UserName { get; set; }
         public uint NumVolumesCollected { get; set; }
         public uint NumVolumesToBeCollected { get; set; }
@@ -16,6 +17,7 @@ namespace Tsundoku.Models
         public decimal MeanScore { get; set; }
         public uint VolumesRead { get; set; }
         public string CollectionPrice { get; set; }
+        public byte[] UserIcon { get; set; }
         public ObservableCollection<TsundokuTheme> SavedThemes { get; set; }
         public ObservableCollection<Series> UserCollection { get; set; }
 
@@ -31,6 +33,15 @@ namespace Tsundoku.Models
             UserCollection = userCollection;
             NumVolumesCollected = 0;
             NumVolumesToBeCollected = 0;
+        }
+
+        public static byte[] ImageToByteArray(Avalonia.Media.Imaging.Bitmap image)
+        {
+            using (MemoryStream stream = new())
+            {
+                image.Save(stream, 100);
+                return stream.ToArray();
+            }
         }
     }
 }

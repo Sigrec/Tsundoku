@@ -13,13 +13,17 @@ using Avalonia.ReactiveUI;
 using ReactiveUI;
 using System.IO;
 using System.Runtime.InteropServices;
+using Avalonia.Platform.Storage;
+using System.Collections.Generic;
+using Avalonia.Media.Imaging;
 
 namespace Tsundoku.Views
 {
     public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
     {
         public MainWindowViewModel? CollectionViewModel => DataContext as MainWindowViewModel;
-        private WindowState previousWindowState; 
+        private WindowState previousWindowState;
+        private static readonly List<FilePickerFileType> fileOptions = new() { FilePickerFileTypes.ImageAll };
 
         public MainWindow()
         {
@@ -171,8 +175,8 @@ namespace Tsundoku.Views
                     ushort maxVolumeChange = Convert.ToUInt16(maxVolumeString);
                     if (maxVolumeChange >= curVolumeChange)
                     {
-                        CollectionViewModel.UsersNumVolumesCollected = CollectionViewModel.UsersNumVolumesCollected - curSeries.CurVolumeCount + curVolumeChange;
-                        CollectionViewModel.UsersNumVolumesToBeCollected = CollectionViewModel.UsersNumVolumesToBeCollected - (uint)(curSeries.MaxVolumeCount - curSeries.CurVolumeCount) + (uint)(maxVolumeChange - curVolumeChange);
+                        CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UsersNumVolumesCollected = CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UsersNumVolumesCollected - curSeries.CurVolumeCount + curVolumeChange;
+                        CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UsersNumVolumesToBeCollected = CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UsersNumVolumesToBeCollected - (uint)(curSeries.MaxVolumeCount - curSeries.CurVolumeCount) + (uint)(maxVolumeChange - curVolumeChange);
                         Constants.Logger.Info($"Changed Series Values For {curSeries.Titles["Romaji"]} From {curSeries.CurVolumeCount}/{curSeries.MaxVolumeCount} -> {curVolumeChange}/{maxVolumeChange}");
                         curSeries.CurVolumeCount = curVolumeChange;
                         curSeries.MaxVolumeCount = maxVolumeChange;
@@ -205,8 +209,8 @@ namespace Tsundoku.Views
             var result = await Observable.Start(() => 
             {
                 Series curSeries = MainWindowViewModel.Collection.Single(series => series == (Series)((Button)sender).DataContext);
-                CollectionViewModel.UsersNumVolumesCollected -= curSeries.CurVolumeCount;
-                CollectionViewModel.UsersNumVolumesToBeCollected -= (uint)(curSeries.MaxVolumeCount - curSeries.CurVolumeCount);
+                CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UsersNumVolumesCollected -= curSeries.CurVolumeCount;
+                CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UsersNumVolumesToBeCollected -= (uint)(curSeries.MaxVolumeCount - curSeries.CurVolumeCount);
 
                 // Update Stats Window
                 CollectionViewModel.collectionStatsWindow.CollectionStatsVM.VolumesRead -= curSeries.VolumesRead;
@@ -273,27 +277,35 @@ namespace Tsundoku.Views
             }, RxApp.MainThreadScheduler);
         }
 
+        /// <summary>
+        /// Changes the language for the users collection
+        /// </summary>
         private void LanguageChanged(object sender, SelectionChangedEventArgs e)
         {
             if ((sender as ComboBox).IsDropDownOpen)
             {
-                CollectionViewModel.CurLanguage = LanguageSelector.SelectedItem.ToString();
-                // ((sender as ComboBox).GetLogicalSiblings().ElementAt(1) as ComboBox).SelectedItem = "None";
+                CollectionViewModel.CurLanguage = (LanguageSelector.SelectedItem as ComboBoxItem).Content.ToString();
                 Constants.Logger.Info($"Changed Langauge to {CollectionViewModel.CurLanguage}");
                 MainWindowViewModel.SortCollection();
             }
         }
 
+        /// <summary>
+        /// Changes the filter on the users collection
+        /// </summary>
         private void CollectionFilterChanged(object sender, SelectionChangedEventArgs e)
         {
             if ((sender as ComboBox).IsDropDownOpen)
             {
-                string collectionFilter = (sender as ComboBox).SelectedItem as string;
-                MainWindowViewModel.FilterCollection(collectionFilter);
-                Constants.Logger.Info($"Changed Collection Filter To {collectionFilter}");
+                CollectionViewModel.CurFilter = (CollectionFilterSelector.SelectedItem as ComboBoxItem).Content.ToString();
+                MainWindowViewModel.FilterCollection(CollectionViewModel.CurFilter);
+                Constants.Logger.Info($"Changed Collection Filter To {CollectionViewModel.CurFilter}");
             }
         }
 
+        /// <summary>
+        /// Changes the chosen demographic for a particular series
+        /// </summary>
         private void DemographicChanged(object sender, SelectionChangedEventArgs e)
         {
             if ((sender as ComboBox).IsDropDownOpen)
@@ -370,6 +382,9 @@ namespace Tsundoku.Views
             MainWindowViewModel.SaveUsersData();
         }
 
+        /// <summary>
+        /// Opens the AniList or MangaDex website link in the users browser when users clicks on the left side of the series card
+        /// </summary>
         private void OpenSiteLink(object sender, PointerPressedEventArgs args)
         {
             string link = ((Canvas)sender).Name;
@@ -387,7 +402,23 @@ namespace Tsundoku.Views
                 Constants.Logger.Error(other.Message);
             }
         }
+        
+        /// <summary>
+        /// Allows the user to pick a image file to for their icon
+        /// </summary>
+        private async void ChangeUserIcon(object sender, PointerPressedEventArgs args)
+        {
+            var file = await this.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions {
+                AllowMultiple = false,
+                FileTypeFilter = fileOptions
+            });
+            CollectionViewModel.UserIcon = new Bitmap(file[0].Path.LocalPath).CreateScaledBitmap(new Avalonia.PixelSize(Constants.USER_ICON_WIDTH, Constants.USER_ICON_HEIGHT), BitmapInterpolationMode.HighQuality);
+            Constants.Logger.Debug($"Changed Users Icon to {file[0].Path.LocalPath}");
+        }
 
+        /// <summary>
+        /// Opens my PayPal for users to donate if they want to
+        /// </summary>
         private void OpenDonationLink(object sender, RoutedEventArgs args)
         {
             Constants.Logger.Info($"Opening PayPal Donation Lionk");
@@ -405,6 +436,9 @@ namespace Tsundoku.Views
             }
         }
 
+        /// <summary>
+        /// Copies the title of the series when clicked om
+        /// </summary>
         private async void CopySeriesTitleAsync(object sender, PointerPressedEventArgs args)
         {
             string title = ((TextBlock)sender).Text;
@@ -412,16 +446,16 @@ namespace Tsundoku.Views
             await TextCopy.ClipboardService.SetTextAsync(title);
         }
 
-        /*
-         Decrements the series current volume count
-        */
+        /// <summary>
+        /// Increments the series current volume count
+        /// </summary>
         public void AddVolume(object sender, RoutedEventArgs args)
         {
             Series curSeries = (Series)((Button)sender).DataContext;
             if (curSeries.CurVolumeCount < curSeries.MaxVolumeCount)
             {
-                CollectionViewModel.UsersNumVolumesCollected++;
-                CollectionViewModel.UsersNumVolumesToBeCollected--;
+                CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UsersNumVolumesCollected++;
+                CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UsersNumVolumesToBeCollected--;
                 curSeries.CurVolumeCount += 1;
                 TextBlock volumeDisplay = (TextBlock)((Button)sender).GetLogicalSiblings().ElementAt(1);
                 string log = "Adding 1 Volume To " + curSeries.Titles["Romaji"] + " : " + volumeDisplay.Text + " -> ";
@@ -432,16 +466,16 @@ namespace Tsundoku.Views
             }
         }
 
-        /*
-         Decrements the series current volume count
-        */
+        /// <summary>
+        /// Deccrements the series current volume count
+        /// </summary>
         public void SubtractVolume(object sender, RoutedEventArgs args)
         {
             Series curSeries = (Series)((Button)sender).DataContext; //Get the current series data
             if (curSeries.CurVolumeCount >= 1) //Only decrement if the user currently has 1 or more volumes
             {
-                CollectionViewModel.UsersNumVolumesCollected--;
-                CollectionViewModel.UsersNumVolumesToBeCollected++;
+                CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UsersNumVolumesCollected--;
+                CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UsersNumVolumesToBeCollected++;
                 curSeries.CurVolumeCount -= 1;
                 TextBlock volumeDisplay = (TextBlock)((Button)sender).GetLogicalSiblings().ElementAt(1);
                 string log = "Removing 1 Volume From " + curSeries.Titles["Romaji"] + " : " + volumeDisplay.Text + " -> ";

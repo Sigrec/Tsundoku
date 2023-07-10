@@ -46,7 +46,7 @@ namespace Tsundoku.Views
                 string newCurrency = (sender as ComboBox).SelectedItem as string;
                 currencyLength = CollectionWindow.CollectionViewModel.CurCurrency.Length;
                 CollectionWindow.CollectionViewModel.CurCurrency = newCurrency;
-                CollectionWindow.CollectionViewModel.collectionStatsWindow.CollectionStatsVM.CollectionPrice = $"{newCurrency}{ CollectionWindow.CollectionViewModel.collectionStatsWindow.CollectionStatsVM.CollectionPrice.Substring(currencyLength)}";
+                CollectionWindow.CollectionViewModel.collectionStatsWindow.CollectionStatsVM.CollectionPrice = $"{newCurrency}{ CollectionWindow.CollectionViewModel.collectionStatsWindow.CollectionStatsVM.CollectionPrice[currencyLength..]}";
                 Constants.Logger.Info($"Currency Changed To {newCurrency}");
             }
         }
@@ -124,11 +124,11 @@ namespace Tsundoku.Views
                 {
                     Process.Start(new ProcessStartInfo(@$"https://www.youtube.com/@{(sender as Button).Name}") { UseShellExecute = true });
                 }
-                catch (System.ComponentModel.Win32Exception noBrowser)
+                catch (Win32Exception noBrowser)
                 {
                     Constants.Logger.Error(noBrowser.Message);
                 }
-                catch (System.Exception other)
+                catch (Exception other)
                 {
                     Constants.Logger.Error(other.Message);
                 }
@@ -143,11 +143,11 @@ namespace Tsundoku.Views
                 {
                     Process.Start(new ProcessStartInfo(@"https://coolors.co/generate") { UseShellExecute = true });
                 }
-                catch (System.ComponentModel.Win32Exception noBrowser)
+                catch (Win32Exception noBrowser)
                 {
                     Constants.Logger.Error(noBrowser.Message);
                 }
-                catch (System.Exception other)
+                catch (Exception other)
                 {
                     Constants.Logger.Error(other.Message);
                 }
@@ -162,11 +162,11 @@ namespace Tsundoku.Views
                 {
                     Process.Start(new ProcessStartInfo(@"https://discord.gg/QcZ5jcFPeU") { UseShellExecute = true });
                 }
-                catch (System.ComponentModel.Win32Exception noBrowser)
+                catch (Win32Exception noBrowser)
                 {
                     Constants.Logger.Error(noBrowser.Message);
                 }
-                catch (System.Exception other)
+                catch (Exception other)
                 {
                     Constants.Logger.Error(other.Message);
                 }

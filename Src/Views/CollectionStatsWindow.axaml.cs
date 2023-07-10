@@ -1,4 +1,3 @@
-using System.Drawing;
 using Avalonia;
 using Avalonia.Input;
 using LiveChartsCore.Defaults;
@@ -7,7 +6,7 @@ using LiveChartsCore.SkiaSharpView.Painting;
 using Tsundoku.Models;
 using Tsundoku.ViewModels;
 using Avalonia.ReactiveUI;
-using System;
+using ReactiveUI;
 
 namespace Tsundoku.Views
 {
