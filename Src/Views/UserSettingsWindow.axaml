@@ -59,6 +59,7 @@
                                 Classes="menu"
                                 FontSize="15"
                                 MaxLength="18"
+                                Watermark="Enter New Username..."
                                 Text="{Binding UsernameText}"
                                 BorderThickness="2"/>
                         <Button FontSize="20" 

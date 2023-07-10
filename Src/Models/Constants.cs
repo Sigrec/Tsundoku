@@ -6,8 +6,8 @@ namespace Tsundoku.Models
 {
     public class Constants
     {
-		public const ushort USER_ICON_HEIGHT = 68;
-		public const ushort USER_ICON_WIDTH = 68;
+		public const ushort USER_ICON_HEIGHT = 71;
+		public const ushort USER_ICON_WIDTH = 71;
         public const ushort CARD_HEIGHT = 290;
 		public const ushort CARD_WIDTH = 525;
         public const ushort RIGHT_SIDE_CARD_WIDTH = 355;

@@ -36,9 +36,9 @@
 				Classes="menu"
 				BorderThickness="0,0,0,3"
 				Height="150">
-			<Grid Margin="0,15,0,15" ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" HorizontalAlignment="Center" VerticalAlignment="Center">
-				<StackPanel Margin="0,0,365,0" Orientation="Horizontal" Spacing="0,0,1,0" Grid.Column="0" Grid.Row="0" Height="{CompiledBinding Source={x:Static local:Constants.USER_ICON_HEIGHT}}" HorizontalAlignment="Right">
-					<Border BorderThickness="2" Classes="menu" CornerRadius="2" ClipToBounds="True" Height="72">
+			<Grid Margin="0,15,0,15" ColumnDefinitions="*,550,*" RowDefinitions="Auto,Auto" HorizontalAlignment="Center" VerticalAlignment="Center" ShowGridLines="False">
+				<StackPanel Margin="0,0,0,1" Orientation="Horizontal" Spacing="0,0,1,1" Grid.Column="1" Grid.Row="0" Height="{CompiledBinding Source={x:Static local:Constants.USER_ICON_HEIGHT}}" HorizontalAlignment="Left" VerticalAlignment="Center">
+					<Border BorderThickness="2" Classes="menu" CornerRadius="2" ClipToBounds="True" Height="75">
 						<Image Height="{CompiledBinding Source={x:Static local:Constants.USER_ICON_HEIGHT}}"
 							   Width="{CompiledBinding Source={x:Static local:Constants.USER_ICON_WIDTH}}"
 							   Source="{Binding UserIcon}"
@@ -49,7 +49,7 @@
 						</Image>
 					</Border>
 					<TextBlock Name="Username" 
-								FontSize="25" 
+								FontSize="24" 
 								FontWeight="Bold"
 								TextAlignment="Center"
 								HorizontalAlignment="Left"
@@ -57,7 +57,7 @@
 								Text="{CompiledBinding UserName, Mode=OneWay}"
 								Classes="username"/>
 				</StackPanel>
-				<StackPanel Grid.Column="0" Grid.Row="1" Orientation="Horizontal" Spacing="3" VerticalAlignment="Bottom" HorizontalAlignment="Right">
+				<StackPanel Grid.Column="1" Grid.Row="1" Orientation="Horizontal" Spacing="5" VerticalAlignment="Bottom" HorizontalAlignment="Left">
 					<Button Name="SettingsButton"
 							Content="Settings"
 							Width="100"
@@ -98,7 +98,7 @@
 							Content="Price Analysis"
 							BorderThickness="0,3,3,0"/> -->
 				</StackPanel>
-				<StackPanel Margin="10,0,0,0" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Spacing="6">
+				<StackPanel Margin="0,0,0,0" HorizontalAlignment="Left" Grid.Column="2" Grid.Row="0" Grid.RowSpan="2" Spacing="6">
 					<ComboBox Name="LanguageSelector"
 							  SelectionChanged="LanguageChanged"
 							  Height="35"
@@ -709,7 +709,7 @@
 														</Style>
 													</Style>
 												</Grid.Styles>
-												<ProgressBar Height="27"
+												<ProgressBar Height="30"
 															 Width="250"
 															 Grid.Row="0"
 															 Grid.Column="0"
@@ -725,18 +725,18 @@
 															 FontSize="15"
 															 Minimum="0"
 															 CornerRadius="4"
-															 Margin="7,0.5,0,0"
+															 Margin="7,0,0,0"
 															 Maximum="{CompiledBinding MaxVolumeCount}"
 															 Name="VolumeProgress"/>
-												<StackPanel Orientation="Horizontal" Grid.Column="0" Grid.Row="0" Spacing="5" HorizontalAlignment="Center" Margin="10,0,0,0">
+												<StackPanel Orientation="Horizontal" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center" Margin="10,0,0,0">
 													<Button Background="Transparent"
 														Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressTextColor, Converter={StaticResource ConvertColor}}"
 														FontWeight="Bold"
 														Height="15"
-														Width="30"
-														FontSize="32"
+														Width="32"
+														FontSize="31"
 														Margin="0,0,-17,0"
-														Padding="0,-19,0,0"
+														Padding="-2,-17,0,0"
 														Cursor="Hand"
 														Click="SubtractVolume"
 														VerticalAlignment="Center"
@@ -761,13 +761,14 @@
 															FontWeight="Bold"
 															Height="20"
 															Width="21"
-															FontSize="25.5"
+															FontSize="24"
 															Cursor="Hand"
 															Click="AddVolume"
-															Padding="-5,-11,0,0"
-															Margin="0,0,0,0"
+															Padding="-8,-9.5,0,0"
 															VerticalAlignment="Center"
 															HorizontalAlignment="Center"
+															VerticalContentAlignment="Center"
+															HorizontalContentAlignment="Center"
 															Name="IncrementButton"
 															Content="+"/>
 												</StackPanel>

@@ -1,9 +1,10 @@
-V1.6.4.0 - 
+V1.7.0.0- July 9th, 2023 @ 7:50PM PST
 🔥 Fixed pie chart hovering label being cut off
 🔥 Fixed bug with collection filter sometimes skipping series
 🔥 Fixed most color scheming issues of various controls in all windows
 🔥 Fixed ComboBox's not auto setting to current selection on app startup
 ✅ Can now scroll in settings window and resize up to a set size
+✅ Can now upload a image to use as your icon by clicking
 ✅ Updated Menu Layout
 
 V1.6.3.0 - July 2nd, 2023 @ 4:20PM PST
