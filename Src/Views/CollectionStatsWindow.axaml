@@ -13,7 +13,8 @@
 		FontFamily="Segoe UI"
         Classes="menu"
 		MaxWidth="626"
-		MaxHeight="984"
+		MinWidth="626"
+		MaxHeight="1040"
 		Height="650"
 		WindowStartupLocation="2"
 		CanResize="true">
@@ -27,11 +28,11 @@
 	</Window.Styles>
 
 	<Border Classes="menu" BorderThickness="3" CornerRadius="0,0,8,8" ClipToBounds="True">
-		<ScrollViewer Name="CollectionTheme" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"> 
+		<ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"> 
 			<ScrollViewer.Styles>
 				<Style Selector="ScrollBar:vertical">
 					<Style Selector="^ /template/ Rectangle#TrackRect">
-						<Setter Property="Fill" Value="{Binding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}" />
+						<Setter Property="Fill" Value="{Binding CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}" />
 					</Style>
 					<Style Selector="^ /template/ Thumb">
 						<Setter Property="Background" Value="{Binding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" />
@@ -50,22 +51,25 @@
 					</Style>
 				</Style>
 			</ScrollViewer.Styles>
-			<Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="Auto" Margin="20">
+			<Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="Auto" Margin="20">
 				<TextBlock Text="Stats" FontSize="25" FontWeight="Bold" Classes="menu" Grid.Row="0" Grid.Column="0" Margin="5,0,0,0"/>
-				<WrapPanel Grid.Row="1" Grid.Column="0" Margin="-5,0,0,0">
+				<StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="0" Margin="-5,0,0,0" MaxWidth="626" HorizontalAlignment="Center">
 					<controls:ValueStat Text="{Binding MeanScore}" Title="Mean Score" Icon="fa-solid fa-gauge-simple"/>
 					<controls:ValueStat Text="{Binding VolumesRead}" Title="Volumes Read" Icon="fa-solid fa-book-open-reader"/>
 					<controls:ValueStat Text="{Binding SeriesCount}" Title="Series Count" Icon="fa-solid fa-globe"/>
-				</WrapPanel>
-				<controls:ValueStat Grid.Row="2" Grid.Column="0" HorizontalAlignment="Center" Text="{Binding CollectionPrice}" Title="Collection Value" Icon="fa-solid fa-sack-dollar" PointerPressed="CopyTextAsync"/>
-				<!-- <controls:TsundokuPieChart Grid.Row="3" Grid.Column="0" ChartData="{Binding Demographics}" ChartTitle="Demographics"/> -->
-				<TextBlock Text="Distributions" FontSize="25" FontWeight="Bold" Classes="menu" Grid.Row="3" Grid.Column="0" Margin="0,0,0,10"/>
-				<StackPanel Orientation="Horizontal" Grid.Row="4" Grid.Column="0" HorizontalAlignment="Center" Spacing="55">
-					<Border Background="{CompiledBinding CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" Width="260" Height="375" Margin="0,0,0,0" HorizontalAlignment="Left">
+				</StackPanel>
+				<StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Center">
+					<controls:ValueStat Text="{Binding UsersNumVolumesCollected}" Width="240" Title="Volumes Collected" Icon="fa-solid fa-gauge-simple"/>
+					<controls:ValueStat Width="240" Text="{Binding UsersNumVolumesToBeCollected}" Title="Volumes To Be Collected" Icon="fa-solid fa-gauge-simple"/>
+				</StackPanel>
+				<controls:ValueStat Grid.Row="3" Grid.Column="0" HorizontalAlignment="Center" Text="{Binding CollectionPrice}" Title="Collection Value" Icon="fa-solid fa-sack-dollar" PointerPressed="CopyTextAsync"/>
+				<TextBlock Text="Distributions" FontSize="25" FontWeight="Bold" Classes="menu" Grid.Row="4" Grid.Column="0" Margin="0,0,0,10"/>
+				<StackPanel Orientation="Horizontal" Grid.Row="5" Grid.Column="0" HorizontalAlignment="Center" Spacing="10">
+					<Border Background="{CompiledBinding CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" Width="280" Height="375" Margin="0,0,0,0" HorizontalAlignment="Left">
 						<Border CornerRadius="8" ClipToBounds="True">
 							<StackPanel Spacing="3">
 								<TextBlock Text="Demographic" TextDecorations="Underline" FontSize="22" FontWeight="Bold" Classes="menu" HorizontalAlignment="Center" Margin="0,10,0,0"/>
-								<lvc:PieChart Series="{Binding Demographics}" Width="210" Height="210"/>
+								<lvc:PieChart Series="{Binding Demographics}" Height="210"/>
 								<Border CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" ClipToBounds="True" Width="165" Height="24" OpacityMask="White">
 									<TextBlock Text="{Binding ShounenPercentage, StringFormat='Shounen {0}%', Mode=OneWay}" Background="{CompiledBinding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}" Classes="menu" FontWeight="Bold" TextAlignment="Center" FontSize="14"/>
 								</Border>
@@ -81,11 +85,11 @@
 							</StackPanel>
 						</Border>
 					</Border>
-					<Border Background="{CompiledBinding CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" Width="260" Height="375" Margin="0,0,0,0" HorizontalAlignment="Right">
+					<Border Background="{CompiledBinding CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" Width="280" Height="375" Margin="0,0,0,0" HorizontalAlignment="Right">
 						<Border CornerRadius="8" ClipToBounds="True">
 							<StackPanel Spacing="3">
 								<TextBlock Text="Status" TextDecorations="Underline" FontSize="22" FontWeight="Bold" Classes="menu" HorizontalAlignment="Center" Margin="0,10,0,0"/>
-								<lvc:PieChart Series="{Binding StatusDistribution}" Width="210" Height="210"/>
+								<lvc:PieChart Series="{Binding StatusDistribution}" Height="210"/>
 								<Border CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" ClipToBounds="True" Width="165" Height="24">
 									<TextBlock Text="{Binding FinishedPercentage, StringFormat='Finished {0}%', Mode=OneWay}" Background="{CompiledBinding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}" Classes="menu" FontWeight="Bold" TextAlignment="Center" FontSize="14"/>
 								</Border>
@@ -102,7 +106,7 @@
 						</Border>
 					</Border>
 				</StackPanel>
-				<Border Grid.Row="5" Grid.Column="0" Background="{CompiledBinding CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" Width="575" Height="300" Margin="0,30,0,0" HorizontalAlignment="Right">
+				<Border Grid.Row="6" Grid.Column="0" Background="{CompiledBinding CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" Width="575" Height="300" Margin="0,10,0,0" HorizontalAlignment="Right">
 					<Border CornerRadius="8" ClipToBounds="True">
 						<StackPanel>
 							<TextBlock Text="Scores" TextDecorations="Underline" FontSize="21" FontWeight="Bold" Classes="menu" HorizontalAlignment="Center" Margin="0,10,0,0"/>

@@ -12,11 +12,10 @@ namespace Tsundoku.Helpers
 
         public object? Convert(IList<object?> values, Type type, object? parameter, CultureInfo culture)
         {
-            if (values.Any(x => x is Avalonia.UnsetValueType)) return false;
-            var titles = (values[0] as Dictionary<string, string>);
-            if (titles.ContainsKey((values[1] as string)))
+            var titles = values[0] as Dictionary<string, string>;
+            if (titles.ContainsKey(values[1] as string))
             {
-                return titles[(values[1] as string)];
+                return titles[values[1] as string];
             }
             return titles["Romaji"];
         }

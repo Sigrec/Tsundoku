@@ -4,35 +4,30 @@ using ReactiveUI.Fody.Helpers;
 using DynamicData;
 using Avalonia.Media.Imaging;
 using System.Collections.ObjectModel;
+using Avalonia.Controls;
+using ReactiveUI;
+using System;
 
 namespace Tsundoku.ViewModels
 {
     public class AddNewSeriesViewModel : ViewModelBase
     {
-        public static string[] AvailableLanguages { get; } = new string[] { "Arabic", "Azerbaijan", "Bengali", "Bulgarian", "Burmese", "Catalan", "Chinese", "Croatian", "Czech", "Danish", "Dutch", "Esperanto", "Estonian", "Filipino", "Finnish", "French", "German", "Greek", "Hebrew", "Hindi", "Hungarian", "Indonesian", "Italian", "Kazakh", "Korean", "Latin", "Lithuanian", "Malay", "Mongolian", "Nepali", "Norwegian", "Persian", "Polish", "Portuguese", "Romanian", "Russian", "Serbian", "Slovak", "Spanish", "Swedish", "Tamil", "Thai", "Turkish", "Ukrainian", "Vietnamese" };
+        public static readonly string[] AvailableLanguages = new string[] { "Arabic", "Azerbaijan", "Bengali", "Bulgarian", "Burmese", "Catalan", "Chinese", "Croatian", "Czech", "Danish", "Dutch", "Esperanto", "Estonian", "Filipino", "Finnish", "French", "German", "Greek", "Hebrew", "Hindi", "Hungarian", "Indonesian", "Italian", "Kazakh", "Korean", "Latin", "Lithuanian", "Malay", "Mongolian", "Nepali", "Norwegian", "Persian", "Polish", "Portuguese", "Romanian", "Russian", "Serbian", "Slovak", "Spanish", "Swedish", "Tamil", "Thai", "Turkish", "Ukrainian", "Vietnamese" };
 
-        [Reactive]
-        public string TitleText { get; set; }
+        [Reactive] public string TitleText { get; set; }
+        [Reactive] public string MaxVolumeCount { get; set; }
+        [Reactive] public string CurVolumeCount { get; set; }
+        [Reactive] public bool IsAddSeriesButtonEnabled { get; set; } = true;
 
-        [Reactive]
-        public string MaxVolumeCount { get; set; }
+        public ObservableCollection<ListBoxItem> SelectedAdditionalLanguages { get; } = new ObservableCollection<ListBoxItem>();
 
-        [Reactive]
-        public string CurVolumeCount { get; set; }
-
-        [Reactive]
-        public bool IsAddSeriesButtonEnabled { get; set; } = true;
-
-        public ObservableCollection<string> SelectedAdditionalLanguages { get; } = new ObservableCollection<string>();
-
-        Helpers.AniListQuery ALQuery = new Helpers.AniListQuery();
-        Helpers.MangadexQuery MD_Query = new Helpers.MangadexQuery();
+        readonly Helpers.AniListQuery ALQuery = new();
+        readonly Helpers.MangadexQuery MD_Query = new();
 
         public AddNewSeriesViewModel()
         {
             // Disable the button to add a series to the users collection if the fields aren't populated and validated correctly
-            // this.WhenAnyValue(x => x.TitleText, x => x.MaxVolumeCount, x => x.CurVolumeCount, (title, max, cur) => !string.IsNullOrWhiteSpace(title) && !string.IsNullOrWhiteSpace(max) && !string.IsNullOrWhiteSpace(cur) && Convert.ToUInt16(cur) <= Convert.ToUInt16(max)).Subscribe(x => IsAddSeriesButtonEnabled = x);
-            // this.WhenAnyValue(x => x.CurrentTheme).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.MainTheme = x.CurAdditionalLanguage);
+            // this.WhenAnyValue(x => x.TitleText, x => x.MaxVolumeCount, x => x.CurVolumeCount, (title, max, cur) => !string.IsNullOrWhiteSpace(title) && !string.IsNullOrWhiteSpace(max) && !string.IsNullOrWhiteSpace(cur) && (Convert.ToUInt16(cur) <= Convert.ToUInt16(max))).Subscribe(x => IsAddSeriesButtonEnabled = x);
         }
         
         /**
@@ -77,7 +72,7 @@ namespace Tsundoku.ViewModels
                     Constants.Logger.Info($"\nAdding New Series -> {title} | {bookType} | {curVolCount} | {maxVolCount} |\n{newSeries.ToJsonString(options)}");
                     // File.WriteAllText(@"Series.json", newSeries.ToJsonString(options));
 
-                    int index = MainWindowViewModel.Collection.BinarySearch<Series>(newSeries, new SeriesComparer(MainWindowViewModel.MainUser.CurLanguage));
+                    int index = MainWindowViewModel.Collection.BinarySearch(newSeries, new SeriesComparer(MainUser.CurLanguage));
                     index = index < 0 ? ~index : index;
                     newSeries.CoverBitMap = new Bitmap(newSeries.Cover).CreateScaledBitmap(new Avalonia.PixelSize(Constants.LEFT_SIDE_CARD_WIDTH, Constants.IMAGE_HEIGHT), BitmapInterpolationMode.HighQuality);
 
@@ -94,6 +89,16 @@ namespace Tsundoku.ViewModels
                 Constants.Logger.Info($"{title} -> Does Not Exist");
             }
             return duplicateSeriesCheck;
+        }
+
+        public static ObservableCollection<string> ConvertSelectedLangList(ObservableCollection<ListBoxItem> SelectedLangs)
+        {
+            ObservableCollection<string> ConvertedList = new();
+            foreach (ListBoxItem lang in SelectedLangs)
+            {
+                ConvertedList.Add(lang.Content.ToString());
+            }
+            return ConvertedList;
         }
     }
 }

@@ -10,197 +10,176 @@
         Icon="\Assets\Icons\Tsundoku-Logo.ico"
         Title="Settings"
         FontFamily="Segoe UI"
-        SizeToContent="WidthAndHeight"
+        MinWidth="491"
+        MaxWidth="491"
+        MaxHeight="840"
+        Height="550"
         WindowStartupLocation="2"
-        KeyboardNavigation.TabNavigation="None"
-        CanResize="false">
+        KeyboardNavigation.TabNavigation="None">
+    
+    <Window.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceInclude Source="/Styles/SettingsThemeControls.xaml"/>
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>
+	</Window.Resources>
 
     <Border Classes="menu" BorderThickness="3" CornerRadius="0,0,8,8" ClipToBounds="True">
-        <StackPanel Margin="20" Spacing="20">
-            <StackPanel Spacing="5">
-                <TextBlock Text="Change Username" FontSize="20" FontWeight="Bold" Classes="menu"/>
-                <StackPanel Orientation="Horizontal" Spacing="5">
-                    <TextBox Name="UsernameChange"
-                             Width="400"
-                             FontWeight="Bold"
-                             Classes="menu"
-                             FontSize="15"
-                             MaxLength="21"
-                             Text="{Binding UsernameText}"
-                             BorderThickness="2"/>
-                    <Button FontSize="20" 
-                            BorderThickness="2"
-                            Classes="menu"
-                            i:Attached.Icon="fa-check" 
-                            Click="ChangeUsername"
-                            IsEnabled="{Binding IsChangeUsernameButtonEnabled}"/>
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"> 
+            <ScrollViewer.Styles>
+				<Style Selector="ScrollBar:vertical">
+					<Style Selector="^ /template/ Rectangle#TrackRect">
+						<Setter Property="Fill" Value="{Binding CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}" />
+					</Style>
+					<Style Selector="^ /template/ Thumb">
+						<Setter Property="Background" Value="{Binding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" />
+					</Style>
+				</Style>
+				<Style Selector="Thumb:pointerover /template/ Border">
+					<Setter Property="Background" Value="{Binding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" />
+				</Style>
+				<Style Selector="RepeatButton">
+					<Setter Property="TextElement.Foreground" Value="{Binding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}"/>
+
+					<Style Selector="^:pressed /template/ ContentPresenter, ^:pointerover /template/ ContentPresenter">
+						<Setter Property="Background" Value="{Binding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" />
+						<Setter Property="BorderBrush" Value="Red" />
+						<Setter Property="TextElement.Foreground" Value="{Binding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}"/>
+					</Style>
+				</Style>
+			</ScrollViewer.Styles>
+            <StackPanel Margin="20" Spacing="20">
+                <StackPanel Spacing="5">
+                    <TextBlock Text="Change Username" FontSize="20" FontWeight="Bold" Classes="menu"/>
+                    <StackPanel Orientation="Horizontal" Spacing="5">
+                        <TextBox Name="UsernameChange"
+                                Width="400"
+                                FontWeight="Bold"
+                                Classes="menu"
+                                FontSize="15"
+                                MaxLength="18"
+                                Text="{Binding UsernameText}"
+                                BorderThickness="2"/>
+                        <Button FontSize="20" 
+                                BorderThickness="2"
+                                Classes="menu"
+                                i:Attached.Icon="fa-check" 
+                                Click="ChangeUsername"
+                                IsEnabled="{Binding IsChangeUsernameButtonEnabled}"/>
+                    </StackPanel>
+                </StackPanel>
+                <StackPanel Spacing="5">
+                    <TextBlock Text="Change Currency" FontSize="20" FontWeight="Bold" Classes="menu"/>
+                    <ComboBox Name="CurrencySelector"
+                            SelectionChanged="CurrencyChanged"
+                            ItemsSource="{Binding Source={x:Static model:Constants.CURRENCY_SYMBOLS}}"
+                            SelectedItem="{Binding CurCurrency}"
+                            Theme="{StaticResource MenuComboBox}"
+                            HorizontalAlignment="Left"
+                            AutoScrollToSelectedItem="True"/>
+                </StackPanel>
+                <StackPanel Spacing="5">
+                    <TextBlock Text="Settings" FontSize="20" FontWeight="Bold" Classes="menu"/>
+                    <WrapPanel Width="450" Margin="-5,0,0,0">
+                        <WrapPanel.Styles>
+                            <Style Selector="Button">
+                                <Setter Property="Margin" Value="5"/>
+                            </Style>
+                        </WrapPanel.Styles>
+                        <Button Theme="{StaticResource UserSettingsButton}"
+                                Click="JoinDiscord"
+                                Content="Join Discord"/>
+                        <Button Theme="{StaticResource UserSettingsButton}"
+                                Click="ReportBug"
+                                Content="Report Issue/Bug"/>
+                        <Button Theme="{StaticResource UserSettingsButton}"
+                                Click="OpenCoolorsSite"
+                                Content="Open Coolors"/>
+                        <Button Theme="{StaticResource UserSettingsButton}"
+                                Click="OpenScreenshotsFolder" 
+                                Content="Open Screenshots Folder"/>
+                        <Button Theme="{StaticResource UserSettingsButton}"
+                                Click="OpenCoversFolder" 
+                                Content="Open Covers Folder"/>
+                        <Button FontWeight="Bold"
+                                Theme="{StaticResource UserSettingsButton}"
+                                BorderThickness="2"
+                                Command="{Binding ExportToSpreadsheetCommand}"
+                                Content="Export to Spreadsheet"/>
+                    </WrapPanel>
+                </StackPanel>
+                <StackPanel Spacing="5">
+                    <TextBlock Text="Controls" FontSize="20" FontWeight="Bold" Classes="menu"/>
+                    <TextBlock Text="Toggle Fullscreen → F11" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
+                    <TextBlock Text="Screenshot Collection → CTRL+P" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
+                    <TextBlock Text="Save Collection (Auto Saves on Close) → CTRL+S" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
+                    <TextBlock Text="Copy Title → Click Title on Series Card" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
+                    <TextBlock Text="Open AL Page → Click Series Image" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
+                </StackPanel>
+                <StackPanel Spacing="5">
+                    <TextBlock Text="Youtubers" FontSize="20" FontWeight="Bold" Classes="menu"/>
+                    <WrapPanel Width="450" Margin="-5,0,0,0">
+                        <WrapPanel.Styles>
+                            <Style Selector="Button">
+                                <Setter Property="Margin" Value="5"/>
+                            </Style>
+                        </WrapPanel.Styles>
+                        <Button Theme="{StaticResource UserSettingsButton}"
+                                Click="OpenYoutuberSite"
+                                Name="EastCoastManga"
+                                Content="EastCoastManga"/>
+                        <Button Theme="{StaticResource UserSettingsButton}"
+                                Click="OpenYoutuberSite" 
+                                Name="PlasmsManga"
+                                Content="Plasm's Manga"/>
+                        <Button Theme="{StaticResource UserSettingsButton}"
+                                Click="OpenYoutuberSite" 
+                                Name="hvlmanga"
+                                Content="hvlmanga"/>
+                        <Button Theme="{StaticResource UserSettingsButton}"
+                                Click="OpenYoutuberSite" 
+                                Name="JakeThePog"
+                                Content="Jake The Pog"/>
+                        <Button Theme="{StaticResource UserSettingsButton}"
+                                Click="OpenYoutuberSite" 
+                                Name="BasedSempai"
+                                Content="Based Sempai"/>
+                        <Button Theme="{StaticResource UserSettingsButton}"
+                                Click="OpenYoutuberSite" 
+                                Name="Ararawgi"
+                                Content="Ararawgi"/>
+                        <Button Theme="{StaticResource UserSettingsButton}"
+                                Click="OpenYoutuberSite" 
+                                Name="meettheweebfamily1202"
+                                Content="Meet the Weeb Family"/>
+                        <Button Theme="{StaticResource UserSettingsButton}"
+                                Click="OpenYoutuberSite" 
+                                Name="MangaHunter"
+                                Content="Sam's Sidequest"/>
+                    </WrapPanel>
+                </StackPanel>
+                <StackPanel Spacing="5">
+                    <TextBlock Text="Credits" FontSize="20" FontWeight="Bold" Classes="menu"/>
+                    <WrapPanel Width="450" Margin="-5,0,0,0">
+                        <WrapPanel.Styles>
+                            <Style Selector="Button">
+                                <Setter Property="Margin" Value="5"/>
+                            </Style>
+                        </WrapPanel.Styles>
+                        <Button Theme="{StaticResource UserSettingsButton}"
+                                Click="OpenAniListLink"
+                                HorizontalAlignment="Center"
+                                Name="AniListCredit"
+                                Content="AniList"/>
+                        <Button Theme="{StaticResource UserSettingsButton}"
+                                Click="OpenMangadexLink" 
+                                HorizontalAlignment="Center"
+                                Name="MangadexCredit"
+                                Content="Mangadex"/>
+                    </WrapPanel>
                 </StackPanel>
             </StackPanel>
-            <StackPanel Spacing="5">
-                <TextBlock Text="Change Currency" FontSize="20" FontWeight="Bold" Classes="menu"/>
-                <ComboBox Name="CurrencySelector"
-                          SelectionChanged="CurrencyChanged"
-                          ItemsSource="{Binding Source={x:Static model:Constants.CURRENCY_SYMBOLS}}"
-                          FontWeight="Bold"
-                          SelectedItem="{Binding CurCurrency}"
-                          FontSize="15"
-                          Width="80"
-                          Classes="menu"
-                          BorderThickness="2"
-                          AutoScrollToSelectedItem="True"/>
-            </StackPanel>
-            <StackPanel Spacing="5">
-                <TextBlock Text="Settings" FontSize="20" FontWeight="Bold" Classes="menu"/>
-                <WrapPanel Width="450" Margin="-5,0,0,0">
-                    <WrapPanel.Styles>
-                        <Style Selector="Button">
-                            <Setter Property="Margin" Value="5"/>
-                        </Style>
-                    </WrapPanel.Styles>
-                    <Button FontSize="15" 
-                            FontWeight="Bold" 
-                            BorderThickness="2" 
-                            Classes="menu"
-                            Click="JoinDiscord"
-                            Content="Join Discord"/>
-                    <Button FontSize="15" 
-                            FontWeight="Bold" 
-                            BorderThickness="2" 
-                            Classes="menu"
-                            Click="ReportBug"
-                            Content="Report Issue/Bug"/>
-                    <Button FontSize="15" 
-                            FontWeight="Bold" 
-                            BorderThickness="2" 
-                            Classes="menu"
-                            Click="OpenCoolorsSite"
-                            Content="Open Coolors"/>
-                    <Button FontSize="15" 
-                            FontWeight="Bold" 
-                            BorderThickness="2" 
-                            Classes="menu"
-                            Click="OpenScreenshotsFolder" 
-                            Content="Open Screenshots Folder"/>
-                    <Button FontSize="15" 
-                            FontWeight="Bold" 
-                            BorderThickness="2" 
-                            Classes="menu"
-                            Click="OpenCoversFolder" 
-                            Content="Open Covers Folder"/>
-                    <Button FontSize="15" 
-                            FontWeight="Bold"
-                            Classes="menu"
-                            BorderThickness="2"
-                            Command="{Binding ExportToSpreadsheetCommand}"
-                            Content="Export to Spreadsheet"/>
-                </WrapPanel>
-            </StackPanel>
-            <StackPanel Spacing="5">
-                <TextBlock Text="Youtubers" FontSize="20" FontWeight="Bold" Classes="menu"/>
-                <WrapPanel Width="450" Margin="-5,0,0,0">
-                    <WrapPanel.Styles>
-                        <Style Selector="Button">
-                            <Setter Property="Margin" Value="5"/>
-                        </Style>
-                    </WrapPanel.Styles>
-                    <Button FontSize="15" 
-                            FontWeight="Bold" 
-                            BorderThickness="2" 
-                            Classes="menu"
-                            Click="OpenYoutuberSite"
-                            Name="EastCoastManga"
-                            Content="EastCoastManga"/>
-                    <Button FontSize="15" 
-                            FontWeight="Bold" 
-                            BorderThickness="2" 
-                            Classes="menu"
-                            Click="OpenYoutuberSite" 
-                            Name="PlasmsManga"
-                            Content="Plasm's Manga"/>
-                    <Button FontSize="15" 
-                            FontWeight="Bold" 
-                            BorderThickness="2" 
-                            Classes="menu"
-                            Click="OpenYoutuberSite" 
-                            HorizontalAlignment="Center"
-                            Name="hvlmanga"
-                            Content="hvlmanga"/>
-                    <Button FontSize="15"
-                            FontWeight="Bold" 
-                            BorderThickness="2" 
-                            Classes="menu"
-                            Click="OpenYoutuberSite" 
-                            HorizontalAlignment="Center"
-                            Name="JakeThePog"
-                            Content="Jake The Pog"/>
-                    <Button FontSize="15"
-                            FontWeight="Bold" 
-                            BorderThickness="2" 
-                            Classes="menu"
-                            Click="OpenYoutuberSite" 
-                            HorizontalAlignment="Center"
-                            Name="BasedSempai"
-                            Content="Based Sempai"/>
-                    <Button FontSize="15"
-                            FontWeight="Bold" 
-                            BorderThickness="2" 
-                            Classes="menu"
-                            Click="OpenYoutuberSite" 
-                            HorizontalAlignment="Center"
-                            Name="Ararawgi"
-                            Content="Ararawgi"/>
-                    <Button FontSize="15"
-                            FontWeight="Bold" 
-                            BorderThickness="2" 
-                            Classes="menu"
-                            Click="OpenYoutuberSite" 
-                            HorizontalAlignment="Center"
-                            Name="meettheweebfamily1202"
-                            Content="Meet the Weeb Family"/>
-                    <Button FontSize="15"
-                            FontWeight="Bold" 
-                            BorderThickness="2" 
-                            Classes="menu"
-                            Click="OpenYoutuberSite" 
-                            HorizontalAlignment="Center"
-                            Name="MangaHunter"
-                            Content="Sam's Sidequest"/>
-                </WrapPanel>
-            </StackPanel>
-            <StackPanel Spacing="5">
-                <TextBlock Text="Controls" FontSize="20" FontWeight="Bold" Classes="menu"/>
-                <TextBlock Text="Toggle Fullscreen → F11" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
-                <TextBlock Text="Screenshot Collection → CTRL+P" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
-                <TextBlock Text="Save Collection (Auto Saves on Close) → CTRL+S" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
-                <TextBlock Text="Copy Title → Click Title on Series Card" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
-                <TextBlock Text="Open AL Page → Click Series Image" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
-            </StackPanel>
-            <StackPanel Spacing="5">
-                <TextBlock Text="Credits" FontSize="20" FontWeight="Bold" Classes="menu"/>
-				<WrapPanel Width="450" Margin="-5,0,0,0">
-                    <WrapPanel.Styles>
-                        <Style Selector="Button">
-                            <Setter Property="Margin" Value="5"/>
-                        </Style>
-                    </WrapPanel.Styles>
-					<Button FontSize="15"
-							FontWeight="Bold" 
-							BorderThickness="2" 
-							Classes="menu"
-							Click="OpenAniListLink"
-							HorizontalAlignment="Center"
-							Name="AniListCredit"
-							Content="AniList"/>
-					<Button FontSize="15"
-							FontWeight="Bold" 
-							BorderThickness="2" 
-							Classes="menu"
-							Click="OpenMangadexLink" 
-							HorizontalAlignment="Center"
-							Name="MangadexCredit"
-							Content="Mangadex"/>
-				</WrapPanel>
-			</StackPanel>
-        </StackPanel>
+        </ScrollViewer>
     </Border>
 </Window>

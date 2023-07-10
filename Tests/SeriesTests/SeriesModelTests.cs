@@ -11,7 +11,8 @@ namespace Tests.SeriesTests
     public class SeriesModelTests
     {
         
-        public static readonly JsonSerializerOptions options = new JsonSerializerOptions { 
+        public static readonly JsonSerializerOptions options = new()
+        { 
             WriteIndented = true,
             ReadCommentHandling = JsonCommentHandling.Skip,
             AllowTrailingCommas = true,

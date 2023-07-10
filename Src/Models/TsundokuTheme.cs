@@ -4,7 +4,7 @@ using Avalonia.Media;
 
 namespace Tsundoku.Models
 {
-    public class TsundokuTheme : ICloneable, IEquatable<TsundokuTheme?>
+    public class TsundokuTheme : ICloneable, IEquatable<TsundokuTheme?>, IComparable
     {
         public string ThemeName { get; set; }
         public uint MenuBGColor { get; set; }
@@ -262,6 +262,11 @@ namespace Tsundoku.Models
                    SeriesEditPaneButtonsBorderHoverColor == other.SeriesEditPaneButtonsBorderHoverColor &&
                    SeriesEditPaneButtonsIconColor == other.SeriesEditPaneButtonsIconColor &&
                    SeriesEditPaneButtonsIconHoverColor == other.SeriesEditPaneButtonsIconHoverColor;
+        }
+
+        public int CompareTo(object? obj)
+        {
+            return this.ThemeName.CompareTo((obj as TsundokuTheme).ThemeName);
         }
 
         public static bool operator ==(TsundokuTheme? left, TsundokuTheme? right)

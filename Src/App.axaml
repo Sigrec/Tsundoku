@@ -3,15 +3,21 @@
              xmlns:local="using:Tsundoku"
 			 xmlns:vm="using:Tsundoku.ViewModels"
              xmlns:cv="clr-namespace:Tsundoku.Helpers"
+			 RequestedThemeVariant="Dark"
 			 x:DataType="vm:MainWindowViewModel"
              x:Class="Tsundoku.App">
 	<!-- TODO: Figure out a way to prevent other windows from hiding under main window when open and clicking main window -->
 	<Application.Resources>
-		<cv:ColorConverter x:Key="ConvertColor"/>
+		<ResourceDictionary>
+			<cv:ColorConverter x:Key="ConvertColor"/>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceInclude Source="/Styles/AppThemeControls.xaml"/>
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>
 	</Application.Resources>
 
     <Application.Styles>
-		<FluentTheme/>
+		<FluentTheme />
 		<!-- <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/> -->
 		<StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml" />
 		<StyleInclude Source="/Styles/MenuTheme.xaml" />

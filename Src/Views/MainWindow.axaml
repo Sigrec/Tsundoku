@@ -3,10 +3,10 @@
 		xmlns:local="clr-namespace:Tsundoku.Models"
         xmlns:vm="clr-namespace:Tsundoku.ViewModels"
 		xmlns:cv="clr-namespace:Tsundoku.Helpers"
+		xmlns:controls="clr-namespace:Tsundoku.Controls"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
-		xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
         x:Class="Tsundoku.Views.MainWindow"
         Icon="\Assets\Icons\Tsundoku-Logo.ico"
         Title="Tsundoku"
@@ -19,13 +19,14 @@
 		KeyboardNavigation.TabNavigation="None"
 		x:DataType="vm:MainWindowViewModel">
 
-	<Design.DataContext>
-		<vm:MainWindowViewModel/>
-	</Design.DataContext>
-
 	<Window.Resources>
-		<cv:TitleLangConverter x:Key="ConvertTitle"/>
-		<cv:StaffLangConverter x:Key="ConvertStaff"/>
+		<ResourceDictionary>
+			<cv:TitleLangConverter x:Key="ConvertTitle"/>
+			<cv:StaffLangConverter x:Key="ConvertStaff"/>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceInclude Source="/Styles/CollectionThemeControls.xaml"/>
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>
 	</Window.Resources>
 
 	<DockPanel>
@@ -34,152 +35,155 @@
 				DockPanel.Dock="Top" 
 				Classes="menu"
 				BorderThickness="0,0,0,3"
-				Height="130">
-			<DockPanel Margin="0,7,0,12">
-				<TextBlock Name="Username" 
-						   FontSize="25" 
-						   FontWeight="Bold"
-						   TextDecorations="Underline"
-						   TextAlignment="Center"
-						   HorizontalAlignment="Center"
-						   VerticalAlignment="Center" 
-						   Text="{CompiledBinding UserName, Mode=OneWay}"
-						   DockPanel.Dock="Top"
-						   Classes="username"/>
-				<StackPanel Spacing="15" HorizontalAlignment="Center" VerticalAlignment="Center" DockPanel.Dock="Bottom" Orientation="Horizontal">
-					<StackPanel Spacing="5" HorizontalAlignment="Center" VerticalAlignment="Center" Width="165">
-						<StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Center" VerticalAlignment="Center">
-							<Button Name="SettingsButton"
-									FontSize="18" 
-									Classes="menu"
-									BorderThickness="2"
-									ToolTip.Tip="User Settings"
-									Width="50"
-									Height="35"
-									i:Attached.Icon="fa-address-book" 
-									Command="{CompiledBinding OpenSettingsWindow}"/>
-							<Button Name="ThemeButton" 
-									FontSize="18" 
-									Width="50"
-									Height="35"
-									Classes="menu"
-									BorderThickness="2"
-									ToolTip.Tip="Themes"
-									i:Attached.Icon="fa-swatchbook" 
-									Command="{CompiledBinding OpenThemeSettingsWindow}"/>
-							<Button FontWeight="Bold"
-									Name="AnalysisButton"
-									FontSize="18"
-									IsEnabled="False"
-									Classes="menu"
-									Width="50"
-									Height="35"
-									ToolTip.Tip="Price Analysis"
-									BorderThickness="2"
-									Command="{CompiledBinding OpenPriceAnalysisWindow}"
-									i:Attached.Icon="fa-chart-line"/>
-						</StackPanel>
-						<StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Center" VerticalAlignment="Center">
-							<Button FontWeight="Bold"
-									Name="AddNewSeriesButton"
-									FontSize="18"
-									Classes="menu"
-									ToolTip.Tip="Add New Series"
-									BorderThickness="2"
-									Width="50"
-									Height="35"
-									Command="{CompiledBinding OpenAddNewSeriesWindow}"
-									i:Attached.Icon="fa-book-medical"/>
-							<Button FontWeight="Bold"
-									Name="DonateButton"
-									FontSize="18"
-									Classes="menu"
-									Width="50"
-									Height="35"
-									ToolTip.Tip="Donate"
-									BorderThickness="2"
-									Click="OpenDonationLink"
-									i:Attached.Icon="fa-circle-dollar-to-slot"/>
-							<Button FontWeight="Bold"
-									Name="StatsButton"
-									FontSize="18"
-									Classes="menu"
-									Width="50"
-									Height="35"
-									ToolTip.Tip="Collection Stats"
-									BorderThickness="2"
-									Command="{CompiledBinding OpenCollectionStatsWindow}"
-									i:Attached.Icon="fa-chart-pie"/>
-						</StackPanel>
-					</StackPanel>
-					<TextBlock Name="NumVolumesCollected" 
-							   Text="{CompiledBinding UsersNumVolumesCollected, StringFormat='Collected&#x0a;{0} Volumes', Mode=OneWay}"
-							   TextAlignment="Center" 
-							   FontSize="21" 
-							   FontWeight="Bold" 
-							   Classes="menu"
-							   VerticalAlignment="Center"
-							   HorizontalAlignment="Center"/>
-					<StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="5">
-						<TextBlock Name="SearchCollectionHeader" VerticalAlignment="Center" Text="Search Collection" TextAlignment="Center" HorizontalAlignment="Center" FontSize="21" FontWeight="Bold" Classes="menu"/>
-						<TextBox Name="SearchBar" 
-								Text="{CompiledBinding SearchText, Mode=TwoWay}" 
-								KeyUp="SearchCollection"
-								Classes="menu"
-								BorderThickness="2"
-								Width="185"
+				Height="150">
+			<Grid Margin="0,15,0,15" ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" HorizontalAlignment="Center" VerticalAlignment="Center">
+				<StackPanel Margin="0,0,365,0" Orientation="Horizontal" Spacing="0,0,1,0" Grid.Column="0" Grid.Row="0" Height="{CompiledBinding Source={x:Static local:Constants.USER_ICON_HEIGHT}}" HorizontalAlignment="Right">
+					<Border BorderThickness="2" Classes="menu" CornerRadius="2" ClipToBounds="True" Height="72">
+						<Image Height="{CompiledBinding Source={x:Static local:Constants.USER_ICON_HEIGHT}}"
+							   Width="{CompiledBinding Source={x:Static local:Constants.USER_ICON_WIDTH}}"
+							   Source="{Binding UserIcon}"
+							   Cursor="Hand"
+							   PointerPressed="ChangeUserIcon"
+							   ClipToBounds="True"
+							   Name="IconImage">
+						</Image>
+					</Border>
+					<TextBlock Name="Username" 
+								FontSize="25" 
 								FontWeight="Bold"
-								VerticalAlignment="Center"/>
-					</StackPanel>
-					<TextBlock Name="NumVolumesToBeCollected" 
-							   Text="{CompiledBinding UsersNumVolumesToBeCollected, StringFormat='Need To Collect&#x0a;{0} Volumes', Mode=OneWay}" 
-							   TextAlignment="Center" 
-							   FontSize="21" 
-							   FontWeight="Bold" 
-							   Classes="menu"
-							   VerticalAlignment="Center" 
-							   HorizontalAlignment="Center"/>
-					<StackPanel Spacing="5" HorizontalAlignment="Center" VerticalAlignment="Center">
-						<ComboBox Name="LanguageSelector"
-								  ItemsSource="{CompiledBinding AvailableLanguages, Mode=OneWay}"
-								  SelectionChanged="LanguageChanged"
-								  SelectedItem="{Binding CurLanguage}"
-								  Height="35"
-								  Width="130"
-								  Classes="menu"
-								  BorderThickness="2"
-								  FontWeight="Bold"
-								  FontSize="15"
-								  VerticalAlignment="Center"
-								  HorizontalAlignment="Center">
-							<!-- <ComboBox.Styles>
-								<Style Selector="ComboBoxItem">
-									<Setter Property="TextBlock.Foreground" Value="{DynamicResource MenuButtonTextAndIconColor}"/>
-
-									<Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter, ^:selected /template/ ContentPresenter#PART_ContentPresenter, ^:pressed /template/ ContentPresenter#PART_ContentPresenter" x:DataType="vm:ViewModelBase">
-										<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}, Mode=TwoWay}"/>
-										<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
-										<Setter Property="TextBlock.Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
-									</Style>
-								</Style>
-							</ComboBox.Styles> -->
-						</ComboBox>
-						<ComboBox Name="CollectionFilterSelector"
-								  SelectionChanged="CollectionFilterChanged"
-								  Height="35"
-								  FontWeight="Bold"
-								  FontSize="15"
-								  SelectedItem="{Binding CurFilter}"
-								  ItemsSource="{CompiledBinding AvailableCollectionFilters, Mode=OneWay}"
-								  Width="130"
-								  BorderThickness="2"
-								  VerticalAlignment="Center"
-								  HorizontalAlignment="Center"
-								  Classes="menu"
-								  AutoScrollToSelectedItem="True"/>
-					</StackPanel>
+								TextAlignment="Center"
+								HorizontalAlignment="Left"
+								VerticalAlignment="Center" 
+								Text="{CompiledBinding UserName, Mode=OneWay}"
+								Classes="username"/>
 				</StackPanel>
-			</DockPanel>
+				<StackPanel Grid.Column="0" Grid.Row="1" Orientation="Horizontal" Spacing="3" VerticalAlignment="Bottom" HorizontalAlignment="Right">
+					<Button Name="SettingsButton"
+							Content="Settings"
+							Width="100"
+							Height="35"
+							FontSize="15"
+							Theme="{StaticResource MenuButton}"
+							Command="{CompiledBinding OpenSettingsWindow}"/>
+					<Button Name="AddNewSeriesButton"
+							Theme="{StaticResource MenuButton}"
+							Content="Query"
+							Width="100"
+							Height="35"
+							FontSize="15"
+							Command="{CompiledBinding OpenAddNewSeriesWindow}"/>
+					<Button Name="ThemeButton" 
+							Theme="{StaticResource MenuButton}"
+							Content="Themes"
+							Width="100"
+							Height="35"
+							FontSize="15"
+							Command="{CompiledBinding OpenThemeSettingsWindow}"/>
+					<Button Name="StatsButton"
+							Theme="{StaticResource MenuButton}"
+							Content="Stats"
+							Width="100"
+							Height="35"
+							FontSize="15"
+							Command="{CompiledBinding OpenCollectionStatsWindow}"/>
+					<Button Name="DonateButton"
+							Theme="{StaticResource MenuButton}"
+							Content="Donate"
+							Width="100"
+							Height="35"
+							FontSize="15"
+							Click="OpenDonationLink"/>
+					<!-- <Button Name="AnalysisButton"
+							Theme="{StaticResource MenuNavButton}"
+							Content="Price Analysis"
+							BorderThickness="0,3,3,0"/> -->
+				</StackPanel>
+				<StackPanel Margin="10,0,0,0" HorizontalAlignment="Left" Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Spacing="6">
+					<ComboBox Name="LanguageSelector"
+							  SelectionChanged="LanguageChanged"
+							  Height="35"
+							  Width="185"
+							  SelectedIndex="{CompiledBinding LanguageIndex}"
+							  Theme="{StaticResource MenuComboBox}">
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Romaji</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">English</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Japanese</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Arabic</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Azerbaijan</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Bengali</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Bulgarian</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Burmese</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Catalan</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Chinese</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Croatian</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Czech</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Danish</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Dutch</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Esperanto</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Estonian</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Filipino</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Finnish</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">French</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">German</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Greek</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Hewbrew</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Hindi</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Hungarian</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Indonesian</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Italian</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Kazakh</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Korean</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Latin</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Lithuanian</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Malay</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Mongolian</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Nepali</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Norwegian</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Persian</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Polish</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Portugese</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Romanian</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Russian</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Serbian</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Slovak</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Spanish</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Swedish</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Tamil</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Thai</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Turkish</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Ukranian</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Vietnamese</ComboBoxItem>
+					</ComboBox>
+					<ComboBox Name="CollectionFilterSelector"
+							  SelectionChanged="CollectionFilterChanged"
+							  Height="35"
+							  Width="185"
+							  SelectedIndex="{CompiledBinding FilterIndex}"
+							  Theme="{StaticResource MenuComboBox}">
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">None</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Favorites</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Complete</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Incomplete</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Ongoing</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Finished</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Hiatus</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Cancelled</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Manga</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Novel</ComboBoxItem>
+					</ComboBox>
+					<TextBox Name="SearchBar" 
+							Text="{CompiledBinding SearchText, Mode=TwoWay}" 
+							KeyUp="SearchCollection"
+							Classes="menu"
+							BorderThickness="2"
+							Width="185"
+							FontWeight="Bold"
+							Watermark="Search..."
+							Height="35"
+							HorizontalAlignment="Center"
+							VerticalAlignment="Center"/>
+				</StackPanel>
+			</Grid>
 		</Border>
 		
 		<!-- Collection -->
@@ -201,7 +205,7 @@
 
 					<Style Selector="^:pressed /template/ ContentPresenter, ^:pointerover /template/ ContentPresenter">
 						<Setter Property="Background" Value="{Binding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" />
-						<Setter Property="BorderBrush" Value="Red" />
+						<Setter Property="BorderBrush" Value="Aqua" />
 						<Setter Property="TextElement.Foreground" Value="{Binding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}"/>
 					</Style>
 				</Style>
@@ -642,11 +646,11 @@
 													   Name="SeriesTitle"
 													   Padding="10,2,5,0"
 													   Cursor="Hand"
-													   LineHeight="22.0"> <!-- Ideal Line Height 24.0 --> <!-- old font size was 23 -->
+													   LineHeight="24.0"> <!-- Ideal Line Height 24.0 --> <!-- old font size was 23 -->
 												<TextBlock.Text>
 													<MultiBinding Converter="{StaticResource ConvertTitle}">
 														<Binding Path="Titles"/>
-														<Binding Path="#LanguageSelector.SelectedItem"/>
+														<Binding Path="#CollectionTheme.DataContext.CurLanguage"/>
 													</MultiBinding>
 												</TextBlock.Text>
 											</TextBlock>
@@ -657,7 +661,7 @@
 												<TextBlock.Text>
 													<MultiBinding Converter="{StaticResource ConvertStaff}" Mode="OneWay">
 														<Binding Path="Staff"/>
-														<Binding Path="#LanguageSelector.SelectedItem"/>
+														<Binding Path="#CollectionTheme.DataContext.CurLanguage"/>
 													</MultiBinding>
 												</TextBlock.Text>
 											</TextBlock>

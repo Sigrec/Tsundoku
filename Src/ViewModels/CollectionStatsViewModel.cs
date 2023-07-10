@@ -45,6 +45,7 @@ namespace Tsundoku.ViewModels
         [Reactive] public uint VolumesRead { get; set; }
         [Reactive] public string CollectionPrice { get; set; }
         [Reactive] public uint SeriesCount { get; set; } = (uint)MainUser.UserCollection.Count;
+        [Reactive] public uint FavoriteCount { get; set; } = (uint)MainUser.UserCollection.Count(series => series.IsFavorite);
         [Reactive] public decimal FinishedPercentage { get; set; }
         [Reactive] public decimal OngoingPercentage { get; set; }
         [Reactive] public decimal CancelledPercentage { get; set; }
@@ -53,6 +54,8 @@ namespace Tsundoku.ViewModels
         [Reactive] public decimal SeinenPercentage { get; set; }
         [Reactive] public decimal ShoujoPercentage { get; set; }
         [Reactive] public decimal JoseiPercentage { get; set; }
+        [Reactive] public uint UsersNumVolumesCollected { get; set; }
+        [Reactive] public uint UsersNumVolumesToBeCollected { get; set; }
 
         public CollectionStatsViewModel()
         {
@@ -61,6 +64,8 @@ namespace Tsundoku.ViewModels
             this.WhenAnyValue(x => x.MeanScore).Subscribe(x => MainUser.MeanScore = x);
             this.WhenAnyValue(x => x.VolumesRead).Subscribe(x => MainUser.VolumesRead = x);
             this.WhenAnyValue(x => x.CollectionPrice).Subscribe(x => MainUser.CollectionPrice = x);
+            this.WhenAnyValue(x => x.UsersNumVolumesCollected).Subscribe(x => MainUser.NumVolumesCollected = x);
+            this.WhenAnyValue(x => x.UsersNumVolumesToBeCollected).Subscribe(x => MainUser.NumVolumesToBeCollected = x);
         }
 
         /// <summary>
@@ -211,11 +216,6 @@ namespace Tsundoku.ViewModels
             JoseiPercentage = Math.Round(Convert.ToDecimal(actualCount != 0 && JoseiCount.Value != double.NaN ? JoseiCount.Value / actualCount * 100 : 0), 2);
         }
 
-        // private uint GetMaxScoreCount()
-        // {
-        //     return (uint)Math.Max((uint)OneScoreCount.Value, Math.Max((uint)TwoScoreCount.Value, Math.Max((uint)ThreeScoreCount.Value, Math.Max((uint)FourScoreCount.Value, Math.Max((uint)FiveScoreCount.Value, Math.Max((uint)SixScoreCount.Value, Math.Max((uint)SevenScoreCount.Value, Math.Max((uint)EightScoreCount.Value, Math.Max((uint)NineScoreCount.Value, (uint)TenScoreCount.Value)))))))));
-        // }
-
         /// <summary>
         /// Generates all of the values for the users stats
         /// </summary>
@@ -226,12 +226,14 @@ namespace Tsundoku.ViewModels
             UpdateScoreChartValues();
 
             // Constants.Logger.Debug("Generate Stats");
-            uint testVolumesRead = 0;
+            uint testVolumesRead = 0, testUsersNumVolumesCollected = 0, testUsersNumVolumesToBeCollected = 0;
             decimal testCollectionPrice = 0, testMeanScore = 0, countMeanScore = 0;
             foreach (Series x in MainWindowViewModel.Collection)
             {
                 testVolumesRead += x.VolumesRead;
                 testCollectionPrice += x.Cost;
+                testUsersNumVolumesCollected += x.CurVolumeCount;
+                testUsersNumVolumesToBeCollected += (uint)(x.MaxVolumeCount - x.CurVolumeCount);
 
                 if (x.Score >= 0)
                 {
@@ -239,22 +241,26 @@ namespace Tsundoku.ViewModels
                     countMeanScore++;
                 }
             }
-
+            
             testMeanScore = countMeanScore == 0 ? 0 : decimal.Round(testMeanScore / countMeanScore, 1);
             string testCollectionPriceString = $"{MainUser.Currency}{decimal.Round(testCollectionPrice, 2)}";
 
             // Crash protection for aggregate values
-            if (MainUser.VolumesRead == testVolumesRead && MainUser.MeanScore == testMeanScore && MainUser.CollectionPrice.Equals(testCollectionPriceString))
+            if (MainUser.VolumesRead == testVolumesRead && MainUser.MeanScore == testMeanScore && MainUser.CollectionPrice.Equals(testCollectionPriceString) && testUsersNumVolumesCollected == MainUser.NumVolumesCollected && testUsersNumVolumesToBeCollected == MainUser.NumVolumesToBeCollected)
             {
                 MeanScore = MainUser.MeanScore;
                 VolumesRead = MainUser.VolumesRead;
                 CollectionPrice = MainUser.CollectionPrice;
+                UsersNumVolumesCollected = MainUser.NumVolumesCollected;
+                UsersNumVolumesToBeCollected = MainUser.NumVolumesToBeCollected;
             }
             else
             {
                 MeanScore = testMeanScore;
                 VolumesRead = testVolumesRead;
                 CollectionPrice = testCollectionPriceString;
+                UsersNumVolumesCollected = testUsersNumVolumesCollected;
+                UsersNumVolumesToBeCollected = testUsersNumVolumesToBeCollected;
             }
 
             GenerateCharts();

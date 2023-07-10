@@ -1,6 +1,14 @@
-V1.6.3.0 - July 2nd, 2023 @ 4:40PM PST
-🔥HotFix for users whose current version is less than 1.5, app now starts as expected
-🔥HotFix can now scroll in stats window and resize up to a set size
+V1.6.4.0 - 
+🔥 Fixed pie chart hovering label being cut off
+🔥 Fixed bug with collection filter sometimes skipping series
+🔥 Fixed most color scheming issues of various controls in all windows
+🔥 Fixed ComboBox's not auto setting to current selection on app startup
+✅ Can now scroll in settings window and resize up to a set size
+✅ Updated Menu Layout
+
+V1.6.3.0 - July 2nd, 2023 @ 4:20PM PST
+🔥 HotFix for users whose current version is less than 1.5, app now starts as expected
+🔥 HotFix can now scroll in stats window and resize up to a set size
 
 V1.6.2.0 - June 24th, 2023 @ 3:17PM PST
 🔥 Fixed crash when creating a new theme
@@ -9,7 +17,7 @@ V1.6.2.0 - June 24th, 2023 @ 3:17PM PST
 ✅ Uses AL Web Link if available & Queried from MangaDex
 
 V1.6.1.0 - June 20th, 2023 @ 6:22AM PST
-🔥HotFix for app being unable to load (crashes) on clean install
+🔥 HotFix for app being unable to load (crashes) on clean install
 
 V1.6.0.0 - June 4th, 2023 @ 1:36PM PST
 ✅ Added 2 new pie charts to the stats window showing distribution for demograhics and status for a series

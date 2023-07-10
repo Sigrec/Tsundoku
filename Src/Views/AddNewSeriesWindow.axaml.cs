@@ -29,9 +29,9 @@ namespace Tsundoku.Views
                 ((AddNewSeriesWindow)s).Hide();
                 NovelButton.IsChecked = false;
                 MangaButton.IsChecked = false;
-                TitleBox.Text = String.Empty;
-                CurVolCount.Text = String.Empty;
-                MaxVolCount.Text = String.Empty;
+                TitleBox.Text = string.Empty;
+                CurVolCount.Text = string.Empty;
+                MaxVolCount.Text = string.Empty;
                 IsOpen ^= true;
                 Topmost = false;
                 e.Cancel = true;
@@ -51,10 +51,11 @@ namespace Tsundoku.Views
 
         public void OnButtonClicked(object sender, RoutedEventArgs args)
         {
-            foreach (var x in AddNewSeriesVM.SelectedAdditionalLanguages)
+            if (AddNewSeriesVM.SelectedAdditionalLanguages.Count != 0)
             {
-                Constants.Logger.Debug(x);
+                
             }
+
             bool validResponse = true;
             string errorMessage = "";
             if (string.IsNullOrWhiteSpace(TitleBox.Text))
@@ -81,15 +82,14 @@ namespace Tsundoku.Views
                 validResponse = false;
             }
 
-            ushort cur = 0;
-            ushort max = 0;
-            if (!ushort.TryParse(CurVolCount.Text.Replace("_", ""), out cur))
+
+            if (!ushort.TryParse(CurVolCount.Text.Replace("_", ""), out ushort cur))
             {
                 errorMessage += "Current Volume Count Inputted is not a Number\n";
                 validResponse = false;
             }
 
-            if (!ushort.TryParse(MaxVolCount.Text.Replace("_", ""), out max))
+            if (!ushort.TryParse(MaxVolCount.Text.Replace("_", ""), out ushort max))
             {
                 errorMessage += "Max Volumes Count Inpuuted is not a Number\n";
                 validResponse = false;
@@ -112,10 +112,10 @@ namespace Tsundoku.Views
                 });
                 errorBox.Show();
             }
-            else if (!AddNewSeriesVM.GetSeriesData(TitleBox.Text.Trim(), (MangaButton.IsChecked == true) ? "MANGA" : "NOVEL", cur, max, AddNewSeriesVM.SelectedAdditionalLanguages)) // Boolean returns whether the series added is a duplicate
+            else if (!AddNewSeriesVM.GetSeriesData(TitleBox.Text.Trim(), (MangaButton.IsChecked == true) ? "MANGA" : "NOVEL", cur, max, AddNewSeriesViewModel.ConvertSelectedLangList(AddNewSeriesVM.SelectedAdditionalLanguages))) // Boolean returns whether the series added is a duplicate
             {
-                CollectionWindow.CollectionViewModel.UsersNumVolumesCollected += cur;
-                CollectionWindow.CollectionViewModel.UsersNumVolumesToBeCollected += (uint)(max - cur);
+                CollectionWindow.CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UsersNumVolumesCollected += cur;
+                CollectionWindow.CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UsersNumVolumesToBeCollected += (uint)(max - cur);
                 CollectionWindow.CollectionViewModel.SearchText = "";
                 CollectionWindow.CollectionViewModel.collectionStatsWindow.CollectionStatsVM.SeriesCount = (uint)MainWindowViewModel.Collection.Count;
 

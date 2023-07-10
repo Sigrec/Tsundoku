@@ -6,6 +6,8 @@ namespace Tsundoku.Models
 {
     public class Constants
     {
+		public const ushort USER_ICON_HEIGHT = 68;
+		public const ushort USER_ICON_WIDTH = 68;
         public const ushort CARD_HEIGHT = 290;
 		public const ushort CARD_WIDTH = 525;
         public const ushort RIGHT_SIDE_CARD_WIDTH = 355;
@@ -21,6 +23,10 @@ namespace Tsundoku.Models
 		// TODO: Fix Logging so it actually logs to a external file
 		public static readonly NLog.Logger Logger = NLog.LogManager.GetLogger("TsundOkuLogs");
 		// public static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
+
+		public static readonly string[] AvailableLanguages = new string[] { "Romaji", "English", "Japanese", "Arabic", "Azerbaijan", "Bengali", "Bulgarian", "Burmese", "Catalan", "Chinese", "Croatian", "Czech", "Danish", "Dutch", "Esperanto", "Estonian", "Filipino", "Finnish", "French", "German", "Greek", "Hebrew", "Hindi", "Hungarian", "Indonesian", "Italian", "Kazakh", "Korean", "Latin", "Lithuanian", "Malay", "Mongolian", "Nepali", "Norwegian", "Persian", "Polish", "Portuguese", "Romanian", "Russian", "Serbian", "Slovak", "Spanish", "Swedish", "Tamil", "Thai", "Turkish", "Ukrainian", "Vietnamese" };
+
+		public static readonly string[] AvailableCollectionFilters = new string[] { "None", "Favorites", "Complete", "Incomplete", "Ongoing", "Finished", "Hiatus", "Cancelled", "Manga", "Novel" };
 
         public enum Site
         {

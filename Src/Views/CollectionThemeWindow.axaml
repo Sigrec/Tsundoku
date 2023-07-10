@@ -3,7 +3,6 @@
 	xmlns:c="using:Tsundoku.CustomControls"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-	xmlns:h="clr-namespace:Tsundoku.Helpers"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
 	x:Class="Tsundoku.Views.CollectionThemeWindow"
@@ -17,12 +16,13 @@
 	x:DataType="vm:ThemeSettingsViewModel"
 	CanResize="true">
 
-	<Design.DataContext>
-		<vm:ThemeSettingsViewModel/>
-	</Design.DataContext>
-
 	<Window.Resources>
-		<h:ColorConverter x:Key="ConvertColor"/>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<!-- <ResourceInclude Source="/Styles/ThemeSettingsControlThemes.xaml"/> -->
+				<ResourceInclude Source="/Styles/CollectionThemeControls.xaml"/>
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>
 	</Window.Resources>
 
 	<Border Classes="menu" BorderThickness="3">
@@ -31,16 +31,6 @@
 				<StackPanel HorizontalAlignment="Center">
 					<TextBlock Text="Menu / Nav Bar" FontSize="30" FontWeight="Bold" Classes="menu" HorizontalAlignment="Center" TextDecorations="Underline"/>
 					<WrapPanel>
-						<WrapPanel.Styles>
-							<Style Selector="Button">
-								<!-- <Style Selector="^:pointerover /template/ ContentPresenter, ^:pressed /template/ ContentPresenter">
-									<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}"/>
-								</Style> -->
-								<Style Selector="^:pressed">
-									<Setter Property="RenderTransform" Value="scale(1)" />
-								</Style>
-							</Style>
-						</WrapPanel.Styles>
 						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
 							<TextBlock Text="Menu BG" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
@@ -656,13 +646,10 @@
 								FontWeight="Bold"
 								Text="{Binding ThemeName}"
 								BorderThickness="2"/>
-						<Button FontSize="15" 
-								FontWeight="Bold" 
-								Name="SaveThemeButton"
-								BorderThickness="2" 
-								HorizontalAlignment="Center" 
-								Content="Save" 
-								Classes="menu"
+						<Button Name="SaveThemeButton"
+								Content="Save"
+								IsEnabled="{CompiledBinding IsSaveThemeButtonEnabled}"
+								Theme="{StaticResource MenuButton}"
 								Click="SaveNewTheme"/>
 						<ComboBox Name="ThemeSelector"
 								  SelectionChanged="ChangeMainTheme"
@@ -670,20 +657,14 @@
 								  Width="150"
 								  Height="35"
 								  BorderThickness="2"
-								  SelectedIndex="0"
-								  Classes="menu"
-								  AutoScrollToSelectedItem="True"
+								  Theme="{StaticResource MenuComboBox}"
+								  SelectedIndex="{CompiledBinding CurThemeIndex}"
 								  Margin="10,0,0,0">
 							<ComboBox.ItemTemplate>
 								<DataTemplate>
-									<TextBlock FontSize="15" 
-											   FontWeight="Bold" 
-											   Classes="menu"
-											   Text="{Binding ThemeName}">
-									</TextBlock>
+									<TextBlock Text="{Binding ThemeName}"/>
 								</DataTemplate>
 							</ComboBox.ItemTemplate>
-
 						</ComboBox>
 						<Button FontSize="20" 
 								FontWeight="Bold" 
@@ -703,7 +684,6 @@
 								Grid.Column="0"
 								BorderThickness="2"
 								Classes="menu"
-								ToolTip.Tip="Clear"
 								HorizontalAlignment="Center" 
 								i:Attached.Icon="fa-xmark" 
 								Click="ClearThemeValues"/>
@@ -776,6 +756,7 @@
 								ToolTip.Tip="Theme 1"
 								HorizontalAlignment="Center" 
 								i:Attached.Icon="fa-1" 
+								IsEnabled="{CompiledBinding IsSaveThemeButtonEnabled}"
 								Click="GenerateThemeType1"/>
 						<Button FontSize="20"
 								FontWeight="Bold" 
@@ -785,7 +766,8 @@
 								Classes="menu"
 								ToolTip.Tip="Theme 2"
 								HorizontalAlignment="Center" 
-								i:Attached.Icon="fa-2" 
+								i:Attached.Icon="fa-2"
+								IsEnabled="{CompiledBinding IsSaveThemeButtonEnabled}"
 								Click="GenerateThemeType2"/>
 					</Grid>
 				</StackPanel>

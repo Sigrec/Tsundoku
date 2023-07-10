@@ -4,7 +4,10 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.ReactiveUI;
+using DynamicData;
 using System;
+using System.Collections.ObjectModel;
+using System.Linq;
 using Tsundoku.Models;
 using Tsundoku.ViewModels;
 
@@ -14,7 +17,7 @@ namespace Tsundoku.Views
     {
         public ThemeSettingsViewModel? ThemeSettingsVM => DataContext as ThemeSettingsViewModel;
         private TsundokuTheme NewTheme;
-        public bool IsOpen = false;
+        public bool IsOpen, ThemeChanged = false;
         MainWindow CollectionWindow;
 
         public CollectionThemeWindow () 
@@ -27,6 +30,7 @@ namespace Tsundoku.Views
                 ThemeSettingsVM.CurrentTheme = CollectionWindow.CollectionViewModel.CurrentTheme;
                 NewTheme = ThemeSettingsVM.CurrentTheme.Cloning();
                 IsOpen ^= true;
+                ThemeSettingsVM.CurThemeIndex = Array.IndexOf(ThemeSettingsViewModel.UserThemes.ToArray(), ThemeSettingsVM.CurrentTheme);
                 ApplyColors();
             };
 
@@ -281,9 +285,8 @@ namespace Tsundoku.Views
                                 {
                                     ThemeSelector.SelectedIndex = y; // Set the current theme to the next closet theme so the new theme can be replaced
                                     ThemeSettingsViewModel.UserThemes[x] = replaceTheme;
+                                    ThemeChanged = true;
                                     ThemeSelector.SelectedIndex = x;
-                                    GC.Collect();
-                                    GC.WaitForPendingFinalizers();
                                     return;
                                 }
                             }
@@ -292,9 +295,13 @@ namespace Tsundoku.Views
 
                     if (!duplicateCheck)
                     {
-                        ThemeSettingsViewModel.UserThemes.Insert(0, NewTheme.Cloning());
+                        ThemeChanged = true;
+                        TsundokuTheme placeHolderTheme = NewTheme.Cloning();
+                        int index = ThemeSettingsViewModel.UserThemes.BinarySearch(placeHolderTheme);
+                        index = index < 0 ? ~index : index;
+                        ThemeSettingsViewModel.UserThemes.Insert(index, placeHolderTheme);
                         Constants.Logger.Info($"Added New Theme {NewTheme.ThemeName} to Saved Themes");
-                        ThemeSelector.SelectedIndex = 0;
+                        ThemeSelector.SelectedIndex = index;
                         GC.Collect();
                         GC.WaitForPendingFinalizers();
                     }
@@ -311,7 +318,6 @@ namespace Tsundoku.Views
         /// <summary>
         /// RoutedEvent method used to call the AddTheme method to save the users new theme
         /// </summary>
-        /// <see cref="member">AddThme</see>
         private void SaveNewTheme(object sender, RoutedEventArgs args)
         {
             if (!string.IsNullOrWhiteSpace(NewThemeName.Text) && !NewThemeName.Text.Equals("Default", StringComparison.OrdinalIgnoreCase))
@@ -331,20 +337,19 @@ namespace Tsundoku.Views
         {
             if (ThemeSettingsViewModel.UserThemes.Count > 1 && !(ThemeSelector.SelectedItem as TsundokuTheme).ThemeName.Equals("Default"))
             {
-                int curIndex = ThemeSettingsViewModel.UserThemes.IndexOf(ThemeSelector.SelectedItem as TsundokuTheme); //1
+                int curIndex = ThemeSettingsViewModel.UserThemes.IndexOf(ThemeSelector.SelectedItem as TsundokuTheme);
                 for (int x = 0; x < ThemeSettingsViewModel.UserThemes.Count; x++)
                 {
                     if (x != curIndex)
                     {
-                        ThemeSelector.SelectedIndex = x;
                         Constants.Logger.Info($"Removed Theme {ThemeSettingsViewModel.UserThemes[curIndex].ThemeName} From Saved Themes");
                         ThemeSettingsViewModel.UserThemes.Remove(ThemeSettingsViewModel.UserThemes[curIndex]);
+                        ThemeChanged = true;
+                        ThemeSelector.SelectedIndex = --x;
                         break; 
                     }
                 }
             }
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
         }
 
         /// <summary>
@@ -352,7 +357,7 @@ namespace Tsundoku.Views
         /// </summary>
         private void ChangeMainTheme(object sender, SelectionChangedEventArgs e)
         {
-            if (this.IsActive)
+            if (ThemeSelector.IsDropDownOpen || ThemeChanged)
             {
                 CollectionWindow.CollectionViewModel.CurrentTheme = ThemeSelector.SelectedItem as TsundokuTheme;
                 ThemeSettingsVM.CurrentTheme = CollectionWindow.CollectionViewModel.CurrentTheme;
@@ -363,6 +368,7 @@ namespace Tsundoku.Views
                 Constants.Logger.Info($"Theme Changed To {(ThemeSelector.SelectedItem as TsundokuTheme).ThemeName}");
                 ApplyColors();
                 CollectionWindow.CollectionViewModel.collectionStatsWindow.UpdateChartColors();
+                ThemeChanged = false;
             }
         }
 
