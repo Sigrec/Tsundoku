@@ -1,4 +1,9 @@
-V1.7.0.0- July 9th, 2023 @ 7:50PM PST
+V1.7.1.0 - July 26th, 2023 @ 10:56AM PST
+🔥 HotFix for new users where the app doesn't start
+✅ Added https://www.youtube.com/@DanielPeppers to youtubers section
+✅ Increased ProgressBar Text Size
+
+V1.7.0.0 - July 9th, 2023 @ 7:50PM PST
 🔥 Fixed pie chart hovering label being cut off
 🔥 Fixed bug with collection filter sometimes skipping series
 🔥 Fixed most color scheming issues of various controls in all windows

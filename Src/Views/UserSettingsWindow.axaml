@@ -144,6 +144,10 @@
                                 Content="Jake The Pog"/>
                         <Button Theme="{StaticResource UserSettingsButton}"
                                 Click="OpenYoutuberSite" 
+                                Name="DanielPeppers"
+                                Content="Daniel Peppers"/>
+                        <Button Theme="{StaticResource UserSettingsButton}"
+                                Click="OpenYoutuberSite" 
                                 Name="BasedSempai"
                                 Content="Based Sempai"/>
                         <Button Theme="{StaticResource UserSettingsButton}"

@@ -745,10 +745,10 @@
 														Content="-"/>
 													<TextBlock Name="VolumeCount" 
 																TextAlignment="Center" 
-																FontSize="15" 
+																FontSize="16" 
 																FontWeight="Bold" 
 																Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressTextColor, Converter={StaticResource ConvertColor}}"
-																Margin="0,10,0,0">
+																Margin="0,7.5,0,0">
 														<TextBlock.Text>
 															<MultiBinding StringFormat="{}{0}/{1}">
 																<Binding Path="CurVolumeCount"/>
@@ -764,7 +764,7 @@
 															FontSize="24"
 															Cursor="Hand"
 															Click="AddVolume"
-															Padding="-8,-9.5,0,0"
+															Padding="-6,-9.5,0,0"
 															VerticalAlignment="Center"
 															HorizontalAlignment="Center"
 															VerticalContentAlignment="Center"

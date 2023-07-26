@@ -302,8 +302,7 @@ namespace Tsundoku.Views
                         ThemeSettingsViewModel.UserThemes.Insert(index, placeHolderTheme);
                         Constants.Logger.Info($"Added New Theme {NewTheme.ThemeName} to Saved Themes");
                         ThemeSelector.SelectedIndex = index;
-                        GC.Collect();
-                        GC.WaitForPendingFinalizers();
+
                     }
                 }
             }
