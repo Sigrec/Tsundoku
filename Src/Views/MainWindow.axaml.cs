@@ -412,8 +412,11 @@ namespace Tsundoku.Views
                 AllowMultiple = false,
                 FileTypeFilter = fileOptions
             });
-            CollectionViewModel.UserIcon = new Bitmap(file[0].Path.LocalPath).CreateScaledBitmap(new Avalonia.PixelSize(Constants.USER_ICON_WIDTH, Constants.USER_ICON_HEIGHT), BitmapInterpolationMode.HighQuality);
-            Constants.Logger.Debug($"Changed Users Icon to {file[0].Path.LocalPath}");
+            if (file.Count > 0)
+            {
+                CollectionViewModel.UserIcon = new Bitmap(file[0].Path.LocalPath).CreateScaledBitmap(new Avalonia.PixelSize(Constants.USER_ICON_WIDTH, Constants.USER_ICON_HEIGHT), BitmapInterpolationMode.HighQuality);
+                Constants.Logger.Debug($"Changed Users Icon to {file[0].Path.LocalPath}");
+            }
         }
 
         /// <summary>

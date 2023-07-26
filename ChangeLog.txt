@@ -1,5 +1,6 @@
-V1.7.1.0 - July 26th, 2023 @ 10:56AM PST
+V1.7.1.0 - July 26th, 2023 @ 11:37AM PST
 🔥 HotFix for new users where the app doesn't start
+🔥 Fixed Crash where Opening Icon Selector and not selecting causes crash
 ✅ Added https://www.youtube.com/@DanielPeppers to youtubers section
 ✅ Increased ProgressBar Text Size
 
