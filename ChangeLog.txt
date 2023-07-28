@@ -1,3 +1,7 @@
+V1.7.2.0
+ Changed "Query" to "Add" for the button to open the window to add a new series
+ Changed & Fixed Theme Settings Names for UI Changes from previous release
+
 V1.7.1.0 - July 26th, 2023 @ 11:37AM PST
 🔥 HotFix for new users where the app doesn't start
 🔥 Fixed Crash where Opening Icon Selector and not selecting causes crash
