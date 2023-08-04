@@ -24,7 +24,7 @@
 			<cv:TitleLangConverter x:Key="ConvertTitle"/>
 			<cv:StaffLangConverter x:Key="ConvertStaff"/>
 			<ResourceDictionary.MergedDictionaries>
-				<ResourceInclude Source="/Styles/CollectionThemeControls.xaml"/>
+				<ResourceInclude Source="/Styles/CollectionControlThemes.xaml"/>
 			</ResourceDictionary.MergedDictionaries>
 		</ResourceDictionary>
 	</Window.Resources>
@@ -67,7 +67,7 @@
 							Command="{CompiledBinding OpenSettingsWindow}"/>
 					<Button Name="AddNewSeriesButton"
 							Theme="{StaticResource MenuButton}"
-							Content="Query"
+							Content="Add Series"
 							Width="100"
 							Height="35"
 							FontSize="15"
@@ -94,9 +94,12 @@
 							FontSize="15"
 							Click="OpenDonationLink"/>
 					<!-- <Button Name="AnalysisButton"
-							Theme="{StaticResource MenuNavButton}"
-							Content="Price Analysis"
-							BorderThickness="0,3,3,0"/> -->
+							Theme="{StaticResource MenuButton}"
+							Content="Scrape"
+							Width="100"
+							Height="35"
+							FontSize="15"
+							Command="{CompiledBinding OpenPriceAnalysisWindow}"/> -->
 				</StackPanel>
 				<StackPanel Margin="0,0,0,0" HorizontalAlignment="Left" Grid.Column="2" Grid.Row="0" Grid.RowSpan="2" Spacing="6">
 					<ComboBox Name="LanguageSelector"
@@ -188,28 +191,6 @@
 		
 		<!-- Collection -->
 		<ScrollViewer Name="CollectionTheme" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" DockPanel.Dock="Bottom" Background="{CompiledBinding CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}"> 
-			<ScrollViewer.Styles>
-				<Style Selector="ScrollBar:vertical">
-					<Style Selector="^ /template/ Rectangle#TrackRect">
-						<Setter Property="Fill" Value="{Binding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}" />
-					</Style>
-					<Style Selector="^ /template/ Thumb">
-						<Setter Property="Background" Value="{Binding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" />
-					</Style>
-				</Style>
-				<Style Selector="Thumb:pointerover /template/ Border">
-					<Setter Property="Background" Value="{Binding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" />
-				</Style>
-				<Style Selector="RepeatButton">
-					<Setter Property="TextElement.Foreground" Value="{Binding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}"/>
-
-					<Style Selector="^:pressed /template/ ContentPresenter, ^:pointerover /template/ ContentPresenter">
-						<Setter Property="Background" Value="{Binding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" />
-						<Setter Property="BorderBrush" Value="Aqua" />
-						<Setter Property="TextElement.Foreground" Value="{Binding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}"/>
-					</Style>
-				</Style>
-			</ScrollViewer.Styles>
 			<ItemsControl Name="CollectionItems" Margin="0,50,0,50" ItemsSource="{Binding SearchedCollection}" HorizontalAlignment="Center" VerticalAlignment="Center">
 				<ItemsControl.ItemsPanel>
 					<ItemsPanelTemplate>
@@ -685,19 +666,19 @@
 													VerticalAlignment="Stretch">
 											<StackPanel.Styles>
 												<Style Selector="#EditSeriesButton:pointerover /template/ ContentPresenter, #EditSeriesStatsButton:pointerover /template/ ContentPresenter">
-													<Setter Property="TextBlock.Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesSwitchPaneButtonIconHoverColor, Converter={StaticResource ConvertColor}}"/>
-													<Setter Property="Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesSwitchPaneButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
+													<Setter Property="TextBlock.Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesButtonIconHoverColor, Converter={StaticResource ConvertColor}}"/>
+													<Setter Property="Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
 												</Style>
 											</StackPanel.Styles>
 											<Button Name="EditSeriesButton"
-													Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesSwitchPaneButtonBGColor, Converter={StaticResource ConvertColor}}"
+													Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesButtonBGColor, Converter={StaticResource ConvertColor}}"
 													FontSize="23"
 													BorderThickness="0"
-													BorderBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesSwitchPaneButtonIconColor, Converter={StaticResource ConvertColor}}"
+													BorderBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesButtonIconColor, Converter={StaticResource ConvertColor}}"
 													Height="{CompiledBinding Source={x:Static local:Constants.BOTTOM_SECTION_CARD_HEIGHT}}"
 													Width="45"
 													CornerRadius="0"
-													Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesSwitchPaneButtonIconColor, Converter={StaticResource ConvertColor}}"
+													Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesButtonIconColor, Converter={StaticResource ConvertColor}}"
 													i:Attached.Icon="fa-solid fa-pen-to-square"
 													Click="ShowEditPane"/>
 											<Grid ColumnDefinitions="Auto" RowDefinitions="40" Width="265">
@@ -774,13 +755,13 @@
 												</StackPanel>
 											</Grid>
 											<Button Name="EditSeriesStatsButton"
-													Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesSwitchPaneButtonBGColor, Converter={StaticResource ConvertColor}}"
+													Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesButtonBGColor, Converter={StaticResource ConvertColor}}"
 													FontSize="23"
 													BorderThickness="0"
-													BorderBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesSwitchPaneButtonIconColor, Converter={StaticResource ConvertColor}}"
+													BorderBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesButtonIconColor, Converter={StaticResource ConvertColor}}"
 													Height="{CompiledBinding Source={x:Static local:Constants.BOTTOM_SECTION_CARD_HEIGHT}}"
 													Width="45"
-													Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesSwitchPaneButtonIconColor, Converter={StaticResource ConvertColor}}"
+													Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesButtonIconColor, Converter={StaticResource ConvertColor}}"
 													i:Attached.Icon="fa-solid fa-square-poll-vertical"
 													Click="ShowStatsPane"/>
 										</StackPanel>

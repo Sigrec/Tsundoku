@@ -19,14 +19,13 @@
 	<Window.Resources>
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
-				<!-- <ResourceInclude Source="/Styles/ThemeSettingsControlThemes.xaml"/> -->
-				<ResourceInclude Source="/Styles/CollectionThemeControls.xaml"/>
+				<ResourceInclude Source="/Styles/UniversalNavControlThemes.xaml"/>
 			</ResourceDictionary.MergedDictionaries>
 		</ResourceDictionary>
 	</Window.Resources>
 
 	<Border Classes="menu" BorderThickness="3">
-		<ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden">
+		<ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
 			<StackPanel Spacing="30" Margin="20">
 				<StackPanel HorizontalAlignment="Center">
 					<TextBlock Text="Menu / Nav Bar" FontSize="30" FontWeight="Bold" Classes="menu" HorizontalAlignment="Center" TextDecorations="Underline"/>
@@ -439,13 +438,13 @@
 							</Border>
 						</StackPanel>
 						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
-							<TextBlock Text="Series Switch Pane Button BG" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<TextBlock Text="Series Button BG" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
 								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<Button Name="SeriesSwitchPaneButton_BG_Button" Background="{CompiledBinding CurrentTheme.SeriesSwitchPaneButtonBGColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+									<Button Name="SeriesButton_BG_Button" Background="{CompiledBinding CurrentTheme.SeriesButtonBGColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
 										<Button.Flyout>
 											<Flyout Placement="Bottom">
-												<ColorView Name="SeriesSwitchPaneButton_BG"/>
+												<ColorView Name="SeriesButton_BG"/>
 											</Flyout>
 										</Button.Flyout>
 									</Button>
@@ -453,13 +452,13 @@
 							</Border>
 						</StackPanel>
 						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
-							<TextBlock Text="Series Switch Pane Button BG (Hover)" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<TextBlock Text="Series Button BG (Hover)" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
 								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<Button Name="SeriesSwitchPaneButton_BG_Hover_Button" Background="{CompiledBinding CurrentTheme.SeriesSwitchPaneButtonBGHoverColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+									<Button Name="SeriesButton_BG_Hover_Button" Background="{CompiledBinding CurrentTheme.SeriesButtonBGHoverColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
 										<Button.Flyout>
 											<Flyout Placement="Bottom">
-												<ColorView Name="SeriesSwitchPaneButton_BG_Hover"/>
+												<ColorView Name="SeriesButton_BG_Hover"/>
 											</Flyout>
 										</Button.Flyout>
 									</Button>
@@ -467,13 +466,13 @@
 							</Border>
 						</StackPanel>
 						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
-							<TextBlock Text="Series Switch Pane Button Icon" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<TextBlock Text="Series Button Icon" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
 								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<Button Name="SeriesSwitchPaneButton_Icon_Button" Background="{CompiledBinding CurrentTheme.SeriesSwitchPaneButtonIconColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+									<Button Name="SeriesButton_Icon_Button" Background="{CompiledBinding CurrentTheme.SeriesButtonIconColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
 										<Button.Flyout>
 											<Flyout Placement="Bottom">
-												<ColorView Name="SeriesSwitchPaneButton_Icon"/>
+												<ColorView Name="SeriesButton_Icon"/>
 											</Flyout>
 										</Button.Flyout>
 									</Button>
@@ -481,13 +480,13 @@
 							</Border>
 						</StackPanel>
 						<StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
-							<TextBlock Text="Series Switch Pane Button Icon (Hover)" FontSize="12" FontWeight="Bold" Classes="menu"/>
+							<TextBlock Text="Series Button Icon (Hover)" FontSize="12" FontWeight="Bold" Classes="menu"/>
 							<Border Classes="menu" BorderThickness="2">
 								<Border Classes="menu" BorderThickness="2" Margin="2">	
-									<Button Name="SeriesSwitchPaneButton_Icon_Hover_Button" Background="{CompiledBinding CurrentTheme.SeriesSwitchPaneButtonIconHoverColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
+									<Button Name="SeriesButton_Icon_Hover_Button" Background="{CompiledBinding CurrentTheme.SeriesButtonIconHoverColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
 										<Button.Flyout>
 											<Flyout Placement="Bottom">
-												<ColorView Name="SeriesSwitchPaneButton_Icon_Hover"/>
+												<ColorView Name="SeriesButton_Icon_Hover"/>
 											</Flyout>
 										</Button.Flyout>
 									</Button>

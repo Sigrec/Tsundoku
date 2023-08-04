@@ -29,7 +29,7 @@ namespace Tsundoku.ViewModels
     public partial class MainWindowViewModel : ViewModelBase
     {
         private static readonly string filePath = @"UserData.json";
-        private const double SCHEMA_VERSION = 1.7;
+        private const double SCHEMA_VERSION = 1.8;
         private static bool newUserFlag = false;
         public static ObservableCollection<Series> SearchedCollection { get; set; } = new();
         public static ObservableCollection<Series> Collection { get; set; } = new();
@@ -255,7 +255,7 @@ namespace Tsundoku.ViewModels
             {
                 Constants.Logger.Info("Creating New User");
                 ThemeSettingsViewModel.UserThemes = new ObservableCollection<TsundokuTheme>() { TsundokuTheme.DEFAULT_THEME };
-                MainUser = new User("UserName", "Romaji", "Default", "Card", "$", "$0.00", ThemeSettingsViewModel.UserThemes, Collection)
+                MainUser = new User("UserName", "Romaji", "Default", "Card", SCHEMA_VERSION, "$", "$0.00", ThemeSettingsViewModel.UserThemes, Collection)
                 {
                     CurDataVersion = SCHEMA_VERSION
                 };
@@ -324,19 +324,20 @@ namespace Tsundoku.ViewModels
         {
             string json = File.ReadAllText(filePath);
             JsonNode userData = JsonNode.Parse(json);
-            JsonArray collectionJsonArray = userData["UserCollection"].AsArray();
             JsonNode series;
+            JsonArray collectionJsonArray = userData["UserCollection"].AsArray();
             bool updatedVersion = false;
             
             // For users who did not get the older update
             if (!userData.AsObject().ContainsKey("CurDataVersion"))
             {
+                Constants.Logger.Debug("Check #4");
                 userData.AsObject().Add("CurDataVersion", "1.0");
-                Constants.Logger.Info("Added CurDataVersion Data");
+                Constants.Logger.Info("Added CurDataVersion Json Object");
             }
+            double curVersion = double.Parse(userData["CurDataVersion"].ToString());
 
             // 1.5 Data Update
-            double curVersion = double.Parse(userData["CurDataVersion"].ToString());
             if (curVersion < 1.5)
             {
                 userData.AsObject().Add("Currency", "$");
@@ -414,17 +415,35 @@ namespace Tsundoku.ViewModels
 
                 if (newUserFlag)
                 {
-                    Constants.Logger.Debug("New User Created");
                     userData["UserIcon"] = defaultFileByte;
+                    updatedVersion = false;
                 }
                 else
                 {
                     userData.AsObject().Add(nameof(UserIcon), defaultFileByte);
+                    userData["CurDataVersion"] = 1.7;
+                    Constants.Logger.Info("Updated Users Data to v1.7");
+                    updatedVersion = true;
+                }
+            }
+
+            if (curVersion < 1.8)
+            {
+                JsonArray themeJsonArray = userData["SavedThemes"].AsArray();
+                JsonObject theme;
+                
+                for (int x = 0; x < themeJsonArray.Count; x++)
+                {
+                    theme = themeJsonArray.ElementAt(x).AsObject();
+                    theme["SeriesButtonBGColor"] = (uint)theme["SeriesSwitchPaneButtonBGColor"];
+                    theme["SeriesButtonBGHoverColor"] = (uint)theme["SeriesSwitchPaneButtonBGHoverColor"];
+                    theme["SeriesButtonIconColor"] = (uint)theme["SeriesSwitchPaneButtonIconColor"];
+                    theme["SeriesButtonIconHoverColor"] = (uint)theme["SeriesSwitchPaneButtonIconHoverColor"];
                 }
 
-                userData["CurDataVersion"] = 1.7;
-                updatedVersion = true;
-                Constants.Logger.Info("Updated Users Data to v1.7");
+                userData["CurDataVersion"] = 1.8;
+                Constants.Logger.Info("Updated Users Data to v1.8");
+                updatedVersion = true;  
             }
 
             File.WriteAllText(filePath, JsonSerializer.Serialize(userData, options));

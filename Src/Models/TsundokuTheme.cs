@@ -35,10 +35,10 @@ namespace Tsundoku.Models
         public uint SeriesProgressBarBorderColor { get; set; }
         public uint SeriesProgressTextColor { get; set; }
         public uint SeriesProgressButtonsHoverColor { get; set; }
-        public uint SeriesSwitchPaneButtonBGColor { get; set; }
-        public uint SeriesSwitchPaneButtonBGHoverColor { get; set; }
-        public uint SeriesSwitchPaneButtonIconColor { get; set; }
-        public uint SeriesSwitchPaneButtonIconHoverColor { get; set; }
+        public uint SeriesButtonBGColor { get; set; }
+        public uint SeriesButtonBGHoverColor { get; set; }
+        public uint SeriesButtonIconColor { get; set; }
+        public uint SeriesButtonIconHoverColor { get; set; }
         public uint SeriesEditPaneBGColor { get; set; }
         public uint SeriesNotesBGColor  { get; set; }
         public uint SeriesNotesBorderColor { get; set; }
@@ -80,10 +80,10 @@ namespace Tsundoku.Models
             Color.FromArgb((byte)Math.Floor(0.9 * 255), 236, 236, 236).ToUInt32(), //SeriesProgressBarBorderColor
             Color.FromArgb((byte)Math.Floor(0.9 * 255), 236, 236, 236).ToUInt32(), //SeriesProgressTextColor
             Color.FromRgb(18, 23, 29).ToUInt32(), //SeriesProgressButtonsHoverColor
-            Color.FromRgb(44, 45, 66).ToUInt32(), //SeriesSwitchPaneButtonBGColor
-            Color.FromRgb(223, 213, 158).ToUInt32(), //SeriesSwitchPaneButtonBGHoverColor
-            Color.FromRgb(223, 213, 158).ToUInt32(), //SeriesSwitchPaneButtonIconColor
-            Color.FromRgb(18, 23, 29).ToUInt32(), //SeriesSwitchPaneButtonIconHoverColor
+            Color.FromRgb(44, 45, 66).ToUInt32(), //SeriesButtonBGColor
+            Color.FromRgb(223, 213, 158).ToUInt32(), //SeriesButtonBGHoverColor
+            Color.FromRgb(223, 213, 158).ToUInt32(), //SeriesButtonIconColor
+            Color.FromRgb(18, 23, 29).ToUInt32(), //SeriesButtonIconHoverColor
             Color.FromRgb(32, 35, 45).ToUInt32(), //SeriesEditPaneBGColor 
             Color.FromRgb(18, 23, 29).ToUInt32(), //SeriesNotesBGColor
             Color.FromRgb(223, 213, 158).ToUInt32(), //SeriesNotesBorderColor
@@ -106,7 +106,7 @@ namespace Tsundoku.Models
             ThemeName = themeName;
         }
 
-        public TsundokuTheme(string themeName, uint menuBGColor, uint usernameColor, uint menuTextColor, uint searchBarBGColor, uint searchBarBorderColor, uint searchBarTextColor, uint menuButtonBGColor, uint menuButtonBGHoverColor, uint menuButtonBorderColor, uint menuButtonBorderHoverColor, uint menuButtonTextAndIconColor, uint menuButtonTextAndIconHoverColor, uint dividerColor, uint collectionBGColor, uint statusAndBookTypeBGColor, uint statusAndBookTypeBGHoverColor, uint statusAndBookTypeTextColor, uint statusAndBookTypeTextHoverColor, uint seriesCardBGColor, uint seriesCardTitleColor, uint seriesCardStaffColor, uint seriesCardDescColor, uint seriesProgressBGColor, uint seriesProgressBarColor, uint seriesProgressBarBGColor, uint seriesProgressBarBorderColor, uint seriesProgressTextColor, uint seriesProgressButtonsHoverColor, uint seriesSwitchPaneButtonBGColor, uint seriesSwitchPaneButtonBGHoverColor, uint seriesSwitchPaneButtonIconColor, uint seriesSwitchPaneButtonIconHoverColor, uint seriesEditPaneBGColor, uint seriesNotesBGColor, uint seriesNotesBorderColor, uint seriesNotesTextColor, uint seriesEditPaneButtonsBGColor, uint seriesEditPaneButtonsBGHoverColor, uint seriesEditPaneButtonsBorderColor, uint seriesEditPaneButtonsBorderHoverColor, uint seriesEditPaneButtonsIconColor, uint seriesEditPaneButtonsIconHoverColor) : this(themeName)
+        public TsundokuTheme(string themeName, uint menuBGColor, uint usernameColor, uint menuTextColor, uint searchBarBGColor, uint searchBarBorderColor, uint searchBarTextColor, uint menuButtonBGColor, uint menuButtonBGHoverColor, uint menuButtonBorderColor, uint menuButtonBorderHoverColor, uint menuButtonTextAndIconColor, uint menuButtonTextAndIconHoverColor, uint dividerColor, uint collectionBGColor, uint statusAndBookTypeBGColor, uint statusAndBookTypeBGHoverColor, uint statusAndBookTypeTextColor, uint statusAndBookTypeTextHoverColor, uint seriesCardBGColor, uint seriesCardTitleColor, uint seriesCardStaffColor, uint seriesCardDescColor, uint seriesProgressBGColor, uint seriesProgressBarColor, uint seriesProgressBarBGColor, uint seriesProgressBarBorderColor, uint seriesProgressTextColor, uint seriesProgressButtonsHoverColor, uint seriesButtonBGColor, uint seriesButtonBGHoverColor, uint seriesButtonIconColor, uint seriesButtonIconHoverColor, uint seriesEditPaneBGColor, uint seriesNotesBGColor, uint seriesNotesBorderColor, uint seriesNotesTextColor, uint seriesEditPaneButtonsBGColor, uint seriesEditPaneButtonsBGHoverColor, uint seriesEditPaneButtonsBorderColor, uint seriesEditPaneButtonsBorderHoverColor, uint seriesEditPaneButtonsIconColor, uint seriesEditPaneButtonsIconHoverColor) : this(themeName)
         {
             MenuBGColor = menuBGColor;
             UsernameColor = usernameColor;
@@ -136,10 +136,10 @@ namespace Tsundoku.Models
             SeriesProgressBarBorderColor = seriesProgressBarBorderColor;
             SeriesProgressTextColor = seriesProgressTextColor;
             SeriesProgressButtonsHoverColor = seriesProgressButtonsHoverColor;
-            SeriesSwitchPaneButtonBGColor = seriesSwitchPaneButtonBGColor;
-            SeriesSwitchPaneButtonBGHoverColor = seriesSwitchPaneButtonBGHoverColor;
-            SeriesSwitchPaneButtonIconColor = seriesSwitchPaneButtonIconColor;
-            SeriesSwitchPaneButtonIconHoverColor = seriesSwitchPaneButtonIconHoverColor;
+            SeriesButtonBGColor = seriesButtonBGColor;
+            SeriesButtonBGHoverColor = seriesButtonBGHoverColor;
+            SeriesButtonIconColor = seriesButtonIconColor;
+            SeriesButtonIconHoverColor = seriesButtonIconHoverColor;
             SeriesEditPaneBGColor = seriesEditPaneBGColor;
             SeriesNotesBGColor = seriesNotesBGColor;
             SeriesNotesBorderColor = seriesNotesBorderColor;
@@ -154,7 +154,7 @@ namespace Tsundoku.Models
 
         public virtual TsundokuTheme Cloning()
         {
-            return new TsundokuTheme(ThemeName, MenuBGColor, UsernameColor, MenuTextColor, SearchBarBGColor, SearchBarBorderColor, SearchBarTextColor, MenuButtonBGColor, MenuButtonBGHoverColor, MenuButtonBorderColor, MenuButtonBorderHoverColor, MenuButtonTextAndIconColor, MenuButtonTextAndIconHoverColor, DividerColor, CollectionBGColor, StatusAndBookTypeBGColor, StatusAndBookTypeBGHoverColor, StatusAndBookTypeTextColor, StatusAndBookTypeTextHoverColor, SeriesCardBGColor, SeriesCardTitleColor, SeriesCardStaffColor, SeriesCardDescColor, SeriesProgressBGColor, SeriesProgressBarColor, SeriesProgressBarBGColor, SeriesProgressBarBorderColor, SeriesProgressTextColor, SeriesProgressButtonsHoverColor, SeriesSwitchPaneButtonBGColor, SeriesSwitchPaneButtonBGHoverColor, SeriesSwitchPaneButtonIconColor, SeriesSwitchPaneButtonIconHoverColor, SeriesEditPaneBGColor, SeriesNotesBGColor, SeriesNotesBorderColor, SeriesNotesTextColor, SeriesEditPaneButtonsBGColor, SeriesEditPaneButtonsBGHoverColor, SeriesEditPaneButtonsBorderColor, SeriesEditPaneButtonsBorderHoverColor, SeriesEditPaneButtonsIconColor, SeriesEditPaneButtonsIconHoverColor);
+            return new TsundokuTheme(ThemeName, MenuBGColor, UsernameColor, MenuTextColor, SearchBarBGColor, SearchBarBorderColor, SearchBarTextColor, MenuButtonBGColor, MenuButtonBGHoverColor, MenuButtonBorderColor, MenuButtonBorderHoverColor, MenuButtonTextAndIconColor, MenuButtonTextAndIconHoverColor, DividerColor, CollectionBGColor, StatusAndBookTypeBGColor, StatusAndBookTypeBGHoverColor, StatusAndBookTypeTextColor, StatusAndBookTypeTextHoverColor, SeriesCardBGColor, SeriesCardTitleColor, SeriesCardStaffColor, SeriesCardDescColor, SeriesProgressBGColor, SeriesProgressBarColor, SeriesProgressBarBGColor, SeriesProgressBarBorderColor, SeriesProgressTextColor, SeriesProgressButtonsHoverColor, SeriesButtonBGColor, SeriesButtonBGHoverColor, SeriesButtonIconColor, SeriesButtonIconHoverColor, SeriesEditPaneBGColor, SeriesNotesBGColor, SeriesNotesBorderColor, SeriesNotesTextColor, SeriesEditPaneButtonsBGColor, SeriesEditPaneButtonsBGHoverColor, SeriesEditPaneButtonsBorderColor, SeriesEditPaneButtonsBorderHoverColor, SeriesEditPaneButtonsIconColor, SeriesEditPaneButtonsIconHoverColor);
         }
 
         object ICloneable.Clone()
@@ -194,10 +194,10 @@ namespace Tsundoku.Models
             hash.Add(SeriesProgressBarBorderColor);
             hash.Add(SeriesProgressTextColor);
             hash.Add(SeriesProgressButtonsHoverColor);
-            hash.Add(SeriesSwitchPaneButtonBGColor);
-            hash.Add(SeriesSwitchPaneButtonBGHoverColor);
-            hash.Add(SeriesSwitchPaneButtonIconColor);
-            hash.Add(SeriesSwitchPaneButtonIconHoverColor);
+            hash.Add(SeriesButtonBGColor);
+            hash.Add(SeriesButtonBGHoverColor);
+            hash.Add(SeriesButtonIconColor);
+            hash.Add(SeriesButtonIconHoverColor);
             hash.Add(SeriesEditPaneBGColor);
             hash.Add(SeriesNotesBGColor);
             hash.Add(SeriesNotesBorderColor);
@@ -248,10 +248,10 @@ namespace Tsundoku.Models
                    SeriesProgressBarBorderColor == other.SeriesProgressBarBorderColor &&
                    SeriesProgressTextColor == other.SeriesProgressTextColor &&
                    SeriesProgressButtonsHoverColor == other.SeriesProgressButtonsHoverColor &&
-                   SeriesSwitchPaneButtonBGColor == other.SeriesSwitchPaneButtonBGColor &&
-                   SeriesSwitchPaneButtonBGHoverColor == other.SeriesSwitchPaneButtonBGHoverColor &&
-                   SeriesSwitchPaneButtonIconColor == other.SeriesSwitchPaneButtonIconColor &&
-                   SeriesSwitchPaneButtonIconHoverColor == other.SeriesSwitchPaneButtonIconHoverColor &&
+                   SeriesButtonBGColor == other.SeriesButtonBGColor &&
+                   SeriesButtonBGHoverColor == other.SeriesButtonBGHoverColor &&
+                   SeriesButtonIconColor == other.SeriesButtonIconColor &&
+                   SeriesButtonIconHoverColor == other.SeriesButtonIconHoverColor &&
                    SeriesEditPaneBGColor == other.SeriesEditPaneBGColor &&
                    SeriesNotesBGColor == other.SeriesNotesBGColor &&
                    SeriesNotesBorderColor == other.SeriesNotesBorderColor &&

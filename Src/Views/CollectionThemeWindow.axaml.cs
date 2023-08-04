@@ -152,10 +152,10 @@ namespace Tsundoku.Views
                 NewTheme.SeriesProgressBarBorderColor = Color.Parse(TextColor2.Text).ToUInt32();
                 NewTheme.SeriesProgressTextColor = Color.Parse(TextColor2.Text).ToUInt32();
                 NewTheme.SeriesProgressButtonsHoverColor = Color.Parse(MainColor1.Text).ToUInt32(); 
-                NewTheme.SeriesSwitchPaneButtonBGColor = Color.Parse(AccentColor2.Text).ToUInt32();
-                NewTheme.SeriesSwitchPaneButtonBGHoverColor = Color.Parse(AccentColor2.Text).ToUInt32();
-                NewTheme.SeriesSwitchPaneButtonIconColor = Color.Parse(TextColor2.Text).ToUInt32();
-                NewTheme.SeriesSwitchPaneButtonIconHoverColor = Color.Parse(AccentColor1.Text).ToUInt32();
+                NewTheme.SeriesButtonBGColor = Color.Parse(AccentColor2.Text).ToUInt32();
+                NewTheme.SeriesButtonBGHoverColor = Color.Parse(AccentColor2.Text).ToUInt32();
+                NewTheme.SeriesButtonIconColor = Color.Parse(TextColor2.Text).ToUInt32();
+                NewTheme.SeriesButtonIconHoverColor = Color.Parse(AccentColor1.Text).ToUInt32();
                 NewTheme.SeriesEditPaneBGColor = Color.Parse(MainColor1.Text).ToUInt32();
                 NewTheme.SeriesNotesBGColor = Color.Parse(AccentColor2.Text).ToUInt32();
                 NewTheme.SeriesNotesBorderColor = Color.Parse(AccentColor1.Text).ToUInt32();
@@ -226,10 +226,10 @@ namespace Tsundoku.Views
                 NewTheme.SeriesProgressBarBorderColor = Color.Parse(TextColor2.Text).ToUInt32();
                 NewTheme.SeriesProgressTextColor = Color.Parse(TextColor2.Text).ToUInt32();
                 NewTheme.SeriesProgressButtonsHoverColor = Color.Parse(MainColor1.Text).ToUInt32();
-                NewTheme.SeriesSwitchPaneButtonBGColor = Color.Parse(AccentColor2.Text).ToUInt32();
-                NewTheme.SeriesSwitchPaneButtonBGHoverColor = Color.Parse(AccentColor2.Text).ToUInt32();
-                NewTheme.SeriesSwitchPaneButtonIconColor = Color.Parse(TextColor2.Text).ToUInt32();
-                NewTheme.SeriesSwitchPaneButtonIconHoverColor = Color.Parse(MainColor1.Text).ToUInt32();
+                NewTheme.SeriesButtonBGColor = Color.Parse(AccentColor2.Text).ToUInt32();
+                NewTheme.SeriesButtonBGHoverColor = Color.Parse(AccentColor2.Text).ToUInt32();
+                NewTheme.SeriesButtonIconColor = Color.Parse(TextColor2.Text).ToUInt32();
+                NewTheme.SeriesButtonIconHoverColor = Color.Parse(MainColor1.Text).ToUInt32();
                 NewTheme.SeriesEditPaneBGColor = Color.Parse(MainColor1.Text).ToUInt32();
                 NewTheme.SeriesNotesBGColor = Color.Parse(AccentColor2.Text).ToUInt32();
                 NewTheme.SeriesNotesBorderColor = Color.Parse(AccentColor1.Text).ToUInt32();
@@ -404,10 +404,10 @@ namespace Tsundoku.Views
             SeriesProgress_Bar_Border.Color = Color.FromUInt32(CollectionWindow.CollectionViewModel.CurrentTheme.SeriesProgressBarBorderColor);
             SeriesProgress_Text.Color = Color.FromUInt32(CollectionWindow.CollectionViewModel.CurrentTheme.SeriesProgressTextColor);
             SeriesProgress_Buttons_Hover.Color = Color.FromUInt32(CollectionWindow.CollectionViewModel.CurrentTheme.SeriesProgressButtonsHoverColor);
-            SeriesSwitchPaneButton_BG.Color = Color.FromUInt32(CollectionWindow.CollectionViewModel.CurrentTheme.SeriesSwitchPaneButtonBGColor);
-            SeriesSwitchPaneButton_BG_Hover.Color = Color.FromUInt32(CollectionWindow.CollectionViewModel.CurrentTheme.SeriesSwitchPaneButtonBGHoverColor);
-            SeriesSwitchPaneButton_Icon.Color = Color.FromUInt32(CollectionWindow.CollectionViewModel.CurrentTheme.SeriesSwitchPaneButtonIconColor);
-            SeriesSwitchPaneButton_Icon_Hover.Color = Color.FromUInt32(CollectionWindow.CollectionViewModel.CurrentTheme.SeriesSwitchPaneButtonIconHoverColor);
+            SeriesButton_BG.Color = Color.FromUInt32(CollectionWindow.CollectionViewModel.CurrentTheme.SeriesButtonBGColor);
+            SeriesButton_BG_Hover.Color = Color.FromUInt32(CollectionWindow.CollectionViewModel.CurrentTheme.SeriesButtonBGHoverColor);
+            SeriesButton_Icon.Color = Color.FromUInt32(CollectionWindow.CollectionViewModel.CurrentTheme.SeriesButtonIconColor);
+            SeriesButton_Icon_Hover.Color = Color.FromUInt32(CollectionWindow.CollectionViewModel.CurrentTheme.SeriesButtonIconHoverColor);
             SeriesEditPane_BG.Color = Color.FromUInt32(CollectionWindow.CollectionViewModel.CurrentTheme.SeriesEditPaneBGColor);
             SeriesNotes_BG.Color = Color.FromUInt32(CollectionWindow.CollectionViewModel.CurrentTheme.SeriesNotesBGColor);
             SeriesNotes_Border.Color = Color.FromUInt32(CollectionWindow.CollectionViewModel.CurrentTheme.SeriesNotesBorderColor);
@@ -732,43 +732,43 @@ namespace Tsundoku.Views
                 }
             };
 
-            SeriesSwitchPaneButton_BG.PropertyChanged += (sender, e) =>
+            SeriesButton_BG.PropertyChanged += (sender, e) =>
             {
                 if (e.Property == ColorView.ColorProperty)
                 {
-                    //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesSwitchPaneButton_BG.Color);
-                    SeriesSwitchPaneButton_BG_Button.Background = new SolidColorBrush(SeriesSwitchPaneButton_BG.Color);
-                    NewTheme.SeriesSwitchPaneButtonBGColor = SeriesSwitchPaneButton_BG.Color.ToUInt32();
+                    //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesButton_BG.Color);
+                    SeriesButton_BG_Button.Background = new SolidColorBrush(SeriesButton_BG.Color);
+                    NewTheme.SeriesButtonBGColor = SeriesButton_BG.Color.ToUInt32();
                 }
             };
 
-            SeriesSwitchPaneButton_BG_Hover.PropertyChanged += (sender, e) =>
+            SeriesButton_BG_Hover.PropertyChanged += (sender, e) =>
             {
                 if (e.Property == ColorView.ColorProperty)
                 {
-                    //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesSwitchPaneButton_BG_Hover.Color);
-                    SeriesSwitchPaneButton_BG_Hover_Button.Background = new SolidColorBrush(SeriesSwitchPaneButton_BG_Hover.Color);
-                    NewTheme.SeriesSwitchPaneButtonBGHoverColor = SeriesSwitchPaneButton_BG_Hover.Color.ToUInt32();
+                    //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesButton_BG_Hover.Color);
+                    SeriesButton_BG_Hover_Button.Background = new SolidColorBrush(SeriesButton_BG_Hover.Color);
+                    NewTheme.SeriesButtonBGHoverColor = SeriesButton_BG_Hover.Color.ToUInt32();
                 }
             };
 
-            SeriesSwitchPaneButton_Icon.PropertyChanged += (sender, e) =>
+            SeriesButton_Icon.PropertyChanged += (sender, e) =>
             {
                 if (e.Property == ColorView.ColorProperty)
                 {
-                    //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesSwitchPaneButton_Icon.Color);
-                    SeriesSwitchPaneButton_Icon_Button.Background = new SolidColorBrush(SeriesSwitchPaneButton_Icon.Color);
-                    NewTheme.SeriesSwitchPaneButtonIconColor = SeriesSwitchPaneButton_Icon.Color.ToUInt32();
+                    //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesButton_Icon.Color);
+                    SeriesButton_Icon_Button.Background = new SolidColorBrush(SeriesButton_Icon.Color);
+                    NewTheme.SeriesButtonIconColor = SeriesButton_Icon.Color.ToUInt32();
                 }
             };
 
-            SeriesSwitchPaneButton_Icon_Hover.PropertyChanged += (sender, e) =>
+            SeriesButton_Icon_Hover.PropertyChanged += (sender, e) =>
             {
                 if (e.Property == ColorView.ColorProperty)
                 {
-                    //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesSwitchPaneButton_Icon_Hover.Color);
-                    SeriesSwitchPaneButton_Icon_Hover_Button.Background = new SolidColorBrush(SeriesSwitchPaneButton_Icon_Hover.Color);
-                    NewTheme.SeriesSwitchPaneButtonIconHoverColor = SeriesSwitchPaneButton_Icon_Hover.Color.ToUInt32();
+                    //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesButton_Icon_Hover.Color);
+                    SeriesButton_Icon_Hover_Button.Background = new SolidColorBrush(SeriesButton_Icon_Hover.Color);
+                    NewTheme.SeriesButtonIconHoverColor = SeriesButton_Icon_Hover.Color.ToUInt32();
                 }
             };
 

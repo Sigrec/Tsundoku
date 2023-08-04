@@ -1,0 +1,25 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					xmlns:vm="clr-namespace:Tsundoku.ViewModels"
+                    xmlns:local="clr-namespace:Tsundoku.Models"
+					x:DataType="vm:ViewModelBase">
+    <ControlTheme x:Key="LeftSideTextBlock" TargetType="TextBlock">
+		<Setter Property="FontWeight" Value="Bold"/>
+		<Setter Property="FontSize" Value="17"/>
+		<Setter Property="Width" Value="{CompiledBinding Source={x:Static local:Constants.LEFT_SIDE_CARD_WIDTH}}"/>
+        <Setter Property="Height" Value="{CompiledBinding Source={x:Static local:Constants.BOTTOM_SECTION_CARD_HEIGHT}}"/>
+        <Setter Property="Padding" Value="0,8,0,0"/>
+        <Setter Property="TextAlignment" Value="Center"/>
+		<Setter Property="RenderTransform" Value="none"/>
+		<!-- <Setter Property="Padding" Value="{DynamicResource ButtonPadding}"/> -->
+
+		<Style Selector="TextBlock.mouseover">
+            <Setter Property="Background" Value="{CompiledBinding CurrentTheme.StatusAndBookTypeBGHoverColor, Converter={StaticResource ConvertColor}}"/>
+            <Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.StatusAndBookTypeTextHoverColor, Converter={StaticResource ConvertColor}}"/>
+        </Style>
+        <Style Selector="TextBlock.nomouseover">
+            <Setter Property="Background" Value="{CompiledBinding CurrentTheme.StatusAndBookTypeBGColor, Converter={StaticResource ConvertColor}}"/>
+            <Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.StatusAndBookTypeTextColor, Converter={StaticResource ConvertColor}}"/>
+        </Style>
+	</ControlTheme>
+</ResourceDictionary>

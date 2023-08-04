@@ -20,35 +20,14 @@
     <Window.Resources>
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
-				<ResourceInclude Source="/Styles/SettingsThemeControls.xaml"/>
+				<ResourceInclude Source="/Styles/UniversalNavControlThemes.xaml"/>
+                <ResourceInclude Source="/Styles/UserSettingsControlThemes.xaml"/>
 			</ResourceDictionary.MergedDictionaries>
 		</ResourceDictionary>
 	</Window.Resources>
 
     <Border Classes="menu" BorderThickness="3" CornerRadius="0,0,8,8" ClipToBounds="True">
         <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"> 
-            <ScrollViewer.Styles>
-				<Style Selector="ScrollBar:vertical">
-					<Style Selector="^ /template/ Rectangle#TrackRect">
-						<Setter Property="Fill" Value="{Binding CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}" />
-					</Style>
-					<Style Selector="^ /template/ Thumb">
-						<Setter Property="Background" Value="{Binding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" />
-					</Style>
-				</Style>
-				<Style Selector="Thumb:pointerover /template/ Border">
-					<Setter Property="Background" Value="{Binding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" />
-				</Style>
-				<Style Selector="RepeatButton">
-					<Setter Property="TextElement.Foreground" Value="{Binding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}"/>
-
-					<Style Selector="^:pressed /template/ ContentPresenter, ^:pointerover /template/ ContentPresenter">
-						<Setter Property="Background" Value="{Binding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" />
-						<Setter Property="BorderBrush" Value="Red" />
-						<Setter Property="TextElement.Foreground" Value="{Binding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}"/>
-					</Style>
-				</Style>
-			</ScrollViewer.Styles>
             <StackPanel Margin="20" Spacing="20">
                 <StackPanel Spacing="5">
                     <TextBlock Text="Change Username" FontSize="20" FontWeight="Bold" Classes="menu"/>
