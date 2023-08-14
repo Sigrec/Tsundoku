@@ -2,10 +2,8 @@ using Avalonia.Controls;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data;
-using System.Linq;
 using System.Collections.ObjectModel;
 using Avalonia.Interactivity;
-using Avalonia.LogicalTree;
 using Tsundoku.ViewModels;
 using Tsundoku.Models;
 using System.Diagnostics.CodeAnalysis;
@@ -27,31 +25,6 @@ namespace Tsundoku.Views
                 CollectionWindow = (MainWindow)((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).MainWindow;
                 PriceAnalysisVM.CurrentTheme = CollectionWindow.CollectionViewModel.CurrentTheme;
                 IsOpen ^= true;
-
-                // Set the headers without any data
-                for (int x = 0; x < 4; x++)
-                {
-                    DataGridTextColumn col = new DataGridTextColumn();
-                    switch (x)
-                    {
-                        case 0:
-                            col.Header = "Item";
-                            break;
-                        case 1:
-                            col.Header = "Price";
-                            break;
-                        case 2:
-                            col.Header = "Stock Status";
-                            break;
-                        case 3:
-                            col.Header = "Website";
-                            break;
-                    }
-                    col.FontSize = 18;
-                    col.FontWeight = Avalonia.Media.FontWeight.Bold;
-                    AnalysisDataGrid.Columns.Add(col);
-                }
-                AnalysisDataGrid.ItemsSource = PriceAnalysisViewModel.testData;
             };
 
             Closing += (s, e) =>
@@ -76,29 +49,11 @@ namespace Tsundoku.Views
         
         public void PerformAnalysis(object sender, RoutedEventArgs args)
         {
-            // foreach (var x in ((Button)sender).GetLogicalSiblings())
-            // {
-            //     Constants.Logger.Debug(x.GetType());
-            // } , ((DataGrid)((Button)sender).GetLogicalSiblings().ElementAt(8))
-            AddDataPoints(PriceAnalysisViewModel.testData);
-        }
-
-        [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "No Issue Right Now 6/22/2023")]
-        public void AddDataPoints(ObservableCollection<string[]> masterData)
-        {
-            for (int idx = 0; idx < 4; idx++)
-            {
-                ((DataGridTextColumn)AnalysisDataGrid.Columns[idx]).Binding = new Binding(string.Format($"[{idx}]"));
-                ((DataGridTextColumn)AnalysisDataGrid.Columns[idx]).FontSize = 18;
-            }
-
-            AnalysisDataGrid.ItemsSource = masterData;
-            AnalysisDataGrid.AutoGenerateColumns = false;
+            Constants.Logger.Debug("Started Scrape");
         }
 
         private void BrowserChanged(object sender, SelectionChangedEventArgs e)
         {
-            //Constants.Logger.Debug(((sender as ComboBox).GetLogicalSiblings().ElementAt(1) as ComboBox).Name);
             if ((sender as ComboBox).IsDropDownOpen)
             {
                 switch (BrowserSelector.SelectedItem)

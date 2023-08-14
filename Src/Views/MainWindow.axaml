@@ -386,7 +386,7 @@
 												</Style>
 											</Grid.Styles>
 											<StackPanel Margin="10,7,0,0" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="1">
-												<TextBlock Text="{Binding VolumesRead, StringFormat='Read {0} Volumes'}"
+												<TextBlock Text="{Binding VolumesRead, StringFormat='Read {0} Vol(s)'}"
 														   Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesCardTitleColor, Converter={StaticResource ConvertColor}}"
 													   	   FontWeight="Bold"
 														   HorizontalAlignment="Center"
@@ -625,8 +625,9 @@
 													   MaxHeight="{CompiledBinding Source={x:Static local:Constants.TOP_SECTION_CARD_HEIGHT}}"
 													   PointerPressed="CopySeriesTitleAsync"
 													   Name="SeriesTitle"
-													   Padding="10,2,5,0"
+													   Padding="9,2,5,0"
 													   Cursor="Hand"
+													   TextAlignment="Left"
 													   LineHeight="24.0"> <!-- Ideal Line Height 24.0 --> <!-- old font size was 23 -->
 												<TextBlock.Text>
 													<MultiBinding Converter="{StaticResource ConvertTitle}">
@@ -638,7 +639,7 @@
 											<TextBlock DockPanel.Dock="Top"
 														TextWrapping="Wrap"
 														Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesCardStaffColor, Converter={StaticResource ConvertColor}}"
-														Padding="10,0,4,2">
+														Padding="9,0,4,2">
 												<TextBlock.Text>
 													<MultiBinding Converter="{StaticResource ConvertStaff}" Mode="OneWay">
 														<Binding Path="Staff"/>
@@ -646,12 +647,12 @@
 													</MultiBinding>
 												</TextBlock.Text>
 											</TextBlock>
-											<ScrollViewer VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled" DockPanel.Dock="Bottom" IsScrollChainingEnabled="false">
+											<ScrollViewer VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled" DockPanel.Dock="Bottom" IsScrollChainingEnabled="false">
 												<TextBlock TextWrapping="Wrap"
 															Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesCardDescColor, Converter={StaticResource ConvertColor}}"
 															Opacity="0.9"
 															Text="{Binding Description}"
-															Padding="10,-2,5,10"/>
+															Padding="10,-2,6,10"/>
 											</ScrollViewer>
 										</DockPanel>
 

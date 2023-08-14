@@ -12,7 +12,7 @@
         FontFamily="Segoe UI"
         MinWidth="491"
         MaxWidth="491"
-        MaxHeight="840"
+        MaxHeight="860"
         Height="550"
         WindowStartupLocation="2"
         KeyboardNavigation.TabNavigation="None">
@@ -64,7 +64,7 @@
                     <WrapPanel Width="450" Margin="-5,0,0,0">
                         <WrapPanel.Styles>
                             <Style Selector="Button">
-                                <Setter Property="Margin" Value="5"/>
+                                <Setter Property="Margin" Value="3"/>
                             </Style>
                         </WrapPanel.Styles>
                         <Button Theme="{StaticResource UserSettingsButton}"
@@ -94,17 +94,13 @@
                     <TextBlock Text="Toggle Fullscreen → F11" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
                     <TextBlock Text="Screenshot Collection → CTRL+P" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
                     <TextBlock Text="Save Collection (Auto Saves on Close) → CTRL+S" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
+                    <TextBlock Text="Reload Collection → CTRL+R" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
                     <TextBlock Text="Copy Title → Click Title on Series Card" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
                     <TextBlock Text="Open AL Page → Click Series Image" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
                 </StackPanel>
                 <StackPanel Spacing="5">
                     <TextBlock Text="Youtubers" FontSize="20" FontWeight="Bold" Classes="menu"/>
                     <WrapPanel Width="450" Margin="-5,0,0,0">
-                        <WrapPanel.Styles>
-                            <Style Selector="Button">
-                                <Setter Property="Margin" Value="5"/>
-                            </Style>
-                        </WrapPanel.Styles>
                         <Button Theme="{StaticResource UserSettingsButton}"
                                 Click="OpenYoutuberSite"
                                 Name="EastCoastManga"
@@ -146,11 +142,6 @@
                 <StackPanel Spacing="5">
                     <TextBlock Text="Credits" FontSize="20" FontWeight="Bold" Classes="menu"/>
                     <WrapPanel Width="450" Margin="-5,0,0,0">
-                        <WrapPanel.Styles>
-                            <Style Selector="Button">
-                                <Setter Property="Margin" Value="5"/>
-                            </Style>
-                        </WrapPanel.Styles>
                         <Button Theme="{StaticResource UserSettingsButton}"
                                 Click="OpenAniListLink"
                                 HorizontalAlignment="Center"

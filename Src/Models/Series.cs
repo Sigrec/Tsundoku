@@ -34,6 +34,10 @@ namespace Tsundoku.Models
 		public string Description { get; }
 		public string Format { get; }
 		public string Status { get; set; }
+
+		/// <summary>
+		/// Path to the cover for a series
+		/// </summary>
 		public string Cover { get; set; }
 		public string Link { get; }
 		public string SeriesNotes { get; set; }

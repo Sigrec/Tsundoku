@@ -18,7 +18,7 @@
 		<StyleInclude Source="/Styles/MenuTheme.xaml" />
 	</Window.Styles>
 
-	<Grid ColumnDefinitions="*,*,*" RowDefinitions="*,*,10,*,*,10,*,10,*" Margin="20">
+	<Grid ColumnDefinitions="*,*,*" RowDefinitions="*,*,10,*,*,10,*,10,*" Margin="20" ShowGridLines="True">
 		<Grid.Styles>
 			<StyleInclude Source="/Styles/MenuTheme.xaml" />
 			<Style Selector="Button:focus /template/ ContentPresenter#PART_ContentPresenter">
@@ -100,14 +100,21 @@
 				  BorderThickness="2"
 				  Width="130"
 				  Classes="menu"/>
-		<DataGrid Classes="menu"
+		<DataGrid ItemsSource="{Binding AnalyzedList}"
+				  Classes="menu"
 				  Name="AnalysisDataGrid"
 				  AutoGenerateColumns="True"
+				  GridLinesVisibility="All"
 				  BorderThickness="2"
 				  Grid.ColumnSpan="2"
 				  Grid.Column="0"
 				  Grid.Row="6"
-				  BorderBrush="Red"/>
+				  BorderBrush="Red">
+			<!-- <DataGridTextColumn Header="Entry" Binding="{Binding Entry}"/>
+			<DataGridTextColumn Header="Price" Binding="{Binding Price}"/>
+			<DataGridTextColumn Header="Stock Status" Binding="{Binding StockStatus}"/>
+			<DataGridTextColumn Header="Website" Binding="{Binding Website}"/> -->
+		</DataGrid>
 		<Button Classes="Menu"
 				BorderThickness="2"
 				FontWeight="Bold"

@@ -10,6 +10,7 @@
 		<Setter Property="FontWeight" Value="Bold"/>
 		<Setter Property="FontSize" Value="15"/>
 		<Setter Property="BorderThickness" Value="2"/>
+		<Setter Property="Margin" Value="3"/>
 		<Setter Property="RenderTransform" Value="none" />
         <Setter Property="HorizontalAlignment" Value="Center"/>
 		<Setter Property="Padding" Value="{DynamicResource ButtonPadding}" />

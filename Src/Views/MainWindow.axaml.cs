@@ -54,6 +54,15 @@ namespace Tsundoku.Views
                     CollectionViewModel.SearchText = "";
                     MainWindowViewModel.SaveUsersData();
                 }
+                else if (e.KeyModifiers == KeyModifiers.Control && e.Key == Key.R)
+                {
+                    Constants.Logger.Info("Reloading Collection");
+                    if (CollectionViewModel.CurFilter != "None")
+                    {
+                        MainWindowViewModel.FilterCollection("None");
+                    }
+                    MainWindowViewModel.AllocateCoverBitmaps();
+                }
             };
 
             Closing += (s, e) =>
@@ -74,7 +83,7 @@ namespace Tsundoku.Views
             {
                 uint volumesReadVal = Convert.ToUInt32(volumesRead), countVolumesRead = 0;
                 curSeries.VolumesRead = volumesReadVal;
-                ((TextBlock)stackPanels.ElementAt(0).GetLogicalChildren().ElementAt(0)).Text = $"Read {volumesReadVal}";
+                ((TextBlock)stackPanels.ElementAt(0).GetLogicalChildren().ElementAt(0)).Text = $"Read {volumesReadVal} Vol(s)";
                 Constants.Logger.Info($"Updated # of Volumes Read for {curSeries.Titles["Romaji"]} to {volumesReadVal}");
                 volumesReadVal = 0;
                 foreach (Series x in CollectionsMarshal.AsSpan(MainWindowViewModel.Collection.ToList()))

@@ -5,6 +5,7 @@ using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.ReactiveUI;
 using DynamicData;
+using MsBox.Avalonia;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -112,7 +113,7 @@ namespace Tsundoku.Views
         /// <summary>
         /// Generates the Type1 theme
         /// </summary>
-        private void GenerateThemeType1(object sender, RoutedEventArgs args)
+        private async void GenerateThemeType1(object sender, RoutedEventArgs args)
         {
             string errorMessage = GenerateThemeValidation();
             if (string.IsNullOrWhiteSpace(errorMessage))
@@ -173,20 +174,23 @@ namespace Tsundoku.Views
             else
             {
                 Constants.Logger.Warn("User Input to Generate Theme is Invalid");
-                var errorBox = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(
-                new MessageBox.Avalonia.DTO.MessageBoxStandardParams
-                {
-                    ContentTitle = "Error Generating Theme",
-                    ContentMessage = errorMessage
-                });
-                errorBox.Show();
+                // var errorBox = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(
+                // new MessageBox.Avalonia.DTO.MessageBoxStandardParams
+                // {
+                //     ContentTitle = "Error Generating Theme",
+                //     ContentMessage = errorMessage
+                // });
+                // errorBox.Show();
+
+                var errorBox = MessageBoxManager.GetMessageBoxStandard("Error Generating Theme", errorMessage);
+                await errorBox.ShowAsync();
             }
         }
 
         /// <summary>
         /// Generates the Type2 theme
         /// </summary>
-        private void GenerateThemeType2(object sender, RoutedEventArgs args)
+        private async void GenerateThemeType2(object sender, RoutedEventArgs args)
         {
             string errorMessage = GenerateThemeValidation();
             if (string.IsNullOrWhiteSpace(errorMessage))
@@ -247,13 +251,15 @@ namespace Tsundoku.Views
             else
             {
                 Constants.Logger.Warn("User Input to Generate Theme is Invalid");
-                var errorBox = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(
-                new MessageBox.Avalonia.DTO.MessageBoxStandardParams
-                {
-                    ContentTitle = "Error Generating Theme",
-                    ContentMessage = errorMessage
-                });
-                errorBox.Show();
+                // var errorBox = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(
+                // new MessageBox.Avalonia.DTO.MessageBoxStandardParams
+                // {
+                //     ContentTitle = "Error Generating Theme",
+                //     ContentMessage = errorMessage
+                // });
+                // errorBox.Show();
+                var errorBox = MessageBoxManager.GetMessageBoxStandard("Error Generating Theme", errorMessage);
+                await errorBox.ShowAsync();
             }
         }
 

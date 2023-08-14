@@ -2,6 +2,7 @@ using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using MsBox.Avalonia;
 using Tsundoku.Models;
 using Tsundoku.ViewModels;
 
@@ -49,7 +50,7 @@ namespace Tsundoku.Views
             MangaButton.IsChecked = false;
         }
 
-        public void OnButtonClicked(object sender, RoutedEventArgs args)
+        public async void OnButtonClicked(object sender, RoutedEventArgs args)
         {
             if (AddNewSeriesVM.SelectedAdditionalLanguages.Count != 0)
             {
@@ -104,13 +105,14 @@ namespace Tsundoku.Views
             if (!validResponse)
             {
                 Constants.Logger.Warn("User Input to Add New Series is Invalid");
-                var errorBox = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(
-                new MessageBox.Avalonia.DTO.MessageBoxStandardParams
-                {
-                    ContentTitle = "Error Adding Series",
-                    ContentMessage = errorMessage
-                });
-                errorBox.Show();
+                var errorBox = MessageBoxManager.GetMessageBoxStandard("Error Adding Series", errorMessage);
+                await errorBox.ShowAsync();
+                // var errorBox = MessageBox.Avalonia.MessageBoxManager.GetMessageBoxStandardWindow(
+                // new MessageBox.Avalonia.DTO.MessageBoxStandardParams
+                // {
+                //     ContentTitle = "Error Adding Series",
+                //     ContentMessage = errorMessage
+                // });
             }
             else if (!AddNewSeriesVM.GetSeriesData(TitleBox.Text.Trim(), (MangaButton.IsChecked == true) ? "MANGA" : "NOVEL", cur, max, AddNewSeriesViewModel.ConvertSelectedLangList(AddNewSeriesVM.SelectedAdditionalLanguages))) // Boolean returns whether the series added is a duplicate
             {
