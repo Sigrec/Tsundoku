@@ -23,6 +23,7 @@
 		<ResourceDictionary>
 			<cv:TitleLangConverter x:Key="ConvertTitle"/>
 			<cv:StaffLangConverter x:Key="ConvertStaff"/>
+			<cv:LineCountVisibilityConverter x:Key="TitleToolTipVisibility"/>
 			<ResourceDictionary.MergedDictionaries>
 				<ResourceInclude Source="/Styles/CollectionControlThemes.xaml"/>
 			</ResourceDictionary.MergedDictionaries>
@@ -625,9 +626,10 @@
 													   MaxHeight="{CompiledBinding Source={x:Static local:Constants.TOP_SECTION_CARD_HEIGHT}}"
 													   PointerPressed="CopySeriesTitleAsync"
 													   Name="SeriesTitle"
-													   Padding="9,2,5,0"
+													   Padding="9,2,7,0"
 													   Cursor="Hand"
 													   TextAlignment="Left"
+													   MaxLines="3"
 													   LineHeight="24.0"> <!-- Ideal Line Height 24.0 --> <!-- old font size was 23 -->
 												<TextBlock.Text>
 													<MultiBinding Converter="{StaticResource ConvertTitle}">

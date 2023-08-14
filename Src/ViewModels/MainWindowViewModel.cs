@@ -28,7 +28,7 @@ namespace Tsundoku.ViewModels
 {
     public partial class MainWindowViewModel : ViewModelBase
     {
-        private static readonly string filePath = @"UserData.json";
+        private static readonly string filePath = @"TestData.json";
         private const double SCHEMA_VERSION = 1.8;
         private static bool newUserFlag = false;
         public static ObservableCollection<Series> SearchedCollection { get; set; } = new();

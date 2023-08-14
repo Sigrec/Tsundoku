@@ -12,7 +12,6 @@ using System.Collections.Generic;
 using Avalonia.Media.Imaging;
 using System.Text.Json.Serialization;
 using System.Text.Json;
-using System.Text.Json.Nodes;
 using static Tsundoku.Models.Constants;
 
 namespace Tsundoku.Models
@@ -79,9 +78,11 @@ namespace Tsundoku.Models
         {
 			JsonDocument? seriesDataDoc;
 			int pageNum = 1;
+			bool isAniListID = false;
 			if (int.TryParse(title, out int seriesId))
 			{
 				seriesDataDoc = await AniListQuery.GetSeriesByIDAsync(seriesId, bookType, pageNum);
+				isAniListID = true;
 			}
 			else
 			{
@@ -95,15 +96,15 @@ namespace Tsundoku.Models
 
 			// AniList Query Check
 			Restart:
-			if (seriesDataDoc != null)
+			if (isAniListID || seriesDataDoc != null)
 			{
-				Logger.Debug("AniList Query");
+				Logger.Info("Valid AniList Query");
 				JsonElement seriesData = seriesDataDoc.RootElement.GetProperty("Media");
 				nativeTitle = seriesData.GetProperty("title").GetProperty("native").ToString();
 				romajiTitle = seriesData.GetProperty("title").GetProperty("romaji").ToString();
 				englishTitle = seriesData.GetProperty("title").GetProperty("english").ToString();
 				
-				if (!nativeTitle.Equals(title, StringComparison.OrdinalIgnoreCase) && !englishTitle.Equals(title, StringComparison.OrdinalIgnoreCase) && !romajiTitle.Equals(title, StringComparison.OrdinalIgnoreCase))
+				if (!isAniListID && !(ExtensionMethods.Similar(title, englishTitle) || ExtensionMethods.Similar(title, nativeTitle) || ExtensionMethods.Similar(title, romajiTitle)))
 				{
 					Logger.Info("Not on AniList or Incorrect Entry -> Trying Mangadex");
 					seriesDataDoc = null;
@@ -223,7 +224,8 @@ namespace Tsundoku.Models
 						foreach (JsonElement series in data.EnumerateArray())
 						{
 							attributes = series.GetProperty("attributes");
-							if (attributes.GetProperty("title").GetProperty("en").ToString().Equals(title, StringComparison.OrdinalIgnoreCase) || data.GetArrayLength() == 1)
+							altTitles = attributes.GetProperty("altTitles").EnumerateArray().ToList();
+							if (data.GetArrayLength() == 1 || ExtensionMethods.Similar(title, attributes.GetProperty("title").GetProperty("en").ToString()) || ExtensionMethods.Similar(title, GetAltTitle("en", altTitles)) || ExtensionMethods.Similar(title, GetAltTitle("ja", altTitles)))
 							{
 								data = series;
 								notFoundCondition = false;
@@ -240,9 +242,9 @@ namespace Tsundoku.Models
 					else
 					{
 						attributes = data.GetProperty("attributes");
+						altTitles = attributes.GetProperty("altTitles").EnumerateArray().ToList();
 					}
 
-					altTitles = attributes.GetProperty("altTitles").EnumerateArray().ToList();
 					relationships = data.GetProperty("relationships").EnumerateArray().ToList();
 					curId = string.IsNullOrWhiteSpace(curId) ? data.GetProperty("id").ToString() : curId;
 					romajiTitle = attributes.GetProperty("title").GetProperty("en").ToString();

@@ -1,5 +1,4 @@
 using System.Text.Json;
-using Tsundoku.Models;
 using System.Collections.ObjectModel;
 
 [assembly: Description("Testing Tsundoku")]
@@ -43,6 +42,12 @@ namespace Tests.SeriesTests
         public void MultipleAdditionalLangTitle_MangaDexID_AniListLink_Test()
         {
             Assert.That(Series.CreateNewSeriesCard("32fdfe9b-6e11-4a13-9e36-dcd8ea77b4e4", "MANGA", 18, 0, ALQuery, MDQuery, new ObservableCollection<string>() { "Arabic", "Chinese", "French", "Korean", "Russian", "Spanish" }).Result.ToJsonString(options), Is.EqualTo(File.ReadAllText(@"\Tsundoku\Tests\SeriesTests\SeriesTestData\Rent-A-Girlfriend.json")));
+        }
+
+        [Test]
+        public void SimilarNotEquals_AniList_Test()
+        {
+            Assert.That(Series.CreateNewSeriesCard("dont toy with me miss nagatoro", "MANGA", 5, 0, ALQuery, MDQuery, new ObservableCollection<string>()).Result.ToJsonString(options), Is.EqualTo(File.ReadAllText(@"\Tsundoku\Tests\SeriesTests\SeriesTestData\IjiranaideNagatoro-san.json")));
         }
 
         [Test]

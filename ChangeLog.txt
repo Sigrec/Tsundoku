@@ -1,10 +1,11 @@
-V1.8.0.0
+V1.8.0.0 - August 14th, 2023 @ 11:54AM PST
 ✅ Changed "Query" to "Add Series" for the button to open the window to add a new series
 ✅ Added option to Reload covers in app (CTRL+R), this allows users to change covers see the changes without having to restart
 🔥 Changed & Fixed Theme Settings Names for UI Changes from previous release
 🔥 Fixed & Changed series stats pane volumes read text
 🔥 Fixed issue where searching doesn't go back to the current filter that is set
-❌ Windows now always open on the monitor the main collection window is open in
+🔥 Fixed issue where adding a new series using a title that wasn't exactly the same caused the app to crash
+🔥 Fixed card issue when series title is very long and blocks out everything else (Currently the title just gets cut off at 3 lines, better functionality will be made in the future)
 
 V1.7.1.0 - July 26th, 2023 @ 11:37AM PST
 🔥 HotFix for new users where the app doesn't start
