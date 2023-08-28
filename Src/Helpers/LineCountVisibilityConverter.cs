@@ -11,7 +11,6 @@ namespace Tsundoku.Helpers
         {
             if (value is uint v)
             {
-                Logger.Debug(v);
                 return v > 3;
             }
             throw new NotSupportedException();

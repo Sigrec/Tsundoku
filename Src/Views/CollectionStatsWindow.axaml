@@ -30,7 +30,7 @@
 	<Window.Resources>
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
-				<ResourceInclude Source="/Styles/UniversalNavControlThemes.xaml"/>
+				<ResourceInclude Source="/Styles/WindowControlThemes.xaml"/>
 			</ResourceDictionary.MergedDictionaries>
 		</ResourceDictionary>
 	</Window.Resources>

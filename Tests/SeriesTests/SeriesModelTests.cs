@@ -30,7 +30,6 @@ namespace Tests.SeriesTests
         [OneTimeTearDown]
         public void Cleanup()
         {
-            MDQuery.Dispose();
             ALQuery.Dispose();
             if (Directory.Exists("Covers"))
             {
@@ -65,15 +64,15 @@ namespace Tests.SeriesTests
         [Test]
         public async Task GetJapaneseAltTitle_Test()
         {
-            Assert.That("俺だけレベルアップな件", Is.EqualTo(Series.GetAltTitle("ja", (await MangadexQuery.GetSeriesByTitleAsync("나 혼자만 레벨업")).RootElement.GetProperty("data").EnumerateArray().ElementAt(0).GetProperty("attributes").GetProperty("altTitles").EnumerateArray().ToList())));
+            Assert.That(Series.GetAltTitle("ja", (await MDQuery.GetSeriesByTitleAsync("나 혼자만 레벨업")).RootElement.GetProperty("data").EnumerateArray().ElementAt(0).GetProperty("attributes").GetProperty("altTitles").EnumerateArray().ToList()), Is.EqualTo("俺だけレベルアップな件"));
         }
 
         [Test]
         public async Task CreateCoverFilePath_Test()
         {
-            JsonElement narutoQuery = (await AniListQuery.GetSeriesByTitleAsync("Naruto", "MANGA", 1)).RootElement.GetProperty("Media");
+            JsonElement narutoQuery = (await ALQuery.GetSeriesByTitleAsync("Naruto", "MANGA", 1)).RootElement.GetProperty("Media");
 
-            Assert.That("Covers\\NARUTO_MANGA.jpg", Is.EqualTo(Series.CreateCoverFilePath(narutoQuery.GetProperty("coverImage").GetProperty("extraLarge").ToString(), narutoQuery.GetProperty("title").GetProperty("romaji").ToString(), "MANGA", narutoQuery.GetProperty("synonyms").EnumerateArray().ToList(), Constants.Site.AniList)));
+            Assert.That(Series.CreateCoverFilePath(narutoQuery.GetProperty("coverImage").GetProperty("extraLarge").ToString(), narutoQuery.GetProperty("title").GetProperty("romaji").ToString(), "MANGA", narutoQuery.GetProperty("synonyms").EnumerateArray().ToList(), Constants.Site.AniList), Is.EqualTo("Covers\\NARUTO_MANGA.jpg"));
         }
 
         [Test]
@@ -81,8 +80,8 @@ namespace Tests.SeriesTests
         {
             Assert.Multiple(async () =>
             {
-                Assert.That((await AniListQuery.GetSeriesByIDAsync(98282, "MANGA", 1)).RootElement.GetProperty("Media").GetProperty("title").GetProperty("romaji").ToString(), Is.EqualTo("Getsuyoubi no Tawawa"));
-                Assert.That((await AniListQuery.GetSeriesByIDAsync(125854, "MANGA", 1)).RootElement.GetProperty("Media").GetProperty("title").GetProperty("romaji").ToString(), Is.EqualTo("Getsuyoubi no Tawawa"));
+                Assert.That((await ALQuery.GetSeriesByIDAsync(98282, "MANGA", 1)).RootElement.GetProperty("Media").GetProperty("title").GetProperty("romaji").ToString(), Is.EqualTo("Getsuyoubi no Tawawa"));
+                Assert.That((await ALQuery.GetSeriesByIDAsync(125854, "MANGA", 1)).RootElement.GetProperty("Media").GetProperty("title").GetProperty("romaji").ToString(), Is.EqualTo("Getsuyoubi no Tawawa"));
             });
         }
 
@@ -214,19 +213,19 @@ namespace Tests.SeriesTests
         [Test] // Testing with Bungou Stray Dogs
         public async Task GetSeriesStaff_UntrimmedRole_Test()
         {
-            Assert.That(Series.GetSeriesStaff((await AniListQuery.GetSeriesByTitleAsync("文豪ストレイドッグス", "MANGA", 1)).RootElement.GetProperty("Media").GetProperty("staff").GetProperty("edges"), "full", "Manga", "Bungou Stray Dogs", new System.Text.StringBuilder()), Is.EqualTo("Kafka Asagiri | Harukawa35"));
+            Assert.That(Series.GetSeriesStaff((await ALQuery.GetSeriesByTitleAsync("文豪ストレイドッグス", "MANGA", 1)).RootElement.GetProperty("Media").GetProperty("staff").GetProperty("edges"), "full", "Manga", "Bungou Stray Dogs", new System.Text.StringBuilder()), Is.EqualTo("Kafka Asagiri | Harukawa35"));
         }
 
         [Test] // Testing with Bakemonogatari
         public async Task GetSeriesStaff_ToManyIllustrators_Test()
         {
-            Assert.That(Series.GetSeriesStaff((await AniListQuery.GetSeriesByTitleAsync("化物語", "MANGA", 1)).RootElement.GetProperty("Media").GetProperty("staff").GetProperty("edges"), "full", "Manga", "Bakemonogatari", new System.Text.StringBuilder()), Is.EqualTo("Ito Oogure | NISIOISIN | VOFAN | Akio Watanabe"));
+            Assert.That(Series.GetSeriesStaff((await ALQuery.GetSeriesByTitleAsync("化物語", "MANGA", 1)).RootElement.GetProperty("Media").GetProperty("staff").GetProperty("edges"), "full", "Manga", "Bakemonogatari", new System.Text.StringBuilder()), Is.EqualTo("Ito Oogure | NISIOISIN | VOFAN | Akio Watanabe"));
         }
 
         [Test]
         public async Task GetSeriesStaff_MultplieStaffForValidRole_Test()
         {
-            Assert.That(Series.GetSeriesStaff((await AniListQuery.GetSeriesByTitleAsync("나 혼자만 레벨업", "MANGA", 1)).RootElement.GetProperty("Media").GetProperty("staff").GetProperty("edges"), "full", "Manga", "Na Honjaman Level Up", new System.Text.StringBuilder()), Is.EqualTo("Chu-Gong | So-Ryeong Gi | Hyeon-Gun | Seong-Rak Jang"));
+            Assert.That(Series.GetSeriesStaff((await ALQuery.GetSeriesByTitleAsync("나 혼자만 레벨업", "MANGA", 1)).RootElement.GetProperty("Media").GetProperty("staff").GetProperty("edges"), "full", "Manga", "Na Honjaman Level Up", new System.Text.StringBuilder()), Is.EqualTo("Chu-Gong | So-Ryeong Gi | Hyeon-Gun | Seong-Rak Jang"));
         }
 
         [Test]

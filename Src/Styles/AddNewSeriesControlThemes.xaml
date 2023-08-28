@@ -3,9 +3,9 @@
 					xmlns:vm="clr-namespace:Tsundoku.ViewModels"
 					x:DataType="vm:AddNewSeriesViewModel">
     <ControlTheme x:Key="QueryListBox" TargetType="ListBox">
-		<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"/>
-		<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"/>
-		<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"/>
+		<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
+		<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
+        <Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"/>
         <Setter Property="Height" Value="220" />
 		<Setter Property="Width" Value="206" />
         <Setter Property="BorderThickness" Value="2" />
@@ -41,34 +41,12 @@
                 </Border>
             </ControlTemplate>
         </Setter>
-
-        <!-- <Style Selector="^:pressed, ^:pointerover">
-			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
-			<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
-		</Style> -->
-
-        <!-- <Style Selector="^:selected">
-			<Style Selector="^">
-				<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
-				<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
-			</Style>
-
-            <Style Selector="^:not(:focus)">
-                <Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
-				<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
-            </Style>
-
-            <Style Selector="^:pressed, ^:pointerover">
-                <Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"/>
-		        <Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"/>
-            </Style>
-		</Style> -->
 	</ControlTheme>
-
-    <Thickness x:Key="ListBoxItemPadding">12,9,12,12</Thickness>
+<!-- 
+    <Thickness x:Key="ListBoxItemPadding">12,9,12,12</Thickness> -->
     <ControlTheme x:Key="QueryListBoxItem" TargetType="ListBoxItem">
         <Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"/>
-        <Setter Property="Padding" Value="{DynamicResource ListBoxItemPadding}" />
+        <Setter Property="Padding" Value="12,9,12,12" />
         <Setter Property="BorderThickness" Value="0,1,0,1" />
         <Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"/>
         <Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"/>
@@ -76,46 +54,20 @@
         <Setter Property="Template">
             <ControlTemplate>
                 <ContentPresenter Name="PART_ContentPresenter"
-                                Foreground="{TemplateBinding Foreground}"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="{TemplateBinding CornerRadius}"
-                                ContentTemplate="{TemplateBinding ContentTemplate}"
-                                Content="{TemplateBinding Content}"
-                                FontWeight="Bold"
-                                FontSize="15"
-                                Padding="{TemplateBinding Padding}"
-                                VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-                                HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" />
+                                  Foreground="{TemplateBinding Foreground}"
+                                  Background="{TemplateBinding Background}"
+                                  BorderBrush="{TemplateBinding BorderBrush}"
+                                  BorderThickness="{TemplateBinding BorderThickness}"
+                                  CornerRadius="{TemplateBinding CornerRadius}"
+                                  ContentTemplate="{TemplateBinding ContentTemplate}"
+                                  Content="{TemplateBinding Content}"
+                                  FontWeight="Bold"
+                                  FontSize="15"
+                                  Padding="{TemplateBinding Padding}"
+                                  VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                  HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" />
             </ControlTemplate>
         </Setter>
-
-        <Style Selector="^:pointerover">
-			<Setter Property="Background" Value="Aqua"/>
-			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
-			<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
-		</Style>
-
-		<Style Selector="^:selected">
-			<Style Selector="^">
-				<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
-                <Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
-				<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
-			</Style>
-
-            <Style Selector="^:not(:focus)">
-                <Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
-                <Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
-				<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
-            </Style>
-
-            <Style Selector="^:pressed, ^:pointerover">
-                <Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"/>
-                <Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"/>
-		        <Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"/>
-            </Style>
-		</Style>
     </ControlTheme>
 
     <ControlTheme x:Key="QueryToggleButton" TargetType="ToggleButton">

@@ -12,7 +12,7 @@
         FontFamily="Segoe UI"
         MinWidth="491"
         MaxWidth="491"
-        MaxHeight="860"
+        MaxHeight="830"
         Height="550"
         WindowStartupLocation="2"
         KeyboardNavigation.TabNavigation="None">
@@ -20,8 +20,8 @@
     <Window.Resources>
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
-				<ResourceInclude Source="/Styles/UniversalNavControlThemes.xaml"/>
                 <ResourceInclude Source="/Styles/UserSettingsControlThemes.xaml"/>
+				<ResourceInclude Source="/Styles/WindowControlThemes.xaml"/>
 			</ResourceDictionary.MergedDictionaries>
 		</ResourceDictionary>
 	</Window.Resources>
@@ -52,12 +52,41 @@
                 <StackPanel Spacing="5">
                     <TextBlock Text="Change Currency" FontSize="20" FontWeight="Bold" Classes="menu"/>
                     <ComboBox Name="CurrencySelector"
-                            SelectionChanged="CurrencyChanged"
-                            ItemsSource="{Binding Source={x:Static model:Constants.CURRENCY_SYMBOLS}}"
-                            SelectedItem="{Binding CurCurrency}"
-                            Theme="{StaticResource MenuComboBox}"
-                            HorizontalAlignment="Left"
-                            AutoScrollToSelectedItem="True"/>
+                              SelectionChanged="CurrencyChanged"
+                              SelectedIndex="{CompiledBinding CurrencyIndex}"
+                              Theme="{StaticResource MenuComboBox}"
+                              HorizontalAlignment="Left"
+							  Width="80"
+                              AutoScrollToSelectedItem="True">
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="$"/>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="€"/>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="£"/>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="¥"/>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₣"/>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₹"/>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₱"/>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₩"/>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₽"/>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₺"/>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₫"/>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="฿"/>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₸"/>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₼"/>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₾"/>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₻"/>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Rp"/>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="RM"/>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="﷼"/>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="د.إ"/>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="د. ك"/>
+						<ComboBox.Resources>
+							<ResourceDictionary>
+								<ResourceDictionary.MergedDictionaries>
+									<ResourceInclude Source="/Styles/CollectionControlThemes.xaml"/>
+								</ResourceDictionary.MergedDictionaries>
+							</ResourceDictionary>
+						</ComboBox.Resources>
+					</ComboBox>
                 </StackPanel>
                 <StackPanel Spacing="5">
                     <TextBlock Text="Settings" FontSize="20" FontWeight="Bold" Classes="menu"/>

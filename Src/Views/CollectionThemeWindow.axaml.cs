@@ -350,7 +350,7 @@ namespace Tsundoku.Views
                         Constants.Logger.Info($"Removed Theme {ThemeSettingsViewModel.UserThemes[curIndex].ThemeName} From Saved Themes");
                         ThemeSettingsViewModel.UserThemes.Remove(ThemeSettingsViewModel.UserThemes[curIndex]);
                         ThemeChanged = true;
-                        ThemeSelector.SelectedIndex = --x;
+                        ThemeSelector.SelectedIndex = curIndex == 0 ? 0 : --curIndex;
                         break; 
                     }
                 }

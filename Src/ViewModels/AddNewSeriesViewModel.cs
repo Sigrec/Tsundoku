@@ -21,8 +21,8 @@ namespace Tsundoku.ViewModels
 
         public ObservableCollection<ListBoxItem> SelectedAdditionalLanguages { get; } = new ObservableCollection<ListBoxItem>();
 
-        readonly Helpers.AniListQuery ALQuery = new();
-        readonly Helpers.MangadexQuery MD_Query = new();
+        static readonly Helpers.AniListQuery ALQuery = new();
+        static readonly Helpers.MangadexQuery MDQuery = new();
 
         public AddNewSeriesViewModel()
         {
@@ -44,7 +44,7 @@ namespace Tsundoku.ViewModels
         */
         public bool GetSeriesData(string title, string bookType, ushort curVolCount, ushort maxVolCount, ObservableCollection<string> additionalLanguages)
         {
-            var getNewSeries = Task.Run(async () => await Series.CreateNewSeriesCard(title, bookType, maxVolCount, curVolCount, ALQuery, MD_Query, additionalLanguages));
+            var getNewSeries = Task.Run(async () => await Series.CreateNewSeriesCard(title, bookType, maxVolCount, curVolCount, ALQuery, MDQuery, additionalLanguages));
             getNewSeries.Wait();
             Series? newSeries = getNewSeries.Result;
             

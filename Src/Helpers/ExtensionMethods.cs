@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using static Tsundoku.Models.Constants;
 
 namespace Tsundoku.Helpers
@@ -100,7 +101,7 @@ namespace Tsundoku.Helpers
 			return new string(src, 0, dstIdx);
 		}
 
-		private void PrintCultures()
+		public static void PrintCultures()
         {
             List<string> list = new List<string>();
             foreach (CultureInfo ci in CultureInfo.GetCultures(CultureTypes.AllCultures))
@@ -111,17 +112,30 @@ namespace Tsundoku.Helpers
                     specName = CultureInfo.CreateSpecificCulture(ci.Name).Name; 
                 } 
                 catch { }
-                list.Add(String.Format("{0,-12}{1,-12}{2}", ci.Name, specName, ci.EnglishName));
+                list.Add(string.Format("{0,-12}{1,-12}{2}", ci.Name, specName, ci.EnglishName));
             }
 
             list.Sort();  // sort by name
 
             using (StreamWriter outputFile = new StreamWriter(@"CurrentCultures.txt"))
             {
-                // write to console
+                // write to file
                 outputFile.WriteLine("CULTURE   SPEC.CULTURE  ENGLISH NAME");
                 outputFile.WriteLine("--------------------------------------------------------------");
                 foreach (string str in list)
+                {
+                    outputFile.WriteLine(str);
+                }
+            } 
+        }
+
+        public static void PrintCurrencySymbols()
+        {
+            string[] symbols = CultureInfo.GetCultures(CultureTypes.SpecificCultures).Select(ci => ci.Name).Distinct().Select(id => new RegionInfo(id)).Select(r => r.CurrencySymbol).Distinct().ToArray();
+            using (StreamWriter outputFile = new StreamWriter(@"CurrencySymbols.txt"))
+            {
+                // write to file
+                foreach (string str in symbols)
                 {
                     outputFile.WriteLine(str);
                 }

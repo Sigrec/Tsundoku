@@ -11,7 +11,7 @@
 		<ResourceDictionary>
 			<cv:ColorConverter x:Key="ConvertColor"/>
 			<ResourceDictionary.MergedDictionaries>
-				<ResourceInclude Source="/Styles/AppThemeControls.xaml"/>
+				<ResourceInclude Source="/Styles/UniversalNavControlThemes.xaml"/>
 			</ResourceDictionary.MergedDictionaries>
 		</ResourceDictionary>
 	</Application.Resources>

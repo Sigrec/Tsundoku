@@ -32,7 +32,7 @@ namespace Tsundoku.Helpers
 		/// <param name="format">The format of the series either manga or light novel</param>
 		/// <param name="pageNum">The current page number of the GraphQL query</param>
 		/// <returns></returns>
-        public static async Task<JsonDocument?> GetSeriesByTitleAsync(string title, string format, int pageNum)
+        public async Task<JsonDocument?> GetSeriesByTitleAsync(string title, string format, int pageNum)
 		{
 			try
 			{
@@ -83,7 +83,7 @@ namespace Tsundoku.Helpers
 			}
 			catch(Exception e)
 			{
-				Constants.Logger.Warn($"{title} Request Failed {e.Message}");
+				Constants.Logger.Warn($"AniList GetSeriesByTitle w/ {title} Request Failed {e.Message}");
 			}
 			return null;
 		}
@@ -95,7 +95,7 @@ namespace Tsundoku.Helpers
 		/// <param name="format">The format of the series either manga or light novel</param>
 		/// <param name="pageNum">The current page number of the GraphQL query</param>
 		/// <returns></returns>
-		public static async Task<JsonDocument?> GetSeriesByIDAsync(int seriesId, string format, int pageNum)
+		public async Task<JsonDocument?> GetSeriesByIDAsync(int seriesId, string format, int pageNum)
 		{
 			try
 			{
@@ -147,7 +147,7 @@ namespace Tsundoku.Helpers
 			}
 			catch(Exception e)
 			{
-				Constants.Logger.Warn($"{seriesId} Request Failed {e.Message}");
+				Constants.Logger.Warn($"AniList GetSeriesById w/ {seriesId} Request Failed {e.Message}");
 			}
 			return null;
 		}

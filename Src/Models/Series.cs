@@ -81,12 +81,12 @@ namespace Tsundoku.Models
 			bool isAniListID = false;
 			if (int.TryParse(title, out int seriesId))
 			{
-				seriesDataDoc = await AniListQuery.GetSeriesByIDAsync(seriesId, bookType, pageNum);
+				seriesDataDoc = await ALQuery.GetSeriesByIDAsync(seriesId, bookType, pageNum);
 				isAniListID = true;
 			}
 			else
 			{
-				seriesDataDoc = await AniListQuery.GetSeriesByTitleAsync(title, bookType, pageNum);
+				seriesDataDoc = await ALQuery.GetSeriesByTitleAsync(title, bookType, pageNum);
 			}
 
 			string countryOfOrigin = "", nativeTitle = "", japaneseTitle = "", romajiTitle = "", englishTitle = "", filteredBookType = "", nativeStaff = "", fullStaff = "", coverPath = "";
@@ -121,7 +121,7 @@ namespace Tsundoku.Models
 				// If available on AniList and is not a Japanese series get the Japanese title from Mangadex
 				if (!bookType.Equals("NOVEL") && (countryOfOrigin.Equals("KR") || countryOfOrigin.Equals("CW") || countryOfOrigin.Equals("TW")))
 				{
-					mangaDexAltTitles = MangadexQuery.GetAdditionalMangaDexTitleList((await MangadexQuery.GetSeriesByTitleAsync(romajiTitle)).RootElement.GetProperty("data"));
+					mangaDexAltTitles = MangadexQuery.GetAdditionalMangaDexTitleList((await MD_Query.GetSeriesByTitleAsync(romajiTitle)).RootElement.GetProperty("data"));
 					japaneseTitle = GetAltTitle("ja", mangaDexAltTitles);
 				}
 
@@ -132,11 +132,11 @@ namespace Tsundoku.Models
 					JsonDocument? moreStaffQuery;
 					if (int.TryParse(title, out seriesId))
 					{
-						moreStaffQuery = await AniListQuery.GetSeriesByIDAsync(seriesId, bookType, ++pageNum);
+						moreStaffQuery = await ALQuery.GetSeriesByIDAsync(seriesId, bookType, ++pageNum);
 					}
 					else
 					{
-						moreStaffQuery = await AniListQuery.GetSeriesByTitleAsync(title, bookType, ++pageNum);
+						moreStaffQuery = await ALQuery.GetSeriesByTitleAsync(title, bookType, ++pageNum);
 					}
 					JsonElement moreStaff = moreStaffQuery.RootElement.GetProperty("Media").GetProperty("staff");
 					nativeStaff = GetSeriesStaff(moreStaff.GetProperty("edges"), "native", filteredBookType, romajiTitle, new StringBuilder(nativeStaff + " | "));
@@ -166,7 +166,7 @@ namespace Tsundoku.Models
 				{
 					if (mangaDexAltTitles.Count == 0)
 					{
-						AddAdditionalLanguages(newTitles, additionalLanguages, MangadexQuery.GetAdditionalMangaDexTitleList((await MangadexQuery.GetSeriesByTitleAsync(romajiTitle)).RootElement.GetProperty("data")));
+						AddAdditionalLanguages(newTitles, additionalLanguages, MangadexQuery.GetAdditionalMangaDexTitleList((await MD_Query.GetSeriesByTitleAsync(romajiTitle)).RootElement.GetProperty("data")));
 					}
 					else
 					{
@@ -204,12 +204,12 @@ namespace Tsundoku.Models
 				bool notFoundCondition = true;
 				if (MangaDexIDRegex().IsMatch(title))
 				{
-					seriesJson = await MangadexQuery.GetSeriesByIdAsync(title);
+					seriesJson = await MD_Query.GetSeriesByIdAsync(title);
 					curId = title;
 				}
 				else
 				{
-					seriesJson = await MangadexQuery.GetSeriesByTitleAsync(title);
+					seriesJson = await MD_Query.GetSeriesByTitleAsync(title);
 				}
 
 				if (!string.IsNullOrWhiteSpace(seriesJson.ToString()))
@@ -252,7 +252,7 @@ namespace Tsundoku.Models
 					seriesStatus = GetSeriesStatus(attributes.GetProperty("status").ToString());
 					link = !attributes.GetProperty("links").TryGetProperty("al", out JsonElement aniListId) ? @$"https://mangadex.org/title/{curId}" : @$"https://anilist.co/manga/{aniListId}";
 					countryOfOrigin = attributes.GetProperty("originalLanguage").ToString();
-					string coverLink = @$"https://uploads.mangadex.org/covers/{curId}/{await MangadexQuery.GetCover(relationships.Single(x => x.GetProperty("type").ToString().Equals("cover_art")).GetProperty("id").ToString())}";
+					string coverLink = @$"https://uploads.mangadex.org/covers/{curId}/{await MD_Query.GetCover(relationships.Single(x => x.GetProperty("type").ToString().Equals("cover_art")).GetProperty("id").ToString())}";
 					Logger.Debug(coverLink);
 					coverPath = SaveNewCoverImage(CreateCoverFilePath(coverLink, romajiTitle, bookType, altTitles, Site.MangaDex), coverLink);
 					demographic = attributes.GetProperty("publicationDemographic").ToString();
@@ -288,7 +288,7 @@ namespace Tsundoku.Models
 					string staffName = "";
 					foreach(JsonElement staff in relationships.Where(staff => staff.GetProperty("type").ToString().Equals("author") || staff.GetProperty("type").ToString().Equals("artist")))
 					{
-						staffName = await MangadexQuery.GetAuthor(staff.GetProperty("id").ToString());
+						staffName = await MD_Query.GetAuthor(staff.GetProperty("id").ToString());
 						if (FindStaffRegex().IsMatch(staffName))
 						{
 							string native = NativeStaffRegex().Match(staffName).Groups[1].ToString();

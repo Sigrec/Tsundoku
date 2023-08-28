@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -9,34 +10,50 @@ using Tsundoku.Models;
 
 namespace Tsundoku.Helpers
 {
-    public partial class MangadexQuery : IDisposable
+    public partial class MangadexQuery
     {
-        private static readonly HttpClient MangadexClient = new();
+        private static readonly HttpClient MangadexClient = new HttpClient(new SocketsHttpHandler
+        {
+            PooledConnectionLifetime = TimeSpan.FromMinutes(5)
+        })
+        {
+            BaseAddress = new Uri("https://api.mangadex.org/"),
+            DefaultRequestVersion = HttpVersion.Version30,
+            DefaultVersionPolicy = HttpVersionPolicy.RequestVersionExact
+        };
+
         public static readonly JsonSerializerOptions options = new()
         { 
             WriteIndented = true,
             ReadCommentHandling = JsonCommentHandling.Skip,
             AllowTrailingCommas = true,
         };
-        private bool disposedValue;
+
+        private static readonly string USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36 Edg/116.0.1938.62";
         [GeneratedRegex("\\n\\n\\n---[\\S\\s.]*|\\n\\n\\*\\*[\\S\\s.]*")] private static partial Regex MangaDexDescRegex();
+
+        public MangadexQuery()
+        {
+            MangadexClient.DefaultRequestHeaders.Add("User-Agent", USER_AGENT);
+        }
 
         /// <summary>
         /// REST request to get series data for a MangaDex series by title
         /// </summary>
         /// <param name="title">A string used for getting series data from MangaDex</param>
         /// <returns></returns>
-        public static async Task<JsonDocument?> GetSeriesByTitleAsync(string title)
+        public async Task<JsonDocument?> GetSeriesByTitleAsync(string title)
         {
             try
             {
-                var response = await MangadexClient.GetStringAsync(@$"https://api.mangadex.org/manga?title='{title}'");
+                //Constants.Logger.Debug($"{MangadexClient.BaseAddress}manga?title={title.Replace(" ", "%20")}");
+                var response = await MangadexClient.GetStringAsync($"manga?title={title.Replace(" ", "%20")}");
                 // File.WriteAllText(@"MangadexTitleTest.json", JsonSerializer.Serialize(JsonDocument.Parse(response), options));
                 return JsonDocument.Parse(response);
             }
-            catch (Exception e)
+            catch (HttpRequestException e)
             {
-                Constants.Logger.Warn($"{title} Request Failed {e.Message}");
+                Constants.Logger.Warn($"MangaDex GetSeriesByTitle w/ {title} Request Failed HttpRequestException {e.Message}");
             }
             return null;
         }
@@ -46,17 +63,17 @@ namespace Tsundoku.Helpers
         /// </summary>
         /// <param name="id">A unique string ID used for getting series data from MangaDex</param>
         /// <returns></returns>
-        public static async Task<JsonDocument?> GetSeriesByIdAsync(string id)
+        public async Task<JsonDocument?> GetSeriesByIdAsync(string id)
         {
             try
             {
-                var response = await MangadexClient.GetStringAsync(@$"https://api.mangadex.org/manga/{id}");
+                var response = await MangadexClient.GetStringAsync($"manga/{id}");
                 // File.WriteAllText(@"MangadexIdTest.json", JsonSerializer.Serialize(JsonDocument.Parse(response), options));
                 return JsonDocument.Parse(response);
             }
             catch (Exception e)
             {
-                Constants.Logger.Warn($"{id} Request Failed {e.Message}");
+                Constants.Logger.Warn($"MangaDex GetSeriesById w/ {id} Request Failed {e} {e.Message}");
             }
             return null;
         }
@@ -66,17 +83,17 @@ namespace Tsundoku.Helpers
         /// </summary>
         /// <param name="id">The string id used to query the author data for a MangaDex series</param>
         /// <returns></returns>
-        public static async Task<string?> GetAuthor(string id)
+        public async Task<string?> GetAuthor(string id)
         {
             try
             {
-                var response = await MangadexClient.GetStringAsync(@$"https://api.mangadex.org/author/{id}");
+                var response = await MangadexClient.GetStringAsync($"author/{id}");
                 // File.WriteAllText(@"MangadexAuthorTest.json", JsonSerializer.Serialize(response, options));
                 return JsonDocument.Parse(response).RootElement.GetProperty("data").GetProperty("attributes").GetProperty("name").ToString();
             }
             catch (Exception e)
             {
-                Constants.Logger.Warn($"{id} Request Failed {e.Message}");
+                Constants.Logger.Warn($"MangaDex GetAuthor w/ {id} Request Failed {e.Message}");
             }
             return null;
         }
@@ -86,11 +103,11 @@ namespace Tsundoku.Helpers
         /// </summary>
         /// <param name="id">The id used to query the cover</param>
         /// <returns></returns>
-        public static async Task<string?> GetCover(string id)
+        public async Task<string?> GetCover(string id)
         {
             try
             {
-                var response = await MangadexClient.GetStringAsync(@$"https://api.mangadex.org/cover/{id}");
+                var response = await MangadexClient.GetStringAsync($"cover/{id}");
                 JsonElement data = JsonDocument.Parse(response).RootElement.GetProperty("data");
                 // File.WriteAllText(@"MangadexCoverTest.json", JsonSerializer.Serialize(JsonDocument.Parse(response), options));
                 if (data.ValueKind == JsonValueKind.Array)
@@ -103,7 +120,7 @@ namespace Tsundoku.Helpers
             }
             catch (Exception e)
             {
-                Constants.Logger.Warn($"{id} Request Failed {e.Message}");
+                Constants.Logger.Warn($"MangaDex GetCover w/ {id} Request Failed {e.Message}");
             }
             return null;
         }
@@ -134,35 +151,5 @@ namespace Tsundoku.Helpers
 		{
 			return MangaDexDescRegex().Replace(seriesDescription, "").Trim();
 		}
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    // Dispose managed state (managed objects)
-                }
-
-                // Free unmanaged resources (unmanaged objects) and override finalizer
-                // Set large fields to null
-				MangadexClient.Dispose();
-                disposedValue = true;
-            }
-        }
-
-        // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
-        // ~AniListQuery()
-        // {
-        //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        //     Dispose(disposing: false);
-        // }
-
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
-        }
     }
 }

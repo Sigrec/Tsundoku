@@ -18,13 +18,14 @@ namespace Tsundoku.Models
         public const ushort USER_NOTES_HEIGHT = TOP_SECTION_CARD_HEIGHT - 16;
         public const ushort IMAGE_HEIGHT = CARD_HEIGHT - BOTTOM_SECTION_CARD_HEIGHT;
 		public static readonly string[] DEMOGRAPHICS = new string[] { "Shounen", "Shoujo", "Seinen", "Josei", "Unknown" };
-		public static readonly string[] CURRENCY_SYMBOLS = CultureInfo.GetCultures(CultureTypes.SpecificCultures).Select(ci => ci.Name).Distinct().Select(id => new RegionInfo(id)).Select(r => r.CurrencySymbol).Distinct().ToArray();
 
 		// TODO: Fix Logging so it actually logs to a external file
 		public static readonly NLog.Logger Logger = NLog.LogManager.GetLogger("TsundOkuLogs");
 		// public static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 
 		public static readonly string[] AvailableLanguages = new string[] { "Romaji", "English", "Japanese", "Arabic", "Azerbaijan", "Bengali", "Bulgarian", "Burmese", "Catalan", "Chinese", "Croatian", "Czech", "Danish", "Dutch", "Esperanto", "Estonian", "Filipino", "Finnish", "French", "German", "Greek", "Hebrew", "Hindi", "Hungarian", "Indonesian", "Italian", "Kazakh", "Korean", "Latin", "Lithuanian", "Malay", "Mongolian", "Nepali", "Norwegian", "Persian", "Polish", "Portuguese", "Romanian", "Russian", "Serbian", "Slovak", "Spanish", "Swedish", "Tamil", "Thai", "Turkish", "Ukrainian", "Vietnamese" };
+
+		public static readonly string[] AvailableCurrency = new string[] { "$", "€", "£", "¥", "₣", "₹", "₱", "₩", "₽", "₺", "₫", "฿", "₸", "₼", "₾", "₻", "Rp", "RM", "﷼", "د.إ", "د. ك" };
 
 		public static readonly string[] AvailableCollectionFilters = new string[] { "None", "Favorites", "Complete", "Incomplete", "Ongoing", "Finished", "Hiatus", "Cancelled", "Manga", "Novel" };
 

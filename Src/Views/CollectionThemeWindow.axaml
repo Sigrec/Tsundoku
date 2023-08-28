@@ -19,7 +19,7 @@
 	<Window.Resources>
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
-				<ResourceInclude Source="/Styles/UniversalNavControlThemes.xaml"/>
+				<ResourceInclude Source="/Styles/WindowControlThemes.xaml"/>
 			</ResourceDictionary.MergedDictionaries>
 		</ResourceDictionary>
 	</Window.Resources>
@@ -656,12 +656,21 @@
 								  Width="150"
 								  Height="35"
 								  BorderThickness="2"
+								  Foreground="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"
 								  Theme="{StaticResource MenuComboBox}"
 								  SelectedIndex="{CompiledBinding CurThemeIndex}"
 								  Margin="10,0,0,0">
+							<ComboBox.Resources>
+								<ResourceDictionary>
+									<ResourceDictionary.MergedDictionaries>
+										<ResourceInclude Source="/Styles/ThemeSettingsControlThemes.xaml"/>
+										<ResourceInclude Source="/Styles/CollectionControlThemes.xaml"/>
+									</ResourceDictionary.MergedDictionaries>
+								</ResourceDictionary>
+							</ComboBox.Resources>
 							<ComboBox.ItemTemplate>
 								<DataTemplate>
-									<TextBlock Text="{Binding ThemeName}"/>
+									<ComboBoxItem Theme="{StaticResource ThemeComboBoxItem}" Content="{Binding ThemeName}"/>
 								</DataTemplate>
 							</ComboBox.ItemTemplate>
 						</ComboBox>
@@ -669,7 +678,8 @@
 								FontWeight="Bold" 
 								BorderThickness="2"
 								Classes="menu"
-								HorizontalAlignment="Center" 
+								HorizontalAlignment="Center"
+								VerticalAlignment="Center"
 								i:Attached.Icon="fa-xmark" 
 								Click="RemoveSavedTheme"/>
 					</StackPanel>
@@ -683,7 +693,8 @@
 								Grid.Column="0"
 								BorderThickness="2"
 								Classes="menu"
-								HorizontalAlignment="Center" 
+								HorizontalAlignment="Center"
+								VerticalAlignment="Center"
 								i:Attached.Icon="fa-xmark" 
 								Click="ClearThemeValues"/>
 						<TextBlock Classes="menu" Text="Main Color 1" FontSize="14" Margin="3,0,0,2" FontWeight="Bold" Grid.Row="0" Grid.Column="1"/>

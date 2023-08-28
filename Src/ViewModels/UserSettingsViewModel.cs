@@ -14,11 +14,12 @@ namespace Tsundoku.ViewModels
     {
         [Reactive] public string UsernameText { get; set; }
         [Reactive] public bool IsChangeUsernameButtonEnabled { get; set; }
+        [Reactive] public int CurrencyIndex { get; set; }
         public ICommand ExportToSpreadsheetCommand { get; }
         public UserSettingsViewModel()
         {
             CurCurrency = MainUser.Currency;
-            this.WhenAnyValue(x => x.CurCurrency).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.Currency = x);
+            this.WhenAnyValue(x => x.CurCurrency).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => CurrencyIndex = Array.IndexOf(Constants.AvailableCurrency, Uri.UnescapeDataString(x)));
             this.WhenAnyValue(x => x.UsernameText, x => !string.IsNullOrWhiteSpace(x)).Subscribe(x => IsChangeUsernameButtonEnabled = x);
             ExportToSpreadsheetCommand = ReactiveCommand.CreateFromTask(ExportToSpreadsheetAsync);
         }

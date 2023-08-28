@@ -16,19 +16,11 @@ using Avalonia.Media.Imaging;
 using DynamicData;
 using System.Text.Json.Nodes;
 
-/*
-Issues
-❌ LineHeight doesn't work with lower LineHeight values
-❌ ComboBoxItem text color not applying in non main windows
-❌ ListBoxItem theme/styling not applying in AddNewSeriesWindow
-❌ Users can run multiple instances of the application
-*/
-
 namespace Tsundoku.ViewModels
 {
     public partial class MainWindowViewModel : ViewModelBase
     {
-        private static readonly string filePath = @"TestData.json";
+        private static readonly string filePath = @"UserData2.json";
         private const double SCHEMA_VERSION = 1.8;
         private static bool newUserFlag = false;
         public static ObservableCollection<Series> SearchedCollection { get; set; } = new();
@@ -64,6 +56,7 @@ namespace Tsundoku.ViewModels
         public MainWindowViewModel()
         {
             // Helpers.ExtensionMethods.PrintCultures();
+            // Helpers.ExtensionMethods.PrintCurrencySymbols();
             Constants.Logger.Info("Starting TsundOku");
             GetUserData();
             ConfigureWindows();

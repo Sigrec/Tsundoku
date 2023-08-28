@@ -2,165 +2,214 @@
 					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 					xmlns:vm="clr-namespace:Tsundoku.ViewModels"
 					x:DataType="vm:ViewModelBase"> 
-    <ControlTheme x:Key="FluentScrollBarThumb" TargetType="Thumb">
-		<Setter Property="Background" Value="{CompiledBinding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}"/>
+	<ControlTheme x:Key="MenuComboBox" TargetType="ComboBox">
+		<Setter Property="Padding" Value="{DynamicResource ComboBoxPadding}" />
+		<Setter Property="FocusAdorner" Value="{x:Null}" />
+		<Setter Property="MaxDropDownHeight" Value="504" />
+		<Setter Property="BorderThickness" Value="2" />
+		<Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
+		<Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+		<Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+		<Setter Property="HorizontalContentAlignment" Value="Stretch" />
+		<Setter Property="VerticalContentAlignment" Value="Center" />
+		<Setter Property="HorizontalAlignment" Value="Center" />
+		<Setter Property="VerticalAlignment" Value="Center" />
+		<Setter Property="FontSize" Value="15" />
+		<Setter Property="FontWeight" Value="Bold"/>
+		<Setter Property="AutoScrollToSelectedItem" Value="True"/>
+		<!-- <Setter Property="PlaceholderForeground" Value="Aqua" /> -->
+		<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"/>
+		<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"/>
+		<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"/>
+
 		<Setter Property="Template">
-			<Setter.Value>
 			<ControlTemplate>
-				<Border Background="{TemplateBinding Background}"
-						CornerRadius="{TemplateBinding CornerRadius}"/>
+				<DataValidationErrors>
+					<Grid ColumnDefinitions="*,32">
+						<Border x:Name="Background"
+								Grid.Column="0"
+								Grid.ColumnSpan="2"
+								Background="{TemplateBinding Background}"
+								BorderBrush="{TemplateBinding BorderBrush}"
+								BorderThickness="{TemplateBinding BorderThickness}"
+								CornerRadius="{TemplateBinding CornerRadius}"
+								MinWidth="{DynamicResource ComboBoxThemeMinWidth}" />
+						<Border x:Name="HighlightBackground"
+								Grid.Column="0"
+								Grid.ColumnSpan="2"
+								Background="{DynamicResource ComboBoxBackgroundUnfocused}"
+								BorderBrush="{DynamicResource ComboBoxBackgroundBorderBrushUnfocused}"
+								BorderThickness="{TemplateBinding BorderThickness}"
+								CornerRadius="{TemplateBinding CornerRadius}"
+								IsVisible="False"/>
+						<TextBlock x:Name="PlaceholderTextBlock"
+								Grid.Column="0"
+								HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+								VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+								Margin="{TemplateBinding Padding}"
+								Text="{TemplateBinding PlaceholderText}"
+								Foreground="{TemplateBinding PlaceholderForeground}"
+								IsVisible="{TemplateBinding SelectionBoxItem, Converter={x:Static ObjectConverters.IsNull}}" />
+						<ContentControl x:Name="ContentPresenter"
+										Content="{TemplateBinding SelectionBoxItem}"
+										ContentTemplate="{TemplateBinding ItemTemplate}"
+										Grid.Column="0"
+										Margin="{TemplateBinding Padding}"
+										HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+										VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+
+						<Border x:Name="DropDownOverlay"
+								Grid.Column="1"
+								Background="Transparent"
+								Margin="0,1,1,1"
+								Width="30"
+								IsVisible="False"
+								HorizontalAlignment="Right" />
+
+						<PathIcon x:Name="DropDownGlyph"
+								Grid.Column="1"
+								UseLayoutRounding="False"
+								IsHitTestVisible="False"
+								Height="12"
+								Width="12"
+								Margin="0,0,10,0"
+								HorizontalAlignment="Right"
+								VerticalAlignment="Center"
+								Foreground="{CompiledBinding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"
+								Data="M1939 486L2029 576L1024 1581L19 576L109 486L1024 1401L1939 486Z"/>
+
+						<Popup Name="PART_Popup"
+							WindowManagerAddShadowHint="False"
+							IsOpen="{TemplateBinding IsDropDownOpen, Mode=TwoWay}"
+							MinWidth="{Binding Bounds.Width, RelativeSource={RelativeSource TemplatedParent}}"
+							MaxHeight="{TemplateBinding MaxDropDownHeight}"
+							PlacementTarget="Background"
+							IsLightDismissEnabled="True"
+							InheritsTransform="True">
+						<Border x:Name="PopupBorder"
+								Background="{CompiledBinding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"
+								BorderBrush="{CompiledBinding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"
+								BorderThickness="2"
+								CornerRadius="2">
+							<ScrollViewer HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
+										VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}">
+							<ItemsPresenter Name="PART_ItemsPresenter"
+											Margin="{DynamicResource ComboBoxDropdownContentMargin}"
+											ItemsPanel="{TemplateBinding ItemsPanel}" />
+							</ScrollViewer>
+						</Border>
+						</Popup>
+					</Grid>
+				</DataValidationErrors>
 			</ControlTemplate>
-			</Setter.Value>
-		</Setter>
-		<Setter Property="Transitions">
-			<Transitions>
-			<CornerRadiusTransition Property="CornerRadius" Duration="0:0:0.1" />
-			<TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.1" />
-			</Transitions>
 		</Setter>
 
-		<Style Selector="^:pointerover /template/ Border">
-			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" />
+		<Style Selector="^:pointerover /template/ Border#Background">
+			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
+			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
 		</Style>
-		<Style Selector="^:pressed  /template/ Border">
-			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" />
+
+		<Style Selector="^:pressed /template/ Border#Background">
+			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
+			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
+		</Style>
+
+		<Style Selector="^:pointerover /template/ ContentControl#ContentPresenter">
+			<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
+		</Style>
+
+		<Style Selector="^:pointerover /template/ PathIcon#DropDownGlyph">
+			<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
 		</Style>
 	</ControlTheme>
 
-	<ControlTheme x:Key="FluentScrollBarLineButton" TargetType="RepeatButton">
-		<Setter Property="Opacity" Value="0" />
-		<Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}"/>
+	<ControlTheme x:Key="MenuComboBoxItem" TargetType="ComboBoxItem">
+		<Setter Property="Padding" Value="{DynamicResource ComboBoxItemThemePadding}" />
+		<Setter Property="HorizontalContentAlignment" Value="Stretch" />
+		<Setter Property="Background" Value="Transparent"/>
+		<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"/>
+
 		<Setter Property="Template">
 			<ControlTemplate>
-			<ContentPresenter Background="{CompiledBinding CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}"
-							  BorderBrush="{DynamicResource ScrollBarButtonBorderBrush}"
-							  Content="{TemplateBinding Content}"/>
+				<ContentPresenter Name="PART_ContentPresenter"
+								Foreground="{TemplateBinding Foreground}"
+								Background="{TemplateBinding Background}"
+								BorderBrush="{TemplateBinding BorderBrush}"
+								BorderThickness="{TemplateBinding BorderThickness}"
+								CornerRadius="{TemplateBinding CornerRadius}"
+								ContentTemplate="{TemplateBinding ContentTemplate}"
+								Content="{TemplateBinding Content}"
+								HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+								VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+								Padding="{TemplateBinding Padding}" />
 			</ControlTemplate>
 		</Setter>
+
+		<Style Selector="^:pressed">
+			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
+			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
+			<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
+		</Style>
+
+		<Style Selector="^:pointerover">
+			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
+			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
+			<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
+		</Style>
+
+		<Style Selector="^:selected">
+			<Style Selector="^">
+				<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
+				<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
+			</Style>
+		</Style>
+	</ControlTheme>
+
+	<ControlTheme x:Key="MenuButton" TargetType="Button">
+		<Setter Property="HorizontalContentAlignment" Value="Center"/>
+		<Setter Property="VerticalContentAlignment" Value="Center"/>
+		<Setter Property="CornerRadius" Value="2"/>
+		<Setter Property="FontWeight" Value="Bold"/>
+		<Setter Property="FontSize" Value="15"/>
+		<Setter Property="BorderThickness" Value="2"/>
+		<Setter Property="RenderTransform" Value="none"/>
+		<Setter Property="Padding" Value="{DynamicResource ButtonPadding}"/>
 		<Setter Property="Transitions">
 			<Transitions>
-			<DoubleTransition Property="Opacity" Duration="0:0:0.1" />
+				<TransformOperationsTransition Property="RenderTransform" Duration="0:0:.075" />
 			</Transitions>
+		</Setter>
+		<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"/>
+		<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"/>
+		<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"/>
+
+		<Setter Property="Template">
+			<ControlTemplate>
+				<ContentPresenter x:Name="PART_ContentPresenter"
+								Background="{TemplateBinding Background}"
+								BorderBrush="{TemplateBinding BorderBrush}"
+								BorderThickness="{TemplateBinding BorderThickness}"
+								CornerRadius="{TemplateBinding CornerRadius}"
+								Content="{TemplateBinding Content}"
+								ContentTemplate="{TemplateBinding ContentTemplate}"
+								Padding="{TemplateBinding Padding}"
+								RecognizesAccessKey="True"
+								HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+								VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+			</ControlTemplate>
 		</Setter>
 
 		<Style Selector="^:pointerover">
-			<Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
-
-			<Style Selector="^ /template/ ContentPresenter" >
-				<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
-				<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
-			</Style>
+			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
+			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
+			<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
 		</Style>
-
+	
 		<Style Selector="^:pressed">
-			<Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}"/>
-			<Style Selector="^ /template/ ContentPresenter" >
-			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" />
-			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}" />
-			</Style>
-		</Style>
-	</ControlTheme>
-
-	<ControlTheme x:Key="{x:Type ScrollBar}" TargetType="ScrollBar">
-		<Setter Property="MinWidth" Value="{DynamicResource ScrollBarSize}" />
-		<Setter Property="MinHeight" Value="{DynamicResource ScrollBarSize}" />
-		<Setter Property="Background" Value="{DynamicResource ScrollBarBackground}" />
-		<Setter Property="Foreground" Value="{DynamicResource ScrollBarForeground}" />
-		<Setter Property="BorderBrush" Value="{DynamicResource ScrollBarBorderBrush}" />
-
-		<Style Selector="^:vertical">
-			<Setter Property="Template">
-			<ControlTemplate>
-				<Grid x:Name="Root">
-				<Border x:Name="VerticalRoot"
-						Background="{TemplateBinding Background}"
-						BorderBrush="{TemplateBinding BorderBrush}">
-					<Grid RowDefinitions="Auto,*,Auto">
-					<Rectangle x:Name="TrackRect"
-								Fill="{CompiledBinding CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}"
-								Stroke="{DynamicResource ScrollBarTrackStroke}"
-								StrokeThickness="{DynamicResource ScrollBarTrackBorderThemeThickness}"
-								Opacity="0"
-								Grid.RowSpan="3">
-						<Rectangle.Transitions>
-						<Transitions>
-							<DoubleTransition Property="Opacity" Duration="0:0:0.1" />
-						</Transitions>
-						</Rectangle.Transitions>
-					</Rectangle>
-
-					<RepeatButton Name="PART_LineUpButton"
-									HorizontalAlignment="Center"
-									Theme="{StaticResource FluentScrollBarLineButton}"
-									Grid.Row="0"
-									Focusable="False"
-									MinWidth="{DynamicResource ScrollBarSize}"
-									Height="{DynamicResource ScrollBarSize}">
-						<PathIcon Data="M 19.091797 14.970703 L 10 5.888672 L 0.908203 14.970703 L 0.029297 14.091797 L 10 4.111328 L 19.970703 14.091797 Z"
-								Width="{DynamicResource ScrollBarButtonArrowIconFontSize}"
-								Height="{DynamicResource ScrollBarButtonArrowIconFontSize}"/>
-					</RepeatButton>
-
-					<Track Grid.Row="1"
-							Minimum="{TemplateBinding Minimum}"
-							Maximum="{TemplateBinding Maximum}"
-							Value="{TemplateBinding Value, Mode=TwoWay}"
-							ViewportSize="{TemplateBinding ViewportSize}"
-							Orientation="{TemplateBinding Orientation}"
-							IsDirectionReversed="True">
-						<Track.DecreaseButton>
-						<RepeatButton Name="PART_PageUpButton"
-										Classes="largeIncrease"
-										Theme="{StaticResource FluentScrollBarPageButton}"
-										Focusable="False" />
-						</Track.DecreaseButton>
-						<Track.IncreaseButton>
-						<RepeatButton Name="PART_PageDownButton"
-										Classes="largeIncrease"
-										Theme="{StaticResource FluentScrollBarPageButton}"
-										Focusable="False" />
-						</Track.IncreaseButton>
-						<Thumb Theme="{StaticResource FluentScrollBarThumb}"
-								Width="{DynamicResource ScrollBarSize}"
-								MinHeight="{DynamicResource ScrollBarSize}"
-								RenderTransform="{DynamicResource VerticalSmallScrollThumbScaleTransform}"
-								RenderTransformOrigin="100%,50%" />
-					</Track>
-
-					<RepeatButton Name="PART_LineDownButton"
-									HorizontalAlignment="Center"
-									Theme="{StaticResource FluentScrollBarLineButton}"
-									Grid.Row="2"
-									Focusable="False"
-									MinWidth="{DynamicResource ScrollBarSize}"
-									Height="{DynamicResource ScrollBarSize}">
-						<PathIcon Data="M 18.935547 4.560547 L 19.814453 5.439453 L 10 15.253906 L 0.185547 5.439453 L 1.064453 4.560547 L 10 13.496094 Z"
-								Width="{DynamicResource ScrollBarButtonArrowIconFontSize}"
-								Height="{DynamicResource ScrollBarButtonArrowIconFontSize}"/>
-					</RepeatButton>
-					</Grid>
-				</Border>
-				</Grid>
-			</ControlTemplate>
-			</Setter>
-		</Style>
-
-		<Style Selector="^[IsExpanded=true]">
-			<Style Selector="^ /template/ Grid#Root">
-				<Setter Property="Background" Value="{DynamicResource ScrollBarBackgroundPointerOver}" />
-			</Style>
-			<Style Selector="^ /template/ Rectangle#TrackRect">
-				<Setter Property="Fill" Value="{CompiledBinding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}" />
-				<Setter Property="Stroke" Value="{DynamicResource ScrollBarTrackStrokePointerOver}" />
-				<Setter Property="Opacity" Value="1" />
-			</Style>
-			<Style Selector="^ /template/ Thumb">
-				<Setter Property="Background" Value="{CompiledBinding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" />
-				<Setter Property="RenderTransform" Value="none" />
-			</Style>
-			<Style Selector="^ /template/ RepeatButton">
-				<Setter Property="Opacity" Value="1" />
-			</Style>
+			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
+			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
+			<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
+			<Setter Property="RenderTransform" Value="scale(0.98)" />
 		</Style>
 	</ControlTheme>
 </ResourceDictionary>

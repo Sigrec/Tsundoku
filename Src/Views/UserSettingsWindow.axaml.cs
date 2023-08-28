@@ -43,7 +43,7 @@ namespace Tsundoku.Views
         {
             if ((sender as ComboBox).IsDropDownOpen)
             {
-                string newCurrency = (sender as ComboBox).SelectedItem as string;
+                string newCurrency = (CurrencySelector.SelectedItem as ComboBoxItem).Content.ToString();
                 currencyLength = CollectionWindow.CollectionViewModel.CurCurrency.Length;
                 CollectionWindow.CollectionViewModel.CurCurrency = newCurrency;
                 CollectionWindow.CollectionViewModel.collectionStatsWindow.CollectionStatsVM.CollectionPrice = $"{newCurrency}{ CollectionWindow.CollectionViewModel.collectionStatsWindow.CollectionStatsVM.CollectionPrice[currencyLength..]}";

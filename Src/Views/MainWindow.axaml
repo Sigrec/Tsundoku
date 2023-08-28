@@ -108,6 +108,7 @@
 							  Height="35"
 							  Width="185"
 							  SelectedIndex="{CompiledBinding LanguageIndex}"
+							  AutoScrollToSelectedItem="True"
 							  Theme="{StaticResource MenuComboBox}">
 						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Romaji</ComboBoxItem>
 						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">English</ComboBoxItem>
@@ -163,6 +164,7 @@
 							  Height="35"
 							  Width="185"
 							  SelectedIndex="{CompiledBinding FilterIndex}"
+							  AutoScrollToSelectedItem="True"
 							  Theme="{StaticResource MenuComboBox}">
 						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">None</ComboBoxItem>
 						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Favorites</ComboBoxItem>
@@ -622,15 +624,15 @@
 													   TextWrapping="Wrap"
 													   Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesCardTitleColor, Converter={StaticResource ConvertColor}}"
 													   FontWeight="Bold"
-													   FontSize="22"
+													   FontSize="23"
 													   MaxHeight="{CompiledBinding Source={x:Static local:Constants.TOP_SECTION_CARD_HEIGHT}}"
 													   PointerPressed="CopySeriesTitleAsync"
 													   Name="SeriesTitle"
-													   Padding="9,2,7,0"
+													   Padding="8,0,7,6"
 													   Cursor="Hand"
 													   TextAlignment="Left"
 													   MaxLines="3"
-													   LineHeight="24.0"> <!-- Ideal Line Height 24.0 --> <!-- old font size was 23 -->
+													   LineHeight="24.0">
 												<TextBlock.Text>
 													<MultiBinding Converter="{StaticResource ConvertTitle}">
 														<Binding Path="Titles"/>

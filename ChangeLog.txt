@@ -1,3 +1,13 @@
+V1.9.0.0 - August 28th, 2023 @ 3:PM PST 
+✅ Upgraded Avalonia to 11.0.4
+✅ Changed currency list, if you need one added send me a message on discord or create a ticket in Git
+🔥 Fixed issue where you could run multiple instances of the application at the same time
+🔥 Fixed ListBoxItem theme/styling not applying in AddNewSeriesWindow
+🔥 Fixed Series Title LineHeight & Reverted back to FontSize 23
+🔥 Fixed ComboBoxItem styles not working correctly in Settings window
+🔥 Fixed Settings Window max height being to large
+🔥 Fixed theme selection after deleting a theme, now correctly changes
+
 V1.8.0.0 - August 14th, 2023 @ 11:54AM PST
 ✅ Changed "Query" to "Add Series" for the button to open the window to add a new series
 ✅ Added option to Reload covers in app (CTRL+R), this allows users to change covers see the changes without having to restart
