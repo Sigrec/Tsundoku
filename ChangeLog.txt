@@ -1,4 +1,4 @@
-V1.9.0.0 - August 28th, 2023 @ 3:PM PST 
+V1.9.0.0 - August 28th, 2023 @ 2:57PM PST 
 ✅ Upgraded Avalonia to 11.0.4
 ✅ Changed currency list, if you need one added send me a message on discord or create a ticket in Git
 🔥 Fixed issue where you could run multiple instances of the application at the same time
