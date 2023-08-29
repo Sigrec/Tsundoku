@@ -4,7 +4,6 @@ using ReactiveUI.Fody.Helpers;
 using ReactiveUI;
 using System.Reactive.Linq;
 using System;
-using System.Linq;
 
 namespace Tsundoku.ViewModels
 {
@@ -13,6 +12,7 @@ namespace Tsundoku.ViewModels
         public static ObservableCollection<TsundokuTheme> UserThemes { get; set; }
         [Reactive] public string ThemeName { get; set; }
         [Reactive] public bool IsSaveThemeButtonEnabled { get; set; }
+        [Reactive] public bool IsGenerateThemeButtonEnabled { get; set; } = false;
         [Reactive] public int CurThemeIndex { get; set; }
 
         public ThemeSettingsViewModel()

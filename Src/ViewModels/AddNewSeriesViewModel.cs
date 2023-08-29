@@ -17,7 +17,7 @@ namespace Tsundoku.ViewModels
         [Reactive] public string TitleText { get; set; }
         [Reactive] public string MaxVolumeCount { get; set; }
         [Reactive] public string CurVolumeCount { get; set; }
-        [Reactive] public bool IsAddSeriesButtonEnabled { get; set; } = true;
+        [Reactive] public bool IsAddSeriesButtonEnabled { get; set; } = false;
 
         public ObservableCollection<ListBoxItem> SelectedAdditionalLanguages { get; } = new ObservableCollection<ListBoxItem>();
 
@@ -26,8 +26,7 @@ namespace Tsundoku.ViewModels
 
         public AddNewSeriesViewModel()
         {
-            // Disable the button to add a series to the users collection if the fields aren't populated and validated correctly
-            // this.WhenAnyValue(x => x.TitleText, x => x.MaxVolumeCount, x => x.CurVolumeCount, (title, max, cur) => !string.IsNullOrWhiteSpace(title) && !string.IsNullOrWhiteSpace(max) && !string.IsNullOrWhiteSpace(cur) && (Convert.ToUInt16(cur) <= Convert.ToUInt16(max))).Subscribe(x => IsAddSeriesButtonEnabled = x);
+
         }
         
         /**
@@ -42,11 +41,9 @@ namespace Tsundoku.ViewModels
         *      ushort   | curVolCount | The current # of volumes the user has collected for this series
         *      ushort   | maxVolCount | The max # of volumes this series currently has
         */
-        public bool GetSeriesData(string title, string bookType, ushort curVolCount, ushort maxVolCount, ObservableCollection<string> additionalLanguages)
+        public async Task<bool> GetSeriesData(string title, string bookType, ushort curVolCount, ushort maxVolCount, ObservableCollection<string> additionalLanguages)
         {
-            var getNewSeries = Task.Run(async () => await Series.CreateNewSeriesCard(title, bookType, maxVolCount, curVolCount, ALQuery, MDQuery, additionalLanguages));
-            getNewSeries.Wait();
-            Series? newSeries = getNewSeries.Result;
+            Series? newSeries = await Series.CreateNewSeriesCard(title, bookType, maxVolCount, curVolCount, ALQuery, MDQuery, additionalLanguages);
             
             bool duplicateSeriesCheck = true;
             if (newSeries != null)

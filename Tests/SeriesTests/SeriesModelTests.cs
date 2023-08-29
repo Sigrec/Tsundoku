@@ -38,15 +38,21 @@ namespace Tests.SeriesTests
         }
 
         [Test]
+        public void Novel_AniList_Test()
+        {
+            Assert.That(Series.CreateNewSeriesCard("Classroom of the Elite", "NOVEL", 14, 0, ALQuery, MDQuery, new ObservableCollection<string>()).Result.ToJsonString(options), Is.EqualTo(File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesTests\SeriesTestData\CoTE.json").Result));
+        }
+
+        [Test]
         public void MultipleAdditionalLangTitle_MangaDexID_AniListLink_Test()
         {
-            Assert.That(Series.CreateNewSeriesCard("32fdfe9b-6e11-4a13-9e36-dcd8ea77b4e4", "MANGA", 18, 0, ALQuery, MDQuery, new ObservableCollection<string>() { "Arabic", "Chinese", "French", "Korean", "Russian", "Spanish" }).Result.ToJsonString(options), Is.EqualTo(File.ReadAllText(@"\Tsundoku\Tests\SeriesTests\SeriesTestData\Rent-A-Girlfriend.json")));
+            Assert.That(Series.CreateNewSeriesCard("32fdfe9b-6e11-4a13-9e36-dcd8ea77b4e4", "MANGA", 18, 0, ALQuery, MDQuery, new ObservableCollection<string>() { "Arabic", "Chinese", "French", "Korean", "Russian", "Spanish" }).Result.ToJsonString(options), Is.EqualTo(File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesTests\SeriesTestData\Rent-A-Girlfriend.json").Result));
         }
 
         [Test]
         public void SimilarNotEquals_AniList_Test()
         {
-            Assert.That(Series.CreateNewSeriesCard("dont toy with me miss nagatoro", "MANGA", 5, 0, ALQuery, MDQuery, new ObservableCollection<string>()).Result.ToJsonString(options), Is.EqualTo(File.ReadAllText(@"\Tsundoku\Tests\SeriesTests\SeriesTestData\IjiranaideNagatoro-san.json")));
+            Assert.That(Series.CreateNewSeriesCard("dont toy with me miss nagatoro", "MANGA", 5, 0, ALQuery, MDQuery, new ObservableCollection<string>()).Result.ToJsonString(options), Is.EqualTo(File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesTests\SeriesTestData\IjiranaideNagatoro-san.json").Result));
         }
 
         [Test]

@@ -1,3 +1,9 @@
+V1.9.1.0 - August 29th, 2023 @ 9:48AM PST
+✅ Fields in the AddNewSeries Window now clear after adding a series
+🔥 "AddNewSeries" Button now is disabled properly until conditions are met
+🔥 Theme Generation Buttons now are disabled properly until conditions are met
+🔥 Fixed issue where Currency symbol was not being saved
+
 V1.9.0.0 - August 28th, 2023 @ 2:57PM PST 
 ✅ Upgraded Avalonia to 11.0.4
 ✅ Changed currency list, if you need one added send me a message on discord or create a ticket in Git

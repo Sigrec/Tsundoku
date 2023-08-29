@@ -47,6 +47,7 @@ namespace Tsundoku.Views
                 currencyLength = CollectionWindow.CollectionViewModel.CurCurrency.Length;
                 CollectionWindow.CollectionViewModel.CurCurrency = newCurrency;
                 CollectionWindow.CollectionViewModel.collectionStatsWindow.CollectionStatsVM.CollectionPrice = $"{newCurrency}{ CollectionWindow.CollectionViewModel.collectionStatsWindow.CollectionStatsVM.CollectionPrice[currencyLength..]}";
+                ViewModelBase.MainUser.Currency = newCurrency;
                 Constants.Logger.Info($"Currency Changed To {newCurrency}");
             }
         }
