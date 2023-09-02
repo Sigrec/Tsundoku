@@ -296,21 +296,6 @@ namespace Tsundoku.ViewModels
             if (save) { SaveUsersData(); UpdateDefaultTheme(); }
         }
 
-        public static void AllocateCoverBitmaps()
-        {
-            // Pre allocate the bitmaps for every image so it is not remade every pass.
-            foreach (Series x in Collection)
-            {
-                // If the image does not exist in the covers folder then don't create a bitmap for it
-                if (File.Exists(x.Cover))
-                {
-                    x.CoverBitMap = new Bitmap(x.Cover).CreateScaledBitmap(new Avalonia.PixelSize(Constants.LEFT_SIDE_CARD_WIDTH, Constants.IMAGE_HEIGHT), BitmapInterpolationMode.HighQuality);
-                }
-            }
-            SearchedCollection.Clear();
-            SearchedCollection.AddRange(Collection);
-        }
-
         /// <summary>
         /// Updates the default TsundokuTheme
         /// </summary>

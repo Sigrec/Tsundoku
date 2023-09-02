@@ -1,3 +1,4 @@
+using System.Reflection.Emit;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -16,6 +17,8 @@ using System.Runtime.InteropServices;
 using Avalonia.Platform.Storage;
 using System.Collections.Generic;
 using Avalonia.Media.Imaging;
+using DynamicData;
+using FileWatcherEx;
 
 namespace Tsundoku.Views
 {
@@ -24,6 +27,12 @@ namespace Tsundoku.Views
         public MainWindowViewModel? CollectionViewModel => DataContext as MainWindowViewModel;
         private WindowState previousWindowState;
         private static readonly List<FilePickerFileType> fileOptions = new() { FilePickerFileTypes.ImageAll };
+        private static List<Series> CoverChangedSeriesList = new List<Series>();
+        FileSystemWatcherEx coverFolderWatcher = new FileSystemWatcherEx(@"Covers")
+        {
+            IncludeSubdirectories = false,
+            NotifyFilter = NotifyFilters.LastWrite
+        };
 
         public MainWindow()
         {
@@ -61,14 +70,46 @@ namespace Tsundoku.Views
                     {
                         MainWindowViewModel.FilterCollection("None");
                     }
-                    MainWindowViewModel.AllocateCoverBitmaps();
+                    ReloadCoverBitmaps();
                 }
             };
+
+            coverFolderWatcher.OnChanged += (s, e) =>
+            {
+                CoverChangedSeriesList.Add(MainWindowViewModel.Collection.AsParallel().Single(series => series.Cover.Equals(e.FullPath)));
+                Constants.Logger.Info($"{e.FullPath} Changed");
+            };
+            coverFolderWatcher.Start();
 
             Closing += (s, e) =>
             {
                 SaveOnClose();
             };
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private static void ReloadCoverBitmaps()
+        {
+            uint cache = 0;
+            for (int x = 0; x < MainWindowViewModel.Collection.Count; x++)
+            {
+                // If the image does not exist in the covers folder then don't create a bitmap for it
+                if (CoverChangedSeriesList.Contains(MainWindowViewModel.Collection[x]))
+                {
+                    Constants.Logger.Debug(MainWindowViewModel.Collection[x].Titles["Romaji"]);
+                    MainWindowViewModel.SearchedCollection.RemoveAt(x);
+                    MainWindowViewModel.Collection[x].CoverBitMap = new Bitmap(MainWindowViewModel.Collection[x].Cover).CreateScaledBitmap(new Avalonia.PixelSize(Constants.LEFT_SIDE_CARD_WIDTH, Constants.IMAGE_HEIGHT), BitmapInterpolationMode.HighQuality);
+                    MainWindowViewModel.SearchedCollection.Insert(x, MainWindowViewModel.Collection[x]);
+                    cache++;
+                }
+                else if (cache == CoverChangedSeriesList.Count)
+                {
+                    break;
+                }
+            }
+            CoverChangedSeriesList.Clear();
         }
 
         /// <summary>

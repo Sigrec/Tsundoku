@@ -82,7 +82,7 @@
 	
   <ItemGroup>
     <PackageReference Include="Avalonia.Controls.ColorPicker" Version="11.0.4" />
-    <PackageReference Include="Avalonia.Desktop" Version="11.0.999-cibuild0038800-beta" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.0.999-cibuild0039124-beta" />
 	<!-- <PackageReference Include="Avalonia" Version="11.0.0-preview6" /> -->
     <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
     <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.4" />
@@ -93,6 +93,7 @@
     <PackageReference Include="GraphQL.Client" Version="6.0.0" />
 	<PackageReference Include="GraphQL.Client.Serializer.SystemTextJson" Version="6.0.0" />
     <PackageReference Include="NLog" Version="5.2.3" />
+	<PackageReference Include="FileWatcherEx" Version="2.5.0" />
     <PackageReference Include="Projektanker.Icons.Avalonia.FontAwesome" Version="8.2.0" />
 	<PackageReference Include="TextCopy" Version="6.2.1" />
     <PackageReference Include="ReactiveUI.Fody" Version="19.4.1" />

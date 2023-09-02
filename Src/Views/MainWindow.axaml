@@ -628,7 +628,7 @@
 													   MaxHeight="{CompiledBinding Source={x:Static local:Constants.TOP_SECTION_CARD_HEIGHT}}"
 													   PointerPressed="CopySeriesTitleAsync"
 													   Name="SeriesTitle"
-													   Padding="8,0,7,6"
+													   Padding="8,1,7,6"
 													   Cursor="Hand"
 													   TextAlignment="Left"
 													   MaxLines="3"

@@ -96,6 +96,12 @@
                                 <Setter Property="Margin" Value="3"/>
                             </Style>
                         </WrapPanel.Styles>
+                         <Button Theme="{StaticResource UserSettingsButton}"
+                                Click="OpenCoversFolder" 
+                                Content="Open Covers Folder"/>
+                        <Button Theme="{StaticResource UserSettingsButton}"
+                                Click="OpenScreenshotsFolder" 
+                                Content="Open Screenshots Folder"/>
                         <Button Theme="{StaticResource UserSettingsButton}"
                                 Click="JoinDiscord"
                                 Content="Join Discord"/>
@@ -103,19 +109,11 @@
                                 Click="ReportBug"
                                 Content="Report Issue/Bug"/>
                         <Button Theme="{StaticResource UserSettingsButton}"
-                                Click="OpenCoolorsSite"
-                                Content="Open Coolors"/>
-                        <Button Theme="{StaticResource UserSettingsButton}"
-                                Click="OpenScreenshotsFolder" 
-                                Content="Open Screenshots Folder"/>
-                        <Button Theme="{StaticResource UserSettingsButton}"
-                                Click="OpenCoversFolder" 
-                                Content="Open Covers Folder"/>
-                        <Button FontWeight="Bold"
-                                Theme="{StaticResource UserSettingsButton}"
-                                BorderThickness="2"
                                 Command="{Binding ExportToSpreadsheetCommand}"
                                 Content="Export to Spreadsheet"/>
+                         <Button Theme="{StaticResource UserSettingsButton}"
+                                Click="OpenCoolorsSite"
+                                Content="Open Coolors"/>
                     </WrapPanel>
                 </StackPanel>
                 <StackPanel Spacing="5">
@@ -123,7 +121,7 @@
                     <TextBlock Text="Toggle Fullscreen → F11" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
                     <TextBlock Text="Screenshot Collection → CTRL+P" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
                     <TextBlock Text="Save Collection (Auto Saves on Close) → CTRL+S" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
-                    <TextBlock Text="Reload Collection → CTRL+R" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
+                    <TextBlock Text="Reload Covers → CTRL+R+C" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
                     <TextBlock Text="Copy Title → Click Title on Series Card" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
                     <TextBlock Text="Open AL Page → Click Series Image" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
                 </StackPanel>

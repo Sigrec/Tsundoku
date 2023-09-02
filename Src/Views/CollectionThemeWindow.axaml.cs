@@ -64,7 +64,7 @@ namespace Tsundoku.Views
         /// <summary>
         /// Generates the Type1 theme
         /// </summary>
-        private async void GenerateThemeType1(object sender, RoutedEventArgs args)
+        private void GenerateThemeType1(object sender, RoutedEventArgs args)
         {
             Constants.Logger.Info("Generating New Theme1");
 
@@ -123,7 +123,7 @@ namespace Tsundoku.Views
         /// <summary>
         /// Generates the Type2 theme
         /// </summary>
-        private async void GenerateThemeType2(object sender, RoutedEventArgs args)
+        private void GenerateThemeType2(object sender, RoutedEventArgs args)
         {
            Constants.Logger.Info("Generating New Theme2");
 

@@ -8,7 +8,8 @@ namespace Tsundoku
     public partial class App : Application
     {
         private static Mutex _mutex;
-        
+        public static Mutex Mutex { get => _mutex; set => _mutex = value; }
+
         public override void Initialize()
         {
             AvaloniaXamlLoader.Load(this);
