@@ -1,8 +1,15 @@
-V1.9.1.1 - September 2023 @  PST
+Legend
+❌ -> In the works/partially completed
+✅ -> Completed new feature/update
+🔥 -> Completed bug/hot fix
+⌛ -> Completed performance/librry update
+
+V1.9.1.1 - September 2023 @ PST
 ✅ Refactored Stats Window Color Layout
-✅ Improved performance of cover reload & RAM spike
 ✅ Adding slight spacing above series title
 ✅ Rearranged settings windows button order
+⌛ Improved performance of cover reload functionality
+🔥 Fixed minimum height & width of main collection window
 
 V1.9.1.0 - August 29th, 2023 @ 9:48AM PST
 ✅ Fields in the AddNewSeries Window now clear after adding a series
