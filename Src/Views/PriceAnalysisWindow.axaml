@@ -18,7 +18,7 @@
 		<StyleInclude Source="/Styles/MenuTheme.xaml" />
 	</Window.Styles>
 
-	<Grid ColumnDefinitions="*,*,*" RowDefinitions="*,*,10,*,*,10,*,10,*" Margin="20" ShowGridLines="True">
+	<Grid ColumnDefinitions="Auto,Auto,Auto" RowDefinitions="*,*,10,*,*,10,*,10,*" Margin="20" ShowGridLines="True">
 		<Grid.Styles>
 			<StyleInclude Source="/Styles/MenuTheme.xaml" />
 			<Style Selector="Button:focus /template/ ContentPresenter#PART_ContentPresenter">
@@ -27,9 +27,9 @@
 				<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
 			</Style>
 		</Grid.Styles>
-		<TextBlock Grid.ColumnSpan="2" Grid.Column="0" Grid.Row="0" Margin="0,0,0,0" Text="Enter Title" FontSize="20" FontWeight="Bold" Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+		<TextBlock Grid.ColumnSpan="3" Grid.Column="0" Grid.Row="0" Margin="0,0,0,0" Text="Enter Title" FontSize="20" FontWeight="Bold" Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
 		<TextBox Watermark="Title..."
-				 Grid.ColumnSpan="2"
+				 Grid.ColumnSpan="3"
 				 Grid.Column="0"
 				 Grid.Row="1"
 				 Classes="menu"
@@ -87,7 +87,7 @@
 						Classes="menu"
 						Content="Novel"/>
 		</StackPanel>
-		<TextBlock Grid.Column="2" Grid.Row="3" HorizontalAlignment="Center" Text="Select Browser" Margin="0,0,0,0" FontSize="20" FontWeight="Bold" Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}" VerticalAlignment="Center"/>
+		<TextBlock Grid.Column="2" Grid.Row="3" HorizontalAlignment="Center" Text="Select Websites" Margin="0,0,0,0" FontSize="20" FontWeight="Bold" Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}" VerticalAlignment="Center"/>
 		<ComboBox Name="WebsiteSelector"
 				  Grid.Column="2"
 				  Grid.Row="4"
@@ -104,10 +104,10 @@
 				  Classes="menu"
 				  Name="AnalysisDataGrid"
 				  IsReadOnly="True"
-				  AutoGenerateColumns="True"
+				  AutoGenerateColumns="False"
 				  GridLinesVisibility="All"
 				  BorderThickness="2"
-				  Grid.ColumnSpan="2"
+				  Grid.ColumnSpan="3"
 				  Grid.Column="0"
 				  Grid.Row="6"
 				  BorderBrush="Red">
@@ -121,8 +121,7 @@
 		<Button Classes="Menu"
 				BorderThickness="2"
 				FontWeight="Bold"
-				Grid.ColumnSpan="2"
-				Grid.Column="0"
+				Grid.Column="1"
 				Grid.Row="8"
 				FontSize="16"
 				VerticalAlignment="Center"
