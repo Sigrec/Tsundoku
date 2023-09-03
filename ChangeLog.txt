@@ -1,8 +1,16 @@
-V1.9.1.1 - September 2023 @  PST
+Legend
+❌ -> In the works/partially completed
+✅ -> Completed new feature/update
+🔥 -> Completed bug/hot fix
+⌛ -> Completed performance/librry update
+
+V1.9.1.1 - September 2023 @ PST
 ✅ Refactored Stats Window Color Layout
-✅ Improved performance of cover reload & RAM spike
 ✅ Adding slight spacing above series title
 ✅ Rearranged settings windows button order
+✅ Added Scrape button for future update
+⌛ Improved performance of cover reload functionality
+🔥 Fixed minimum height & width of main collection window
 
 V1.9.1.0 - August 29th, 2023 @ 9:48AM PST
 ✅ Fields in the AddNewSeries Window now clear after adding a series
@@ -11,7 +19,7 @@ V1.9.1.0 - August 29th, 2023 @ 9:48AM PST
 🔥 Fixed issue where Currency symbol was not being saved
 
 V1.9.0.0 - August 28th, 2023 @ 2:57PM PST 
-✅ Upgraded Avalonia to 11.0.4
+⌛ Upgraded Avalonia to 11.0.4
 ✅ Changed currency list, if you need one added send me a message on discord or create a ticket in Git
 🔥 Fixed issue where you could run multiple instances of the application at the same time
 🔥 Fixed ListBoxItem theme/styling not applying in AddNewSeriesWindow

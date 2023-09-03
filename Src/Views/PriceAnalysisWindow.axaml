@@ -103,6 +103,7 @@
 		<DataGrid ItemsSource="{Binding AnalyzedList}"
 				  Classes="menu"
 				  Name="AnalysisDataGrid"
+				  IsReadOnly="True"
 				  AutoGenerateColumns="True"
 				  GridLinesVisibility="All"
 				  BorderThickness="2"
@@ -110,10 +111,12 @@
 				  Grid.Column="0"
 				  Grid.Row="6"
 				  BorderBrush="Red">
-			<!-- <DataGridTextColumn Header="Entry" Binding="{Binding Entry}"/>
-			<DataGridTextColumn Header="Price" Binding="{Binding Price}"/>
-			<DataGridTextColumn Header="Stock Status" Binding="{Binding StockStatus}"/>
-			<DataGridTextColumn Header="Website" Binding="{Binding Website}"/> -->
+			<DataGrid.Columns>
+				<DataGridTextColumn Header="Entry" Binding="{Binding Entry}"/>
+				<DataGridTextColumn Header="Price" Binding="{Binding Price}"/>
+				<DataGridTextColumn Header="Stock Status" Binding="{Binding StockStatus}"/>
+				<DataGridTextColumn Header="Website" Binding="{Binding Website}"/>
+			</DataGrid.Columns>
 		</DataGrid>
 		<Button Classes="Menu"
 				BorderThickness="2"

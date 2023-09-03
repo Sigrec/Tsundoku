@@ -1,12 +1,9 @@
 using Avalonia.Controls;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Data;
-using System.Collections.ObjectModel;
 using Avalonia.Interactivity;
 using Tsundoku.ViewModels;
 using Tsundoku.Models;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Tsundoku.Views
 {
