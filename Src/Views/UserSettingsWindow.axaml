@@ -121,7 +121,7 @@
                     <TextBlock Text="Toggle Fullscreen → F11" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
                     <TextBlock Text="Screenshot Collection → CTRL+P" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
                     <TextBlock Text="Save Collection (Auto Saves on Close) → CTRL+S" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
-                    <TextBlock Text="Reload Covers → CTRL+R+C" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
+                    <TextBlock Text="Reload Covers → CTRL+R" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
                     <TextBlock Text="Copy Title → Click Title on Series Card" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
                     <TextBlock Text="Open AL Page → Click Series Image" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
                 </StackPanel>
