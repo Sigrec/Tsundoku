@@ -21,8 +21,9 @@ namespace Tsundoku.ViewModels
     public partial class MainWindowViewModel : ViewModelBase
     {
         private static readonly string filePath = @"UserData.json";
-        private const double SCHEMA_VERSION = 1.8;
+        private const double SCHEMA_VERSION = 1.9;
         private static bool newUserFlag = false;
+        public static bool updatedVersion = false;
         public static ObservableCollection<Series> SearchedCollection { get; set; } = new();
         public static ObservableCollection<Series> Collection { get; set; } = new();
 
@@ -286,14 +287,14 @@ namespace Tsundoku.ViewModels
             foreach (Series x in Collection)
             {
                 // If the image does not exist in the covers folder then don't create a bitmap for it
-                if (File.Exists(x.Cover))
+                if(File.Exists(x.Cover))
                 {
-                    x.CoverBitMap = new Bitmap(x.Cover).CreateScaledBitmap(new Avalonia.PixelSize(Constants.LEFT_SIDE_CARD_WIDTH, Constants.IMAGE_HEIGHT), BitmapInterpolationMode.HighQuality);
+                    x.CoverBitMap = new Bitmap(x.Cover);
                 }
                 SearchedCollection.Add(x);
             }
 
-            if (save) { SaveUsersData(); UpdateDefaultTheme(); }
+            if (save) { SaveUsersData(); UpdateDefaultTheme(); updatedVersion = false; }
         }
 
         /// <summary>
@@ -320,7 +321,6 @@ namespace Tsundoku.ViewModels
             JsonNode userData = JsonNode.Parse(json);
             JsonNode series;
             JsonArray collectionJsonArray = userData["UserCollection"].AsArray();
-            bool updatedVersion = false;
             
             // For users who did not get the older update
             if (!userData.AsObject().ContainsKey("CurDataVersion"))
@@ -438,6 +438,23 @@ namespace Tsundoku.ViewModels
                 userData["CurDataVersion"] = 1.8;
                 Constants.Logger.Info("Updated Users Data to v1.8");
                 updatedVersion = true;  
+            }
+
+            if (curVersion < 1.9)
+            {
+                string coverPath;
+                for (int x = 0; x < collectionJsonArray.Count; x++)
+                {
+                    coverPath = collectionJsonArray.ElementAt(x)["Cover"].ToString();
+                    if (File.Exists(coverPath))
+                    {
+                        Bitmap resizedBitMap = new Bitmap(coverPath).CreateScaledBitmap(new Avalonia.PixelSize(Constants.LEFT_SIDE_CARD_WIDTH, Constants.IMAGE_HEIGHT), BitmapInterpolationMode.HighQuality);
+                        resizedBitMap.Save(coverPath, 100);
+                    }
+                }
+                userData["CurDataVersion"] = 1.9;
+                Constants.Logger.Info("Updated Users Data to v1.9");
+                updatedVersion = true;
             }
 
             File.WriteAllText(filePath, JsonSerializer.Serialize(userData, options));

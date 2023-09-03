@@ -31,7 +31,15 @@ namespace Tsundoku.Models
 		public Dictionary<string, string> Titles { get; }
         public Dictionary<string, string> Staff { get; }
 		public string Description { get; }
+
+		/// <summary>
+		/// The format of the series (Manga, Manhwa, Manhua, Manfra, Comic, or Novel)
+		/// </summary>
 		public string Format { get; }
+
+		/// <summary>
+		/// The serialization status of the series (Finished, Ongoing, Hiatus, Cancelled, or Error)
+		/// </summary>
 		public string Status { get; set; }
 
 		/// <summary>
@@ -103,7 +111,7 @@ namespace Tsundoku.Models
 				nativeTitle = seriesData.GetProperty("title").GetProperty("native").ToString();
 				romajiTitle = seriesData.GetProperty("title").GetProperty("romaji").ToString();
 				englishTitle = seriesData.GetProperty("title").GetProperty("english").ToString();
-				
+
 				if (!isAniListID && !(ExtensionMethods.Similar(title, englishTitle) || ExtensionMethods.Similar(title, nativeTitle) || ExtensionMethods.Similar(title, romajiTitle)))
 				{
 					Logger.Info("Not on AniList or Incorrect Entry -> Trying Mangadex");
@@ -183,7 +191,7 @@ namespace Tsundoku.Models
 				{
 					newStaff.Add(ANILIST_LANG_CODES[countryOfOrigin], nativeStaff);
 				}
-				
+
 				return new Series(
 					newTitles,
 					newStaff,
@@ -265,7 +273,7 @@ namespace Tsundoku.Models
 					{
 						Logger.Warn("Series has no Alternate Titles");
 					}
-					
+
 					newTitles = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase)
 					{
 						{ "Romaji", romajiTitle },

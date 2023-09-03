@@ -25,8 +25,8 @@
 		<IncludeSymbols>False</IncludeSymbols>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<DebugType>None</DebugType>
-		<Version>1.9.0</Version>
-		<FileVersion>1.9.1.0</FileVersion>
+		<Version>1.9.1</Version>
+		<FileVersion>1.9.1.1</FileVersion>
 		<PackageIcon>Assets\Icons\Tsundoku-Logo.png</PackageIcon>
 		<RepositoryUrl>https://github.com/Sigrec/TsundokuApp</RepositoryUrl>
 	</PropertyGroup>

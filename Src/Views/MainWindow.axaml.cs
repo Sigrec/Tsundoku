@@ -76,8 +76,11 @@ namespace Tsundoku.Views
 
             coverFolderWatcher.OnChanged += (s, e) =>
             {
-                CoverChangedSeriesList.Add(MainWindowViewModel.Collection.AsParallel().Single(series => series.Cover.Equals(e.FullPath)));
-                Constants.Logger.Info($"{e.FullPath} Changed");
+                if (!MainWindowViewModel.updatedVersion)
+                {
+                    CoverChangedSeriesList.Add(MainWindowViewModel.Collection.AsParallel().Single(series => series.Cover.Equals(e.FullPath)));
+                    Constants.Logger.Info($"{e.FullPath} Changed");
+                }
             };
             coverFolderWatcher.Start();
 
@@ -100,7 +103,9 @@ namespace Tsundoku.Views
                 {
                     Constants.Logger.Debug(MainWindowViewModel.Collection[x].Titles["Romaji"]);
                     MainWindowViewModel.SearchedCollection.RemoveAt(x);
-                    MainWindowViewModel.Collection[x].CoverBitMap = new Bitmap(MainWindowViewModel.Collection[x].Cover).CreateScaledBitmap(new Avalonia.PixelSize(Constants.LEFT_SIDE_CARD_WIDTH, Constants.IMAGE_HEIGHT), BitmapInterpolationMode.HighQuality);
+                    Bitmap newCover = new Bitmap(MainWindowViewModel.Collection[x].Cover).CreateScaledBitmap(new Avalonia.PixelSize(Constants.LEFT_SIDE_CARD_WIDTH, Constants.IMAGE_HEIGHT), BitmapInterpolationMode.HighQuality);
+                    MainWindowViewModel.Collection[x].CoverBitMap = newCover;
+                    newCover.Save(MainWindowViewModel.Collection[x].Cover, 100);
                     MainWindowViewModel.SearchedCollection.Insert(x, MainWindowViewModel.Collection[x]);
                     cache++;
                 }
