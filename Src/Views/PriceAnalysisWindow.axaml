@@ -10,25 +10,26 @@
 		FontFamily="Segoe UI"
 		SizeToContent="WidthAndHeight"
         Classes="menu"
+		CanResize="False"
 		WindowStartupLocation="2"
 		KeyboardNavigation.TabNavigation="Cycle"
 		x:DataType="vm:PriceAnalysisViewModel">
 
-	<Window.Styles>
-		<StyleInclude Source="/Styles/MenuTheme.xaml" />
-	</Window.Styles>
+	<Window.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceInclude Source="/Styles/AddNewSeriesControlThemes.xaml"/>
+                <ResourceInclude Source="/Styles/PriceAnalysisControlThemes.xaml"/>
+				<ResourceInclude Source="/Styles/WindowControlThemes.xaml"/>
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>
+	</Window.Resources>
 
-	<Grid ColumnDefinitions="Auto,Auto,Auto" RowDefinitions="*,*,10,*,*,10,*,10,*" Margin="20" ShowGridLines="True">
-		<Grid.Styles>
-			<StyleInclude Source="/Styles/MenuTheme.xaml" />
-			<Style Selector="Button:focus /template/ ContentPresenter#PART_ContentPresenter">
-				<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
-				<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
-				<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
-			</Style>
-		</Grid.Styles>
-		<TextBlock Grid.ColumnSpan="3" Grid.Column="0" Grid.Row="0" Margin="0,0,0,0" Text="Enter Title" FontSize="20" FontWeight="Bold" Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-		<TextBox Watermark="Title..."
+	<Border Classes="menu" BorderThickness="3" CornerRadius="0,0,8,8" ClipToBounds="True">
+		<Grid ColumnDefinitions="Auto,10,Auto,10,Auto" RowDefinitions="Auto,Auto,10,Auto,Auto,10,Auto,10,Auto" Margin="20" ShowGridLines="False">
+		<TextBlock Grid.Column="0" Grid.Row="0" Text="Enter Title" FontSize="20" FontWeight="Bold" Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}"/>
+		<TextBox Name="TitleBox"
+				 Watermark="Title..."
 				 Grid.ColumnSpan="3"
 				 Grid.Column="0"
 				 Grid.Row="1"
@@ -37,79 +38,84 @@
 				 FontSize="18"
 				 FontWeight="Bold"
 				 TextWrapping="Wrap"
+				 Margin="0"
 				 VerticalAlignment="Center"
 				 HorizontalAlignment="Center"
 				 BorderThickness="2"/>
-		<TextBlock Grid.Column="0" Grid.Row="3" HorizontalAlignment="Center" Text="Select Browser" Margin="0,0,0,0" FontSize="20" FontWeight="Bold" Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}" VerticalAlignment="Center"/>
+		<TextBlock Grid.Column="2" Grid.Row="3" Text="Select Browser" FontSize="20" FontWeight="Bold" Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}"/>
 		<ComboBox Name="BrowserSelector"
-				  Grid.Column="0"
 				  Grid.Row="4"
-				  SelectedItem="Edge"
-				  Height="37"
-				  VerticalAlignment="Center"
-				  HorizontalAlignment="Center"
-				  ItemsSource="{Binding AvailableBrowsers, Mode=OneWay}"
-				  FontWeight="Bold"
-				  BorderThickness="2"
-				  Width="130"
-				  Classes="menu"/>
-		<TextBlock HorizontalAlignment="Center" 
-				   VerticalAlignment="Center"
-				   Text="Select Book Type"
-				   Grid.Row="3" 
-				   Grid.Column="1" 
-				   Margin="0,8,0,0" 
-				   FontSize="20" 
-				   FontWeight="Bold" 
-				   Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}"/>
-		<StackPanel Orientation="Horizontal" Width="180" Grid.Column="1" Grid.Row="4" Spacing="4" Margin="0,0,0,0">
-			<StackPanel.Styles>
-				<StyleInclude Source="/Styles/MenuTheme.xaml" />
-			</StackPanel.Styles>
-			<ToggleButton Name="MangaButton"
-						FontSize="15"
-						Height="37" 
-						FontWeight="Bold"
-						Width="88"
-						BorderThickness="2"
-						VerticalContentAlignment="Center"
-						HorizontalContentAlignment="Center"
-						Classes="menu"
-						Content="Manga"/>
-			<ToggleButton Name="NovelButton"
-						FontSize="15" 
-						FontWeight="Bold"
-						Width="88"
-						Height="37" 
-						BorderThickness="2"
-						VerticalContentAlignment="Center"
-						HorizontalContentAlignment="Center"
-						Classes="menu"
-						Content="Novel"/>
-		</StackPanel>
-		<TextBlock Grid.Column="2" Grid.Row="3" HorizontalAlignment="Center" Text="Select Websites" Margin="0,0,0,0" FontSize="20" FontWeight="Bold" Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}" VerticalAlignment="Center"/>
-		<ComboBox Name="WebsiteSelector"
 				  Grid.Column="2"
-				  Grid.Row="4"
-				  SelectedItem="Edge"
+				  SelectionChanged="BrowserChanged"
 				  Height="37"
-				  VerticalAlignment="Center"
-				  HorizontalAlignment="Center"
-				  ItemsSource="{Binding AvailableWebsites, Mode=OneWay}"
-				  FontWeight="Bold"
-				  BorderThickness="2"
-				  Width="130"
-				  Classes="menu"/>
+				  Width="182"
+				  AutoScrollToSelectedItem="True"
+				  HorizontalAlignment="Left"
+				  Theme="{StaticResource MenuComboBox}">
+			<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Chrome</ComboBoxItem>
+			<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Edge</ComboBoxItem>
+			<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">FireFox</ComboBoxItem>
+		</ComboBox>
+		<TextBlock Text="Select Book Type"
+				   Grid.Row="3" 
+				   Grid.Column="0"
+				   FontSize="20" 
+				   FontWeight="Bold"
+				   Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}"/>
+		<StackPanel Orientation="Horizontal" Width="180" Grid.Column="0" Grid.Row="4" Spacing="5" HorizontalAlignment="Left">
+			<ToggleButton Name="MangaButton"
+						  Checked="IsMangaButtonClicked"
+						  Theme="{StaticResource QueryToggleButton}"
+						  Content="Manga"/>
+			<ToggleButton Name="NovelButton"
+			  			  Checked="IsNovelButtonClicked"
+						  Theme="{StaticResource QueryToggleButton}"
+						  Content="Novel"/>
+		</StackPanel>
+		<TextBlock Grid.Column="4" Grid.Row="0" Grid.RowSpan="4" Text="Select Websites" FontSize="20" FontWeight="Bold" Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}"/>
+		<ListBox Name="WebsiteSelector"
+				 Theme="{StaticResource QueryListBox}"
+				 Grid.Column="4"
+				 Grid.Row="1"
+				 Grid.RowSpan="6"
+				 SelectionMode="Multiple,Toggle"
+				 SelectedItems="{CompiledBinding SelectedWebsites}"
+				 Height="160"
+				 Width="220">
+			<!-- <ListBoxItem Theme="{StaticResource QueryListBoxItem}">AmazonUSA</ListBoxItem> -->
+			<ListBoxItem Theme="{StaticResource QueryListBoxItem}">BarnesAndNoble</ListBoxItem>
+			<ListBoxItem Theme="{StaticResource QueryListBoxItem}">BooksAMillion</ListBoxItem>
+			<ListBoxItem Theme="{StaticResource QueryListBoxItem}">InStockTrades</ListBoxItem>
+			<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Kinokuniya</ListBoxItem>
+			<ListBoxItem Theme="{StaticResource QueryListBoxItem}">RightStufAnime</ListBoxItem>
+			<ListBoxItem Theme="{StaticResource QueryListBoxItem}">RobertsAnimeCornerStore</ListBoxItem>
+			<!-- <ListBoxItem Theme="{StaticResource QueryListBoxItem}">WorldOfBooks</ListBoxItem> -->
+		</ListBox>
+		<Button Classes="Menu"
+				BorderThickness="2"
+				FontWeight="Bold"
+				Grid.Column="0"
+				Grid.ColumnSpan="3"
+				Grid.Row="6"
+				Width="150"
+				FontSize="18"
+				IsEnabled="{CompiledBinding IsAnalyzeButtonEnabled}"
+				Theme="{StaticResource MenuButton}"
+				Click="PerformAnalysis"
+				Content="Analyze"/>
+		<!-- TODO Need to add control styling for DataGrid -->
 		<DataGrid ItemsSource="{Binding AnalyzedList}"
 				  Classes="menu"
 				  Name="AnalysisDataGrid"
 				  IsReadOnly="True"
 				  AutoGenerateColumns="False"
+				  HorizontalAlignment="Center"
+				  VerticalAlignment="Center"
 				  GridLinesVisibility="All"
 				  BorderThickness="2"
-				  Grid.ColumnSpan="3"
+				  Grid.ColumnSpan="5"
 				  Grid.Column="0"
-				  Grid.Row="6"
+				  Grid.Row="8"
 				  BorderBrush="Red">
 			<DataGrid.Columns>
 				<DataGridTextColumn Header="Entry" Binding="{Binding Entry}"/>
@@ -118,15 +124,6 @@
 				<DataGridTextColumn Header="Website" Binding="{Binding Website}"/>
 			</DataGrid.Columns>
 		</DataGrid>
-		<Button Classes="Menu"
-				BorderThickness="2"
-				FontWeight="Bold"
-				Grid.Column="1"
-				Grid.Row="8"
-				FontSize="16"
-				VerticalAlignment="Center"
-				HorizontalAlignment="Center"
-				Click="PerformAnalysis"
-				Content="Analyze"/>
-	</Grid>
+		</Grid>
+	</Border>
 </Window>

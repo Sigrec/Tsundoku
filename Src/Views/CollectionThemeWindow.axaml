@@ -25,7 +25,7 @@
 		</ResourceDictionary>
 	</Window.Resources>
 
-	<Border Classes="menu" BorderThickness="3">
+	<Border Classes="menu" BorderThickness="3" CornerRadius="0,0,8,8" ClipToBounds="True">
 		<ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
 			<StackPanel Spacing="30" Margin="20">
 				<StackPanel HorizontalAlignment="Center">
