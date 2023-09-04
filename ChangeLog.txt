@@ -4,11 +4,11 @@ Legend
 🔥 -> Completed bug/hot fix
 ⌛ -> Completed performance/librry update
 
-V1.9.2.1 - September 3rd, 2023 @ 6:40PM PST
+V1.9.2.1 - September 3rd, 2023 @ 8:56PM PST
 🔥 Fixed issue where you couldn't reload the cover when searching or filtering
 🔥 Fixed issue where covers would sometimes not reload after changing them in the Covers folder (this is due to images sometimes having to be downloaded initially)
 🔥 Fixed wrong key command in settings window from CTRL+R+C to correct cone CTRL+R to reload covers
-🔥 Fixed search bar text size being to small
+🔥 Fixed search bar text size being too small
 
 V1.9.1.1 - September 3rd, 2023 @ 9:28AM PST
 ✅ Refactored Stats Window Color Layout
