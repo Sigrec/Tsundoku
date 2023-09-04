@@ -17,7 +17,6 @@ using System.Runtime.InteropServices;
 using Avalonia.Platform.Storage;
 using System.Collections.Generic;
 using Avalonia.Media.Imaging;
-using DynamicData;
 using FileWatcherEx;
 
 namespace Tsundoku.Views
@@ -28,16 +27,15 @@ namespace Tsundoku.Views
         private WindowState previousWindowState;
         private static readonly List<FilePickerFileType> fileOptions = new() { FilePickerFileTypes.ImageAll };
         private static List<Series> CoverChangedSeriesList = new List<Series>();
-        FileSystemWatcherEx coverFolderWatcher = new FileSystemWatcherEx(@"Covers")
+        private static FileSystemWatcherEx coverFolderWatcher = new FileSystemWatcherEx(@"Covers")
         {
             IncludeSubdirectories = false,
-            NotifyFilter = NotifyFilters.LastWrite
+            NotifyFilter = NotifyFilters.FileName
         };
 
         public MainWindow()
         {
             InitializeComponent();
-
             KeyDown += (s, e) => 
             {
                 if (e.Key == Key.F11) 
@@ -65,21 +63,38 @@ namespace Tsundoku.Views
                 }
                 else if (e.KeyModifiers == KeyModifiers.Control && e.Key == Key.R)
                 {
-                    Constants.Logger.Info("Reloading Collection");
+                    Constants.Logger.Info("Reloading Covers");
                     if (CollectionViewModel.CurFilter != "None")
                     {
                         MainWindowViewModel.FilterCollection("None");
                     }
-                    ReloadCoverBitmaps();
+                    
+                    if (CoverChangedSeriesList.Count != 0)
+                    {
+                        ReloadCoverBitmaps();
+                    }
+                    else
+                    {
+                        Constants.Logger.Info("No Covers Changed");
+                    }
                 }
             };
 
-            coverFolderWatcher.OnChanged += (s, e) =>
+            coverFolderWatcher.OnCreated += static (s, e) =>
             {
-                if (!MainWindowViewModel.updatedVersion)
+                e.FullPath = e.FullPath.Replace(".crdownload", "");
+                if (!MainWindowViewModel.updatedVersion && (e.FullPath.EndsWith(".jpg") || e.FullPath.EndsWith(".png")))
                 {
-                    CoverChangedSeriesList.Add(MainWindowViewModel.Collection.AsParallel().Single(series => series.Cover.Equals(e.FullPath)));
-                    Constants.Logger.Info($"{e.FullPath} Changed");
+                    Series series = MainWindowViewModel.Collection.SingleOrDefault(series => series.Cover.Equals(e.FullPath));
+                    if (series != null && !CoverChangedSeriesList.Contains(series))
+                    {
+                        CoverChangedSeriesList.Add(series);
+                        Constants.Logger.Info($"{e.FullPath} Changed");
+                    }
+                    else
+                    {
+                        Constants.Logger.Info($"{e.FullPath} Changed Again");
+                    }
                 }
             };
             coverFolderWatcher.Start();
@@ -101,14 +116,14 @@ namespace Tsundoku.Views
                 // If the image does not exist in the covers folder then don't create a bitmap for it
                 if (CoverChangedSeriesList.Contains(MainWindowViewModel.Collection[x]))
                 {
-                    Constants.Logger.Debug(MainWindowViewModel.Collection[x].Titles["Romaji"]);
                     int index = MainWindowViewModel.SearchedCollection.IndexOf(MainWindowViewModel.Collection[x]);
                     MainWindowViewModel.SearchedCollection.Remove(MainWindowViewModel.Collection[x]);
                     Bitmap newCover = new Bitmap(MainWindowViewModel.Collection[x].Cover).CreateScaledBitmap(new Avalonia.PixelSize(Constants.LEFT_SIDE_CARD_WIDTH, Constants.IMAGE_HEIGHT), BitmapInterpolationMode.HighQuality);
-                    MainWindowViewModel.Collection[x].CoverBitMap = newCover;
                     newCover.Save(MainWindowViewModel.Collection[x].Cover, 100);
+                    MainWindowViewModel.Collection[x].CoverBitMap = newCover;
                     MainWindowViewModel.SearchedCollection.Insert(index, MainWindowViewModel.Collection[x]);
                     cache++;
+                    Constants.Logger.Info($"Updated {MainWindowViewModel.Collection[x].Titles["Romaji"]} Cover");
                 }
                 else if (cache == CoverChangedSeriesList.Count)
                 {
@@ -400,6 +415,7 @@ namespace Tsundoku.Views
         {
             CollectionViewModel.SearchText = "";
             Helpers.DiscordRP.Deinitialize();
+            coverFolderWatcher.Dispose();
             Constants.Logger.Info("Closing Tsundoku");
 
             if (CollectionViewModel.newSeriesWindow != null)

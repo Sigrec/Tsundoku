@@ -186,6 +186,7 @@
 							FontWeight="Bold"
 							Watermark="Search..."
 							Height="35"
+							FontSize="15"
 							HorizontalAlignment="Center"
 							VerticalAlignment="Center"/>
 				</StackPanel>
