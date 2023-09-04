@@ -102,11 +102,12 @@ namespace Tsundoku.Views
                 if (CoverChangedSeriesList.Contains(MainWindowViewModel.Collection[x]))
                 {
                     Constants.Logger.Debug(MainWindowViewModel.Collection[x].Titles["Romaji"]);
-                    MainWindowViewModel.SearchedCollection.RemoveAt(x);
+                    int index = MainWindowViewModel.SearchedCollection.IndexOf(MainWindowViewModel.Collection[x]);
+                    MainWindowViewModel.SearchedCollection.Remove(MainWindowViewModel.Collection[x]);
                     Bitmap newCover = new Bitmap(MainWindowViewModel.Collection[x].Cover).CreateScaledBitmap(new Avalonia.PixelSize(Constants.LEFT_SIDE_CARD_WIDTH, Constants.IMAGE_HEIGHT), BitmapInterpolationMode.HighQuality);
                     MainWindowViewModel.Collection[x].CoverBitMap = newCover;
                     newCover.Save(MainWindowViewModel.Collection[x].Cover, 100);
-                    MainWindowViewModel.SearchedCollection.Insert(x, MainWindowViewModel.Collection[x]);
+                    MainWindowViewModel.SearchedCollection.Insert(index, MainWindowViewModel.Collection[x]);
                     cache++;
                 }
                 else if (cache == CoverChangedSeriesList.Count)

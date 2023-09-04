@@ -4,6 +4,10 @@ Legend
 🔥 -> Completed bug/hot fix
 ⌛ -> Completed performance/librry update
 
+V1.9.2.1 - September 3rd, 2023 @ 6:PM PST
+🔥 Fixed issue where you couldn't reload the cover when searching or filtering
+🔥 Fixed wromg key command in settings window from CTRL+R+C to correct cone CTRL+R to reload covers
+
 V1.9.1.1 - September 3rd, 2023 @ 9:28AM PST
 ✅ Refactored Stats Window Color Layout
 ✅ Adding slight spacing above series title

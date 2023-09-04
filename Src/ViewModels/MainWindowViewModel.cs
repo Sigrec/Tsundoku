@@ -26,7 +26,6 @@ namespace Tsundoku.ViewModels
         public static bool updatedVersion = false;
         public static ObservableCollection<Series> SearchedCollection { get; set; } = new();
         public static ObservableCollection<Series> Collection { get; set; } = new();
-
         [Reactive] public string SearchText { get; set; }
         [Reactive] public bool LanguageChanged { get; set; } = false;
         [Reactive] public bool SearchIsBusy { get; set; } = false;
@@ -237,7 +236,7 @@ namespace Tsundoku.ViewModels
             {
                 SearchedCollection.Clear();
                 SearchIsBusy = false;
-                FilterCollection(CurFilter);
+                SearchedCollection.AddRange(Collection);
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
             }
