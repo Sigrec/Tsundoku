@@ -15,13 +15,14 @@ using System.Diagnostics.CodeAnalysis;
 using Avalonia.Media.Imaging;
 using DynamicData;
 using System.Text.Json.Nodes;
+using System.Collections.Generic;
 
 namespace Tsundoku.ViewModels
 {
     public partial class MainWindowViewModel : ViewModelBase
     {
         private static readonly string filePath = @"UserData.json";
-        private const double SCHEMA_VERSION = 1.8;
+        private const double SCHEMA_VERSION = 1.9;
         private static bool newUserFlag = false;
         public static ObservableCollection<Series> SearchedCollection { get; set; } = new();
         public static ObservableCollection<Series> Collection { get; set; } = new();
@@ -249,7 +250,7 @@ namespace Tsundoku.ViewModels
             {
                 Constants.Logger.Info("Creating New User");
                 ThemeSettingsViewModel.UserThemes = new ObservableCollection<TsundokuTheme>() { TsundokuTheme.DEFAULT_THEME };
-                MainUser = new User("UserName", "Romaji", "Default", "Card", SCHEMA_VERSION, "$", "$0.00", ThemeSettingsViewModel.UserThemes, Collection)
+                MainUser = new User("UserName", "Romaji", "Default", "Card", SCHEMA_VERSION, "$", "$0.00", new Dictionary<string, bool>(), ThemeSettingsViewModel.UserThemes, Collection)
                 {
                     CurDataVersion = SCHEMA_VERSION
                 };
@@ -331,7 +332,6 @@ namespace Tsundoku.ViewModels
             }
             double curVersion = double.Parse(userData["CurDataVersion"].ToString());
 
-            // 1.5 Data Update
             if (curVersion < 1.5)
             {
                 userData.AsObject().Add("Currency", "$");
@@ -386,7 +386,6 @@ namespace Tsundoku.ViewModels
                 updatedVersion = true;        
             }
 
-            // Update to 1.6 schema
             if (curVersion < 1.6)
             {
                 for (int x = 0; x < collectionJsonArray.Count; x++)
@@ -438,6 +437,37 @@ namespace Tsundoku.ViewModels
                 userData["CurDataVersion"] = 1.8;
                 Constants.Logger.Info("Updated Users Data to v1.8");
                 updatedVersion = true;  
+            }
+
+            if (curVersion < 1.9)
+            {
+                string coverPath;
+                for (int x = 0; x < collectionJsonArray.Count; x++)
+                {
+                    coverPath = collectionJsonArray.ElementAt(x)["Cover"].ToString();
+                    if (File.Exists(coverPath))
+                    {
+                        Bitmap resizedBitMap = new Bitmap(coverPath).CreateScaledBitmap(new Avalonia.PixelSize(Constants.LEFT_SIDE_CARD_WIDTH, Constants.IMAGE_HEIGHT), BitmapInterpolationMode.HighQuality);
+                        resizedBitMap.Save(coverPath, 100);
+                    }
+                }
+                userData["CurDataVersion"] = 1.9;
+                Constants.Logger.Info("Updated Users Data to v1.9");
+                updatedVersion = true;
+            }
+
+            if (curVersion < 2.0)
+            {
+                userData["Memberships"] = new JsonObject
+                {
+                    ["RightStufAnime"] = false,
+                    ["BarnesAndNoble"] = false,
+                    ["BooksAMillion"] = false,
+                    ["KinokuniyaUSA"] = false
+                };
+                userData["CurDataVersion"] = 2.0;
+                Constants.Logger.Info("Updated Users Data to v2.0");
+                updatedVersion = true;
             }
 
             File.WriteAllText(filePath, JsonSerializer.Serialize(userData, options));

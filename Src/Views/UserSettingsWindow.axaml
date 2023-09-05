@@ -21,7 +21,6 @@
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
                 <ResourceInclude Source="/Styles/UserSettingsControlThemes.xaml"/>
-				<ResourceInclude Source="/Styles/WindowControlThemes.xaml"/>
 			</ResourceDictionary.MergedDictionaries>
 		</ResourceDictionary>
 	</Window.Resources>
@@ -41,7 +40,7 @@
                                 Watermark="Enter New Username..."
                                 Text="{Binding UsernameText}"
                                 BorderThickness="2"/>
-                        <Button FontSize="20" 
+                        <Button FontSize="18"
                                 BorderThickness="2"
                                 Classes="menu"
                                 i:Attached.Icon="fa-check" 
@@ -89,6 +88,32 @@
 					</ComboBox>
                 </StackPanel>
                 <StackPanel Spacing="5">
+                    <TextBlock Text="Memberships" FontSize="20" FontWeight="Bold" Classes="menu"/>
+                    <WrapPanel Width="450" Margin="-5,0,0,0">
+						<WrapPanel.Styles>
+                            <Style Selector="ToggleButton">
+                                <Setter Property="Margin" Value="3"/>
+                            </Style>
+                        </WrapPanel.Styles>
+					<ToggleButton Name="RightStufAnimeButton"
+								  IsChecked="{Binding RightStufAnimeMember}"
+							      Theme="{StaticResource MenuToggleButton}"
+							      Content="RightStufAnime"/>
+					<ToggleButton Name="BarnesAndNobleButton"
+								  IsChecked="{Binding BarnesAndNobleMember}"
+							      Theme="{StaticResource MenuToggleButton}"
+							      Content="Barnes &#x26; Noble"/>
+					<ToggleButton Name="BooksAMillionButton"
+								  IsChecked="{Binding BooksAMillionMember}"
+							      Theme="{StaticResource MenuToggleButton}"
+							      Content="Books-A-Million"/>
+					<ToggleButton Name="KinokuniyaUSAButton"
+								  IsChecked="{Binding KinokuniyaUSAMember}"
+							      Theme="{StaticResource MenuToggleButton}"
+							      Content="Kinokuniya USA"/>
+					</WrapPanel>
+                </StackPanel>
+                <StackPanel Spacing="5">
                     <TextBlock Text="Settings" FontSize="20" FontWeight="Bold" Classes="menu"/>
                     <WrapPanel Width="450" Margin="-5,0,0,0">
                         <WrapPanel.Styles>
@@ -96,7 +121,7 @@
                                 <Setter Property="Margin" Value="3"/>
                             </Style>
                         </WrapPanel.Styles>
-                         <Button Theme="{StaticResource UserSettingsButton}"
+                        <Button Theme="{StaticResource UserSettingsButton}"
                                 Click="OpenCoversFolder" 
                                 Content="Open Covers Folder"/>
                         <Button Theme="{StaticResource UserSettingsButton}"

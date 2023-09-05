@@ -131,12 +131,14 @@
 					   Classes="menu"/>
 			<StackPanel Orientation="Horizontal" Width="180" Grid.Row="7" Grid.Column="0" Spacing="5" Margin="0,0,10,0">
 				<ToggleButton Name="MangaButton"
+						 	  Width="87.5"
 							  Checked="IsMangaButtonClicked"
-							  Theme="{StaticResource QueryToggleButton}"
+							  Theme="{StaticResource MenuToggleButton}"
 							  Content="Manga"/>
 				<ToggleButton Name="NovelButton"
+							  Width="87.5"
 							  Checked="IsNovelButtonClicked"
-							  Theme="{StaticResource QueryToggleButton}"
+							  Theme="{StaticResource MenuToggleButton}"
 							  Content="Novel"/>
 			</StackPanel>
 			<TextBlock HorizontalAlignment="Left"

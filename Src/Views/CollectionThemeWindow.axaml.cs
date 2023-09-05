@@ -45,7 +45,7 @@ namespace Tsundoku.Views
             MenuColorChanges();
             CollectionColorChanges();
 
-            this.WhenAnyValue(x => x.NewThemeName.Text, x => x.MainColor1.Mask.Length, x => x.MainColor2.Mask.Length, x => x.TextColor1.Mask.Length, x => x.TextColor2.Mask.Length, x => x.AccentColor1.Mask.Length, x => x.AccentColor2.Mask.Length, (name, mc1 ,mc2, tc1, tc2, ac1, ac2) => !string.IsNullOrWhiteSpace(name) && !name.Equals("Default", StringComparison.OrdinalIgnoreCase) && mc1 != 7 && mc2 != 7 && tc1 != 7 && tc2 != 7 && ac1 != 7 && ac2 != 7).Subscribe(x => ThemeSettingsVM.IsGenerateThemeButtonEnabled = x, x => Constants.Logger.Debug("Generate Theme Button Enabled" + x));
+            this.WhenAnyValue(x => x.NewThemeName.Text, x => x.MainColor1.Mask.Length, x => x.MainColor2.Mask.Length, x => x.TextColor1.Mask.Length, x => x.TextColor2.Mask.Length, x => x.AccentColor1.Mask.Length, x => x.AccentColor2.Mask.Length, (name, mc1 ,mc2, tc1, tc2, ac1, ac2) => !string.IsNullOrWhiteSpace(name) && !name.Equals("Default", StringComparison.OrdinalIgnoreCase) && mc1 != 7 && mc2 != 7 && tc1 != 7 && tc2 != 7 && ac1 != 7 && ac2 != 7).Subscribe(x => ThemeSettingsVM.IsGenerateThemeButtonEnabled = x);
         }
 
         /// <summary>

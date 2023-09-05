@@ -9,6 +9,7 @@ using Avalonia;
 using System.ComponentModel;
 using Tsundoku.Models;
 using System.Threading.Tasks;
+using ReactiveUI;
 
 namespace Tsundoku.Views
 {
@@ -37,6 +38,11 @@ namespace Tsundoku.Views
                 IsOpen ^= true;
                 e.Cancel = true;
             };
+
+            this.WhenAnyValue(x => x.RightStufAnimeButton.IsChecked, (member) => member != null && member == true).Subscribe(x => UserSettingsVM.RightStufAnimeMember = x);
+            this.WhenAnyValue(x => x.BarnesAndNobleButton.IsChecked, (member) => member != null && member == true).Subscribe(x => UserSettingsVM.BarnesAndNobleMember = x);
+            this.WhenAnyValue(x => x.BooksAMillionButton.IsChecked, (member) => member != null && member == true).Subscribe(x => UserSettingsVM.BooksAMillionMember = x);
+            this.WhenAnyValue(x => x.KinokuniyaUSAButton.IsChecked, (member) => member != null && member == true).Subscribe(x => UserSettingsVM.KinokuniyaUSAMember = x);
         }
 
         private void CurrencyChanged(object sender, SelectionChangedEventArgs e)

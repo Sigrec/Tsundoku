@@ -10,6 +10,7 @@ using DynamicData;
 using System;
 using System.Collections.Generic;
 using ReactiveUI;
+using System.Threading.Tasks;
 
 namespace Tsundoku.Views
 {
@@ -18,6 +19,7 @@ namespace Tsundoku.Views
         public PriceAnalysisViewModel? PriceAnalysisVM => DataContext as PriceAnalysisViewModel;
         public bool IsOpen = false;
         private MasterScrape Scrape = new MasterScrape();
+        private static List<MasterScrape.Website> scrapeWebsiteList = new List<MasterScrape.Website>();
         MainWindow CollectionWindow;
 
         public PriceAnalysisWindow()
@@ -41,7 +43,7 @@ namespace Tsundoku.Views
             };
 
             // TODO Need to figure out how to check for website list being empty
-            this.WhenAnyValue(x => x.TitleBox.Text, x => x.MangaButton.IsChecked, x => x.NovelButton.IsChecked, x => x.PriceAnalysisVM.CurBrowser, (title, manga, novel, browser) => !string.IsNullOrWhiteSpace(title) && !(manga == false && novel == false) && !string.IsNullOrWhiteSpace(browser)).Subscribe(x => PriceAnalysisVM.IsAnalyzeButtonEnabled = x);
+            this.WhenAnyValue(x => x.TitleBox.Text, x => x.MangaButton.IsChecked, x => x.NovelButton.IsChecked, x => x.PriceAnalysisVM.CurBrowser, (title, manga, novel, browser) => !string.IsNullOrWhiteSpace(title) && !((manga == false) && novel == false) && manga != null && novel != null && !string.IsNullOrWhiteSpace(browser)).Subscribe(x => PriceAnalysisVM.IsAnalyzeButtonEnabled = x);
         }
 
         private void IsMangaButtonClicked(object sender, RoutedEventArgs args)
@@ -57,47 +59,49 @@ namespace Tsundoku.Views
         
         public void PerformAnalysis(object sender, RoutedEventArgs args)
         {
-            Constants.Logger.Info($"Selected Browser = {PriceAnalysisVM.CurBrowser}");
-
             // Create the Website list for the scrape
-            List<Website> scrapeWebsiteList = new List<Website>();
+            scrapeWebsiteList.Clear();
             string website;
             foreach (ListBoxItem x in PriceAnalysisVM.SelectedWebsites)
             {
+                Constants.Logger.Debug("Check2");
                 website = x.Content.ToString();
                 switch (website)
                 {
                     case "RightStufAnime":
-                        scrapeWebsiteList.Add(Website.RightStufAnime);
+                        scrapeWebsiteList.Add(MasterScrape.Website.RightStufAnime);
                         break;
-                    case "BarnesAndNoble":
-                        scrapeWebsiteList.Add(Website.BarnesAndNoble);
+                    case "Barnes & Noble":
+                        scrapeWebsiteList.Add(MasterScrape.Website.BarnesAndNoble);
                         break;
-                    case "BooksAMillion":
-                        scrapeWebsiteList.Add(Website.BooksAMillion);
+                    case "Books-A-Million":
+                        scrapeWebsiteList.Add(MasterScrape.Website.BooksAMillion);
                         break;
                     case "RobertsAnimeCornerStore":
-                        scrapeWebsiteList.Add(Website.RobertsAnimeCornerStore);
+                        scrapeWebsiteList.Add(MasterScrape.Website.RobertsAnimeCornerStore);
                         break;
                     case "InStockTrades":
-                        scrapeWebsiteList.Add(Website.InStockTrades);
+                        scrapeWebsiteList.Add(MasterScrape.Website.InStockTrades);
+                        break;
+                    case "Kinokuniya USA":
+                        scrapeWebsiteList.Add(MasterScrape.Website.KinokuniyaUSA);
                         break;
                     case "AmazonUSA":
-                        scrapeWebsiteList.Add(Website.AmazonUSA);
+                        scrapeWebsiteList.Add(MasterScrape.Website.AmazonUSA);
                         break;
                     case "AmazonJapan":
-                        scrapeWebsiteList.Add(Website.AmazonJapan);
+                        scrapeWebsiteList.Add(MasterScrape.Website.AmazonJapan);
                         break;
-                    case "WorldOfBooks":
-                        scrapeWebsiteList.Add(Website.WorldOfBooks);
-                        break;
+                    // case "CDJapan":
+                    //     scrapeWebsiteList.Add(Website.CDJapan);
+                    //     break;
                 }
                 Constants.Logger.Info($"Added {website} to Scrape");
             }
-
-            // Initialize Scrape & D
-            Constants.Logger.Info($"Started Scrape");
-            Scrape.InitializeScrape(TitleBox.Text, MangaButton.IsChecked == true ? 'M' : 'N', scrapeWebsiteList);
+            Constants.Logger.Debug($"Memberships = {ViewModelBase.MainUser.Memberships["RightStufAnime"]} {ViewModelBase.MainUser.Memberships["BarnesAndNoble"]} {ViewModelBase.MainUser.Memberships["BooksAMillion"]} {ViewModelBase.MainUser.Memberships["KinokuniyaUSA"]}");
+            Constants.Logger.Info($"Started Scrape w/ {PriceAnalysisVM.CurBrowser} Browser");
+            Scrape.InitializeScrape(TitleBox.Text, MangaButton.IsChecked == true ? 'M' : 'N', scrapeWebsiteList, PriceAnalysisVM.CurBrowser, ViewModelBase.MainUser.Memberships["RightStufAnime"], ViewModelBase.MainUser.Memberships["BarnesAndNoble"], ViewModelBase.MainUser.Memberships["BooksAMillion"], ViewModelBase.MainUser.Memberships["KinokuniyaUSA"]);
+            Constants.Logger.Info($"Scrape Finished");
             PriceAnalysisVM.AnalyzedList.Clear();
             PriceAnalysisVM.AnalyzedList.AddRange(Scrape.GetResults());
         }
