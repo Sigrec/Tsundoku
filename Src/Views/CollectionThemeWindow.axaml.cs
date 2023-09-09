@@ -285,6 +285,7 @@ namespace Tsundoku.Views
                 CollectionWindow.CollectionViewModel.newSeriesWindow.AddNewSeriesVM.CurrentTheme = CollectionWindow.CollectionViewModel.CurrentTheme;
                 CollectionWindow.CollectionViewModel.settingsWindow.UserSettingsVM.CurrentTheme = CollectionWindow.CollectionViewModel.CurrentTheme;
                 CollectionWindow.CollectionViewModel.collectionStatsWindow.CollectionStatsVM.CurrentTheme = CollectionWindow.CollectionViewModel.CurrentTheme;
+                CollectionWindow.CollectionViewModel.priceAnalysisWindow.PriceAnalysisVM.CurrentTheme = CollectionWindow.CollectionViewModel.CurrentTheme;
                 
                 Constants.Logger.Info($"Theme Changed To {(ThemeSelector.SelectedItem as TsundokuTheme).ThemeName}");
                 ApplyColors();

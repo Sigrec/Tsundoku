@@ -11,17 +11,30 @@ using System;
 using System.Collections.Generic;
 using ReactiveUI;
 using System.Threading.Tasks;
+using Avalonia.Logging;
+using DynamicData.Binding;
+using System.Reactive.Linq;
+using System.Threading;
 
 namespace Tsundoku.Views
 {
     public partial class PriceAnalysisWindow : Window
     {
         public PriceAnalysisViewModel? PriceAnalysisVM => DataContext as PriceAnalysisViewModel;
-        public bool IsOpen = false;
+        public bool IsOpen = false, manga;
         private MasterScrape Scrape = new MasterScrape();
+        private string browser, website;
+        private readonly string[] EXCLUDE_NONE_FILTER = { };
+        private readonly string[] EXCLUDE_BOTH_FILTER = { "PO", "OOS" };
+        private readonly string[] EXCLUDE_PO_FILTER = { "PO" };
+        private readonly string[] EXCLUDE_OOS_FILTER = { "OOS" };
+        private static string[] CurStockFilter;
+        private static string Title;
         private static List<MasterScrape.Website> scrapeWebsiteList = new List<MasterScrape.Website>();
         MainWindow CollectionWindow;
 
+        // [AMD64-Windows_NT] 2023-09-08 08:29:28.8109 | DEBUG > Analysis Window Width = 720
+        // [AMD64-Windows_NT] 2023-09-08 08:29:28.8109 | DEBUG > Analysis Window HEight = 611
         public PriceAnalysisWindow()
         {
             InitializeComponent();
@@ -43,7 +56,7 @@ namespace Tsundoku.Views
             };
 
             // TODO Need to figure out how to check for website list being empty
-            this.WhenAnyValue(x => x.TitleBox.Text, x => x.MangaButton.IsChecked, x => x.NovelButton.IsChecked, x => x.PriceAnalysisVM.CurBrowser, (title, manga, novel, browser) => !string.IsNullOrWhiteSpace(title) && !((manga == false) && novel == false) && manga != null && novel != null && !string.IsNullOrWhiteSpace(browser)).Subscribe(x => PriceAnalysisVM.IsAnalyzeButtonEnabled = x);
+            this.WhenAnyValue(x => x.TitleBox.Text, x => x.MangaButton.IsChecked, x => x.NovelButton.IsChecked, x => x.PriceAnalysisVM.CurBrowser, x => x.PriceAnalysisVM.WebsitesSelected, (title, manga, novel, browser, websites) => !string.IsNullOrWhiteSpace(title) && !(manga == false && novel == false) && !string.IsNullOrWhiteSpace(browser) && websites).Subscribe(x => PriceAnalysisVM.IsAnalyzeButtonEnabled = x);
         }
 
         private void IsMangaButtonClicked(object sender, RoutedEventArgs args)
@@ -51,20 +64,29 @@ namespace Tsundoku.Views
             NovelButton.IsChecked = false;
         }
 
-
         private void IsNovelButtonClicked(object sender, RoutedEventArgs args)
         {
             MangaButton.IsChecked = false;
         }
         
-        public void PerformAnalysis(object sender, RoutedEventArgs args)
+        // TODO Crash sometimes whne edgedriver fails handshake need to catch
+        // TODO Website text sometimes getting cut off saw when applying a filter need to investigate
+        public async void PerformAnalysis(object sender, RoutedEventArgs args)
         {
-            // Create the Website list for the scrape
             scrapeWebsiteList.Clear();
-            string website;
+            browser = PriceAnalysisVM.CurBrowser;
+            Title = TitleBox.Text;
+            manga = MangaButton.IsChecked != null ? MangaButton.IsChecked.Value : false;
+            CurStockFilter = (StockFilterSelector.SelectedItem as ComboBoxItem).Content.ToString() switch
+            {
+                "Exclude PO & OOS" => EXCLUDE_BOTH_FILTER,
+                "Exclude PO" => EXCLUDE_PO_FILTER,
+                "Exclude OOS" => EXCLUDE_OOS_FILTER,
+                _ => EXCLUDE_NONE_FILTER
+            };
+
             foreach (ListBoxItem x in PriceAnalysisVM.SelectedWebsites)
             {
-                Constants.Logger.Debug("Check2");
                 website = x.Content.ToString();
                 switch (website)
                 {
@@ -92,18 +114,31 @@ namespace Tsundoku.Views
                     case "AmazonJapan":
                         scrapeWebsiteList.Add(MasterScrape.Website.AmazonJapan);
                         break;
-                    // case "CDJapan":
-                    //     scrapeWebsiteList.Add(Website.CDJapan);
-                    //     break;
+                    case "CDJapan":
+                        scrapeWebsiteList.Add(MasterScrape.Website.CDJapan);
+                        break;
                 }
                 Constants.Logger.Info($"Added {website} to Scrape");
             }
             Constants.Logger.Debug($"Memberships = {ViewModelBase.MainUser.Memberships["RightStufAnime"]} {ViewModelBase.MainUser.Memberships["BarnesAndNoble"]} {ViewModelBase.MainUser.Memberships["BooksAMillion"]} {ViewModelBase.MainUser.Memberships["KinokuniyaUSA"]}");
-            Constants.Logger.Info($"Started Scrape w/ {PriceAnalysisVM.CurBrowser} Browser");
-            Scrape.InitializeScrape(TitleBox.Text, MangaButton.IsChecked == true ? 'M' : 'N', scrapeWebsiteList, PriceAnalysisVM.CurBrowser, ViewModelBase.MainUser.Memberships["RightStufAnime"], ViewModelBase.MainUser.Memberships["BarnesAndNoble"], ViewModelBase.MainUser.Memberships["BooksAMillion"], ViewModelBase.MainUser.Memberships["KinokuniyaUSA"]);
+
+            StartScrapeButton.IsEnabled = false;
+            await Task.Run(() =>
+            {
+                Constants.Logger.Info($"Started Scrape w/ {browser} Browser w/ Filters [{string.Join(",", CurStockFilter)}]");
+                Scrape.InitializeScrape(Title, manga == true ? 'M' : 'N', CurStockFilter, scrapeWebsiteList, browser, ViewModelBase.MainUser.Memberships["RightStufAnime"], ViewModelBase.MainUser.Memberships["BarnesAndNoble"], ViewModelBase.MainUser.Memberships["BooksAMillion"], ViewModelBase.MainUser.Memberships["KinokuniyaUSA"]);
+            });
+            StartScrapeButton.IsEnabled = PriceAnalysisVM.IsAnalyzeButtonEnabled;
+
             Constants.Logger.Info($"Scrape Finished");
             PriceAnalysisVM.AnalyzedList.Clear();
             PriceAnalysisVM.AnalyzedList.AddRange(Scrape.GetResults());
+            // foreach (EntryModel entry in Scrape.GetResults())
+            // {
+            //     Constants.Logger.Debug(entry.ToString());
+            //     PriceAnalysisVM.AnalyzedList.Add(entry);
+            // }
+            MasterScrape.ClearAllWebsiteData();
         }
 
         private void BrowserChanged(object sender, SelectionChangedEventArgs e)
@@ -111,8 +146,12 @@ namespace Tsundoku.Views
             if ((sender as ComboBox).IsDropDownOpen)
             {
                 PriceAnalysisVM.CurBrowser = (BrowserSelector.SelectedItem as ComboBoxItem).Content.ToString();
-                Constants.Logger.Info($"Browser Langauge to {PriceAnalysisVM.CurBrowser}");
             }
+        }
+
+        private void WebsiteSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            PriceAnalysisVM.WebsitesSelected = (sender as ListBox).SelectedItems.Count > 0;
         }
     }
 }

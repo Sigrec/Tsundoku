@@ -29,7 +29,7 @@
 	</Window.Resources>
 
 	<Border Classes="menu" BorderThickness="3" CornerRadius="0,0,8,8" ClipToBounds="True">
-		<Grid ColumnDefinitions="*,15,*,15,*" RowDefinitions="Auto,Auto,15,Auto,Auto,15,Auto,Auto" Margin="15">
+		<Grid ColumnDefinitions="*,15,*,15,*" RowDefinitions="Auto,Auto,15,Auto,Auto,15,Auto,Auto" Margin="20,10,20,20">
 			<TextBlock HorizontalAlignment="Left" Grid.Row="0" Grid.Column="4" Text="Additional Languages" FontSize="20" FontWeight="Bold" Classes="menu" Margin="0,0,0,1"/>
 			<ListBox Name="AdditionalLangSelector"
 					 SelectedItems="{Binding SelectedAdditionalLanguages}"
