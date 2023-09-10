@@ -5,16 +5,15 @@ using Avalonia.Interactivity;
 using Tsundoku.ViewModels;
 using Tsundoku.Models;
 using MangaLightNovelWebScrape;
-using System.Collections.ObjectModel;
 using DynamicData;
 using System;
 using System.Collections.Generic;
 using ReactiveUI;
 using System.Threading.Tasks;
-using Avalonia.Logging;
-using DynamicData.Binding;
 using System.Reactive.Linq;
-using System.Threading;
+using Avalonia.Input;
+using System.ComponentModel;
+using System.Diagnostics;
 
 namespace Tsundoku.Views
 {
@@ -29,7 +28,6 @@ namespace Tsundoku.Views
         private readonly string[] EXCLUDE_PO_FILTER = { "PO" };
         private readonly string[] EXCLUDE_OOS_FILTER = { "OOS" };
         private static string[] CurStockFilter;
-        private static string Title;
         private static List<MasterScrape.Website> scrapeWebsiteList = new List<MasterScrape.Website>();
         MainWindow CollectionWindow;
 
@@ -69,7 +67,6 @@ namespace Tsundoku.Views
             MangaButton.IsChecked = false;
         }
         
-        // TODO Crash sometimes whne edgedriver fails handshake need to catch
         // TODO Website text sometimes getting cut off saw when applying a filter need to investigate
         public async void PerformAnalysis(object sender, RoutedEventArgs args)
         {
@@ -123,22 +120,18 @@ namespace Tsundoku.Views
             Constants.Logger.Debug($"Memberships = {ViewModelBase.MainUser.Memberships["RightStufAnime"]} {ViewModelBase.MainUser.Memberships["BarnesAndNoble"]} {ViewModelBase.MainUser.Memberships["BooksAMillion"]} {ViewModelBase.MainUser.Memberships["KinokuniyaUSA"]}");
 
             StartScrapeButton.IsEnabled = false;
-            await Task.Run(() =>
-            {
-                Constants.Logger.Info($"Started Scrape w/ {browser} Browser w/ Filters [{string.Join(",", CurStockFilter)}]");
-                Scrape.InitializeScrape(Title, manga == true ? 'M' : 'N', CurStockFilter, scrapeWebsiteList, browser, ViewModelBase.MainUser.Memberships["RightStufAnime"], ViewModelBase.MainUser.Memberships["BarnesAndNoble"], ViewModelBase.MainUser.Memberships["BooksAMillion"], ViewModelBase.MainUser.Memberships["KinokuniyaUSA"]);
-            });
+            Constants.Logger.Info($"Started Scrape w/ {browser} Browser & [{string.Join(",", CurStockFilter)}] Filters");
+            await Scrape.InitializeScrapeAsync(Title, manga == true ? 'M' : 'N', CurStockFilter, scrapeWebsiteList, browser, ViewModelBase.MainUser.Memberships["RightStufAnime"], ViewModelBase.MainUser.Memberships["BarnesAndNoble"], ViewModelBase.MainUser.Memberships["BooksAMillion"], ViewModelBase.MainUser.Memberships["KinokuniyaUSA"]);
             StartScrapeButton.IsEnabled = PriceAnalysisVM.IsAnalyzeButtonEnabled;
 
             Constants.Logger.Info($"Scrape Finished");
             PriceAnalysisVM.AnalyzedList.Clear();
             PriceAnalysisVM.AnalyzedList.AddRange(Scrape.GetResults());
-            // foreach (EntryModel entry in Scrape.GetResults())
-            // {
-            //     Constants.Logger.Debug(entry.ToString());
-            //     PriceAnalysisVM.AnalyzedList.Add(entry);
-            // }
             MasterScrape.ClearAllWebsiteData();
+            foreach (var x in Scrape.GetResultUrls())
+            {
+                Constants.Logger.Debug($"{x.Key} | {x.Value}");
+            }
         }
 
         private void BrowserChanged(object sender, SelectionChangedEventArgs e)
