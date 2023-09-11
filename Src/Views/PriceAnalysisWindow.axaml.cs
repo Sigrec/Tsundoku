@@ -21,7 +21,7 @@ namespace Tsundoku.Views
     {
         public PriceAnalysisViewModel? PriceAnalysisVM => DataContext as PriceAnalysisViewModel;
         public bool IsOpen = false, manga;
-        private MasterScrape Scrape = new MasterScrape();
+        private readonly MasterScrape Scrape = new();
         private string browser, website;
         private readonly string[] EXCLUDE_NONE_FILTER = { };
         private readonly string[] EXCLUDE_BOTH_FILTER = { "PO", "OOS" };
@@ -48,12 +48,12 @@ namespace Tsundoku.Views
             Closing += (s, e) =>
             {
                 ((PriceAnalysisWindow)s).Hide();
+                TitleBox.Text = string.Empty;
                 Topmost = false;
                 IsOpen ^= true;
                 e.Cancel = true;
             };
 
-            // TODO Need to figure out how to check for website list being empty
             this.WhenAnyValue(x => x.TitleBox.Text, x => x.MangaButton.IsChecked, x => x.NovelButton.IsChecked, x => x.PriceAnalysisVM.CurBrowser, x => x.PriceAnalysisVM.WebsitesSelected, (title, manga, novel, browser, websites) => !string.IsNullOrWhiteSpace(title) && !(manga == false && novel == false) && !string.IsNullOrWhiteSpace(browser) && websites).Subscribe(x => PriceAnalysisVM.IsAnalyzeButtonEnabled = x);
         }
 
@@ -67,7 +67,6 @@ namespace Tsundoku.Views
             MangaButton.IsChecked = false;
         }
         
-        // TODO Website text sometimes getting cut off saw when applying a filter need to investigate
         public async void PerformAnalysis(object sender, RoutedEventArgs args)
         {
             scrapeWebsiteList.Clear();
@@ -123,15 +122,11 @@ namespace Tsundoku.Views
             Constants.Logger.Info($"Started Scrape w/ {browser} Browser & [{string.Join(",", CurStockFilter)}] Filters");
             await Scrape.InitializeScrapeAsync(Title, manga == true ? 'M' : 'N', CurStockFilter, scrapeWebsiteList, browser, ViewModelBase.MainUser.Memberships["RightStufAnime"], ViewModelBase.MainUser.Memberships["BarnesAndNoble"], ViewModelBase.MainUser.Memberships["BooksAMillion"], ViewModelBase.MainUser.Memberships["KinokuniyaUSA"]);
             StartScrapeButton.IsEnabled = PriceAnalysisVM.IsAnalyzeButtonEnabled;
-
             Constants.Logger.Info($"Scrape Finished");
+
             PriceAnalysisVM.AnalyzedList.Clear();
             PriceAnalysisVM.AnalyzedList.AddRange(Scrape.GetResults());
             MasterScrape.ClearAllWebsiteData();
-            foreach (var x in Scrape.GetResultUrls())
-            {
-                Constants.Logger.Debug($"{x.Key} | {x.Value}");
-            }
         }
 
         private void BrowserChanged(object sender, SelectionChangedEventArgs e)
@@ -145,6 +140,11 @@ namespace Tsundoku.Views
         private void WebsiteSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             PriceAnalysisVM.WebsitesSelected = (sender as ListBox).SelectedItems.Count > 0;
+        }
+
+        private void OpenSiteLink(object sender, PointerPressedEventArgs args)
+        {
+            ViewModelBase.OpenSiteLink(Scrape.GetResultUrls()[(sender as TextBlock).Text]);
         }
     }
 }

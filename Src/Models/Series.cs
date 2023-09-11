@@ -13,6 +13,7 @@ using Avalonia.Media.Imaging;
 using System.Text.Json.Serialization;
 using System.Text.Json;
 using static Tsundoku.Models.Constants;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Tsundoku.Models
 {
@@ -537,12 +538,13 @@ namespace Tsundoku.Models
 			return newPath;
         }
 
-		public string ToJsonString(JsonSerializerOptions options)
-		{
-			return JsonSerializer.Serialize<Series?>(this, options);
-		}
+        [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "<Pending>")]
+        public string ToJsonString(JsonSerializerOptions options)
+        {
+            return JsonSerializer.Serialize<Series?>(this, options);
+        }
 
-		protected virtual void Dispose(bool disposing)
+        protected virtual void Dispose(bool disposing)
 		{
 			if (!disposedValue)
 			{
