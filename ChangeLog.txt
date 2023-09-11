@@ -5,7 +5,7 @@ Legend
 ⌛ -> Completed performance/librry update
 
 V2.0.0.0 - September , 2023 @ PST
-❌ Added new "Scrape" Window that allows users to scrape multiple websites to get the website that contains the lowest price volume in USD for each volume of a series
+✅ Added new "Scrape" Window that allows users to scrape multiple websites to get the website that contains the lowest price volume in USD for each volume of a series. Includes filtering out OOS and PO entires as well.
 ✅ Added 4 new toggle buttons in the user settings window to determine if the user is a member of RightStufAnime, B&N, BooksAMillion, and/or Kinokuniya
 ✅ Updated UserData JSON schema to include Memberships dictionary in the User
 🔥 Fixed Themes Settings window border now being curved on the bottom
