@@ -69,64 +69,72 @@ namespace Tsundoku.Views
         
         public async void PerformAnalysis(object sender, RoutedEventArgs args)
         {
-            scrapeWebsiteList.Clear();
-            browser = PriceAnalysisVM.CurBrowser;
-            Title = TitleBox.Text;
-            manga = MangaButton.IsChecked != null ? MangaButton.IsChecked.Value : false;
-            CurStockFilter = (StockFilterSelector.SelectedItem as ComboBoxItem).Content.ToString() switch
+            try
             {
-                "Exclude PO & OOS" => EXCLUDE_BOTH_FILTER,
-                "Exclude PO" => EXCLUDE_PO_FILTER,
-                "Exclude OOS" => EXCLUDE_OOS_FILTER,
-                _ => EXCLUDE_NONE_FILTER
-            };
-
-            foreach (ListBoxItem x in PriceAnalysisVM.SelectedWebsites)
-            {
-                website = x.Content.ToString();
-                switch (website)
+                scrapeWebsiteList.Clear();
+                browser = PriceAnalysisVM.CurBrowser;
+                Title = TitleBox.Text;
+                manga = MangaButton.IsChecked != null ? MangaButton.IsChecked.Value : false;
+                CurStockFilter = (StockFilterSelector.SelectedItem as ComboBoxItem).Content.ToString() switch
                 {
-                    case "RightStufAnime":
-                        scrapeWebsiteList.Add(MasterScrape.Website.RightStufAnime);
-                        break;
-                    case "Barnes & Noble":
-                        scrapeWebsiteList.Add(MasterScrape.Website.BarnesAndNoble);
-                        break;
-                    case "Books-A-Million":
-                        scrapeWebsiteList.Add(MasterScrape.Website.BooksAMillion);
-                        break;
-                    case "RobertsAnimeCornerStore":
-                        scrapeWebsiteList.Add(MasterScrape.Website.RobertsAnimeCornerStore);
-                        break;
-                    case "InStockTrades":
-                        scrapeWebsiteList.Add(MasterScrape.Website.InStockTrades);
-                        break;
-                    case "Kinokuniya USA":
-                        scrapeWebsiteList.Add(MasterScrape.Website.KinokuniyaUSA);
-                        break;
-                    case "AmazonUSA":
-                        scrapeWebsiteList.Add(MasterScrape.Website.AmazonUSA);
-                        break;
-                    case "AmazonJapan":
-                        scrapeWebsiteList.Add(MasterScrape.Website.AmazonJapan);
-                        break;
-                    case "CDJapan":
-                        scrapeWebsiteList.Add(MasterScrape.Website.CDJapan);
-                        break;
+                    "Exclude PO & OOS" => EXCLUDE_BOTH_FILTER,
+                    "Exclude PO" => EXCLUDE_PO_FILTER,
+                    "Exclude OOS" => EXCLUDE_OOS_FILTER,
+                    _ => EXCLUDE_NONE_FILTER
+                };
+
+                foreach (ListBoxItem x in PriceAnalysisVM.SelectedWebsites)
+                {
+                    website = x.Content.ToString();
+                    switch (website)
+                    {
+                        case "RightStufAnime":
+                            scrapeWebsiteList.Add(MasterScrape.Website.RightStufAnime);
+                            break;
+                        case "Barnes & Noble":
+                            scrapeWebsiteList.Add(MasterScrape.Website.BarnesAndNoble);
+                            break;
+                        case "Books-A-Million":
+                            scrapeWebsiteList.Add(MasterScrape.Website.BooksAMillion);
+                            break;
+                        case "RobertsAnimeCornerStore":
+                            scrapeWebsiteList.Add(MasterScrape.Website.RobertsAnimeCornerStore);
+                            break;
+                        case "InStockTrades":
+                            scrapeWebsiteList.Add(MasterScrape.Website.InStockTrades);
+                            break;
+                        case "Kinokuniya USA":
+                            scrapeWebsiteList.Add(MasterScrape.Website.KinokuniyaUSA);
+                            break;
+                        case "AmazonUSA":
+                            scrapeWebsiteList.Add(MasterScrape.Website.AmazonUSA);
+                            break;
+                        case "AmazonJapan":
+                            scrapeWebsiteList.Add(MasterScrape.Website.AmazonJapan);
+                            break;
+                        case "CDJapan":
+                            scrapeWebsiteList.Add(MasterScrape.Website.CDJapan);
+                            break;
+                    }
+                    LOGGER.Info($"Added {website} to Scrape");
                 }
-                Constants.Logger.Info($"Added {website} to Scrape");
+                LOGGER.Debug($"Memberships = {ViewModelBase.MainUser.Memberships["RightStufAnime"]} {ViewModelBase.MainUser.Memberships["BarnesAndNoble"]} {ViewModelBase.MainUser.Memberships["BooksAMillion"]} {ViewModelBase.MainUser.Memberships["KinokuniyaUSA"]}");
+
+                StartScrapeButton.IsEnabled = false;
+                LOGGER.Info($"Started Scrape w/ {browser} Browser & [{string.Join(",", CurStockFilter)}] Filters");
+                await Scrape.InitializeScrapeAsync(Title, manga == true ? 'M' : 'N', CurStockFilter, scrapeWebsiteList, browser, ViewModelBase.MainUser.Memberships["RightStufAnime"], ViewModelBase.MainUser.Memberships["BarnesAndNoble"], ViewModelBase.MainUser.Memberships["BooksAMillion"], ViewModelBase.MainUser.Memberships["KinokuniyaUSA"]);
+
+                StartScrapeButton.IsEnabled = PriceAnalysisVM.IsAnalyzeButtonEnabled;
+                LOGGER.Info($"Scrape Finished");
+
+                PriceAnalysisVM.AnalyzedList.Clear();
+                PriceAnalysisVM.AnalyzedList.AddRange(Scrape.GetResults());
+                MasterScrape.ClearAllWebsiteData();
             }
-            Constants.Logger.Debug($"Memberships = {ViewModelBase.MainUser.Memberships["RightStufAnime"]} {ViewModelBase.MainUser.Memberships["BarnesAndNoble"]} {ViewModelBase.MainUser.Memberships["BooksAMillion"]} {ViewModelBase.MainUser.Memberships["KinokuniyaUSA"]}");
-
-            StartScrapeButton.IsEnabled = false;
-            Constants.Logger.Info($"Started Scrape w/ {browser} Browser & [{string.Join(",", CurStockFilter)}] Filters");
-            await Scrape.InitializeScrapeAsync(Title, manga == true ? 'M' : 'N', CurStockFilter, scrapeWebsiteList, browser, ViewModelBase.MainUser.Memberships["RightStufAnime"], ViewModelBase.MainUser.Memberships["BarnesAndNoble"], ViewModelBase.MainUser.Memberships["BooksAMillion"], ViewModelBase.MainUser.Memberships["KinokuniyaUSA"]);
-            StartScrapeButton.IsEnabled = PriceAnalysisVM.IsAnalyzeButtonEnabled;
-            Constants.Logger.Info($"Scrape Finished");
-
-            PriceAnalysisVM.AnalyzedList.Clear();
-            PriceAnalysisVM.AnalyzedList.AddRange(Scrape.GetResults());
-            MasterScrape.ClearAllWebsiteData();
+            catch (Exception e)
+            {
+                LOGGER.Error($"{e}");
+            }
         }
 
         private void BrowserChanged(object sender, SelectionChangedEventArgs e)

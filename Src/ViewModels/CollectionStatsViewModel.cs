@@ -225,7 +225,7 @@ namespace Tsundoku.ViewModels
             UpdateDemographicPercentages();
             UpdateScoreChartValues();
 
-            // Constants.Logger.Debug("Generate Stats");
+            // LOGGER.Debug("Generate Stats");
             uint testVolumesRead = 0, testUsersNumVolumesCollected = 0, testUsersNumVolumesToBeCollected = 0;
             decimal testCollectionPrice = 0, testMeanScore = 0, countMeanScore = 0;
             foreach (Series x in MainWindowViewModel.Collection)

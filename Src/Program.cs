@@ -1,5 +1,4 @@
 using System.Runtime.CompilerServices;
-using Avalonia;
 using Avalonia.ReactiveUI;
 using Projektanker.Icons.Avalonia.FontAwesome;
 using System;
@@ -28,7 +27,7 @@ namespace Tsundoku
                 .LogToTrace()
                 .UseReactiveUI()
                 .With(LoaderOptimization.MultiDomainHost)
-                .With(LoadHint.Sometimes);
+                .With(LoadHint.Always);
         }
     }
 }

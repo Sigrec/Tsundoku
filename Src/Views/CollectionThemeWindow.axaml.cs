@@ -1,4 +1,3 @@
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Interactivity;
@@ -66,7 +65,7 @@ namespace Tsundoku.Views
         /// </summary>
         private void GenerateThemeType1(object sender, RoutedEventArgs args)
         {
-            Constants.Logger.Info("Generating New Theme1");
+            LOGGER.Info("Generating New Theme1");
 
             NewTheme.ThemeName = NewThemeName.Text;
 
@@ -125,7 +124,7 @@ namespace Tsundoku.Views
         /// </summary>
         private void GenerateThemeType2(object sender, RoutedEventArgs args)
         {
-           Constants.Logger.Info("Generating New Theme2");
+           LOGGER.Info("Generating New Theme2");
 
             NewTheme.ThemeName = NewThemeName.Text;
 
@@ -197,7 +196,7 @@ namespace Tsundoku.Views
                         // Checks if the new theme already exists (some other theme has the same name as what the theme the user is currently trying to save)
                         if (NewTheme.ThemeName.Equals(ThemeSettingsViewModel.UserThemes[x].ThemeName))
                         {
-                            Constants.Logger.Info($"{NewTheme.ThemeName} Already Exists Replacing Color Values at {x}");
+                            LOGGER.Info($"{NewTheme.ThemeName} Already Exists Replacing Color Values at {x}");
                             duplicateCheck = true;
                             replaceTheme = NewTheme.Cloning();
 
@@ -222,7 +221,7 @@ namespace Tsundoku.Views
                         int index = ThemeSettingsViewModel.UserThemes.BinarySearch(placeHolderTheme);
                         index = index < 0 ? ~index : index;
                         ThemeSettingsViewModel.UserThemes.Insert(index, placeHolderTheme);
-                        Constants.Logger.Info($"Added New Theme {NewTheme.ThemeName} to Saved Themes");
+                        LOGGER.Info($"Added New Theme {NewTheme.ThemeName} to Saved Themes");
                         ThemeSelector.SelectedIndex = index;
 
                     }
@@ -230,8 +229,8 @@ namespace Tsundoku.Views
             }
             else
             {
-                Constants.Logger.Debug($"{NewTheme.ThemeName} | {ThemeSettingsVM.CurrentTheme.ThemeName} | {NewTheme.MenuBGColor} | {ThemeSettingsVM.CurrentTheme.MenuBGColor}");
-                Constants.Logger.Error($"CAN'T SAVE THEME {!string.IsNullOrWhiteSpace(NewThemeName.Text) && !NewThemeName.Text.Equals("Default")} | {NewTheme != ThemeSettingsVM.CurrentTheme}");
+                LOGGER.Debug($"{NewTheme.ThemeName} | {ThemeSettingsVM.CurrentTheme.ThemeName} | {NewTheme.MenuBGColor} | {ThemeSettingsVM.CurrentTheme.MenuBGColor}");
+                LOGGER.Error($"CAN'T SAVE THEME {!string.IsNullOrWhiteSpace(NewThemeName.Text) && !NewThemeName.Text.Equals("Default")} | {NewTheme != ThemeSettingsVM.CurrentTheme}");
             }
         }
 
@@ -247,7 +246,7 @@ namespace Tsundoku.Views
             }
             else
             {
-                Constants.Logger.Info("Empty or Invalid Theme Name");
+                LOGGER.Info("Empty or Invalid Theme Name");
             }
         }
 
@@ -263,7 +262,7 @@ namespace Tsundoku.Views
                 {
                     if (x != curIndex)
                     {
-                        Constants.Logger.Info($"Removed Theme {ThemeSettingsViewModel.UserThemes[curIndex].ThemeName} From Saved Themes");
+                        LOGGER.Info($"Removed Theme {ThemeSettingsViewModel.UserThemes[curIndex].ThemeName} From Saved Themes");
                         ThemeSettingsViewModel.UserThemes.Remove(ThemeSettingsViewModel.UserThemes[curIndex]);
                         ThemeChanged = true;
                         ThemeSelector.SelectedIndex = curIndex == 0 ? 0 : --curIndex;
@@ -287,7 +286,7 @@ namespace Tsundoku.Views
                 CollectionWindow.CollectionViewModel.collectionStatsWindow.CollectionStatsVM.CurrentTheme = CollectionWindow.CollectionViewModel.CurrentTheme;
                 CollectionWindow.CollectionViewModel.priceAnalysisWindow.PriceAnalysisVM.CurrentTheme = CollectionWindow.CollectionViewModel.CurrentTheme;
                 
-                Constants.Logger.Info($"Theme Changed To {(ThemeSelector.SelectedItem as TsundokuTheme).ThemeName}");
+                LOGGER.Info($"Theme Changed To {(ThemeSelector.SelectedItem as TsundokuTheme).ThemeName}");
                 ApplyColors();
                 CollectionWindow.CollectionViewModel.collectionStatsWindow.UpdateChartColors();
                 ThemeChanged = false;

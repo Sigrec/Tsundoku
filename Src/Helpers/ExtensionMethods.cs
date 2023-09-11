@@ -1,9 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using static Tsundoku.Models.Constants;
 
 namespace Tsundoku.Helpers
 {
@@ -29,21 +27,16 @@ namespace Tsundoku.Helpers
 
             while (titleOnePointer < titleOne.Length && titleTwoPointer < titleTwo.Length) // Keep traversing until u reach the end of titleOne's string
             {
-                // Logger.Debug("O " + titleOnePointer + "(" + titleOne[titleOnePointer] + ")" + "\t" + titleTwoPointer + "(" + titleTwo[titleTwoPointer] + ")");
                 if (titleOne[titleOnePointer] != titleTwo[titleTwoPointer]) // Checks to see if the characters match
                 {
-                    // Logger.Debug($"{titleOne[titleOnePointer]},{titleOnePointer} | {titleTwo[titleTwoPointer]},{titleTwoPointer}");
                     count++; // There is 1 additional character difference
                     for (int z = titleOnePointer; z < titleOne.Length; z++) // Start at the index of where the characters were not the same, then traverse the other string to see if it matches
                     {
-                        // Logger.Debug("I " + z + "(" + titleOne[z] + ")" + "\t" + titleTwoPointer + "(" + titleTwo[titleTwoPointer] + ")");
                         if (titleOne[z] == titleTwo[titleTwoPointer]) // Checks to see if the character is present in the other string and is in a similar position
                         {
                             break;
                         }
                     }
-					// Logger.Debug("Current Cache Size After = " + cache);
-                    // Logger.Debug("Count = " + count);
                 } 
                 else // Characters do match so just move to the next set of characters to compare in the strings
                 {
@@ -51,9 +44,6 @@ namespace Tsundoku.Helpers
                 }
                 titleTwoPointer++;
             }
-
-            // Logger.Debug("Count = " + count);
-            // Logger.Debug((count != -1 && count <= (titleOne.Length > titleTwo.Length ? titleTwo.Length / 5 : titleOne.Length / 5)) ? $"{titleOne} is Similar to {titleTwo}" : $"{titleOne} is Not Similar to {titleTwo}");
             return count != -1 && count <= (titleOne.Length > titleTwo.Length ? titleTwo.Length / 5 : titleOne.Length / 5); // Determine if they are similar enough by a threshold of 1/5 the size of longest title
         }
 

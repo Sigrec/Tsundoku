@@ -1,27 +1,24 @@
-﻿using Microsoft.VisualBasic;
-using DiscordRPC;
+﻿using DiscordRPC;
 
 namespace Tsundoku.Helpers
 {
     internal class DiscordRP
     {
         private static DiscordRpcClient client;
+        private static string UserName;
 
         public static void Initialize()
         {
-            // == Create the client
             client = new DiscordRpcClient("1050229234674696252");
 
-            // == Subscribe to some events
             client.OnReady += (sender, msg) =>
             {
-                Tsundoku.Models.Constants.Logger.Info("Connected To Discord With User {0}", msg.User.Username);
+                UserName = msg.User.Username;
+                LOGGER.Info($"Connected To Discord With User {UserName}");
             };
 
-            // == Initialize
             client.Initialize();
 
-            // == Set the presence
             client.SetPresence(new RichPresence()
             {
                 Details = "Manga & Light Novel Collection App",
@@ -45,6 +42,7 @@ namespace Tsundoku.Helpers
 
         public static void Deinitialize() 
         {
+            LOGGER.Info($"Disconnecting From Discord With User {UserName}");
             client.Dispose();
         }
     }

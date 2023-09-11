@@ -1,8 +1,6 @@
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Avalonia.Controls;
 using MangaLightNovelWebScrape;
-using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 namespace Tsundoku.ViewModels

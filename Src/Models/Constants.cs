@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
 
 namespace Tsundoku.Models
 {
@@ -18,10 +16,6 @@ namespace Tsundoku.Models
         public const ushort USER_NOTES_HEIGHT = TOP_SECTION_CARD_HEIGHT - 16;
         public const ushort IMAGE_HEIGHT = CARD_HEIGHT - BOTTOM_SECTION_CARD_HEIGHT;
 		public static readonly string[] DEMOGRAPHICS = new string[] { "Shounen", "Shoujo", "Seinen", "Josei", "Unknown" };
-
-		// TODO: Fix Logging so it actually logs to a external file
-		public static readonly NLog.Logger Logger = NLog.LogManager.GetLogger("TsundOkuLogs");
-		// public static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
 
 		public static readonly string[] AvailableLanguages = new string[] { "Romaji", "English", "Japanese", "Arabic", "Azerbaijan", "Bengali", "Bulgarian", "Burmese", "Catalan", "Chinese", "Croatian", "Czech", "Danish", "Dutch", "Esperanto", "Estonian", "Filipino", "Finnish", "French", "German", "Greek", "Hebrew", "Hindi", "Hungarian", "Indonesian", "Italian", "Kazakh", "Korean", "Latin", "Lithuanian", "Malay", "Mongolian", "Nepali", "Norwegian", "Persian", "Polish", "Portuguese", "Romanian", "Russian", "Serbian", "Slovak", "Spanish", "Swedish", "Tamil", "Thai", "Turkish", "Ukrainian", "Vietnamese" };
 

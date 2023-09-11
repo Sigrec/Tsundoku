@@ -58,7 +58,7 @@ namespace Tsundoku.ViewModels
         {
             // Helpers.ExtensionMethods.PrintCultures();
             // Helpers.ExtensionMethods.PrintCurrencySymbols();
-            Constants.Logger.Info("Starting TsundOku");
+            LOGGER.Info("Starting TsundOku");
             GetUserData();
             ConfigureWindows();
 
@@ -185,7 +185,7 @@ namespace Tsundoku.ViewModels
         public static void FilterCollection(string filter)
         {
             SearchedCollection.Clear();
-            Constants.Logger.Info($"Filtering Collection by {filter}");
+            LOGGER.Info($"Filtering Collection by {filter}");
             switch (filter)
             {
                 case "Ongoing":
@@ -248,7 +248,7 @@ namespace Tsundoku.ViewModels
         {
             if (!File.Exists(filePath))
             {
-                Constants.Logger.Info("Creating New User");
+                LOGGER.Info("Creating New User");
                 ThemeSettingsViewModel.UserThemes = new ObservableCollection<TsundokuTheme>() { TsundokuTheme.DEFAULT_THEME };
                 MainUser = new User("UserName", "Romaji", "Default", "Card", SCHEMA_VERSION, "$", "$0.00", new Dictionary<string, bool>(), ThemeSettingsViewModel.UserThemes, Collection)
                 {
@@ -269,7 +269,7 @@ namespace Tsundoku.ViewModels
             fRead.Flush();
             fRead.Close();
 
-            Constants.Logger.Info($"Loading {MainUser.UserName}'s Data");
+            LOGGER.Info($"Loading {MainUser.UserName}'s Data");
             UserName = MainUser.UserName;
             Collection = MainUser.UserCollection;
             ThemeSettingsViewModel.UserThemes = new ObservableCollection<TsundokuTheme>(MainUser.SavedThemes.OrderBy(theme => theme.ThemeName).ToList());
@@ -307,7 +307,7 @@ namespace Tsundoku.ViewModels
                 if (MainUser.SavedThemes[x].ThemeName.Equals("Default"))
                 {
                     MainUser.SavedThemes[x] = TsundokuTheme.DEFAULT_THEME;
-                    Constants.Logger.Info("Updated Default Theme");
+                    LOGGER.Info("Updated Default Theme");
                     break;
                 }
             }
@@ -325,9 +325,9 @@ namespace Tsundoku.ViewModels
             // For users who did not get the older update
             if (!userData.AsObject().ContainsKey("CurDataVersion"))
             {
-                Constants.Logger.Debug("Check #4");
+                LOGGER.Debug("Check #4");
                 userData.AsObject().Add("CurDataVersion", "1.0");
-                Constants.Logger.Info("Added CurDataVersion Json Object");
+                LOGGER.Info("Added CurDataVersion Json Object");
             }
             double curVersion = double.Parse(userData["CurDataVersion"].ToString());
 
@@ -381,7 +381,7 @@ namespace Tsundoku.ViewModels
                     }
                 }
                 userData["CurDataVersion"] = 1.5;
-                Constants.Logger.Info("Updated Users Data to v1.5");
+                LOGGER.Info("Updated Users Data to v1.5");
                 updatedVersion = true;        
             }
 
@@ -397,7 +397,7 @@ namespace Tsundoku.ViewModels
                 }
 
                 userData["CurDataVersion"] = 1.6;
-                Constants.Logger.Info("Updated Users Data to v1.6");
+                LOGGER.Info("Updated Users Data to v1.6");
                 updatedVersion = true;  
             }
 
@@ -414,7 +414,7 @@ namespace Tsundoku.ViewModels
                 {
                     userData.AsObject().Add(nameof(UserIcon), defaultFileByte);
                     userData["CurDataVersion"] = 1.7;
-                    Constants.Logger.Info("Updated Users Data to v1.7");
+                    LOGGER.Info("Updated Users Data to v1.7");
                     updatedVersion = true;
                 }
             }
@@ -434,7 +434,7 @@ namespace Tsundoku.ViewModels
                 }
 
                 userData["CurDataVersion"] = 1.8;
-                Constants.Logger.Info("Updated Users Data to v1.8");
+                LOGGER.Info("Updated Users Data to v1.8");
                 updatedVersion = true;  
             }
 
@@ -451,7 +451,7 @@ namespace Tsundoku.ViewModels
                     }
                 }
                 userData["CurDataVersion"] = 1.9;
-                Constants.Logger.Info("Updated Users Data to v1.9");
+                LOGGER.Info("Updated Users Data to v1.9");
                 updatedVersion = true;
             }
 
@@ -465,7 +465,7 @@ namespace Tsundoku.ViewModels
                     ["KinokuniyaUSA"] = false
                 };
                 userData["CurDataVersion"] = 2.0;
-                Constants.Logger.Info("Updated Users Data to v2.0");
+                LOGGER.Info("Updated Users Data to v2.0");
                 updatedVersion = true;
             }
 
@@ -476,7 +476,7 @@ namespace Tsundoku.ViewModels
         [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "A New file will always be created if it doesn't exist before serialization")]
         public static void SaveUsersData()
         {
-            Constants.Logger.Info($"Saving {MainUser.UserName}'s Data");
+            LOGGER.Info($"Saving {MainUser.UserName}'s Data");
             MainUser.UserCollection = Collection;
             MainUser.SavedThemes = ThemeSettingsViewModel.UserThemes;
 

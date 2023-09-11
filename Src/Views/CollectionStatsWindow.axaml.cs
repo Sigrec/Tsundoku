@@ -1,12 +1,9 @@
-using Avalonia;
 using Avalonia.Input;
 using LiveChartsCore.Defaults;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
-using Tsundoku.Models;
 using Tsundoku.ViewModels;
 using Avalonia.ReactiveUI;
-using ReactiveUI;
 
 namespace Tsundoku.Views
 {
@@ -84,13 +81,13 @@ namespace Tsundoku.Views
 
             CollectionStatsVM.ScoreYAxes[0].SeparatorsPaint = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.MenuButtonBGColor));
 
-            Constants.Logger.Info("Updated Chart Colors ");
+            LOGGER.Info("Updated Chart Colors ");
         }
 
         private async void CopyTextAsync(object sender, PointerPressedEventArgs args)
         {
             string curText = (sender as Controls.ValueStat).Text;
-            Constants.Logger.Info($"Copying {curText} to Clipboard");
+            LOGGER.Info($"Copying {curText} to Clipboard");
             await TextCopy.ClipboardService.SetTextAsync(curText);
         }
     }

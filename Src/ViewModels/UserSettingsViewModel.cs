@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using System.Text;
 using Tsundoku.Models;
 using System.Windows.Input;
-using System.Diagnostics;
 
 namespace Tsundoku.ViewModels
 {
@@ -61,11 +60,11 @@ namespace Tsundoku.ViewModels
                 try
                 {
                     System.IO.File.WriteAllTextAsync(file, output.ToString(), Encoding.UTF8);
-                    Constants.Logger.Info($"Exported {MainUser.UserName}'s Data To -> TsundokuCollection.csv");
+                    LOGGER.Info($"Exported {MainUser.UserName}'s Data To -> TsundokuCollection.csv");
                 }
                 catch (Exception ex)
                 {
-                    Constants.Logger.Warn($"Could not Export {MainUser.UserName}'s Data To -> TsundokuCollection.csv \n{ex}");
+                    LOGGER.Warn($"Could not Export {MainUser.UserName}'s Data To -> TsundokuCollection.csv \n{ex}");
                 }
             });
         }

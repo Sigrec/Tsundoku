@@ -6,18 +6,17 @@ using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Tsundoku.Models;
 
 namespace Tsundoku.Helpers
 {
-	public partial class AniListQuery : IDisposable
+    public partial class AniListQuery : IDisposable
 	{
 		private static readonly string USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.66 Safari/537.36";
 		private static GraphQLHttpClient AniListClient = new GraphQLHttpClient("https://graphql.anilist.co", new SystemTextJsonSerializer());
         private bool disposedValue;
         [GeneratedRegex("\\(Source: [\\S\\s]+|\\<.*?\\>")] private static partial Regex AniListDescRegex();
 
-		public AniListQuery()
+		static AniListQuery()
 		{
 			AniListClient.HttpClient.DefaultRequestHeaders.Add("RequestType", "POST");
 			AniListClient.HttpClient.DefaultRequestHeaders.Add("ContentType", "application/json");
@@ -32,7 +31,7 @@ namespace Tsundoku.Helpers
 		/// <param name="format">The format of the series either manga or light novel</param>
 		/// <param name="pageNum">The current page number of the GraphQL query</param>
 		/// <returns></returns>
-        public async Task<JsonDocument?> GetSeriesByTitleAsync(string title, string format, int pageNum)
+        public static async Task<JsonDocument?> GetSeriesByTitleAsync(string title, string format, int pageNum)
 		{
 			try
 			{
@@ -83,7 +82,7 @@ namespace Tsundoku.Helpers
 			}
 			catch(Exception e)
 			{
-				Constants.Logger.Warn($"AniList GetSeriesByTitle w/ {title} Request Failed {e.Message}");
+				LOGGER.Error($"AniList GetSeriesByTitle w/ {title} Request Failed {e.Message}");
 			}
 			return null;
 		}
@@ -95,7 +94,7 @@ namespace Tsundoku.Helpers
 		/// <param name="format">The format of the series either manga or light novel</param>
 		/// <param name="pageNum">The current page number of the GraphQL query</param>
 		/// <returns></returns>
-		public async Task<JsonDocument?> GetSeriesByIDAsync(int seriesId, string format, int pageNum)
+		public static async Task<JsonDocument?> GetSeriesByIDAsync(int seriesId, string format, int pageNum)
 		{
 			try
 			{
@@ -147,7 +146,7 @@ namespace Tsundoku.Helpers
 			}
 			catch(Exception e)
 			{
-				Constants.Logger.Warn($"AniList GetSeriesById w/ {seriesId} Request Failed {e.Message}");
+				LOGGER.Error($"AniList GetSeriesById w/ {seriesId} Request Failed {e.Message}");
 			}
 			return null;
 		}

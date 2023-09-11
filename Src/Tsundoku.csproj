@@ -35,6 +35,7 @@
 	    <AvaloniaResource Include="Assets/**" />
         <AvaloniaResource Include="Styles/**" />
 		<AvaloniaResource Include="Covers/**" />
+		<EmbeddedResource Include="NLog.config" />
         <AvaloniaXaml Remove="Covers\**" />
         <Compile Remove="Covers\**" />
         <EmbeddedResource Remove="Covers\**" />
@@ -67,11 +68,11 @@
     <Content Include="Assets\Icons\Tsundoku-Logo.ico" />
   </ItemGroup>
 	
-  <ItemGroup>
+  <!-- <ItemGroup>
 	  <Content Include="NLog.config">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
-  </ItemGroup>
+  </ItemGroup> -->
 	
   <ItemGroup>
     <!--This helps with theme dll-s trimming.

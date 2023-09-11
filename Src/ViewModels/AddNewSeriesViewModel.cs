@@ -5,7 +5,6 @@ using DynamicData;
 using Avalonia.Media.Imaging;
 using System.Collections.ObjectModel;
 using Avalonia.Controls;
-using ReactiveUI;
 using System;
 
 namespace Tsundoku.ViewModels
@@ -29,21 +28,18 @@ namespace Tsundoku.ViewModels
 
         }
         
-        /**
-        * Last Modified: 08 December 2022
-        *  by: Sean Njenga
-        * Desc: Recieves the call from the AddNewSeriesWindow Button "Add" press which sends the data to this method which calls for
-        *       the method to get the series data and create a new series object. Then it checks to see if it's a valid series and
-        *       whether the series already exists in the users collection if not then it adds.
-        * Params:
-        *      title    | string      | The titles of the new series to add
-        *      bookType | string      | The book type or format of the series to add either a Manga(Comic) or Novel
-        *      ushort   | curVolCount | The current # of volumes the user has collected for this series
-        *      ushort   | maxVolCount | The max # of volumes this series currently has
-        */
-        public async Task<bool> GetSeriesData(string title, string bookType, ushort curVolCount, ushort maxVolCount, ObservableCollection<string> additionalLanguages)
+        /// <summary>
+        /// Recieves the call from the AddNewSeriesWindow Button "Add" press which sends the data to this method which calls for the method to get the series data and create a new series object. Then it checks to see if it's a valid series and whether the series already exists in the users collection if not then it adds.
+        /// </summary>
+        /// <param name="title">The titles of the new series to add</param>
+        /// <param name="bookType">The book type or format of the series to add either a Manga(Comic) or Novel</param>
+        /// <param name="curVolCount">The current # of volumes the user has collected for this series</param>
+        /// <param name="maxVolCount">The max # of volumes this series currently has</param>
+        /// <param name="additionalLanguages">Additional languages to get more info for from Mangadex</param>
+        /// <returns>Whether the series can be added to the users collection or not</returns>
+        public static async Task<bool> GetSeriesDataAsync(string title, string bookType, ushort curVolCount, ushort maxVolCount, ObservableCollection<string> additionalLanguages)
         {
-            Series? newSeries = await Series.CreateNewSeriesCard(title, bookType, maxVolCount, curVolCount, ALQuery, MDQuery, additionalLanguages);
+            Series? newSeries = await Series.CreateNewSeriesCardAsync(title, bookType, maxVolCount, curVolCount,  additionalLanguages);
             
             bool duplicateSeriesCheck = true;
             if (newSeries != null)
@@ -53,7 +49,7 @@ namespace Tsundoku.ViewModels
                 {
                     if (!duplicateSeriesCheck && series.Link.Equals(newSeries.Link))
                     {
-                        Constants.Logger.Debug($"{series.Link} | {newSeries.Link}");
+                        LOGGER.Debug($"{series.Link} | {newSeries.Link}");
                         duplicateSeriesCheck = true;
                     }
                 }
@@ -63,10 +59,10 @@ namespace Tsundoku.ViewModels
                     // If the user is currently searching need to "refresh" the SearchedCollection so it can insert at correct index
                     if (MainWindowViewModel.SearchedCollection.Count != MainWindowViewModel.Collection.Count)
                     {
-                        Constants.Logger.Info("Refreshing Searched Collection");
+                        LOGGER.Info("Refreshing Searched Collection");
                         MainWindowViewModel.SortCollection();
                     }
-                    Constants.Logger.Info($"\nAdding New Series -> {title} | {bookType} | {curVolCount} | {maxVolCount} |\n{newSeries.ToJsonString(options)}");
+                    LOGGER.Info($"\nAdding New Series -> {title} | {bookType} | {curVolCount} | {maxVolCount} |\n{newSeries.ToJsonString(options)}");
                     // File.WriteAllText(@"Series.json", newSeries.ToJsonString(options));
 
                     int index = MainWindowViewModel.Collection.BinarySearch(newSeries, new SeriesComparer(MainUser.CurLanguage));
@@ -78,12 +74,12 @@ namespace Tsundoku.ViewModels
                 }
                 else
                 {
-                    Constants.Logger.Info("Series Already Exists");
+                    LOGGER.Info("Series Already Exists");
                 }
             }
             else
             {
-                Constants.Logger.Info($"{title} -> Does Not Exist");
+                LOGGER.Info($"{title} -> Does Not Exist");
             }
             return duplicateSeriesCheck;
         }

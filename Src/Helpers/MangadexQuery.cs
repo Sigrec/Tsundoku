@@ -6,7 +6,6 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Tsundoku.Models;
 
 namespace Tsundoku.Helpers
 {
@@ -32,7 +31,7 @@ namespace Tsundoku.Helpers
         private static readonly string USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36 Edg/116.0.1938.62";
         [GeneratedRegex("\\n\\n\\n---[\\S\\s.]*|\\n\\n\\*\\*[\\S\\s.]*")] private static partial Regex MangaDexDescRegex();
 
-        public MangadexQuery()
+        static MangadexQuery()
         {
             MangadexClient.DefaultRequestHeaders.Add("User-Agent", USER_AGENT);
         }
@@ -42,18 +41,18 @@ namespace Tsundoku.Helpers
         /// </summary>
         /// <param name="title">A string used for getting series data from MangaDex</param>
         /// <returns></returns>
-        public async Task<JsonDocument?> GetSeriesByTitleAsync(string title)
+        public static async Task<JsonDocument?> GetSeriesByTitleAsync(string title)
         {
             try
             {
-                //Constants.Logger.Debug($"{MangadexClient.BaseAddress}manga?title={title.Replace(" ", "%20")}");
+                //LOGGER.Debug($"{MangadexClient.BaseAddress}manga?title={title.Replace(" ", "%20")}");
                 var response = await MangadexClient.GetStringAsync($"manga?title={title.Replace(" ", "%20")}");
                 // File.WriteAllText(@"MangadexTitleTest.json", JsonSerializer.Serialize(JsonDocument.Parse(response), options));
                 return JsonDocument.Parse(response);
             }
             catch (HttpRequestException e)
             {
-                Constants.Logger.Warn($"MangaDex GetSeriesByTitle w/ {title} Request Failed HttpRequestException {e.Message}");
+                LOGGER.Error($"MangaDex GetSeriesByTitle w/ {title} Request Failed HttpRequestException {e.Message}");
             }
             return null;
         }
@@ -63,7 +62,7 @@ namespace Tsundoku.Helpers
         /// </summary>
         /// <param name="id">A unique string ID used for getting series data from MangaDex</param>
         /// <returns></returns>
-        public async Task<JsonDocument?> GetSeriesByIdAsync(string id)
+        public static async Task<JsonDocument?> GetSeriesByIdAsync(string id)
         {
             try
             {
@@ -73,7 +72,7 @@ namespace Tsundoku.Helpers
             }
             catch (Exception e)
             {
-                Constants.Logger.Warn($"MangaDex GetSeriesById w/ {id} Request Failed {e} {e.Message}");
+                LOGGER.Error($"MangaDex GetSeriesById w/ {id} Request Failed {e} {e.Message}");
             }
             return null;
         }
@@ -83,7 +82,7 @@ namespace Tsundoku.Helpers
         /// </summary>
         /// <param name="id">The string id used to query the author data for a MangaDex series</param>
         /// <returns></returns>
-        public async Task<string?> GetAuthor(string id)
+        public static async Task<string?> GetAuthorAsync(string id)
         {
             try
             {
@@ -93,7 +92,7 @@ namespace Tsundoku.Helpers
             }
             catch (Exception e)
             {
-                Constants.Logger.Warn($"MangaDex GetAuthor w/ {id} Request Failed {e.Message}");
+                LOGGER.Error($"MangaDex GetAuthor w/ {id} Request Failed {e.Message}");
             }
             return null;
         }
@@ -103,7 +102,7 @@ namespace Tsundoku.Helpers
         /// </summary>
         /// <param name="id">The id used to query the cover</param>
         /// <returns></returns>
-        public async Task<string?> GetCover(string id)
+        public static async Task<string?> GetCoverAsync(string id)
         {
             try
             {
@@ -120,7 +119,7 @@ namespace Tsundoku.Helpers
             }
             catch (Exception e)
             {
-                Constants.Logger.Warn($"MangaDex GetCover w/ {id} Request Failed {e.Message}");
+                LOGGER.Error($"MangaDex GetCover w/ {id} Request Failed {e.Message}");
             }
             return null;
         }
