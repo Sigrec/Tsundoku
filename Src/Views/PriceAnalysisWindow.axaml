@@ -3,6 +3,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:vm="using:Tsundoku.ViewModels"
+		xmlns:models="using:MangaAndLightNovelWebScrape.EntryModel"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Tsundoku.Views.PriceAnalysisWindow"
         Icon="\Assets\Icons\Tsundoku-Logo.ico"
@@ -10,121 +11,171 @@
 		FontFamily="Segoe UI"
 		SizeToContent="WidthAndHeight"
         Classes="menu"
+		CanResize="True"
+		MinWidth="666"
+		MaxWidth="666"
+        MaxHeight="611"
+        Height="500"
 		WindowStartupLocation="2"
 		KeyboardNavigation.TabNavigation="Cycle"
 		x:DataType="vm:PriceAnalysisViewModel">
+		
+	<Window.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceInclude Source="/Styles/AddNewSeriesControlThemes.xaml"/>
+                <ResourceInclude Source="/Styles/PriceAnalysisControlThemes.xaml"/>
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>
+	</Window.Resources>
 
-	<Window.Styles>
-		<StyleInclude Source="/Styles/MenuTheme.xaml" />
-	</Window.Styles>
-
-	<Grid ColumnDefinitions="*,*,*" RowDefinitions="*,*,10,*,*,10,*,10,*" Margin="20" ShowGridLines="True">
-		<Grid.Styles>
-			<StyleInclude Source="/Styles/MenuTheme.xaml" />
-			<Style Selector="Button:focus /template/ ContentPresenter#PART_ContentPresenter">
-				<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
-				<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
-				<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
-			</Style>
-		</Grid.Styles>
-		<TextBlock Grid.ColumnSpan="2" Grid.Column="0" Grid.Row="0" Margin="0,0,0,0" Text="Enter Title" FontSize="20" FontWeight="Bold" Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-		<TextBox Watermark="Title..."
-				 Grid.ColumnSpan="2"
-				 Grid.Column="0"
-				 Grid.Row="1"
-				 Classes="menu"
-				 Width="390"
-				 FontSize="18"
-				 FontWeight="Bold"
-				 TextWrapping="Wrap"
-				 VerticalAlignment="Center"
-				 HorizontalAlignment="Center"
-				 BorderThickness="2"/>
-		<TextBlock Grid.Column="0" Grid.Row="3" HorizontalAlignment="Center" Text="Select Browser" Margin="0,0,0,0" FontSize="20" FontWeight="Bold" Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}" VerticalAlignment="Center"/>
-		<ComboBox Name="BrowserSelector"
-				  Grid.Column="0"
-				  Grid.Row="4"
-				  SelectedItem="Edge"
-				  Height="37"
-				  VerticalAlignment="Center"
-				  HorizontalAlignment="Center"
-				  ItemsSource="{Binding AvailableBrowsers, Mode=OneWay}"
-				  FontWeight="Bold"
-				  BorderThickness="2"
-				  Width="130"
-				  Classes="menu"/>
-		<TextBlock HorizontalAlignment="Center" 
-				   VerticalAlignment="Center"
-				   Text="Select Book Type"
-				   Grid.Row="3" 
-				   Grid.Column="1" 
-				   Margin="0,8,0,0" 
-				   FontSize="20" 
-				   FontWeight="Bold" 
-				   Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}"/>
-		<StackPanel Orientation="Horizontal" Width="180" Grid.Column="1" Grid.Row="4" Spacing="4" Margin="0,0,0,0">
-			<StackPanel.Styles>
-				<StyleInclude Source="/Styles/MenuTheme.xaml" />
-			</StackPanel.Styles>
-			<ToggleButton Name="MangaButton"
-						FontSize="15"
-						Height="37" 
+	<Border Classes="menu" BorderThickness="3" CornerRadius="0,0,8,8" ClipToBounds="True">
+		<ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"> 
+			<Grid ColumnDefinitions="Auto,10,Auto,10,Auto" RowDefinitions="Auto,Auto,Auto,20,Auto" Margin="20,10,20,20" ShowGridLines="False">
+				<StackPanel Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3">
+					<TextBlock Text="Enter Title" FontSize="20" FontWeight="Bold" Classes="menu" Margin="0,0,0,1"/>
+					<TextBox Name="TitleBox"
+							Watermark="Title..."
+							Classes="menu"
+							Width="390"
+							FontSize="18"
+							FontWeight="Bold"
+							TextWrapping="Wrap"
+							Margin="0"
+							VerticalAlignment="Center"
+							HorizontalAlignment="Center"
+							BorderThickness="2"/>
+				</StackPanel>
+				<StackPanel Grid.Column="2" Grid.Row="1" Margin="0,5,0,0">
+					<TextBlock Text="Select Browser" FontSize="20" FontWeight="Bold" Classes="menu" Margin="0,0,0,3"/>
+					<ComboBox Name="BrowserSelector"
+							  Height="37"
+							  SelectionChanged="BrowserChanged"
+							  Width="182"
+							  AutoScrollToSelectedItem="True"
+							  HorizontalAlignment="Left"
+							  Theme="{StaticResource MenuComboBox}">
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Chrome</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Edge</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">FireFox</ComboBoxItem>
+					</ComboBox>
+				</StackPanel>
+				<StackPanel Grid.Column="0" Grid.Row="1" Margin="0,5,0,0">
+					<TextBlock Text="Select Book Type"
+						FontSize="20" 
 						FontWeight="Bold"
-						Width="88"
-						BorderThickness="2"
-						VerticalContentAlignment="Center"
-						HorizontalContentAlignment="Center"
-						Classes="menu"
-						Content="Manga"/>
-			<ToggleButton Name="NovelButton"
-						FontSize="15" 
+						Margin="0,0,0,3"
+						Classes="menu"/>
+					<StackPanel Orientation="Horizontal" Width="180" Spacing="5" HorizontalAlignment="Left">
+						<ToggleButton Name="MangaButton"
+									Checked="IsMangaButtonClicked"
+									Width="87.5"
+									Theme="{StaticResource MenuToggleButton}"
+									Content="Manga"/>
+						<ToggleButton Name="NovelButton"
+									Checked="IsNovelButtonClicked"
+									IsEnabled="False"
+									Width="87.5"
+									Theme="{StaticResource MenuToggleButton}"
+									Content="Novel"/>
+					</StackPanel>
+				</StackPanel>
+				<StackPanel Grid.Column="4" Grid.Row="0" Grid.RowSpan="3">
+					<TextBlock Text="Select Websites" FontSize="20" FontWeight="Bold" Classes="menu"/>
+					<!-- TODO Fix pressed style for listboxitem so it's opposite of hover -->
+					<ListBox Name="WebsiteSelector"
+							  Theme="{StaticResource QueryListBox}"
+							  SelectionMode="Multiple,Toggle"
+							  SelectionChanged="WebsiteSelectionChanged"
+							  SelectedItems="{CompiledBinding SelectedWebsites}"
+							  Height="185"
+							  Width="220">
+						<!-- <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Amazon USA"/> -->
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="RightStufAnime"/>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Barnes &#x26; Noble"/>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Books-A-Million"/>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="InStockTrades"/>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Kinokuniya USA"/>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="RobertsAnimeCornerStore"/>
+						<!-- <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Amazon Japan"/> -->
+						<!-- <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="CDJapan"/> -->
+						<!-- <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Indigo"/> -->
+					</ListBox>
+				</StackPanel>
+				<StackPanel Grid.Column="0" Grid.Row="2" Margin="0,5,0,0">
+					<TextBlock Text="Stock Status Filters" FontSize="20" FontWeight="Bold" Classes="menu" Margin="0,0,0,3"/>
+					<ComboBox Name="StockFilterSelector"
+							  Height="37"
+							  Width="182"
+							  SelectedIndex="0"
+							  AutoScrollToSelectedItem="True"
+							  HorizontalAlignment="Left"
+							  Theme="{StaticResource MenuComboBox}">
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Exclude None"/>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Exclude PO &#x26; OOS"/>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Exclude PO"/>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Exclude OOS"/>
+					</ComboBox>
+				</StackPanel>
+				<StackPanel Grid.Row="2" Grid.Column="2" HorizontalAlignment="Center" Margin="0,5,0,0">
+					<TextBlock Text="Start Scrape"
+						FontSize="20" 
+						HorizontalAlignment="Center"
 						FontWeight="Bold"
-						Width="88"
-						Height="37" 
-						BorderThickness="2"
-						VerticalContentAlignment="Center"
-						HorizontalContentAlignment="Center"
-						Classes="menu"
-						Content="Novel"/>
-		</StackPanel>
-		<TextBlock Grid.Column="2" Grid.Row="3" HorizontalAlignment="Center" Text="Select Browser" Margin="0,0,0,0" FontSize="20" FontWeight="Bold" Foreground="{Binding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}" VerticalAlignment="Center"/>
-		<ComboBox Name="WebsiteSelector"
-				  Grid.Column="2"
-				  Grid.Row="4"
-				  SelectedItem="Edge"
-				  Height="37"
-				  VerticalAlignment="Center"
-				  HorizontalAlignment="Center"
-				  ItemsSource="{Binding AvailableWebsites, Mode=OneWay}"
-				  FontWeight="Bold"
-				  BorderThickness="2"
-				  Width="130"
-				  Classes="menu"/>
-		<DataGrid ItemsSource="{Binding AnalyzedList}"
-				  Classes="menu"
-				  Name="AnalysisDataGrid"
-				  AutoGenerateColumns="True"
-				  GridLinesVisibility="All"
-				  BorderThickness="2"
-				  Grid.ColumnSpan="2"
-				  Grid.Column="0"
-				  Grid.Row="6"
-				  BorderBrush="Red">
-			<!-- <DataGridTextColumn Header="Entry" Binding="{Binding Entry}"/>
-			<DataGridTextColumn Header="Price" Binding="{Binding Price}"/>
-			<DataGridTextColumn Header="Stock Status" Binding="{Binding StockStatus}"/>
-			<DataGridTextColumn Header="Website" Binding="{Binding Website}"/> -->
-		</DataGrid>
-		<Button Classes="Menu"
-				BorderThickness="2"
-				FontWeight="Bold"
-				Grid.ColumnSpan="2"
-				Grid.Column="0"
-				Grid.Row="8"
-				FontSize="16"
-				VerticalAlignment="Center"
-				HorizontalAlignment="Center"
-				Click="PerformAnalysis"
-				Content="Analyze"/>
-	</Grid>
+						Margin="0,0,0,3"
+						Classes="menu"/>
+					<Button Classes="Menu"
+							BorderThickness="2"
+							FontWeight="Bold"
+							Width="182"
+							Height="37"
+							Name="StartScrapeButton"
+							FontSize="18"
+							Padding="-10,0,0,0"
+							IsEnabled="{CompiledBinding IsAnalyzeButtonEnabled}"
+							Theme="{StaticResource MenuButton}"
+							Click="PerformAnalysis"
+							Content="Scrape"/>
+				</StackPanel>
+				<!-- TODO CornerRadius doesn't apply to column headers -->
+				<DataGrid Name="AnalysisDataGrid"
+						  ItemsSource="{CompiledBinding AnalyzedList}"
+						  Classes="menu"
+						  MaxWidth="620"
+						  Height="340"
+						  MaxHeight="340"
+						  ClipToBounds="True"
+						  IsReadOnly="True"
+						  CanUserReorderColumns="False"
+						  CanUserSortColumns="False"
+						  AutoGenerateColumns="False"
+						  CanUserResizeColumns="False"
+						  AreRowGroupHeadersFrozen="False"
+						  FrozenColumnCount="4"
+						  AreRowDetailsFrozen="True"
+						  HorizontalAlignment="Center"
+						  VerticalAlignment="Center"
+						  GridLinesVisibility="All"
+						  BorderThickness="2"
+						  Grid.ColumnSpan="5"
+						  Grid.Column="0"
+						  FontWeight="Bold"
+						  Grid.Row="7">
+					<DataGrid.Columns>
+						<DataGridTextColumn Width="*" Header="Entry" Binding="{Binding Entry}"/>
+						<DataGridTextColumn MinWidth="65" Width="SizeToCells" Header="Price" Binding="{Binding Price}"/>
+						<DataGridTextColumn MinWidth="65" Width="SizeToHeader" Header="Stock" Binding="{Binding StockStatus}"/>
+						<DataGridTemplateColumn MinWidth="100" Width="SizeToCells" Header="Website">
+							<DataGridTemplateColumn.CellTemplate>
+								<DataTemplate>
+									<TextBlock Text="{Binding Website}" VerticalAlignment="Center" HorizontalAlignment="Left" PointerPressed="OpenSiteLink" Padding="12,0,12,0"
+									/>
+								</DataTemplate>
+							</DataGridTemplateColumn.CellTemplate>
+						</DataGridTemplateColumn>
+					</DataGrid.Columns>
+				</DataGrid>
+			</Grid>
+		</ScrollViewer>
+	</Border>
 </Window>

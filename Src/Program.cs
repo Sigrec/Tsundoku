@@ -29,15 +29,6 @@ namespace Tsundoku
                 .UseReactiveUI()
                 .With(LoaderOptimization.MultiDomainHost)
                 .With(LoadHint.Sometimes);
-                // .With(new SkiaOptions 
-                // {
-                //     MaxGpuResourceSizeBytes = 1024000000
-                // })
-                // .With(new Win32PlatformOptions
-                // {
-                //     UseWgl = true,
-                //     AllowEglInitialization = true
-                // });
         }
     }
 }

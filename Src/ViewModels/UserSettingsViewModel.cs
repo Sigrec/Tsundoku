@@ -15,13 +15,22 @@ namespace Tsundoku.ViewModels
         [Reactive] public string UsernameText { get; set; }
         [Reactive] public bool IsChangeUsernameButtonEnabled { get; set; }
         [Reactive] public int CurrencyIndex { get; set; }
+        [Reactive] public bool RightStufAnimeMember { get; set; } = MainUser.Memberships["RightStufAnime"];
+        [Reactive] public bool BarnesAndNobleMember { get; set; } = MainUser.Memberships["BarnesAndNoble"];
+        [Reactive] public bool BooksAMillionMember { get; set; } = MainUser.Memberships["BooksAMillion"];
+        [Reactive] public bool KinokuniyaUSAMember { get; set; } = MainUser.Memberships["KinokuniyaUSA"];
         public ICommand ExportToSpreadsheetCommand { get; }
         public UserSettingsViewModel()
         {
             CurCurrency = MainUser.Currency;
+            ExportToSpreadsheetCommand = ReactiveCommand.CreateFromTask(ExportToSpreadsheetAsync);
+
             this.WhenAnyValue(x => x.CurCurrency).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => CurrencyIndex = Array.IndexOf(Constants.AvailableCurrency, Uri.UnescapeDataString(x)));
             this.WhenAnyValue(x => x.UsernameText, x => !string.IsNullOrWhiteSpace(x)).Subscribe(x => IsChangeUsernameButtonEnabled = x);
-            ExportToSpreadsheetCommand = ReactiveCommand.CreateFromTask(ExportToSpreadsheetAsync);
+            this.WhenAnyValue(x => x.RightStufAnimeMember).Subscribe(x => MainUser.Memberships["RightStufAnime"] = x);
+            this.WhenAnyValue(x => x.BarnesAndNobleMember).Subscribe(x => MainUser.Memberships["BarnesAndNoble"] = x);
+            this.WhenAnyValue(x => x.BooksAMillionMember).Subscribe(x => MainUser.Memberships["BooksAMillion"] = x);
+            this.WhenAnyValue(x => x.KinokuniyaUSAMember).Subscribe(x => MainUser.Memberships["KinokuniyaUSA"] = x);
         }
 
         private async Task ExportToSpreadsheetAsync()

@@ -14,7 +14,7 @@
         Classes="menu"
 		MaxWidth="626"
 		MinWidth="626"
-		MaxHeight="1040"
+		MaxHeight="1010"
 		Height="650"
 		WindowStartupLocation="2"
 		CanResize="true">
@@ -27,18 +27,10 @@
 		<StyleInclude Source="/Controls/ValueStat.axaml"/>
 	</Window.Styles>
 
-	<Window.Resources>
-		<ResourceDictionary>
-			<ResourceDictionary.MergedDictionaries>
-				<ResourceInclude Source="/Styles/WindowControlThemes.xaml"/>
-			</ResourceDictionary.MergedDictionaries>
-		</ResourceDictionary>
-	</Window.Resources>
-
 	<Border Classes="menu" BorderThickness="3" CornerRadius="0,0,8,8" ClipToBounds="True">
 		<ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"> 
-			<Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="Auto" Margin="20">
-				<TextBlock Text="Stats" FontSize="25" FontWeight="Bold" Classes="menu" Grid.Row="0" Grid.Column="0" Margin="5,0,0,0"/>
+			<Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="Auto" Margin="20,10,20,20">
+				<TextBlock Text="Stats" FontSize="25" FontWeight="Bold" Classes="menu" Grid.Row="0" Grid.Column="0" Margin="5,0,0,-7"/>
 				<StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="0" Margin="-5,0,0,0" MaxWidth="626" HorizontalAlignment="Center">
 					<controls:ValueStat Text="{Binding MeanScore}" Title="Mean Score" Icon="fa-solid fa-gauge-simple"/>
 					<controls:ValueStat Text="{Binding VolumesRead}" Title="Volumes Read" Icon="fa-solid fa-book-open-reader"/>
@@ -49,7 +41,7 @@
 					<controls:ValueStat Width="240" Text="{Binding UsersNumVolumesToBeCollected}" Title="Volumes To Be Collected" Icon="fa-solid fa-gauge-simple"/>
 				</StackPanel>
 				<controls:ValueStat Grid.Row="3" Grid.Column="0" HorizontalAlignment="Center" Text="{Binding CollectionPrice}" Title="Collection Value" Icon="fa-solid fa-sack-dollar" PointerPressed="CopyTextAsync"/>
-				<TextBlock Text="Distributions" FontSize="25" FontWeight="Bold" Classes="menu" Grid.Row="4" Grid.Column="0" Margin="0,0,0,10"/>
+				<TextBlock Text="Distributions" FontSize="25" FontWeight="Bold" Classes="menu" Grid.Row="4" Grid.Column="0" Margin="5,0,0,5"/>
 				<StackPanel Orientation="Horizontal" Grid.Row="5" Grid.Column="0" HorizontalAlignment="Center" Spacing="10">
 					<Border Background="{CompiledBinding CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" Width="280" Height="375" Margin="0,0,0,0" HorizontalAlignment="Left">
 						<Border CornerRadius="8" ClipToBounds="True">

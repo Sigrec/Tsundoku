@@ -459,20 +459,7 @@ namespace Tsundoku.Views
         /// </summary>
         private void OpenSiteLink(object sender, PointerPressedEventArgs args)
         {
-            string link = ((Canvas)sender).Name;
-            Constants.Logger.Info($"Opening Link {link}");
-            try
-            {
-                Process.Start(new ProcessStartInfo(link) { UseShellExecute = true });
-            }
-            catch (Win32Exception noBrowser)
-            {
-                Constants.Logger.Error(noBrowser.Message);
-            }
-            catch (Exception other)
-            {
-                Constants.Logger.Error(other.Message);
-            }
+            ViewModelBase.OpenSiteLink(((Canvas)sender).Name);
         }
         
         /// <summary>

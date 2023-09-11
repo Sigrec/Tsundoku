@@ -37,7 +37,7 @@
 				Classes="menu"
 				BorderThickness="0,0,0,3"
 				Height="150">
-			<Grid Margin="0,15,0,15" ColumnDefinitions="*,550,*" RowDefinitions="Auto,Auto" HorizontalAlignment="Center" VerticalAlignment="Center" ShowGridLines="False">
+			<Grid Margin="0,15,0,15" ColumnDefinitions="*,600,*" RowDefinitions="Auto,Auto" HorizontalAlignment="Center" VerticalAlignment="Center" ShowGridLines="False">
 				<StackPanel Margin="0,0,0,1" Orientation="Horizontal" Spacing="0,0,1,1" Grid.Column="1" Grid.Row="0" Height="{CompiledBinding Source={x:Static local:Constants.USER_ICON_HEIGHT}}" HorizontalAlignment="Left" VerticalAlignment="Center">
 					<Border BorderThickness="2" Classes="menu" CornerRadius="2" ClipToBounds="True" Height="75">
 						<Image Height="{CompiledBinding Source={x:Static local:Constants.USER_ICON_HEIGHT}}"
@@ -61,7 +61,7 @@
 				<StackPanel Grid.Column="1" Grid.Row="1" Orientation="Horizontal" Spacing="5" VerticalAlignment="Bottom" HorizontalAlignment="Left">
 					<Button Name="SettingsButton"
 							Content="Settings"
-							Width="100"
+							Width="95"
 							Height="35"
 							FontSize="15"
 							Theme="{StaticResource MenuButton}"
@@ -69,38 +69,38 @@
 					<Button Name="AddNewSeriesButton"
 							Theme="{StaticResource MenuButton}"
 							Content="Add Series"
-							Width="100"
+							Width="95"
 							Height="35"
 							FontSize="15"
 							Command="{CompiledBinding OpenAddNewSeriesWindow}"/>
 					<Button Name="ThemeButton" 
 							Theme="{StaticResource MenuButton}"
 							Content="Themes"
-							Width="100"
+							Width="95"
 							Height="35"
 							FontSize="15"
 							Command="{CompiledBinding OpenThemeSettingsWindow}"/>
 					<Button Name="StatsButton"
 							Theme="{StaticResource MenuButton}"
 							Content="Stats"
-							Width="100"
+							Width="95"
 							Height="35"
 							FontSize="15"
 							Command="{CompiledBinding OpenCollectionStatsWindow}"/>
+					<Button Name="AnalysisButton"
+							Theme="{StaticResource MenuButton}"
+							Content="Scrape"
+							Width="95"
+							Height="35"
+							FontSize="15"
+							Command="{CompiledBinding OpenPriceAnalysisWindow}"/>
 					<Button Name="DonateButton"
 							Theme="{StaticResource MenuButton}"
 							Content="Donate"
-							Width="100"
+							Width="95"
 							Height="35"
 							FontSize="15"
 							Click="OpenDonationLink"/>
-					<!-- <Button Name="AnalysisButton"
-							Theme="{StaticResource MenuButton}"
-							Content="Scrape"
-							Width="100"
-							Height="35"
-							FontSize="15"
-							Command="{CompiledBinding OpenPriceAnalysisWindow}"/> -->
 				</StackPanel>
 				<StackPanel Margin="0,0,0,0" HorizontalAlignment="Left" Grid.Column="2" Grid.Row="0" Grid.RowSpan="2" Spacing="6">
 					<ComboBox Name="LanguageSelector"

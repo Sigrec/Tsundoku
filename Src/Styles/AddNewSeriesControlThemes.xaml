@@ -42,8 +42,8 @@
             </ControlTemplate>
         </Setter>
 	</ControlTheme>
-<!-- 
-    <Thickness x:Key="ListBoxItemPadding">12,9,12,12</Thickness> -->
+    
+    <!-- <Thickness x:Key="ListBoxItemPadding">12,9,12,12</Thickness> -->
     <ControlTheme x:Key="QueryListBoxItem" TargetType="ListBoxItem">
         <Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"/>
         <Setter Property="Padding" Value="12,9,12,12" />
@@ -68,70 +68,5 @@
                                   HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" />
             </ControlTemplate>
         </Setter>
-    </ControlTheme>
-
-    <ControlTheme x:Key="QueryToggleButton" TargetType="ToggleButton">
-        <Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"/>
-		<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"/>
-		<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"/>
-        <Setter Property="BorderThickness" Value="2" />
-        <Setter Property="CornerRadius" Value="2" />
-        <Setter Property="Padding" Value="{DynamicResource ButtonPadding}" />
-        <Setter Property="HorizontalAlignment" Value="Center" />
-        <Setter Property="VerticalAlignment" Value="Center" />
-        <Setter Property="VerticalContentAlignment" Value="Center" />
-        <Setter Property="HorizontalContentAlignment" Value="Center" />
-        <Setter Property="FontSize" Value="15" />
-        <Setter Property="FontWeight" Value="Bold" />
-        <Setter Property="RenderTransform" Value="none" />
-        <Setter Property="Height" Value="37" />
-		<Setter Property="Width" Value="87.5" />
-        <Setter Property="Transitions">
-        <Transitions>
-            <TransformOperationsTransition Property="RenderTransform" Duration="0:0:.075" />
-        </Transitions>
-        </Setter>
-
-        <Setter Property="Template">
-            <ControlTemplate>
-                <ContentPresenter x:Name="PART_ContentPresenter"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="{TemplateBinding CornerRadius}"
-                                Content="{TemplateBinding Content}"
-                                ContentTemplate="{TemplateBinding ContentTemplate}"
-                                Padding="{TemplateBinding Padding}"
-                                RecognizesAccessKey="True"
-                                HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
-            </ControlTemplate>
-        </Setter>
-	
-		<Style Selector="^:pointerover, ^:focus">
-			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
-			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
-			<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
-		</Style>
-
-		<Style Selector="^:pressed">
-			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
-			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
-			<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
-		</Style>
-
-		<Style Selector="^:checked">
-			<Style Selector="^">
-				<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
-				<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
-				<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
-			</Style>
-
-			<Style Selector="^:pressed">
-				<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"/>
-				<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"/>
-				<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"/>
-			</Style>
-		</Style>
     </ControlTheme>
 </ResourceDictionary>                   

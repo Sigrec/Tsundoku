@@ -4,6 +4,13 @@ Legend
 🔥 -> Completed bug/hot fix
 ⌛ -> Completed performance/librry update
 
+V2.0.0.0 - September , 2023 @ PST
+✅ Added new "Scrape" Window that allows users to scrape multiple websites to get the website that contains the lowest price volume in USD for each volume of a series. Includes filtering out OOS and PO entires as well.
+✅ Added 4 new toggle buttons in the user settings window to determine if the user is a member of RightStufAnime, B&N, BooksAMillion, and/or Kinokuniya
+✅ Updated UserData JSON schema to include Memberships dictionary in the User
+🔥 Fixed Themes Settings window border now being curved on the bottom
+🔥 Slight Changes to the formatting of all windows except main collection window
+
 V1.9.2.1 - September 3rd, 2023 @ 8:56PM PST
 🔥 Fixed issue where you couldn't reload the cover when searching or filtering
 🔥 Fixed issue where covers would sometimes not reload after changing them in the Covers folder (this is due to images sometimes having to be downloaded initially)
@@ -25,7 +32,7 @@ V1.9.1.0 - August 29th, 2023 @ 9:48AM PST
 🔥 Fixed issue where Currency symbol was not being saved
 
 V1.9.0.0 - August 28th, 2023 @ 2:57PM PST 
-✅ Upgraded Avalonia to 11.0.4
+⌛ Upgraded Avalonia to 11.0.4
 ✅ Changed currency list, if you need one added send me a message on discord or create a ticket in Git
 🔥 Fixed issue where you could run multiple instances of the application at the same time
 🔥 Fixed ListBoxItem theme/styling not applying in AddNewSeriesWindow
