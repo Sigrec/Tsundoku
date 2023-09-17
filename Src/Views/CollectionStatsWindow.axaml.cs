@@ -14,6 +14,7 @@ namespace Tsundoku.Views
         public bool CanUpdate = true; // On First Update
         MainWindow CollectionWindow;
 
+        // TODO Clicking stats isn't copying
         public CollectionStatsWindow()
         {
             InitializeComponent();
@@ -86,9 +87,9 @@ namespace Tsundoku.Views
 
         private async void CopyTextAsync(object sender, PointerPressedEventArgs args)
         {
-            string curText = (sender as Controls.ValueStat).Text;
+            string curText = $"{(sender as Controls.ValueStat).Title} {(sender as Controls.ValueStat).Text}";
             LOGGER.Info($"Copying {curText} to Clipboard");
-            await TextCopy.ClipboardService.SetTextAsync(curText);
+            await TextCopy.ClipboardService.SetTextAsync($"{curText}");
         }
     }
 }

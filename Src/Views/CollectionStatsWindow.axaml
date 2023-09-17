@@ -32,33 +32,61 @@
 			<Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="Auto" Margin="20,10,20,20">
 				<TextBlock Text="Stats" FontSize="25" FontWeight="Bold" Classes="menu" Grid.Row="0" Grid.Column="0" Margin="5,0,0,-7"/>
 				<StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="0" Margin="-5,0,0,0" MaxWidth="626" HorizontalAlignment="Center">
-					<controls:ValueStat Text="{Binding MeanScore}" Title="Mean Score" Icon="fa-solid fa-gauge-simple"/>
-					<controls:ValueStat Text="{Binding VolumesRead}" Title="Volumes Read" Icon="fa-solid fa-book-open-reader"/>
-					<controls:ValueStat Text="{Binding SeriesCount}" Title="Series Count" Icon="fa-solid fa-globe"/>
+					<controls:ValueStat Text="{CompiledBinding MeanScore}" Title="Mean Score" Icon="fa-solid fa-gauge-simple" PointerPressed="CopyTextAsync"/>
+					<controls:ValueStat Text="{CompiledBinding VolumesRead}" Title="Volumes Read" Icon="fa-solid fa-book-open-reader" PointerPressed="CopyTextAsync"/>
+					<controls:ValueStat Text="{CompiledBinding SeriesCount}" Title="Series Count" Icon="fa-solid fa-globe" PointerPressed="CopyTextAsync"/>
 				</StackPanel>
 				<StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Center">
-					<controls:ValueStat Text="{Binding UsersNumVolumesCollected}" Width="240" Title="Volumes Collected" Icon="fa-solid fa-gauge-simple"/>
-					<controls:ValueStat Width="240" Text="{Binding UsersNumVolumesToBeCollected}" Title="Volumes To Be Collected" Icon="fa-solid fa-gauge-simple"/>
+					<controls:ValueStat Text="{CompiledBinding UsersNumVolumesCollected}" Width="240" Title="Volumes Collected" Icon="fa-solid fa-gauge-simple" PointerPressed="CopyTextAsync"/>
+					<controls:ValueStat Width="240" Text="{CompiledBinding UsersNumVolumesToBeCollected}" Title="Volumes To Be Collected" Icon="fa-solid fa-gauge-simple" PointerPressed="CopyTextAsync"/>
 				</StackPanel>
-				<controls:ValueStat Grid.Row="3" Grid.Column="0" HorizontalAlignment="Center" Text="{Binding CollectionPrice}" Title="Collection Value" Icon="fa-solid fa-sack-dollar" PointerPressed="CopyTextAsync"/>
+				<controls:ValueStat Grid.Row="3" Grid.Column="0" HorizontalAlignment="Center" Text="{CompiledBinding CollectionPrice}" Title="Collection Value" Icon="fa-solid fa-sack-dollar" PointerPressed="CopyTextAsync"/>
 				<TextBlock Text="Distributions" FontSize="25" FontWeight="Bold" Classes="menu" Grid.Row="4" Grid.Column="0" Margin="5,0,0,5"/>
 				<StackPanel Orientation="Horizontal" Grid.Row="5" Grid.Column="0" HorizontalAlignment="Center" Spacing="10">
 					<Border Background="{CompiledBinding CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" Width="280" Height="375" Margin="0,0,0,0" HorizontalAlignment="Left">
 						<Border CornerRadius="8" ClipToBounds="True">
 							<StackPanel Spacing="3">
 								<TextBlock Text="Demographic" TextDecorations="Underline" FontSize="22" FontWeight="Bold" Classes="menu" HorizontalAlignment="Center" Margin="0,10,0,0"/>
-								<lvc:PieChart Series="{Binding Demographics}" Height="210"/>
+								<lvc:PieChart Series="{CompiledBinding Demographics}" Height="210" TooltipPosition="Hidden"/>
 								<Border CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" ClipToBounds="True" Width="165" Height="24" OpacityMask="White">
-									<TextBlock Text="{Binding ShounenPercentage, StringFormat='Shounen {0}%', Mode=OneWay}" Background="{CompiledBinding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}" Classes="menu" FontWeight="Bold" TextAlignment="Center" FontSize="14"/>
+									<TextBlock Background="{CompiledBinding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}" Classes="menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
+									<TextBlock.Text>
+											<MultiBinding StringFormat="Shounen {0}% ({1})" Mode="OneWay">
+												<Binding Path="ShounenPercentage"/>
+												<Binding Path="ShounenCount.Value"/>
+											</MultiBinding>
+										</TextBlock.Text>
+									</TextBlock>
 								</Border>
 								<Border CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" ClipToBounds="True" Width="165" Height="24">
-									<TextBlock Text="{Binding ShoujoPercentage, StringFormat='Shoujo {0}%', Mode=OneWay}" Background="{CompiledBinding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}" Classes="menu" FontWeight="Bold" TextAlignment="Center" FontSize="14"/>
+									<TextBlock Background="{CompiledBinding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}" Classes="menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
+									<TextBlock.Text>
+											<MultiBinding StringFormat="Shoujo {0}% ({1})" Mode="OneWay">
+												<Binding Path="ShoujoPercentage"/>
+												<Binding Path="ShoujoCount.Value"/>
+											</MultiBinding>
+										</TextBlock.Text>
+									</TextBlock>
 								</Border>
 								<Border CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" ClipToBounds="True" Width="165" Height="24">
-									<TextBlock Text="{Binding SeinenPercentage, StringFormat='Seinen {0}%', Mode=OneWay}" Background="{CompiledBinding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}" Classes="menu" FontWeight="Bold" TextAlignment="Center" FontSize="14"/>
+									<TextBlock Background="{CompiledBinding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}" Classes="menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
+									<TextBlock.Text>
+											<MultiBinding StringFormat="Seinen {0}% ({1})" Mode="OneWay">
+												<Binding Path="SeinenPercentage"/>
+												<Binding Path="SeinenCount.Value"/>
+											</MultiBinding>
+										</TextBlock.Text>
+									</TextBlock>
 								</Border>
 								<Border CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" ClipToBounds="True" Width="165" Height="24">
-									<TextBlock Text="{Binding JoseiPercentage, StringFormat='Josei {0}%', Mode=OneWay}" Background="{CompiledBinding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}" Classes="menu" FontWeight="Bold" TextAlignment="Center" FontSize="14"/>
+									<TextBlock Background="{CompiledBinding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}" Classes="menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
+									<TextBlock.Text>
+											<MultiBinding StringFormat="Josei {0}% ({1})" Mode="OneWay">
+												<Binding Path="JoseiPercentage"/>
+												<Binding Path="JoseiCount.Value"/>
+											</MultiBinding>
+										</TextBlock.Text>
+									</TextBlock>
 								</Border>
 							</StackPanel>
 						</Border>
@@ -67,18 +95,46 @@
 						<Border CornerRadius="8" ClipToBounds="True">
 							<StackPanel Spacing="3">
 								<TextBlock Text="Status" TextDecorations="Underline" FontSize="22" FontWeight="Bold" Classes="menu" HorizontalAlignment="Center" Margin="0,10,0,0"/>
-								<lvc:PieChart Series="{Binding StatusDistribution}" Height="210"/>
+								<lvc:PieChart Series="{CompiledBinding StatusDistribution}" Height="210" TooltipPosition="Hidden"/>
 								<Border CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" ClipToBounds="True" Width="165" Height="24">
-									<TextBlock Text="{Binding FinishedPercentage, StringFormat='Finished {0}%', Mode=OneWay}" Background="{CompiledBinding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}" Classes="menu" FontWeight="Bold" TextAlignment="Center" FontSize="14"/>
+									<TextBlock Background="{CompiledBinding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}" Classes="menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
+										<TextBlock.Text>
+											<MultiBinding StringFormat="Finished {0}% ({1})" Mode="OneWay">
+												<Binding Path="FinishedPercentage"/>
+												<Binding Path="FinishedCount.Value"/>
+											</MultiBinding>
+										</TextBlock.Text>
+									</TextBlock>
 								</Border>
 								<Border CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" ClipToBounds="True" Width="165" Height="24">
-									<TextBlock Text="{Binding OngoingPercentage, StringFormat='Ongoing {0}%', Mode=OneWay}" Background="{CompiledBinding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}" Classes="menu" FontWeight="Bold" TextAlignment="Center" FontSize="14"/>
+									<TextBlock Background="{CompiledBinding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}" Classes="menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
+									<TextBlock.Text>
+											<MultiBinding StringFormat="Ongoing {0}% ({1})" Mode="OneWay">
+												<Binding Path="OngoingPercentage"/>
+												<Binding Path="OngoingCount.Value"/>
+											</MultiBinding>
+										</TextBlock.Text>
+									</TextBlock>
 								</Border>
 								<Border CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" ClipToBounds="True" Width="165" Height="24">
-									<TextBlock Text="{Binding CancelledPercentage, StringFormat='Cancelled {0}%', Mode=OneWay}" Background="{CompiledBinding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}" Classes="menu" FontWeight="Bold" TextAlignment="Center" FontSize="14"/>
+									<TextBlock Background="{CompiledBinding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}" Classes="menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
+									<TextBlock.Text>
+											<MultiBinding StringFormat="Hiatus {0}% ({1})" Mode="OneWay">
+												<Binding Path="HiatusPercentage"/>
+												<Binding Path="HiatusCount.Value"/>
+											</MultiBinding>
+										</TextBlock.Text>
+									</TextBlock>
 								</Border>
 								<Border CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" ClipToBounds="True" Width="165" Height="24">
-									<TextBlock Text="{Binding HiatusPercentage, StringFormat='Hiatus {0}%', Mode=OneWay}" Background="{CompiledBinding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}" Classes="menu" FontWeight="Bold" TextAlignment="Center" FontSize="14"/>
+									<TextBlock Background="{CompiledBinding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}" Classes="menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
+									<TextBlock.Text>
+											<MultiBinding StringFormat="Cancelled {0}% ({1})" Mode="OneWay">
+												<Binding Path="CancelledPercentage"/>
+												<Binding Path="CancelledCount.Value"/>
+											</MultiBinding>
+										</TextBlock.Text>
+									</TextBlock>
 								</Border>
 							</StackPanel>
 						</Border>
@@ -88,7 +144,7 @@
 					<Border CornerRadius="8" ClipToBounds="True">
 						<StackPanel>
 							<TextBlock Text="Scores" TextDecorations="Underline" FontSize="21" FontWeight="Bold" Classes="menu" HorizontalAlignment="Center" Margin="0,10,0,0"/>
-							<lvc:CartesianChart Series="{Binding ScoreDistribution}" XAxes="{Binding ScoreXAxes}" YAxes="{Binding ScoreYAxes}" Width="570" Height="260"/>
+							<lvc:CartesianChart Series="{CompiledBinding ScoreDistribution}" XAxes="{CompiledBinding ScoreXAxes}" YAxes="{CompiledBinding ScoreYAxes}" Width="570" Height="260"/>
 						</StackPanel>
 					</Border>
 				</Border>

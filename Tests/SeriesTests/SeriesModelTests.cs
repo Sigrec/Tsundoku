@@ -2,7 +2,7 @@ using System.Text.Json;
 using System.Collections.ObjectModel;
 
 [assembly: Description("Testing Tsundoku")]
-namespace Tests.SeriesTests
+namespace SeriesTests
 {
     [Author("Sean (Alias -> Prem or Sigrec)")]
     [TestOf(typeof(Series))]

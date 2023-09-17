@@ -95,7 +95,7 @@
 					 Text="{Binding TitleText}"
 					 Classes="menu"
 					 BorderThickness="2"
-					 TextWrapping="Wrap"
+					 TextWrapping="NoWrap"
 					 Watermark="Title..."/>
 			<TextBlock Text="Cur Volumes" Grid.Row="3" Grid.Column="0" FontSize="20" FontWeight="Bold" Classes="menu" Margin="0,0,0,1"/>
 			<MaskedTextBox Name="CurVolCount"

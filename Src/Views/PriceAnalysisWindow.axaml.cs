@@ -1,19 +1,14 @@
 using Avalonia.Controls;
-using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Interactivity;
 using Tsundoku.ViewModels;
-using Tsundoku.Models;
 using MangaLightNovelWebScrape;
 using DynamicData;
 using System;
 using System.Collections.Generic;
 using ReactiveUI;
-using System.Threading.Tasks;
 using System.Reactive.Linq;
 using Avalonia.Input;
-using System.ComponentModel;
-using System.Diagnostics;
 
 namespace Tsundoku.Views
 {
@@ -23,7 +18,7 @@ namespace Tsundoku.Views
         public bool IsOpen = false, manga;
         private readonly MasterScrape Scrape = new();
         private string browser, website;
-        private readonly string[] EXCLUDE_NONE_FILTER = { };
+        private readonly string[] EXCLUDE_NONE_FILTER = Array.Empty<string>();
         private readonly string[] EXCLUDE_BOTH_FILTER = { "PO", "OOS" };
         private readonly string[] EXCLUDE_PO_FILTER = { "PO" };
         private readonly string[] EXCLUDE_OOS_FILTER = { "OOS" };
