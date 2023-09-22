@@ -7,12 +7,17 @@ Legend
 V2.0.0.0 - September , 2023 @ PST
 ✅ Logs now output to TsundokuLogs.log file in folder, and are cleared everytime the application is started to prevent overflow
 ✅ Added new "Scrape" Window that allows users to scrape multiple websites to get the website that contains the lowest price volume in USD for each volume of a series. Includes filtering out OOS and PO entires as well. Currently only supports websites that have USD. Others are 
-✅ Added 4 new toggle buttons in the user settings window to determine if the user is a member of RightStufAnime, B&N, BooksAMillion, and/or Kinokuniya
+✅ Added 4 new toggle buttons in the user settings window to determine if the user is a member of RightStufAnime, Banres & Noble, BooksAMillion, and/or Kinokuniya
 ✅ Updated UserData JSON schema to include Memberships dictionary in the User
 ✅ Now can copy stat text for all stats to clipboard by clicking
 ✅ Disabled hovering of pie charts and moved the counts to the legend
+✅ Windows now open full sized if your monitor height is large enough
+✅ Hovering over Title & Additional Language Title Text's in "Add Series" window now shows full title and list of currenly selected languages
+✅ Fixed/Changed Layout of Settings Window & doubled size of input textbox for series title
+✅ Fixed/Changed Layout & Styling of Stats Window
 🔥 Fixed Themes Settings window border now being curved on the bottom
 🔥 Slight Changes to the formatting of all windows except main collection window
+🔥 Fixed issue where users could input negative numbers into a series score
 ❌ Update Libraries
 
 V1.9.2.1 - September 3rd, 2023 @ 8:56PM PST

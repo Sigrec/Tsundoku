@@ -26,6 +26,11 @@ namespace Tsundoku.Views
                 CollectionWindow = (MainWindow)((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).MainWindow;
                 UserSettingsVM.CurrentTheme = CollectionWindow.CollectionViewModel.CurrentTheme;
                 IsOpen ^= true;
+
+                if (Screens.Primary.WorkingArea.Height < 920)
+                {
+                    this.Height = 550;
+                }
             };
 
             Closing += (s, e) =>

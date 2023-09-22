@@ -117,7 +117,7 @@ namespace Tsundoku.Views
                 {
                     int index = MainWindowViewModel.SearchedCollection.IndexOf(MainWindowViewModel.Collection[x]);
                     MainWindowViewModel.SearchedCollection.Remove(MainWindowViewModel.Collection[x]);
-                    Bitmap newCover = new Bitmap(MainWindowViewModel.Collection[x].Cover).CreateScaledBitmap(new Avalonia.PixelSize(Constants.LEFT_SIDE_CARD_WIDTH, Constants.IMAGE_HEIGHT), BitmapInterpolationMode.HighQuality);
+                    Bitmap newCover = new Bitmap(MainWindowViewModel.Collection[x].Cover).CreateScaledBitmap(new PixelSize(LEFT_SIDE_CARD_WIDTH, IMAGE_HEIGHT), BitmapInterpolationMode.HighQuality);
                     newCover.Save(MainWindowViewModel.Collection[x].Cover, 100);
                     MainWindowViewModel.Collection[x].CoverBitMap = newCover;
                     MainWindowViewModel.SearchedCollection.Insert(index, MainWindowViewModel.Collection[x]);
@@ -315,10 +315,8 @@ namespace Tsundoku.Views
 
                 CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UpdateDemographicChartValues();
                 CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UpdateDemographicPercentages();
-
                 CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UpdateStatusChartValues();
                 CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UpdateStatusPercentages();
-
                 CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UpdateScoreChartValues();
             }, RxApp.MainThreadScheduler);
         }

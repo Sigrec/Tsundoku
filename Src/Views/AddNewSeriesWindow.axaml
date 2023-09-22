@@ -29,10 +29,10 @@
 	</Window.Resources>
 
 	<Border Classes="menu" BorderThickness="3" CornerRadius="0,0,8,8" ClipToBounds="True">
-		<Grid ColumnDefinitions="*,15,*,15,*" RowDefinitions="Auto,Auto,15,Auto,Auto,15,Auto,Auto" Margin="20,10,20,20">
-			<TextBlock HorizontalAlignment="Left" Grid.Row="0" Grid.Column="4" Text="Additional Languages" FontSize="20" FontWeight="Bold" Classes="menu" Margin="0,0,0,1"/>
+		<Grid ColumnDefinitions="*,15,*,15,*" RowDefinitions="Auto,*,5,Auto,Auto,5,Auto,Auto" Margin="20,10,20,20" ShowGridLines="False">
+			<TextBlock Name="AdditionalLangTitle" TextDecorations="Underline" HorizontalAlignment="Left" Grid.Row="0" Grid.Column="4" Text="Additional Languages" FontSize="20" FontWeight="Bold" Classes="menu" Margin="0,0,0,3" ToolTip.Tip="{CompiledBinding AdditionalLanguagesToolTipText}" ToolTip.IsEnabled="{CompiledBinding AdditionalLanguagesToolTipText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
 			<ListBox Name="AdditionalLangSelector"
-					 SelectedItems="{Binding SelectedAdditionalLanguages}"
+					 SelectedItems="{CompiledBinding SelectedAdditionalLanguages}"
 					 SelectionMode="Multiple,Toggle"
 					 Grid.Row="1"
 					 Grid.RowSpan="10"
@@ -84,20 +84,20 @@
 						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Ukranian</ListBoxItem>
 						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Vietnamese</ListBoxItem>
 			</ListBox>
-			<TextBlock Text="Enter Title or ID" Grid.Row="0" Grid.Column="0" FontSize="20" FontWeight="Bold" Classes="menu" Margin="0,0,0,1"/>
+			<TextBlock Text="Enter Title or ID" TextDecorations="Underline" Grid.Row="0" Grid.Column="0" FontSize="20" FontWeight="Bold" Classes="menu" Margin="0,0,0,1" ToolTip.Tip="{CompiledBinding TitleText}"/>
 			<TextBox Name="TitleBox"
 					 FontSize="18"
 					 Grid.Row="1"
-					 Width="390"
+					 Width="388"
 					 Grid.Column="0"
 					 Grid.ColumnSpan="3"
 					 FontWeight="Bold"
-					 Text="{Binding TitleText}"
+					 Text="{CompiledBinding TitleText}"
 					 Classes="menu"
 					 BorderThickness="2"
 					 TextWrapping="NoWrap"
-					 Watermark="Title..."/>
-			<TextBlock Text="Cur Volumes" Grid.Row="3" Grid.Column="0" FontSize="20" FontWeight="Bold" Classes="menu" Margin="0,0,0,1"/>
+					 Watermark="Title | AniList ID | MangaDex ID"/>
+			<TextBlock Text="Cur Volumes" TextDecorations="Underline" Grid.Row="3" Grid.Column="0" FontSize="20" FontWeight="Bold" Classes="menu" Margin="0,0,0,1"/>
 			<MaskedTextBox Name="CurVolCount"
 						   Width="182"
 						   Classes="menu"
@@ -109,7 +109,7 @@
 						   FontSize="18"
 						   Mask="000"
 						   MaxLength="3"/>
-			<TextBlock Text="Max Volumes" Grid.Row="3" Grid.Column="2" FontSize="20" FontWeight="Bold" Classes="menu" Margin="2,0,0,1"/>
+			<TextBlock Text="Max Volumes" TextDecorations="Underline" Grid.Row="3" Grid.Column="2" FontSize="20" FontWeight="Bold" Classes="menu" Margin="2,0,0,1"/>
 			<MaskedTextBox Name="MaxVolCount"
 						   PromptChar=' '
 						   Width="182"
@@ -122,12 +122,13 @@
 						   Mask="000"
 						   MaxLength="3"/>
 			<TextBlock HorizontalAlignment="Left"
+					   TextDecorations="Underline"
 					   Text="Select Book Type"
 					   Grid.Row="6"
 					   Grid.Column="0"
 					   FontSize="20"
 					   FontWeight="Bold"
-					   Margin="0,0,0,4"
+					   Margin="0,0,0,3"
 					   Classes="menu"/>
 			<StackPanel Orientation="Horizontal" Width="180" Grid.Row="7" Grid.Column="0" Spacing="5" Margin="0,0,10,0">
 				<ToggleButton Name="MangaButton"
@@ -142,12 +143,13 @@
 							  Content="Novel"/>
 			</StackPanel>
 			<TextBlock HorizontalAlignment="Left"
+					   TextDecorations="Underline"
 					   Text="Query"
 					   Grid.Row="6"
 					   Grid.Column="2"
 					   FontSize="20"
 					   FontWeight="Bold"
-					   Margin="2,0,0,4"
+					   Margin="2,0,0,3"
 					   Classes="menu"/>
 			<Button Name="AddSeriesButton"
 					Content="Add New Series"

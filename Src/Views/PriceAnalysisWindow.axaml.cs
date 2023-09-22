@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using ReactiveUI;
 using System.Reactive.Linq;
 using Avalonia.Input;
+using MangaLightNovelWebScrape.Models;
 
 namespace Tsundoku.Views
 {
@@ -16,7 +17,7 @@ namespace Tsundoku.Views
     {
         public PriceAnalysisViewModel? PriceAnalysisVM => DataContext as PriceAnalysisViewModel;
         public bool IsOpen = false, manga;
-        private readonly MasterScrape Scrape = new();
+        private readonly MasterScrape Scrape = new MasterScrape().DisableDebugMode();
         private string browser, website;
         private readonly string[] EXCLUDE_NONE_FILTER = Array.Empty<string>();
         private readonly string[] EXCLUDE_BOTH_FILTER = { "PO", "OOS" };
@@ -26,18 +27,19 @@ namespace Tsundoku.Views
         private static List<MasterScrape.Website> scrapeWebsiteList = new List<MasterScrape.Website>();
         MainWindow CollectionWindow;
 
-        // [AMD64-Windows_NT] 2023-09-08 08:29:28.8109 | DEBUG > Analysis Window Width = 720
-        // [AMD64-Windows_NT] 2023-09-08 08:29:28.8109 | DEBUG > Analysis Window HEight = 611
         public PriceAnalysisWindow()
         {
             InitializeComponent();
-            MasterScrape.DisableDebugMode();
             DataContext = new PriceAnalysisViewModel();
             Opened += (s, e) =>
             {
                 CollectionWindow = (MainWindow)((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).MainWindow;
                 PriceAnalysisVM.CurrentTheme = CollectionWindow.CollectionViewModel.CurrentTheme;
                 IsOpen ^= true;
+                if (Screens.Primary.WorkingArea.Height < 611)
+                {
+                    this.Height = 500;
+                }
             };
 
             Closing += (s, e) =>
@@ -117,7 +119,7 @@ namespace Tsundoku.Views
 
                 StartScrapeButton.IsEnabled = false;
                 LOGGER.Info($"Started Scrape w/ {browser} Browser & [{string.Join(",", CurStockFilter)}] Filters");
-                await Scrape.InitializeScrapeAsync(Title, manga == true ? 'M' : 'N', CurStockFilter, scrapeWebsiteList, browser, ViewModelBase.MainUser.Memberships["RightStufAnime"], ViewModelBase.MainUser.Memberships["BarnesAndNoble"], ViewModelBase.MainUser.Memberships["BooksAMillion"], ViewModelBase.MainUser.Memberships["KinokuniyaUSA"]);
+                await Scrape.InitializeScrapeAsync(Title, manga == true ? Book.Manga : Book.LightNovel, CurStockFilter, scrapeWebsiteList, browser, ViewModelBase.MainUser.Memberships["RightStufAnime"], ViewModelBase.MainUser.Memberships["BarnesAndNoble"], ViewModelBase.MainUser.Memberships["BooksAMillion"], ViewModelBase.MainUser.Memberships["KinokuniyaUSA"]);
 
                 StartScrapeButton.IsEnabled = PriceAnalysisVM.IsAnalyzeButtonEnabled;
                 LOGGER.Info($"Scrape Finished");

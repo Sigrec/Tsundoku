@@ -55,10 +55,10 @@ namespace Tsundoku.Models
 		public string Demographic { get; set; }
 		public bool IsFavorite { get; set; } = false;
 
-		public Series(Dictionary<string, string> titles, Dictionary<string, string> staff, string description, string format, string status, string cover, string link, ushort maxVolumeCount, ushort curVolumeCount, decimal score, string demographic)
+		public Series(Dictionary<string, string> Titles, Dictionary<string, string> Staff, string description, string format, string status, string cover, string link, ushort maxVolumeCount, ushort curVolumeCount, decimal score, string demographic)
         {
-			Titles = titles;
-			Staff = staff;
+            this.Titles = Titles;
+			this.Staff = Staff;
 			Description = description;
             Format = format;
             Status = status;

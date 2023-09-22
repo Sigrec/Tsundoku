@@ -63,9 +63,9 @@ namespace Tsundoku.ViewModels
             ConfigureWindows();
 
             this.WhenAnyValue(x => x.CurLanguage).Subscribe(x => MainUser.CurLanguage = x);
-            this.WhenAnyValue(x => x.CurLanguage).Subscribe(x => LanguageIndex = Constants.AvailableLanguages.IndexOf(x));
-            this.WhenAnyValue(x => x.CurFilter).Subscribe(x => FilterIndex = Constants.AvailableCollectionFilters.IndexOf(x));
-            this.WhenAnyValue(x => x.SearchText).Throttle(TimeSpan.FromMilliseconds(600)).ObserveOn(RxApp.MainThreadScheduler).Subscribe(SearchCollection);
+            this.WhenAnyValue(x => x.CurLanguage).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => LanguageIndex = AvailableLanguages.IndexOf(x));
+            this.WhenAnyValue(x => x.CurFilter).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => FilterIndex = AvailableCollectionFilters.IndexOf(x));
+            this.WhenAnyValue(x => x.SearchText).Throttle(TimeSpan.FromMilliseconds(500)).ObserveOn(RxApp.MainThreadScheduler).Subscribe(SearchCollection);
             this.WhenAnyValue(x => x.CurrentTheme).Subscribe(x => MainUser.MainTheme = x.ThemeName);
             this.WhenAnyValue(x => x.CurDisplay).Subscribe(x => MainUser.Display = x);
             this.WhenAnyValue(x => x.UserName).Subscribe(x => MainUser.UserName = x);

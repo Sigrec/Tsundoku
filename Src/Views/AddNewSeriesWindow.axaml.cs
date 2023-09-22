@@ -1,4 +1,6 @@
 using System;
+using System.Collections.ObjectModel;
+using System.Text;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using ReactiveUI;
@@ -43,7 +45,6 @@ namespace Tsundoku.Views
         {
             NovelButton.IsChecked = false;
         }
-
 
         private void IsNovelButtonClicked(object sender, RoutedEventArgs args)
         {

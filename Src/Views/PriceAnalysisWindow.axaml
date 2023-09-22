@@ -15,7 +15,6 @@
 		MinWidth="666"
 		MaxWidth="666"
         MaxHeight="611"
-        Height="500"
 		WindowStartupLocation="2"
 		KeyboardNavigation.TabNavigation="Cycle"
 		x:DataType="vm:PriceAnalysisViewModel">

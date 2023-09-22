@@ -6,6 +6,12 @@ using Avalonia.Media.Imaging;
 using System.Collections.ObjectModel;
 using Avalonia.Controls;
 using System;
+using System.Collections.Specialized;
+using System.Text;
+using DynamicData.Binding;
+using ReactiveUI;
+using System.Linq;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Tsundoku.ViewModels
 {
@@ -16,15 +22,39 @@ namespace Tsundoku.ViewModels
         [Reactive] public string TitleText { get; set; }
         [Reactive] public string MaxVolumeCount { get; set; }
         [Reactive] public string CurVolumeCount { get; set; }
+        [Reactive] public string AdditionalLanguagesToolTipText { get; set; }
         [Reactive] public bool IsAddSeriesButtonEnabled { get; set; } = false;
-
-        public ObservableCollection<ListBoxItem> SelectedAdditionalLanguages { get; } = new ObservableCollection<ListBoxItem>();
-
-        static readonly Helpers.AniListQuery ALQuery = new();
-        static readonly Helpers.MangadexQuery MDQuery = new();
+        public ObservableCollection<ListBoxItem> SelectedAdditionalLanguages { get; set; } = new ObservableCollection<ListBoxItem>();
 
         public AddNewSeriesViewModel()
         {
+            SelectedAdditionalLanguages.CollectionChanged += AdditionalLanguagesCollectionChanged;
+        }
+
+        private void AdditionalLanguagesCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                case NotifyCollectionChangedAction.Remove:
+                    if (!SelectedAdditionalLanguages.IsNullOrEmpty())
+                    {
+                        StringBuilder items = new StringBuilder();
+                        for (int x = 0; x < SelectedAdditionalLanguages.Count - 1; x++)
+                        {
+                            items.AppendLine(SelectedAdditionalLanguages[x].Content.ToString());
+                        }
+                        items.Append(SelectedAdditionalLanguages.Last().Content.ToString());
+                        AdditionalLanguagesToolTipText = items.ToString();
+                    }
+                    else
+                    {
+                        AdditionalLanguagesToolTipText = string.Empty;
+                    }
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
 
         }
         

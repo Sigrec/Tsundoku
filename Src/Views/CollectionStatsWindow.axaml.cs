@@ -4,6 +4,9 @@ using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
 using Tsundoku.ViewModels;
 using Avalonia.ReactiveUI;
+using Avalonia.Platform;
+using System.Drawing;
+using Avalonia.Logging;
 
 namespace Tsundoku.Views
 {
@@ -26,6 +29,11 @@ namespace Tsundoku.Views
                 if (CanUpdate) { UpdateChartColors(); }
                 CanUpdate = false;
                 IsOpen ^= true;
+
+                if (Screens.Primary.WorkingArea.Height < 1010)
+                {
+                    this.Height = 550;
+                }
             };
 
             Closing += (s, e) =>
@@ -64,23 +72,27 @@ namespace Tsundoku.Views
             FinishedObject.Stroke = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.DividerColor));
 
             PieSeries<ObservableValue> CancelledObject = (PieSeries<ObservableValue>)CollectionStatsVM.StatusDistribution[2];
-            CancelledObject.Fill = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.MenuTextColor));
+            CancelledObject.Fill = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.DividerColor));
             CancelledObject.Stroke = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.DividerColor));
 
             PieSeries<ObservableValue> HiatusObject = (PieSeries<ObservableValue>)CollectionStatsVM.StatusDistribution[3];
-            HiatusObject.Fill = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.DividerColor));
+            HiatusObject.Fill = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.MenuTextColor));
             HiatusObject.Stroke = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.DividerColor));
 
-            ColumnSeries<ObservableValue> BarObject = (ColumnSeries<ObservableValue>)CollectionStatsVM.ScoreDistribution[0];
+            Color behindBarColor = Color.FromArgb((int)CollectionStatsVM.CurrentTheme.MenuButtonBGColor);
+            ColumnSeries<ObservableValue> BarBehindObject = (ColumnSeries<ObservableValue>)CollectionStatsVM.ScoreDistribution[0];
+            BarBehindObject.Fill = new SolidColorPaint(new SkiaSharp.SKColor(behindBarColor.R, behindBarColor.G, behindBarColor.B, 120));
+
+            ColumnSeries<ObservableValue> BarObject = (ColumnSeries<ObservableValue>)CollectionStatsVM.ScoreDistribution[1];
             BarObject.Fill = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.MenuBGColor));
             BarObject.DataLabelsPaint = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.MenuTextColor));
             BarObject.Stroke = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.DividerColor));
 
             Axis XAxisObject = CollectionStatsVM.ScoreXAxes[0];
-            XAxisObject.LabelsPaint = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.DividerColor));
-            XAxisObject.TicksPaint = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.MenuButtonBGColor));
+            XAxisObject.LabelsPaint = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.MenuTextColor));
+            XAxisObject.TicksPaint = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.MenuTextColor));
 
-            CollectionStatsVM.ScoreYAxes[0].SeparatorsPaint = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.MenuButtonBGColor));
+            CollectionStatsVM.ScoreYAxes[0].SeparatorsPaint = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.DividerColor));
 
             LOGGER.Info("Updated Chart Colors ");
         }

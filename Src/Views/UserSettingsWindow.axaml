@@ -10,10 +10,8 @@
         Icon="\Assets\Icons\Tsundoku-Logo.ico"
         Title="Settings"
         FontFamily="Segoe UI"
-        MinWidth="491"
-        MaxWidth="491"
-        MaxHeight="830"
-        Height="550"
+        Width="491"
+        MaxHeight="910"
         WindowStartupLocation="2"
         KeyboardNavigation.TabNavigation="None">
     
@@ -27,9 +25,9 @@
 
     <Border Classes="menu" BorderThickness="3" CornerRadius="0,0,8,8" ClipToBounds="True">
         <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"> 
-            <StackPanel Margin="20,15,20,20" Spacing="20">
+            <StackPanel Margin="20,15,20,20" Spacing="10">
                 <StackPanel Spacing="5">
-                    <TextBlock Text="Change Username" FontSize="20" FontWeight="Bold" Classes="menu"/>
+                    <TextBlock Text="Change Username" TextDecorations="Underline" FontSize="20" FontWeight="Bold" Classes="menu"/>
                     <StackPanel Orientation="Horizontal" Spacing="5">
                         <TextBox Name="UsernameChange"
                                 Width="400"
@@ -49,7 +47,7 @@
                     </StackPanel>
                 </StackPanel>
                 <StackPanel Spacing="5">
-                    <TextBlock Text="Change Currency" FontSize="20" FontWeight="Bold" Classes="menu"/>
+                    <TextBlock Text="Change Currency" TextDecorations="Underline" FontSize="20" FontWeight="Bold" Classes="menu"/>
                     <ComboBox Name="CurrencySelector"
                               SelectionChanged="CurrencyChanged"
                               SelectedIndex="{CompiledBinding CurrencyIndex}"
@@ -88,7 +86,7 @@
 					</ComboBox>
                 </StackPanel>
                 <StackPanel Spacing="5">
-                    <TextBlock Text="Memberships" FontSize="20" FontWeight="Bold" Classes="menu"/>
+                    <TextBlock Text="Memberships" TextDecorations="Underline" FontSize="20" FontWeight="Bold" Classes="menu"/>
                     <WrapPanel Width="450" Margin="-5,0,0,0">
 						<WrapPanel.Styles>
                             <Style Selector="ToggleButton">
@@ -113,8 +111,17 @@
 							      Content="Kinokuniya USA"/>
 					</WrapPanel>
                 </StackPanel>
+				<StackPanel Spacing="5">
+                    <TextBlock Text="Controls" TextDecorations="Underline" FontSize="20" FontWeight="Bold" Classes="menu"/>
+                    <TextBlock Text="Toggle Fullscreen → F11" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
+                    <TextBlock Text="Screenshot Collection → CTRL+P" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
+                    <TextBlock Text="Save Collection (Auto Saves on Close) → CTRL+S" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
+                    <TextBlock Text="Reload Covers → CTRL+R" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
+                    <TextBlock Text="Copy Title → Click Title on Series Card" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
+                    <TextBlock Text="Open AL Page → Click Series Image" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
+                </StackPanel>
                 <StackPanel Spacing="5">
-                    <TextBlock Text="Settings" FontSize="20" FontWeight="Bold" Classes="menu"/>
+                    <TextBlock Text="Settings" TextDecorations="Underline" FontSize="20" FontWeight="Bold" Classes="menu"/>
                     <WrapPanel Width="450" Margin="-5,0,0,0">
                         <WrapPanel.Styles>
                             <Style Selector="Button">
@@ -142,16 +149,7 @@
                     </WrapPanel>
                 </StackPanel>
                 <StackPanel Spacing="5">
-                    <TextBlock Text="Controls" FontSize="20" FontWeight="Bold" Classes="menu"/>
-                    <TextBlock Text="Toggle Fullscreen → F11" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
-                    <TextBlock Text="Screenshot Collection → CTRL+P" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
-                    <TextBlock Text="Save Collection (Auto Saves on Close) → CTRL+S" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
-                    <TextBlock Text="Reload Covers → CTRL+R" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
-                    <TextBlock Text="Copy Title → Click Title on Series Card" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
-                    <TextBlock Text="Open AL Page → Click Series Image" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
-                </StackPanel>
-                <StackPanel Spacing="5">
-                    <TextBlock Text="Youtubers" FontSize="20" FontWeight="Bold" Classes="menu"/>
+                    <TextBlock Text="Youtubers" TextDecorations="Underline" FontSize="20" FontWeight="Bold" Classes="menu"/>
                     <WrapPanel Width="450" Margin="-5,0,0,0">
                         <Button Theme="{StaticResource UserSettingsButton}"
                                 Click="OpenYoutuberSite"
@@ -192,7 +190,7 @@
                     </WrapPanel>
                 </StackPanel>
                 <StackPanel Spacing="5">
-                    <TextBlock Text="Credits" FontSize="20" FontWeight="Bold" Classes="menu"/>
+                    <TextBlock Text="Credits" TextDecorations="Underline" FontSize="20" FontWeight="Bold" Classes="menu"/>
                     <WrapPanel Width="450" Margin="-5,0,0,0">
                         <Button Theme="{StaticResource UserSettingsButton}"
                                 Click="OpenAniListLink"

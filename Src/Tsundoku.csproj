@@ -99,7 +99,7 @@
     <PackageReference Include="Projektanker.Icons.Avalonia.FontAwesome" Version="8.2.0" />
 	<PackageReference Include="TextCopy" Version="6.2.1" />
     <PackageReference Include="ReactiveUI.Fody" Version="19.4.1" />
-	<PackageReference Include="LiveChartsCore.SkiaSharpView.Avalonia" Version="2.0.0-beta.802-11.0.0-rc1.1" />
+	<PackageReference Include="LiveChartsCore.SkiaSharpView.Avalonia" Version="2.0.0-rc1" />
   </ItemGroup>
   <!-- <ItemGroup>
     <Compile Update="Program.cs">

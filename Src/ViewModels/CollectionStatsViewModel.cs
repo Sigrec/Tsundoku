@@ -8,6 +8,8 @@ using ReactiveUI.Fody.Helpers;
 using LiveChartsCore.Defaults;
 using LiveChartsCore.SkiaSharpView;
 using Tsundoku.Models;
+using System.Collections.Generic;
+using Avalonia.Logging;
 
 namespace Tsundoku.ViewModels
 {
@@ -40,6 +42,16 @@ namespace Tsundoku.ViewModels
         public ObservableValue NineScoreCount { get; set; } = new ObservableValue(MainWindowViewModel.Collection.Count(series => series.Score >= 9 && series.Score < 10));
         public ObservableValue TenScoreCount { get; set; } = new ObservableValue(MainWindowViewModel.Collection.Count(series => series.Score == 10));
         public ObservableValue MaxScoreCount { get; set; } = new ObservableValue(0);
+        public ObservableValue MaxScoreCount1 { get; set; } = new ObservableValue(0);
+        public ObservableValue MaxScoreCount2 { get; set; } = new ObservableValue(0);
+        public ObservableValue MaxScoreCount3 { get; set; } = new ObservableValue(0);
+        public ObservableValue MaxScoreCount4 { get; set; } = new ObservableValue(0);
+        public ObservableValue MaxScoreCount5 { get; set; } = new ObservableValue(0);
+        public ObservableValue MaxScoreCount6 { get; set; } = new ObservableValue(0);
+        public ObservableValue MaxScoreCount7 { get; set; } = new ObservableValue(0);
+        public ObservableValue MaxScoreCount8 { get; set; } = new ObservableValue(0);
+        public ObservableValue MaxScoreCount9 { get; set; } = new ObservableValue(0);
+        public ObservableValue MaxScoreCount10 { get; set; } = new ObservableValue(0);
 
         [Reactive] public decimal MeanScore { get; set; }
         [Reactive] public uint VolumesRead { get; set; }
@@ -56,6 +68,7 @@ namespace Tsundoku.ViewModels
         [Reactive] public decimal JoseiPercentage { get; set; }
         [Reactive] public uint UsersNumVolumesCollected { get; set; }
         [Reactive] public uint UsersNumVolumesToBeCollected { get; set; }
+        private List<double?> ScoreArray = new List<double?>(10);
 
         public CollectionStatsViewModel()
         {
@@ -129,12 +142,16 @@ namespace Tsundoku.ViewModels
                 Name = "Hiatus"
             });
 
-            // ScoreDistribution.Add(new ColumnSeries<ObservableValue> 
-            // { 
-            //     IsHoverable = false,
-            //     Values = new ObservableCollection<ObservableValue> { MaxScoreCount, MaxScoreCount, MaxScoreCount, MaxScoreCount, MaxScoreCount, MaxScoreCount, MaxScoreCount, MaxScoreCount, MaxScoreCount, MaxScoreCount },
-            //     IgnoresBarPosition = true
-            // });
+            ScoreDistribution.Add(new ColumnSeries<ObservableValue> 
+            { 
+                IsHoverable = false,
+                Values = new ObservableCollection<ObservableValue> 
+                { 
+                    MaxScoreCount, MaxScoreCount1, MaxScoreCount2, MaxScoreCount3, MaxScoreCount4, MaxScoreCount5, MaxScoreCount6, MaxScoreCount7, MaxScoreCount8, MaxScoreCount9, MaxScoreCount10
+                },
+                Stroke = null,
+                IgnoresBarPosition = true
+            });
             ScoreDistribution.Add(new ColumnSeries<ObservableValue> 
             { 
                 IsHoverable = false,
@@ -142,10 +159,10 @@ namespace Tsundoku.ViewModels
                 {
                     ZeroScoreCount, OneScoreCount, TwoScoreCount, ThreeScoreCount, FourScoreCount, FiveScoreCount, SixScoreCount, SevenScoreCount, EightScoreCount, NineScoreCount, TenScoreCount
                 },
-                DataLabelsPosition = LiveChartsCore.Measure.DataLabelsPosition.Top,
                 DataLabelsSize = 15,
                 IgnoresBarPosition = true
             });
+
             ScoreXAxes.Add(new Axis
             {
                 LabelsRotation = 0,
@@ -153,6 +170,7 @@ namespace Tsundoku.ViewModels
                 MinStep = 1,
                 ForceStepToMin = true
             });
+
             ScoreYAxes.Add(new Axis
             {
                 Labels = Array.Empty<string>(),
@@ -179,6 +197,7 @@ namespace Tsundoku.ViewModels
         /// </summary>
         public void UpdateScoreChartValues()
         {
+            ScoreArray.Clear();
             ZeroScoreCount.Value = MainWindowViewModel.Collection.Count(series => series.Score >= 0 && series.Score < 1);
             OneScoreCount.Value = MainWindowViewModel.Collection.Count(series => series.Score >= 1 && series.Score < 2);
             TwoScoreCount.Value = MainWindowViewModel.Collection.Count(series => series.Score >= 2 && series.Score < 3);
@@ -190,7 +209,30 @@ namespace Tsundoku.ViewModels
             EightScoreCount.Value = MainWindowViewModel.Collection.Count(series => series.Score >= 8 && series.Score < 9);
             NineScoreCount.Value = MainWindowViewModel.Collection.Count(series => series.Score >= 9 && series.Score < 10);
             TenScoreCount.Value = MainWindowViewModel.Collection.Count(series => series.Score == 10);
-            // MaxScoreCount.Value = GetMaxScoreCount();
+
+            ScoreArray.Add(ZeroScoreCount.Value);
+            ScoreArray.Add(OneScoreCount.Value);
+            ScoreArray.Add(TwoScoreCount.Value);
+            ScoreArray.Add(ThreeScoreCount.Value);
+            ScoreArray.Add(FourScoreCount.Value);
+            ScoreArray.Add(FiveScoreCount.Value);
+            ScoreArray.Add(SixScoreCount.Value);
+            ScoreArray.Add(SevenScoreCount.Value);
+            ScoreArray.Add(EightScoreCount.Value);
+            ScoreArray.Add(NineScoreCount.Value);
+            ScoreArray.Add(TenScoreCount.Value);
+
+            MaxScoreCount.Value = ScoreArray.Max();
+            MaxScoreCount1.Value = MaxScoreCount.Value;
+            MaxScoreCount2.Value = MaxScoreCount.Value;
+            MaxScoreCount3.Value = MaxScoreCount.Value;
+            MaxScoreCount4.Value = MaxScoreCount.Value;
+            MaxScoreCount5.Value = MaxScoreCount.Value;
+            MaxScoreCount6.Value = MaxScoreCount.Value;
+            MaxScoreCount7.Value = MaxScoreCount.Value;
+            MaxScoreCount8.Value = MaxScoreCount.Value;
+            MaxScoreCount9.Value = MaxScoreCount.Value;
+            MaxScoreCount10.Value = MaxScoreCount.Value;
         }
 
         /// <summary>

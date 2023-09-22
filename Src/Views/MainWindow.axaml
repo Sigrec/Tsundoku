@@ -23,7 +23,6 @@
 		<ResourceDictionary>
 			<cv:TitleLangConverter x:Key="ConvertTitle"/>
 			<cv:StaffLangConverter x:Key="ConvertStaff"/>
-			<cv:LineCountVisibilityConverter x:Key="TitleToolTipVisibility"/>
 			<ResourceDictionary.MergedDictionaries>
 				<ResourceInclude Source="/Styles/CollectionControlThemes.xaml"/>
 			</ResourceDictionary.MergedDictionaries>
@@ -454,7 +453,7 @@
 															   SelectionForegroundBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesNotesBGColor, Converter={StaticResource ConvertColor}}"
 															   HorizontalContentAlignment="Center"
 															   HidePromptOnLeave="True"
-															   Mask="##.#/1\0.\0"/>
+															   Mask="90.0/1\0.\0"/>
 											</StackPanel>
 											<StackPanel Margin="0,10,10,0" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="1">
 												<StackPanel.Styles>
