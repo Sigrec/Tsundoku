@@ -18,6 +18,7 @@ V2.0.0.0 - September , 2023 @ PST
 🔥 Fixed Themes Settings window border now being curved on the bottom
 🔥 Slight Changes to the formatting of all windows except main collection window
 🔥 Fixed issue where users could input negative numbers into a series score
+❌ Fixed issue where clicking on a different window cause other windows to hide
 ❌ Update Libraries
 
 V1.9.2.1 - September 3rd, 2023 @ 8:56PM PST

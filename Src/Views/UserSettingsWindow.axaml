@@ -190,8 +190,8 @@
                     </WrapPanel>
                 </StackPanel>
                 <StackPanel Spacing="5">
-                    <TextBlock Text="Credits" TextDecorations="Underline" FontSize="20" FontWeight="Bold" Classes="menu"/>
-                    <WrapPanel Width="450" Margin="-5,0,0,0">
+                    <TextBlock Text="© V2.0.0.0" TextDecorations="Underline" FontSize="20" FontWeight="Bold" Classes="menu"/>
+                    <StackPanel Orientation="Horizontal" Width="450" Margin="-5,0,0,0">
                         <Button Theme="{StaticResource UserSettingsButton}"
                                 Click="OpenAniListLink"
                                 HorizontalAlignment="Center"
@@ -202,7 +202,7 @@
                                 HorizontalAlignment="Center"
                                 Name="MangadexCredit"
                                 Content="Mangadex"/>
-                    </WrapPanel>
+                    </StackPanel>
                 </StackPanel>
             </StackPanel>
         </ScrollViewer>

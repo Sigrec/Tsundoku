@@ -21,8 +21,8 @@ namespace Tsundoku.ViewModels
 {
     public partial class MainWindowViewModel : ViewModelBase
     {
-        private static readonly string filePath = @"UserData.json";
-        private const double SCHEMA_VERSION = 1.9;
+        private static readonly string USER_DATA_FILEPATH = @"UserData.json";
+        private const double SCHEMA_VERSION = 2.0;
         private static bool newUserFlag = false;
         public static bool updatedVersion = false;
         public static ObservableCollection<Series> SearchedCollection { get; set; } = new();
@@ -246,7 +246,7 @@ namespace Tsundoku.ViewModels
         [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "A New file will always be created if it doesn't exist before deserialization")]
         private void GetUserData()
         {
-            if (!File.Exists(filePath))
+            if (!File.Exists(USER_DATA_FILEPATH))
             {
                 LOGGER.Info("Creating New User");
                 ThemeSettingsViewModel.UserThemes = new ObservableCollection<TsundokuTheme>() { TsundokuTheme.DEFAULT_THEME };
@@ -264,7 +264,7 @@ namespace Tsundoku.ViewModels
             
             bool save = VersionUpdate();
 
-            FileStream fRead = new(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            FileStream fRead = new(USER_DATA_FILEPATH, FileMode.Open, FileAccess.Read, FileShare.Read);
             MainUser = JsonSerializer.Deserialize<User>(fRead, options);
             fRead.Flush();
             fRead.Close();
@@ -317,7 +317,7 @@ namespace Tsundoku.ViewModels
         [RequiresUnreferencedCode("Calls System.Text.Json.JsonSerializer.Serialize<TValue>(TValue, JsonSerializerOptions)")]
         private static bool VersionUpdate()
         {
-            string json = File.ReadAllText(filePath);
+            string json = File.ReadAllText(USER_DATA_FILEPATH);
             JsonNode userData = JsonNode.Parse(json);
             JsonNode series;
             JsonArray collectionJsonArray = userData["UserCollection"].AsArray();
@@ -446,7 +446,7 @@ namespace Tsundoku.ViewModels
                     coverPath = collectionJsonArray.ElementAt(x)["Cover"].ToString();
                     if (File.Exists(coverPath))
                     {
-                        Bitmap resizedBitMap = new Bitmap(coverPath).CreateScaledBitmap(new Avalonia.PixelSize(Constants.LEFT_SIDE_CARD_WIDTH, Constants.IMAGE_HEIGHT), BitmapInterpolationMode.HighQuality);
+                        Bitmap resizedBitMap = new Bitmap(coverPath).CreateScaledBitmap(new PixelSize(LEFT_SIDE_CARD_WIDTH, IMAGE_HEIGHT), BitmapInterpolationMode.HighQuality);
                         resizedBitMap.Save(coverPath, 100);
                     }
                 }
@@ -469,7 +469,7 @@ namespace Tsundoku.ViewModels
                 updatedVersion = true;
             }
 
-            File.WriteAllText(filePath, JsonSerializer.Serialize(userData, options));
+            File.WriteAllText(USER_DATA_FILEPATH, JsonSerializer.Serialize(userData, options));
             return updatedVersion;
         }
 
@@ -480,7 +480,7 @@ namespace Tsundoku.ViewModels
             MainUser.UserCollection = Collection;
             MainUser.SavedThemes = ThemeSettingsViewModel.UserThemes;
 
-            File.WriteAllText(filePath, JsonSerializer.Serialize(MainUser, options));
+            File.WriteAllText(USER_DATA_FILEPATH, JsonSerializer.Serialize(MainUser, options));
         }
     }
 }
