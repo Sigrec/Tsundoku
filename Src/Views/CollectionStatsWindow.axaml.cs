@@ -80,19 +80,19 @@ namespace Tsundoku.Views
             HiatusObject.Stroke = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.DividerColor));
 
             Color behindBarColor = Color.FromArgb((int)CollectionStatsVM.CurrentTheme.MenuButtonBGColor);
-            ColumnSeries<ObservableValue> BarBehindObject = (ColumnSeries<ObservableValue>)CollectionStatsVM.ScoreDistribution[0];
+            ColumnSeries<ObservableValue> BarBehindObject = (ColumnSeries<ObservableValue>)CollectionStatsVM.RatingDistribution[0];
             BarBehindObject.Fill = new SolidColorPaint(new SkiaSharp.SKColor(behindBarColor.R, behindBarColor.G, behindBarColor.B, 120));
 
-            ColumnSeries<ObservableValue> BarObject = (ColumnSeries<ObservableValue>)CollectionStatsVM.ScoreDistribution[1];
+            ColumnSeries<ObservableValue> BarObject = (ColumnSeries<ObservableValue>)CollectionStatsVM.RatingDistribution[1];
             BarObject.Fill = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.MenuBGColor));
             BarObject.DataLabelsPaint = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.MenuTextColor));
             BarObject.Stroke = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.DividerColor));
 
-            Axis XAxisObject = CollectionStatsVM.ScoreXAxes[0];
+            Axis XAxisObject = CollectionStatsVM.RatingXAxes[0];
             XAxisObject.LabelsPaint = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.MenuTextColor));
             XAxisObject.TicksPaint = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.MenuTextColor));
 
-            CollectionStatsVM.ScoreYAxes[0].SeparatorsPaint = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.DividerColor));
+            CollectionStatsVM.RatingYAxes[0].SeparatorsPaint = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.DividerColor));
 
             LOGGER.Info("Updated Chart Colors ");
         }

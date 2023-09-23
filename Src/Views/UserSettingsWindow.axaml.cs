@@ -7,6 +7,7 @@ using System;
 using System.ComponentModel;
 using System.Threading.Tasks;
 using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 
 namespace Tsundoku.Views
 {
@@ -27,7 +28,7 @@ namespace Tsundoku.Views
                 UserSettingsVM.CurrentTheme = CollectionWindow.CollectionViewModel.CurrentTheme;
                 IsOpen ^= true;
 
-                if (Screens.Primary.WorkingArea.Height < 920)
+                if (Screens.Primary.WorkingArea.Height < 935)
                 {
                     this.Height = 550;
                 }

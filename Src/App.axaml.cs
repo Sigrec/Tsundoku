@@ -37,5 +37,10 @@ namespace Tsundoku
             }
             base.OnFrameworkInitializationCompleted();
         }
+
+        public static void DisposeMutex()
+        {
+            _mutex.Dispose();
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using DiscordRPC;
+using DiscordRPC.Logging;
 
 namespace Tsundoku.Helpers
 {
@@ -9,7 +10,10 @@ namespace Tsundoku.Helpers
 
         public static void Initialize()
         {
-            client = new DiscordRpcClient("1050229234674696252");
+            client = new DiscordRpcClient("1050229234674696252")
+            {
+                Logger = new ConsoleLogger(LogLevel.Error, true)
+            };
 
             client.OnReady += (sender, msg) =>
             {

@@ -24,7 +24,7 @@ namespace Tsundoku.ViewModels
             CurCurrency = MainUser.Currency;
             ExportToSpreadsheetCommand = ReactiveCommand.CreateFromTask(ExportToSpreadsheetAsync);
 
-            this.WhenAnyValue(x => x.CurCurrency).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => CurrencyIndex = Array.IndexOf(Constants.AvailableCurrency, Uri.UnescapeDataString(x)));
+            this.WhenAnyValue(x => x.CurCurrency).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => CurrencyIndex = Array.IndexOf(AvailableCurrency, Uri.UnescapeDataString(x)));
             this.WhenAnyValue(x => x.UsernameText, x => !string.IsNullOrWhiteSpace(x)).Subscribe(x => IsChangeUsernameButtonEnabled = x);
             this.WhenAnyValue(x => x.RightStufAnimeMember).Subscribe(x => MainUser.Memberships["RightStufAnime"] = x);
             this.WhenAnyValue(x => x.BarnesAndNobleMember).Subscribe(x => MainUser.Memberships["BarnesAndNoble"] = x);
@@ -38,10 +38,10 @@ namespace Tsundoku.ViewModels
             {
                 string file = @"TsundokuCollection.csv";
                 StringBuilder output = new();
-                string[] headers = new string[] { "Title", "Staff", "Format", "Status", "Cur Volumes", "Max Volumes", "Demographic", "Cost", "Score", "Volumes Read", "Notes" };
+                string[] headers = new string[] { "Title", "Staff", "Format", "Status", "Cur Volumes", "Max Volumes", "Demographic", "Cost", "Rating", "Volumes Read", "Notes" };
                 output.AppendLine(string.Join(",", headers));
 
-                foreach (Series curSeries in MainWindowViewModel.Collection)
+                foreach (Series curSeries in MainWindowViewModel.UserCollection)
                 {
                     output.AppendLine(string.Join(",", new string[] { 
                         curSeries.Titles.ContainsKey(MainUser.CurLanguage) ? curSeries.Titles[MainUser.CurLanguage] : curSeries.Titles["Romaji"], 
@@ -51,9 +51,9 @@ namespace Tsundoku.ViewModels
                         curSeries.CurVolumeCount.ToString(), 
                         curSeries.MaxVolumeCount.ToString(), 
                         curSeries.Demographic, 
-                        $"{MainUser.Currency}{curSeries.Cost.ToString()}", 
-                        curSeries.Score.ToString(), 
-                        $"{curSeries.VolumesRead.ToString()}", 
+                        $"{MainUser.Currency}{curSeries.Cost}", 
+                        curSeries.Rating.ToString(), 
+                        $"{curSeries.VolumesRead}", 
                         curSeries.SeriesNotes }));
                 }
 

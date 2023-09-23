@@ -2,9 +2,9 @@
   "Titles": {
     "Romaji": "Kanojo, Okarishimasu",
     "English": "Rent-A-Girlfriend",
-    "Chinese": "\u5973\u670B\u53CB\u3001\u501F\u6211\u4E00\u4E0B",
-    "French": "J\u0027aimerais emprunter une petite amie",
     "Korean": "\uC5EC\uCE5C, \uBE4C\uB9AC\uACA0\uC2B5\uB2C8\uB2E4",
+    "French": "J\u0027aimerais emprunter une petite amie",
+    "Chinese": "\u5973\u670B\u53CB\u3001\u501F\u6211\u4E00\u4E0B",
     "Russian": "\u0414\u0435\u0432\u0443\u0448\u043A\u0430 \u043D\u0430 \u043F\u0440\u043E\u043A\u0430\u0442",
     "Spanish": "Novia de Alquiler",
     "Japanese": "\u304B\u306E\u304B\u308A"
@@ -22,7 +22,7 @@
   "CurVolumeCount": 0,
   "VolumesRead": 0,
   "Cost": 0,
-  "Score": -1,
+  "Rating": -1,
   "Demographic": "Shounen",
   "IsFavorite": false
 }

@@ -46,6 +46,7 @@ namespace Tsundoku.Helpers
             try
             {
                 //LOGGER.Debug($"{MangadexClient.BaseAddress}manga?title={title.Replace(" ", "%20")}");
+                LOGGER.Debug("MangaDex Getting Series By Title Async");
                 var response = await MangadexClient.GetStringAsync($"manga?title={title.Replace(" ", "%20")}");
                 // File.WriteAllText(@"MangadexTitleTest.json", JsonSerializer.Serialize(JsonDocument.Parse(response), options));
                 return JsonDocument.Parse(response);
@@ -66,6 +67,7 @@ namespace Tsundoku.Helpers
         {
             try
             {
+                LOGGER.Debug("MangaDex Getting Series By Id Async");
                 var response = await MangadexClient.GetStringAsync($"manga/{id}");
                 // File.WriteAllText(@"MangadexIdTest.json", JsonSerializer.Serialize(JsonDocument.Parse(response), options));
                 return JsonDocument.Parse(response);
@@ -86,9 +88,10 @@ namespace Tsundoku.Helpers
         {
             try
             {
+                LOGGER.Debug("MangaDex Getting Author Async");
                 var response = await MangadexClient.GetStringAsync($"author/{id}");
                 // File.WriteAllText(@"MangadexAuthorTest.json", JsonSerializer.Serialize(response, options));
-                return JsonDocument.Parse(response).RootElement.GetProperty("data").GetProperty("attributes").GetProperty("name").ToString();
+                return JsonDocument.Parse(response).RootElement.GetProperty("data").GetProperty("attributes").GetProperty("name").GetString();
             }
             catch (Exception e)
             {
@@ -106,20 +109,21 @@ namespace Tsundoku.Helpers
         {
             try
             {
+                LOGGER.Debug("MangaDex Getting Cover Async");
                 var response = await MangadexClient.GetStringAsync($"cover/{id}");
                 JsonElement data = JsonDocument.Parse(response).RootElement.GetProperty("data");
                 // File.WriteAllText(@"MangadexCoverTest.json", JsonSerializer.Serialize(JsonDocument.Parse(response), options));
                 if (data.ValueKind == JsonValueKind.Array)
                 {
-                    return data.EnumerateArray().ElementAt(0).GetProperty("attributes").GetProperty("fileName").ToString();
+                    return data.EnumerateArray().ElementAt(0).GetProperty("attributes").GetProperty("fileName").GetString();
                 }
                 {
-                    return data.GetProperty("attributes").GetProperty("fileName").ToString();
+                    return data.GetProperty("attributes").GetProperty("fileName").GetString();
                 }
             }
             catch (Exception e)
             {
-                LOGGER.Error($"MangaDex GetCover w/ {id} Request Failed {e.Message}");
+                LOGGER.Error($"MangaDex Get Cover w/ {id} Request Failed {e.Message}");
             }
             return null;
         }
@@ -129,15 +133,15 @@ namespace Tsundoku.Helpers
         /// </summary>
         /// <param name="data">The JSON data of the series from MangaDex</param>
         /// <returns></returns>
-        public static List<JsonElement> GetAdditionalMangaDexTitleList(JsonElement data)
+        public static JsonElement.ArrayEnumerator GetAdditionalMangaDexTitleList(JsonElement data)
 		{
 			if (data.ValueKind == JsonValueKind.Array) // Collection
 			{
-				return data.EnumerateArray().ElementAt(0).GetProperty("attributes").GetProperty("altTitles").EnumerateArray().ToList();
+				return data.EnumerateArray().ElementAt(0).GetProperty("attributes").GetProperty("altTitles").EnumerateArray();
 			}
 			else
 			{
-				return data.GetProperty("attributes").GetProperty("altTitles").EnumerateArray().ToList();
+				return data.GetProperty("attributes").GetProperty("altTitles").EnumerateArray();
 			}
 		}
 

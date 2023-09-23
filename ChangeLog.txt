@@ -2,22 +2,32 @@ Legend
 ❌ -> In the works/partially completed
 ✅ -> Completed new feature/update
 🔥 -> Completed bug/hot fix
-⌛ -> Completed performance/librry update
+⌛ -> Completed performance/library update
 
-V2.0.0.0 - September , 2023 @ PST
+✅ Updated UserData JSON schema to change Series "Score" to appropiate naming convention "Rating"
+✅ Fixed/Changed Layout of Settings Window 
+✅ Added 8 new filters/sorts, "Shounen", "Shoujo", "Seinen", "Josei", "Rating", "Cost", "Read", & "Unread"
+✅ Added new Command "CTRL+F" to reload the current filter/sort on the collection
+⌛ Updated to .NET 8.0
+
+V2.0.0.0 - PST
 ✅ Logs now output to TsundokuLogs.log file in folder, and are cleared everytime the application is started to prevent overflow
-✅ Added new "Scrape" Window that allows users to scrape multiple websites to get the website that contains the lowest price volume in USD for each volume of a series. Includes filtering out OOS and PO entires as well. Currently only supports websites that have USD. Others are 
+✅ Added new "Scrape" Window that allows users to scrape multiple websites to get the website that contains the lowest price volume in USD for each volume of a series. Includes filtering out OOS and PO entires as well. Currently only supports websites that have USD.
 ✅ Added 4 new toggle buttons in the user settings window to determine if the user is a member of RightStufAnime, Banres & Noble, BooksAMillion, and/or Kinokuniya
-✅ Updated UserData JSON schema to include Memberships dictionary in the User
-✅ Now can copy stat text for all stats to clipboard by clicking
+✅ Updated UserData JSON schema to include Memberships dictionary in the User & Changed Series "Score" to appropiate naming convention "Rating"
+✅ Added functionality to copy stat text for all stats to clipboard by clicking on stat box
 ✅ Disabled hovering of pie charts and moved the counts to the legend
 ✅ Windows now open full sized if your monitor height is large enough
 ✅ Hovering over Title & Additional Language Title Text's in "Add Series" window now shows full title and list of currenly selected languages
 ✅ Fixed/Changed Layout of Settings Window & doubled size of input textbox for series title
 ✅ Fixed/Changed Layout & Styling of Stats Window
+✅ Added 8 new filters/sorts, "Shounen", "Shoujo", "Seinen", "Josei", "Rating", "Cost", "Read", & "Unread"
+✅ Added new Command "CTRL+F" to reload the current filter/sort on the collection
 🔥 Fixed Themes Settings window border now being curved on the bottom
 🔥 Slight Changes to the formatting of all windows except main collection window
-🔥 Fixed issue where users could input negative numbers into a series score
+🔥 Fixed issue where users could input negative numbers into a series score, user can no longer can do that
+🔥 Fixed issue where filtering collection by "Manga" doesn't include "Comics"
+⌛ Updated to .NET 8.0
 ❌ Fixed issue where clicking on a different window cause other windows to hide
 ❌ Update Libraries
 

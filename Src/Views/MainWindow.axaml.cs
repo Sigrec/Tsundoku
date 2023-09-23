@@ -24,9 +24,9 @@ namespace Tsundoku.Views
     {
         public MainWindowViewModel? CollectionViewModel => DataContext as MainWindowViewModel;
         private WindowState previousWindowState;
-        private static readonly List<FilePickerFileType> fileOptions = new() { FilePickerFileTypes.ImageAll };
-        private static List<Series> CoverChangedSeriesList = new List<Series>();
-        private static FileSystemWatcherEx coverFolderWatcher = new FileSystemWatcherEx(@"Covers")
+        private static readonly List<FilePickerFileType> fileOptions = [FilePickerFileTypes.ImageAll];
+        private static readonly List<Series> CoverChangedSeriesList = [];
+        private static readonly FileSystemWatcherEx coverFolderWatcher = new(@"Covers")
         {
             IncludeSubdirectories = false,
             NotifyFilter = NotifyFilters.FileName
@@ -77,6 +77,11 @@ namespace Tsundoku.Views
                         LOGGER.Info("No Covers Changed");
                     }
                 }
+                else if (e.KeyModifiers == KeyModifiers.Control && e.Key == Key.F)
+                {
+                    LOGGER.Info("Reloading Filter/Sort on Collection");
+                    MainWindowViewModel.FilterCollection(CollectionViewModel.CurFilter);
+                }
             };
 
             coverFolderWatcher.OnCreated += static (s, e) =>
@@ -84,7 +89,7 @@ namespace Tsundoku.Views
                 e.FullPath = e.FullPath.Replace(".crdownload", "");
                 if (!MainWindowViewModel.updatedVersion && (e.FullPath.EndsWith(".jpg") || e.FullPath.EndsWith(".png")))
                 {
-                    Series series = MainWindowViewModel.Collection.SingleOrDefault(series => series.Cover.Equals(e.FullPath));
+                    Series series = MainWindowViewModel.UserCollection.SingleOrDefault(series => series.Cover.Equals(e.FullPath));
                     if (series != null && !CoverChangedSeriesList.Contains(series))
                     {
                         CoverChangedSeriesList.Add(series);
@@ -110,19 +115,19 @@ namespace Tsundoku.Views
         private static void ReloadCoverBitmaps()
         {
             uint cache = 0;
-            for (int x = 0; x < MainWindowViewModel.Collection.Count; x++)
+            for (int x = 0; x < MainWindowViewModel.UserCollection.Count; x++)
             {
                 // If the image does not exist in the covers folder then don't create a bitmap for it
-                if (CoverChangedSeriesList.Contains(MainWindowViewModel.Collection[x]))
+                if (CoverChangedSeriesList.Contains(MainWindowViewModel.UserCollection[x]))
                 {
-                    int index = MainWindowViewModel.SearchedCollection.IndexOf(MainWindowViewModel.Collection[x]);
-                    MainWindowViewModel.SearchedCollection.Remove(MainWindowViewModel.Collection[x]);
-                    Bitmap newCover = new Bitmap(MainWindowViewModel.Collection[x].Cover).CreateScaledBitmap(new PixelSize(LEFT_SIDE_CARD_WIDTH, IMAGE_HEIGHT), BitmapInterpolationMode.HighQuality);
-                    newCover.Save(MainWindowViewModel.Collection[x].Cover, 100);
-                    MainWindowViewModel.Collection[x].CoverBitMap = newCover;
-                    MainWindowViewModel.SearchedCollection.Insert(index, MainWindowViewModel.Collection[x]);
+                    int index = MainWindowViewModel.SearchedCollection.IndexOf(MainWindowViewModel.UserCollection[x]);
+                    MainWindowViewModel.SearchedCollection.Remove(MainWindowViewModel.UserCollection[x]);
+                    Bitmap newCover = new Bitmap(MainWindowViewModel.UserCollection[x].Cover).CreateScaledBitmap(new PixelSize(LEFT_SIDE_CARD_WIDTH, IMAGE_HEIGHT), BitmapInterpolationMode.HighQuality);
+                    newCover.Save(MainWindowViewModel.UserCollection[x].Cover, 100);
+                    MainWindowViewModel.UserCollection[x].CoverBitMap = newCover;
+                    MainWindowViewModel.SearchedCollection.Insert(index, MainWindowViewModel.UserCollection[x]);
                     cache++;
-                    LOGGER.Info($"Updated {MainWindowViewModel.Collection[x].Titles["Romaji"]} Cover");
+                    LOGGER.Info($"Updated {MainWindowViewModel.UserCollection[x].Titles["Romaji"]} Cover");
                 }
                 else if (cache == CoverChangedSeriesList.Count)
                 {
@@ -147,7 +152,7 @@ namespace Tsundoku.Views
                 ((TextBlock)stackPanels.ElementAt(0).GetLogicalChildren().ElementAt(0)).Text = $"Read {volumesReadVal} Vol(s)";
                 LOGGER.Info($"Updated # of Volumes Read for {curSeries.Titles["Romaji"]} to {volumesReadVal}");
                 volumesReadVal = 0;
-                foreach (Series x in CollectionsMarshal.AsSpan(MainWindowViewModel.Collection.ToList()))
+                foreach (Series x in CollectionsMarshal.AsSpan(MainWindowViewModel.UserCollection.ToList()))
                 {
                     volumesReadVal += x.VolumesRead;
                     if (x.VolumesRead != 0)
@@ -160,14 +165,14 @@ namespace Tsundoku.Views
             }
 
             string cost = ((MaskedTextBox)stackPanels.ElementAt(1).GetLogicalChildren().ElementAt(1)).Text.Replace("_", "");
-            if (!cost.Equals("."))
+            if (!cost.Equals('.'))
             {
                 decimal costVal = Convert.ToDecimal(cost);
                 curSeries.Cost = costVal;
                 ((TextBlock)stackPanels.ElementAt(1).GetLogicalChildren().ElementAt(0)).Text = $"Cost {CollectionViewModel.CurCurrency}{costVal}";
                 LOGGER.Info($"Updated Cost for {curSeries.Titles["Romaji"]} to {CollectionViewModel.CurCurrency}{costVal}");
                 costVal = 0;
-                foreach (Series x in CollectionsMarshal.AsSpan(MainWindowViewModel.Collection.ToList()))
+                foreach (Series x in CollectionsMarshal.AsSpan(MainWindowViewModel.UserCollection.ToList()))
                 {
                     costVal += x.Cost;
                 }
@@ -175,36 +180,36 @@ namespace Tsundoku.Views
                 ((MaskedTextBox)stackPanels.ElementAt(1).GetLogicalChildren().ElementAt(1)).Text = "";
             }
 
-            string score = ((MaskedTextBox)stackPanels.ElementAt(2).GetLogicalChildren().ElementAt(1)).Text[..4].Replace("_", "");
-            if (!score.Equals("."))
+            string rating = ((MaskedTextBox)stackPanels.ElementAt(2).GetLogicalChildren().ElementAt(1)).Text[..4].Replace("_", "");
+            if (!rating.Equals('.'))
             {
-                decimal scoreVal = Convert.ToDecimal(score);
-                if (decimal.Compare(scoreVal, new decimal(10.0)) <= 0)
+                decimal ratingVal = Convert.ToDecimal(rating);
+                if (decimal.Compare(ratingVal, new decimal(10.0)) <= 0)
                 {
-                    int countScore = 0;
-                    curSeries.Score = scoreVal;
-                    ((TextBlock)stackPanels.ElementAt(2).GetLogicalChildren().ElementAt(0)).Text = $"Score {scoreVal}/10.0";
+                    int countrating = 0;
+                    curSeries.Rating = ratingVal;
+                    ((TextBlock)stackPanels.ElementAt(2).GetLogicalChildren().ElementAt(0)).Text = $"rating {ratingVal}/10.0";
                     
-                    // Update Score Distribution Chart
-                    MainWindowViewModel.Collection.First(series => series == curSeries).Score = scoreVal;
-                    CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UpdateScoreChartValues();
+                    // Update rating Distribution Chart
+                    MainWindowViewModel.UserCollection.First(series => series == curSeries).Rating = ratingVal;
+                    CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UpdateRatingChartValues();
 
-                    LOGGER.Info($"Updated Score for {curSeries.Titles["Romaji"]} to {scoreVal}/10.0");
-                    scoreVal = 0;
-                    foreach (Series x in CollectionsMarshal.AsSpan(MainWindowViewModel.Collection.ToList()))
+                    LOGGER.Info($"Updated rating for {curSeries.Titles["Romaji"]} to {ratingVal}/10.0");
+                    ratingVal = 0;
+                    foreach (Series x in CollectionsMarshal.AsSpan(MainWindowViewModel.UserCollection.ToList()))
                     {
-                        if (x.Score >= 0)
+                        if (x.Rating >= 0)
                         {
-                            scoreVal += x.Score;
-                            countScore++;
+                            ratingVal += x.Rating;
+                            countrating++;
                         }
                     }
-                    CollectionViewModel.collectionStatsWindow.CollectionStatsVM.MeanScore = decimal.Round(scoreVal / countScore, 1);
+                    CollectionViewModel.collectionStatsWindow.CollectionStatsVM.MeanRating = decimal.Round(ratingVal / countrating, 1);
                     ((MaskedTextBox)stackPanels.ElementAt(1).GetLogicalChildren().ElementAt(1)).Text = "";
                 }
                 else
                 {
-                    LOGGER.Warn($"Score Value {scoreVal} larger than 10.0");
+                    LOGGER.Warn($"Rating Value {ratingVal} larger than 10.0");
                 }
             }
         }
@@ -278,7 +283,7 @@ namespace Tsundoku.Views
         {
             var result = await Observable.Start(() => 
             {
-                Series curSeries = MainWindowViewModel.Collection.Single(series => series == (Series)((Button)sender).DataContext);
+                Series curSeries = MainWindowViewModel.UserCollection.Single(series => series == (Series)((Button)sender).DataContext);
                 CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UsersNumVolumesCollected -= curSeries.CurVolumeCount;
                 CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UsersNumVolumesToBeCollected -= (uint)(curSeries.MaxVolumeCount - curSeries.CurVolumeCount);
 
@@ -287,7 +292,7 @@ namespace Tsundoku.Views
                 CollectionViewModel.collectionStatsWindow.CollectionStatsVM.CollectionPrice = $"{CollectionViewModel.CurCurrency}{decimal.Round(Convert.ToDecimal(CollectionViewModel.collectionStatsWindow.CollectionStatsVM.CollectionPrice[CollectionViewModel.CurCurrency.Length..]) - curSeries.Cost, 2)}";
 
                 MainWindowViewModel.SearchedCollection.Remove(curSeries);
-                MainWindowViewModel.Collection.Remove(curSeries);
+                MainWindowViewModel.UserCollection.Remove(curSeries);
 
                 if (File.Exists(curSeries.Cover))
                 {
@@ -297,52 +302,46 @@ namespace Tsundoku.Views
                     LOGGER.Info($"Deleted Cover -> {curSeries.Cover}");
                 }
 
-                // Update Mean Score
-                int countScore = 0;
-                decimal scoreVal = 0;
-                foreach (Series x in CollectionsMarshal.AsSpan(MainWindowViewModel.Collection.ToList()))
+                // Update Mean rating
+                int countrating = 0;
+                decimal ratingVal = 0;
+                foreach (Series x in CollectionsMarshal.AsSpan(MainWindowViewModel.UserCollection.ToList()))
                 {
-                    if (x.Score >= 0)
+                    if (x.Rating >= 0)
                     {
-                        scoreVal += x.Score;
-                        countScore++;
+                        ratingVal += x.Rating;
+                        countrating++;
                     }
                 }
-                CollectionViewModel.collectionStatsWindow.CollectionStatsVM.MeanScore = countScore != 0 ? decimal.Round(scoreVal / countScore, 1) : 0;
+                CollectionViewModel.collectionStatsWindow.CollectionStatsVM.MeanRating = countrating != 0 ? decimal.Round(ratingVal / countrating, 1) : 0;
                 
                 LOGGER.Info($"Removed {curSeries.Titles["Romaji"]} From Collection");
-                CollectionViewModel.collectionStatsWindow.CollectionStatsVM.SeriesCount = (uint)MainWindowViewModel.Collection.Count;
+                CollectionViewModel.collectionStatsWindow.CollectionStatsVM.SeriesCount = (uint)MainWindowViewModel.UserCollection.Count;
 
                 CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UpdateDemographicChartValues();
                 CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UpdateDemographicPercentages();
                 CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UpdateStatusChartValues();
                 CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UpdateStatusPercentages();
-                CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UpdateScoreChartValues();
+                CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UpdateRatingChartValues();
             }, RxApp.MainThreadScheduler);
         }
 
-        private async void ShowEditPane(object sender, RoutedEventArgs args)
+        private void ShowEditPane(object sender, RoutedEventArgs args)
         {
-            var result = await Observable.Start(() => 
+            if (((sender as Button).FindLogicalAncestorOfType<Grid>(false).GetLogicalChildren().ElementAt(1) as Grid).IsVisible == true)
             {
-                if (((sender as Button).FindLogicalAncestorOfType<Grid>(false).GetLogicalChildren().ElementAt(1) as Grid).IsVisible == true)
-                {
-                    ((sender as Button).FindLogicalAncestorOfType<Grid>(false).GetLogicalChildren().ElementAt(1) as Grid).IsVisible = false;
-                }
-                ((Button)sender).FindLogicalAncestorOfType<Grid>(false).FindLogicalDescendantOfType<Grid>(false).IsVisible ^= true;
-            }, RxApp.MainThreadScheduler);
+                ((sender as Button).FindLogicalAncestorOfType<Grid>(false).GetLogicalChildren().ElementAt(1) as Grid).IsVisible = false;
+            }
+            ((Button)sender).FindLogicalAncestorOfType<Grid>(false).FindLogicalDescendantOfType<Grid>(false).IsVisible ^= true;
         }
 
-        private async void ShowStatsPane(object sender, RoutedEventArgs args)
+        private void ShowStatsPane(object sender, RoutedEventArgs args)
         {
-            var result = await Observable.Start(() => 
+            if (((Button)sender).FindLogicalAncestorOfType<Grid>(false).FindLogicalDescendantOfType<Grid>(false).IsVisible == true)
             {
-                if (((Button)sender).FindLogicalAncestorOfType<Grid>(false).FindLogicalDescendantOfType<Grid>(false).IsVisible == true)
-                {
-                    ((Button)sender).FindLogicalAncestorOfType<Grid>(false).FindLogicalDescendantOfType<Grid>(false).IsVisible = false;
-                }
-                ((sender as Button).FindLogicalAncestorOfType<Grid>(false).GetLogicalChildren().ElementAt(1) as Grid).IsVisible ^= true;
-            }, RxApp.MainThreadScheduler);
+                ((Button)sender).FindLogicalAncestorOfType<Grid>(false).FindLogicalDescendantOfType<Grid>(false).IsVisible = false;
+            }
+            ((sender as Button).FindLogicalAncestorOfType<Grid>(false).GetLogicalChildren().ElementAt(1) as Grid).IsVisible ^= true;
         }
 
         /// <summary>
@@ -382,7 +381,7 @@ namespace Tsundoku.Views
                 string demographic = (sender as ComboBox).SelectedItem as string;
                 
                 // Update Demographic Chart Values
-                MainWindowViewModel.Collection.First(series => series == curSeries).Demographic = demographic;
+                MainWindowViewModel.UserCollection.First(series => series == curSeries).Demographic = demographic;
                 CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UpdateDemographicChartValues();
                 CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UpdateDemographicPercentages();
                 
@@ -449,6 +448,7 @@ namespace Tsundoku.Views
             ThemeSettingsViewModel.UserThemes.Move(ThemeSettingsViewModel.UserThemes.IndexOf(ThemeSettingsViewModel.UserThemes.Single(x => x.ThemeName == ViewModelBase.MainUser.MainTheme)), 0);
 
             MainWindowViewModel.SaveUsersData();
+            App.Mutex.Dispose();
         }
 
         /// <summary>
@@ -470,7 +470,7 @@ namespace Tsundoku.Views
             });
             if (file.Count > 0)
             {
-                CollectionViewModel.UserIcon = new Bitmap(file[0].Path.LocalPath).CreateScaledBitmap(new Avalonia.PixelSize(Constants.USER_ICON_WIDTH, Constants.USER_ICON_HEIGHT), BitmapInterpolationMode.HighQuality);
+                CollectionViewModel.UserIcon = new Bitmap(file[0].Path.LocalPath).CreateScaledBitmap(new PixelSize(USER_ICON_WIDTH, USER_ICON_HEIGHT), BitmapInterpolationMode.HighQuality);
                 LOGGER.Debug($"Changed Users Icon to {file[0].Path.LocalPath}");
             }
         }
@@ -517,7 +517,7 @@ namespace Tsundoku.Views
                 CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UsersNumVolumesToBeCollected--;
                 curSeries.CurVolumeCount += 1;
                 TextBlock volumeDisplay = (TextBlock)((Button)sender).GetLogicalSiblings().ElementAt(1);
-                string log = "Adding 1 Volume To " + curSeries.Titles["Romaji"] + " : " + volumeDisplay.Text + " -> ";
+                string log = $"Adding 1 Volume To {curSeries.Titles["Romaji"]} : {volumeDisplay.Text} -> ";
                 volumeDisplay.Text = curSeries.CurVolumeCount + "/" + curSeries.MaxVolumeCount;
                 LOGGER.Info(log + volumeDisplay.Text);
 
@@ -537,7 +537,7 @@ namespace Tsundoku.Views
                 CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UsersNumVolumesToBeCollected++;
                 curSeries.CurVolumeCount -= 1;
                 TextBlock volumeDisplay = (TextBlock)((Button)sender).GetLogicalSiblings().ElementAt(1);
-                string log = "Removing 1 Volume From " + curSeries.Titles["Romaji"] + " : " + volumeDisplay.Text + " -> ";
+                string log = $"Removing 1 Volume From {curSeries.Titles["Romaji"]} : {volumeDisplay.Text} -> ";
                 volumeDisplay.Text = curSeries.CurVolumeCount + "/" + curSeries.MaxVolumeCount;
                 LOGGER.Info(log + volumeDisplay.Text);
 

@@ -173,8 +173,16 @@
 						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Finished</ComboBoxItem>
 						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Hiatus</ComboBoxItem>
 						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Cancelled</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Shounen</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Shoujo</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Seinen</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Josei</ComboBoxItem>
 						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Manga</ComboBoxItem>
 						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Novel</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Read</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Unread</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Rating</ComboBoxItem>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Cost</ComboBoxItem>
 					</ComboBox>
 					<TextBox Name="SearchBar" 
 							Text="{CompiledBinding SearchText, Mode=TwoWay}" 
@@ -202,6 +210,7 @@
 				</ItemsControl.ItemsPanel>
 
 				<ItemsControl.ItemTemplate>
+					<!-- Full Card Display -->
 					<DataTemplate x:DataType="{x:Type local:Series}">
 						<Border Background="Transparent" Margin="20" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 15 6 #B3000000">
 							<Border CornerRadius="8" ClipToBounds="True">
@@ -435,7 +444,7 @@
 															   Mask="000000000.00"/>
 											</StackPanel>
 											<StackPanel Margin="10,7,0,0" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="1">
-												<TextBlock Text="{Binding Score, StringFormat='Score {0}/10.0'}"
+												<TextBlock Text="{Binding Rating, StringFormat='Rating {0}/10.0'}"
 														   Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesCardTitleColor, Converter={StaticResource ConvertColor}}"
 													   	   FontWeight="Bold"
 														   HorizontalAlignment="Center"

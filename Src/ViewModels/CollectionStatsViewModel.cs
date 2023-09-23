@@ -16,44 +16,44 @@ namespace Tsundoku.ViewModels
     public partial class CollectionStatsViewModel : ViewModelBase
     {
         public ObservableCollection<ISeries> Demographics { get; set; } = new ObservableCollection<ISeries>();
-        public ObservableValue ShounenCount { get; set; } = new ObservableValue(MainWindowViewModel.Collection.Count(series => !string.IsNullOrWhiteSpace(series.Demographic) && series.Demographic.Equals("Shounen")));
-        public ObservableValue SeinenCount { get; set; } = new ObservableValue(MainWindowViewModel.Collection.Count(series => !string.IsNullOrWhiteSpace(series.Demographic) && series.Demographic.Equals("Seinen")));
-        public ObservableValue ShoujoCount { get; set; } = new ObservableValue(MainWindowViewModel.Collection.Count(series => !string.IsNullOrWhiteSpace(series.Demographic) && series.Demographic.Equals("Shoujo")));
-        public ObservableValue JoseiCount { get; set; } = new ObservableValue(MainWindowViewModel.Collection.Count(series => !string.IsNullOrWhiteSpace(series.Demographic) && series.Demographic.Equals("Josei")));
+        public ObservableValue ShounenCount { get; set; } = new ObservableValue(MainWindowViewModel.UserCollection.Count(series => !string.IsNullOrWhiteSpace(series.Demographic) && series.Demographic.Equals("Shounen")));
+        public ObservableValue SeinenCount { get; set; } = new ObservableValue(MainWindowViewModel.UserCollection.Count(series => !string.IsNullOrWhiteSpace(series.Demographic) && series.Demographic.Equals("Seinen")));
+        public ObservableValue ShoujoCount { get; set; } = new ObservableValue(MainWindowViewModel.UserCollection.Count(series => !string.IsNullOrWhiteSpace(series.Demographic) && series.Demographic.Equals("Shoujo")));
+        public ObservableValue JoseiCount { get; set; } = new ObservableValue(MainWindowViewModel.UserCollection.Count(series => !string.IsNullOrWhiteSpace(series.Demographic) && series.Demographic.Equals("Josei")));
 
         public ObservableCollection<ISeries> StatusDistribution { get; set; } = new ObservableCollection<ISeries>();
-        public ObservableValue OngoingCount { get; set; } = new ObservableValue(MainWindowViewModel.Collection.Count(series => !series.Status.Equals("Error") && series.Status.Equals("Ongoing")));
-        public ObservableValue FinishedCount { get; set; } = new ObservableValue(MainWindowViewModel.Collection.Count(series => !series.Status.Equals("Error") && series.Status.Equals("Finished")));
-        public ObservableValue CancelledCount { get; set; } = new ObservableValue(MainWindowViewModel.Collection.Count(series => !series.Status.Equals("Error") && series.Status.Equals("Cancelled")));
-        public ObservableValue HiatusCount { get; set; } = new ObservableValue(MainWindowViewModel.Collection.Count(series => !series.Status.Equals("Error") && series.Status.Equals("Hiatus")));
+        public ObservableValue OngoingCount { get; set; } = new ObservableValue(MainWindowViewModel.UserCollection.Count(series => !series.Status.Equals("Error") && series.Status.Equals("Ongoing")));
+        public ObservableValue FinishedCount { get; set; } = new ObservableValue(MainWindowViewModel.UserCollection.Count(series => !series.Status.Equals("Error") && series.Status.Equals("Finished")));
+        public ObservableValue CancelledCount { get; set; } = new ObservableValue(MainWindowViewModel.UserCollection.Count(series => !series.Status.Equals("Error") && series.Status.Equals("Cancelled")));
+        public ObservableValue HiatusCount { get; set; } = new ObservableValue(MainWindowViewModel.UserCollection.Count(series => !series.Status.Equals("Error") && series.Status.Equals("Hiatus")));
 
-        public ObservableCollection<ISeries> ScoreDistribution { get; set; } = new ObservableCollection<ISeries>();
-        public ObservableCollection<Axis> ScoreXAxes { get; set; } = new ObservableCollection<Axis>();
-        public ObservableCollection<Axis> ScoreYAxes { get; set; } = new ObservableCollection<Axis>();
-        public ObservableValue ZeroScoreCount { get; set; } = new ObservableValue(MainWindowViewModel.Collection.Count(series => series.Score > 0 && series.Score < 1));
-        public ObservableValue OneScoreCount { get; set; } = new ObservableValue(MainWindowViewModel.Collection.Count(series => series.Score >= 1 && series.Score < 2));
-        public ObservableValue TwoScoreCount { get; set; } = new ObservableValue(MainWindowViewModel.Collection.Count(series => series.Score >= 2 && series.Score < 3));
-        public ObservableValue ThreeScoreCount { get; set; } = new ObservableValue(MainWindowViewModel.Collection.Count(series => series.Score >= 3 && series.Score < 4));
-        public ObservableValue FourScoreCount { get; set; } = new ObservableValue(MainWindowViewModel.Collection.Count(series => series.Score >= 4 && series.Score < 5));
-        public ObservableValue FiveScoreCount { get; set; } = new ObservableValue(MainWindowViewModel.Collection.Count(series => series.Score >= 5 && series.Score < 6));
-        public ObservableValue SixScoreCount { get; set; } = new ObservableValue(MainWindowViewModel.Collection.Count(series => series.Score >= 7 && series.Score < 8));
-        public ObservableValue SevenScoreCount { get; set; } = new ObservableValue(MainWindowViewModel.Collection.Count(series => series.Score >= 7 && series.Score < 8));
-        public ObservableValue EightScoreCount { get; set; } = new ObservableValue(MainWindowViewModel.Collection.Count(series => series.Score >= 8 && series.Score < 9));
-        public ObservableValue NineScoreCount { get; set; } = new ObservableValue(MainWindowViewModel.Collection.Count(series => series.Score >= 9 && series.Score < 10));
-        public ObservableValue TenScoreCount { get; set; } = new ObservableValue(MainWindowViewModel.Collection.Count(series => series.Score == 10));
-        public ObservableValue MaxScoreCount { get; set; } = new ObservableValue(0);
-        public ObservableValue MaxScoreCount1 { get; set; } = new ObservableValue(0);
-        public ObservableValue MaxScoreCount2 { get; set; } = new ObservableValue(0);
-        public ObservableValue MaxScoreCount3 { get; set; } = new ObservableValue(0);
-        public ObservableValue MaxScoreCount4 { get; set; } = new ObservableValue(0);
-        public ObservableValue MaxScoreCount5 { get; set; } = new ObservableValue(0);
-        public ObservableValue MaxScoreCount6 { get; set; } = new ObservableValue(0);
-        public ObservableValue MaxScoreCount7 { get; set; } = new ObservableValue(0);
-        public ObservableValue MaxScoreCount8 { get; set; } = new ObservableValue(0);
-        public ObservableValue MaxScoreCount9 { get; set; } = new ObservableValue(0);
-        public ObservableValue MaxScoreCount10 { get; set; } = new ObservableValue(0);
+        public ObservableCollection<ISeries> RatingDistribution { get; set; } = new ObservableCollection<ISeries>();
+        public ObservableCollection<Axis> RatingXAxes { get; set; } = new ObservableCollection<Axis>();
+        public ObservableCollection<Axis> RatingYAxes { get; set; } = new ObservableCollection<Axis>();
+        public ObservableValue ZeroRatingCount { get; set; } = new ObservableValue(MainWindowViewModel.UserCollection.Count(series => series.Rating > 0 && series.Rating < 1));
+        public ObservableValue OneRatingCount { get; set; } = new ObservableValue(MainWindowViewModel.UserCollection.Count(series => series.Rating >= 1 && series.Rating < 2));
+        public ObservableValue TwoRatingCount { get; set; } = new ObservableValue(MainWindowViewModel.UserCollection.Count(series => series.Rating >= 2 && series.Rating < 3));
+        public ObservableValue ThreeRatingCount { get; set; } = new ObservableValue(MainWindowViewModel.UserCollection.Count(series => series.Rating >= 3 && series.Rating < 4));
+        public ObservableValue FourRatingCount { get; set; } = new ObservableValue(MainWindowViewModel.UserCollection.Count(series => series.Rating >= 4 && series.Rating < 5));
+        public ObservableValue FiveRatingCount { get; set; } = new ObservableValue(MainWindowViewModel.UserCollection.Count(series => series.Rating >= 5 && series.Rating < 6));
+        public ObservableValue SixRatingCount { get; set; } = new ObservableValue(MainWindowViewModel.UserCollection.Count(series => series.Rating >= 7 && series.Rating < 8));
+        public ObservableValue SevenRatingCount { get; set; } = new ObservableValue(MainWindowViewModel.UserCollection.Count(series => series.Rating >= 7 && series.Rating < 8));
+        public ObservableValue EightRatingCount { get; set; } = new ObservableValue(MainWindowViewModel.UserCollection.Count(series => series.Rating >= 8 && series.Rating < 9));
+        public ObservableValue NineRatingCount { get; set; } = new ObservableValue(MainWindowViewModel.UserCollection.Count(series => series.Rating >= 9 && series.Rating < 10));
+        public ObservableValue TenRatingCount { get; set; } = new ObservableValue(MainWindowViewModel.UserCollection.Count(series => series.Rating == 10));
+        public ObservableValue MaxRatingCount { get; set; } = new ObservableValue(0);
+        public ObservableValue MaxRatingCount1 { get; set; } = new ObservableValue(0);
+        public ObservableValue MaxRatingCount2 { get; set; } = new ObservableValue(0);
+        public ObservableValue MaxRatingCount3 { get; set; } = new ObservableValue(0);
+        public ObservableValue MaxRatingCount4 { get; set; } = new ObservableValue(0);
+        public ObservableValue MaxRatingCount5 { get; set; } = new ObservableValue(0);
+        public ObservableValue MaxRatingCount6 { get; set; } = new ObservableValue(0);
+        public ObservableValue MaxRatingCount7 { get; set; } = new ObservableValue(0);
+        public ObservableValue MaxRatingCount8 { get; set; } = new ObservableValue(0);
+        public ObservableValue MaxRatingCount9 { get; set; } = new ObservableValue(0);
+        public ObservableValue MaxRatingCount10 { get; set; } = new ObservableValue(0);
 
-        [Reactive] public decimal MeanScore { get; set; }
+        [Reactive] public decimal MeanRating { get; set; }
         [Reactive] public uint VolumesRead { get; set; }
         [Reactive] public string CollectionPrice { get; set; }
         [Reactive] public uint SeriesCount { get; set; } = (uint)MainUser.UserCollection.Count;
@@ -68,13 +68,13 @@ namespace Tsundoku.ViewModels
         [Reactive] public decimal JoseiPercentage { get; set; }
         [Reactive] public uint UsersNumVolumesCollected { get; set; }
         [Reactive] public uint UsersNumVolumesToBeCollected { get; set; }
-        private List<double?> ScoreArray = new List<double?>(10);
+        private List<double?> RatingArray = new List<double?>(10);
 
         public CollectionStatsViewModel()
         {
             GenerateStats();
 
-            this.WhenAnyValue(x => x.MeanScore).Subscribe(x => MainUser.MeanScore = x);
+            this.WhenAnyValue(x => x.MeanRating).Subscribe(x => MainUser.MeanRating = x);
             this.WhenAnyValue(x => x.VolumesRead).Subscribe(x => MainUser.VolumesRead = x);
             this.WhenAnyValue(x => x.CollectionPrice).Subscribe(x => MainUser.CollectionPrice = x);
             this.WhenAnyValue(x => x.UsersNumVolumesCollected).Subscribe(x => MainUser.NumVolumesCollected = x);
@@ -86,13 +86,13 @@ namespace Tsundoku.ViewModels
         /// </summary>
         public void UpdateDemographicChartValues()
         {
-            ShounenCount.Value = MainWindowViewModel.Collection.Count(series => !string.IsNullOrWhiteSpace(series.Demographic) && series.Demographic.Equals("Shounen"));
+            ShounenCount.Value = MainWindowViewModel.UserCollection.Count(series => !string.IsNullOrWhiteSpace(series.Demographic) && series.Demographic.Equals("Shounen"));
 
-            SeinenCount.Value = MainWindowViewModel.Collection.Count(series => !string.IsNullOrWhiteSpace(series.Demographic) && series.Demographic.Equals("Seinen"));
+            SeinenCount.Value = MainWindowViewModel.UserCollection.Count(series => !string.IsNullOrWhiteSpace(series.Demographic) && series.Demographic.Equals("Seinen"));
 
-            ShoujoCount.Value = MainWindowViewModel.Collection.Count(series => !string.IsNullOrWhiteSpace(series.Demographic) && series.Demographic.Equals("Shoujo"));
+            ShoujoCount.Value = MainWindowViewModel.UserCollection.Count(series => !string.IsNullOrWhiteSpace(series.Demographic) && series.Demographic.Equals("Shoujo"));
 
-            JoseiCount.Value = MainWindowViewModel.Collection.Count(series => !string.IsNullOrWhiteSpace(series.Demographic) && series.Demographic.Equals("Josei"));
+            JoseiCount.Value = MainWindowViewModel.UserCollection.Count(series => !string.IsNullOrWhiteSpace(series.Demographic) && series.Demographic.Equals("Josei"));
         }
 
         /// <summary>
@@ -142,28 +142,28 @@ namespace Tsundoku.ViewModels
                 Name = "Hiatus"
             });
 
-            ScoreDistribution.Add(new ColumnSeries<ObservableValue> 
+            RatingDistribution.Add(new ColumnSeries<ObservableValue> 
             { 
                 IsHoverable = false,
                 Values = new ObservableCollection<ObservableValue> 
                 { 
-                    MaxScoreCount, MaxScoreCount1, MaxScoreCount2, MaxScoreCount3, MaxScoreCount4, MaxScoreCount5, MaxScoreCount6, MaxScoreCount7, MaxScoreCount8, MaxScoreCount9, MaxScoreCount10
+                    MaxRatingCount, MaxRatingCount1, MaxRatingCount2, MaxRatingCount3, MaxRatingCount4, MaxRatingCount5, MaxRatingCount6, MaxRatingCount7, MaxRatingCount8, MaxRatingCount9, MaxRatingCount10
                 },
                 Stroke = null,
                 IgnoresBarPosition = true
             });
-            ScoreDistribution.Add(new ColumnSeries<ObservableValue> 
+            RatingDistribution.Add(new ColumnSeries<ObservableValue> 
             { 
                 IsHoverable = false,
                 Values = new ObservableCollection<ObservableValue>
                 {
-                    ZeroScoreCount, OneScoreCount, TwoScoreCount, ThreeScoreCount, FourScoreCount, FiveScoreCount, SixScoreCount, SevenScoreCount, EightScoreCount, NineScoreCount, TenScoreCount
+                    ZeroRatingCount, OneRatingCount, TwoRatingCount, ThreeRatingCount, FourRatingCount, FiveRatingCount, SixRatingCount, SevenRatingCount, EightRatingCount, NineRatingCount, TenRatingCount
                 },
                 DataLabelsSize = 15,
                 IgnoresBarPosition = true
             });
 
-            ScoreXAxes.Add(new Axis
+            RatingXAxes.Add(new Axis
             {
                 LabelsRotation = 0,
                 TextSize = 14,
@@ -171,7 +171,7 @@ namespace Tsundoku.ViewModels
                 ForceStepToMin = true
             });
 
-            ScoreYAxes.Add(new Axis
+            RatingYAxes.Add(new Axis
             {
                 Labels = Array.Empty<string>(),
                 MinLimit = 0
@@ -183,56 +183,56 @@ namespace Tsundoku.ViewModels
         /// </summary>
         public void UpdateStatusChartValues()
         {
-            OngoingCount.Value = MainWindowViewModel.Collection.Count(series => !series.Status.Equals("Error") && series.Status.Equals("Ongoing"));
+            OngoingCount.Value = MainWindowViewModel.UserCollection.Count(series => !series.Status.Equals("Error") && series.Status.Equals("Ongoing"));
 
-            FinishedCount.Value = MainWindowViewModel.Collection.Count(series => !series.Status.Equals("Error") && series.Status.Equals("Finished"));
+            FinishedCount.Value = MainWindowViewModel.UserCollection.Count(series => !series.Status.Equals("Error") && series.Status.Equals("Finished"));
 
-            CancelledCount.Value = MainWindowViewModel.Collection.Count(series => !series.Status.Equals("Error") && series.Status.Equals("Cancelled"));
+            CancelledCount.Value = MainWindowViewModel.UserCollection.Count(series => !series.Status.Equals("Error") && series.Status.Equals("Cancelled"));
 
-            HiatusCount.Value = MainWindowViewModel.Collection.Count(series => !series.Status.Equals("Error") && series.Status.Equals("Hiatus"));
+            HiatusCount.Value = MainWindowViewModel.UserCollection.Count(series => !series.Status.Equals("Error") && series.Status.Equals("Hiatus"));
         }
 
         /// <summary>
-        /// Updates the values in the score bar/cartersian chart
+        /// Updates the values in the Rating bar/cartersian chart
         /// </summary>
-        public void UpdateScoreChartValues()
+        public void UpdateRatingChartValues()
         {
-            ScoreArray.Clear();
-            ZeroScoreCount.Value = MainWindowViewModel.Collection.Count(series => series.Score >= 0 && series.Score < 1);
-            OneScoreCount.Value = MainWindowViewModel.Collection.Count(series => series.Score >= 1 && series.Score < 2);
-            TwoScoreCount.Value = MainWindowViewModel.Collection.Count(series => series.Score >= 2 && series.Score < 3);
-            ThreeScoreCount.Value = MainWindowViewModel.Collection.Count(series => series.Score >= 3 && series.Score < 4);
-            FourScoreCount.Value = MainWindowViewModel.Collection.Count(series => series.Score >= 4 && series.Score < 5);
-            FiveScoreCount.Value = MainWindowViewModel.Collection.Count(series => series.Score >= 5 && series.Score < 6);
-            SixScoreCount.Value = MainWindowViewModel.Collection.Count(series => series.Score >= 6 && series.Score < 7);
-            SevenScoreCount.Value = MainWindowViewModel.Collection.Count(series => series.Score >= 7 && series.Score < 8);
-            EightScoreCount.Value = MainWindowViewModel.Collection.Count(series => series.Score >= 8 && series.Score < 9);
-            NineScoreCount.Value = MainWindowViewModel.Collection.Count(series => series.Score >= 9 && series.Score < 10);
-            TenScoreCount.Value = MainWindowViewModel.Collection.Count(series => series.Score == 10);
+            RatingArray.Clear();
+            ZeroRatingCount.Value = MainWindowViewModel.UserCollection.Count(series => series.Rating >= 0 && series.Rating < 1);
+            OneRatingCount.Value = MainWindowViewModel.UserCollection.Count(series => series.Rating >= 1 && series.Rating < 2);
+            TwoRatingCount.Value = MainWindowViewModel.UserCollection.Count(series => series.Rating >= 2 && series.Rating < 3);
+            ThreeRatingCount.Value = MainWindowViewModel.UserCollection.Count(series => series.Rating >= 3 && series.Rating < 4);
+            FourRatingCount.Value = MainWindowViewModel.UserCollection.Count(series => series.Rating >= 4 && series.Rating < 5);
+            FiveRatingCount.Value = MainWindowViewModel.UserCollection.Count(series => series.Rating >= 5 && series.Rating < 6);
+            SixRatingCount.Value = MainWindowViewModel.UserCollection.Count(series => series.Rating >= 6 && series.Rating < 7);
+            SevenRatingCount.Value = MainWindowViewModel.UserCollection.Count(series => series.Rating >= 7 && series.Rating < 8);
+            EightRatingCount.Value = MainWindowViewModel.UserCollection.Count(series => series.Rating >= 8 && series.Rating < 9);
+            NineRatingCount.Value = MainWindowViewModel.UserCollection.Count(series => series.Rating >= 9 && series.Rating < 10);
+            TenRatingCount.Value = MainWindowViewModel.UserCollection.Count(series => series.Rating == 10);
 
-            ScoreArray.Add(ZeroScoreCount.Value);
-            ScoreArray.Add(OneScoreCount.Value);
-            ScoreArray.Add(TwoScoreCount.Value);
-            ScoreArray.Add(ThreeScoreCount.Value);
-            ScoreArray.Add(FourScoreCount.Value);
-            ScoreArray.Add(FiveScoreCount.Value);
-            ScoreArray.Add(SixScoreCount.Value);
-            ScoreArray.Add(SevenScoreCount.Value);
-            ScoreArray.Add(EightScoreCount.Value);
-            ScoreArray.Add(NineScoreCount.Value);
-            ScoreArray.Add(TenScoreCount.Value);
+            RatingArray.Add(ZeroRatingCount.Value);
+            RatingArray.Add(OneRatingCount.Value);
+            RatingArray.Add(TwoRatingCount.Value);
+            RatingArray.Add(ThreeRatingCount.Value);
+            RatingArray.Add(FourRatingCount.Value);
+            RatingArray.Add(FiveRatingCount.Value);
+            RatingArray.Add(SixRatingCount.Value);
+            RatingArray.Add(SevenRatingCount.Value);
+            RatingArray.Add(EightRatingCount.Value);
+            RatingArray.Add(NineRatingCount.Value);
+            RatingArray.Add(TenRatingCount.Value);
 
-            MaxScoreCount.Value = ScoreArray.Max();
-            MaxScoreCount1.Value = MaxScoreCount.Value;
-            MaxScoreCount2.Value = MaxScoreCount.Value;
-            MaxScoreCount3.Value = MaxScoreCount.Value;
-            MaxScoreCount4.Value = MaxScoreCount.Value;
-            MaxScoreCount5.Value = MaxScoreCount.Value;
-            MaxScoreCount6.Value = MaxScoreCount.Value;
-            MaxScoreCount7.Value = MaxScoreCount.Value;
-            MaxScoreCount8.Value = MaxScoreCount.Value;
-            MaxScoreCount9.Value = MaxScoreCount.Value;
-            MaxScoreCount10.Value = MaxScoreCount.Value;
+            MaxRatingCount.Value = RatingArray.Max();
+            MaxRatingCount1.Value = MaxRatingCount.Value;
+            MaxRatingCount2.Value = MaxRatingCount.Value;
+            MaxRatingCount3.Value = MaxRatingCount.Value;
+            MaxRatingCount4.Value = MaxRatingCount.Value;
+            MaxRatingCount5.Value = MaxRatingCount.Value;
+            MaxRatingCount6.Value = MaxRatingCount.Value;
+            MaxRatingCount7.Value = MaxRatingCount.Value;
+            MaxRatingCount8.Value = MaxRatingCount.Value;
+            MaxRatingCount9.Value = MaxRatingCount.Value;
+            MaxRatingCount10.Value = MaxRatingCount.Value;
         }
 
         /// <summary>
@@ -240,10 +240,10 @@ namespace Tsundoku.ViewModels
         /// </summary>
         public void UpdateStatusPercentages()
         {
-            FinishedPercentage = Math.Round(Convert.ToDecimal(MainWindowViewModel.Collection.Count != 0 && FinishedCount.Value != double.NaN ? FinishedCount.Value / MainWindowViewModel.Collection.Count * 100 : 0), 2);
-            OngoingPercentage = Math.Round(Convert.ToDecimal(MainWindowViewModel.Collection.Count != 0 && OngoingCount.Value != double.NaN ? OngoingCount.Value / MainWindowViewModel.Collection.Count * 100 : 0), 2);
-            CancelledPercentage = Math.Round(Convert.ToDecimal(MainWindowViewModel.Collection.Count != 0 && CancelledCount.Value != double.NaN ? CancelledCount.Value / MainWindowViewModel.Collection.Count * 100 : 0), 2);
-            HiatusPercentage = Math.Round(Convert.ToDecimal(MainWindowViewModel.Collection.Count != 0 && HiatusCount.Value != double.NaN ? HiatusCount.Value / MainWindowViewModel.Collection.Count * 100 : 0), 2);
+            FinishedPercentage = Math.Round(Convert.ToDecimal(MainWindowViewModel.UserCollection.Count != 0 && FinishedCount.Value != double.NaN ? FinishedCount.Value / MainWindowViewModel.UserCollection.Count * 100 : 0), 2);
+            OngoingPercentage = Math.Round(Convert.ToDecimal(MainWindowViewModel.UserCollection.Count != 0 && OngoingCount.Value != double.NaN ? OngoingCount.Value / MainWindowViewModel.UserCollection.Count * 100 : 0), 2);
+            CancelledPercentage = Math.Round(Convert.ToDecimal(MainWindowViewModel.UserCollection.Count != 0 && CancelledCount.Value != double.NaN ? CancelledCount.Value / MainWindowViewModel.UserCollection.Count * 100 : 0), 2);
+            HiatusPercentage = Math.Round(Convert.ToDecimal(MainWindowViewModel.UserCollection.Count != 0 && HiatusCount.Value != double.NaN ? HiatusCount.Value / MainWindowViewModel.UserCollection.Count * 100 : 0), 2);
         }
 
         /// <summary>
@@ -251,7 +251,7 @@ namespace Tsundoku.ViewModels
         /// </summary>
         public void UpdateDemographicPercentages()
         {
-            int actualCount = MainWindowViewModel.Collection.Count(series => !string.IsNullOrWhiteSpace(series.Demographic));
+            int actualCount = MainWindowViewModel.UserCollection.Count(series => !string.IsNullOrWhiteSpace(series.Demographic));
             ShounenPercentage = Math.Round(Convert.ToDecimal(actualCount != 0 && ShounenCount.Value != double.NaN ? ShounenCount.Value / actualCount * 100 : 0), 2);
             SeinenPercentage = Math.Round(Convert.ToDecimal(actualCount != 0 && SeinenCount.Value != double.NaN ? SeinenCount.Value / actualCount * 100 : 0), 2);
             ShoujoPercentage = Math.Round(Convert.ToDecimal(actualCount != 0 && ShoujoCount.Value != double.NaN ? ShoujoCount.Value / actualCount * 100 : 0), 2);
@@ -265,32 +265,32 @@ namespace Tsundoku.ViewModels
         {
             UpdateStatusPercentages();
             UpdateDemographicPercentages();
-            UpdateScoreChartValues();
+            UpdateRatingChartValues();
 
             // LOGGER.Debug("Generate Stats");
             uint testVolumesRead = 0, testUsersNumVolumesCollected = 0, testUsersNumVolumesToBeCollected = 0;
-            decimal testCollectionPrice = 0, testMeanScore = 0, countMeanScore = 0;
-            foreach (Series x in MainWindowViewModel.Collection)
+            decimal testCollectionPrice = 0, testMeanRating = 0, countMeanRating = 0;
+            foreach (Series x in MainWindowViewModel.UserCollection)
             {
                 testVolumesRead += x.VolumesRead;
                 testCollectionPrice += x.Cost;
                 testUsersNumVolumesCollected += x.CurVolumeCount;
                 testUsersNumVolumesToBeCollected += (uint)(x.MaxVolumeCount - x.CurVolumeCount);
 
-                if (x.Score >= 0)
+                if (x.Rating >= 0)
                 {
-                    testMeanScore += x.Score;
-                    countMeanScore++;
+                    testMeanRating += x.Rating;
+                    countMeanRating++;
                 }
             }
             
-            testMeanScore = countMeanScore == 0 ? 0 : decimal.Round(testMeanScore / countMeanScore, 1);
+            testMeanRating = countMeanRating == 0 ? 0 : decimal.Round(testMeanRating / countMeanRating, 1);
             string testCollectionPriceString = $"{MainUser.Currency}{decimal.Round(testCollectionPrice, 2)}";
 
             // Crash protection for aggregate values
-            if (MainUser.VolumesRead == testVolumesRead && MainUser.MeanScore == testMeanScore && MainUser.CollectionPrice.Equals(testCollectionPriceString) && testUsersNumVolumesCollected == MainUser.NumVolumesCollected && testUsersNumVolumesToBeCollected == MainUser.NumVolumesToBeCollected)
+            if (MainUser.VolumesRead == testVolumesRead && MainUser.MeanRating == testMeanRating && MainUser.CollectionPrice.Equals(testCollectionPriceString) && testUsersNumVolumesCollected == MainUser.NumVolumesCollected && testUsersNumVolumesToBeCollected == MainUser.NumVolumesToBeCollected)
             {
-                MeanScore = MainUser.MeanScore;
+                MeanRating = MainUser.MeanRating;
                 VolumesRead = MainUser.VolumesRead;
                 CollectionPrice = MainUser.CollectionPrice;
                 UsersNumVolumesCollected = MainUser.NumVolumesCollected;
@@ -298,7 +298,7 @@ namespace Tsundoku.ViewModels
             }
             else
             {
-                MeanScore = testMeanScore;
+                MeanRating = testMeanRating;
                 VolumesRead = testVolumesRead;
                 CollectionPrice = testCollectionPriceString;
                 UsersNumVolumesCollected = testUsersNumVolumesCollected;

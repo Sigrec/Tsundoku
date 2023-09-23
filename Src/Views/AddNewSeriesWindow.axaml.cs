@@ -77,7 +77,7 @@ namespace Tsundoku.Views
                 CollectionWindow.CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UsersNumVolumesCollected += CurVolNum;
                 CollectionWindow.CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UsersNumVolumesToBeCollected += (uint)(MaxVolNum - CurVolNum);
                 CollectionWindow.CollectionViewModel.SearchText = "";
-                CollectionWindow.CollectionViewModel.collectionStatsWindow.CollectionStatsVM.SeriesCount = (uint)MainWindowViewModel.Collection.Count;
+                CollectionWindow.CollectionViewModel.collectionStatsWindow.CollectionStatsVM.SeriesCount = (uint)MainWindowViewModel.UserCollection.Count;
 
                 CollectionWindow.CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UpdateStatusChartValues();
                 CollectionWindow.CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UpdateStatusPercentages();
@@ -85,7 +85,7 @@ namespace Tsundoku.Views
                 CollectionWindow.CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UpdateDemographicChartValues();
                 CollectionWindow.CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UpdateDemographicPercentages();
 
-                CollectionWindow.CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UpdateScoreChartValues();
+                CollectionWindow.CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UpdateRatingChartValues();
                 ClearFields();
             }
         }

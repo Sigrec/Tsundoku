@@ -31,7 +31,7 @@
 			<Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="Auto" Margin="20,10,20,20">
 				<TextBlock Text="Stats" TextDecorations="Underline" FontSize="25" FontWeight="Bold" Classes="menu" Grid.Row="0" Grid.Column="0" Margin="5,0,0,-7"/>
 				<StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="0" Margin="-5,0,0,0" MaxWidth="626" HorizontalAlignment="Center">
-					<controls:ValueStat Text="{CompiledBinding MeanScore}" Title="Mean Score" Icon="fa-solid fa-gauge-simple" PointerPressed="CopyTextAsync"/>
+					<controls:ValueStat Text="{CompiledBinding MeanRating}" Title="Mean Score" Icon="fa-solid fa-gauge-simple" PointerPressed="CopyTextAsync"/>
 					<controls:ValueStat Text="{CompiledBinding VolumesRead}" Title="Volumes Read" Icon="fa-solid fa-book-open-reader" PointerPressed="CopyTextAsync"/>
 					<controls:ValueStat Text="{CompiledBinding SeriesCount}" Title="Series Count" Icon="fa-solid fa-globe" PointerPressed="CopyTextAsync"/>
 				</StackPanel>
@@ -142,8 +142,8 @@
 				<Border Grid.Row="6" Grid.Column="0" Background="{CompiledBinding CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" Width="570" Height="300" Margin="0,10,0,0" HorizontalAlignment="Center">
 					<Border CornerRadius="8" ClipToBounds="True">
 						<StackPanel>
-							<TextBlock Text="Scores" TextDecorations="Underline" FontSize="21" FontWeight="Bold" Classes="menu" HorizontalAlignment="Center" Margin="0,10,0,0"/>
-							<lvc:CartesianChart Series="{CompiledBinding ScoreDistribution}" XAxes="{CompiledBinding ScoreXAxes}" YAxes="{CompiledBinding ScoreYAxes}" Width="570" Height="260"/>
+							<TextBlock Text="Ratings" TextDecorations="Underline" FontSize="21" FontWeight="Bold" Classes="menu" HorizontalAlignment="Center" Margin="0,10,0,0"/>
+							<lvc:CartesianChart Series="{CompiledBinding RatingDistribution}" XAxes="{CompiledBinding RatingXAxes}" YAxes="{CompiledBinding RatingYAxes}" Width="570" Height="260"/>
 						</StackPanel>
 					</Border>
 				</Border>

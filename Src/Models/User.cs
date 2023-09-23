@@ -14,7 +14,7 @@ namespace Tsundoku.Models
         public string MainTheme { get; set; }
         public double CurDataVersion { get; set; }
         public string Currency { get; set; }
-        public decimal MeanScore { get; set; }
+        public decimal MeanRating { get; set; }
         public uint VolumesRead { get; set; }
         public string CollectionPrice { get; set; }
         public Dictionary<string, bool> Memberships { get; set; }

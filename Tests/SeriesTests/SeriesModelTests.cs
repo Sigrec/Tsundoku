@@ -9,7 +9,6 @@ namespace SeriesTests
     [Description("Testing Series Model")]
     public class SeriesModelTests
     {
-        
         public static readonly JsonSerializerOptions options = new()
         { 
             WriteIndented = true,
@@ -34,37 +33,37 @@ namespace SeriesTests
         [Test]
         public void Novel_AniList_Test()
         {
-            Assert.That(Series.CreateNewSeriesCardAsync("Classroom of the Elite", "NOVEL", 14, 0, new ObservableCollection<string>()).Result.ToJsonString(options), Is.EqualTo(File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesTests\SeriesTestData\CoTE.json").Result));
+            Assert.That(Series.CreateNewSeriesCardAsync("Classroom of the Elite", "NOVEL", 14, 0, []).Result.ToJsonString(options), Is.EqualTo(File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesTests\SeriesTestData\CoTE.json").Result));
         }
 
         [Test]
         public void MultipleAdditionalLangTitle_MangaDexID_AniListLink_Test()
         {
-            Assert.That(Series.CreateNewSeriesCardAsync("32fdfe9b-6e11-4a13-9e36-dcd8ea77b4e4", "MANGA", 18, 0, new ObservableCollection<string>() { "Arabic", "Chinese", "French", "Korean", "Russian", "Spanish" }).Result.ToJsonString(options), Is.EqualTo(File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesTests\SeriesTestData\Rent-A-Girlfriend.json").Result));
+            Assert.That(Series.CreateNewSeriesCardAsync("32fdfe9b-6e11-4a13-9e36-dcd8ea77b4e4", "MANGA", 18, 0, ["Arabic", "Chinese", "French", "Korean", "Russian", "Spanish"]).Result.ToJsonString(options), Is.EqualTo(File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesTests\SeriesTestData\Rent-A-Girlfriend.json").Result));
         }
 
         [Test]
         public void SimilarNotEquals_AniList_Test()
         {
-            Assert.That(Series.CreateNewSeriesCardAsync("dont toy with me miss nagatoro", "MANGA", 5, 0, new ObservableCollection<string>()).Result.ToJsonString(options), Is.EqualTo(File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesTests\SeriesTestData\IjiranaideNagatoro-san.json").Result));
+            Assert.That(Series.CreateNewSeriesCardAsync("dont toy with me miss nagatoro", "MANGA", 5, 0, []).Result.ToJsonString(options), Is.EqualTo(File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesTests\SeriesTestData\IjiranaideNagatoro-san.json").Result));
         }
 
         [Test]
         public void Radiant_MangaDexTitle_Test()
         {
-            Assert.That(Series.CreateNewSeriesCardAsync("Radiant", "MANGA", 18, 0, new ObservableCollection<string>()).Result.ToJsonString(options), Is.EqualTo(File.ReadAllText(@"\Tsundoku\Tests\SeriesTests\SeriesTestData\Radiant.json")));
+            Assert.That(Series.CreateNewSeriesCardAsync("Radiant", "MANGA", 18, 0, []).Result.ToJsonString(options), Is.EqualTo(File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesTests\SeriesTestData\Radiant.json").Result));
         }
 
         [Test]
         public void TheBeginningAfterTheEnd_NoDemographic_MangaDexTitle_Test()
         {
-            Assert.That(Series.CreateNewSeriesCardAsync("The Beginning After The End", "MANGA", 5, 0, new ObservableCollection<string>()).Result.ToJsonString(options), Is.EqualTo(File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesTests\SeriesTestData\TBATE.json").Result));
+            Assert.That(Series.CreateNewSeriesCardAsync("The Beginning After The End", "MANGA", 5, 0, []).Result.ToJsonString(options), Is.EqualTo(File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesTests\SeriesTestData\TBATE.json").Result));
         }
 
         [Test]
         public async Task GetJapaneseAltTitle_Test()
         {
-            Assert.That(Series.GetAltTitle("ja", (await MangadexQuery.GetSeriesByTitleAsync("나 혼자만 레벨업")).RootElement.GetProperty("data").EnumerateArray().ElementAt(0).GetProperty("attributes").GetProperty("altTitles").EnumerateArray().ToList()), Is.EqualTo("俺だけレベルアップな件"));
+            Assert.That(Series.GetAltTitle("ja", (await MangadexQuery.GetSeriesByTitleAsync("나 혼자만 레벨업")).RootElement.GetProperty("data").EnumerateArray().ElementAt(0).GetProperty("attributes").GetProperty("altTitles").EnumerateArray()), Is.EqualTo("俺だけレベルアップな件"));
         }
 
         [Test]
@@ -72,7 +71,7 @@ namespace SeriesTests
         {
             JsonElement narutoQuery = (await AniListQuery.GetSeriesByTitleAsync("Naruto", "MANGA", 1)).RootElement.GetProperty("Media");
 
-            Assert.That(Series.CreateCoverFilePath(narutoQuery.GetProperty("coverImage").GetProperty("extraLarge").ToString(), narutoQuery.GetProperty("title").GetProperty("romaji").ToString(), "MANGA", narutoQuery.GetProperty("synonyms").EnumerateArray().ToList(), Constants.Site.AniList), Is.EqualTo("Covers\\NARUTO_MANGA.jpg"));
+            Assert.That(Series.CreateCoverFilePath(narutoQuery.GetProperty("coverImage").GetProperty("extraLarge").GetString(), narutoQuery.GetProperty("title").GetProperty("romaji").GetString(), "MANGA", narutoQuery.GetProperty("synonyms").EnumerateArray(), Constants.Site.AniList), Is.EqualTo("Covers\\NARUTO_MANGA.jpg"));
         }
 
         [Test]
@@ -80,8 +79,8 @@ namespace SeriesTests
         {
             Assert.Multiple(async () =>
             {
-                Assert.That((await AniListQuery.GetSeriesByIDAsync(98282, "MANGA", 1)).RootElement.GetProperty("Media").GetProperty("title").GetProperty("romaji").ToString(), Is.EqualTo("Getsuyoubi no Tawawa"));
-                Assert.That((await AniListQuery.GetSeriesByIDAsync(125854, "MANGA", 1)).RootElement.GetProperty("Media").GetProperty("title").GetProperty("romaji").ToString(), Is.EqualTo("Getsuyoubi no Tawawa"));
+                Assert.That((await AniListQuery.GetSeriesByIDAsync(98282, "MANGA", 1)).RootElement.GetProperty("Media").GetProperty("title").GetProperty("romaji").GetString(), Is.EqualTo("Getsuyoubi no Tawawa"));
+                Assert.That((await AniListQuery.GetSeriesByIDAsync(125854, "MANGA", 1)).RootElement.GetProperty("Media").GetProperty("title").GetProperty("romaji").GetString(), Is.EqualTo("Getsuyoubi no Tawawa"));
             });
         }
 
@@ -232,13 +231,13 @@ namespace SeriesTests
         public void GetSeriesStaff_Anthology_Test()
         {
             //Lycoris Recoil Koushiki Comic Anthology: Repeat
-            Assert.That(Series.CreateNewSeriesCardAsync("リコリス・リコイル 公式コミックアンソロジー リピート", "MANGA", 5, 0, new ObservableCollection<string>()).Result.Staff["Romaji"], Is.EqualTo("Takeshi Kojima | Mekimeki | Nyoijizai | GUNP | Itsuki Takano | Ren Sakuragi | sometime | Ryou Niina | Ginmoku | Mikaduchi | Nikomi Wakadori | Miki Morinaga | Raika Suzumi | Ree | Itsuki Tsutsui | Utashima | Shirou Urayama | Bonryuu | Yasuka Manuma | Yuichi | Marco Nii | Nana Komado | Yuu Kimura | Sugar.Kirikanoko | Atto | Kasumi Fukagawa | Tiv | Sou Hamayumiba | Kanari Abe | Nachi Aono | Koruse"));
+            Assert.That(Series.CreateNewSeriesCardAsync("リコリス・リコイル 公式コミックアンソロジー リピート", "MANGA", 5, 0, []).Result.Staff["Romaji"], Is.EqualTo("Takeshi Kojima | Mekimeki | Nyoijizai | GUNP | Itsuki Takano | Ren Sakuragi | sometime | Ryou Niina | Ginmoku | Mikaduchi | Nikomi Wakadori | Miki Morinaga | Raika Suzumi | Ree | Itsuki Tsutsui | Utashima | Shirou Urayama | Bonryuu | Yasuka Manuma | Yuichi | Marco Nii | Nana Komado | Yuu Kimura | Sugar.Kirikanoko | Atto | Kasumi Fukagawa | Tiv | Sou Hamayumiba | Kanari Abe | Nachi Aono | Koruse"));
         }
 
         [Test] // Tests if only native = null, onyl full = null, and both native and full are null
         public void GetSeriesStaff_AllNullStaffScenarios_Name_Test()
         {
-            Assert.That(Series.GetSeriesStaff(JsonDocument.Parse(File.ReadAllText(@"\Tsundoku\Tests\SeriesTests\SeriesTestData\staffNameTest.json")).RootElement.GetProperty("data").GetProperty("Media").GetProperty("staff").GetProperty("edges"), "full", "Novel", "86: Eighty Six", new System.Text.StringBuilder()), Is.EqualTo("Asato Asato | しらび | Error"));
+            Assert.That(Series.GetSeriesStaff(JsonDocument.Parse(File.ReadAllText(@"\Tsundoku\Tests\SeriesTests\SeriesTestData\staffNameTest.json")).RootElement.GetProperty("data").GetProperty("Media").GetProperty("staff").GetProperty("edges"), "full", "Novel", "86: Eighty Six", new System.Text.StringBuilder()), Is.EqualTo("Asato Asato | しらび | Ⅰ-Ⅳ"));
         }
     }
 }

@@ -17,7 +17,7 @@ namespace Tsundoku.ViewModels
 {
     public class AddNewSeriesViewModel : ViewModelBase
     {
-        public static readonly string[] AvailableLanguages = new string[] { "Arabic", "Azerbaijan", "Bengali", "Bulgarian", "Burmese", "Catalan", "Chinese", "Croatian", "Czech", "Danish", "Dutch", "Esperanto", "Estonian", "Filipino", "Finnish", "French", "German", "Greek", "Hebrew", "Hindi", "Hungarian", "Indonesian", "Italian", "Kazakh", "Korean", "Latin", "Lithuanian", "Malay", "Mongolian", "Nepali", "Norwegian", "Persian", "Polish", "Portuguese", "Romanian", "Russian", "Serbian", "Slovak", "Spanish", "Swedish", "Tamil", "Thai", "Turkish", "Ukrainian", "Vietnamese" };
+        public static readonly string[] AvailableLanguages = ["Arabic", "Azerbaijan", "Bengali", "Bulgarian", "Burmese", "Catalan", "Chinese", "Croatian", "Czech", "Danish", "Dutch", "Esperanto", "Estonian", "Filipino", "Finnish", "French", "German", "Greek", "Hebrew", "Hindi", "Hungarian", "Indonesian", "Italian", "Kazakh", "Korean", "Latin", "Lithuanian", "Malay", "Mongolian", "Nepali", "Norwegian", "Persian", "Polish", "Portuguese", "Romanian", "Russian", "Serbian", "Slovak", "Spanish", "Swedish", "Tamil", "Thai", "Turkish", "Ukrainian", "Vietnamese"];
 
         [Reactive] public string TitleText { get; set; }
         [Reactive] public string MaxVolumeCount { get; set; }
@@ -26,10 +26,7 @@ namespace Tsundoku.ViewModels
         [Reactive] public bool IsAddSeriesButtonEnabled { get; set; } = false;
         public ObservableCollection<ListBoxItem> SelectedAdditionalLanguages { get; set; } = new ObservableCollection<ListBoxItem>();
 
-        public AddNewSeriesViewModel()
-        {
-            SelectedAdditionalLanguages.CollectionChanged += AdditionalLanguagesCollectionChanged;
-        }
+        public AddNewSeriesViewModel() => SelectedAdditionalLanguages.CollectionChanged += AdditionalLanguagesCollectionChanged;
 
         private void AdditionalLanguagesCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -75,7 +72,7 @@ namespace Tsundoku.ViewModels
             if (newSeries != null)
             {
                 duplicateSeriesCheck = false;
-                foreach (Series series in MainWindowViewModel.Collection)
+                foreach (Series series in MainWindowViewModel.UserCollection)
                 {
                     if (!duplicateSeriesCheck && series.Link.Equals(newSeries.Link))
                     {
@@ -87,7 +84,7 @@ namespace Tsundoku.ViewModels
                 if (!duplicateSeriesCheck)
                 {
                     // If the user is currently searching need to "refresh" the SearchedCollection so it can insert at correct index
-                    if (MainWindowViewModel.SearchedCollection.Count != MainWindowViewModel.Collection.Count)
+                    if (MainWindowViewModel.SearchedCollection.Count != MainWindowViewModel.UserCollection.Count)
                     {
                         LOGGER.Info("Refreshing Searched Collection");
                         MainWindowViewModel.SortCollection();
@@ -95,11 +92,11 @@ namespace Tsundoku.ViewModels
                     LOGGER.Info($"\nAdding New Series -> {title} | {bookType} | {curVolCount} | {maxVolCount} |\n{newSeries.ToJsonString(options)}");
                     // File.WriteAllText(@"Series.json", newSeries.ToJsonString(options));
 
-                    int index = MainWindowViewModel.Collection.BinarySearch(newSeries, new SeriesComparer(MainUser.CurLanguage));
+                    int index = MainWindowViewModel.UserCollection.BinarySearch(newSeries, new SeriesComparer(MainUser.CurLanguage));
                     index = index < 0 ? ~index : index;
                     newSeries.CoverBitMap = new Bitmap(newSeries.Cover).CreateScaledBitmap(new Avalonia.PixelSize(Constants.LEFT_SIDE_CARD_WIDTH, Constants.IMAGE_HEIGHT), BitmapInterpolationMode.HighQuality);
 
-                    MainWindowViewModel.Collection.Insert(index, newSeries);
+                    MainWindowViewModel.UserCollection.Insert(index, newSeries);
                     MainWindowViewModel.SearchedCollection.Insert(index, newSeries);
                 }
                 else
