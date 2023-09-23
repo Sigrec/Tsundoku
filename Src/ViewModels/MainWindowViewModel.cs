@@ -24,8 +24,9 @@ namespace Tsundoku.ViewModels
         private static readonly string USER_DATA_FILEPATH = @"UserData.json";
         private const double SCHEMA_VERSION = 2.0;
         private static bool newUserFlag = false;
-        public static ObservableCollection<Series> SearchedCollection { get; set; } = new();
-        public static ObservableCollection<Series> UserCollection { get; set; } = new();
+        public static ObservableCollection<Series> SearchedCollection { get; set; } = [];
+        public static List<Series> UserCollection { get; set; } = [];
+        private static IEnumerable<Series> FilteredCollection { get; set; } = [];
         [Reactive] public string SearchText { get; set; }
         [Reactive] public bool LanguageChanged { get; set; } = false;
         [Reactive] public bool SearchIsBusy { get; set; } = false;
@@ -168,116 +169,124 @@ namespace Tsundoku.ViewModels
         /// <summary>
         /// Sorts the users collection based on language
         /// </summary>
-        public static void SortCollection()
+        public static async void SortCollection()
         {
+            await Task.Run(() => 
+            {
+                UserCollection.Sort(new SeriesComparer(MainUser.CurLanguage));
+            });
             SearchedCollection.Clear();
-            SearchedCollection.AddRange(UserCollection.OrderBy(x => x.Titles.TryGetValue(MainUser.CurLanguage, out string? value) ? value : x.Titles["Romaji"], StringComparer.Create(new System.Globalization.CultureInfo(CULTURE_LANG_CODES[MainUser.CurLanguage]), false)));
-            UserCollection = new ObservableCollection<Series>(SearchedCollection);
+            SearchedCollection.AddRange(UserCollection);
         }
 
         /// <summary>
         /// Filters the users collection based on the selected preset filter
         /// </summary>
         /// <param name="filter">The filter preset chosen</param>
-        public static void FilterCollection(string filter)
+        public static async void FilterCollection(string filter)
         {
+            await Task.Run(() => {
+                switch (filter)
+                {
+                    case "Ongoing":
+                        FilteredCollection = UserCollection.Where(series => series.Status.Equals("Ongoing"));
+                        LOGGER.Info($"Filtered Collection by {filter}");
+                        break;
+                    case "Finished":
+                        FilteredCollection = UserCollection.Where(series => series.Status.Equals("Finished"));
+                        LOGGER.Info($"Filtered Collection by {filter}");
+                        break;
+                    case "Hiatus":
+                        FilteredCollection = UserCollection.Where(series => series.Status.Equals("Hiatus"));
+                        LOGGER.Info($"Filtered Collection by {filter}");
+                        break;
+                    case "Cancelled":
+                        FilteredCollection = UserCollection.Where(series => series.Status.Equals("Cancelled"));
+                        LOGGER.Info($"Filtered Collection by {filter}");
+                        break;
+                    case "Complete":
+                        FilteredCollection = UserCollection.Where(series => series.CurVolumeCount == series.MaxVolumeCount);
+                        LOGGER.Info($"Filtered Collection by {filter}");
+                        break;
+                    case "Incomplete":
+                        FilteredCollection = UserCollection.Where(series => series.CurVolumeCount != series.MaxVolumeCount);
+                        LOGGER.Info($"Filtered Collection by {filter}");
+                        break;
+                    case "Favorites":
+                        FilteredCollection = UserCollection.Where(series => series.IsFavorite);
+                        LOGGER.Info($"Filtered Collection by {filter}");
+                        break;
+                    case "Manga":
+                        FilteredCollection = UserCollection.Where(series => series.Format.Equals("Manga") || series.Format.Equals("Manhwa") || series.Format.Equals("Manhua") || series.Format.Equals("Manfra") || series.Format.Equals("Comic"));
+                        LOGGER.Info($"Filtered Collection by {filter}");
+                        break;
+                    case "Novel":
+                        FilteredCollection = UserCollection.Where(series => series.Format.Equals("Novel"));
+                        LOGGER.Info($"Filtered Collection by {filter}");
+                        break;
+                    case "Shounen":
+                        FilteredCollection = UserCollection.Where(series => !string.IsNullOrWhiteSpace(series.Demographic) && series.Demographic.Equals("Shounen"));
+                        LOGGER.Info($"Filtered Collection by {filter}");
+                        break;
+                    case "Shoujo":
+                        FilteredCollection = UserCollection.Where(series => !string.IsNullOrWhiteSpace(series.Demographic) &&series.Demographic.Equals("Shoujo"));
+                        LOGGER.Info($"Filtered Collection by {filter}");
+                        break;
+                    case "Seinen":
+                        FilteredCollection = UserCollection.Where(series => !string.IsNullOrWhiteSpace(series.Demographic) &&series.Demographic.Equals("Seinen"));
+                        LOGGER.Info($"Filtered Collection by {filter}");
+                        break;
+                    case "Josei":
+                        FilteredCollection = UserCollection.Where(series => !string.IsNullOrWhiteSpace(series.Demographic) &&series.Demographic.Equals("Josei"));
+                        LOGGER.Info($"Filtered Collection by {filter}");
+                        break;
+                    case "Read":
+                        FilteredCollection = UserCollection.Where(series => series.VolumesRead != 0);
+                        LOGGER.Info($"Filtered Collection by {filter}");
+                        break;
+                    case "Unread":
+                        FilteredCollection = UserCollection.Where(series => series.VolumesRead == 0);
+                        LOGGER.Info($"Filtered Collection by {filter}");
+                        break;
+                    case "Rating":
+                        FilteredCollection = UserCollection.OrderByDescending(series => series.Rating);
+                        LOGGER.Info($"Sorted Collection by {filter}");
+                        break;
+                    case "Cost":
+                        FilteredCollection = UserCollection.OrderByDescending(series => series.Cost);
+                        LOGGER.Info($"Sorted Collection by {filter}");
+                        break;
+                    case "None":
+                    default:
+                        FilteredCollection = UserCollection;
+                        LOGGER.Info($"Removing Sort/Filter");
+                        break;
+                }
+            });
             SearchedCollection.Clear();
-            switch (filter)
-            {
-                case "Ongoing":
-                    SearchedCollection.AddRange(UserCollection.Where(series => series.Status.Equals("Ongoing")));
-                    LOGGER.Info($"Filtered Collection by {filter}");
-                    break;
-                case "Finished":
-                    SearchedCollection.AddRange(UserCollection.Where(series => series.Status.Equals("Finished")));
-                    LOGGER.Info($"Filtered Collection by {filter}");
-                    break;
-                case "Hiatus":
-                    SearchedCollection.AddRange(UserCollection.Where(series => series.Status.Equals("Hiatus")));
-                    LOGGER.Info($"Filtered Collection by {filter}");
-                    break;
-                case "Cancelled":
-                    SearchedCollection.AddRange(UserCollection.Where(series => series.Status.Equals("Cancelled")));
-                    LOGGER.Info($"Filtered Collection by {filter}");
-                    break;
-                case "Complete":
-                    SearchedCollection.AddRange(UserCollection.Where(series => series.CurVolumeCount == series.MaxVolumeCount));
-                    LOGGER.Info($"Filtered Collection by {filter}");
-                    break;
-                case "Incomplete":
-                    SearchedCollection.AddRange(UserCollection.Where(series => series.CurVolumeCount != series.MaxVolumeCount));
-                    LOGGER.Info($"Filtered Collection by {filter}");
-                    break;
-                case "Favorites":
-                    SearchedCollection.AddRange(UserCollection.Where(series => series.IsFavorite));
-                    LOGGER.Info($"Filtered Collection by {filter}");
-                    break;
-                case "Manga":
-                    SearchedCollection.AddRange(UserCollection.Where(series => series.Format.Equals("Manga") || series.Format.Equals("Manhwa") || series.Format.Equals("Manhua") || series.Format.Equals("Manfra") || series.Format.Equals("Comic")));
-                    LOGGER.Info($"Filtered Collection by {filter}");
-                    break;
-                case "Novel":
-                    SearchedCollection.AddRange(UserCollection.Where(series => series.Format.Equals("Novel")));
-                    LOGGER.Info($"Filtered Collection by {filter}");
-                    break;
-                case "Shounen":
-                    SearchedCollection.AddRange(UserCollection.Where(series => series.Demographic.Equals("Shounen")));
-                    LOGGER.Info($"Filtered Collection by {filter}");
-                    break;
-                case "Shoujo":
-                    SearchedCollection.AddRange(UserCollection.Where(series => series.Demographic.Equals("Shoujo")));
-                    LOGGER.Info($"Filtered Collection by {filter}");
-                    break;
-                case "Seinen":
-                    SearchedCollection.AddRange(UserCollection.Where(series => series.Demographic.Equals("Seinen")));
-                    LOGGER.Info($"Filtered Collection by {filter}");
-                    break;
-                case "Josei":
-                    SearchedCollection.AddRange(UserCollection.Where(series => series.Demographic.Equals("Josei")));
-                    LOGGER.Info($"Filtered Collection by {filter}");
-                    break;
-                case "Read":
-                    SearchedCollection.AddRange(UserCollection.Where(series => series.VolumesRead != 0));
-                    LOGGER.Info($"Filtered Collection by {filter}");
-                    break;
-                case "Unread":
-                    SearchedCollection.AddRange(UserCollection.Where(series => series.VolumesRead == 0));
-                    LOGGER.Info($"Filtered Collection by {filter}");
-                    break;
-                case "Rating":
-                    SearchedCollection.AddRange(UserCollection.OrderByDescending(series => series.Rating));
-                    LOGGER.Info($"Sorted Collection by {filter}");
-                    break;
-                case "Cost":
-                    SearchedCollection.AddRange(UserCollection.OrderByDescending(series => series.Cost));
-                    LOGGER.Info($"Sorted Collection by {filter}");
-                    break;
-                case "None":
-                default:
-                    SearchedCollection.AddRange(UserCollection);
-                    LOGGER.Info($"Removing Sort/Filter");
-                    break;
-            }
+            SearchedCollection.AddRange(FilteredCollection);
         }
 
         /// <summary>
         /// Searches the users collection by title and/or staff
         /// </summary>
         /// <param name="searchText">The text to search for</param>
-        private void SearchCollection(string searchText)
+        private async void SearchCollection(string searchText)
         {
             if (!string.IsNullOrWhiteSpace(searchText))
             {
+                await Task.Run(() => {
+                    FilteredCollection = UserCollection.Where(x => x.Titles.Values.AsParallel().Any(title => title.Contains(searchText, StringComparison.OrdinalIgnoreCase)) || x.Staff.Values.AsParallel().Any(staff => staff.Contains(searchText, StringComparison.OrdinalIgnoreCase))); 
+                });
+
                 SearchedCollection.Clear();
-                SearchedCollection.AddRange(UserCollection.AsParallel().Where(x => x.Titles.AsParallel().Any(text => text.Value.Contains(searchText, StringComparison.OrdinalIgnoreCase)) || x.Staff.AsParallel().Any(text => text.Value.Contains(searchText, StringComparison.OrdinalIgnoreCase))));
+                SearchedCollection.AddRange(FilteredCollection);
             }
             else if (SearchIsBusy)
             {
-                SearchedCollection.Clear();
                 SearchIsBusy = false;
+                SearchedCollection.Clear();
                 SearchedCollection.AddRange(UserCollection);
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
             }
         }
 

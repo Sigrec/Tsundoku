@@ -1,33 +1,26 @@
 using System.Text.Json;
-using Avalonia;
-using Avalonia.Headless;
-using Avalonia.Headless.NUnit;
 
 [assembly: Description("Testing Series Model from Tsundoku")]
-namespace SeriesTests
+namespace Tsundoku.Tests.SeriesModel
 {
     [Author("Sean (Alias -> Prem or Sigrec)")]
     [Parallelizable(scope: ParallelScope.All)]
     [TestOf(typeof(Series))]
     [Description("Testing Series Model")]
-    [assembly: AvaloniaTestApplication(typeof(TestAppBuilder))]
     public class SeriesModelTests
     {
         public static readonly JsonSerializerOptions options = new()
-        { 
+        {
             WriteIndented = true,
             ReadCommentHandling = JsonCommentHandling.Skip,
             AllowTrailingCommas = true,
         };
 
-        public static AppBuilder BuildAvaloniaApp() => AppBuilder.Configure<Tsundoku.App>()
-        .UseHeadless(new AvaloniaHeadlessPlatformOptions());
-        
         [OneTimeSetUp]
         public void Setup()
         {
         }
-        
+
         [OneTimeTearDown]
         public void Cleanup()
         {

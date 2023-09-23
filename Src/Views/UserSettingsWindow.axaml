@@ -9,6 +9,7 @@
         x:DataType="vm:UserSettingsViewModel"
         Icon="\Assets\Icons\Tsundoku-Logo.ico"
         Title="Settings"
+        Topmost="true"
         FontFamily="Segoe UI"
         Width="491"
         MaxHeight="935"
@@ -141,8 +142,9 @@
                         <Button Theme="{StaticResource UserSettingsButton}"
                                 Click="ReportBug"
                                 Content="Report Issue/Bug"/>
-                        <Button Theme="{StaticResource UserSettingsButton}"
-                                Command="{Binding ExportToSpreadsheetCommand}"
+                        <Button Name="ExportToSpreadSheetButton"
+                                Theme="{StaticResource UserSettingsButton}"
+                                Command="{Binding ExportToSpreadSheetAsyncCommand}"
                                 Content="Export to Spreadsheet"/>
                          <Button Theme="{StaticResource UserSettingsButton}"
                                 Click="OpenCoolorsSite"

@@ -15,6 +15,7 @@ using System.IO;
 using MangaLightNovelWebScrape;
 using Microsoft.IdentityModel.Tokens;
 using System.Runtime.InteropServices;
+using System.Globalization;
 
 namespace Tsundoku.Models
 {
@@ -162,7 +163,7 @@ namespace Tsundoku.Models
 					hasNextPage = moreStaff.GetProperty("pageInfo").GetProperty("hasNextPage").GetBoolean();
 				}
 
-				newTitles = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
+				newTitles = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 				if (!string.IsNullOrWhiteSpace(romajiTitle))
 				{
 					newTitles.Add("Romaji", romajiTitle);
@@ -182,7 +183,7 @@ namespace Tsundoku.Models
 
 				if (additionalLanguages.Count != 0)
 				{
-					if (mangaDexAltTitles.Count() == 0)
+					if (mangaDexAltTitles.Any())
 					{
 						AddAdditionalLanguages(ref newTitles, additionalLanguages, MangadexQuery.GetAdditionalMangaDexTitleList((await MangadexQuery.GetSeriesByTitleAsync(romajiTitle)).RootElement.GetProperty("data")).ToList());
 					}
@@ -192,7 +193,7 @@ namespace Tsundoku.Models
 					}
 				}
 
-				Dictionary<string, string> newStaff = new(StringComparer.InvariantCultureIgnoreCase);
+				Dictionary<string, string> newStaff = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 				if (!string.IsNullOrWhiteSpace(fullStaff))
 				{
 					newStaff.Add("Romaji", fullStaff);
@@ -289,12 +290,12 @@ namespace Tsundoku.Models
 						demographic = $"{char.ToUpper(demographic[0])}{demographic[1..]}";
 					}
 
-					if (altTitles.Count() == 0)
+					if (altTitles.Any())
 					{
 						LOGGER.Warn("Series has no Alternate Titles");
 					}
 
-					newTitles = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase)
+					newTitles = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
 					{
 						{ "Romaji", romajiTitle },
 						{ "English", !countryOfOrigin.Equals("en") ? GetAltTitle("en", altTitles) : romajiTitle }
@@ -336,11 +337,12 @@ namespace Tsundoku.Models
 					nativeStaff = !string.IsNullOrWhiteSpace(nativeStaff) ? nativeStaff[..^3] : string.Empty;
 					fullStaff = fullStaff[..^3];
 
-					Dictionary<string, string> newStaff = new(StringComparer.InvariantCultureIgnoreCase)
+					Dictionary<string, string> newStaff = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
 					{
 						{ "Romaji", fullStaff }
 					};
 
+                    // If country of origin is not English based add the english title and staff
 					if (!countryOfOrigin.Equals("en"))
 					{
 						newTitles.Add(MANGADEX_LANG_CODES[countryOfOrigin], GetAltTitle(countryOfOrigin, altTitles));
@@ -350,7 +352,6 @@ namespace Tsundoku.Models
 					// Remove empty titles
 					foreach (var x in newTitles)
 					{
-						// LOGGER.Debug(x.Key + " | " + x.Value);
 						if (string.IsNullOrWhiteSpace(x.Value))
 						{
 							newTitles.Remove(x.Key);
@@ -360,7 +361,6 @@ namespace Tsundoku.Models
 					// Remove empty titles
 					foreach (var x in newStaff)
 					{
-						// LOGGER.Debug(x.Key + " | " + x.Value);
 						if (string.IsNullOrWhiteSpace(x.Value))
 						{
 							newStaff.Remove(x.Key);
@@ -570,10 +570,11 @@ namespace Tsundoku.Models
     class SeriesComparer(string curLang) : IComparer<Series>
     {
         private readonly string curLang = curLang;
+        private readonly StringComparer SeriesTitleComparer = StringComparer.Create(new CultureInfo(CULTURE_LANG_CODES[curLang]), false);
 
         public int Compare(Series? x, Series? y)
         {
-			return (x.Titles.ContainsKey(curLang) ? x.Titles[curLang] : x.Titles["Romaji"]).CompareTo(y.Titles.ContainsKey(curLang) ? y.Titles[curLang] : y.Titles["Romaji"]);
+            return SeriesTitleComparer.Compare(x.Titles.TryGetValue(curLang, out string? xValue) ? xValue : x.Titles["Romaji"], y.Titles.TryGetValue(curLang, out string? yValue) ? yValue : y.Titles["Romaji"]);
         }
     }
 }

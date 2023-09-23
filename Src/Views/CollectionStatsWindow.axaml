@@ -15,6 +15,7 @@
 		MaxWidth="626"
 		MinWidth="626"
 		MaxHeight="1010"
+		Topmost="true"
 		WindowStartupLocation="2"
 		CanResize="true">
 

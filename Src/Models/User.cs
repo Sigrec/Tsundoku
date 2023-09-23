@@ -20,20 +20,20 @@ namespace Tsundoku.Models
         public Dictionary<string, bool> Memberships { get; set; }
         public byte[] UserIcon { get; set; }
         public ObservableCollection<TsundokuTheme> SavedThemes { get; set; }
-        public ObservableCollection<Series> UserCollection { get; set; }
+        public List<Series> UserCollection { get; set; }
 
-        public User(string userName, string curLanguage, string mainTheme, string display, double curDataVersion, string currency, string collectionPrice,  Dictionary<string, bool> memberships, ObservableCollection<TsundokuTheme> savedThemes, ObservableCollection<Series> userCollection)
+        public User(string UserName, string CurLanguage, string MainTheme, string Display, double CurDataVersion, string Currency, string CollectionPrice,  Dictionary<string, bool> Memberships, ObservableCollection<TsundokuTheme> SavedThemes, List<Series> UserCollection)
         {
-            UserName = userName;
-            CurLanguage = curLanguage;
-            Display = display;
-            CurDataVersion = curDataVersion;
-            Currency = currency;
-            MainTheme = mainTheme;
-            CollectionPrice = collectionPrice;
-            SavedThemes = savedThemes;
-            UserCollection = userCollection;
-            Memberships = memberships;
+            this.UserName = UserName;
+            this.CurLanguage = CurLanguage;
+            this.Display = Display;
+            this.CurDataVersion = CurDataVersion;
+            this.Currency = Currency;
+            this.MainTheme = MainTheme;
+            this.CollectionPrice = CollectionPrice;
+            this.SavedThemes = SavedThemes;
+            this.UserCollection = UserCollection;
+            this.Memberships = Memberships;
             NumVolumesCollected = 0;
             NumVolumesToBeCollected = 0;
         }

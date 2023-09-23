@@ -71,6 +71,7 @@ namespace Tsundoku.Views
 
         public async void OnButtonClicked(object sender, RoutedEventArgs args)
         {
+            AddSeriesButton.IsEnabled = false;
             bool validSeries = await AddNewSeriesViewModel.GetSeriesDataAsync(TitleBox.Text.Trim(), (MangaButton.IsChecked == true) ? "MANGA" : "NOVEL", CurVolNum, MaxVolNum, AddNewSeriesViewModel.ConvertSelectedLangList(AddNewSeriesVM.SelectedAdditionalLanguages));
             if (!validSeries) // Boolean returns whether the series added is a duplicate
             {
@@ -88,6 +89,7 @@ namespace Tsundoku.Views
                 CollectionWindow.CollectionViewModel.collectionStatsWindow.CollectionStatsVM.UpdateRatingChartValues();
                 ClearFields();
             }
+            AddSeriesButton.IsEnabled = AddNewSeriesVM.IsAddSeriesButtonEnabled;
         }
     }
 }

@@ -12,6 +12,7 @@
 	FontFamily="Segoe UI"
 	WindowState="Maximized"
 	Classes="menu"
+    Topmost="true"
 	WindowStartupLocation="2"
 	KeyboardNavigation.TabNavigation="None"
 	x:DataType="vm:ThemeSettingsViewModel"

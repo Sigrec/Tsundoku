@@ -48,7 +48,7 @@ namespace Tsundoku.Views
             this.WhenAnyValue(x => x.KinokuniyaUSAButton.IsChecked, (member) => member != null && member == true).Subscribe(x => UserSettingsVM.KinokuniyaUSAMember = x);
         }
 
-        private void CurrencyChanged(object sender, SelectionChangedEventArgs e)
+        public void CurrencyChanged(object sender, SelectionChangedEventArgs e)
         {
             if ((sender as ComboBox).IsDropDownOpen)
             {
@@ -61,59 +61,35 @@ namespace Tsundoku.Views
             }
         }
 
-        private void OpenAniListLink(object sender, RoutedEventArgs args)
+        public void OpenAniListLink(object sender, RoutedEventArgs args)
         {
             Task.Run(() =>{
-                LOGGER.Info(@"Opening Link https://anilist.co/");
-                try
-                {
-                    Process.Start(new ProcessStartInfo(@"https://anilist.co/") { UseShellExecute = true });
-                }
-                catch (Win32Exception noBrowser)
-                {
-                    LOGGER.Error(noBrowser.Message);
-                }
-                catch (Exception other)
-                {
-                    LOGGER.Error(other.Message);
-                }
+                ViewModelBase.OpenSiteLink(@"https://anilist.co/");
             });
         }
 
-        private void OpenMangadexLink(object sender, RoutedEventArgs args)
+        public void OpenMangadexLink(object sender, RoutedEventArgs args)
         {
             Task.Run(() =>{
-                LOGGER.Info(@"Opening Link https://mangadex.org/");
-                try
-                {
-                    Process.Start(new ProcessStartInfo(@"https://mangadex.org/") { UseShellExecute = true });
-                }
-                catch (Win32Exception noBrowser)
-                {
-                    LOGGER.Error(noBrowser.Message);
-                }
-                catch (Exception other)
-                {
-                    LOGGER.Error(other.Message);
-                }
+                ViewModelBase.OpenSiteLink(@"https://mangadex.org/");
             });
         }
 
-        private void OpenCoversFolder(object sender, RoutedEventArgs args)
+        public void OpenCoversFolder(object sender, RoutedEventArgs args)
         {
             Task.Run(() =>{
                 Process.Start("explorer.exe", @$"Covers");
             });
         }
 
-        private void OpenScreenshotsFolder(object sender, RoutedEventArgs args)
+        public void OpenScreenshotsFolder(object sender, RoutedEventArgs args)
         {
             Task.Run(() =>{
                 Process.Start("explorer.exe", @$"Screenshots");
             });
         }
 
-        private void ChangeUsername(object sender, RoutedEventArgs args)
+        public void ChangeUsername(object sender, RoutedEventArgs args)
         {
             if (!string.IsNullOrWhiteSpace(UsernameChange.Text))
             {
@@ -126,79 +102,31 @@ namespace Tsundoku.Views
             }
         }
 
-        private void OpenYoutuberSite(object sender, RoutedEventArgs args)
+        public void OpenYoutuberSite(object sender, RoutedEventArgs args)
         {
             Task.Run(() =>{
-                LOGGER.Info(@$"Opening Coolors Website https://www.youtube.com/@{(sender as Button).Name}");
-                try
-                {
-                    Process.Start(new ProcessStartInfo(@$"https://www.youtube.com/@{(sender as Button).Name}") { UseShellExecute = true });
-                }
-                catch (Win32Exception noBrowser)
-                {
-                    LOGGER.Error(noBrowser.Message);
-                }
-                catch (Exception other)
-                {
-                    LOGGER.Error(other.Message);
-                }
+                ViewModelBase.OpenSiteLink(@$"https://www.youtube.com/@{(sender as Button).Name}");
             });
         }
 
-        private void OpenCoolorsSite(object sender, RoutedEventArgs args)
+        public void OpenCoolorsSite(object sender, RoutedEventArgs args)
         {
             Task.Run(() =>{
-                LOGGER.Info(@"Opening Coolors Website https://coolors.co/generate");
-                try
-                {
-                    Process.Start(new ProcessStartInfo(@"https://coolors.co/generate") { UseShellExecute = true });
-                }
-                catch (Win32Exception noBrowser)
-                {
-                    LOGGER.Error(noBrowser.Message);
-                }
-                catch (Exception other)
-                {
-                    LOGGER.Error(other.Message);
-                }
+                ViewModelBase.OpenSiteLink(@"https://coolors.co/generate");
             });
         }
 
-        private void JoinDiscord(object sender, RoutedEventArgs args)
+        public void JoinDiscord(object sender, RoutedEventArgs args)
         {
             Task.Run(() =>{
-                LOGGER.Info(@"Opening Issue Repo https://discord.gg/QcZ5jcFPeU");
-                try
-                {
-                    Process.Start(new ProcessStartInfo(@"https://discord.gg/QcZ5jcFPeU") { UseShellExecute = true });
-                }
-                catch (Win32Exception noBrowser)
-                {
-                    LOGGER.Error(noBrowser.Message);
-                }
-                catch (Exception other)
-                {
-                    LOGGER.Error(other.Message);
-                }
+                ViewModelBase.OpenSiteLink(@"https://discord.gg/QcZ5jcFPeU");
             });
         }
 
-        private void ReportBug(object sender, RoutedEventArgs args)
+        public void ReportBug(object sender, RoutedEventArgs args)
         {
             Task.Run(() =>{
-                LOGGER.Info(@"Opening Issue Repo https://github.com/Sigrec/TsundokuApp/issues/new");
-                try
-                {
-                    Process.Start(new ProcessStartInfo(@"https://github.com/Sigrec/TsundokuApp/issues/new") { UseShellExecute = true });
-                }
-                catch (System.ComponentModel.Win32Exception noBrowser)
-                {
-                    LOGGER.Error(noBrowser.Message);
-                }
-                catch (System.Exception other)
-                {
-                    LOGGER.Error(other.Message);
-                }
+                ViewModelBase.OpenSiteLink(@"https://github.com/Sigrec/TsundokuApp/issues/new");
             });
         }
     }

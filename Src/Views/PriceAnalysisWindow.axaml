@@ -15,6 +15,7 @@
 		MinWidth="666"
 		MaxWidth="666"
         MaxHeight="611"
+        Topmost="true"
 		WindowStartupLocation="2"
 		KeyboardNavigation.TabNavigation="Cycle"
 		x:DataType="vm:PriceAnalysisViewModel">
@@ -67,16 +68,15 @@
 						Classes="menu"/>
 					<StackPanel Orientation="Horizontal" Width="180" Spacing="5" HorizontalAlignment="Left">
 						<ToggleButton Name="MangaButton"
-									Checked="IsMangaButtonClicked"
-									Width="87.5"
-									Theme="{StaticResource MenuToggleButton}"
-									Content="Manga"/>
+									  Checked="IsMangaButtonClicked"
+									  Width="87.5"
+									  Theme="{StaticResource MenuToggleButton}"
+									  Content="Manga"/>
 						<ToggleButton Name="NovelButton"
-									Checked="IsNovelButtonClicked"
-									IsEnabled="False"
-									Width="87.5"
-									Theme="{StaticResource MenuToggleButton}"
-									Content="Novel"/>
+									  Checked="IsNovelButtonClicked"
+									  Width="87.5"
+									  Theme="{StaticResource MenuToggleButton}"
+									  Content="Novel"/>
 					</StackPanel>
 				</StackPanel>
 				<StackPanel Grid.Column="4" Grid.Row="0" Grid.RowSpan="3">

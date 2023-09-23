@@ -9,22 +9,22 @@ using System.Collections.Generic;
 using ReactiveUI;
 using System.Reactive.Linq;
 using Avalonia.Input;
-using MangaLightNovelWebScrape.Models;
+using Microsoft.IdentityModel.Tokens;
+using static Src.Models.Constants;
+using System.Linq;
 
 namespace Tsundoku.Views
 {
     public partial class PriceAnalysisWindow : Window
     {
         public PriceAnalysisViewModel? PriceAnalysisVM => DataContext as PriceAnalysisViewModel;
-        public bool IsOpen = false, manga;
-        private readonly MasterScrape Scrape = new MasterScrape().DisableDebugMode();
-        private string browser, website;
-        private readonly string[] EXCLUDE_NONE_FILTER = Array.Empty<string>();
-        private readonly string[] EXCLUDE_BOTH_FILTER = { "PO", "OOS" };
-        private readonly string[] EXCLUDE_PO_FILTER = { "PO" };
-        private readonly string[] EXCLUDE_OOS_FILTER = { "OOS" };
-        private static string[] CurStockFilter;
-        private static List<MasterScrape.Website> scrapeWebsiteList = new List<MasterScrape.Website>();
+        public bool IsOpen = false, Manga;
+        public readonly MasterScrape Scrape = new MasterScrape().DisableDebugMode();
+        private string ScrapeTitle;
+        private readonly string[] EXCLUDE_NONE_FILTER = [];
+        private readonly string[] EXCLUDE_BOTH_FILTER = ["PO", "OOS"];
+        private readonly string[] EXCLUDE_PO_FILTER = ["PO"];
+        private readonly string[] EXCLUDE_OOS_FILTER = ["OOS"];
         MainWindow CollectionWindow;
 
         public PriceAnalysisWindow()
@@ -68,65 +68,36 @@ namespace Tsundoku.Views
         {
             try
             {
-                scrapeWebsiteList.Clear();
-                browser = PriceAnalysisVM.CurBrowser;
-                Title = TitleBox.Text;
-                manga = MangaButton.IsChecked != null ? MangaButton.IsChecked.Value : false;
-                CurStockFilter = (StockFilterSelector.SelectedItem as ComboBoxItem).Content.ToString() switch
-                {
-                    "Exclude PO & OOS" => EXCLUDE_BOTH_FILTER,
-                    "Exclude PO" => EXCLUDE_PO_FILTER,
-                    "Exclude OOS" => EXCLUDE_OOS_FILTER,
-                    _ => EXCLUDE_NONE_FILTER
-                };
+                ScrapeTitle = TitleBox.Text;
 
-                foreach (ListBoxItem x in PriceAnalysisVM.SelectedWebsites)
-                {
-                    website = x.Content.ToString();
-                    switch (website)
-                    {
-                        case "RightStufAnime":
-                            scrapeWebsiteList.Add(MasterScrape.Website.RightStufAnime);
-                            break;
-                        case "Barnes & Noble":
-                            scrapeWebsiteList.Add(MasterScrape.Website.BarnesAndNoble);
-                            break;
-                        case "Books-A-Million":
-                            scrapeWebsiteList.Add(MasterScrape.Website.BooksAMillion);
-                            break;
-                        case "RobertsAnimeCornerStore":
-                            scrapeWebsiteList.Add(MasterScrape.Website.RobertsAnimeCornerStore);
-                            break;
-                        case "InStockTrades":
-                            scrapeWebsiteList.Add(MasterScrape.Website.InStockTrades);
-                            break;
-                        case "Kinokuniya USA":
-                            scrapeWebsiteList.Add(MasterScrape.Website.KinokuniyaUSA);
-                            break;
-                        case "AmazonUSA":
-                            scrapeWebsiteList.Add(MasterScrape.Website.AmazonUSA);
-                            break;
-                        case "AmazonJapan":
-                            scrapeWebsiteList.Add(MasterScrape.Website.AmazonJapan);
-                            break;
-                        case "CDJapan":
-                            scrapeWebsiteList.Add(MasterScrape.Website.CDJapan);
-                            break;
-                    }
-                    LOGGER.Info($"Added {website} to Scrape");
-                }
-                LOGGER.Debug($"Memberships = {ViewModelBase.MainUser.Memberships["RightStufAnime"]} {ViewModelBase.MainUser.Memberships["BarnesAndNoble"]} {ViewModelBase.MainUser.Memberships["BooksAMillion"]} {ViewModelBase.MainUser.Memberships["KinokuniyaUSA"]}");
+                LOGGER.Debug($"Memberships = {string.Join(" | ", ViewModelBase.MainUser.Memberships)}");
+                LOGGER.Debug($"Websites = [{string.Join(", ", PriceAnalysisVM.SelectedWebsites.Select(site => site.Content.ToString()))}]");
 
                 StartScrapeButton.IsEnabled = false;
-                LOGGER.Info($"Started Scrape w/ {browser} Browser & [{string.Join(",", CurStockFilter)}] Filters");
-                await Scrape.InitializeScrapeAsync(Title, manga == true ? Book.Manga : Book.LightNovel, CurStockFilter, scrapeWebsiteList, browser, ViewModelBase.MainUser.Memberships["RightStufAnime"], ViewModelBase.MainUser.Memberships["BarnesAndNoble"], ViewModelBase.MainUser.Memberships["BooksAMillion"], ViewModelBase.MainUser.Memberships["KinokuniyaUSA"]);
-
+                LOGGER.Info($"Started Scrape For {TitleBox.Text} on {PriceAnalysisVM.CurBrowser} Browser w/ {(StockFilterSelector.SelectedItem as ComboBoxItem).Content} Filter");
+                await Scrape.InitializeScrapeAsync(
+                        TitleBox.Text, 
+                        MangaButton.IsChecked != null && MangaButton.IsChecked.Value ? Book.Manga : Book.LightNovel, 
+                        (StockFilterSelector.SelectedItem as ComboBoxItem).Content.ToString() switch
+                        {
+                            "Exclude PO & OOS" => EXCLUDE_BOTH_FILTER,
+                            "Exclude PO" => EXCLUDE_PO_FILTER,
+                            "Exclude OOS" => EXCLUDE_OOS_FILTER,
+                            _ => EXCLUDE_NONE_FILTER
+                        }, 
+                        PriceAnalysisVM.SelectedWebsites.Select(site => site.Content.ToString()).ToList(), 
+                        PriceAnalysisVM.CurBrowser, 
+                        ViewModelBase.MainUser.Memberships["RightStufAnime"], 
+                        ViewModelBase.MainUser.Memberships["BarnesAndNoble"], 
+                        ViewModelBase.MainUser.Memberships["BooksAMillion"], 
+                        ViewModelBase.MainUser.Memberships["KinokuniyaUSA"],
+                        false
+                    );
                 StartScrapeButton.IsEnabled = PriceAnalysisVM.IsAnalyzeButtonEnabled;
                 LOGGER.Info($"Scrape Finished");
 
                 PriceAnalysisVM.AnalyzedList.Clear();
                 PriceAnalysisVM.AnalyzedList.AddRange(Scrape.GetResults());
-                MasterScrape.ClearAllWebsiteData();
             }
             catch (Exception e)
             {

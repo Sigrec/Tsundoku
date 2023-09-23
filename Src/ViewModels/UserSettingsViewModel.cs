@@ -18,11 +18,11 @@ namespace Tsundoku.ViewModels
         [Reactive] public bool BarnesAndNobleMember { get; set; } = MainUser.Memberships["BarnesAndNoble"];
         [Reactive] public bool BooksAMillionMember { get; set; } = MainUser.Memberships["BooksAMillion"];
         [Reactive] public bool KinokuniyaUSAMember { get; set; } = MainUser.Memberships["KinokuniyaUSA"];
-        public ICommand ExportToSpreadsheetCommand { get; }
+        public ICommand ExportToSpreadSheetAsyncCommand { get; }
         public UserSettingsViewModel()
         {
             CurCurrency = MainUser.Currency;
-            ExportToSpreadsheetCommand = ReactiveCommand.CreateFromTask(ExportToSpreadsheetAsync);
+            ExportToSpreadSheetAsyncCommand = ReactiveCommand.CreateFromTask(ExportToSpreadSheetAsync);
 
             this.WhenAnyValue(x => x.CurCurrency).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => CurrencyIndex = Array.IndexOf(AvailableCurrency, Uri.UnescapeDataString(x)));
             this.WhenAnyValue(x => x.UsernameText, x => !string.IsNullOrWhiteSpace(x)).Subscribe(x => IsChangeUsernameButtonEnabled = x);
@@ -32,13 +32,13 @@ namespace Tsundoku.ViewModels
             this.WhenAnyValue(x => x.KinokuniyaUSAMember).Subscribe(x => MainUser.Memberships["KinokuniyaUSA"] = x);
         }
 
-        private async Task ExportToSpreadsheetAsync()
+        private static async Task ExportToSpreadSheetAsync()
         {
             await Task.Run(() =>
             {
                 string file = @"TsundokuCollection.csv";
                 StringBuilder output = new();
-                string[] headers = new string[] { "Title", "Staff", "Format", "Status", "Cur Volumes", "Max Volumes", "Demographic", "Cost", "Rating", "Volumes Read", "Notes" };
+                string[] headers = ["Title", "Staff", "Format", "Status", "Cur Volumes", "Max Volumes", "Demographic", "Cost", "Rating", "Volumes Read", "Notes"];
                 output.AppendLine(string.Join(",", headers));
 
                 foreach (Series curSeries in MainWindowViewModel.UserCollection)

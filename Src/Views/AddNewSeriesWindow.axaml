@@ -11,6 +11,7 @@
 		FontFamily="Segoe UI"
 		SizeToContent="WidthAndHeight"
         Classes="menu"
+        Topmost="true"
 		WindowStartupLocation="2"
 		KeyboardNavigation.TabNavigation="Cycle"
 		x:DataType="vm:AddNewSeriesViewModel"

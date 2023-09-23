@@ -17,6 +17,7 @@ using Avalonia.Platform.Storage;
 using System.Collections.Generic;
 using Avalonia.Media.Imaging;
 using FileWatcherEx;
+using Avalonia.Logging;
 
 namespace Tsundoku.Views
 {
@@ -110,7 +111,7 @@ namespace Tsundoku.Views
         }
 
         /// <summary>
-        /// 
+        /// Reloads Covers for Series where the cover was changed
         /// </summary>
         private static void ReloadCoverBitmaps()
         {
@@ -165,14 +166,14 @@ namespace Tsundoku.Views
             }
 
             string cost = ((MaskedTextBox)stackPanels.ElementAt(1).GetLogicalChildren().ElementAt(1)).Text.Replace("_", "");
-            if (!cost.Equals('.'))
+            if (!cost.Equals("."))
             {
                 decimal costVal = Convert.ToDecimal(cost);
                 curSeries.Cost = costVal;
                 ((TextBlock)stackPanels.ElementAt(1).GetLogicalChildren().ElementAt(0)).Text = $"Cost {CollectionViewModel.CurCurrency}{costVal}";
                 LOGGER.Info($"Updated Cost for {curSeries.Titles["Romaji"]} to {CollectionViewModel.CurCurrency}{costVal}");
                 costVal = 0;
-                foreach (Series x in CollectionsMarshal.AsSpan(MainWindowViewModel.UserCollection.ToList()))
+                foreach (Series x in MainWindowViewModel.UserCollection)
                 {
                     costVal += x.Cost;
                 }
@@ -181,7 +182,7 @@ namespace Tsundoku.Views
             }
 
             string rating = ((MaskedTextBox)stackPanels.ElementAt(2).GetLogicalChildren().ElementAt(1)).Text[..4].Replace("_", "");
-            if (!rating.Equals('.'))
+            if (!rating.Equals("."))
             {
                 decimal ratingVal = Convert.ToDecimal(rating);
                 if (decimal.Compare(ratingVal, new decimal(10.0)) <= 0)
