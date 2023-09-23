@@ -58,7 +58,7 @@ namespace Tsundoku.Models
 		public string Demographic { get; set; }
 		public bool IsFavorite { get; set; } = false;
 
-		public Series(Dictionary<string, string> Titles, Dictionary<string, string> Staff, string description, string format, string status, string cover, string link, ushort maxVolumeCount, ushort curVolumeCount, decimal rating, string demographic)
+		public Series(Dictionary<string, string> Titles, Dictionary<string, string> Staff, string description, string format, string status, string cover, string link, ushort maxVolumeCount, ushort curVolumeCount, decimal rating, string demographic, Bitmap CoverBitMap)
         {
             this.Titles = Titles;
 			this.Staff = Staff;
@@ -71,6 +71,7 @@ namespace Tsundoku.Models
             CurVolumeCount = curVolumeCount;
 			Rating = rating;
 			Demographic = demographic;
+			this.CoverBitMap = CoverBitMap;
         }
 
 		/// <summary>
@@ -133,7 +134,7 @@ namespace Tsundoku.Models
 				filteredBookType = bookType.Equals("MANGA") ? GetCorrectComicName(countryOfOrigin) : "Novel";
 				nativeStaff = GetSeriesStaff(seriesData.GetProperty("staff").GetProperty("edges"), "native", filteredBookType, romajiTitle, new StringBuilder());
 				fullStaff = GetSeriesStaff(seriesData.GetProperty("staff").GetProperty("edges"), "full", filteredBookType, romajiTitle, new StringBuilder());
-				coverPath = SaveNewCoverImage(CreateCoverFilePath(seriesData.GetProperty("coverImage").GetProperty("extraLarge").GetString(), romajiTitle, filteredBookType.ToUpper(), seriesData.GetProperty("synonyms").EnumerateArray(), Site.AniList), seriesData.GetProperty("coverImage").GetProperty("extraLarge").GetString());
+				coverPath = CreateCoverFilePath(seriesData.GetProperty("coverImage").GetProperty("extraLarge").GetString(), romajiTitle, filteredBookType.ToUpper(), seriesData.GetProperty("synonyms").EnumerateArray(), Site.AniList);
 
 				// If available on AniList and is not a Japanese series get the Japanese title from Mangadex
 				if (!bookType.Equals("NOVEL") && (countryOfOrigin.Equals("KR") || countryOfOrigin.Equals("CW") || countryOfOrigin.Equals("TW")))
@@ -201,19 +202,20 @@ namespace Tsundoku.Models
 					newStaff.Add(ANILIST_LANG_CODES[countryOfOrigin], nativeStaff);
 				}
 
-				return new Series(
-					newTitles,
-					newStaff,
-					AniListQuery.ParseAniListDescription(seriesData.GetProperty("description").GetString()),
-					filteredBookType,
-					GetSeriesStatus(seriesData.GetProperty("status").GetString()),
-					coverPath,
-					seriesData.GetProperty("siteUrl").GetString(),
-					maxVolCount,
-					minVolCount,
-					-1,
-					string.Empty
-				);
+                return new Series(
+						newTitles,
+						newStaff,
+						AniListQuery.ParseAniListDescription(seriesData.GetProperty("description").GetString()),
+						filteredBookType,
+						GetSeriesStatus(seriesData.GetProperty("status").GetString()),
+						coverPath,
+						seriesData.GetProperty("siteUrl").GetString(),
+						maxVolCount,
+						minVolCount,
+						-1,
+						string.Empty,
+						await ViewModels.AddNewSeriesViewModel.SaveCoverAsync(coverPath, seriesData.GetProperty("coverImage").GetProperty("extraLarge").GetString())
+					);
 			}
 			else if (bookType.Equals("MANGA")) // MangadexQuery
 			{
@@ -279,7 +281,8 @@ namespace Tsundoku.Models
 					countryOfOrigin = attributes.GetProperty("originalLanguage").GetString();
 					string coverLink = @$"https://uploads.mangadex.org/covers/{curId}/{await MangadexQuery.GetCoverAsync(relationships.Single(x => x.GetProperty("type").GetString().Equals("cover_art")).GetProperty("id").GetString())}";
 					LOGGER.Debug(coverLink);
-					coverPath = SaveNewCoverImage(CreateCoverFilePath(coverLink, romajiTitle, bookType, altTitles, Site.MangaDex), coverLink);
+					coverPath = CreateCoverFilePath(coverLink, romajiTitle, bookType, altTitles, Site.MangaDex);
+
 					demographic = attributes.GetProperty("publicationDemographic").GetString();
 					if (!string.IsNullOrWhiteSpace(demographic))
 					{
@@ -308,7 +311,6 @@ namespace Tsundoku.Models
 					{
 						AddAdditionalLanguages(ref newTitles, additionalLanguages, altTitles.ToList());
 					}
-					Console.WriteLine(string.Join(Environment.NewLine, newTitles));
 
 					// Get the staff for a series
 					string staffName = string.Empty;
@@ -365,18 +367,19 @@ namespace Tsundoku.Models
 						}
 					}
 
-					return new Series(
-						newTitles,
-						newStaff,
-						description,
-						GetCorrectComicName(countryOfOrigin),
-						seriesStatus,
-						coverPath,
-						link,
-						maxVolCount,
-						minVolCount,
-						-1,
-						demographic
+                    return new Series(
+                        newTitles,
+                        newStaff,
+                        description,
+                        GetCorrectComicName(countryOfOrigin),
+                        seriesStatus,
+                        coverPath,
+                        link,
+                        maxVolCount,
+                        minVolCount,
+                        -1,
+                        demographic,
+						await ViewModels.AddNewSeriesViewModel.SaveCoverAsync(coverPath, coverLink)
 					);
 				}
 			}
@@ -396,7 +399,7 @@ namespace Tsundoku.Models
 				{
 					if (!newTitles.ContainsKey(MANGADEX_LANG_CODES[langKey]) && mdKey.TryGetProperty(langKey, out foundTitle))
 					{
-						Console.WriteLine($"Added [{MANGADEX_LANG_CODES[langKey]} : {foundTitle.GetString()}]");
+						LOGGER.Debug($"Added [{MANGADEX_LANG_CODES[langKey]} : {foundTitle.GetString()}]");
 						newTitles.Add(MANGADEX_LANG_CODES[langKey], foundTitle.GetString());
 						break;
 					}
@@ -445,7 +448,6 @@ namespace Tsundoku.Models
             {
 				string staffRole = StaffRegex().Replace(name.GetProperty("role").GetString(), string.Empty).Trim();
 				JsonElement nameProperty = name.GetProperty("node").GetProperty("name");
-				Console.WriteLine("Check1");
 
 				// Don't include "Illustration" staff for manga that are not anthologies
 				if (
@@ -460,7 +462,6 @@ namespace Tsundoku.Models
 						)
 					)
                 {
-					Console.WriteLine("Check2");
 					string newStaff = nameProperty.GetProperty(nameType).GetString();
 					string newStaffOther = nameProperty.GetProperty(nameType.Equals("native") ? "full" : "native").GetString();
 					if (string.IsNullOrWhiteSpace(newStaff) || !staffList.ToString().Contains(newStaff)) // Check to see if this staff member has multiple roles to only add them once
@@ -477,7 +478,6 @@ namespace Tsundoku.Models
 						{
 							staffList.AppendFormat("{0} | ", nameProperty.GetProperty("alternative")[0].GetString().Trim());
 						}
-						Console.WriteLine("Check3");
 					}
 					else
 					{
@@ -525,26 +525,6 @@ namespace Tsundoku.Models
             }
 			return newPath;
 		}
-		public static string SaveNewCoverImage(string newPath, string coverLink)
-        {
-            try
-            {
-                HttpClient client = new();
-                Task<HttpResponseMessage> response = Task.Run(async () => await client.GetAsync(new Uri(coverLink)));
-                response.Wait();
-                HttpResponseMessage clientResponse = response.Result;
-                using (FileStream fs = new(newPath, FileMode.Create, FileAccess.Write))
-                {
-                    Task fileResponse = Task.Run(async () => await clientResponse.Content.CopyToAsync(fs));
-                    fileResponse.Wait();
-                }
-            }
-            catch (Exception e)
-            {
-                LOGGER.Debug(e);
-            }
-			return newPath;
-        }
 
         [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "<Pending>")]
         public string? ToJsonString(JsonSerializerOptions options)
@@ -587,32 +567,13 @@ namespace Tsundoku.Models
 		}
     }
 
-    class SeriesComparer : IComparer<Series>
+    class SeriesComparer(string curLang) : IComparer<Series>
     {
-        private readonly string curLang;
+        private readonly string curLang = curLang;
 
-        public SeriesComparer(string curLang)
-        {
-            this.curLang = curLang;
-        }
         public int Compare(Series? x, Series? y)
         {
-            if (!x.Titles.ContainsKey(curLang) && !y.Titles.ContainsKey(curLang))
-			{
-				return x.Titles["Romaji"].CompareTo(y.Titles["Romaji"]);
-			}
-			else if (x.Titles.ContainsKey(curLang) && !y.Titles.ContainsKey(curLang))
-			{
-				return x.Titles[curLang].CompareTo(y.Titles["Romaji"]);
-			}
-			else if (!x.Titles.ContainsKey(curLang) && y.Titles.ContainsKey(curLang))
-			{
-				return x.Titles["Romaji"].CompareTo(y.Titles[curLang]);
-			}
-			else
-			{
-				return x.Titles[curLang].CompareTo(y.Titles[curLang]);
-			}
+			return (x.Titles.ContainsKey(curLang) ? x.Titles[curLang] : x.Titles["Romaji"]).CompareTo(y.Titles.ContainsKey(curLang) ? y.Titles[curLang] : y.Titles["Romaji"]);
         }
     }
 }

@@ -4,12 +4,6 @@ Legend
 🔥 -> Completed bug/hot fix
 ⌛ -> Completed performance/library update
 
-✅ Updated UserData JSON schema to change Series "Score" to appropiate naming convention "Rating"
-✅ Fixed/Changed Layout of Settings Window 
-✅ Added 8 new filters/sorts, "Shounen", "Shoujo", "Seinen", "Josei", "Rating", "Cost", "Read", & "Unread"
-✅ Added new Command "CTRL+F" to reload the current filter/sort on the collection
-⌛ Updated to .NET 8.0
-
 V2.0.0.0 - PST
 ✅ Logs now output to TsundokuLogs.log file in folder, and are cleared everytime the application is started to prevent overflow
 ✅ Added new "Scrape" Window that allows users to scrape multiple websites to get the website that contains the lowest price volume in USD for each volume of a series. Includes filtering out OOS and PO entires as well. Currently only supports websites that have USD.

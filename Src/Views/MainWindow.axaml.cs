@@ -87,7 +87,7 @@ namespace Tsundoku.Views
             coverFolderWatcher.OnCreated += static (s, e) =>
             {
                 e.FullPath = e.FullPath.Replace(".crdownload", "");
-                if (!MainWindowViewModel.updatedVersion && (e.FullPath.EndsWith(".jpg") || e.FullPath.EndsWith(".png")))
+                if (!(!ViewModelBase.updatedVersion || (!e.FullPath.EndsWith(".jpg") && !e.FullPath.EndsWith(".png"))))
                 {
                     Series series = MainWindowViewModel.UserCollection.SingleOrDefault(series => series.Cover.Equals(e.FullPath));
                     if (series != null && !CoverChangedSeriesList.Contains(series))

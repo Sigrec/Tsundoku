@@ -1,12 +1,16 @@
 using System.Text.Json;
-using System.Collections.ObjectModel;
+using Avalonia;
+using Avalonia.Headless;
+using Avalonia.Headless.NUnit;
 
-[assembly: Description("Testing Tsundoku")]
+[assembly: Description("Testing Series Model from Tsundoku")]
 namespace SeriesTests
 {
     [Author("Sean (Alias -> Prem or Sigrec)")]
+    [Parallelizable(scope: ParallelScope.All)]
     [TestOf(typeof(Series))]
     [Description("Testing Series Model")]
+    [assembly: AvaloniaTestApplication(typeof(TestAppBuilder))]
     public class SeriesModelTests
     {
         public static readonly JsonSerializerOptions options = new()
@@ -15,6 +19,9 @@ namespace SeriesTests
             ReadCommentHandling = JsonCommentHandling.Skip,
             AllowTrailingCommas = true,
         };
+
+        public static AppBuilder BuildAvaloniaApp() => AppBuilder.Configure<Tsundoku.App>()
+        .UseHeadless(new AvaloniaHeadlessPlatformOptions());
         
         [OneTimeSetUp]
         public void Setup()
@@ -30,34 +37,34 @@ namespace SeriesTests
             }
         }
 
-        [Test]
-        public void Novel_AniList_Test()
+        [AvaloniaTest]
+        public async Task Novel_AniList_Test()
         {
-            Assert.That(Series.CreateNewSeriesCardAsync("Classroom of the Elite", "NOVEL", 14, 0, []).Result.ToJsonString(options), Is.EqualTo(File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesTests\SeriesTestData\CoTE.json").Result));
+            Assert.That((await Series.CreateNewSeriesCardAsync("Classroom of the Elite", "NOVEL", 14, 0, [])).ToJsonString(options), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesTests\SeriesTestData\CoTE.json")));
         }
 
-        [Test]
-        public void MultipleAdditionalLangTitle_MangaDexID_AniListLink_Test()
+        [AvaloniaTest]
+        public async Task MultipleAdditionalLangTitle_MangaDexID_AniListLink_Test()
         {
-            Assert.That(Series.CreateNewSeriesCardAsync("32fdfe9b-6e11-4a13-9e36-dcd8ea77b4e4", "MANGA", 18, 0, ["Arabic", "Chinese", "French", "Korean", "Russian", "Spanish"]).Result.ToJsonString(options), Is.EqualTo(File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesTests\SeriesTestData\Rent-A-Girlfriend.json").Result));
+            Assert.That((await Series.CreateNewSeriesCardAsync("32fdfe9b-6e11-4a13-9e36-dcd8ea77b4e4", "MANGA", 18, 0, ["Arabic", "Chinese", "French", "Korean", "Russian", "Spanish"])).ToJsonString(options), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesTests\SeriesTestData\Rent-A-Girlfriend.json")));
         }
 
-        [Test]
-        public void SimilarNotEquals_AniList_Test()
+        [AvaloniaTest]
+        public async Task SimilarNotEquals_AniList_Test()
         {
-            Assert.That(Series.CreateNewSeriesCardAsync("dont toy with me miss nagatoro", "MANGA", 5, 0, []).Result.ToJsonString(options), Is.EqualTo(File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesTests\SeriesTestData\IjiranaideNagatoro-san.json").Result));
+            Assert.That((await Series.CreateNewSeriesCardAsync("dont toy with me miss nagatoro", "MANGA", 5, 0, [])).ToJsonString(options), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesTests\SeriesTestData\IjiranaideNagatoro-san.json")));
         }
 
-        [Test]
-        public void Radiant_MangaDexTitle_Test()
+        [AvaloniaTest]
+        public async Task Radiant_MangaDexTitle_Test()
         {
-            Assert.That(Series.CreateNewSeriesCardAsync("Radiant", "MANGA", 18, 0, []).Result.ToJsonString(options), Is.EqualTo(File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesTests\SeriesTestData\Radiant.json").Result));
+            Assert.That((await Series.CreateNewSeriesCardAsync("Radiant", "MANGA", 18, 0, [])).ToJsonString(options), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesTests\SeriesTestData\Radiant.json")));
         }
 
-        [Test]
-        public void TheBeginningAfterTheEnd_NoDemographic_MangaDexTitle_Test()
+        [AvaloniaTest]
+        public async Task TheBeginningAfterTheEnd_NoDemographic_MangaDexTitle_Test()
         {
-            Assert.That(Series.CreateNewSeriesCardAsync("The Beginning After The End", "MANGA", 5, 0, []).Result.ToJsonString(options), Is.EqualTo(File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesTests\SeriesTestData\TBATE.json").Result));
+            Assert.That((await Series.CreateNewSeriesCardAsync("The Beginning After The End", "MANGA", 5, 0, [])).ToJsonString(options), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesTests\SeriesTestData\TBATE.json")));
         }
 
         [Test]
@@ -227,11 +234,11 @@ namespace SeriesTests
             Assert.That(Series.GetSeriesStaff((await AniListQuery.GetSeriesByTitleAsync("나 혼자만 레벨업", "MANGA", 1)).RootElement.GetProperty("Media").GetProperty("staff").GetProperty("edges"), "full", "Manga", "Na Honjaman Level Up", new System.Text.StringBuilder()), Is.EqualTo("Chu-Gong | So-Ryeong Gi | Hyeon-Gun | Seong-Rak Jang"));
         }
 
-        [Test]
-        public void GetSeriesStaff_Anthology_Test()
+        [AvaloniaTest]
+        public async Task GetSeriesStaff_Anthology_Test()
         {
             //Lycoris Recoil Koushiki Comic Anthology: Repeat
-            Assert.That(Series.CreateNewSeriesCardAsync("リコリス・リコイル 公式コミックアンソロジー リピート", "MANGA", 5, 0, []).Result.Staff["Romaji"], Is.EqualTo("Takeshi Kojima | Mekimeki | Nyoijizai | GUNP | Itsuki Takano | Ren Sakuragi | sometime | Ryou Niina | Ginmoku | Mikaduchi | Nikomi Wakadori | Miki Morinaga | Raika Suzumi | Ree | Itsuki Tsutsui | Utashima | Shirou Urayama | Bonryuu | Yasuka Manuma | Yuichi | Marco Nii | Nana Komado | Yuu Kimura | Sugar.Kirikanoko | Atto | Kasumi Fukagawa | Tiv | Sou Hamayumiba | Kanari Abe | Nachi Aono | Koruse"));
+            Assert.That((await Series.CreateNewSeriesCardAsync("リコリス・リコイル 公式コミックアンソロジー リピート", "MANGA", 5, 0, [])).Staff["Romaji"], Is.EqualTo("Takeshi Kojima | Mekimeki | Nyoijizai | GUNP | Itsuki Takano | Ren Sakuragi | sometime | Ryou Niina | Ginmoku | Mikaduchi | Nikomi Wakadori | Miki Morinaga | Raika Suzumi | Ree | Itsuki Tsutsui | Utashima | Shirou Urayama | Bonryuu | Yasuka Manuma | Yuichi | Marco Nii | Nana Komado | Yuu Kimura | Sugar.Kirikanoko | Atto | Kasumi Fukagawa | Tiv | Sou Hamayumiba | Kanari Abe | Nachi Aono | Koruse"));
         }
 
         [Test] // Tests if only native = null, onyl full = null, and both native and full are null

@@ -16,8 +16,6 @@ using Avalonia.Media.Imaging;
 using DynamicData;
 using System.Text.Json.Nodes;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using Avalonia.Input;
 
 namespace Tsundoku.ViewModels
 {
@@ -26,7 +24,6 @@ namespace Tsundoku.ViewModels
         private static readonly string USER_DATA_FILEPATH = @"UserData.json";
         private const double SCHEMA_VERSION = 2.0;
         private static bool newUserFlag = false;
-        public static bool updatedVersion = false;
         public static ObservableCollection<Series> SearchedCollection { get; set; } = new();
         public static ObservableCollection<Series> UserCollection { get; set; } = new();
         [Reactive] public string SearchText { get; set; }

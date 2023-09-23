@@ -8,10 +8,10 @@ using Avalonia.Controls;
 using System;
 using System.Collections.Specialized;
 using System.Text;
-using DynamicData.Binding;
-using ReactiveUI;
 using System.Linq;
 using Microsoft.IdentityModel.Tokens;
+using System.Net.Http;
+using System.IO;
 
 namespace Tsundoku.ViewModels
 {
@@ -25,7 +25,7 @@ namespace Tsundoku.ViewModels
         [Reactive] public string AdditionalLanguagesToolTipText { get; set; }
         [Reactive] public bool IsAddSeriesButtonEnabled { get; set; } = false;
         public ObservableCollection<ListBoxItem> SelectedAdditionalLanguages { get; set; } = new ObservableCollection<ListBoxItem>();
-
+        private static readonly HttpClient AddCoverHttpClient = new HttpClient();
         public AddNewSeriesViewModel() => SelectedAdditionalLanguages.CollectionChanged += AdditionalLanguagesCollectionChanged;
 
         private void AdditionalLanguagesCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -94,7 +94,7 @@ namespace Tsundoku.ViewModels
 
                     int index = MainWindowViewModel.UserCollection.BinarySearch(newSeries, new SeriesComparer(MainUser.CurLanguage));
                     index = index < 0 ? ~index : index;
-                    newSeries.CoverBitMap = new Bitmap(newSeries.Cover).CreateScaledBitmap(new Avalonia.PixelSize(Constants.LEFT_SIDE_CARD_WIDTH, Constants.IMAGE_HEIGHT), BitmapInterpolationMode.HighQuality);
+                    newSeries.CoverBitMap = new Bitmap(newSeries.Cover).CreateScaledBitmap(new PixelSize(LEFT_SIDE_CARD_WIDTH, IMAGE_HEIGHT), BitmapInterpolationMode.HighQuality);
 
                     MainWindowViewModel.UserCollection.Insert(index, newSeries);
                     MainWindowViewModel.SearchedCollection.Insert(index, newSeries);
@@ -111,9 +111,23 @@ namespace Tsundoku.ViewModels
             return duplicateSeriesCheck;
         }
 
+        public static async Task<Bitmap> SaveCoverAsync(string newPath, string coverLink)
+        {
+            //using (FileStream fs = new(newPath, FileMode.Create, FileAccess.Write));
+            HttpResponseMessage response = await AddCoverHttpClient.GetAsync(new Uri(coverLink));
+            using (FileStream fs = new(newPath, FileMode.Create, FileAccess.Write))
+            {
+                await response.Content.CopyToAsync(fs);
+            }
+ 
+			Bitmap newCover = new Bitmap(newPath).CreateScaledBitmap(new PixelSize(LEFT_SIDE_CARD_WIDTH, IMAGE_HEIGHT), BitmapInterpolationMode.HighQuality);
+			newCover.Save(newPath, 100);
+            return newCover;
+        }
+
         public static ObservableCollection<string> ConvertSelectedLangList(ObservableCollection<ListBoxItem> SelectedLangs)
         {
-            ObservableCollection<string> ConvertedList = new();
+            ObservableCollection<string> ConvertedList = [];
             foreach (ListBoxItem lang in SelectedLangs)
             {
                 ConvertedList.Add(lang.Content.ToString());
