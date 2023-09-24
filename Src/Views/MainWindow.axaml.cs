@@ -66,7 +66,7 @@ namespace Tsundoku.Views
                     LOGGER.Info("Reloading Covers");
                     if (CollectionViewModel.CurFilter != "None")
                     {
-                        MainWindowViewModel.FilterCollection("None");
+                        CollectionViewModel.FilterCollection("None");
                     }
                     
                     if (CoverChangedSeriesList.Count != 0)
@@ -81,7 +81,7 @@ namespace Tsundoku.Views
                 else if (e.KeyModifiers == KeyModifiers.Control && e.Key == Key.F)
                 {
                     LOGGER.Info("Reloading Filter/Sort on Collection");
-                    MainWindowViewModel.FilterCollection(CollectionViewModel.CurFilter);
+                    CollectionViewModel.FilterCollection(CollectionViewModel.CurFilter);
                 }
             };
 
@@ -189,7 +189,7 @@ namespace Tsundoku.Views
                 {
                     int countrating = 0;
                     curSeries.Rating = ratingVal;
-                    ((TextBlock)stackPanels.ElementAt(2).GetLogicalChildren().ElementAt(0)).Text = $"rating {ratingVal}/10.0";
+                    ((TextBlock)stackPanels.ElementAt(2).GetLogicalChildren().ElementAt(0)).Text = $"Rating {ratingVal}/10.0";
                     
                     // Update rating Distribution Chart
                     MainWindowViewModel.UserCollection.First(series => series == curSeries).Rating = ratingVal;
@@ -366,7 +366,7 @@ namespace Tsundoku.Views
             if ((sender as ComboBox).IsDropDownOpen)
             {
                 CollectionViewModel.CurFilter = (CollectionFilterSelector.SelectedItem as ComboBoxItem).Content.ToString();
-                MainWindowViewModel.FilterCollection(CollectionViewModel.CurFilter);
+                CollectionViewModel.FilterCollection(CollectionViewModel.CurFilter);
                 LOGGER.Info($"Changed Collection Filter To {CollectionViewModel.CurFilter}");
             }
         }

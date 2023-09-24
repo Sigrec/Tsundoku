@@ -17,6 +17,7 @@ V2.0.0.0 - PST
 ✅ Fixed/Changed Layout & Styling of Stats Window
 ✅ Added 8 new filters/sorts, "Shounen", "Shoujo", "Seinen", "Josei", "Rating", "Cost", "Read", & "Unread"
 ✅ Added new Command "CTRL+F" to reload the current filter/sort on the collection
+🔥 Fixed issue where Searching & Filtering would conflict with each other
 🔥 Fixed Themes Settings window border now being curved on the bottom
 🔥 Slight Changes to the formatting of all windows except main collection window
 🔥 Fixed issue where users could input negative numbers into a series score, user can no longer can do that

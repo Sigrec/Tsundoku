@@ -26,9 +26,10 @@
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<DebugType>None</DebugType>
 		<Version>2.0.0</Version>
-		<FileVersion>2.0.0.0</FileVersion>
+		<FileVersion>2.0.0.3</FileVersion>
 		<PackageIcon>Assets\Icons\Tsundoku-Logo.png</PackageIcon>
 		<RepositoryUrl>https://github.com/Sigrec/TsundokuApp</RepositoryUrl>
+		<LangVersion>preview</LangVersion>
 	</PropertyGroup>
 	<ItemGroup>
 		<RuntimeHostConfigurationOption Value="true" Include="System.Net.SocketsHttpHandler.Http3Support" />
