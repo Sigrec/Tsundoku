@@ -2,6 +2,7 @@
 	xmlns:vm="using:Tsundoku.ViewModels"
 	xmlns:c="using:Tsundoku.CustomControls"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:cv="clr-namespace:Tsundoku.Helpers"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
@@ -10,13 +11,22 @@
 	Icon="\Assets\Icons\Tsundoku-Logo.ico"
 	Title="Theme Settings"
 	FontFamily="Segoe UI"
-	WindowState="Maximized"
+	WindowState="2"
 	Classes="menu"
     Topmost="true"
 	WindowStartupLocation="2"
 	KeyboardNavigation.TabNavigation="None"
 	x:DataType="vm:ThemeSettingsViewModel"
 	CanResize="true">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <cv:ThemeListConverter x:Key="ConvertList"/>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="/Styles/ThemeSettingsControlThemes.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
 
 	<Border Classes="menu" BorderThickness="3" CornerRadius="0,0,8,8" ClipToBounds="True">
 		<ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
@@ -213,9 +223,6 @@
 					<WrapPanel>
 						<WrapPanel.Styles>
 							<Style Selector="Button">
-								<!-- <Style Selector="^:pointerover /template/ ContentPresenter, ^:pressed /template/ ContentPresenter">
-									<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}"/>
-								</Style> -->
 								<Style Selector="^:pressed">
 									<Setter Property="RenderTransform" Value="scale(1)" />
 								</Style>
@@ -634,47 +641,33 @@
 					<StackPanel Orientation="Horizontal" Spacing="5" Margin="0,10,0,0">
 						<TextBox Name="NewThemeName"
 								 Width="250"
+                                 Height="35"
 								 FontSize="15"
 								 Classes="menu"
 								 FontWeight="Bold"
-								 Text="{Binding ThemeName}"
+								 Text="{CompiledBinding ThemeName}"
 								 BorderThickness="2"/>
 						<Button Name="SaveThemeButton"
 								Content="Save"
+                                Height="35"
 								IsEnabled="{CompiledBinding IsSaveThemeButtonEnabled}"
 								Theme="{StaticResource MenuButton}"
 								Click="SaveNewTheme"/>
 						<ComboBox Name="ThemeSelector"
 								  SelectionChanged="ChangeMainTheme"
-								  ItemsSource="{Binding UserThemes}"
-								  Width="150"
-								  Height="35"
+                                  Height="35"
+								  ItemsSource="{CompiledBinding UserThemesDisplay}"
 								  BorderThickness="2"
-								  Foreground="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"
 								  Theme="{StaticResource MenuComboBox}"
-								  SelectedIndex="{CompiledBinding CurThemeIndex}"
-								  Margin="10,0,0,0">
-							<ComboBox.Resources>
-								<ResourceDictionary>
-									<ResourceDictionary.MergedDictionaries>
-										<ResourceInclude Source="/Styles/ThemeSettingsControlThemes.xaml"/>
-										<ResourceInclude Source="/Styles/CollectionControlThemes.xaml"/>
-									</ResourceDictionary.MergedDictionaries>
-								</ResourceDictionary>
-							</ComboBox.Resources>
-							<ComboBox.ItemTemplate>
-								<DataTemplate>
-									<ComboBoxItem Theme="{StaticResource ThemeComboBoxItem}" Content="{Binding ThemeName}"/>
-								</DataTemplate>
-							</ComboBox.ItemTemplate>
-						</ComboBox>
+								  SelectedIndex="{CompiledBinding CurThemeIndex}"/>
 						<Button FontSize="20" 
 								FontWeight="Bold" 
 								BorderThickness="2"
+                                Height="35"
 								Classes="menu"
 								HorizontalAlignment="Center"
 								VerticalAlignment="Center"
-								i:Attached.Icon="fa-xmark" 
+                                i:Attached.Icon="fa-xmark"
 								Click="RemoveSavedTheme"/>
 					</StackPanel>
 				</StackPanel>

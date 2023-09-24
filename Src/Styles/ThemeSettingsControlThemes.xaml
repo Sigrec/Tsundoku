@@ -1,9 +1,11 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
 					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 					xmlns:vm="clr-namespace:Tsundoku.ViewModels"
+                    xmlns:model="clr-namespace:Tsundoku.Models"
 					x:DataType="vm:ThemeSettingsViewModel">
-    <ControlTheme x:Key="ThemeComboBoxItem" TargetType="ComboBoxItem">
-		<Setter Property="Padding" Value="0" />
+
+    <ControlTheme x:Key="Test" TargetType="ComboBoxItem">
+		<Setter Property="Padding" Value="{DynamicResource ComboBoxItemThemePadding}" />
 		<Setter Property="HorizontalContentAlignment" Value="Stretch" />
 		<Setter Property="Background" Value="Transparent"/>
 		<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"/>
@@ -14,8 +16,8 @@
 								Foreground="{TemplateBinding Foreground}"
 								Background="{TemplateBinding Background}"
 								BorderBrush="{TemplateBinding BorderBrush}"
-								BorderThickness="{TemplateBinding BorderThickness}"
-								CornerRadius="{TemplateBinding CornerRadius}"
+								BorderThickness="{DynamicResource ComboBoxDropdownBorderThickness}"
+								CornerRadius="0"
 								ContentTemplate="{TemplateBinding ContentTemplate}"
 								Content="{TemplateBinding Content}"
 								HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
@@ -26,13 +28,11 @@
 
 		<Style Selector="^:pressed">
 			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
-			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
 			<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
 		</Style>
 
-		<Style Selector="^:pointerover">
+		<Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
 			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
-			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
 			<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
 		</Style>
 

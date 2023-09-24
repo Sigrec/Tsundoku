@@ -86,18 +86,18 @@
 							PlacementTarget="Background"
 							IsLightDismissEnabled="True"
 							InheritsTransform="True">
-						<Border x:Name="PopupBorder"
-								Background="{CompiledBinding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"
-								BorderBrush="{CompiledBinding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"
-								BorderThickness="2"
-								CornerRadius="2">
-							<ScrollViewer HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
-										VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}">
-							<ItemsPresenter Name="PART_ItemsPresenter"
-											Margin="{DynamicResource ComboBoxDropdownContentMargin}"
-											ItemsPanel="{TemplateBinding ItemsPanel}" />
-							</ScrollViewer>
-						</Border>
+                            <Border x:Name="PopupBorder"
+                                    Background="{CompiledBinding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"
+                                    BorderBrush="{CompiledBinding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"
+                                    BorderThickness="2"
+                                    CornerRadius="2">
+                                <ScrollViewer HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
+                                            VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}">
+                                <ItemsPresenter Name="PART_ItemsPresenter"
+                                                Margin="{DynamicResource ComboBoxDropdownContentMargin}"
+                                                ItemsPanel="{TemplateBinding ItemsPanel}" />
+                                </ScrollViewer>
+                            </Border>
 						</Popup>
 					</Grid>
 				</DataValidationErrors>
@@ -112,10 +112,6 @@
 		<Style Selector="^:pressed /template/ Border#Background">
 			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
 			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
-		</Style>
-
-		<Style Selector="^:pointerover /template/ ContentControl#ContentPresenter">
-			<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
 		</Style>
 
 		<Style Selector="^:pointerover /template/ PathIcon#DropDownGlyph">
@@ -136,7 +132,7 @@
 								Background="{TemplateBinding Background}"
 								BorderBrush="{TemplateBinding BorderBrush}"
 								BorderThickness="{TemplateBinding BorderThickness}"
-								CornerRadius="{TemplateBinding CornerRadius}"
+								CornerRadius="0"
 								ContentTemplate="{TemplateBinding ContentTemplate}"
 								Content="{TemplateBinding Content}"
 								HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
@@ -147,13 +143,11 @@
 
 		<Style Selector="^:pressed">
 			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
-			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
 			<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
 		</Style>
 
 		<Style Selector="^:pointerover">
 			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
-			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
 			<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
 		</Style>
 

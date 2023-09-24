@@ -29,7 +29,7 @@ namespace Tsundoku.Views
                 ThemeSettingsVM.CurrentTheme = CollectionWindow.CollectionViewModel.CurrentTheme;
                 NewTheme = ThemeSettingsVM.CurrentTheme.Cloning();
                 IsOpen ^= true;
-                ThemeSettingsVM.CurThemeIndex = Array.IndexOf(ThemeSettingsViewModel.UserThemes.ToArray(), ThemeSettingsVM.CurrentTheme);
+                ThemeSettingsVM.CurThemeIndex = ThemeSettingsViewModel.UserThemes.IndexOf(ThemeSettingsVM.CurrentTheme);
                 ApplyColors();
             };
 
@@ -196,7 +196,7 @@ namespace Tsundoku.Views
                         // Checks if the new theme already exists (some other theme has the same name as what the theme the user is currently trying to save)
                         if (NewTheme.ThemeName.Equals(ThemeSettingsViewModel.UserThemes[x].ThemeName))
                         {
-                            LOGGER.Info($"{NewTheme.ThemeName} Already Exists Replacing Color Values at {x}");
+                            LOGGER.Info($"{NewTheme.ThemeName} Already Exists Replacing Theme");
                             duplicateCheck = true;
                             replaceTheme = NewTheme.Cloning();
 
@@ -204,8 +204,8 @@ namespace Tsundoku.Views
                             {
                                 if (y != x)
                                 {
-                                    ThemeSelector.SelectedIndex = y; // Set the current theme to the next closet theme so the new theme can be replaced
                                     ThemeSettingsViewModel.UserThemes[x] = replaceTheme;
+                                    ThemeSettingsViewModel.UserThemesDisplay.Insert(x, replaceTheme.ThemeName);
                                     ThemeChanged = true;
                                     ThemeSelector.SelectedIndex = x;
                                     return;
@@ -217,10 +217,11 @@ namespace Tsundoku.Views
                     if (!duplicateCheck)
                     {
                         ThemeChanged = true;
-                        TsundokuTheme placeHolderTheme = NewTheme.Cloning();
-                        int index = ThemeSettingsViewModel.UserThemes.BinarySearch(placeHolderTheme);
+                        replaceTheme = NewTheme.Cloning();
+                        int index = ThemeSettingsViewModel.UserThemes.BinarySearch(replaceTheme);
                         index = index < 0 ? ~index : index;
-                        ThemeSettingsViewModel.UserThemes.Insert(index, placeHolderTheme);
+                        ThemeSettingsViewModel.UserThemes.Insert(index, replaceTheme);
+                        ThemeSettingsViewModel.UserThemesDisplay.Insert(index, replaceTheme.ThemeName);
                         LOGGER.Info($"Added New Theme {NewTheme.ThemeName} to Saved Themes");
                         ThemeSelector.SelectedIndex = index;
 
@@ -255,20 +256,14 @@ namespace Tsundoku.Views
         /// </summary>
         private void RemoveSavedTheme(object sender, RoutedEventArgs args)
         {
-            if (ThemeSettingsViewModel.UserThemes.Count > 1 && !(ThemeSelector.SelectedItem as TsundokuTheme).ThemeName.Equals("Default"))
+            if (ThemeSettingsViewModel.UserThemes.Count > 1 && !ThemeSelector.SelectedItem.ToString().Equals("Default"))
             {
-                int curIndex = ThemeSettingsViewModel.UserThemes.IndexOf(ThemeSelector.SelectedItem as TsundokuTheme);
-                for (int x = 0; x < ThemeSettingsViewModel.UserThemes.Count; x++)
-                {
-                    if (x != curIndex)
-                    {
-                        LOGGER.Info($"Removed Theme {ThemeSettingsViewModel.UserThemes[curIndex].ThemeName} From Saved Themes");
-                        ThemeSettingsViewModel.UserThemes.Remove(ThemeSettingsViewModel.UserThemes[curIndex]);
-                        ThemeChanged = true;
-                        ThemeSelector.SelectedIndex = curIndex == 0 ? 0 : --curIndex;
-                        break; 
-                    }
-                }
+                int curIndex = ThemeSettingsViewModel.UserThemes.IndexOf(CollectionWindow.CollectionViewModel.CurrentTheme);
+                ThemeSettingsViewModel.UserThemes.RemoveAt(curIndex);
+                ThemeSettingsViewModel.UserThemesDisplay.RemoveAt(curIndex);
+                ThemeChanged = true;
+                ThemeSelector.SelectedIndex = curIndex == 0 ? curIndex : --curIndex;
+                LOGGER.Info($"Removed Theme {ThemeSettingsViewModel.UserThemes[curIndex].ThemeName} From Saved Themes");
             }
         }
 
@@ -279,14 +274,15 @@ namespace Tsundoku.Views
         {
             if (ThemeSelector.IsDropDownOpen || ThemeChanged)
             {
-                CollectionWindow.CollectionViewModel.CurrentTheme = ThemeSelector.SelectedItem as TsundokuTheme;
+                string toThemeName = ThemeSelector.SelectedItem.ToString();
+                CollectionWindow.CollectionViewModel.CurrentTheme = ThemeSettingsViewModel.UserThemes.Single(theme => theme.ThemeName.Equals(toThemeName));
                 ThemeSettingsVM.CurrentTheme = CollectionWindow.CollectionViewModel.CurrentTheme;
                 CollectionWindow.CollectionViewModel.newSeriesWindow.AddNewSeriesVM.CurrentTheme = CollectionWindow.CollectionViewModel.CurrentTheme;
                 CollectionWindow.CollectionViewModel.settingsWindow.UserSettingsVM.CurrentTheme = CollectionWindow.CollectionViewModel.CurrentTheme;
                 CollectionWindow.CollectionViewModel.collectionStatsWindow.CollectionStatsVM.CurrentTheme = CollectionWindow.CollectionViewModel.CurrentTheme;
                 CollectionWindow.CollectionViewModel.priceAnalysisWindow.PriceAnalysisVM.CurrentTheme = CollectionWindow.CollectionViewModel.CurrentTheme;
                 
-                LOGGER.Info($"Theme Changed To {(ThemeSelector.SelectedItem as TsundokuTheme).ThemeName}");
+                LOGGER.Info($"Theme Changed To {toThemeName}");
                 ApplyColors();
                 CollectionWindow.CollectionViewModel.collectionStatsWindow.UpdateChartColors();
                 ThemeChanged = false;

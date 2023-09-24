@@ -352,6 +352,11 @@ namespace Tsundoku.Views
         {
             if ((sender as ComboBox).IsDropDownOpen)
             {
+                if (!string.IsNullOrWhiteSpace(CollectionViewModel.SearchText)) // Checks if the user is filtering after a search
+                {
+                    CollectionViewModel.SearchIsBusy = false;
+                    CollectionViewModel.SearchText = string.Empty;
+                }
                 CollectionViewModel.CurLanguage = (LanguageSelector.SelectedItem as ComboBoxItem).Content.ToString();
                 LOGGER.Info($"Changed Langauge to {CollectionViewModel.CurLanguage}");
                 MainWindowViewModel.SortCollection();

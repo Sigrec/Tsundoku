@@ -9,7 +9,6 @@ using LiveChartsCore.Defaults;
 using LiveChartsCore.SkiaSharpView;
 using Tsundoku.Models;
 using System.Collections.Generic;
-using Avalonia.Logging;
 
 namespace Tsundoku.ViewModels
 {

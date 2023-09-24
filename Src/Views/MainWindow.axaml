@@ -202,7 +202,7 @@
 		
 		<!-- Collection -->
 		<ScrollViewer Name="CollectionTheme" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" DockPanel.Dock="Bottom" Background="{CompiledBinding CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}"> 
-			<ItemsControl Name="CollectionItems" Margin="0,50,0,50" ItemsSource="{Binding SearchedCollection}" HorizontalAlignment="Center" VerticalAlignment="Center">
+			<ItemsControl Name="CollectionItems" Margin="0,50,0,50" ItemsSource="{CompiledBinding SearchedCollection}" HorizontalAlignment="Center" VerticalAlignment="Center">
 				<ItemsControl.ItemsPanel>
 					<ItemsPanelTemplate>
 						<WrapPanel/>
@@ -237,7 +237,7 @@
 										<!-- Top Left Side Card -->
 										<Image Height="{CompiledBinding Source={x:Static local:Constants.IMAGE_HEIGHT}}"
 												Width="{CompiledBinding Source={x:Static local:Constants.LEFT_SIDE_CARD_WIDTH}}"
-												Source="{Binding CoverBitMap}"
+												Source="{CompiledBinding CoverBitMap}"
 												ClipToBounds="True"
 												Name="SeriesCover">
 										</Image>
@@ -559,12 +559,6 @@
 																<Setter Property="BorderBrush" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"/>
 																<Setter Property="Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"/>
 															</Style>
-
-															<Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-																<Setter Property="Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"/>
-																<Setter Property="BorderBrush" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"/>
-																<Setter Property="Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"/>
-															</Style>
 														</Style>
 													</Style>
 												</StackPanel.Styles>
@@ -579,8 +573,8 @@
 														  FontWeight="Bold"
 														  FontSize="15"
 														  Width="145"
-														  SelectedItem="{Binding Demographic}"
-														  ItemsSource="{Binding Source={x:Static local:Constants.DEMOGRAPHICS}}"
+														  SelectedItem="{CompiledBinding Demographic}"
+														  ItemsSource="{CompiledBinding Source={x:Static local:Constants.DEMOGRAPHICS}}"
 														  BorderThickness="2"
 														  VerticalAlignment="Center"
 														  HorizontalAlignment="Center"
