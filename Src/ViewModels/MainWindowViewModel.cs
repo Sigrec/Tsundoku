@@ -176,10 +176,13 @@ namespace Tsundoku.ViewModels
         /// <summary>
         /// Sorts the users collection based on language
         /// </summary>
-        public static void SortCollection()
+        public static async void SortCollection()
         {
-            UserCollection.Sort(new SeriesComparer(MainUser.CurLanguage));
             SearchedCollection.Clear();
+            await Task.Run(() => 
+            {
+                UserCollection.Sort(new SeriesComparer(MainUser.CurLanguage));
+            });
             SearchedCollection.AddRange(UserCollection);
         }
 
