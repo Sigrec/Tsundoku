@@ -12,6 +12,7 @@ using Avalonia.Input;
 using Microsoft.IdentityModel.Tokens;
 using static Src.Models.Constants;
 using System.Linq;
+using MangaLightNovelWebScrape.Websites;
 
 namespace Tsundoku.Views
 {
@@ -87,10 +88,10 @@ namespace Tsundoku.Views
                         }, 
                         PriceAnalysisVM.SelectedWebsites.Select(site => site.Content.ToString()).ToList(), 
                         PriceAnalysisVM.CurBrowser, 
-                        ViewModelBase.MainUser.Memberships["RightStufAnime"], 
-                        ViewModelBase.MainUser.Memberships["BarnesAndNoble"], 
-                        ViewModelBase.MainUser.Memberships["BooksAMillion"], 
-                        ViewModelBase.MainUser.Memberships["KinokuniyaUSA"],
+                        ViewModelBase.MainUser.Memberships[RightStufAnime.WEBSITE_TITLE], 
+                        ViewModelBase.MainUser.Memberships[BarnesAndNoble.WEBSITE_TITLE], 
+                        ViewModelBase.MainUser.Memberships[BooksAMillion.WEBSITE_TITLE], 
+                        ViewModelBase.MainUser.Memberships[KinokuniyaUSA.WEBSITE_TITLE],
                         false
                     );
                 StartScrapeButton.IsEnabled = PriceAnalysisVM.IsAnalyzeButtonEnabled;

@@ -16,7 +16,7 @@ using Avalonia.Media.Imaging;
 using DynamicData;
 using System.Text.Json.Nodes;
 using System.Collections.Generic;
-using Avalonia.Media;
+using MangaLightNovelWebScrape.Websites;
 
 namespace Tsundoku.ViewModels
 {
@@ -332,10 +332,23 @@ namespace Tsundoku.ViewModels
             {
                 LOGGER.Info("Creating New User");
                 ThemeSettingsViewModel.UserThemes = [TsundokuTheme.DEFAULT_THEME];
-                MainUser = new User("UserName", "Romaji", "Default", "Card", SCHEMA_VERSION, "$", "$0.00", new Dictionary<string, bool>(), ThemeSettingsViewModel.UserThemes, UserCollection)
-                {
-                    CurDataVersion = SCHEMA_VERSION
-                };
+                MainUser = new User(
+                                    "UserName", 
+                                    "Romaji", 
+                                    "Default", 
+                                    "Card", 
+                                    SCHEMA_VERSION, 
+                                    "$", 
+                                    "$0.00", 
+                                    new Dictionary<string, bool>{
+                                        { RightStufAnime.WEBSITE_TITLE, false },
+                                        { BarnesAndNoble.WEBSITE_TITLE , false },
+                                        { BooksAMillion.WEBSITE_TITLE, false },
+                                        { KinokuniyaUSA.WEBSITE_TITLE , false }
+                                    }, 
+                                    ThemeSettingsViewModel.UserThemes, 
+                                    UserCollection
+                                );
                 UserName = MainUser.UserName;
                 UserCollection = MainUser.UserCollection;
                 CurLanguage = MainUser.CurLanguage;
@@ -541,10 +554,10 @@ namespace Tsundoku.ViewModels
             {
                 userData["Memberships"] = new JsonObject
                 {
-                    ["RightStufAnime"] = false,
-                    ["BarnesAndNoble"] = false,
-                    ["BooksAMillion"] = false,
-                    ["KinokuniyaUSA"] = false
+                    [RightStufAnime.WEBSITE_TITLE] = false,
+                    [BarnesAndNoble.WEBSITE_TITLE] = false,
+                    [BooksAMillion.WEBSITE_TITLE] = false,
+                    [KinokuniyaUSA.WEBSITE_TITLE] = false
                 };
 
                 userData.AsObject()["MeanRating"] = (decimal)userData["MeanScore"];
