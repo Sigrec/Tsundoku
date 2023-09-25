@@ -15,6 +15,7 @@ namespace Tsundoku.Models
         public const ushort USER_NOTES_WIDTH = RIGHT_SIDE_CARD_WIDTH - 74;
         public const ushort USER_NOTES_HEIGHT = TOP_SECTION_CARD_HEIGHT - 16;
         public const ushort IMAGE_HEIGHT = CARD_HEIGHT - BOTTOM_SECTION_CARD_HEIGHT;
+        public const ushort MENU_LENGTH = 150;
 		public static readonly string[] VALID_STAFF_ROLES = ["Story & Art", "Story", "Art", "Original Creator", "Character Design", "Cover Illustration", "Illustration", "Mechanical Design", "Original Story", "Original Character Design", "Original Story"];
 		public static readonly string[] DEMOGRAPHICS = ["Shounen", "Shoujo", "Seinen", "Josei"];
 		public static readonly string[] AvailableLanguages = ["Romaji", "English", "Japanese", "Arabic", "Azerbaijan", "Bengali", "Bulgarian", "Burmese", "Catalan", "Chinese", "Croatian", "Czech", "Danish", "Dutch", "Esperanto", "Estonian", "Filipino", "Finnish", "French", "German", "Greek", "Hebrew", "Hindi", "Hungarian", "Indonesian", "Italian", "Kazakh", "Korean", "Latin", "Lithuanian", "Malay", "Mongolian", "Nepali", "Norwegian", "Persian", "Polish", "Portuguese", "Romanian", "Russian", "Serbian", "Slovak", "Spanish", "Swedish", "Tamil", "Thai", "Turkish", "Ukrainian", "Vietnamese"];

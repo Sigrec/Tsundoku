@@ -402,7 +402,6 @@ namespace Tsundoku.ViewModels
             // For users who did not get the older update
             if (!userData.AsObject().ContainsKey("CurDataVersion"))
             {
-                LOGGER.Debug("Check #4");
                 userData.AsObject().Add("CurDataVersion", "1.0");
                 LOGGER.Info("Added CurDataVersion Json Object");
             }
