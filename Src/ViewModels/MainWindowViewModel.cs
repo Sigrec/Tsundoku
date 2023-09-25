@@ -53,6 +53,11 @@ namespace Tsundoku.ViewModels
         public CollectionStatsWindow collectionStatsWindow;
         public ReactiveCommand<Unit, Unit> OpenCollectionStatsWindow { get; set; }
 
+        // TODO Add wish list selection for series?
+        // TODO Add genres?
+        // TODO Manual Entry Option?
+        // TODO Add Search Filters ex Series that have a rating of 5
+        // TODO Add barcode functiionality?
         public MainWindowViewModel()
         {
             // Helpers.ExtensionMethods.PrintCultures();
