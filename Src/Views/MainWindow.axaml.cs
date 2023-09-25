@@ -18,6 +18,8 @@ using System.Collections.Generic;
 using Avalonia.Media.Imaging;
 using FileWatcherEx;
 using Avalonia.Logging;
+using Avalonia.Controls.Primitives;
+using Avalonia.Media;
 
 namespace Tsundoku.Views
 {
@@ -83,6 +85,10 @@ namespace Tsundoku.Views
                     LOGGER.Info("Reloading Filter/Sort on Collection");
                     CollectionViewModel.FilterCollection(CollectionViewModel.CurFilter);
                 }
+                else if (e.KeyModifiers == KeyModifiers.Shift && e.Key == Key.S)
+                {
+                    AdvancedSearch_Popup();
+                }
             };
 
             coverFolderWatcher.OnCreated += static (s, e) =>
@@ -108,6 +114,15 @@ namespace Tsundoku.Views
             {
                 SaveOnClose();
             };
+        }
+
+        public void AdvancedSearch_Popup()
+        {
+            if (TsundokuWindow != null)
+            {
+                this.Background = new SolidColorBrush(Colors.Black, 80);
+                FlyoutBase.ShowAttachedFlyout(TsundokuWindow);
+            }
         }
 
         /// <summary>

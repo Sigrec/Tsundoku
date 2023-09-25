@@ -16,6 +16,7 @@ using Avalonia.Media.Imaging;
 using DynamicData;
 using System.Text.Json.Nodes;
 using System.Collections.Generic;
+using Avalonia.Media;
 
 namespace Tsundoku.ViewModels
 {
@@ -37,6 +38,7 @@ namespace Tsundoku.ViewModels
         [Reactive] public string CurLanguage { get; set; }
         [Reactive] public int LanguageIndex { get; set; }
         [Reactive] public int FilterIndex { get; set; }
+        //private static SolidColorBrush AdvancedSearchBackgroundColor = new SolidColorBrush(Colors.Black);
 
         public AddNewSeriesWindow newSeriesWindow;
         public ReactiveCommand<Unit, Unit> OpenAddNewSeriesWindow { get; set; }
@@ -58,6 +60,7 @@ namespace Tsundoku.ViewModels
         // TODO Manual Entry Option?
         // TODO Add Search Filters ex Series that have a rating of 5
         // TODO Add barcode functiionality?
+        // TODO Add export/import for themes
         public MainWindowViewModel()
         {
             // Helpers.ExtensionMethods.PrintCultures();
@@ -293,6 +296,8 @@ namespace Tsundoku.ViewModels
         /// <param name="searchText">The text to search for</param>
         private async void SearchCollection(string searchText)
         {
+            // Advanced Search Filter '[<filter><type><value>&<filter><type><value>&...]'
+            // ex '[rating>=5&status=finished&cost>700&format=manga&staff=Tsuyoshi&notes=text&favorite&demographic=shounen&read=0&curvolumes>5&maxvolumes>=8&desc=text&complete]'
             if (!string.IsNullOrWhiteSpace(searchText))
             {
                 if (!CurFilter.Equals("None"))

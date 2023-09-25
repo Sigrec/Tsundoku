@@ -3,6 +3,10 @@
 		xmlns:vm="clr-namespace:Tsundoku.ViewModels"
 		x:DataType="vm:MainWindowViewModel">
 
+    <Style Selector="FlyoutPresenter.mySpecialClass">
+        <Setter Property="Background" Value="Green" />
+    </Style>
+
 	<Style Selector="Window.menu">
 		<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}"/>
 	</Style>
@@ -79,4 +83,3 @@
 		</Style>
 	</Style>
 </Styles>
-
