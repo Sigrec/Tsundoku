@@ -17,9 +17,10 @@ using Avalonia.Platform.Storage;
 using System.Collections.Generic;
 using Avalonia.Media.Imaging;
 using FileWatcherEx;
-using Avalonia.Logging;
-using Avalonia.Controls.Primitives;
 using Avalonia.Media;
+using Avalonia.Controls.Primitives;
+using System.Text.RegularExpressions;
+using System.Text;
 
 namespace Tsundoku.Views
 {
@@ -34,10 +35,15 @@ namespace Tsundoku.Views
             IncludeSubdirectories = false,
             NotifyFilter = NotifyFilters.FileName
         };
+        private static StringBuilder newSearchText = new StringBuilder();
+        private static string itemString, advancedSearchTextString;
+        [GeneratedRegex(@"(?<Filter>\w+)(?<Math>=|<=|>=)(?<Value>\d+|\w+|\'(?:.*?)\')")] private static partial Regex AdvancedSearchRegex();
 
         public MainWindow()
         {
             InitializeComponent();
+            SetupAdvancedSearchBar(" ");
+
             KeyDown += (s, e) => 
             {
                 if (e.Key == Key.F11) 
@@ -116,12 +122,38 @@ namespace Tsundoku.Views
             };
         }
 
+        public void SetupAdvancedSearchBar(string delimeter)
+        {
+            AdvancedSearchBar.ItemsSource = ADVANCED_SEARCH_FILTERS.OrderBy(x => x);
+            AdvancedSearchBar.FilterMode = AutoCompleteFilterMode.Custom;
+            AdvancedSearchBar.ItemSelector = (advancedSearchText, item) =>
+            {
+                newSearchText.Clear();
+                advancedSearchTextString = advancedSearchText as string;
+                if (AdvancedSearchRegex().IsMatch(advancedSearchTextString))
+                {
+                    newSearchText.Append(advancedSearchTextString[..advancedSearchTextString.LastIndexOf(delimeter)]).Append(delimeter);
+                }
+                return newSearchText.Append(item).ToString();
+            };
+            AdvancedSearchBar.ItemFilter = (advancedSearchText, item) =>
+            {
+                itemString = item as string;
+                advancedSearchTextString = advancedSearchText as string;
+                if (!AdvancedSearchRegex().IsMatch(advancedSearchTextString))
+                {
+                    return itemString.StartsWith(advancedSearchTextString, StringComparison.OrdinalIgnoreCase);
+                }
+                return itemString.StartsWith(advancedSearchTextString[(advancedSearchTextString.LastIndexOf(delimeter) + delimeter.Length)..], StringComparison.OrdinalIgnoreCase) && (!advancedSearchTextString.Contains(itemString[..(itemString.IndexOf('=') + 1)], StringComparison.OrdinalIgnoreCase) || !advancedSearchTextString.Contains(itemString[..(itemString.IndexOf('<') + 1)], StringComparison.OrdinalIgnoreCase) || !advancedSearchTextString.Contains(itemString[..(itemString.IndexOf('>') + 1)], StringComparison.OrdinalIgnoreCase));
+            };
+        }
+
         public void AdvancedSearch_Popup()
         {
-            if (TsundokuWindow != null)
+            if (Navigation != null)
             {
-                this.Background = new SolidColorBrush(Colors.Black, 80);
-                FlyoutBase.ShowAttachedFlyout(TsundokuWindow);
+                // this.Background = new SolidColorBrush(Colors.Black, 80);
+                FlyoutBase.ShowAttachedFlyout(Navigation);
             }
         }
 
@@ -245,6 +277,11 @@ namespace Tsundoku.Views
                 }
                 bitmap.Save(@$"Screenshots\{CollectionViewModel.UserName}-Collection-ScreenShot-{CollectionViewModel.CurrentTheme.ThemeName}.jpg", System.Drawing.Imaging.ImageFormat.Jpeg);
             }
+        }
+
+        public void OpenMenu(object sender, RoutedEventArgs args)
+        {
+
         }
 
         private void SearchCollection(object sender, KeyEventArgs args)

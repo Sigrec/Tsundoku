@@ -298,6 +298,7 @@ namespace Tsundoku.ViewModels
         {
             // Advanced Search Filter '[<filter><type><value>&<filter><type><value>&...]'
             // ex '[rating>=5&status=finished&cost>700&format=manga&staff=Tsuyoshi&notes=text&favorite&demographic=shounen&read=0&curvolumes>5&maxvolumes>=8&desc=text&complete]'
+            // Regex = @"(?<filter>\w+)(?<math>=|<=|>=)(?<value>\d+|\w+)(?: & )?"
             if (!string.IsNullOrWhiteSpace(searchText))
             {
                 if (!CurFilter.Equals("None"))

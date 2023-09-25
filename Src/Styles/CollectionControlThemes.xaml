@@ -1,7 +1,61 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
 					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 					xmlns:vm="clr-namespace:Tsundoku.ViewModels"
-					x:DataType="vm:ViewModelBase"> 
+					x:DataType="vm:ViewModelBase">
+
+    <ControlTheme x:Key="{x:Type AutoCompleteBox}" TargetType="AutoCompleteBox">
+        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.SearchBarTextColor, Converter={StaticResource ConvertColor}}"/>
+        <Setter Property="Background" Value="{CompiledBinding CurrentTheme.SearchBarBGColor, Converter={StaticResource ConvertColor}}"/>
+        <Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.SearchBarBorderColor, Converter={StaticResource ConvertColor}}"/>
+        <Setter Property="BorderThickness" Value="2" />
+        <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
+        <Setter Property="FontSize" Value="{DynamicResource ControlContentThemeFontSize}" />
+        <Setter Property="Padding" Value="{DynamicResource TextControlThemePadding}" />
+        <Setter Property="MaxDropDownHeight" Value="{DynamicResource AutoCompleteListMaxHeight}" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid Name="PART_LayoutRoot">
+                    <TextBox Name="PART_TextBox"
+                            Watermark="{TemplateBinding Watermark}"
+                            Classes="menu"
+                            Width="{TemplateBinding Width}"
+                            Foreground="{TemplateBinding Foreground}"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{TemplateBinding CornerRadius}"
+                            FontSize="{TemplateBinding FontSize}"
+                            FontFamily="{TemplateBinding FontFamily}"
+                            TextWrapping="Wrap"
+                            FontWeight="{TemplateBinding FontWeight}"
+                            Padding="{TemplateBinding Padding}"
+                            Margin="0"
+                            DataValidationErrors.Errors="{TemplateBinding (DataValidationErrors.Errors)}" />
+                    <Popup Name="PART_Popup" 
+                            WindowManagerAddShadowHint="False"
+                            MinWidth="{Binding Bounds.Width, RelativeSource={RelativeSource TemplatedParent}}" 
+                            MaxHeight="{TemplateBinding MaxDropDownHeight}"
+                            IsLightDismissEnabled="True"
+                            PlacementTarget="{TemplateBinding}">
+                        <Border Name="PART_SuggestionsContainer"
+                                Padding="{DynamicResource AutoCompleteListMargin}"
+                                BorderThickness="2"
+                                BorderBrush="{DynamicResource AutoCompleteBoxSuggestionsListBorderBrush}"
+                                Background="{DynamicResource AutoCompleteBoxSuggestionsListBackground}"
+                                CornerRadius="{DynamicResource OverlayCornerRadius}">
+                            <ListBox Name="PART_SelectingItemsControl"
+                                    BorderThickness="2"
+                                    Theme="{StaticResource QueryListBox}"
+                                    ItemTemplate="{TemplateBinding ItemTemplate}"
+                                    Margin="{DynamicResource AutoCompleteListPadding}" />
+                        </Border>
+                    </Popup>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+        </ControlTheme>
+
     <ControlTheme x:Key="FluentScrollBarThumb" TargetType="Thumb">
 		<Setter Property="Background" Value="{CompiledBinding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}"/>
 		<Setter Property="Template">

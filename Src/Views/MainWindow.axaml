@@ -36,6 +36,20 @@
 				Classes="menu"
 				BorderThickness="0,0,0,3"
 				Height="150">
+            <FlyoutBase.AttachedFlyout>
+                <Flyout Placement="Center" FlyoutPresenterClasses="menu">
+                    <AutoCompleteBox Name="AdvancedSearchBar" 
+                            Classes="menu"
+                            BorderThickness="2"
+                            Width="400"
+                            FontWeight="Bold"
+                            Watermark="Advanced Search..."
+                            Height="35"
+                            FontSize="15"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"/>
+                </Flyout>
+            </FlyoutBase.AttachedFlyout>
 			<Grid Margin="0,15,0,15" ColumnDefinitions="*,600,*" RowDefinitions="Auto,Auto" HorizontalAlignment="Center" VerticalAlignment="Center" ShowGridLines="False">
 				<StackPanel Margin="0,0,0,1" Orientation="Horizontal" Spacing="0,0,1,1" Grid.Column="1" Grid.Row="0" Height="{CompiledBinding Source={x:Static local:Constants.USER_ICON_HEIGHT}}" HorizontalAlignment="Left" VerticalAlignment="Center">
 					<Border BorderThickness="2" Classes="menu" CornerRadius="2" ClipToBounds="True" Height="75">

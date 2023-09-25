@@ -23,7 +23,6 @@
 	<Window.Resources>
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
-				<ResourceInclude Source="/Styles/AddNewSeriesControlThemes.xaml"/>
                 <ResourceInclude Source="/Styles/PriceAnalysisControlThemes.xaml"/>
 			</ResourceDictionary.MergedDictionaries>
 		</ResourceDictionary>
