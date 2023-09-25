@@ -232,6 +232,11 @@ namespace Tsundoku.Views
             }
         }
 
+        public void OpenMenu()
+        {
+            
+        }
+
         private void SearchCollection(object sender, KeyEventArgs args)
         {
             CollectionViewModel.SearchIsBusy = true;

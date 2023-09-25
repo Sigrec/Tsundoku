@@ -201,11 +201,11 @@
 		</Border>
 		
 		<!-- Collection -->
-        <SplitView.Pane DisplayMode="CompactOverlay" OpenPaneLength="{CompiledBinding Source={x:Static local:Constants.MENU_LENGTH}}">
+        <SplitView DisplayMode="CompactOverlay" OpenPaneLength="{CompiledBinding Source={x:Static local:Constants.MENU_LENGTH}}" DockPanel.Dock="Bottom" PaneBackground="{CompiledBinding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}">
             <SplitView.Pane>
-                <TextBlock Text="Menu"/>
+                <Button Content=">" HorizontalAlignment="Center" VerticalAlignment="Top" Click="OpenMenu"/>
             </SplitView.Pane>
-            <ScrollViewer Name="CollectionTheme" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" DockPanel.Dock="Bottom" Background="{CompiledBinding CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}"> 
+            <ScrollViewer Name="CollectionTheme" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Background="{CompiledBinding CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}"> 
                 <ItemsControl Name="CollectionItems" Margin="0,50,0,50" ItemsSource="{CompiledBinding SearchedCollection}" HorizontalAlignment="Center" VerticalAlignment="Center">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -785,6 +785,6 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </ScrollViewer>
-        </SplitView.Pane>
+        </SplitView>
 	</DockPanel>
 </Window>
