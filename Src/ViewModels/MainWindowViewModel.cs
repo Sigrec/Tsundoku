@@ -17,6 +17,12 @@ using DynamicData;
 using System.Text.Json.Nodes;
 using System.Collections.Generic;
 using MangaLightNovelWebScrape.Websites;
+using Avalonia.Media;
+using System.Text.RegularExpressions;
+using System.Text;
+using System.Linq.Dynamic.Core;
+using System.Windows.Input;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Tsundoku.ViewModels
 {
@@ -30,15 +36,16 @@ namespace Tsundoku.ViewModels
         public static List<Series> UserCollection { get; set; } = [];
         private static IEnumerable<Series> FilteredCollection { get; set; } = [];
         [Reactive] public string SearchText { get; set; }
+        [Reactive] public string AdvancedSearchText { get; set; }
         [Reactive] public bool LanguageChanged { get; set; } = false;
-        [Reactive] public bool SearchIsBusy { get; set; } = false;
+        public bool SearchIsBusy { get; set; } = false;
         [Reactive] public string CurDisplay { get; set; }
         [Reactive] public string CurFilter { get; set; } = "None";
         [Reactive] public Bitmap UserIcon { get; set; }
         [Reactive] public string CurLanguage { get; set; }
         [Reactive] public int LanguageIndex { get; set; }
         [Reactive] public int FilterIndex { get; set; }
-        //private static SolidColorBrush AdvancedSearchBackgroundColor = new SolidColorBrush(Colors.Black);
+        [Reactive] private SolidColorBrush AdvancedSearchBackgroundColor { get; set; } = new SolidColorBrush(Colors.Black, 0.5);
 
         public AddNewSeriesWindow newSeriesWindow;
         public ReactiveCommand<Unit, Unit> OpenAddNewSeriesWindow { get; set; }
@@ -54,6 +61,9 @@ namespace Tsundoku.ViewModels
 
         public CollectionStatsWindow collectionStatsWindow;
         public ReactiveCommand<Unit, Unit> OpenCollectionStatsWindow { get; set; }
+        public ICommand StartAdvancedSearch { get; }
+
+        [GeneratedRegex(@"(\w+)(=|<=|>=)(\d+|\w+|\'(?:.*?)\')")] public static partial Regex AdvancedSearchRegex();
 
         // TODO Add wish list selection for series?
         // TODO Add genres?
@@ -77,6 +87,7 @@ namespace Tsundoku.ViewModels
             this.WhenAnyValue(x => x.CurDisplay).Subscribe(x => MainUser.Display = x);
             this.WhenAnyValue(x => x.UserName).Subscribe(x => MainUser.UserName = x);
             this.WhenAnyValue(x => x.UserIcon).Subscribe(x => MainUser.UserIcon = User.ImageToByteArray(x));
+            StartAdvancedSearch = ReactiveCommand.Create(() => AdvancedSearchCollection(AdvancedSearchText));
         }
 
         private void LanguageChange(string lang)
@@ -296,9 +307,6 @@ namespace Tsundoku.ViewModels
         /// <param name="searchText">The text to search for</param>
         private async void SearchCollection(string searchText)
         {
-            // Advanced Search Filter '[<filter><type><value>&<filter><type><value>&...]'
-            // ex '[rating>=5&status=finished&cost>700&format=manga&staff=Tsuyoshi&notes=text&favorite&demographic=shounen&read=0&curvolumes>5&maxvolumes>=8&desc=text&complete]'
-            // Regex = @"(?<filter>\w+)(?<math>=|<=|>=)(?<value>\d+|\w+)(?: & )?"
             if (!string.IsNullOrWhiteSpace(searchText))
             {
                 if (!CurFilter.Equals("None"))
@@ -323,6 +331,74 @@ namespace Tsundoku.ViewModels
             }
         }
 
+        // TODO Need to add validation on the SearchText
+        // TODO AdvancedSearch below issue where user can search for a logical filter is == and can still choose <= or >=
+        // TODO Notes is not working
+        // Cost<=1000 Cost>=200 Favorite=False CurVolumes<=40 CurVolumes>=5 Demographic=Josei Format=Manga Read=10 Status=Finished Read>=5 MaxVolumes<=100 Read<=60 MaxVolumes>=10 Notes='OOP' Series=Complete Rating>=5
+
+        // Basic Test Query Demographic=Seinen Format=Manga Series=Complete Favorite=True
+        private async void AdvancedSearchCollection(string AdvancedSearchQuery)
+        {
+            if (!string.IsNullOrWhiteSpace(AdvancedSearchQuery))
+            {
+                if (!CurFilter.Equals("None"))
+                {
+                    ShouldFilter = false;
+                    CurFilter = "None";
+                }
+
+                StringBuilder AdvancedFilterExpression = new StringBuilder("series => ");
+                await Task.Run(() => {
+                    var AdvancedSearchMatches = AdvancedSearchRegex().Matches(AdvancedSearchQuery.Trim()).OrderBy(x => x.Value);
+                    GroupCollection advFilter;
+                    string notesQuery = string.Empty;
+
+                    foreach (Match SearchFilter in AdvancedSearchMatches)
+                    {
+                        advFilter = SearchFilter.Groups;
+                        AdvancedFilterExpression.AppendFormat("{0} && ", ParseAdvancedFilter(advFilter[1].Value, advFilter[2].Value, advFilter[3].Value));
+    
+                    }
+                    AdvancedFilterExpression.Remove(AdvancedFilterExpression.Length - 4, 4);
+                    FilteredCollection = UserCollection.AsQueryable().Where(AdvancedFilterExpression.ToString()); 
+                });
+                LOGGER.Debug($"Parsed Query -> {AdvancedFilterExpression}");
+
+                if (FilterCollection != null)
+                {
+                    LOGGER.Debug($"Advanced Query Passed {FilteredCollection.Count()}");
+                    foreach (var x in FilteredCollection)
+                    {
+                        LOGGER.Debug(x.Titles["Romaji"]);
+                    }
+                    SearchedCollection.Clear();
+                    SearchedCollection.AddRange(FilteredCollection);
+                }
+                else
+                {
+                    LOGGER.Debug("Advanced Query Failed");
+                }
+                ShouldFilter = true;
+            }
+        }
+
+        private static string ParseAdvancedFilter(string filterName, string logicType, string filterValue)
+        {
+            logicType = logicType.Equals("=") ? "==" : logicType;
+            return filterName switch
+            {
+                "Rating" or "Cost" => $"series.{filterName} {logicType} {filterValue}M",
+                "Read" => $"series.VolumesRead {logicType} {filterValue}",
+                "CurVolumes" => $"series.CurVolumeCount {logicType} {filterValue}",
+                "MaxVolumes" => $"series.MaxVolumeCount {logicType} {filterValue}",
+                "Demographic" or "Format" or "Status" => $"series.{filterName}.Equals(\"{filterValue}\")",
+                "Series" => filterValue.Equals("Complete") ? "series.MaxVolumeCount == series.CurVolumeCount" : "series.CurVolumeCount < series.MaxVolumeCount",
+                "Favorite" => $"series.IsFavorite == {filterValue.ToLower()}",
+                "Notes" => $"series.SeriesNotes.Contains(\"{filterValue[1..^1]}\")",
+                _ => string.Empty,
+            };
+        }
+
         [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "A New file will always be created if it doesn't exist before deserialization")]
         /// <summary>
         /// Gets the users data from the UserData.Json file in current working directory where the executable is
@@ -334,22 +410,22 @@ namespace Tsundoku.ViewModels
                 LOGGER.Info("Creating New User");
                 ThemeSettingsViewModel.UserThemes = [TsundokuTheme.DEFAULT_THEME];
                 MainUser = new User(
-                                    "UserName", 
-                                    "Romaji", 
-                                    "Default", 
-                                    "Card", 
-                                    SCHEMA_VERSION, 
-                                    "$", 
-                                    "$0.00", 
-                                    new Dictionary<string, bool>{
-                                        { RightStufAnime.WEBSITE_TITLE, false },
-                                        { BarnesAndNoble.WEBSITE_TITLE , false },
-                                        { BooksAMillion.WEBSITE_TITLE, false },
-                                        { KinokuniyaUSA.WEBSITE_TITLE , false }
-                                    }, 
-                                    ThemeSettingsViewModel.UserThemes, 
-                                    UserCollection
-                                );
+                            "UserName", 
+                            "Romaji", 
+                            "Default", 
+                            "Card", 
+                            SCHEMA_VERSION, 
+                            "$", 
+                            "$0.00", 
+                            new Dictionary<string, bool>{
+                                { RightStufAnime.WEBSITE_TITLE, false },
+                                { BarnesAndNoble.WEBSITE_TITLE , false },
+                                { BooksAMillion.WEBSITE_TITLE, false },
+                                { KinokuniyaUSA.WEBSITE_TITLE , false }
+                            }, 
+                            ThemeSettingsViewModel.UserThemes, 
+                            UserCollection
+                        );
                 UserName = MainUser.UserName;
                 UserCollection = MainUser.UserCollection;
                 CurLanguage = MainUser.CurLanguage;

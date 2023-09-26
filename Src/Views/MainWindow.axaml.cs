@@ -17,9 +17,6 @@ using Avalonia.Platform.Storage;
 using System.Collections.Generic;
 using Avalonia.Media.Imaging;
 using FileWatcherEx;
-using Avalonia.Media;
-using Avalonia.Controls.Primitives;
-using System.Text.RegularExpressions;
 using System.Text;
 
 namespace Tsundoku.Views
@@ -27,7 +24,7 @@ namespace Tsundoku.Views
     public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
     {
         public MainWindowViewModel? CollectionViewModel => DataContext as MainWindowViewModel;
-        private WindowState previousWindowState;
+        WindowState previousWindowState;
         private static readonly List<FilePickerFileType> fileOptions = [FilePickerFileTypes.ImageAll];
         private static readonly List<Series> CoverChangedSeriesList = [];
         private static readonly FileSystemWatcherEx coverFolderWatcher = new(@"Covers")
@@ -36,8 +33,7 @@ namespace Tsundoku.Views
             NotifyFilter = NotifyFilters.FileName
         };
         private static StringBuilder newSearchText = new StringBuilder();
-        private static string itemString, advancedSearchTextString;
-        [GeneratedRegex(@"(?<Filter>\w+)(?<Math>=|<=|>=)(?<Value>\d+|\w+|\'(?:.*?)\')")] private static partial Regex AdvancedSearchRegex();
+        private static string itemString, advancedSearchText;
 
         public MainWindow()
         {
@@ -93,7 +89,7 @@ namespace Tsundoku.Views
                 }
                 else if (e.KeyModifiers == KeyModifiers.Shift && e.Key == Key.S)
                 {
-                    AdvancedSearch_Popup();
+                    ShowAdvancedSearchPopup();
                 }
             };
 
@@ -129,32 +125,35 @@ namespace Tsundoku.Views
             AdvancedSearchBar.ItemSelector = (advancedSearchText, item) =>
             {
                 newSearchText.Clear();
-                advancedSearchTextString = advancedSearchText as string;
-                if (AdvancedSearchRegex().IsMatch(advancedSearchTextString))
+                if (MainWindowViewModel.AdvancedSearchRegex().IsMatch(advancedSearchText))
                 {
-                    newSearchText.Append(advancedSearchTextString[..advancedSearchTextString.LastIndexOf(delimeter)]).Append(delimeter);
+                    newSearchText.Append(advancedSearchText[..advancedSearchText.LastIndexOf(delimeter)]).Append(delimeter);
                 }
                 return newSearchText.Append(item).ToString();
             };
+            // TODO Make it so value based searches like Rating you can search within range
             AdvancedSearchBar.ItemFilter = (advancedSearchText, item) =>
             {
                 itemString = item as string;
-                advancedSearchTextString = advancedSearchText as string;
-                if (!AdvancedSearchRegex().IsMatch(advancedSearchTextString))
+                if (!MainWindowViewModel.AdvancedSearchRegex().IsMatch(advancedSearchText))
                 {
-                    return itemString.StartsWith(advancedSearchTextString, StringComparison.OrdinalIgnoreCase);
+                    return itemString.StartsWith(advancedSearchText, StringComparison.OrdinalIgnoreCase);
                 }
-                return itemString.StartsWith(advancedSearchTextString[(advancedSearchTextString.LastIndexOf(delimeter) + delimeter.Length)..], StringComparison.OrdinalIgnoreCase) && (!advancedSearchTextString.Contains(itemString[..(itemString.IndexOf('=') + 1)], StringComparison.OrdinalIgnoreCase) || !advancedSearchTextString.Contains(itemString[..(itemString.IndexOf('<') + 1)], StringComparison.OrdinalIgnoreCase) || !advancedSearchTextString.Contains(itemString[..(itemString.IndexOf('>') + 1)], StringComparison.OrdinalIgnoreCase));
+                int equalsIndex = itemString.IndexOf('=');
+                int lessIndex = itemString.IndexOf('<');
+                int greaterIndex = itemString.IndexOf('>');
+                return itemString.StartsWith(advancedSearchText[(advancedSearchText.LastIndexOf(delimeter) + delimeter.Length)..], StringComparison.OrdinalIgnoreCase) && !advancedSearchText.Contains(itemString[..(equalsIndex != -1 ? equalsIndex : (lessIndex != -1 ? lessIndex : greaterIndex))]);
             };
         }
 
-        public void AdvancedSearch_Popup()
+        public void ShowAdvancedSearchPopup()
         {
-            if (Navigation != null)
-            {
-                // this.Background = new SolidColorBrush(Colors.Black, 80);
-                FlyoutBase.ShowAttachedFlyout(Navigation);
-            }
+            AdvancedSearchPopup.IsVisible = true;
+        }
+
+        private void UnShow_AdvancedSearchPopup(object sender, PointerPressedEventArgs args)
+        {
+            AdvancedSearchPopup.IsVisible = false;
         }
 
         /// <summary>
@@ -277,11 +276,6 @@ namespace Tsundoku.Views
                 }
                 bitmap.Save(@$"Screenshots\{CollectionViewModel.UserName}-Collection-ScreenShot-{CollectionViewModel.CurrentTheme.ThemeName}.jpg", System.Drawing.Imaging.ImageFormat.Jpeg);
             }
-        }
-
-        public void OpenMenu(object sender, RoutedEventArgs args)
-        {
-
         }
 
         private void SearchCollection(object sender, KeyEventArgs args)

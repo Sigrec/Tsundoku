@@ -479,7 +479,7 @@
 	</ControlTheme>
     
     <!-- <Thickness x:Key="ListBoxItemPadding">12,9,12,12</Thickness> -->
-    <ControlTheme x:Key="QueryListBoxItem" TargetType="ListBoxItem">
+    <ControlTheme x:Key="{x:Type ListBoxItem}" TargetType="ListBoxItem">
         <Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"/>
         <Setter Property="Padding" Value="12,9,12,12" />
         <Setter Property="BorderThickness" Value="0,1,0,1" />
@@ -503,5 +503,22 @@
                                   HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" />
             </ControlTemplate>
         </Setter>
+
+        <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter, ^:pressed /template/ ContentPresenter#PART_ContentPresenter">
+			<Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
+			<Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
+		</Style>
+
+		<Style Selector="^:selected">
+			<Style Selector="^ /template/ ContentPresenter#PART_ContentPresenter, ^:not(:focus) /template/ ContentPresenter#PART_ContentPresenter">
+				<Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
+				<Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
+			</Style>
+
+			<Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter, ^:pressed /template/ ContentPresenter#PART_ContentPresenter">
+				<Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"/>
+				<Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"/>
+			</Style>
+		</Style>
     </ControlTheme>
 </ResourceDictionary>

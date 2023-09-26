@@ -4,7 +4,7 @@
 					x:DataType="vm:ViewModelBase">
 
     <ControlTheme x:Key="{x:Type AutoCompleteBox}" TargetType="AutoCompleteBox">
-        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.SearchBarTextColor, Converter={StaticResource ConvertColor}}"/>
         <Setter Property="Background" Value="{CompiledBinding CurrentTheme.SearchBarBGColor, Converter={StaticResource ConvertColor}}"/>
         <Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.SearchBarBorderColor, Converter={StaticResource ConvertColor}}"/>
@@ -28,6 +28,7 @@
                             FontSize="{TemplateBinding FontSize}"
                             FontFamily="{TemplateBinding FontFamily}"
                             TextWrapping="Wrap"
+                            VerticalContentAlignment="Center"
                             FontWeight="{TemplateBinding FontWeight}"
                             Padding="{TemplateBinding Padding}"
                             Margin="0"
@@ -54,7 +55,9 @@
                 </Grid>
             </ControlTemplate>
         </Setter>
-        </ControlTheme>
+
+        
+    </ControlTheme>
 
     <ControlTheme x:Key="FluentScrollBarThumb" TargetType="Thumb">
 		<Setter Property="Background" Value="{CompiledBinding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}"/>

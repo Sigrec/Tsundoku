@@ -87,6 +87,7 @@
 					 Grid.Column="0"
 					 Grid.ColumnSpan="3"
 					 FontWeight="Bold"
+                     Height="74"
 					 Text="{CompiledBinding TitleText}"
 					 Classes="menu"
 					 BorderThickness="2"
