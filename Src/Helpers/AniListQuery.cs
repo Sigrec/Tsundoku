@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
+// TODO Add rate limiting
 namespace Tsundoku.Helpers
 {
     public partial class AniListQuery : IDisposable

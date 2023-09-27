@@ -63,7 +63,7 @@ namespace Tsundoku.ViewModels
         public ReactiveCommand<Unit, Unit> OpenCollectionStatsWindow { get; set; }
         public ICommand StartAdvancedSearch { get; }
 
-        [GeneratedRegex(@"(\w+)(=|<=|>=)(\d+|\w+|\'(?:.*?)\')")] public static partial Regex AdvancedSearchRegex();
+        [GeneratedRegex(@"(\w+)(==|<=|>=)(\d+|\w+|\'(?:.*?)\')")] public static partial Regex AdvancedQueryRegex();
 
         // TODO Add wish list selection for series?
         // TODO Add genres?
@@ -331,12 +331,9 @@ namespace Tsundoku.ViewModels
             }
         }
 
-        // TODO Need to add validation on the SearchText
-        // TODO AdvancedSearch below issue where user can search for a logical filter is == and can still choose <= or >=
-        // TODO Notes is not working
-        // Cost<=1000 Cost>=200 Favorite=False CurVolumes<=40 CurVolumes>=5 Demographic=Josei Format=Manga Read=10 Status=Finished Read>=5 MaxVolumes<=100 Read<=60 MaxVolumes>=10 Notes='OOP' Series=Complete Rating>=5
-
-        // Basic Test Query Demographic=Seinen Format=Manga Series=Complete Favorite=True
+        // TODO Determine what to do after a user inputs a valid query and they want to return to regular view
+        // TODO Determine how to display to users when a query is invalid or returns no entries
+        // Basic Test Query Demographic==Seinen Format==Manga Series==Complete Favorite==True
         private async void AdvancedSearchCollection(string AdvancedSearchQuery)
         {
             if (!string.IsNullOrWhiteSpace(AdvancedSearchQuery))
@@ -349,9 +346,8 @@ namespace Tsundoku.ViewModels
 
                 StringBuilder AdvancedFilterExpression = new StringBuilder("series => ");
                 await Task.Run(() => {
-                    var AdvancedSearchMatches = AdvancedSearchRegex().Matches(AdvancedSearchQuery.Trim()).OrderBy(x => x.Value);
+                    var AdvancedSearchMatches = AdvancedQueryRegex().Matches(AdvancedSearchQuery.Trim()).OrderBy(x => x.Value);
                     GroupCollection advFilter;
-                    string notesQuery = string.Empty;
 
                     foreach (Match SearchFilter in AdvancedSearchMatches)
                     {
@@ -360,23 +356,26 @@ namespace Tsundoku.ViewModels
     
                     }
                     AdvancedFilterExpression.Remove(AdvancedFilterExpression.Length - 4, 4);
-                    FilteredCollection = UserCollection.AsQueryable().Where(AdvancedFilterExpression.ToString()); 
-                });
-                LOGGER.Debug($"Parsed Query -> {AdvancedFilterExpression}");
-
-                if (FilterCollection != null)
-                {
-                    LOGGER.Debug($"Advanced Query Passed {FilteredCollection.Count()}");
-                    foreach (var x in FilteredCollection)
+                    LOGGER.Debug($"'{AdvancedSearchQuery}' = '{AdvancedFilterExpression}'");
+                    try
                     {
-                        LOGGER.Debug(x.Titles["Romaji"]);
+                        FilteredCollection = UserCollection.AsQueryable().Where(AdvancedFilterExpression.ToString()); 
                     }
+                    catch(Exception e)
+                    {
+                        LOGGER.Warn("User Inputted Incorrectly Formatted Advanced Search Query");
+                    }
+                });
+
+                if (FilterCollection != null && FilteredCollection.Any())
+                {
                     SearchedCollection.Clear();
                     SearchedCollection.AddRange(FilteredCollection);
+                    LOGGER.Info($"Valid Advanced Search Query");
                 }
                 else
                 {
-                    LOGGER.Debug("Advanced Query Failed");
+                    LOGGER.Info("Advanced Search Query Returned No Series");
                 }
                 ShouldFilter = true;
             }
@@ -391,10 +390,11 @@ namespace Tsundoku.ViewModels
                 "Read" => $"series.VolumesRead {logicType} {filterValue}",
                 "CurVolumes" => $"series.CurVolumeCount {logicType} {filterValue}",
                 "MaxVolumes" => $"series.MaxVolumeCount {logicType} {filterValue}",
-                "Demographic" or "Format" or "Status" => $"series.{filterName}.Equals(\"{filterValue}\")",
+                "Demographic" => $"(series.Demographic != null && series.Demographic.Equals(\"{filterValue}\"))",
+                "Format" or "Status" => $"series.{filterName}.Equals(\"{filterValue}\")",
                 "Series" => filterValue.Equals("Complete") ? "series.MaxVolumeCount == series.CurVolumeCount" : "series.CurVolumeCount < series.MaxVolumeCount",
                 "Favorite" => $"series.IsFavorite == {filterValue.ToLower()}",
-                "Notes" => $"series.SeriesNotes.Contains(\"{filterValue[1..^1]}\")",
+                "Notes" => $"(!string.IsNullOrWhiteSpace(series.SeriesNotes) && series.SeriesNotes.Contains(\"{filterValue[1..^1]}\"))",
                 _ => string.Empty,
             };
         }

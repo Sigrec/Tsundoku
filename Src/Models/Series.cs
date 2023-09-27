@@ -17,6 +17,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Runtime.InteropServices;
 using System.Globalization;
 
+// TODO Remove setters from variables
 namespace Tsundoku.Models
 {
     public partial class Series : IDisposable

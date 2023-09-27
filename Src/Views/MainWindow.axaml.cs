@@ -33,7 +33,7 @@ namespace Tsundoku.Views
             NotifyFilter = NotifyFilters.FileName
         };
         private static StringBuilder newSearchText = new StringBuilder();
-        private static string itemString, advancedSearchText;
+        private static string itemString, query;
 
         public MainWindow()
         {
@@ -122,27 +122,31 @@ namespace Tsundoku.Views
         {
             AdvancedSearchBar.ItemsSource = ADVANCED_SEARCH_FILTERS.OrderBy(x => x);
             AdvancedSearchBar.FilterMode = AutoCompleteFilterMode.Custom;
-            AdvancedSearchBar.ItemSelector = (advancedSearchText, item) =>
+            AdvancedSearchBar.ItemSelector = (query, item) =>
             {
                 newSearchText.Clear();
-                if (MainWindowViewModel.AdvancedSearchRegex().IsMatch(advancedSearchText))
+                if (MainWindowViewModel.AdvancedQueryRegex().IsMatch(query))
                 {
-                    newSearchText.Append(advancedSearchText[..advancedSearchText.LastIndexOf(delimeter)]).Append(delimeter);
+                    newSearchText.Append(query[..query.LastIndexOf(delimeter)]).Append(delimeter);
                 }
-                return newSearchText.Append(item).ToString();
+                return !item.Equals("Notes==") ? newSearchText.Append(item).ToString() : newSearchText.Append(item).Append("''").ToString();
             };
-            // TODO Make it so value based searches like Rating you can search within range
-            AdvancedSearchBar.ItemFilter = (advancedSearchText, item) =>
+            // TODO Dropdown not showing when empty or clicking back in
+            AdvancedSearchBar.ItemFilter = (query, item) =>
             {
                 itemString = item as string;
-                if (!MainWindowViewModel.AdvancedSearchRegex().IsMatch(advancedSearchText))
+                if (string.IsNullOrWhiteSpace(AdvancedSearchBar.Text))
                 {
-                    return itemString.StartsWith(advancedSearchText, StringComparison.OrdinalIgnoreCase);
+                    return true;
                 }
-                int equalsIndex = itemString.IndexOf('=');
-                int lessIndex = itemString.IndexOf('<');
-                int greaterIndex = itemString.IndexOf('>');
-                return itemString.StartsWith(advancedSearchText[(advancedSearchText.LastIndexOf(delimeter) + delimeter.Length)..], StringComparison.OrdinalIgnoreCase) && !advancedSearchText.Contains(itemString[..(equalsIndex != -1 ? equalsIndex : (lessIndex != -1 ? lessIndex : greaterIndex))]);
+                else if (!MainWindowViewModel.AdvancedQueryRegex().IsMatch(query))
+                {
+                    return itemString.StartsWith(query, StringComparison.OrdinalIgnoreCase);
+                }
+
+                // TODO look to ways to simplify this logic
+                string filterName = itemString[..^2];
+                return !query.Contains(itemString) && itemString.StartsWith(query[(query.LastIndexOf(delimeter) + delimeter.Length)..], StringComparison.OrdinalIgnoreCase) && ((itemString.Contains("==") && !(query.Contains($"{filterName}<=") || query.Contains($"{filterName}>="))) || ((itemString.Contains('>') || itemString.Contains('<')) && !query.Contains($"{filterName}=="))) && ((itemString.Last() != '=' && !query.Contains(itemString[..itemString.IndexOf("==")])) || (itemString.Contains("==") && itemString.Last() == '=') || itemString.Contains('<') || itemString.Contains('>'));
             };
         }
 
@@ -461,10 +465,10 @@ namespace Tsundoku.Views
 
         public void SaveOnClose()
         {
+            LOGGER.Info("Closing Tsundoku");
             CollectionViewModel.SearchText = "";
             Helpers.DiscordRP.Deinitialize();
             coverFolderWatcher.Dispose();
-            LOGGER.Info("Closing Tsundoku");
 
             if (CollectionViewModel.newSeriesWindow != null)
             {
@@ -495,9 +499,6 @@ namespace Tsundoku.Views
                 CollectionViewModel.collectionStatsWindow.Closing += (s, e) => { e.Cancel = false; };
                 CollectionViewModel.collectionStatsWindow.Close();
             }
-
-            // Move the users current theme to the front of the list so when opening again it applies the correct theme
-            ThemeSettingsViewModel.UserThemes.Move(ThemeSettingsViewModel.UserThemes.IndexOf(ThemeSettingsViewModel.UserThemes.Single(x => x.ThemeName == ViewModelBase.MainUser.MainTheme)), 0);
 
             MainWindowViewModel.SaveUsersData();
             App.Mutex.Dispose();

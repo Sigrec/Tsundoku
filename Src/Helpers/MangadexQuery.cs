@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
+// TODO Add rate limiting
 namespace Tsundoku.Helpers
 {
     public partial class MangadexQuery
@@ -45,10 +46,8 @@ namespace Tsundoku.Helpers
         {
             try
             {
-                //LOGGER.Debug($"{MangadexClient.BaseAddress}manga?title={title.Replace(" ", "%20")}");
-                LOGGER.Debug("MangaDex Getting Series By Title Async");
+                LOGGER.Debug($"MangaDex Getting Series {title.Replace(" ", "%20")} By Title Async ");
                 var response = await MangadexClient.GetStringAsync($"manga?title={title.Replace(" ", "%20")}");
-                // File.WriteAllText(@"MangadexTitleTest.json", JsonSerializer.Serialize(JsonDocument.Parse(response), options));
                 return JsonDocument.Parse(response);
             }
             catch (HttpRequestException e)
@@ -67,9 +66,8 @@ namespace Tsundoku.Helpers
         {
             try
             {
-                LOGGER.Debug("MangaDex Getting Series By Id Async");
+                LOGGER.Debug($"MangaDex Getting Series By Id {id} Async");
                 var response = await MangadexClient.GetStringAsync($"manga/{id}");
-                // File.WriteAllText(@"MangadexIdTest.json", JsonSerializer.Serialize(JsonDocument.Parse(response), options));
                 return JsonDocument.Parse(response);
             }
             catch (Exception e)
@@ -88,9 +86,8 @@ namespace Tsundoku.Helpers
         {
             try
             {
-                LOGGER.Debug("MangaDex Getting Author Async");
+                LOGGER.Debug($"MangaDex Getting Author Async w/ Id {id}");
                 var response = await MangadexClient.GetStringAsync($"author/{id}");
-                // File.WriteAllText(@"MangadexAuthorTest.json", JsonSerializer.Serialize(response, options));
                 return JsonDocument.Parse(response).RootElement.GetProperty("data").GetProperty("attributes").GetProperty("name").GetString();
             }
             catch (Exception e)
@@ -109,10 +106,9 @@ namespace Tsundoku.Helpers
         {
             try
             {
-                LOGGER.Debug("MangaDex Getting Cover Async");
+                LOGGER.Debug($"MangaDex Getting Cover Async w/ Id {id}");
                 var response = await MangadexClient.GetStringAsync($"cover/{id}");
                 JsonElement data = JsonDocument.Parse(response).RootElement.GetProperty("data");
-                // File.WriteAllText(@"MangadexCoverTest.json", JsonSerializer.Serialize(JsonDocument.Parse(response), options));
                 if (data.ValueKind == JsonValueKind.Array)
                 {
                     return data.EnumerateArray().ElementAt(0).GetProperty("attributes").GetProperty("fileName").GetString();
