@@ -33,22 +33,31 @@
     <Panel>
         <Panel Name="AdvancedSearchPopup" ZIndex="1" IsVisible="false">
             <Rectangle Fill="Black" Opacity="0.35" PointerPressed="UnShow_AdvancedSearchPopup"/>
-            <StackPanel Orientation="Horizontal" Spacing="5" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,165,0,0">
-                <AutoCompleteBox Name="AdvancedSearchBar"
-                             Text="{CompiledBinding AdvancedSearchText, Mode=TwoWay}"
-                             Classes="menu"
-                             BorderThickness="2"
-                             Width="500"
-                             FontWeight="Bold"
-                             Watermark="Advanced Query..."
-                             FontSize="15"/>
-                    <Button Name="AdvancedSearchButton"
+            <StackPanel Margin="0,165,0,0" HorizontalAlignment="Center" VerticalAlignment="Top">
+                <StackPanel Orientation="Horizontal" Spacing="5">
+                    <AutoCompleteBox Name="AdvancedSearchBar"
+                                Text="{CompiledBinding AdvancedSearchText, Mode=TwoWay}"
+                                Classes="menu"
+                                KeyUp="RemoveErrorMessage"
+                                BorderThickness="2"
+                                Width="500"
+                                FontWeight="Bold"
+                                Watermark="Advanced Search Query..."
+                                FontSize="15"/>
+                    <Button Name="AdvancedSearchQueryButton"
                             IsDefault="True"
                             FontSize="20"
                             Height="35"
                             i:Attached.Icon="fa-magnifying-glass" 
                             Theme="{StaticResource MenuButton}"
                             Command="{CompiledBinding StartAdvancedSearch}"/>
+                </StackPanel>
+                <TextBlock Name="AdvancedSearchQueryErrorMessage"
+                        Text="{CompiledBinding AdvancedSearchQueryErrorMessage}"
+                        FontSize="20"
+                        HorizontalAlignment="Center"
+                        FontWeight="Bold"
+                        Foreground="{CompiledBinding CurrentTheme.SearchBarTextColor, Converter={StaticResource ConvertColor}}"/>
             </StackPanel>
         </Panel>
 
@@ -206,6 +215,7 @@
                             <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Unread</ComboBoxItem>
                             <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Rating</ComboBoxItem>
                             <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Cost</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Query</ComboBoxItem>
                         </ComboBox>
                         <TextBox Name="SearchBar" 
                                 Text="{CompiledBinding SearchText, Mode=TwoWay}" 

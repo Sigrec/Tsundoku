@@ -16,7 +16,8 @@ V2.0.0.0 - PST
 ✅ Fixed/Changed Layout of Settings Window & doubled size of input textbox for series title
 ✅ Fixed/Changed Layout & Styling of Stats Window
 ✅ Added 8 new filters/sorts, "Shounen", "Shoujo", "Seinen", "Josei", "Rating", "Cost", "Read", & "Unread"
-✅ Added new Command "CTRL+F" to reload the current filter/sort on the collection
+✅ Added new Command "SHIFT+F" to reload the current filter/sort on the collection
+✅ Added new Command "CTRL+F" to open Advanced Searching/Querying for your collection
 🔥 Fixed issue where Searching & Filtering or Changing Language would conflict with each other
 🔥 Fixed Themes Settings window border now being curved on the bottom
 🔥 Slight Changes to the formatting of all windows except main collection window

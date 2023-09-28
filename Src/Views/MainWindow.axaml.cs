@@ -82,14 +82,14 @@ namespace Tsundoku.Views
                         LOGGER.Info("No Covers Changed");
                     }
                 }
-                else if (e.KeyModifiers == KeyModifiers.Control && e.Key == Key.F)
+                else if (e.KeyModifiers == KeyModifiers.Shift && e.Key == Key.R)
                 {
                     LOGGER.Info("Reloading Filter/Sort on Collection");
                     CollectionViewModel.FilterCollection(CollectionViewModel.CurFilter);
                 }
-                else if (e.KeyModifiers == KeyModifiers.Shift && e.Key == Key.S)
+                else if (e.KeyModifiers == KeyModifiers.Control && e.Key == Key.F)
                 {
-                    ShowAdvancedSearchPopup();
+                    ShowAdvancedSearchQueryPopup();
                 }
             };
 
@@ -135,22 +135,29 @@ namespace Tsundoku.Views
             AdvancedSearchBar.ItemFilter = (query, item) =>
             {
                 itemString = item as string;
-                if (string.IsNullOrWhiteSpace(AdvancedSearchBar.Text))
-                {
-                    return true;
-                }
-                else if (!MainWindowViewModel.AdvancedQueryRegex().IsMatch(query))
+                if (!MainWindowViewModel.AdvancedQueryRegex().IsMatch(query))
                 {
                     return itemString.StartsWith(query, StringComparison.OrdinalIgnoreCase);
                 }
+                bool lessThan = itemString.Contains('<');
+                bool greaterThan = itemString.Contains('>');
+                bool equalTo = itemString.Contains("==");
 
                 // TODO look to ways to simplify this logic
                 string filterName = itemString[..^2];
-                return !query.Contains(itemString) && itemString.StartsWith(query[(query.LastIndexOf(delimeter) + delimeter.Length)..], StringComparison.OrdinalIgnoreCase) && ((itemString.Contains("==") && !(query.Contains($"{filterName}<=") || query.Contains($"{filterName}>="))) || ((itemString.Contains('>') || itemString.Contains('<')) && !query.Contains($"{filterName}=="))) && ((itemString.Last() != '=' && !query.Contains(itemString[..itemString.IndexOf("==")])) || (itemString.Contains("==") && itemString.Last() == '=') || itemString.Contains('<') || itemString.Contains('>'));
+                return string.IsNullOrWhiteSpace(AdvancedSearchBar.Text) || !query.Contains(itemString) && itemString.StartsWith(query[(query.LastIndexOf(delimeter) + delimeter.Length)..], StringComparison.OrdinalIgnoreCase) && ((equalTo && !(query.Contains($"{filterName}<=") || query.Contains($"{filterName}>="))) || ((greaterThan || lessThan) && !query.Contains($"{filterName}=="))) && ((itemString.Last() != '=' && !query.Contains(itemString[..itemString.IndexOf("==")])) || (equalTo && itemString.Last() == '=') || lessThan || greaterThan);
             };
         }
 
-        public void ShowAdvancedSearchPopup()
+        private void RemoveErrorMessage(object sender, KeyEventArgs args)
+        {
+            if (!string.IsNullOrEmpty(CollectionViewModel.AdvancedSearchQueryErrorMessage))
+            {
+                CollectionViewModel.AdvancedSearchQueryErrorMessage = string.Empty;
+            }
+        }
+
+        private void ShowAdvancedSearchQueryPopup()
         {
             AdvancedSearchPopup.IsVisible = true;
         }
@@ -423,6 +430,10 @@ namespace Tsundoku.Views
                 CollectionViewModel.CurFilter = (CollectionFilterSelector.SelectedItem as ComboBoxItem).Content.ToString();
                 CollectionViewModel.FilterCollection(CollectionViewModel.CurFilter);
                 LOGGER.Info($"Changed Collection Filter To {CollectionViewModel.CurFilter}");
+            }
+            else
+            {
+                (sender as ComboBox).SelectedIndex = CollectionViewModel.FilterIndex;
             }
         }
 

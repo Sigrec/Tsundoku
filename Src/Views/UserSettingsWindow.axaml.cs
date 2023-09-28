@@ -4,10 +4,8 @@ using Tsundoku.ViewModels;
 using Avalonia.Controls;
 using System.Diagnostics;
 using System;
-using System.ComponentModel;
 using System.Threading.Tasks;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 
 namespace Tsundoku.Views
 {
@@ -28,7 +26,7 @@ namespace Tsundoku.Views
                 UserSettingsVM.CurrentTheme = CollectionWindow.CollectionViewModel.CurrentTheme;
                 IsOpen ^= true;
 
-                if (Screens.Primary.WorkingArea.Height < 935)
+                if (Screens.Primary.WorkingArea.Height < 955)
                 {
                     this.Height = 550;
                 }

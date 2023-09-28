@@ -17,7 +17,6 @@ using Microsoft.IdentityModel.Tokens;
 using System.Runtime.InteropServices;
 using System.Globalization;
 
-// TODO Remove setters from variables
 namespace Tsundoku.Models
 {
     public partial class Series : IDisposable
@@ -44,12 +43,12 @@ namespace Tsundoku.Models
 		/// <summary>
 		/// The serialization status of the series (Finished, Ongoing, Hiatus, Cancelled, or Error)
 		/// </summary>
-		public string Status { get; set; }
+		public string Status { get; }
 
 		/// <summary>
 		/// Path to the cover for a series
 		/// </summary>
-		public string Cover { get; set; }
+		public string Cover { get; }
 		public string Link { get; }
 		public string SeriesNotes { get; set; }
 		public ushort MaxVolumeCount { get; set; }

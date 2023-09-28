@@ -22,7 +22,6 @@ using System.Text.RegularExpressions;
 using System.Text;
 using System.Linq.Dynamic.Core;
 using System.Windows.Input;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Tsundoku.ViewModels
 {
@@ -31,7 +30,7 @@ namespace Tsundoku.ViewModels
         private static readonly string USER_DATA_FILEPATH = @"UserData.json";
         private const double SCHEMA_VERSION = 2.0;
         private static bool newUserFlag = false;
-        private static bool ShouldFilter = true;
+        private static bool CanFilter = true;
         public static ObservableCollection<Series> SearchedCollection { get; set; } = [];
         public static List<Series> UserCollection { get; set; } = [];
         private static IEnumerable<Series> FilteredCollection { get; set; } = [];
@@ -45,6 +44,7 @@ namespace Tsundoku.ViewModels
         [Reactive] public string CurLanguage { get; set; }
         [Reactive] public int LanguageIndex { get; set; }
         [Reactive] public int FilterIndex { get; set; }
+        [Reactive] public string AdvancedSearchQueryErrorMessage { get; set; }
         [Reactive] private SolidColorBrush AdvancedSearchBackgroundColor { get; set; } = new SolidColorBrush(Colors.Black, 0.5);
 
         public AddNewSeriesWindow newSeriesWindow;
@@ -62,13 +62,12 @@ namespace Tsundoku.ViewModels
         public CollectionStatsWindow collectionStatsWindow;
         public ReactiveCommand<Unit, Unit> OpenCollectionStatsWindow { get; set; }
         public ICommand StartAdvancedSearch { get; }
+        private static StringBuilder AdvancedFilterExpression = new StringBuilder();
 
         [GeneratedRegex(@"(\w+)(==|<=|>=)(\d+|\w+|\'(?:.*?)\')")] public static partial Regex AdvancedQueryRegex();
-
-        // TODO Add wish list selection for series?
+        
         // TODO Add genres?
         // TODO Manual Entry Option?
-        // TODO Add Search Filters ex Series that have a rating of 5
         // TODO Add barcode functiionality?
         // TODO Add export/import for themes
         public MainWindowViewModel()
@@ -80,20 +79,21 @@ namespace Tsundoku.ViewModels
             ConfigureWindows();
 
             this.WhenAnyValue(x => x.CurLanguage).Subscribe(x => MainUser.CurLanguage = x);
-            this.WhenAnyValue(x => x.CurLanguage).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => LanguageIndex = AvailableLanguages.IndexOf(x));
-            this.WhenAnyValue(x => x.CurFilter).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => AvailableCollectionFilters.IndexOf(x));
+            this.WhenAnyValue(x => x.CurLanguage).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => LanguageIndex = AVAILABLE_LANGUAGES.IndexOf(x));
+            this.WhenAnyValue(x => x.CurFilter).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => FilterIndex = AVAILABLE_COLLECTION_FILTERS.IndexOf(x));
             this.WhenAnyValue(x => x.SearchText).Throttle(TimeSpan.FromMilliseconds(600)).ObserveOn(RxApp.MainThreadScheduler).Subscribe(SearchCollection);
             this.WhenAnyValue(x => x.CurrentTheme).Subscribe(x => MainUser.MainTheme = x.ThemeName);
             this.WhenAnyValue(x => x.CurDisplay).Subscribe(x => MainUser.Display = x);
             this.WhenAnyValue(x => x.UserName).Subscribe(x => MainUser.UserName = x);
             this.WhenAnyValue(x => x.UserIcon).Subscribe(x => MainUser.UserIcon = User.ImageToByteArray(x));
+
             StartAdvancedSearch = ReactiveCommand.Create(() => AdvancedSearchCollection(AdvancedSearchText));
         }
 
         private void LanguageChange(string lang)
         {
             MainUser.CurLanguage = lang;
-            LanguageIndex = AvailableLanguages.IndexOf(lang);
+            LanguageIndex = AVAILABLE_LANGUAGES.IndexOf(lang);
         }
 
         /// <summary>
@@ -211,7 +211,7 @@ namespace Tsundoku.ViewModels
         /// <param name="filter">The filter preset chosen</param>
         public async void FilterCollection(string filter)
         {
-            if (ShouldFilter)
+            if (CanFilter)
             {
                 if (!string.IsNullOrWhiteSpace(SearchText)) // Checks if the user is filtering after a search
                 {
@@ -289,6 +289,8 @@ namespace Tsundoku.ViewModels
                             FilteredCollection = UserCollection.OrderByDescending(series => series.Cost);
                             LOGGER.Info($"Sorted Collection by {filter}");
                             break;
+                        case "Query":
+                            return;
                         case "None":
                         default:
                             FilteredCollection = UserCollection;
@@ -311,7 +313,7 @@ namespace Tsundoku.ViewModels
             {
                 if (!CurFilter.Equals("None"))
                 {
-                    ShouldFilter = false;
+                    CanFilter = false;
                     CurFilter = "None";
                 }
 
@@ -321,7 +323,7 @@ namespace Tsundoku.ViewModels
 
                 SearchedCollection.Clear();
                 SearchedCollection.AddRange(FilteredCollection);
-                ShouldFilter = true;
+                CanFilter = true;
             }
             else if (SearchIsBusy)
             {
@@ -331,21 +333,18 @@ namespace Tsundoku.ViewModels
             }
         }
 
-        // TODO Determine what to do after a user inputs a valid query and they want to return to regular view
-        // TODO Determine how to display to users when a query is invalid or returns no entries
         // Basic Test Query Demographic==Seinen Format==Manga Series==Complete Favorite==True
         private async void AdvancedSearchCollection(string AdvancedSearchQuery)
         {
-            if (!string.IsNullOrWhiteSpace(AdvancedSearchQuery))
+            if (!string.IsNullOrWhiteSpace(AdvancedSearchQuery) && AdvancedQueryRegex().IsMatch(AdvancedSearchQuery))
             {
-                if (!CurFilter.Equals("None"))
+                if (!CurFilter.Equals("Query"))
                 {
-                    ShouldFilter = false;
-                    CurFilter = "None";
+                    CanFilter = false;
                 }
 
-                StringBuilder AdvancedFilterExpression = new StringBuilder("series => ");
-                await Task.Run(() => {
+                await Task.Run(() => 
+                {
                     var AdvancedSearchMatches = AdvancedQueryRegex().Matches(AdvancedSearchQuery.Trim()).OrderBy(x => x.Value);
                     GroupCollection advFilter;
 
@@ -353,32 +352,46 @@ namespace Tsundoku.ViewModels
                     {
                         advFilter = SearchFilter.Groups;
                         AdvancedFilterExpression.AppendFormat("{0} && ", ParseAdvancedFilter(advFilter[1].Value, advFilter[2].Value, advFilter[3].Value));
-    
                     }
-                    AdvancedFilterExpression.Remove(AdvancedFilterExpression.Length - 4, 4);
+                    AdvancedFilterExpression.Insert(0, "series => ").Remove(AdvancedFilterExpression.Length - 4, 4);
                     LOGGER.Debug($"'{AdvancedSearchQuery}' = '{AdvancedFilterExpression}'");
                     try
                     {
                         FilteredCollection = UserCollection.AsQueryable().Where(AdvancedFilterExpression.ToString()); 
                     }
-                    catch(Exception e)
+                    catch (Exception)
                     {
+                        AdvancedSearchQueryErrorMessage = "Inputted Incorrectly Formatted Advanced Search Query!";
                         LOGGER.Warn("User Inputted Incorrectly Formatted Advanced Search Query");
+                    }
+                    finally
+                    {
+                        AdvancedFilterExpression.Clear();
                     }
                 });
 
                 if (FilterCollection != null && FilteredCollection.Any())
                 {
+                    if (!CurFilter.Equals("Query"))
+                    {
+                        CurFilter = "Query";
+                    }
                     SearchedCollection.Clear();
                     SearchedCollection.AddRange(FilteredCollection);
                     LOGGER.Info($"Valid Advanced Search Query");
                 }
                 else
                 {
+                    AdvancedSearchQueryErrorMessage = "Advanced Search Query Returned No Series!";
                     LOGGER.Info("Advanced Search Query Returned No Series");
                 }
-                ShouldFilter = true;
             }
+            else
+            {
+                AdvancedSearchQueryErrorMessage = "Inputted Incorrectly Formatted Advanced Search Query!";
+                LOGGER.Warn("User Inputted Incorrectly Formatted Advanced Search Query");
+            }
+            CanFilter = true;
         }
 
         private static string ParseAdvancedFilter(string filterName, string logicType, string filterValue)
@@ -393,7 +406,7 @@ namespace Tsundoku.ViewModels
                 "Demographic" => $"(series.Demographic != null && series.Demographic.Equals(\"{filterValue}\"))",
                 "Format" or "Status" => $"series.{filterName}.Equals(\"{filterValue}\")",
                 "Series" => filterValue.Equals("Complete") ? "series.MaxVolumeCount == series.CurVolumeCount" : "series.CurVolumeCount < series.MaxVolumeCount",
-                "Favorite" => $"series.IsFavorite == {filterValue.ToLower()}",
+                "Favorite" => filterValue.Equals("True") ? $"series.IsFavorite" : $"!series.IsFavorite",
                 "Notes" => $"(!string.IsNullOrWhiteSpace(series.SeriesNotes) && series.SeriesNotes.Contains(\"{filterValue[1..^1]}\"))",
                 _ => string.Empty,
             };
@@ -448,7 +461,7 @@ namespace Tsundoku.ViewModels
             CurLanguage = MainUser.CurLanguage;
             CurDisplay = MainUser.Display;
             CurCurrency = MainUser.Currency;
-            LanguageIndex = Array.IndexOf(AvailableLanguages, CurLanguage);
+            LanguageIndex = Array.IndexOf(AVAILABLE_LANGUAGES, CurLanguage);
             CurrentTheme = MainUser.SavedThemes.Single(x => x.ThemeName == MainUser.MainTheme).Cloning();
             if (MainUser.UserIcon.Length > 0 && MainUser.UserIcon != null)
             {
@@ -485,7 +498,6 @@ namespace Tsundoku.ViewModels
             }
         }
 
-        // TODO: Need to update Currency as well prob?
         [RequiresUnreferencedCode("Calls System.Text.Json.JsonSerializer.Serialize<TValue>(TValue, JsonSerializerOptions)")]
         private static bool VersionUpdate()
         {

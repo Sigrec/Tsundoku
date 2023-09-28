@@ -235,7 +235,6 @@ namespace Tsundoku.Views
             }
         }
 
-        // TODO : test and see if forced garbage collection is actually necassary
         /// <summary>
         /// RoutedEvent method used to call the AddTheme method to save the users new theme
         /// </summary>
