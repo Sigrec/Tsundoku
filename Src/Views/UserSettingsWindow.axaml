@@ -12,7 +12,7 @@
         Topmost="true"
         FontFamily="Segoe UI"
         Width="491"
-        MaxHeight="935"
+        MaxHeight="955"
         WindowStartupLocation="2"
         KeyboardNavigation.TabNavigation="None">
     
@@ -26,7 +26,7 @@
 
     <Border Classes="menu" BorderThickness="3" CornerRadius="0,0,8,8" ClipToBounds="True">
         <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"> 
-            <StackPanel Margin="20,15,20,20" Spacing="10">
+            <StackPanel Margin="20,10,20,20" Spacing="10">
                 <StackPanel Spacing="5">
                     <TextBlock Text="Change Username" TextDecorations="Underline" FontSize="20" FontWeight="Bold" Classes="menu"/>
                     <StackPanel Orientation="Horizontal" Spacing="5">
@@ -117,8 +117,9 @@
                     <TextBlock Text="Copy Title → Click Title on Series Card" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
                     <TextBlock Text="Open Series Page → Click Series Image" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
                     <TextBlock Text="Toggle Fullscreen → F11" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
+                    <TextBlock Text="Advanced Search → CTRL+F" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
                     <TextBlock Text="Screenshot Collection → CTRL+P" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
-                    <TextBlock Text="Reload Filter/Sort on Collection → CTRL+F" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
+                    <TextBlock Text="Reload Filter/Sort on Collection → SHIFT+R" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
                     <TextBlock Text="Save Collection (Auto Saves on Close) → CTRL+S" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
                     <TextBlock Text="Reload Covers → CTRL+R" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
                 </StackPanel>

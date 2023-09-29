@@ -23,7 +23,6 @@
 	<Window.Resources>
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
-				<ResourceInclude Source="/Styles/AddNewSeriesControlThemes.xaml"/>
                 <ResourceInclude Source="/Styles/PriceAnalysisControlThemes.xaml"/>
 			</ResourceDictionary.MergedDictionaries>
 		</ResourceDictionary>
@@ -142,7 +141,9 @@
 						  Classes="menu"
 						  Width="620"
 						  MaxHeight="340"
-						  ClipToBounds="True"
+                          CornerRadius="0"
+                          BorderThickness="2"
+						  ClipToBounds="False"
 						  IsReadOnly="True"
 						  CanUserReorderColumns="False"
 						  CanUserSortColumns="False"
@@ -154,7 +155,6 @@
 						  HorizontalAlignment="Center"
 						  VerticalAlignment="Center"
 						  GridLinesVisibility="All"
-						  BorderThickness="2"
 						  Grid.ColumnSpan="5"
 						  Grid.Column="0"
 						  FontWeight="Bold"

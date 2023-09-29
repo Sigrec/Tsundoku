@@ -2,6 +2,8 @@
 using GraphQL.Client.Http;
 using GraphQL.Client.Serializer.SystemTextJson;
 using System;
+using System.Linq;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -77,8 +79,16 @@ namespace Tsundoku.Helpers
 						pageNum
 					}
 				};
-				var response = await AniListClient.SendQueryAsync<JsonDocument?>(queryRequest);
-				return response.Data;
+                GraphQLResponse<JsonDocument?> response = await AniListClient.SendQueryAsync<JsonDocument?>(queryRequest);
+                short rateCheck = RateLimitCheck(response.AsGraphQLHttpResponse().ResponseHeaders);
+				if (rateCheck != -1)
+                {
+                    LOGGER.Info($"Waiting {rateCheck} Seconds for Rate Limit");
+                    await Task.Delay(rateCheck * 1000);
+                    response = await AniListClient.SendQueryAsync<JsonDocument?>(queryRequest);
+                }
+                return response.Data;
+			
 			}
 			catch(Exception e)
 			{
@@ -141,8 +151,15 @@ namespace Tsundoku.Helpers
                     }
 				};
 
-				var response = await AniListClient.SendQueryAsync<JsonDocument?>(queryRequest);
-				return response.Data;
+				GraphQLResponse<JsonDocument?> response = await AniListClient.SendQueryAsync<JsonDocument?>(queryRequest);
+                short rateCheck = RateLimitCheck(response.AsGraphQLHttpResponse().ResponseHeaders);
+				if (rateCheck != -1)
+                {
+                    LOGGER.Info($"Waiting {rateCheck} Seconds for Rate Limit");
+                    await Task.Delay(rateCheck * 1000);
+                    response = await AniListClient.SendQueryAsync<JsonDocument?>(queryRequest);
+                }
+                return response.Data;
 			}
 			catch(Exception e)
 			{
@@ -150,6 +167,23 @@ namespace Tsundoku.Helpers
 			}
 			return null;
 		}
+
+        private static short RateLimitCheck(HttpResponseHeaders responseHeaders)
+        {
+            responseHeaders.TryGetValues("X-RateLimit-Remaining", out var rateRemainingValues);
+            _ = short.TryParse(rateRemainingValues?.FirstOrDefault(), out var rateRemaining);
+            LOGGER.Debug($"Rate Remaining = {rateRemaining}");
+            if (rateRemaining > 0)
+            {
+                return -1;
+            }
+            else
+            {
+                responseHeaders.TryGetValues("Retry-After", out var retryAfter);
+                _ = short.TryParse(retryAfter?.FirstOrDefault(), out var retryAfterInSeconds);
+                return retryAfterInSeconds;
+            }
+        }
 
 		public static string ParseAniListDescription(string seriesDescription)
 		{
@@ -172,12 +206,11 @@ namespace Tsundoku.Helpers
             }
         }
 
-        // // TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
-        // ~AniListQuery()
-        // {
-        //     // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        //     Dispose(disposing: false);
-        // }
+        ~AniListQuery()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: false);
+        }
 
         public void Dispose()
         {

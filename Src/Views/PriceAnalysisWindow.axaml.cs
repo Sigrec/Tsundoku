@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using ReactiveUI;
 using System.Reactive.Linq;
 using Avalonia.Input;
-using Microsoft.IdentityModel.Tokens;
 using static Src.Models.Constants;
 using System.Linq;
 using MangaLightNovelWebScrape.Websites;
@@ -71,11 +70,8 @@ namespace Tsundoku.Views
             {
                 ScrapeTitle = TitleBox.Text;
 
-                LOGGER.Debug($"Memberships = {string.Join(" | ", ViewModelBase.MainUser.Memberships)}");
-                LOGGER.Debug($"Websites = [{string.Join(", ", PriceAnalysisVM.SelectedWebsites.Select(site => site.Content.ToString()))}]");
-
                 StartScrapeButton.IsEnabled = false;
-                LOGGER.Info($"Started Scrape For {TitleBox.Text} on {PriceAnalysisVM.CurBrowser} Browser w/ {(StockFilterSelector.SelectedItem as ComboBoxItem).Content} Filter");
+                LOGGER.Info($"Started Scrape For {TitleBox.Text} on {PriceAnalysisVM.CurBrowser} Browser w/ {(StockFilterSelector.SelectedItem as ComboBoxItem).Content} Filter & Websites = [{string.Join(", ", PriceAnalysisVM.SelectedWebsites.Select(site => site.Content.ToString()))}] & Memberships = {string.Join(" | ", ViewModelBase.MainUser.Memberships)}");
                 await Scrape.InitializeScrapeAsync(
                         TitleBox.Text, 
                         MangaButton.IsChecked != null && MangaButton.IsChecked.Value ? Book.Manga : Book.LightNovel, 
@@ -102,7 +98,7 @@ namespace Tsundoku.Views
             }
             catch (Exception e)
             {
-                LOGGER.Error($"{e}");
+                LOGGER.Error($"Price Analysis Scraped Failed -> {e}");
             }
         }
 
