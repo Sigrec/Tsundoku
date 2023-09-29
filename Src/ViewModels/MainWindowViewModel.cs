@@ -38,10 +38,9 @@ namespace Tsundoku.ViewModels
         [Reactive] public string AdvancedSearchText { get; set; }
         [Reactive] public bool LanguageChanged { get; set; } = false;
         public bool SearchIsBusy { get; set; } = false;
-        [Reactive] public string CurDisplay { get; set; }
-        [Reactive] public string CurFilter { get; set; } = "None";
         [Reactive] public Bitmap UserIcon { get; set; }
         [Reactive] public string CurLanguage { get; set; }
+        [Reactive] public string CurFilter { get; set; } = "None";
         [Reactive] public int LanguageIndex { get; set; }
         [Reactive] public int FilterIndex { get; set; }
         [Reactive] public string AdvancedSearchQueryErrorMessage { get; set; }
@@ -74,6 +73,7 @@ namespace Tsundoku.ViewModels
         {
             // Helpers.ExtensionMethods.PrintCultures();
             // Helpers.ExtensionMethods.PrintCurrencySymbols();
+
             LOGGER.Info("Starting TsundOku");
             LoadUserData();
             ConfigureWindows();
@@ -203,6 +203,12 @@ namespace Tsundoku.ViewModels
                 UserCollection.Sort(new SeriesComparer(MainUser.CurLanguage));
             });
             SearchedCollection.AddRange(UserCollection);
+        }
+
+        public void UpdateCurFilter(ComboBoxItem filterBoxItem)
+        {
+            CurFilter = filterBoxItem.Content.ToString();
+            FilterCollection(CurFilter);
         }
 
         /// <summary>
@@ -338,6 +344,7 @@ namespace Tsundoku.ViewModels
         {
             if (!string.IsNullOrWhiteSpace(AdvancedSearchQuery) && AdvancedQueryRegex().IsMatch(AdvancedSearchQuery))
             {
+                AdvancedSearchQuery = AdvancedSearchQuery.Trim();
                 if (!CurFilter.Equals("Query"))
                 {
                     CanFilter = false;
@@ -509,9 +516,7 @@ namespace Tsundoku.ViewModels
             // For users who did not get the older update
             if (!userData.AsObject().ContainsKey("CurDataVersion"))
             {
-                LOGGER.Debug("Check #4");
                 userData.AsObject().Add("CurDataVersion", "1.0");
-                LOGGER.Info("Added CurDataVersion Json Object");
             }
             double curVersion = double.Parse(userData["CurDataVersion"].ToString());
 

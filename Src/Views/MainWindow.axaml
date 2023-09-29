@@ -35,15 +35,13 @@
             <Rectangle Fill="Black" Opacity="0.35" PointerPressed="UnShow_AdvancedSearchPopup"/>
             <StackPanel Margin="0,165,0,0" HorizontalAlignment="Center" VerticalAlignment="Top">
                 <StackPanel Orientation="Horizontal" Spacing="5">
+                    <!-- TODO Color/style issue is due to listbox items being in a selected state by default?-->
                     <AutoCompleteBox Name="AdvancedSearchBar"
-                                Text="{CompiledBinding AdvancedSearchText, Mode=TwoWay}"
-                                Classes="menu"
+                                Text="{CompiledBinding AdvancedSearchText}"
+                                Classes="query"
                                 KeyUp="RemoveErrorMessage"
-                                BorderThickness="2"
-                                Width="500"
-                                FontWeight="Bold"
-                                Watermark="Advanced Search Query..."
-                                FontSize="15"/>
+                                Theme="{StaticResource QuerySearchBox}"
+                                Watermark="Advanced Search Query..."/>
                     <Button Name="AdvancedSearchQueryButton"
                             IsDefault="True"
                             FontSize="20"

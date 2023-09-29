@@ -3,14 +3,16 @@
 					xmlns:vm="clr-namespace:Tsundoku.ViewModels"
 					x:DataType="vm:ViewModelBase">
 
-    <ControlTheme x:Key="{x:Type AutoCompleteBox}" TargetType="AutoCompleteBox">
+    <ControlTheme x:Key="QuerySearchBox" TargetType="AutoCompleteBox">
         <Setter Property="VerticalAlignment" Value="Center" />
-        <Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.SearchBarTextColor, Converter={StaticResource ConvertColor}}"/>
-        <Setter Property="Background" Value="{CompiledBinding CurrentTheme.SearchBarBGColor, Converter={StaticResource ConvertColor}}"/>
-        <Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.SearchBarBorderColor, Converter={StaticResource ConvertColor}}"/>
+        <Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"/>
+		<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"/>
+        <Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"/>
         <Setter Property="BorderThickness" Value="2" />
+        <Setter Property="Width" Value="500" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="FontSize" Value="15" />
         <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
-        <Setter Property="FontSize" Value="{DynamicResource ControlContentThemeFontSize}" />
         <Setter Property="Padding" Value="{DynamicResource TextControlThemePadding}" />
         <Setter Property="MaxDropDownHeight" Value="{DynamicResource AutoCompleteListMaxHeight}" />
         <Setter Property="Template">
@@ -39,24 +41,40 @@
                             MaxHeight="{TemplateBinding MaxDropDownHeight}"
                             IsLightDismissEnabled="True"
                             PlacementTarget="{TemplateBinding}">
-                        <Border Name="PART_SuggestionsContainer"
-                                Padding="{DynamicResource AutoCompleteListMargin}"
-                                BorderThickness="2"
-                                BorderBrush="{DynamicResource AutoCompleteBoxSuggestionsListBorderBrush}"
-                                Background="{DynamicResource AutoCompleteBoxSuggestionsListBackground}"
-                                CornerRadius="{DynamicResource OverlayCornerRadius}">
-                            <ListBox Name="PART_SelectingItemsControl"
+                            <Border Name="PART_SuggestionsContainer"
+                                    Padding="{DynamicResource AutoCompleteListMargin}"
                                     BorderThickness="2"
-                                    Theme="{StaticResource QueryListBox}"
-                                    ItemTemplate="{TemplateBinding ItemTemplate}"
-                                    Margin="{DynamicResource AutoCompleteListPadding}" />
+                                    BorderBrush="{CompiledBinding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"
+                                    Background="{CompiledBinding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"
+                                    Margin="0,5,0,0"
+                                    CornerRadius="{DynamicResource OverlayCornerRadius}">
+                                <ListBox Name="PART_SelectingItemsControl"
+                                        Background="Transparent"
+                                        Foreground="{TemplateBinding Foreground}"
+                                        ItemTemplate="{TemplateBinding ItemTemplate}"
+                                        Margin="{DynamicResource AutoCompleteListPadding}" />
                         </Border>
                     </Popup>
                 </Grid>
             </ControlTemplate>
         </Setter>
-
         
+        <!-- <Style Selector="^:selected /template/ Border#PART_SuggestionsContainer">
+            <Style Selector="^:pointerover /template/ Border#PART_SuggestionsContainer, ^:selected /template/ Border#PART_SuggestionsContainer">
+                <Setter Property="Background" Value="Green"/>
+                <Setter Property="BorderBrush" Value="Aqua"/>
+            </Style>
+            <Style Selector="^:selected /template/ ListBox#PART_SelectingItemsControl, ^:pointerover /template/ ListBox#PART_SelectingItemsControl">
+                <Setter Property="Foreground" Value="Pink"/>
+            </Style>
+        </Style> -->
+        <!-- <Style Selector="^ /template/ Border#PART_SuggestionsContainer">
+            <Setter Property="Background" Value="Green"/>
+            <Setter Property="BorderBrush" Value="Aqua"/>
+        </Style>
+        <Style Selector="^ /template/ ListBox#PART_SelectingItemsControl">
+            <Setter Property="Foreground" Value="Pink"/>
+        </Style> -->
     </ControlTheme>
 
     <ControlTheme x:Key="FluentScrollBarThumb" TargetType="Thumb">

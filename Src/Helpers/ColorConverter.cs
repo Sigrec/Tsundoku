@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using Avalonia.Data.Converters;
+using Avalonia.Media;
 
 namespace Tsundoku.Helpers
 {
@@ -10,7 +11,7 @@ namespace Tsundoku.Helpers
         {
             if (value is uint v)
             {
-                return new Avalonia.Media.SolidColorBrush(v);
+                return new SolidColorBrush(v);
             }
             throw new NotSupportedException();
         }

@@ -122,6 +122,7 @@ namespace Tsundoku.Views
         {
             AdvancedSearchBar.ItemsSource = ADVANCED_SEARCH_FILTERS.OrderBy(x => x);
             AdvancedSearchBar.FilterMode = AutoCompleteFilterMode.Custom;
+            AdvancedSearchBar.MinimumPopulateDelay = new TimeSpan(TimeSpan.TicksPerSecond / 2); // Might just remove this delay in the end
             AdvancedSearchBar.ItemSelector = (query, item) =>
             {
                 newSearchText.Clear();
@@ -129,9 +130,8 @@ namespace Tsundoku.Views
                 {
                     newSearchText.Append(query[..query.LastIndexOf(delimeter)]).Append(delimeter);
                 }
-                return !item.Equals("Notes==") ? newSearchText.Append(item).ToString() : newSearchText.Append(item).Append("''").ToString();
+                return !item.Equals("Notes==") ? newSearchText.Append(item).ToString() : newSearchText.Append(item).ToString();
             };
-            // TODO Dropdown not showing when empty or clicking back in
             AdvancedSearchBar.ItemFilter = (query, item) =>
             {
                 itemString = item as string;
@@ -139,13 +139,27 @@ namespace Tsundoku.Views
                 {
                     return itemString.StartsWith(query, StringComparison.OrdinalIgnoreCase);
                 }
-                bool lessThan = itemString.Contains('<');
-                bool greaterThan = itemString.Contains('>');
-                bool equalTo = itemString.Contains("==");
 
-                // TODO look to ways to simplify this logic
+                if (query.Contains(itemString))
+                {
+                    return false;
+                }
+                else if (itemString.Last() != '=' && query.Contains(itemString[..itemString.IndexOf("==")]))
+                {
+                    return false;
+                }
+                
                 string filterName = itemString[..^2];
-                return string.IsNullOrWhiteSpace(AdvancedSearchBar.Text) || !query.Contains(itemString) && itemString.StartsWith(query[(query.LastIndexOf(delimeter) + delimeter.Length)..], StringComparison.OrdinalIgnoreCase) && ((equalTo && !(query.Contains($"{filterName}<=") || query.Contains($"{filterName}>="))) || ((greaterThan || lessThan) && !query.Contains($"{filterName}=="))) && ((itemString.Last() != '=' && !query.Contains(itemString[..itemString.IndexOf("==")])) || (equalTo && itemString.Last() == '=') || lessThan || greaterThan);
+                if (itemString.Contains("==") && (query.Contains($"{filterName}<=") || query.Contains($"{filterName}>=")))
+                {
+                    return false;
+                }
+                else if ((itemString.Contains('>') || itemString.Contains('<')) && query.Contains($"{filterName}=="))
+                {
+                    return false;
+                }
+ 
+                return itemString.StartsWith(query[(query.LastIndexOf(delimeter) + delimeter.Length)..], StringComparison.OrdinalIgnoreCase);
             };
         }
 
@@ -427,9 +441,7 @@ namespace Tsundoku.Views
         {
             if ((sender as ComboBox).IsDropDownOpen)
             {
-                CollectionViewModel.CurFilter = (CollectionFilterSelector.SelectedItem as ComboBoxItem).Content.ToString();
-                CollectionViewModel.FilterCollection(CollectionViewModel.CurFilter);
-                LOGGER.Info($"Changed Collection Filter To {CollectionViewModel.CurFilter}");
+                CollectionViewModel.UpdateCurFilter(CollectionFilterSelector.SelectedItem as ComboBoxItem);
             }
             else
             {

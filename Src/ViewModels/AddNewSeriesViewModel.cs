@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Tsundoku.Models;
 using ReactiveUI.Fody.Helpers;
-using DynamicData;
 using Avalonia.Media.Imaging;
 using System.Collections.ObjectModel;
 using Avalonia.Controls;
@@ -9,7 +8,6 @@ using System;
 using System.Collections.Specialized;
 using System.Text;
 using System.Linq;
-using Microsoft.IdentityModel.Tokens;
 using System.Net.Http;
 using System.IO;
 
@@ -26,27 +24,29 @@ namespace Tsundoku.ViewModels
         [Reactive] public bool IsAddSeriesButtonEnabled { get; set; } = false;
         public ObservableCollection<ListBoxItem> SelectedAdditionalLanguages { get; set; } = new ObservableCollection<ListBoxItem>();
         private static readonly HttpClient AddCoverHttpClient = new HttpClient();
+        private static readonly StringBuilder CurLanguages = new StringBuilder();
         public AddNewSeriesViewModel() => SelectedAdditionalLanguages.CollectionChanged += AdditionalLanguagesCollectionChanged;
 
-        private void AdditionalLanguagesCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void AdditionalLanguagesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
                 case NotifyCollectionChangedAction.Remove:
-                    if (!SelectedAdditionalLanguages.IsNullOrEmpty())
+                    if (SelectedAdditionalLanguages != null && SelectedAdditionalLanguages.Any())
                     {
-                        StringBuilder items = new StringBuilder();
                         for (int x = 0; x < SelectedAdditionalLanguages.Count - 1; x++)
                         {
-                            items.AppendLine(SelectedAdditionalLanguages[x].Content.ToString());
+                            CurLanguages.AppendLine(SelectedAdditionalLanguages[x].Content.ToString());
                         }
-                        items.Append(SelectedAdditionalLanguages.Last().Content.ToString());
-                        AdditionalLanguagesToolTipText = items.ToString();
+                        CurLanguages.Append(SelectedAdditionalLanguages.Last().Content.ToString());
+                        AdditionalLanguagesToolTipText = CurLanguages.ToString();
+                        CurLanguages.Clear();
                     }
                     else
                     {
-                        AdditionalLanguagesToolTipText = string.Empty;
+                        CurLanguages.Clear();
+                        AdditionalLanguagesToolTipText = CurLanguages.ToString();
                     }
                     break;
                 default:
@@ -64,49 +64,31 @@ namespace Tsundoku.ViewModels
         /// <param name="maxVolCount">The max # of volumes this series currently has</param>
         /// <param name="additionalLanguages">Additional languages to get more info for from Mangadex</param>
         /// <returns>Whether the series can be added to the users collection or not</returns>
-        public static async Task<bool> GetSeriesDataAsync(string title, string bookType, ushort curVolCount, ushort maxVolCount, ObservableCollection<string> additionalLanguages)
+        public async Task<bool> GetSeriesDataAsync(string title, string bookType, ushort curVolCount, ushort maxVolCount, ObservableCollection<string> additionalLanguages)
         {
             Series? newSeries = await Series.CreateNewSeriesCardAsync(title, bookType, maxVolCount, curVolCount,  additionalLanguages);
             
             bool duplicateSeriesCheck = true;
             if (newSeries != null)
             {
-                duplicateSeriesCheck = false;
-                foreach (Series series in MainWindowViewModel.UserCollection)
-                {
-                    if (!duplicateSeriesCheck && series.Link.Equals(newSeries.Link))
-                    {
-                        LOGGER.Debug($"{series.Link} | {newSeries.Link}");
-                        duplicateSeriesCheck = true;
-                    }
-                }
+                duplicateSeriesCheck = MainWindowViewModel.UserCollection.AsParallel().Any(series => series.Link.Equals(newSeries.Link));
 
                 if (!duplicateSeriesCheck)
                 {
-                    // If the user is currently searching need to "refresh" the SearchedCollection so it can insert at correct index
-                    if (MainWindowViewModel.SearchedCollection.Count != MainWindowViewModel.UserCollection.Count)
-                    {
-                        LOGGER.Info("Refreshing Searched Collection");
-                        MainWindowViewModel.SortCollection();
-                    }
-                    LOGGER.Info($"\nAdding New Series -> {title} | {bookType} | {curVolCount} | {maxVolCount} |\n{newSeries.ToJsonString(options)}");
-                    // File.WriteAllText(@"Series.json", newSeries.ToJsonString(options));
+                    LOGGER.Info($"\nAdding New Series -> \"{title}\" | {bookType} | {curVolCount} | {maxVolCount} |\n{newSeries.ToJsonString(options)}");
 
                     int index = MainWindowViewModel.UserCollection.BinarySearch(newSeries, new SeriesComparer(MainUser.CurLanguage));
                     index = index < 0 ? ~index : index;
-                    newSeries.CoverBitMap = new Bitmap(newSeries.Cover).CreateScaledBitmap(new PixelSize(LEFT_SIDE_CARD_WIDTH, IMAGE_HEIGHT), BitmapInterpolationMode.HighQuality);
-
+                    if (MainWindowViewModel.UserCollection.Count == MainWindowViewModel.SearchedCollection.Count)
+                    {
+                        MainWindowViewModel.SearchedCollection.Insert(index, newSeries);
+                    }
                     MainWindowViewModel.UserCollection.Insert(index, newSeries);
-                    MainWindowViewModel.SearchedCollection.Insert(index, newSeries);
                 }
                 else
                 {
-                    LOGGER.Info("Series Already Exists");
+                    LOGGER.Info($"{title} Already Exists");
                 }
-            }
-            else
-            {
-                LOGGER.Info($"{title} -> Does Not Exist");
             }
             return duplicateSeriesCheck;
         }
@@ -119,7 +101,6 @@ namespace Tsundoku.ViewModels
             {
                 await response.Content.CopyToAsync(fs);
             }
- 
 			Bitmap newCover = new Bitmap(newPath).CreateScaledBitmap(new PixelSize(LEFT_SIDE_CARD_WIDTH, IMAGE_HEIGHT), BitmapInterpolationMode.HighQuality);
 			newCover.Save(newPath, 100);
             return newCover;
@@ -127,12 +108,7 @@ namespace Tsundoku.ViewModels
 
         public static ObservableCollection<string> ConvertSelectedLangList(ObservableCollection<ListBoxItem> SelectedLangs)
         {
-            ObservableCollection<string> ConvertedList = [];
-            foreach (ListBoxItem lang in SelectedLangs)
-            {
-                ConvertedList.Add(lang.Content.ToString());
-            }
-            return ConvertedList;
+            return new ObservableCollection<string>(SelectedLangs.Select(lang => lang.Content.ToString()).OfType<string>());
         }
     }
 }

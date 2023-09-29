@@ -3,44 +3,4 @@
 					xmlns:vm="clr-namespace:Tsundoku.ViewModels"
                     xmlns:model="clr-namespace:Tsundoku.Models"
 					x:DataType="vm:ThemeSettingsViewModel">
-
-    <ControlTheme x:Key="Test" TargetType="ComboBoxItem">
-		<Setter Property="Padding" Value="{DynamicResource ComboBoxItemThemePadding}" />
-		<Setter Property="HorizontalContentAlignment" Value="Stretch" />
-		<Setter Property="Background" Value="Transparent"/>
-		<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"/>
-
-		<Setter Property="Template">
-			<ControlTemplate>
-				<ContentPresenter Name="PART_ContentPresenter"
-								Foreground="{TemplateBinding Foreground}"
-								Background="{TemplateBinding Background}"
-								BorderBrush="{TemplateBinding BorderBrush}"
-								BorderThickness="{DynamicResource ComboBoxDropdownBorderThickness}"
-								CornerRadius="0"
-								ContentTemplate="{TemplateBinding ContentTemplate}"
-								Content="{TemplateBinding Content}"
-								HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-								VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-								Padding="{TemplateBinding Padding}" />
-			</ControlTemplate>
-		</Setter>
-
-		<Style Selector="^:pressed">
-			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
-			<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
-		</Style>
-
-		<Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
-			<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
-		</Style>
-
-		<Style Selector="^:selected">
-			<Style Selector="^">
-				<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
-				<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
-			</Style>
-		</Style>
-	</ControlTheme>
 </ResourceDictionary>

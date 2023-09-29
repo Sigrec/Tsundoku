@@ -479,7 +479,7 @@
 	</ControlTheme>
     
     <!-- <Thickness x:Key="ListBoxItemPadding">12,9,12,12</Thickness> -->
-    <ControlTheme x:Key="{x:Type ListBoxItem}" TargetType="ListBoxItem">
+    <ControlTheme x:Key="QueryListBoxItem" TargetType="ListBoxItem">
         <Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"/>
         <Setter Property="Padding" Value="12,9,12,12" />
         <Setter Property="BorderThickness" Value="0,1,0,1" />

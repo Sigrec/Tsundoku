@@ -3,9 +3,20 @@
 		xmlns:vm="clr-namespace:Tsundoku.ViewModels"
 		x:DataType="vm:MainWindowViewModel">
 
-    <Style Selector="AutoCompleteBox.menu">
-        <Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}"/>
-        <Setter Property="BorderThickness" Value="2"/>
+    <Style Selector="AutoCompleteBox.query">
+        <Style Selector=" ^ ListBox > ListBoxItem">
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="FontSize" Value="15" />
+<!-- 
+            <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"/>
+            </Style>
+            <Style Selector="^:selected /template/ ContentPresenter#PART_ContentPresenter">
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"/>
+            </Style> -->
+        </Style>
     </Style>
 
 	<Style Selector="Border.menu">
