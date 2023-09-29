@@ -6,7 +6,6 @@
 			 RequestedThemeVariant="Dark"
 			 x:DataType="vm:MainWindowViewModel"
              x:Class="Tsundoku.App">
-	<!-- TODO: Figure out a way to prevent other windows from hiding under main window when open and clicking main window -->
 	<Application.Resources>
 		<ResourceDictionary>
 			<cv:ColorConverter x:Key="ConvertColor"/>
@@ -17,7 +16,7 @@
 	</Application.Resources>
 
     <Application.Styles>
-		<FluentTheme />
+		<FluentTheme/>
 		<StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
 		<StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml" />
 		<StyleInclude Source="/Styles/MenuTheme.xaml" />

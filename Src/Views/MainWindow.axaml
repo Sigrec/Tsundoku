@@ -29,183 +29,211 @@
 		</ResourceDictionary>
 	</Window.Resources>
 
-	<DockPanel>
-		<!-- Menu -->
-		<Border Name="Navigation" 
-				DockPanel.Dock="Top" 
-				Classes="menu"
-				BorderThickness="0,0,0,3"
-				Height="150">
-			<Grid Margin="0,15,0,15" ColumnDefinitions="*,600,*" RowDefinitions="Auto,Auto" HorizontalAlignment="Center" VerticalAlignment="Center" ShowGridLines="False">
-				<StackPanel Margin="0,0,0,1" Orientation="Horizontal" Spacing="0,0,1,1" Grid.Column="1" Grid.Row="0" Height="{CompiledBinding Source={x:Static local:Constants.USER_ICON_HEIGHT}}" HorizontalAlignment="Left" VerticalAlignment="Center">
-					<Border BorderThickness="2" Classes="menu" CornerRadius="2" ClipToBounds="True" Height="75">
-						<Image Height="{CompiledBinding Source={x:Static local:Constants.USER_ICON_HEIGHT}}"
-							   Width="{CompiledBinding Source={x:Static local:Constants.USER_ICON_WIDTH}}"
-							   Source="{Binding UserIcon}"
-							   Cursor="Hand"
-							   PointerPressed="ChangeUserIcon"
-							   ClipToBounds="True"
-							   Name="IconImage">
-						</Image>
-					</Border>
-					<TextBlock Name="Username" 
-								FontSize="24" 
-								FontWeight="Bold"
-								TextAlignment="Center"
-								HorizontalAlignment="Left"
-								VerticalAlignment="Center" 
-								Text="{CompiledBinding UserName, Mode=OneWay}"
-								Classes="username"/>
-				</StackPanel>
-				<StackPanel Grid.Column="1" Grid.Row="1" Orientation="Horizontal" Spacing="5" VerticalAlignment="Bottom" HorizontalAlignment="Left">
-					<Button Name="SettingsButton"
-							Content="Settings"
-							Width="95"
-							Height="35"
-							FontSize="15"
-							Theme="{StaticResource MenuButton}"
-							Command="{CompiledBinding OpenSettingsWindow}"/>
-					<Button Name="AddNewSeriesButton"
-							Theme="{StaticResource MenuButton}"
-							Content="Add Series"
-							Width="95"
-							Height="35"
-							FontSize="15"
-							Command="{CompiledBinding OpenAddNewSeriesWindow}"/>
-					<Button Name="ThemeButton" 
-							Theme="{StaticResource MenuButton}"
-							Content="Themes"
-							Width="95"
-							Height="35"
-							FontSize="15"
-							Command="{CompiledBinding OpenThemeSettingsWindow}"/>
-					<Button Name="StatsButton"
-							Theme="{StaticResource MenuButton}"
-							Content="Stats"
-							Width="95"
-							Height="35"
-							FontSize="15"
-							Command="{CompiledBinding OpenCollectionStatsWindow}"/>
-					<Button Name="AnalysisButton"
-							Theme="{StaticResource MenuButton}"
-							Content="Scrape"
-							Width="95"
-							Height="35"
-							FontSize="15"
-							Command="{CompiledBinding OpenPriceAnalysisWindow}"/>
-					<Button Name="DonateButton"
-							Theme="{StaticResource MenuButton}"
-							Content="Donate"
-							Width="95"
-							Height="35"
-							FontSize="15"
-							Click="OpenDonationLink"/>
-				</StackPanel>
-				<StackPanel Margin="0,0,0,0" HorizontalAlignment="Left" Grid.Column="2" Grid.Row="0" Grid.RowSpan="2" Spacing="6">
-					<ComboBox Name="LanguageSelector"
-							  SelectionChanged="LanguageChanged"
-							  Height="35"
-							  Width="185"
-							  SelectedIndex="{CompiledBinding LanguageIndex}"
-							  AutoScrollToSelectedItem="True"
-							  Theme="{StaticResource MenuComboBox}">
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Romaji</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">English</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Japanese</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Arabic</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Azerbaijan</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Bengali</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Bulgarian</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Burmese</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Catalan</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Chinese</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Croatian</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Czech</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Danish</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Dutch</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Esperanto</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Estonian</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Filipino</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Finnish</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">French</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">German</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Greek</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Hewbrew</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Hindi</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Hungarian</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Indonesian</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Italian</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Kazakh</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Korean</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Latin</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Lithuanian</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Malay</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Mongolian</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Nepali</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Norwegian</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Persian</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Polish</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Portugese</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Romanian</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Russian</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Serbian</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Slovak</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Spanish</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Swedish</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Tamil</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Thai</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Turkish</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Ukranian</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Vietnamese</ComboBoxItem>
-					</ComboBox>
-					<ComboBox Name="CollectionFilterSelector"
-							  SelectionChanged="CollectionFilterChanged"
-							  Height="35"
-							  Width="185"
-							  SelectedIndex="{CompiledBinding FilterIndex}"
-							  AutoScrollToSelectedItem="True"
-							  Theme="{StaticResource MenuComboBox}">
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">None</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Favorites</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Complete</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Incomplete</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Ongoing</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Finished</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Hiatus</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Cancelled</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Shounen</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Shoujo</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Seinen</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Josei</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Manga</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Novel</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Read</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Unread</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Rating</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Cost</ComboBoxItem>
-					</ComboBox>
-					<TextBox Name="SearchBar" 
-							Text="{CompiledBinding SearchText, Mode=TwoWay}" 
-							KeyUp="SearchCollection"
-							Classes="menu"
-							BorderThickness="2"
-							Width="185"
-							FontWeight="Bold"
-							Watermark="Search..."
-							Height="35"
-							FontSize="15"
-							HorizontalAlignment="Center"
-							VerticalAlignment="Center"/>
-				</StackPanel>
-			</Grid>
-		</Border>
-		
-		<!-- Collection -->
-        <SplitView DisplayMode="CompactOverlay" OpenPaneLength="{CompiledBinding Source={x:Static local:Constants.MENU_LENGTH}}" DockPanel.Dock="Bottom" PaneBackground="{CompiledBinding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}">
-            <SplitView.Pane>
-                <Button Content=">" HorizontalAlignment="Center" VerticalAlignment="Top" Click="OpenMenu"/>
-            </SplitView.Pane>
-            <ScrollViewer Name="CollectionTheme" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Background="{CompiledBinding CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}"> 
+    <!-- Advanced Search Popup -->
+    <Panel>
+        <Panel Name="AdvancedSearchPopup" ZIndex="1" IsVisible="false">
+            <Rectangle Fill="Black" Opacity="0.35" PointerPressed="UnShow_AdvancedSearchPopup"/>
+            <StackPanel Margin="0,165,0,0" HorizontalAlignment="Center" VerticalAlignment="Top">
+                <StackPanel Orientation="Horizontal" Spacing="5">
+                    <!-- TODO Color/style issue is due to listbox items being in a selected state by default?-->
+                    <AutoCompleteBox Name="AdvancedSearchBar"
+                                Text="{CompiledBinding AdvancedSearchText}"
+                                Classes="query"
+                                KeyUp="RemoveErrorMessage"
+                                Theme="{StaticResource QuerySearchBox}"
+                                Watermark="Advanced Search Query..."/>
+                    <Button Name="AdvancedSearchQueryButton"
+                            IsDefault="True"
+                            FontSize="20"
+                            Height="35"
+                            i:Attached.Icon="fa-magnifying-glass" 
+                            Theme="{StaticResource MenuButton}"
+                            Command="{CompiledBinding StartAdvancedSearch}"/>
+                </StackPanel>
+                <TextBlock Name="AdvancedSearchQueryErrorMessage"
+                        Text="{CompiledBinding AdvancedSearchQueryErrorMessage}"
+                        FontSize="20"
+                        HorizontalAlignment="Center"
+                        FontWeight="Bold"
+                        Foreground="{CompiledBinding CurrentTheme.SearchBarTextColor, Converter={StaticResource ConvertColor}}"/>
+            </StackPanel>
+        </Panel>
+
+        <DockPanel ZIndex="0">
+            <!-- Menu -->
+            <Border Name="Navigation" 
+                    DockPanel.Dock="Top" 
+                    Classes="menu"
+                    BorderThickness="0,0,0,3"
+                    Height="150">
+                <Grid Margin="0,15,0,15" ColumnDefinitions="*,600,*" RowDefinitions="Auto,Auto" HorizontalAlignment="Center" VerticalAlignment="Center" ShowGridLines="False">
+                    <StackPanel Margin="0,0,0,1" Orientation="Horizontal" Spacing="0,0,1,1" Grid.Column="1" Grid.Row="0" Height="{CompiledBinding Source={x:Static local:Constants.USER_ICON_HEIGHT}}" HorizontalAlignment="Left" VerticalAlignment="Center">
+                        <Border BorderThickness="2" Classes="menu" CornerRadius="2" ClipToBounds="True" Height="75">
+                            <Image Height="{CompiledBinding Source={x:Static local:Constants.USER_ICON_HEIGHT}}"
+                                Width="{CompiledBinding Source={x:Static local:Constants.USER_ICON_WIDTH}}"
+                                Source="{Binding UserIcon}"
+                                Cursor="Hand"
+                                PointerPressed="ChangeUserIcon"
+                                ClipToBounds="True"
+                                Name="IconImage">
+                            </Image>
+                        </Border>
+                        <TextBlock Name="Username" 
+                                    FontSize="24" 
+                                    FontWeight="Bold"
+                                    TextAlignment="Center"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center" 
+                                    Text="{CompiledBinding UserName, Mode=OneWay}"
+                                    Classes="username"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Grid.Row="1" Orientation="Horizontal" Spacing="5" VerticalAlignment="Bottom" HorizontalAlignment="Left">
+                        <Button Name="SettingsButton"
+                                Content="Settings"
+                                Width="95"
+                                Height="35"
+                                FontSize="15"
+                                Theme="{StaticResource MenuButton}"
+                                Command="{CompiledBinding OpenSettingsWindow}"/>
+                        <Button Name="AddNewSeriesButton"
+                                Theme="{StaticResource MenuButton}"
+                                Content="Add Series"
+                                Width="95"
+                                Height="35"
+                                FontSize="15"
+                                Command="{CompiledBinding OpenAddNewSeriesWindow}"/>
+                        <Button Name="ThemeButton" 
+                                Theme="{StaticResource MenuButton}"
+                                Content="Themes"
+                                Width="95"
+                                Height="35"
+                                FontSize="15"
+                                Command="{CompiledBinding OpenThemeSettingsWindow}"/>
+                        <Button Name="StatsButton"
+                                Theme="{StaticResource MenuButton}"
+                                Content="Stats"
+                                Width="95"
+                                Height="35"
+                                FontSize="15"
+                                Command="{CompiledBinding OpenCollectionStatsWindow}"/>
+                        <Button Name="AnalysisButton"
+                                Theme="{StaticResource MenuButton}"
+                                Content="Scrape"
+                                Width="95"
+                                Height="35"
+                                FontSize="15"
+                                Command="{CompiledBinding OpenPriceAnalysisWindow}"/>
+                        <Button Name="DonateButton"
+                                Theme="{StaticResource MenuButton}"
+                                Content="Donate"
+                                Width="95"
+                                Height="35"
+                                FontSize="15"
+                                Click="OpenDonationLink"/>
+                    </StackPanel>
+                    <StackPanel Margin="0,0,0,0" HorizontalAlignment="Left" Grid.Column="2" Grid.Row="0" Grid.RowSpan="2" Spacing="6">
+                        <ComboBox Name="LanguageSelector"
+                                SelectionChanged="LanguageChanged"
+                                Height="35"
+                                Width="185"
+                                SelectedIndex="{CompiledBinding LanguageIndex}"
+                                AutoScrollToSelectedItem="True"
+                                Theme="{StaticResource MenuComboBox}">
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Romaji</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">English</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Japanese</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Arabic</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Azerbaijan</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Bengali</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Bulgarian</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Burmese</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Catalan</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Chinese</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Croatian</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Czech</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Danish</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Dutch</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Esperanto</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Estonian</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Filipino</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Finnish</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">French</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">German</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Greek</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Hewbrew</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Hindi</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Hungarian</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Indonesian</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Italian</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Kazakh</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Korean</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Latin</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Lithuanian</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Malay</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Mongolian</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Nepali</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Norwegian</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Persian</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Polish</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Portugese</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Romanian</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Russian</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Serbian</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Slovak</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Spanish</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Swedish</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Tamil</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Thai</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Turkish</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Ukranian</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Vietnamese</ComboBoxItem>
+                        </ComboBox>
+                        <ComboBox Name="CollectionFilterSelector"
+                                SelectionChanged="CollectionFilterChanged"
+                                Height="35"
+                                Width="185"
+                                SelectedIndex="{CompiledBinding FilterIndex}"
+                                AutoScrollToSelectedItem="True"
+                                Theme="{StaticResource MenuComboBox}">
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">None</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Favorites</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Complete</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Incomplete</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Ongoing</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Finished</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Hiatus</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Cancelled</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Shounen</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Shoujo</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Seinen</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Josei</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Manga</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Novel</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Read</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Unread</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Rating</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Cost</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Query</ComboBoxItem>
+                        </ComboBox>
+                        <TextBox Name="SearchBar" 
+                                Text="{CompiledBinding SearchText, Mode=TwoWay}" 
+                                KeyUp="SearchCollection"
+                                Classes="menu"
+                                BorderThickness="2"
+                                Width="185"
+                                FontWeight="Bold"
+                                Watermark="Search..."
+                                Height="35"
+                                FontSize="15"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center">
+                        </TextBox>
+                    </StackPanel>
+                </Grid>
+            </Border>
+            
+            <!-- Collection -->
+            <ScrollViewer Name="CollectionTheme" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" DockPanel.Dock="Bottom" Background="{CompiledBinding CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}"> 
                 <ItemsControl Name="CollectionItems" Margin="0,50,0,50" ItemsSource="{CompiledBinding SearchedCollection}" HorizontalAlignment="Center" VerticalAlignment="Center">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -667,124 +695,123 @@
                                                 </ScrollViewer>
                                             </DockPanel>
 
-                                            <!-- Bottom Right Side Card -->
-                                            <StackPanel Height="{CompiledBinding Source={x:Static local:Constants.BOTTOM_SECTION_CARD_HEIGHT}}"
-                                                        Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressBGColor, Converter={StaticResource ConvertColor}}"
-                                                        Width="{CompiledBinding Source={x:Static local:Constants.RIGHT_SIDE_CARD_WIDTH}}"
-                                                        Orientation="Horizontal"
-                                                        Grid.Row="1"
-                                                        Name="BottomRightSideCard"
-                                                        HorizontalAlignment="Stretch"
-                                                        VerticalAlignment="Stretch">
-                                                <StackPanel.Styles>
-                                                    <Style Selector="#EditSeriesButton:pointerover /template/ ContentPresenter, #EditSeriesStatsButton:pointerover /template/ ContentPresenter">
-                                                        <Setter Property="TextBlock.Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesButtonIconHoverColor, Converter={StaticResource ConvertColor}}"/>
-                                                        <Setter Property="Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
-                                                    </Style>
-                                                </StackPanel.Styles>
-                                                <Button Name="EditSeriesButton"
-                                                        Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesButtonBGColor, Converter={StaticResource ConvertColor}}"
-                                                        FontSize="23"
-                                                        BorderThickness="0"
-                                                        BorderBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesButtonIconColor, Converter={StaticResource ConvertColor}}"
-                                                        Height="{CompiledBinding Source={x:Static local:Constants.BOTTOM_SECTION_CARD_HEIGHT}}"
-                                                        Width="45"
-                                                        CornerRadius="0"
-                                                        Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesButtonIconColor, Converter={StaticResource ConvertColor}}"
-                                                        i:Attached.Icon="fa-solid fa-pen-to-square"
-                                                        Click="ShowEditPane"/>
-                                                <Grid ColumnDefinitions="Auto" RowDefinitions="40" Width="265">
-                                                    <Grid.Styles>
-                                                        <Style Selector="Button">
-                                                            <Style Selector="^:pointerover /template/ ContentPresenter">
-                                                                <Setter Property="TextBlock.Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressButtonsHoverColor, Converter={StaticResource ConvertColor}}"/>
-                                                                <Setter Property="Background" Value="Transparent"/>
-                                                            </Style>
-                                                        </Style>
-                                                    </Grid.Styles>
-                                                    <ProgressBar Height="30"
-                                                                Width="250"
-                                                                Grid.Row="0"
-                                                                Grid.Column="0"
-                                                                Value="{CompiledBinding CurVolumeCount}"
-                                                                Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressBarBGColor, Converter={StaticResource ConvertColor}}"
-                                                                Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressBarColor, Converter={StaticResource ConvertColor}}"
-                                                                BorderBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressBarBorderColor, Converter={StaticResource ConvertColor}}"
-                                                                BorderThickness="1.5"
-                                                                Padding="2"
-                                                                FontWeight="Bold"
-                                                                VerticalAlignment="Center"
-                                                                HorizontalAlignment="Center"
-                                                                FontSize="15"
-                                                                Minimum="0"
-                                                                CornerRadius="4"
-                                                                Margin="7,0,0,0"
-                                                                Maximum="{CompiledBinding MaxVolumeCount}"
-                                                                Name="VolumeProgress"/>
-                                                    <StackPanel Orientation="Horizontal" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center" Margin="10,0,0,0">
-                                                        <Button Background="Transparent"
-                                                            Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressTextColor, Converter={StaticResource ConvertColor}}"
-                                                            FontWeight="Bold"
-                                                            Height="15"
-                                                            Width="32"
-                                                            FontSize="31"
-                                                            Margin="0,0,-17,0"
-                                                            Padding="-2,-17,0,0"
-                                                            Cursor="Hand"
-                                                            Click="SubtractVolume"
-                                                            VerticalAlignment="Center"
-                                                            HorizontalAlignment="Center"
-                                                            Name="DecrementButton"
-                                                            Content="-"/>
-                                                        <TextBlock Name="VolumeCount" 
-                                                                    TextAlignment="Center" 
-                                                                    FontSize="16" 
-                                                                    FontWeight="Bold" 
-                                                                    Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressTextColor, Converter={StaticResource ConvertColor}}"
-                                                                    Margin="0,7.5,0,0">
-                                                            <TextBlock.Text>
-                                                                <MultiBinding StringFormat="{}{0}/{1}">
-                                                                    <Binding Path="CurVolumeCount"/>
-                                                                    <Binding Path="MaxVolumeCount"/>
-                                                                </MultiBinding>
-                                                            </TextBlock.Text>
-                                                        </TextBlock>
-                                                        <Button Background="Transparent"
-                                                                Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressTextColor, Converter={StaticResource ConvertColor}}"
-                                                                FontWeight="Bold"
-                                                                Height="20"
-                                                                Width="21"
-                                                                FontSize="24"
-                                                                Cursor="Hand"
-                                                                Click="AddVolume"
-                                                                Padding="-6,-9.5,0,0"
-                                                                VerticalAlignment="Center"
-                                                                HorizontalAlignment="Center"
-                                                                VerticalContentAlignment="Center"
-                                                                HorizontalContentAlignment="Center"
-                                                                Name="IncrementButton"
-                                                                Content="+"/>
-                                                    </StackPanel>
-                                                </Grid>
-                                                <Button Name="EditSeriesStatsButton"
-                                                        Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesButtonBGColor, Converter={StaticResource ConvertColor}}"
-                                                        FontSize="23"
-                                                        BorderThickness="0"
-                                                        BorderBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesButtonIconColor, Converter={StaticResource ConvertColor}}"
-                                                        Height="{CompiledBinding Source={x:Static local:Constants.BOTTOM_SECTION_CARD_HEIGHT}}"
-                                                        Width="45"
-                                                        Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesButtonIconColor, Converter={StaticResource ConvertColor}}"
-                                                        i:Attached.Icon="fa-solid fa-square-poll-vertical"
-                                                        Click="ShowStatsPane"/>
-                                            </StackPanel>
-                                        </Grid>
-                                    </DockPanel>
-                                </Border>
-                            </Border>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
-        </SplitView>
+										<!-- Bottom Right Side Card -->
+										<StackPanel Height="{CompiledBinding Source={x:Static local:Constants.BOTTOM_SECTION_CARD_HEIGHT}}"
+													Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressBGColor, Converter={StaticResource ConvertColor}}"
+													Width="{CompiledBinding Source={x:Static local:Constants.RIGHT_SIDE_CARD_WIDTH}}"
+													Orientation="Horizontal"
+													Grid.Row="1"
+													Name="BottomRightSideCard"
+													HorizontalAlignment="Stretch"
+													VerticalAlignment="Stretch">
+											<StackPanel.Styles>
+												<Style Selector="#EditSeriesButton:pointerover /template/ ContentPresenter, #EditSeriesStatsButton:pointerover /template/ ContentPresenter">
+													<Setter Property="TextBlock.Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesButtonIconHoverColor, Converter={StaticResource ConvertColor}}"/>
+													<Setter Property="Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
+												</Style>
+											</StackPanel.Styles>
+											<Button Name="EditSeriesButton"
+													Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesButtonBGColor, Converter={StaticResource ConvertColor}}"
+													FontSize="23"
+													BorderThickness="0"
+													BorderBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesButtonIconColor, Converter={StaticResource ConvertColor}}"
+													Height="{CompiledBinding Source={x:Static local:Constants.BOTTOM_SECTION_CARD_HEIGHT}}"
+													Width="45"
+													CornerRadius="0"
+													Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesButtonIconColor, Converter={StaticResource ConvertColor}}"
+													i:Attached.Icon="fa-solid fa-pen-to-square"
+													Click="ShowEditPane"/>
+											<Grid ColumnDefinitions="Auto" RowDefinitions="40" Width="265">
+												<Grid.Styles>
+													<Style Selector="Button">
+														<Style Selector="^:pointerover /template/ ContentPresenter">
+															<Setter Property="TextBlock.Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressButtonsHoverColor, Converter={StaticResource ConvertColor}}"/>
+															<Setter Property="Background" Value="Transparent"/>
+														</Style>
+													</Style>
+												</Grid.Styles>
+												<ProgressBar Height="30"
+															 Width="250"
+															 Grid.Row="0"
+															 Grid.Column="0"
+															 Value="{CompiledBinding CurVolumeCount}"
+															 Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressBarBGColor, Converter={StaticResource ConvertColor}}"
+															 Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressBarColor, Converter={StaticResource ConvertColor}}"
+															 BorderBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressBarBorderColor, Converter={StaticResource ConvertColor}}"
+															 BorderThickness="1.5"
+															 Padding="2"
+															 FontWeight="Bold"
+															 VerticalAlignment="Center"
+															 HorizontalAlignment="Center"
+															 FontSize="15"
+															 Minimum="0"
+															 CornerRadius="4"
+															 Margin="7,0,0,0"
+															 Maximum="{CompiledBinding MaxVolumeCount}"
+															 Name="VolumeProgress"/>
+												<StackPanel Orientation="Horizontal" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center" Margin="10,0,0,0">
+													<Button Background="Transparent"
+														Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressTextColor, Converter={StaticResource ConvertColor}}"
+														FontWeight="Bold"
+														Height="15"
+														Width="32"
+														FontSize="31"
+														Margin="0,0,-17,0"
+														Padding="-2,-17,0,0"
+														Cursor="Hand"
+														Click="SubtractVolume"
+														VerticalAlignment="Center"
+														HorizontalAlignment="Center"
+														Name="DecrementButton"
+														Content="-"/>
+													<TextBlock Name="VolumeCount" 
+																TextAlignment="Center" 
+																FontSize="16" 
+																FontWeight="Bold" 
+																Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressTextColor, Converter={StaticResource ConvertColor}}"
+																Margin="0,7.5,0,0">
+														<TextBlock.Text>
+															<MultiBinding StringFormat="{}{0}/{1}">
+																<Binding Path="CurVolumeCount"/>
+																<Binding Path="MaxVolumeCount"/>
+															</MultiBinding>
+														</TextBlock.Text>
+													</TextBlock>
+													<Button Background="Transparent"
+															Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressTextColor, Converter={StaticResource ConvertColor}}"
+															FontWeight="Bold"
+															Height="20"
+															Width="21"
+															FontSize="24"
+															Cursor="Hand"
+															Click="AddVolume"
+															Padding="-6,-9.5,0,0"
+															VerticalAlignment="Center"
+															HorizontalAlignment="Center"
+															VerticalContentAlignment="Center"
+															HorizontalContentAlignment="Center"
+															Name="IncrementButton"
+															Content="+"/>
+												</StackPanel>
+											</Grid>
+											<Button Name="EditSeriesStatsButton"
+													Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesButtonBGColor, Converter={StaticResource ConvertColor}}"
+													FontSize="23"
+													BorderThickness="0"
+													BorderBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesButtonIconColor, Converter={StaticResource ConvertColor}}"
+													Height="{CompiledBinding Source={x:Static local:Constants.BOTTOM_SECTION_CARD_HEIGHT}}"
+													Width="45"
+													Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesButtonIconColor, Converter={StaticResource ConvertColor}}"
+													i:Attached.Icon="fa-solid fa-square-poll-vertical"
+													Click="ShowStatsPane"/>
+										</StackPanel>
+									</Grid>
+								</DockPanel>
+							</Border>
+						</Border>
+					</DataTemplate>
+				</ItemsControl.ItemTemplate>
+			</ItemsControl>
+		</ScrollViewer>
 	</DockPanel>
 </Window>

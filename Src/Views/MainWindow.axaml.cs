@@ -17,14 +17,14 @@ using Avalonia.Platform.Storage;
 using System.Collections.Generic;
 using Avalonia.Media.Imaging;
 using FileWatcherEx;
-using Avalonia.Logging;
+using System.Text;
 
 namespace Tsundoku.Views
 {
     public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
     {
         public MainWindowViewModel? CollectionViewModel => DataContext as MainWindowViewModel;
-        private WindowState previousWindowState;
+        WindowState previousWindowState;
         private static readonly List<FilePickerFileType> fileOptions = [FilePickerFileTypes.ImageAll];
         private static readonly List<Series> CoverChangedSeriesList = [];
         private static readonly FileSystemWatcherEx coverFolderWatcher = new(@"Covers")
@@ -32,10 +32,14 @@ namespace Tsundoku.Views
             IncludeSubdirectories = false,
             NotifyFilter = NotifyFilters.FileName
         };
+        private static StringBuilder newSearchText = new StringBuilder();
+        private static string itemString, query;
 
         public MainWindow()
         {
             InitializeComponent();
+            SetupAdvancedSearchBar(" ");
+
             KeyDown += (s, e) => 
             {
                 if (e.Key == Key.F11) 
@@ -78,10 +82,14 @@ namespace Tsundoku.Views
                         LOGGER.Info("No Covers Changed");
                     }
                 }
-                else if (e.KeyModifiers == KeyModifiers.Control && e.Key == Key.F)
+                else if (e.KeyModifiers == KeyModifiers.Shift && e.Key == Key.R)
                 {
                     LOGGER.Info("Reloading Filter/Sort on Collection");
                     CollectionViewModel.FilterCollection(CollectionViewModel.CurFilter);
+                }
+                else if (e.KeyModifiers == KeyModifiers.Control && e.Key == Key.F)
+                {
+                    ShowAdvancedSearchQueryPopup();
                 }
             };
 
@@ -108,6 +116,69 @@ namespace Tsundoku.Views
             {
                 SaveOnClose();
             };
+        }
+
+        public void SetupAdvancedSearchBar(string delimeter)
+        {
+            AdvancedSearchBar.ItemsSource = ADVANCED_SEARCH_FILTERS.OrderBy(x => x);
+            AdvancedSearchBar.FilterMode = AutoCompleteFilterMode.Custom;
+            AdvancedSearchBar.MinimumPopulateDelay = new TimeSpan(TimeSpan.TicksPerSecond / 2); // Might just remove this delay in the end
+            AdvancedSearchBar.ItemSelector = (query, item) =>
+            {
+                newSearchText.Clear();
+                if (MainWindowViewModel.AdvancedQueryRegex().IsMatch(query))
+                {
+                    newSearchText.Append(query[..query.LastIndexOf(delimeter)]).Append(delimeter);
+                }
+                return !item.Equals("Notes==") ? newSearchText.Append(item).ToString() : newSearchText.Append(item).ToString();
+            };
+            AdvancedSearchBar.ItemFilter = (query, item) =>
+            {
+                itemString = item as string;
+                if (!MainWindowViewModel.AdvancedQueryRegex().IsMatch(query))
+                {
+                    return itemString.StartsWith(query, StringComparison.OrdinalIgnoreCase);
+                }
+
+                if (query.Contains(itemString))
+                {
+                    return false;
+                }
+                else if (itemString.Last() != '=' && query.Contains(itemString[..itemString.IndexOf("==")]))
+                {
+                    return false;
+                }
+                
+                string filterName = itemString[..^2];
+                if (itemString.Contains("==") && (query.Contains($"{filterName}<=") || query.Contains($"{filterName}>=")))
+                {
+                    return false;
+                }
+                else if ((itemString.Contains('>') || itemString.Contains('<')) && query.Contains($"{filterName}=="))
+                {
+                    return false;
+                }
+ 
+                return itemString.StartsWith(query[(query.LastIndexOf(delimeter) + delimeter.Length)..], StringComparison.OrdinalIgnoreCase);
+            };
+        }
+
+        private void RemoveErrorMessage(object sender, KeyEventArgs args)
+        {
+            if (!string.IsNullOrEmpty(CollectionViewModel.AdvancedSearchQueryErrorMessage))
+            {
+                CollectionViewModel.AdvancedSearchQueryErrorMessage = string.Empty;
+            }
+        }
+
+        private void ShowAdvancedSearchQueryPopup()
+        {
+            AdvancedSearchPopup.IsVisible = true;
+        }
+
+        private void UnShow_AdvancedSearchPopup(object sender, PointerPressedEventArgs args)
+        {
+            AdvancedSearchPopup.IsVisible = false;
         }
 
         /// <summary>
@@ -375,9 +446,11 @@ namespace Tsundoku.Views
         {
             if ((sender as ComboBox).IsDropDownOpen)
             {
-                CollectionViewModel.CurFilter = (CollectionFilterSelector.SelectedItem as ComboBoxItem).Content.ToString();
-                CollectionViewModel.FilterCollection(CollectionViewModel.CurFilter);
-                LOGGER.Info($"Changed Collection Filter To {CollectionViewModel.CurFilter}");
+                CollectionViewModel.UpdateCurFilter(CollectionFilterSelector.SelectedItem as ComboBoxItem);
+            }
+            else
+            {
+                (sender as ComboBox).SelectedIndex = CollectionViewModel.FilterIndex;
             }
         }
 
@@ -420,10 +493,10 @@ namespace Tsundoku.Views
 
         public void SaveOnClose()
         {
+            LOGGER.Info("Closing Tsundoku");
             CollectionViewModel.SearchText = "";
             Helpers.DiscordRP.Deinitialize();
             coverFolderWatcher.Dispose();
-            LOGGER.Info("Closing Tsundoku");
 
             if (CollectionViewModel.newSeriesWindow != null)
             {
@@ -454,9 +527,6 @@ namespace Tsundoku.Views
                 CollectionViewModel.collectionStatsWindow.Closing += (s, e) => { e.Cancel = false; };
                 CollectionViewModel.collectionStatsWindow.Close();
             }
-
-            // Move the users current theme to the front of the list so when opening again it applies the correct theme
-            ThemeSettingsViewModel.UserThemes.Move(ThemeSettingsViewModel.UserThemes.IndexOf(ThemeSettingsViewModel.UserThemes.Single(x => x.ThemeName == ViewModelBase.MainUser.MainTheme)), 0);
 
             MainWindowViewModel.SaveUsersData();
             App.Mutex.Dispose();

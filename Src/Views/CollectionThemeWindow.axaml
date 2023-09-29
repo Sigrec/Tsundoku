@@ -21,7 +21,6 @@
 
     <Window.Resources>
         <ResourceDictionary>
-            <cv:ThemeListConverter x:Key="ConvertList"/>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceInclude Source="/Styles/ThemeSettingsControlThemes.xaml"/>
             </ResourceDictionary.MergedDictionaries>

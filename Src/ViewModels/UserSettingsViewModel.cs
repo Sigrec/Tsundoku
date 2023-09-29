@@ -20,12 +20,13 @@ namespace Tsundoku.ViewModels
         [Reactive] public bool BooksAMillionMember { get; set; } = MainUser.Memberships[BooksAMillion.WEBSITE_TITLE];
         [Reactive] public bool KinokuniyaUSAMember { get; set; } = MainUser.Memberships[KinokuniyaUSA.WEBSITE_TITLE];
         public ICommand ExportToSpreadSheetAsyncCommand { get; }
+
         public UserSettingsViewModel()
         {
             CurCurrency = MainUser.Currency;
             ExportToSpreadSheetAsyncCommand = ReactiveCommand.CreateFromTask(ExportToSpreadSheetAsync);
 
-            this.WhenAnyValue(x => x.CurCurrency).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => CurrencyIndex = Array.IndexOf(AvailableCurrency, Uri.UnescapeDataString(x)));
+            this.WhenAnyValue(x => x.CurCurrency).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => CurrencyIndex = Array.IndexOf(AVAILABLE_CURRENCY, Uri.UnescapeDataString(x)));
             this.WhenAnyValue(x => x.UsernameText, x => !string.IsNullOrWhiteSpace(x)).Subscribe(x => IsChangeUsernameButtonEnabled = x);
             this.WhenAnyValue(x => x.RightStufAnimeMember).Subscribe(x => MainUser.Memberships[RightStufAnime.WEBSITE_TITLE] = x);
             this.WhenAnyValue(x => x.BarnesAndNobleMember).Subscribe(x => MainUser.Memberships[BarnesAndNoble.WEBSITE_TITLE] = x);

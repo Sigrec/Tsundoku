@@ -12,6 +12,7 @@ namespace Tsundoku.ViewModels
         [Reactive] public TsundokuTheme CurrentTheme { get; set; }
         [Reactive] public string CurCurrency { get; set; }
         [Reactive] public string UserName { get; set; }
+        [Reactive] public string CurDisplay { get; set; }
         public static User MainUser { get; set; }
         public static bool updatedVersion = false;
 
@@ -29,7 +30,7 @@ namespace Tsundoku.ViewModels
 
         public static void OpenSiteLink(string link)
         {
-            LOGGER.Info($"Opening Link {link}");
+            LOGGER.Debug($"Opening Link {link}");
             try
             {
                 Process.Start(new ProcessStartInfo(link) { UseShellExecute = true });

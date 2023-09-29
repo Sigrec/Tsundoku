@@ -1,10 +1,9 @@
 using System.Text.Json;
 
 [assembly: Description("Testing Series Model from Tsundoku")]
-namespace Tsundoku.Tests.SeriesModel
+namespace Tsundoku.Tests
 {
     [Author("Sean (Alias -> Prem or Sigrec)")]
-    [Parallelizable(scope: ParallelScope.All)]
     [TestOf(typeof(Series))]
     [Description("Testing Series Model")]
     public class SeriesModelTests
@@ -33,31 +32,43 @@ namespace Tsundoku.Tests.SeriesModel
         [AvaloniaTest]
         public async Task Novel_AniList_Test()
         {
-            Assert.That((await Series.CreateNewSeriesCardAsync("Classroom of the Elite", "NOVEL", 14, 0, [])).ToJsonString(options), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesTests\SeriesTestData\CoTE.json")));
+            Assert.That((await Series.CreateNewSeriesCardAsync("Classroom of the Elite", "NOVEL", 14, 0, [])).ToJsonString(options), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesModel\SeriesModelTestData\CoTE.json")));
         }
 
         [AvaloniaTest]
-        public async Task MultipleAdditionalLangTitle_MangaDexID_AniListLink_Test()
+        public async Task MangaDexID_HasNativeStaff_Test()
         {
-            Assert.That((await Series.CreateNewSeriesCardAsync("32fdfe9b-6e11-4a13-9e36-dcd8ea77b4e4", "MANGA", 18, 0, ["Arabic", "Chinese", "French", "Korean", "Russian", "Spanish"])).ToJsonString(options), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesTests\SeriesTestData\Rent-A-Girlfriend.json")));
+            Assert.That((await Series.CreateNewSeriesCardAsync("32d76d19-8a05-4db0-9fc2-e0b0648fe9d0", "MANGA", 2, 0, [])).ToJsonString(options), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesModel\SeriesModelTestData\SoloLeveling.json")));
+        }
+
+        [AvaloniaTest]
+        public async Task MangaDexID_NoNativeStaff_Test()
+        {
+            Assert.That((await Series.CreateNewSeriesCardAsync("c0189f4a-dee6-48f4-abbe-53a4359cbcfb", "MANGA", 2, 0, [])).ToJsonString(options), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesModel\SeriesModelTestData\AtTheNorthernFort.json")));
+        }
+
+        [AvaloniaTest]
+        public async Task MultipleAdditionalLangTitle_AniListLink_Test()
+        {
+            Assert.That((await Series.CreateNewSeriesCardAsync("Rent-A-Girlfriend", "MANGA", 18, 0, ["Arabic", "Chinese", "French", "Korean", "Russian", "Spanish"])).ToJsonString(options), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesModel\SeriesModelTestData\Rent-A-Girlfriend.json")));
         }
 
         [AvaloniaTest]
         public async Task SimilarNotEquals_AniList_Test()
         {
-            Assert.That((await Series.CreateNewSeriesCardAsync("dont toy with me miss nagatoro", "MANGA", 5, 0, [])).ToJsonString(options), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesTests\SeriesTestData\IjiranaideNagatoro-san.json")));
+            Assert.That((await Series.CreateNewSeriesCardAsync("dont toy with me miss nagatoro", "MANGA", 5, 0, [])).ToJsonString(options), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesModel\SeriesModelTestData\IjiranaideNagatoro-san.json")));
         }
 
         [AvaloniaTest]
         public async Task Radiant_MangaDexTitle_Test()
         {
-            Assert.That((await Series.CreateNewSeriesCardAsync("Radiant", "MANGA", 18, 0, [])).ToJsonString(options), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesTests\SeriesTestData\Radiant.json")));
+            Assert.That((await Series.CreateNewSeriesCardAsync("Radiant", "MANGA", 18, 0, [])).ToJsonString(options), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesModel\SeriesModelTestData\Radiant.json")));
         }
 
         [AvaloniaTest]
         public async Task TheBeginningAfterTheEnd_NoDemographic_MangaDexTitle_Test()
         {
-            Assert.That((await Series.CreateNewSeriesCardAsync("The Beginning After The End", "MANGA", 5, 0, [])).ToJsonString(options), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesTests\SeriesTestData\TBATE.json")));
+            Assert.That((await Series.CreateNewSeriesCardAsync("The Beginning After The End", "MANGA", 5, 0, [])).ToJsonString(options), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesModel\SeriesModelTestData\TBATE.json")));
         }
 
         [Test]
@@ -237,7 +248,7 @@ namespace Tsundoku.Tests.SeriesModel
         [Test] // Tests if only native = null, onyl full = null, and both native and full are null
         public void GetSeriesStaff_AllNullStaffScenarios_Name_Test()
         {
-            Assert.That(Series.GetSeriesStaff(JsonDocument.Parse(File.ReadAllText(@"\Tsundoku\Tests\SeriesTests\SeriesTestData\staffNameTest.json")).RootElement.GetProperty("data").GetProperty("Media").GetProperty("staff").GetProperty("edges"), "full", "Novel", "86: Eighty Six", new System.Text.StringBuilder()), Is.EqualTo("Asato Asato | しらび | Ⅰ-Ⅳ"));
+            Assert.That(Series.GetSeriesStaff(JsonDocument.Parse(File.ReadAllText(@"\Tsundoku\Tests\SeriesModel\SeriesModelTestData\staffNameTest.json")).RootElement.GetProperty("data").GetProperty("Media").GetProperty("staff").GetProperty("edges"), "full", "Novel", "86: Eighty Six", new System.Text.StringBuilder()), Is.EqualTo("Asato Asato | しらび | Ⅰ-Ⅳ"));
         }
     }
 }
