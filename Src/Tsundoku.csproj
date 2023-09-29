@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<OutputType>WinExe</OutputType>
+		<OutputType>Exe</OutputType>
 		<TargetFramework>net8.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<DebugType>embedded</DebugType>
@@ -26,7 +26,7 @@
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<DebugType>None</DebugType>
 		<Version>2.0.0</Version>
-		<FileVersion>2.0.0.3</FileVersion>
+		<FileVersion>2.0.0.0</FileVersion>
 		<PackageIcon>Assets\Icons\Tsundoku-Logo.png</PackageIcon>
 		<RepositoryUrl>https://github.com/Sigrec/TsundokuApp</RepositoryUrl>
 		<LangVersion>preview</LangVersion>
