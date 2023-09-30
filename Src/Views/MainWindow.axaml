@@ -35,7 +35,6 @@
             <Rectangle Fill="Black" Opacity="0.35" PointerPressed="UnShow_AdvancedSearchPopup"/>
             <StackPanel Margin="0,165,0,0" HorizontalAlignment="Center" VerticalAlignment="Top">
                 <StackPanel Orientation="Horizontal" Spacing="5">
-                    <!-- TODO Color/style issue is due to listbox items being in a selected state by default?-->
                     <AutoCompleteBox Name="AdvancedSearchBar"
                                 Text="{CompiledBinding AdvancedSearchText}"
                                 Classes="query"
@@ -70,12 +69,12 @@
                     <StackPanel Margin="0,0,0,1" Orientation="Horizontal" Spacing="0,0,1,1" Grid.Column="1" Grid.Row="0" Height="{CompiledBinding Source={x:Static local:Constants.USER_ICON_HEIGHT}}" HorizontalAlignment="Left" VerticalAlignment="Center">
                         <Border BorderThickness="2" Classes="menu" CornerRadius="2" ClipToBounds="True" Height="75">
                             <Image Height="{CompiledBinding Source={x:Static local:Constants.USER_ICON_HEIGHT}}"
-                                Width="{CompiledBinding Source={x:Static local:Constants.USER_ICON_WIDTH}}"
-                                Source="{Binding UserIcon}"
-                                Cursor="Hand"
-                                PointerPressed="ChangeUserIcon"
-                                ClipToBounds="True"
-                                Name="IconImage">
+                                   Width="{CompiledBinding Source={x:Static local:Constants.USER_ICON_WIDTH}}"
+                                   Source="{Binding UserIcon}"
+                                   Cursor="Hand"
+                                   PointerPressed="ChangeUserIcon"
+                                   ClipToBounds="True"
+                                   Name="IconImage">
                             </Image>
                         </Border>
                         <TextBlock Name="Username" 
@@ -131,7 +130,7 @@
                                 FontSize="15"
                                 Click="OpenDonationLink"/>
                     </StackPanel>
-                    <StackPanel Margin="0,0,0,0" HorizontalAlignment="Left" Grid.Column="2" Grid.Row="0" Grid.RowSpan="2" Spacing="6">
+                    <StackPanel HorizontalAlignment="Left" Grid.Column="2" Grid.Row="0" Grid.RowSpan="2" Spacing="6">
                         <ComboBox Name="LanguageSelector"
                                 SelectionChanged="LanguageChanged"
                                 Height="35"
@@ -805,13 +804,14 @@
 													i:Attached.Icon="fa-solid fa-square-poll-vertical"
 													Click="ShowStatsPane"/>
 										</StackPanel>
-									</Grid>
-								</DockPanel>
-							</Border>
-						</Border>
-					</DataTemplate>
-				</ItemsControl.ItemTemplate>
-			</ItemsControl>
-		</ScrollViewer>
-	</DockPanel>
+                                        </Grid>
+                                    </DockPanel>
+                                </Border>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+		    </ScrollViewer>
+	    </DockPanel>
+    </Panel>
 </Window>

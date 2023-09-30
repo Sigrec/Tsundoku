@@ -33,7 +33,7 @@ namespace Tsundoku.Views
             NotifyFilter = NotifyFilters.FileName
         };
         private static StringBuilder newSearchText = new StringBuilder();
-        private static string itemString, query;
+        private static string itemString;
 
         public MainWindow()
         {

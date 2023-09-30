@@ -58,6 +58,10 @@
                 </Grid>
             </ControlTemplate>
         </Setter>
+
+        <!-- <Style Selector="^ /template/ ListBox#PART_SelectingItemsControl > ListBoxItem">
+            <Setter Property="Background" Value="Yellow"/>
+        </Style> -->
         
         <!-- <Style Selector="^:selected /template/ Border#PART_SuggestionsContainer">
             <Style Selector="^:pointerover /template/ Border#PART_SuggestionsContainer, ^:selected /template/ Border#PART_SuggestionsContainer">

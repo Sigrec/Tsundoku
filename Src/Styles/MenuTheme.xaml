@@ -7,15 +7,40 @@
         <Style Selector=" ^ ListBox > ListBoxItem">
             <Setter Property="FontWeight" Value="Bold" />
             <Setter Property="FontSize" Value="15" />
-<!-- 
+            <Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"/>
+            <Setter Property="Background" Value="Transparent"/>
+
             <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-                <Setter Property="Background" Value="Transparent"/>
-                <Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"/>
+                <Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
+                <Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
             </Style>
-            <Style Selector="^:selected /template/ ContentPresenter#PART_ContentPresenter">
-                <Setter Property="Background" Value="Transparent"/>
-                <Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"/>
-            </Style> -->
+
+            <Style Selector="^:pressed /template/ ContentPresenter#PART_ContentPresenter">
+			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
+			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
+		</Style>
+
+		<Style Selector="^:selected">
+			<Style Selector="^ /template/ ContentPresenter#PART_ContentPresenter">
+				<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
+				<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
+			</Style>
+
+            <Style Selector="^:not(:focus) /template/ ContentPresenter#PART_ContentPresenter">
+				<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
+				<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
+			</Style>
+
+			<!-- <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+				<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"/>
+				<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"/>
+			</Style> -->
+
+            <Style Selector="^:pressed /template/ ContentPresenter#PART_ContentPresenter">
+				<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"/>
+				<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"/>
+			</Style>
+		</Style>
         </Style>
     </Style>
 
@@ -26,13 +51,51 @@
 
 	<Style Selector="TextBlock">
 		<Style Selector="^.menu">
-			<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}"/>
+			<Setter Property="TextBlock.Foreground" Value="{CompiledBinding CurrentTheme.MenuTextColor, Converter={StaticResource ConvertColor}}"/>
 		</Style>
 
 		<Style Selector="^.username">
-			<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.UsernameColor, Converter={StaticResource ConvertColor}}"/>
+			<Setter Property="TextBlock.Foreground" Value="{CompiledBinding CurrentTheme.UsernameColor, Converter={StaticResource ConvertColor}}"/>
 		</Style>
 	</Style>
+    <Style Selector="ComboBox.Theme > ComboBoxItem">
+        <Style Selector="^">
+            <Setter Property="TextBlock.Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"/>
+		</Style>
+        
+        <Style Selector="^:pressed /template/ ContentPresenter">
+			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
+			<Setter Property="TextBlock.Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
+		</Style>
+
+		<Style Selector="^:pointerover /template/ ContentPresenter">
+			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
+			<Setter Property="TextBlock.Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
+		</Style>
+
+		<Style Selector="^:selected">
+			<Style Selector="^ /template/ ContentPresenter">
+				<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
+				<Setter Property="TextBlock.Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
+			</Style>
+
+            <!-- <Style Selector="^:disabled /template/ ContentPresenter">
+                <Setter Property="Background" Value="{DynamicResource ComboBoxItemBackgroundSelectedDisabled}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource ComboBoxItemBorderBrushSelectedDisabled}" />
+                <Setter Property="TextBlock.Foreground" Value="{DynamicResource ComboBoxItemTextBlock.ForegroundSelectedDisabled}" />
+            </Style> -->
+
+            <Style Selector="^:pointerover /template/ ContentPresenter">
+                <Setter Property="Background" Value="{DynamicResource ComboBoxItemBackgroundSelectedPointerOver}" />
+                <Setter Property="TextBlock.Foreground" Value="{DynamicResource ComboBoxItemForegroundSelectedPointerOver}" />
+            </Style>
+
+            <Style Selector="^:pressed /template/ ContentPresenter">
+                <Setter Property="Background" Value="{DynamicResource ComboBoxItemBackgroundSelectedPressed}" />
+                <Setter Property="TextBlock.Foreground" Value="{DynamicResource ComboBoxItemForegroundSelectedPressed}" />
+            </Style>
+		</Style>
+    </Style>
 
 	<Style Selector="Button">
 		<Style Selector="^.menu">

@@ -27,7 +27,7 @@ namespace Tsundoku.ViewModels
 {
     public partial class MainWindowViewModel : ViewModelBase
     {
-        private static readonly string USER_DATA_FILEPATH = @"UserData.json";
+        private const string USER_DATA_FILEPATH = @"UserData.json";
         private const double SCHEMA_VERSION = 2.0;
         private static bool newUserFlag = false;
         private static bool CanFilter = true;
@@ -44,7 +44,6 @@ namespace Tsundoku.ViewModels
         [Reactive] public int LanguageIndex { get; set; }
         [Reactive] public int FilterIndex { get; set; }
         [Reactive] public string AdvancedSearchQueryErrorMessage { get; set; }
-        [Reactive] private SolidColorBrush AdvancedSearchBackgroundColor { get; set; } = new SolidColorBrush(Colors.Black, 0.5);
 
         public AddNewSeriesWindow newSeriesWindow;
         public ReactiveCommand<Unit, Unit> OpenAddNewSeriesWindow { get; set; }
@@ -67,7 +66,6 @@ namespace Tsundoku.ViewModels
         
         // TODO Add genres?
         // TODO Manual Entry Option?
-        // TODO Add barcode functiionality?
         // TODO Add export/import for themes
         public MainWindowViewModel()
         {
@@ -78,14 +76,14 @@ namespace Tsundoku.ViewModels
             LoadUserData();
             ConfigureWindows();
 
-            this.WhenAnyValue(x => x.CurLanguage).Subscribe(x => MainUser.CurLanguage = x);
+            this.WhenAnyValue(x => x.CurLanguage).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.CurLanguage = x);
             this.WhenAnyValue(x => x.CurLanguage).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => LanguageIndex = AVAILABLE_LANGUAGES.IndexOf(x));
             this.WhenAnyValue(x => x.CurFilter).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => FilterIndex = AVAILABLE_COLLECTION_FILTERS.IndexOf(x));
             this.WhenAnyValue(x => x.SearchText).Throttle(TimeSpan.FromMilliseconds(600)).ObserveOn(RxApp.MainThreadScheduler).Subscribe(SearchCollection);
-            this.WhenAnyValue(x => x.CurrentTheme).Subscribe(x => MainUser.MainTheme = x.ThemeName);
-            this.WhenAnyValue(x => x.CurDisplay).Subscribe(x => MainUser.Display = x);
-            this.WhenAnyValue(x => x.UserName).Subscribe(x => MainUser.UserName = x);
-            this.WhenAnyValue(x => x.UserIcon).Subscribe(x => MainUser.UserIcon = User.ImageToByteArray(x));
+            this.WhenAnyValue(x => x.CurrentTheme).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.MainTheme = x.ThemeName);
+            this.WhenAnyValue(x => x.CurDisplay).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.Display = x);
+            this.WhenAnyValue(x => x.UserName).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.UserName = x);
+            this.WhenAnyValue(x => x.UserIcon).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.UserIcon = User.ImageToByteArray(x));
 
             StartAdvancedSearch = ReactiveCommand.Create(() => AdvancedSearchCollection(AdvancedSearchText));
         }

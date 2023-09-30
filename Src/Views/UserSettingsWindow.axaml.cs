@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System;
 using System.Threading.Tasks;
 using ReactiveUI;
+using System.IO;
 
 namespace Tsundoku.Views
 {
@@ -76,14 +77,22 @@ namespace Tsundoku.Views
         public void OpenCoversFolder(object sender, RoutedEventArgs args)
         {
             Task.Run(() =>{
-                Process.Start("explorer.exe", @$"Covers");
+                if (!Directory.Exists(@"Covers"))
+                {
+                    Directory.CreateDirectory(@"Covers");
+                }
+                Process.Start("explorer.exe", @"Covers");
             });
         }
 
         public void OpenScreenshotsFolder(object sender, RoutedEventArgs args)
         {
             Task.Run(() =>{
-                Process.Start("explorer.exe", @$"Screenshots");
+                if (!Directory.Exists(@"Screenshots"))
+                {
+                    Directory.CreateDirectory(@"Screenshots");
+                }
+                Process.Start("explorer.exe", @"Screenshots");
             });
         }
 

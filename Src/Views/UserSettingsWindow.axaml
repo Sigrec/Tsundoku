@@ -28,16 +28,21 @@
         <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"> 
             <StackPanel Margin="20,10,20,20" Spacing="10">
                 <StackPanel Spacing="5">
-                    <TextBlock Text="Change Username" TextDecorations="Underline" FontSize="20" FontWeight="Bold" Classes="menu"/>
+                    <TextBlock Text="Change Username" 
+                               TextDecorations="Underline" 
+                               FontSize="20" 
+                               FontWeight="Bold"
+                               ToolTip.Tip="{CompiledBinding UsernameText}"
+                               Classes="menu"/>
                     <StackPanel Orientation="Horizontal" Spacing="5">
                         <TextBox Name="UsernameChange"
                                 Width="400"
                                 FontWeight="Bold"
                                 Classes="menu"
                                 FontSize="15"
-                                MaxLength="18"
+                                MaxLength="20"
                                 Watermark="Enter New Username..."
-                                Text="{Binding UsernameText}"
+                                Text="{CompiledBinding UsernameText}"
                                 BorderThickness="2"/>
                         <Button FontSize="18"
                                 BorderThickness="2"

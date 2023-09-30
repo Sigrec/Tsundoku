@@ -658,6 +658,7 @@
 								  ItemsSource="{CompiledBinding UserThemesDisplay}"
 								  BorderThickness="2"
 								  Theme="{StaticResource MenuComboBox}"
+                                  Classes="Theme"
 								  SelectedIndex="{CompiledBinding CurThemeIndex}"/>
 						<Button FontSize="20" 
 								FontWeight="Bold" 

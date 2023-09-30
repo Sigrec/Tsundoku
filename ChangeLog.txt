@@ -3,33 +3,42 @@ Legend
 ✅ -> Completed new feature/update
 🔥 -> Completed bug/hot fix
 ⌛ -> Completed performance/library update
+✍️ -> Additional Info about a Change
+📜 -> Higher level identifier for feature changes
 
 V2.0.0.0 - PST
 ✅ Logs now output to TsundokuLogs.log file in folder, and are cleared everytime the application is started to prevent overflow
-✅ Added new "Scrape" Window that allows users to scrape multiple websites to get the website that contains the lowest price volume in USD for each volume of a series. Includes filtering out OOS and PO entires as well. Currently only supports websites that have USD.
-✅ Added 4 new toggle buttons in the user settings window to determine if the user is a member of RightStufAnime, Banres & Noble, BooksAMillion, and/or Kinokuniya
-✅ Updated UserData JSON schema to include Memberships dictionary in the User & Changed Series "Score" to appropiate naming convention "Rating"
-✅ Added functionality to copy stat text for all stats to clipboard by clicking on stat box
-✅ Disabled hovering of pie charts and moved the counts to the legend
+✅ Windows besides "Theme" window now stay on top of main collection window
 ✅ Windows now open full sized if your monitor height is large enough
-✅ Hovering over Title & Additional Language Title Text's in "Add Series" window now shows full title and list of currenly selected languages
-✅ Fixed/Changed Layout of Settings Window & doubled size of input textbox for series title
-✅ Fixed/Changed Layout & Styling of Stats Window
 ✅ Added 8 new filters/sorts, "Shounen", "Shoujo", "Seinen", "Josei", "Rating", "Cost", "Read", & "Unread"
-✅ Added new Command "SHIFT+F" to reload the current filter/sort on the collection
-✅ Added new Command "CTRL+F" to open Advanced Searching/Querying for your collection
 ✅ Added RateLimiting to AniListQuery
+⌛ Updated to .NET 8.0 & Libraries
+⌛ Improved Performance when Searching/Filtering/Sorting Collection
 🔥 Fixed issue where Searching & Filtering or Changing Language would conflict with each other
-🔥 Fixed Themes Settings window border now being curved on the bottom
-🔥 Slight Changes to the formatting of all windows except main collection window
 🔥 Fixed issue where users could input negative numbers into a series score, user can no longer can do that
 🔥 Fixed issue where filtering collection by "Manga" doesn't include "Comics"
-🔥 Fixed Issue where using MangaDexID to query a new series would cause the app to crash
-⌛ Updated to .NET 8.0
-⌛ Improved Performance when Searching/Filtering/Sorting Collection
-❌ Theme Settings ComboboxItem Styles not applying properly
-❌ Fixed issue where clicking on a different window cause other windows to hide
-❌ Update Libraries
+🔥 Fixed issue where opening covers or screenshots folder would open a random directory if the directories are not already present
+🔥 Fixed issue with listbox selection where styling would bug out and you were not able to select & deselect a item without clicking the text itself
+📜+✅ Added new "Scrape" Window that allows users to scrape multiple websites to get the website that contains the lowest price volume in USD for each volume of a series. Includes filtering out OOS and PO entires as well. Currently only supports websites that have USD.
+    - ✅ Added 4 new toggle buttons in the user settings window to determine if the user is a member of RightStufAnime, Banres & Noble, BooksAMillion, and/or Kinokuniya
+    - ✅ Updated UserData JSON schema to include Memberships dictionary in the User & Changed Series "Score" to appropiate naming convention "Rating"
+📜 Changes to "Settings" Window
+    - ✅ Added new Command "SHIFT+F" to reload the current filter/sort on the collection
+    - ✅ Added new Command "CTRL+F" to open Advanced Searching/Querying for your collection
+        - ✍️ Seperate queries with a space like "Favorite==True Cost>=500 Cost<=10000"
+    - ✅ Layout changes due to new controls being added above
+    - ✅ Hovering over "Change Username" title above the input text box shows what is currently inputted
+    - ✅ Increased max character length of username from 18 to 20
+📜 Changes to "Stats" Window
+    - ✅ Added functionality to copy stat text for all stats to clipboard by clicking on stat box
+    - ✅ Disabled hovering of pie charts and moved the counts to the legend due to clipping issues
+📜 Changes to "AddSeries" Window
+    - ✅ Doubled size of Title TextBox
+    - ✅ Hovering over "Title" & "Additional Language" titles above input boxes now shows what is selected/inputted
+    - 🔥 Fixed issue where using MangaDexID to query a new series would cause the app to crash
+📜 Changes to "Theme" Window
+    - 🔥 Fixed window border issue not being curved on the bottom
+❌ ComboboxItem Styles not applying properly in Theme & AdvancedQuery
 
 V1.9.2.1 - September 3rd, 2023 @ 8:56PM PST
 🔥 Fixed issue where you couldn't reload the cover when searching or filtering
