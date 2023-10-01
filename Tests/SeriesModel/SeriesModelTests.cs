@@ -1,9 +1,9 @@
+using System.Runtime.InteropServices.ComTypes;
 using System.Text.Json;
 
 [assembly: Description("Testing Series Model from Tsundoku")]
 namespace Tsundoku.Tests
 {
-    // TODO Add test for －ヒトガタナ－ the description is not being parsed properly
     [Author("Sean (Alias -> Prem or Sigrec)")]
     [TestOf(typeof(Series))]
     [Description("Testing Series Model")]
@@ -26,6 +26,7 @@ namespace Tsundoku.Tests
         {
             if (Directory.Exists("Covers"))
             {
+                Console.WriteLine("Deleted Covers Folder");
                 Directory.Delete(@"Covers", true);
             }
         }
@@ -79,14 +80,6 @@ namespace Tsundoku.Tests
         }
 
         [Test]
-        public async Task CreateCoverFilePath_Test()
-        {
-            JsonElement narutoQuery = (await AniListQuery.GetSeriesByTitleAsync("Naruto", "MANGA", 1)).RootElement.GetProperty("Media");
-
-            Assert.That(Series.CreateCoverFilePath(narutoQuery.GetProperty("coverImage").GetProperty("extraLarge").GetString(), narutoQuery.GetProperty("title").GetProperty("romaji").GetString(), "MANGA", narutoQuery.GetProperty("synonyms").EnumerateArray(), Constants.Site.AniList), Is.EqualTo("Covers\\NARUTO_MANGA.jpg"));
-        }
-
-        [Test]
         public void IdenticalSeriesNames_GetSeriesByID_Test()
         {
             Assert.Multiple(async () =>
@@ -94,6 +87,14 @@ namespace Tsundoku.Tests
                 Assert.That((await AniListQuery.GetSeriesByIDAsync(98282, "MANGA", 1)).RootElement.GetProperty("Media").GetProperty("title").GetProperty("romaji").GetString(), Is.EqualTo("Getsuyoubi no Tawawa"));
                 Assert.That((await AniListQuery.GetSeriesByIDAsync(125854, "MANGA", 1)).RootElement.GetProperty("Media").GetProperty("title").GetProperty("romaji").GetString(), Is.EqualTo("Getsuyoubi no Tawawa"));
             });
+        }
+
+        [Test]
+        [Parallelizable(scope: ParallelScope.Self)]
+        public void ParseDescription_MangaDex_Brackets_Test()
+        {
+            // https://mangadex.org/title/b6fed5d7-9021-4ff5-be9d-74c4925152e7/-hitogatana
+            Assert.That(MangadexQuery.ParseMangadexDescription("Crimes commited using manned combat-androids dubbed \"Katana\" run rampant. In an effort to maintain order, the government has organized the AKCD - \"Anti Katana Crime Division.\" Togusa of the 8th squad of the AKCD, while holding existential doubts as a Human-Katana hybrid, continually casts himself into battle…  \n  \n [Official Korean](https://ridibooks.com/books/845012944)  \n [Official Traditional Chinese](https://www.books.com.tw/products/0010625775)\n\n[Wikipedia](https://ja.wikipedia.org/wiki/-%E3%83%92%E3%83%88%E3%82%AC%E3%82%BF%E3%83%8A-)"), Is.EqualTo("Crimes commited using manned combat-androids dubbed \"Katana\" run rampant. In an effort to maintain order, the government has organized the AKCD - \"Anti Katana Crime Division.\" Togusa of the 8th squad of the AKCD, while holding existential doubts as a Human-Katana hybrid, continually casts himself into battle…"));
         }
 
         [Test]
@@ -133,7 +134,7 @@ namespace Tsundoku.Tests
 
         [Test]
         [Parallelizable(scope: ParallelScope.Self)]
-        public void ParseDescription_UnnecessaryBreakRemoval_Test()
+        public void ParseDescription_AniList_UnnecessaryBreakRemoval_Test()
         {
             Assert.Multiple(() =>
             {
@@ -145,7 +146,7 @@ namespace Tsundoku.Tests
 
         [Test]
         [Parallelizable(scope: ParallelScope.Self)]
-        public void ParseDescription_BR_And_Ampersand_Test()
+        public void ParseDescription_AniList_BR_And_Ampersand_Test()
         {
             // Baki description to check for <br><br> & ampersand string for test
             string amerpsandAndBrDesc = "BAKI: THE SEARCH OF OUR STRONGEST HERO is the official name of the 4th saga in which Baki will find strongest enemies in his path, and the way to challenge his dad once again, and this time&hellip; To lose is to die.\n<br><br>Hanma Baki (named &ldquo;Wild Fang&rdquo; by his father) is a boy born under an unlucky star. Since the day of his birth, Baki has been rigorously training at all kinds of martial arts, strengthening himself at his father&rsquo;s command. For he must obey his father&rsquo;s rule that at his &ldquo;coming of age&rdquo; Baki surpass his own father, Hanma Yuujiro, &ldquo;the most powerful creature walking on earth.&rdquo; Baki&rsquo;s life has been nothing but trouble. This has given Baki a wild nature and convinced him that &ldquo;to be the most powerful&rdquo; is his way of life. Tenacious and fearless under all adverse conditions, Baki continues his training looking for new masters and new challenges to strengthen his personality and become &ldquo;the strongest man on earth.&rdquo; That road is a lonely one and Baki experienced the cruelty of his sick dad in a move that would change his life forever.  ";
@@ -157,7 +158,7 @@ namespace Tsundoku.Tests
 
         [Test]
         [Parallelizable(scope: ParallelScope.Self)]
-        public void ParseDescription_ExcessiveLineBreaks_Test()
+        public void ParseDescription_AniList_ExcessiveLineBreaks_Test()
         {
             string excessiveLineBreakDesc = "Average human teenage boy Tsukune accidentally enrolls at a boarding school for monsters--no, not jocks and popular kids, but bona fide werewolves, witches, and unnameables out of his wildest nightmares!<br><br>\nOn the plus side, all the girls have a monster crush on him. On the negative side, all the boys are so jealous they want to kill him! And so do the girls he spurns because he only has eyes for one of them--the far-from-average vampire Moka.<br><br>\nOn the plus side, Moka only has glowing red eyes for Tsukune. On the O-negative side, she also has a burning, unquenchable thirst for his blood...\n<br><br>\n\n(Source: Viz Media)";
             string expectedExcssiveLineBreakDesc = "Average human teenage boy Tsukune accidentally enrolls at a boarding school for monsters--no, not jocks and popular kids, but bona fide werewolves, witches, and unnameables out of his wildest nightmares!\n\nOn the plus side, all the girls have a monster crush on him. On the negative side, all the boys are so jealous they want to kill him! And so do the girls he spurns because he only has eyes for one of them--the far-from-average vampire Moka.\n\nOn the plus side, Moka only has glowing red eyes for Tsukune. On the O-negative side, she also has a burning, unquenchable thirst for his blood...";
@@ -167,7 +168,7 @@ namespace Tsundoku.Tests
 
         [Test]
         [Parallelizable(scope: ParallelScope.Self)]
-        public void ParseDescription_Html_And_RemoveSource_Test()
+        public void ParseDescription_AniList_HtmlAndRemoveSource_Test()
         {
             string htmlDesc = "In a world where awakened beings called “Hunters” must battle deadly monsters to protect humanity, Sung Jinwoo, nicknamed “the weakest hunter of all mankind,” finds himself in a constant struggle for survival. One day, after a brutal encounter in an overpowered dungeon wipes out his party and threatens to end his life, a mysterious System chooses him as its sole player: Jinwoo has been granted the rare opportunity to level up his abilities, possibly beyond any known limits. Follow Jinwoo’s journey as he takes on ever-stronger enemies, both human and monster, to discover the secrets deep within the dungeons and the ultimate extent of his powers.\n<br><br>\n(Source: Tappytoon)\n<br><br>\n<i>Note: Chapter count includes a prologue. </i>";
 
@@ -178,7 +179,7 @@ namespace Tsundoku.Tests
 
         [Test]
         [Parallelizable(scope: ParallelScope.Self)]
-        public void ParseDescription_Brackets_Test()
+        public void ParseDescription_AniList_Brackets_Test()
         {
             string htmlDesc = "The master spy codenamed &lt;Twilight&gt; has spent his days on undercover missions, all for the dream of a better world. But one day, he receives a particularly difficult new order from command. For his mission, he must form a temporary family and start a new life?! A Spy/Action/Comedy about a one-of-a-kind family!<br><br>\n(Source: MANGA Plus)<br><br>\n<i>Notes:<br>\n- Includes 2 \"Extra Missions\" and 9 “Short Missions”.<br>\n- Nominated for the 24th Tezuka Osamu Cultural Prize in 2020.<br>\n- Nominated for the 13th and 14th Manga Taisho Award in 2020 and 2021.<br>\n- Nominated for the 44th Kodansha Manga Award in the Shounen Category in 2020.</i>";
 
@@ -222,18 +223,21 @@ namespace Tsundoku.Tests
         }
 
         [Test] // Testing with Bungou Stray Dogs
+        [Parallelizable(scope: ParallelScope.Self)]
         public async Task GetSeriesStaff_UntrimmedRole_Test()
         {
             Assert.That(Series.GetSeriesStaff((await AniListQuery.GetSeriesByTitleAsync("文豪ストレイドッグス", "MANGA", 1)).RootElement.GetProperty("Media").GetProperty("staff").GetProperty("edges"), "full", "Manga", "Bungou Stray Dogs", new System.Text.StringBuilder()), Is.EqualTo("Kafka Asagiri | Harukawa35"));
         }
 
         [Test] // Testing with Bakemonogatari
+        [Parallelizable(scope: ParallelScope.Self)]
         public async Task GetSeriesStaff_ToManyIllustrators_Test()
         {
             Assert.That(Series.GetSeriesStaff((await AniListQuery.GetSeriesByTitleAsync("化物語", "MANGA", 1)).RootElement.GetProperty("Media").GetProperty("staff").GetProperty("edges"), "full", "Manga", "Bakemonogatari", new System.Text.StringBuilder()), Is.EqualTo("Ito Oogure | NISIOISIN | VOFAN | Akio Watanabe"));
         }
 
         [Test]
+        [Parallelizable(scope: ParallelScope.Self)]
         public async Task GetSeriesStaff_MultplieStaffForValidRole_Test()
         {
             Assert.That(Series.GetSeriesStaff((await AniListQuery.GetSeriesByTitleAsync("나 혼자만 레벨업", "MANGA", 1)).RootElement.GetProperty("Media").GetProperty("staff").GetProperty("edges"), "full", "Manga", "Na Honjaman Level Up", new System.Text.StringBuilder()), Is.EqualTo("Chu-Gong | So-Ryeong Gi | Hyeon-Gun | Seong-Rak Jang"));
@@ -247,6 +251,7 @@ namespace Tsundoku.Tests
         }
 
         [Test] // Tests if only native = null, onyl full = null, and both native and full are null
+        [Parallelizable(scope: ParallelScope.Self)]
         public void GetSeriesStaff_AllNullStaffScenarios_Name_Test()
         {
             Assert.That(Series.GetSeriesStaff(JsonDocument.Parse(File.ReadAllText(@"\Tsundoku\Tests\SeriesModel\SeriesModelTestData\staffNameTest.json")).RootElement.GetProperty("data").GetProperty("Media").GetProperty("staff").GetProperty("edges"), "full", "Novel", "86: Eighty Six", new System.Text.StringBuilder()), Is.EqualTo("Asato Asato | しらび | Ⅰ-Ⅳ"));

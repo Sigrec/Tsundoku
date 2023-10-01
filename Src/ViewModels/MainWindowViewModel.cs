@@ -20,7 +20,7 @@ namespace Tsundoku.ViewModels
 {
     public partial class MainWindowViewModel : ViewModelBase
     {
-        private const string USER_DATA_FILEPATH = @"UserData.json";
+        public const string USER_DATA_FILEPATH = @"UserData.json";
         private const double SCHEMA_VERSION = 2.0;
         private static bool newUserFlag = false;
         private static bool CanFilter = true;
@@ -419,7 +419,6 @@ namespace Tsundoku.ViewModels
             if (!File.Exists(USER_DATA_FILEPATH))
             {
                 LOGGER.Info("Creating New User");
-                ThemeSettingsViewModel.UserThemes = [TsundokuTheme.DEFAULT_THEME];
                 MainUser = new User(
                             "UserName", 
                             "Romaji", 
@@ -434,7 +433,7 @@ namespace Tsundoku.ViewModels
                                 { BooksAMillion.WEBSITE_TITLE, false },
                                 { KinokuniyaUSA.WEBSITE_TITLE , false }
                             }, 
-                            ThemeSettingsViewModel.UserThemes, 
+                            [TsundokuTheme.DEFAULT_THEME], 
                             UserCollection
                         );
                 UserName = MainUser.UserName;
@@ -445,18 +444,28 @@ namespace Tsundoku.ViewModels
                 SaveUsersData();
             }
             
-            bool save = VersionUpdate();
-
             FileStream fRead = new(USER_DATA_FILEPATH, FileMode.Open, FileAccess.Read, FileShare.Read);
             //MainUser = JsonSerializer.Deserialize(fRead, Context.Default.User);
             MainUser = JsonSerializer.Deserialize<User>(fRead, options);
             fRead.Flush();
             fRead.Close();
 
+            if (MainUser.CurDataVersion == 0 || MainUser.CurDataVersion < SCHEMA_VERSION)
+            {
+                VersionUpdate();
+                UpdateDefaultTheme();
+                updatedVersion = false;
+                FileStream fReadUpdate = new(USER_DATA_FILEPATH, FileMode.Open, FileAccess.Read, FileShare.Read);
+                //MainUser = JsonSerializer.Deserialize(fReadUpdate, Context.Default.User);
+                MainUser = JsonSerializer.Deserialize<User>(fReadUpdate, options);
+                fReadUpdate.Flush();
+                fReadUpdate.Close();
+                LOGGER.Info("Reloading User Data");
+            }
+
             LOGGER.Info($"Loading {MainUser.UserName}'s Data");
             UserName = MainUser.UserName;
             UserCollection = MainUser.UserCollection;
-            ThemeSettingsViewModel.UserThemes = new ObservableCollection<TsundokuTheme>(MainUser.SavedThemes.OrderBy(theme => theme.ThemeName).ToList());
             CurLanguage = MainUser.CurLanguage;
             CurDisplay = MainUser.Display;
             CurCurrency = MainUser.Currency;
@@ -477,8 +486,8 @@ namespace Tsundoku.ViewModels
                 }
                 SearchedCollection.Add(x);
             }
+            SearchedCollection.AddRange(UserCollection);
 
-            if (save) { SaveUsersData(); UpdateDefaultTheme(); updatedVersion = false; }
         }
 
         /// <summary>
@@ -500,10 +509,9 @@ namespace Tsundoku.ViewModels
         [RequiresUnreferencedCode("Calls System.Text.Json.JsonSerializer.Serialize<TValue>(TValue, JsonSerializerOptions)")]
         private static bool VersionUpdate()
         {
-            string json = File.ReadAllText(USER_DATA_FILEPATH);
-            JsonNode userData = JsonNode.Parse(json);
+            JsonNode userData = JsonNode.Parse(File.ReadAllText(USER_DATA_FILEPATH));
             JsonNode series;
-            JsonArray collectionJsonArray = userData["UserCollection"].AsArray();
+            JsonArray collectionJsonArray = userData[nameof(UserCollection)].AsArray();
             
             // For users who did not get the older update
             if (!userData.AsObject().ContainsKey("CurDataVersion"))
@@ -512,16 +520,16 @@ namespace Tsundoku.ViewModels
             }
             double curVersion = double.Parse(userData["CurDataVersion"].ToString());
 
-            if (curVersion < 1.5)
+            if (curVersion < 1.5) // 1.5 Version Upgrade changes Series Title, Staff. & Status to accomadte new changes & adds Stats related variables to Series and also changes Native to Japanese
             {
                 userData.AsObject().Add("Currency", "$");
                 userData.AsObject().Add("MeanRating", 0);
                 userData.AsObject().Add("VolumesRead", 0);
                 userData.AsObject().Add("CollectionPrice", "");
 
-                if (userData["CurLanguage"].ToString().Equals("Native"))
+                if (userData[nameof(CurLanguage)].ToString().Equals("Native"))
                 {
-                    userData["CurLanguage"] = "Japanese";
+                    userData[nameof(CurLanguage)] = "Japanese";
                 }
 
                 for (int x = 0; x < collectionJsonArray.Count; x++)
@@ -566,7 +574,7 @@ namespace Tsundoku.ViewModels
                 updatedVersion = true;        
             }
 
-            if (curVersion < 1.6)
+            if (curVersion < 1.6) // 1.6 Version Upgrade fixes scores defaulting to 0 to -1 instead so it doesn't show up i stats
             {
                 for (int x = 0; x < collectionJsonArray.Count; x++)
                 {
@@ -582,13 +590,13 @@ namespace Tsundoku.ViewModels
                 updatedVersion = true;  
             }
 
-            if (curVersion < 1.7 || newUserFlag)
+            if (curVersion < 1.7 || newUserFlag) // 1.7 Version Upgrade To accomdate adding user icon
             {
                 string defaultFileByte = "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";
 
                 if (newUserFlag)
                 {
-                    userData["UserIcon"] = defaultFileByte;
+                    userData[nameof(UserIcon)] = defaultFileByte;
                     updatedVersion = false;
                 }
                 else
@@ -600,7 +608,7 @@ namespace Tsundoku.ViewModels
                 }
             }
 
-            if (curVersion < 1.8)
+            if (curVersion < 1.8) // 1.8 Version Upgrade to rename button color identifiers for TsundokuTheme change
             {
                 JsonArray themeJsonArray = userData["SavedThemes"].AsArray();
                 JsonObject theme;
@@ -619,7 +627,7 @@ namespace Tsundoku.ViewModels
                 updatedVersion = true;  
             }
 
-            if (curVersion < 1.9)
+            if (curVersion < 1.9) // 1.9 Version Upgrade resizes all bitmaps in the users cover folder
             {
                 string coverPath;
                 for (int x = 0; x < collectionJsonArray.Count; x++)
@@ -636,7 +644,7 @@ namespace Tsundoku.ViewModels
                 updatedVersion = true;
             }
 
-            if (curVersion < 2.0)
+            if (curVersion < 2.0) // 2.0 Verion Upgrade adds Memberships for Price Analysis and changes "Score" to "Rating"
             {
                 userData["Memberships"] = new JsonObject
                 {
@@ -652,6 +660,7 @@ namespace Tsundoku.ViewModels
                     series = collectionJsonArray.ElementAt(x).AsObject();
                     series["Rating"] = (decimal)series["Score"];
                 }
+                userData.AsObject().Remove("MeanScore");
 
                 userData["CurDataVersion"] = 2.0;
                 LOGGER.Info("Updated Users Data to v2.0");
@@ -667,8 +676,6 @@ namespace Tsundoku.ViewModels
         {
             LOGGER.Info($"Saving {MainUser?.UserName}'s Data");
             MainUser.UserCollection = UserCollection;
-            // TODO Currently if a user adds a new theme and doesn't save then the theme is lost
-            MainUser.SavedThemes = ThemeSettingsViewModel.UserThemes;
 
             File.WriteAllText(USER_DATA_FILEPATH, JsonSerializer.Serialize(MainUser, options));
             //File.WriteAllText(USER_DATA_FILEPATH, JsonSerializer.Serialize(MainUser, Context.Default.User));

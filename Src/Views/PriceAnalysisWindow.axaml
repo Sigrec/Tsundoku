@@ -80,7 +80,6 @@
 				</StackPanel>
 				<StackPanel Grid.Column="4" Grid.Row="0" Grid.RowSpan="3">
 					<TextBlock Text="Select Websites" FontSize="20" FontWeight="Bold" Classes="menu"/>
-					<!-- TODO Fix pressed style for listboxitem so it's opposite of hover -->
 					<ListBox Name="WebsiteSelector"
 							  Theme="{StaticResource QueryListBox}"
 							  SelectionMode="Multiple,Toggle"

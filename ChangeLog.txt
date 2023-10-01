@@ -12,8 +12,8 @@ V2.0.0.0 - PST
 ✅ Windows now open full sized if your monitor height is large enough
 ✅ Added 8 new filters/sorts, "Shounen", "Shoujo", "Seinen", "Josei", "Rating", "Cost", "Read", & "Unread"
 ✅ Added RateLimiting to AniListQuery
-⌛ Updated to .NET 8.0 & Libraries
 ⌛ Improved Performance when Searching/Filtering/Sorting Collection
+⌛ Improved starting load time of application
 🔥 Fixed issue where Searching & Filtering or Changing Language would conflict with each other
 🔥 Fixed issue where users could input negative numbers into a series score, user can no longer can do that
 🔥 Fixed issue where filtering collection by "Manga" doesn't include "Comics"
@@ -38,6 +38,7 @@ V2.0.0.0 - PST
     - 🔥 Fixed issue where using MangaDexID to query a new series would cause the app to crash
 📜 Changes to "Theme" Window
     - 🔥 Fixed window border issue not being curved on the bottom
+    - 🔥 Themes now save after creation to prevent them from being lost during a crash
 ❌ ComboboxItem Styles not applying properly in Theme & AdvancedQuery
 
 V1.9.2.1 - September 3rd, 2023 @ 8:56PM PST

@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Text.Json;
+﻿using System.Net;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Tsundoku.Helpers
 {
@@ -22,7 +16,7 @@ namespace Tsundoku.Helpers
         };
 
         private static readonly string USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36 Edg/116.0.1938.62";
-        [GeneratedRegex("\\n\\n\\n---[\\S\\s.]*|\\n\\n\\*\\*[\\S\\s.]*")] private static partial Regex MangaDexDescRegex();
+        [GeneratedRegex(@"\n\n\n---[\S\s.]*|\n\n\*\*[\S\s.]*|\[Official.*?\].*|\[Wikipedia.*?\].*")] private static partial Regex MangaDexDescRegex();
 
         static MangadexQuery()
         {
@@ -140,7 +134,7 @@ namespace Tsundoku.Helpers
         /// <returns></returns>
         public static string ParseMangadexDescription(string seriesDescription)
 		{
-			return MangaDexDescRegex().Replace(seriesDescription, "").Trim();
+			return MangaDexDescRegex().Replace(seriesDescription, "").TrimEnd('\n').Trim();
 		}
     }
 }

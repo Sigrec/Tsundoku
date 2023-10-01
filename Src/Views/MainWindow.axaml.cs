@@ -529,6 +529,7 @@ namespace Tsundoku.Views
             }
 
             MainWindowViewModel.SaveUsersData();
+            NLog.LogManager.Shutdown();
             App.Mutex.Dispose();
         }
 
