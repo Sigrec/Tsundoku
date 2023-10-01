@@ -1,13 +1,9 @@
 ﻿using GraphQL;
 using GraphQL.Client.Http;
 using GraphQL.Client.Serializer.SystemTextJson;
-using System;
-using System.Linq;
 using System.Net.Http.Headers;
 using System.Text;
-using System.Text.Json;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Tsundoku.Helpers
 {
@@ -92,7 +88,7 @@ namespace Tsundoku.Helpers
 			}
 			catch(Exception e)
 			{
-				LOGGER.Error($"AniList GetSeriesByTitle w/ {title} Request Failed {e.Message}");
+				LOGGER.Error($"AniList GetSeriesByTitle w/ {title} Request Failed \n{e.Message}");
 			}
 			return null;
 		}
@@ -172,7 +168,7 @@ namespace Tsundoku.Helpers
         {
             responseHeaders.TryGetValues("X-RateLimit-Remaining", out var rateRemainingValues);
             _ = short.TryParse(rateRemainingValues?.FirstOrDefault(), out var rateRemaining);
-            LOGGER.Debug($"Rate Remaining = {rateRemaining}");
+            LOGGER.Info($"Rate Remaining = {rateRemaining}");
             if (rateRemaining > 0)
             {
                 return -1;

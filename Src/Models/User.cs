@@ -1,6 +1,4 @@
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 
 namespace Tsundoku.Models
 {
@@ -40,11 +38,16 @@ namespace Tsundoku.Models
 
         public static byte[] ImageToByteArray(Avalonia.Media.Imaging.Bitmap image)
         {
-            using (MemoryStream stream = new())
-            {
-                image.Save(stream, 100);
-                return stream.ToArray();
-            }
+            using MemoryStream stream = new();
+            image.Save(stream, 100);
+            return stream.ToArray();
         }
     }
+
+    // [JsonSerializable(typeof(User))]
+    // [JsonSourceGenerationOptions(WriteIndented = true, AllowTrailingCommas = true, ReadCommentHandling = JsonCommentHandling.Disallow)]
+    // internal partial class Context : JsonSerializerContext
+    // {
+        
+    // }
 }

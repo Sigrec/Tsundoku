@@ -1,12 +1,10 @@
-using System;
 using ReactiveUI.Fody.Helpers;
 using ReactiveUI;
 using System.Reactive.Linq;
-using System.Threading.Tasks;
 using System.Text;
 using Tsundoku.Models;
 using System.Windows.Input;
-using MangaLightNovelWebScrape.Websites;
+using MangaLightNovelWebScrape.Websites.America;
 
 namespace Tsundoku.ViewModels
 {

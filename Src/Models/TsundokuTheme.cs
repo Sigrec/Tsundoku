@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using Avalonia.Media;
 
 namespace Tsundoku.Models

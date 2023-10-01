@@ -1,6 +1,4 @@
-using System;
 using System.Diagnostics;
-using System.Text.Json;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Tsundoku.Models;
@@ -13,13 +11,13 @@ namespace Tsundoku.ViewModels
         [Reactive] public string CurCurrency { get; set; }
         [Reactive] public string UserName { get; set; }
         [Reactive] public string CurDisplay { get; set; }
-        public static User MainUser { get; set; }
+        public static User? MainUser { get; set; }
         public static bool updatedVersion = false;
 
         public static readonly JsonSerializerOptions options = new()
         { 
             WriteIndented = true,
-            ReadCommentHandling = JsonCommentHandling.Skip,
+            ReadCommentHandling = JsonCommentHandling.Disallow,
             AllowTrailingCommas = true,
         };
 

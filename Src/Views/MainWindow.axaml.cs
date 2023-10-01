@@ -376,7 +376,7 @@ namespace Tsundoku.Views
                     File.SetAttributes(curSeries.Cover, FileAttributes.Normal);
                     File.Delete(curSeries.Cover);
                     curSeries.Dispose();
-                    LOGGER.Info($"Deleted Cover -> {curSeries.Cover}");
+                    LOGGER.Debug($"Deleted Cover -> {curSeries.Cover}");
                 }
 
                 // Update Mean rating

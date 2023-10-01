@@ -9,7 +9,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/Src/bin/Debug/net8.0/win-x64/Tsundoku.dll",
+            "program": "${workspaceFolder}/Src/bin/Debug/net7.0/win-x64/Tsundoku.dll",
             "args": [],
             "cwd": "${workspaceFolder}/Src",
             "console": "internalConsole",

@@ -1,27 +1,20 @@
 ﻿using ReactiveUI;
 using Tsundoku.Models;
 using System.Collections.ObjectModel;
-using System.IO;
 using Tsundoku.Views;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Reactive.Linq;
 using ReactiveUI.Fody.Helpers;
 using System.Reactive;
-using System.Text.Json;
 using Avalonia.Controls;
 using System.Diagnostics.CodeAnalysis;
 using Avalonia.Media.Imaging;
 using DynamicData;
 using System.Text.Json.Nodes;
-using System.Collections.Generic;
-using MangaLightNovelWebScrape.Websites;
-using Avalonia.Media;
 using System.Text.RegularExpressions;
 using System.Text;
 using System.Linq.Dynamic.Core;
 using System.Windows.Input;
+using MangaLightNovelWebScrape.Websites.America;
 
 namespace Tsundoku.ViewModels
 {
@@ -38,7 +31,7 @@ namespace Tsundoku.ViewModels
         [Reactive] public string AdvancedSearchText { get; set; }
         [Reactive] public bool LanguageChanged { get; set; } = false;
         public bool SearchIsBusy { get; set; } = false;
-        [Reactive] public Bitmap UserIcon { get; set; }
+        [Reactive] public Bitmap? UserIcon { get; set; }
         [Reactive] public string CurLanguage { get; set; }
         [Reactive] public string CurFilter { get; set; } = "None";
         [Reactive] public int LanguageIndex { get; set; }
@@ -455,6 +448,7 @@ namespace Tsundoku.ViewModels
             bool save = VersionUpdate();
 
             FileStream fRead = new(USER_DATA_FILEPATH, FileMode.Open, FileAccess.Read, FileShare.Read);
+            //MainUser = JsonSerializer.Deserialize(fRead, Context.Default.User);
             MainUser = JsonSerializer.Deserialize<User>(fRead, options);
             fRead.Flush();
             fRead.Close();
@@ -468,7 +462,7 @@ namespace Tsundoku.ViewModels
             CurCurrency = MainUser.Currency;
             LanguageIndex = Array.IndexOf(AVAILABLE_LANGUAGES, CurLanguage);
             CurrentTheme = MainUser.SavedThemes.Single(x => x.ThemeName == MainUser.MainTheme).Cloning();
-            if (MainUser.UserIcon.Length > 0 && MainUser.UserIcon != null)
+            if (MainUser.UserIcon != null && MainUser.UserIcon.Length > 0)
             {
                 UserIcon = new Bitmap(new MemoryStream(MainUser.UserIcon)).CreateScaledBitmap(new PixelSize(USER_ICON_WIDTH, USER_ICON_HEIGHT), BitmapInterpolationMode.HighQuality);
             }
@@ -664,18 +658,20 @@ namespace Tsundoku.ViewModels
                 updatedVersion = true;
             }
 
-            File.WriteAllText(USER_DATA_FILEPATH, JsonSerializer.Serialize(userData, options));
+            File.WriteAllText(USER_DATA_FILEPATH, userData.ToString());
             return updatedVersion;
         }
 
         [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "A New file will always be created if it doesn't exist before serialization")]
         public static void SaveUsersData()
         {
-            LOGGER.Info($"Saving {MainUser.UserName}'s Data");
+            LOGGER.Info($"Saving {MainUser?.UserName}'s Data");
             MainUser.UserCollection = UserCollection;
+            // TODO Currently if a user adds a new theme and doesn't save then the theme is lost
             MainUser.SavedThemes = ThemeSettingsViewModel.UserThemes;
 
             File.WriteAllText(USER_DATA_FILEPATH, JsonSerializer.Serialize(MainUser, options));
+            //File.WriteAllText(USER_DATA_FILEPATH, JsonSerializer.Serialize(MainUser, Context.Default.User));
         }
     }
 }

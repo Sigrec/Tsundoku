@@ -1,17 +1,10 @@
 ﻿using System.Collections.ObjectModel;
-using System.Threading.Tasks;
-using System.Net.Http;
 using System.Text.RegularExpressions;
 using Tsundoku.Helpers;
 using System.Text;
-using System.Linq;
-using System.Collections.Generic;
 using Avalonia.Media.Imaging;
-using System.Text.Json.Serialization;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
-using System;
-using System.IO;
 using MangaLightNovelWebScrape;
 using System.Runtime.InteropServices;
 using System.Globalization;
@@ -526,12 +519,20 @@ namespace Tsundoku.Models
 			return newPath;
 		}
 
-        [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "<Pending>")]
-        public string? ToJsonString(JsonSerializerOptions options)
+        // public override string ToString()
+        // {
+        //     if (this != null)
+		// 	{
+		// 		return JsonSerializer.Serialize(this, Context.Default.Series);
+		// 	}
+		// 	return "Null Series";
+        // }
+
+        public override string ToString()
         {
             if (this != null)
 			{
-				return JsonSerializer.Serialize<Series?>(this, options);
+				return JsonSerializer.Serialize(this, ViewModels.ViewModelBase.options);
 			}
 			return "Null Series";
         }
@@ -566,6 +567,13 @@ namespace Tsundoku.Models
 			GC.SuppressFinalize(this);
 		}
     }
+
+    // [JsonSerializable(typeof(Series))]
+    // [JsonSourceGenerationOptions(WriteIndented = true, AllowTrailingCommas = true, ReadCommentHandling = JsonCommentHandling.Disallow)]
+    // internal partial class Context : JsonSerializerContext
+    // {
+        
+    // }
 
     class SeriesComparer(string curLang) : IComparer<Series>
     {

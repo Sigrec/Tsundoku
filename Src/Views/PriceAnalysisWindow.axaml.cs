@@ -4,14 +4,11 @@ using Avalonia.Interactivity;
 using Tsundoku.ViewModels;
 using MangaLightNovelWebScrape;
 using DynamicData;
-using System;
-using System.Collections.Generic;
 using ReactiveUI;
 using System.Reactive.Linq;
 using Avalonia.Input;
+using MangaLightNovelWebScrape.Websites.America;
 using static Src.Models.Constants;
-using System.Linq;
-using MangaLightNovelWebScrape.Websites;
 
 namespace Tsundoku.Views
 {
@@ -21,10 +18,10 @@ namespace Tsundoku.Views
         public bool IsOpen = false, Manga;
         public readonly MasterScrape Scrape = new MasterScrape().DisableDebugMode();
         private string ScrapeTitle;
-        private readonly string[] EXCLUDE_NONE_FILTER = [];
-        private readonly string[] EXCLUDE_BOTH_FILTER = ["PO", "OOS"];
-        private readonly string[] EXCLUDE_PO_FILTER = ["PO"];
-        private readonly string[] EXCLUDE_OOS_FILTER = ["OOS"];
+        private static readonly StockStatus[] EXCLUDE_NONE_FILTER = [];
+        private static readonly StockStatus[] EXCLUDE_BOTH_FILTER = [ StockStatus.PO, StockStatus.OOS ];
+        private static readonly StockStatus[] EXCLUDE_PO_FILTER = [ StockStatus.PO ];
+        private static readonly StockStatus[] EXCLUDE_OOS_FILTER = [ StockStatus.OOS ];
         MainWindow CollectionWindow;
 
         public PriceAnalysisWindow()
@@ -74,7 +71,7 @@ namespace Tsundoku.Views
                 LOGGER.Info($"Started Scrape For {TitleBox.Text} on {PriceAnalysisVM.CurBrowser} Browser w/ {(StockFilterSelector.SelectedItem as ComboBoxItem).Content} Filter & Websites = [{string.Join(", ", PriceAnalysisVM.SelectedWebsites.Select(site => site.Content.ToString()))}] & Memberships = {string.Join(" | ", ViewModelBase.MainUser.Memberships)}");
                 await Scrape.InitializeScrapeAsync(
                         TitleBox.Text, 
-                        MangaButton.IsChecked != null && MangaButton.IsChecked.Value ? Book.Manga : Book.LightNovel, 
+                        MangaButton.IsChecked != null && MangaButton.IsChecked.Value ? BookType.Manga : BookType.LightNovel, 
                         (StockFilterSelector.SelectedItem as ComboBoxItem).Content.ToString() switch
                         {
                             "Exclude PO & OOS" => EXCLUDE_BOTH_FILTER,
@@ -83,7 +80,8 @@ namespace Tsundoku.Views
                             _ => EXCLUDE_NONE_FILTER
                         }, 
                         PriceAnalysisVM.SelectedWebsites.Select(site => site.Content.ToString()).ToList(), 
-                        PriceAnalysisVM.CurBrowser, 
+                        PriceAnalysisVM.CurBrowser,
+                        Region.America, 
                         ViewModelBase.MainUser.Memberships[RightStufAnime.WEBSITE_TITLE], 
                         ViewModelBase.MainUser.Memberships[BarnesAndNoble.WEBSITE_TITLE], 
                         ViewModelBase.MainUser.Memberships[BooksAMillion.WEBSITE_TITLE], 
@@ -117,7 +115,7 @@ namespace Tsundoku.Views
 
         private void OpenSiteLink(object sender, PointerPressedEventArgs args)
         {
-            ViewModelBase.OpenSiteLink(Scrape.GetResultUrls()[(sender as TextBlock).Text]);
+            ViewModelBase.OpenSiteLink(Scrape.GetResultUrls(Region.America)[(sender as TextBlock).Text]);
         }
     }
 }
