@@ -69,6 +69,8 @@ namespace Tsundoku.Views
 
                 StartScrapeButton.IsEnabled = false;
                 LOGGER.Info($"Started Scrape For {TitleBox.Text} on {PriceAnalysisVM.CurBrowser} Browser w/ {(StockFilterSelector.SelectedItem as ComboBoxItem).Content} Filter & Websites = [{string.Join(", ", PriceAnalysisVM.SelectedWebsites.Select(site => site.Content.ToString()))}] & Memberships = {string.Join(" | ", ViewModelBase.MainUser.Memberships)}");
+                Scrape.Browser = MasterScrape.GetBrowserFromString(PriceAnalysisVM.CurBrowser);
+                Scrape.Region = Region.America;
                 await Scrape.InitializeScrapeAsync(
                         TitleBox.Text, 
                         MangaButton.IsChecked != null && MangaButton.IsChecked.Value ? BookType.Manga : BookType.LightNovel, 
@@ -79,9 +81,7 @@ namespace Tsundoku.Views
                             "Exclude OOS" => EXCLUDE_OOS_FILTER,
                             _ => EXCLUDE_NONE_FILTER
                         }, 
-                        PriceAnalysisVM.SelectedWebsites.Select(site => site.Content.ToString()).ToList(), 
-                        PriceAnalysisVM.CurBrowser,
-                        Region.America, 
+                        MasterScrape.GenerateWebsiteList(PriceAnalysisVM.SelectedWebsites.Select(site => site.Content.ToString()).ToList()), 
                         ViewModelBase.MainUser.Memberships[RightStufAnime.WEBSITE_TITLE], 
                         ViewModelBase.MainUser.Memberships[BarnesAndNoble.WEBSITE_TITLE], 
                         ViewModelBase.MainUser.Memberships[BooksAMillion.WEBSITE_TITLE], 

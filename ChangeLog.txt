@@ -19,6 +19,7 @@ V2.0.0.0 - PST
 🔥 Fixed issue where filtering collection by "Manga" doesn't include "Comics"
 🔥 Fixed issue where opening covers or screenshots folder would open a random directory if the directories are not already present
 🔥 Fixed issue with listbox selection where styling would bug out and you were not able to select & deselect a item without clicking the text itself
+🔥 Fixed Mangadex desc parsing issue
 📜+✅ Added new "Scrape" Window that allows users to scrape multiple websites to get the website that contains the lowest price volume in USD for each volume of a series. Includes filtering out OOS and PO entires as well. Currently only supports websites that have USD.
     - ✅ Added 4 new toggle buttons in the user settings window to determine if the user is a member of RightStufAnime, Banres & Noble, BooksAMillion, and/or Kinokuniya
     - ✅ Updated UserData JSON schema to include Memberships dictionary in the User & Changed Series "Score" to appropiate naming convention "Rating"
