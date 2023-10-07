@@ -81,7 +81,7 @@ namespace Tsundoku.Views
                             "Exclude OOS" => EXCLUDE_OOS_FILTER,
                             _ => EXCLUDE_NONE_FILTER
                         }, 
-                        MasterScrape.GenerateWebsiteList(PriceAnalysisVM.SelectedWebsites.Select(site => site.Content.ToString()).ToList()), 
+                        Scrape.GenerateWebsiteList(PriceAnalysisVM.SelectedWebsites.Select(site => site.Content.ToString()).ToList()), 
                         ViewModelBase.MainUser.Memberships[RightStufAnime.WEBSITE_TITLE], 
                         ViewModelBase.MainUser.Memberships[BarnesAndNoble.WEBSITE_TITLE], 
                         ViewModelBase.MainUser.Memberships[BooksAMillion.WEBSITE_TITLE], 
@@ -115,7 +115,7 @@ namespace Tsundoku.Views
 
         private void OpenSiteLink(object sender, PointerPressedEventArgs args)
         {
-            ViewModelBase.OpenSiteLink(Scrape.GetResultUrls(Region.America)[(sender as TextBlock).Text]);
+            ViewModelBase.OpenSiteLink(Scrape.GetResultUrls()[(sender as TextBlock).Text]);
         }
     }
 }

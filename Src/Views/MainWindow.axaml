@@ -121,6 +121,7 @@
                                 Width="95"
                                 Height="35"
                                 FontSize="15"
+                                IsEnabled="false"
                                 Command="{CompiledBinding OpenPriceAnalysisWindow}"/>
                         <Button Name="DonateButton"
                                 Theme="{StaticResource MenuButton}"
@@ -195,6 +196,7 @@
                                 AutoScrollToSelectedItem="True"
                                 Theme="{StaticResource MenuComboBox}">
                             <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">None</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Query</ComboBoxItem>
                             <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Favorites</ComboBoxItem>
                             <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Complete</ComboBoxItem>
                             <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Incomplete</ComboBoxItem>
@@ -212,7 +214,6 @@
                             <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Unread</ComboBoxItem>
                             <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Rating</ComboBoxItem>
                             <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Cost</ComboBoxItem>
-                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Query</ComboBoxItem>
                         </ComboBox>
                         <TextBox Name="SearchBar" 
                                 Text="{CompiledBinding SearchText, Mode=TwoWay}" 

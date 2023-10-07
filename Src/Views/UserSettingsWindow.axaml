@@ -11,7 +11,8 @@
         Title="Settings"
         Topmost="true"
         FontFamily="Segoe UI"
-        Width="491"
+        MaxWidth="491"
+        MinWidth="491"
         MaxHeight="955"
         WindowStartupLocation="2"
         KeyboardNavigation.TabNavigation="None">
@@ -53,7 +54,7 @@
                     </StackPanel>
                 </StackPanel>
                 <StackPanel Spacing="5">
-                    <TextBlock Text="Change Currency" TextDecorations="Underline" FontSize="20" FontWeight="Bold" Classes="menu"/>
+                    <TextBlock Text="Currency" TextDecorations="Underline" FontSize="20" FontWeight="Bold" Classes="menu"/>
                     <ComboBox Name="CurrencySelector"
                               SelectionChanged="CurrencyChanged"
                               SelectedIndex="{CompiledBinding CurrencyIndex}"

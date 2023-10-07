@@ -1,10 +1,10 @@
 Legend
-❌ -> In the works/partially completed
 ✅ -> Completed new feature/update
 🔥 -> Completed bug/hot fix
 ⌛ -> Completed performance/library update
 ✍️ -> Additional Info about a Change
 📜 -> Higher level identifier for feature changes
+❌ -> Inprogress feature
 
 V2.0.0.0 - PST
 ✅ Logs now output to TsundokuLogs.log file in folder, and are cleared everytime the application is started to prevent overflow
@@ -20,13 +20,13 @@ V2.0.0.0 - PST
 🔥 Fixed issue where opening covers or screenshots folder would open a random directory if the directories are not already present
 🔥 Fixed issue with listbox selection where styling would bug out and you were not able to select & deselect a item without clicking the text itself
 🔥 Fixed Mangadex desc parsing issue
-📜+✅ Added new "Scrape" Window that allows users to scrape multiple websites to get the website that contains the lowest price volume in USD for each volume of a series. Includes filtering out OOS and PO entires as well. Currently only supports websites that have USD.
+📜✅❌ Added new "Scrape" Window that allows users to scrape multiple websites to get the website that contains the lowest price volume in USD for each volume of a series. Includes filtering out OOS and PO entires as well. Currently only supports websites that have USD.
     - ✅ Added 4 new toggle buttons in the user settings window to determine if the user is a member of RightStufAnime, Banres & Noble, BooksAMillion, and/or Kinokuniya
     - ✅ Updated UserData JSON schema to include Memberships dictionary in the User & Changed Series "Score" to appropiate naming convention "Rating"
 📜 Changes to "Settings" Window
     - ✅ Added new Command "SHIFT+F" to reload the current filter/sort on the collection
     - ✅ Added new Command "CTRL+F" to open Advanced Searching/Querying for your collection
-        - ✍️ Seperate queries with a space like "Favorite==True Cost>=500 Cost<=10000"
+        - ✍️ Seperate queries with " & " like "Favorite==True & Cost>=500 & Cost<=10000"
     - ✅ Layout changes due to new controls being added above
     - ✅ Hovering over "Change Username" title above the input text box shows what is currently inputted
     - ✅ Increased max character length of username from 18 to 20

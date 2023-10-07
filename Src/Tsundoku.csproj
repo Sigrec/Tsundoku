@@ -32,7 +32,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<RuntimeHostConfigurationOption Value="true" Include="System.Net.SocketsHttpHandler.Http3Support" />
+		<!-- <RuntimeHostConfigurationOption Value="true" Include="System.Net.SocketsHttpHandler.Http3Support" /> -->
 	    <AvaloniaResource Include="Assets/**" />
         <AvaloniaResource Include="Styles/**" />
 		<AvaloniaResource Include="Covers/**" />
@@ -87,7 +87,6 @@
     <PackageReference Include="Avalonia.Controls.ColorPicker" Version="11.0.999-cibuild0040289-beta" />
     <PackageReference Include="Avalonia.Desktop" Version="11.0.999-cibuild0040289-beta" />
 	<!-- <PackageReference Include="Avalonia" Version="11.0.0-preview6" /> -->
-    <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
     <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.999-cibuild0040154-beta" />
     <PackageReference Include="Avalonia.ReactiveUI" Version="11.0.999-cibuild0040289-beta" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.999-cibuild0040289-beta" />

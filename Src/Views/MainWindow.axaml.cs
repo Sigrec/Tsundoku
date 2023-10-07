@@ -38,7 +38,7 @@ namespace Tsundoku.Views
         public MainWindow()
         {
             InitializeComponent();
-            SetupAdvancedSearchBar(" ");
+            SetupAdvancedSearchBar(" & ");
 
             KeyDown += (s, e) => 
             {
@@ -89,7 +89,7 @@ namespace Tsundoku.Views
                 }
                 else if (e.KeyModifiers == KeyModifiers.Control && e.Key == Key.F)
                 {
-                    ShowAdvancedSearchQueryPopup();
+                    AdvancedSearchPopup.IsVisible ^= true;
                 }
             };
 
@@ -169,11 +169,6 @@ namespace Tsundoku.Views
             {
                 CollectionViewModel.AdvancedSearchQueryErrorMessage = string.Empty;
             }
-        }
-
-        private void ShowAdvancedSearchQueryPopup()
-        {
-            AdvancedSearchPopup.IsVisible = true;
         }
 
         private void UnShow_AdvancedSearchPopup(object sender, PointerPressedEventArgs args)
@@ -301,11 +296,6 @@ namespace Tsundoku.Views
                 }
                 bitmap.Save(@$"Screenshots\{CollectionViewModel.UserName}-Collection-ScreenShot-{CollectionViewModel.CurrentTheme.ThemeName}.jpg", System.Drawing.Imaging.ImageFormat.Jpeg);
             }
-        }
-
-        public void OpenMenu()
-        {
-            
         }
 
         private void SearchCollection(object sender, KeyEventArgs args)
