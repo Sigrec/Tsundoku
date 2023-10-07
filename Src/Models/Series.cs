@@ -3,8 +3,6 @@ using System.Text.RegularExpressions;
 using Tsundoku.Helpers;
 using System.Text;
 using Avalonia.Media.Imaging;
-using System.Diagnostics.CodeAnalysis;
-using System.Text.Json;
 using MangaLightNovelWebScrape;
 using System.Runtime.InteropServices;
 using System.Globalization;
@@ -566,6 +564,28 @@ namespace Tsundoku.Models
 			Dispose(disposing: true);
 			GC.SuppressFinalize(this);
 		}
+
+        public override bool Equals(object? obj)
+        {
+            return obj is Series series &&
+                   EqualityComparer<Dictionary<string, string>>.Default.Equals(Titles, series.Titles) &&
+                   EqualityComparer<Dictionary<string, string>>.Default.Equals(Staff, series.Staff) &&
+                   Description == series.Description &&
+                   Format == series.Format &&
+                   Status == series.Status &&
+                   Cover == series.Cover &&
+                   Link == series.Link;
+        }
+
+        public static bool operator ==(Series? left, Series? right)
+        {
+            return EqualityComparer<Series>.Default.Equals(left, right);
+        }
+
+        public static bool operator !=(Series? left, Series? right)
+        {
+            return !(left == right);
+        }
     }
 
     // [JsonSerializable(typeof(Series))]

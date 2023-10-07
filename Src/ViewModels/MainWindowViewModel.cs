@@ -487,8 +487,6 @@ namespace Tsundoku.ViewModels
                 }
                 SearchedCollection.Add(x);
             }
-            SearchedCollection.AddRange(UserCollection);
-
         }
 
         /// <summary>

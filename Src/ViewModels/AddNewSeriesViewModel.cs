@@ -1,22 +1,14 @@
-﻿using System.Threading.Tasks;
-using Tsundoku.Models;
+﻿using Tsundoku.Models;
 using ReactiveUI.Fody.Helpers;
 using Avalonia.Media.Imaging;
 using System.Collections.ObjectModel;
 using Avalonia.Controls;
-using System;
 using System.Collections.Specialized;
-using System.Text;
-using System.Linq;
-using System.Net.Http;
-using System.IO;
 
 namespace Tsundoku.ViewModels
 {
     public class AddNewSeriesViewModel : ViewModelBase
     {
-        public static readonly string[] AVAILABLE_LANGUAGES = ["Arabic", "Azerbaijan", "Bengali", "Bulgarian", "Burmese", "Catalan", "Chinese", "Croatian", "Czech", "Danish", "Dutch", "Esperanto", "Estonian", "Filipino", "Finnish", "French", "German", "Greek", "Hebrew", "Hindi", "Hungarian", "Indonesian", "Italian", "Kazakh", "Korean", "Latin", "Lithuanian", "Malay", "Mongolian", "Nepali", "Norwegian", "Persian", "Polish", "Portuguese", "Romanian", "Russian", "Serbian", "Slovak", "Spanish", "Swedish", "Tamil", "Thai", "Turkish", "Ukrainian", "Vietnamese"];
-
         [Reactive] public string TitleText { get; set; }
         [Reactive] public string MaxVolumeCount { get; set; }
         [Reactive] public string CurVolumeCount { get; set; }
@@ -71,15 +63,15 @@ namespace Tsundoku.ViewModels
             bool duplicateSeriesCheck = true;
             if (newSeries != null)
             {
-                duplicateSeriesCheck = MainWindowViewModel.UserCollection.AsParallel().Any(series => series.Link.Equals(newSeries.Link));
+                duplicateSeriesCheck = MainWindowViewModel.UserCollection.AsParallel().Any(series => series.Equals(newSeries));
 
                 if (!duplicateSeriesCheck)
                 {
                     LOGGER.Info($"\nAdding New Series -> \"{title}\" | {bookType} | {curVolCount} | {maxVolCount}");
-                    LOGGER.Info(newSeries);
 
                     int index = MainWindowViewModel.UserCollection.BinarySearch(newSeries, new SeriesComparer(MainUser.CurLanguage));
                     index = index < 0 ? ~index : index;
+                    LOGGER.Info(index);
                     if (MainWindowViewModel.UserCollection.Count == MainWindowViewModel.SearchedCollection.Count)
                     {
                         MainWindowViewModel.SearchedCollection.Insert(index, newSeries);

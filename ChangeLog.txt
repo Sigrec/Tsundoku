@@ -6,6 +6,9 @@ Legend
 📜 -> Higher level identifier for feature changes
 ❌ -> Inprogress feature will be fixed in later release
 
+V2.0.1.0 -
+❌ Fix Issue where dropdown in advanced search query stays after untoggling it
+
 V2.0.0.0 - October 7th, 2023 @ 3:23PM PST
 ✅ Logs now output to TsundokuLogs.log file in folder, and are cleared everytime the application is started to prevent overflow
 ✅ Windows besides "Theme" window now stay on top of main collection window

@@ -2,19 +2,15 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
-using System;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
 using Tsundoku.Models;
 using Tsundoku.ViewModels;
 using System.Reactive.Linq;
 using Avalonia.ReactiveUI;
 using ReactiveUI;
-using System.IO;
 using System.Runtime.InteropServices;
 using Avalonia.Platform.Storage;
-using System.Collections.Generic;
 using Avalonia.Media.Imaging;
 using FileWatcherEx;
 using System.Text;
@@ -159,7 +155,7 @@ namespace Tsundoku.Views
                     return false;
                 }
  
-                return itemString.StartsWith(query[(query.LastIndexOf(delimeter) + delimeter.Length)..], StringComparison.OrdinalIgnoreCase);
+                return AdvancedSearchBar.IsVisible && itemString.StartsWith(query[(query.LastIndexOf(delimeter) + delimeter.Length)..], StringComparison.OrdinalIgnoreCase);
             };
         }
 
