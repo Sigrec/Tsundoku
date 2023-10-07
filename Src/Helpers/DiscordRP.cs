@@ -33,7 +33,7 @@ namespace Tsundoku.Helpers
                     new Button() 
                     { 
                         Label = "Download Tsundoku", 
-                        Url = "https://github.com/Sigrec/TsundokuApp/blob/main/README.md"
+                        Url = "https://github.com/Sigrec/Tsundoku/blob/main/README.md"
                     }
                 },
                 Assets = new Assets()

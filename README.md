@@ -2,9 +2,9 @@
 
 ## [Donate](https://www.paypal.com/donate/?business=JAYCVEJGDF4GY&no_recurring=0&item_name=Anyone+amount+helps+and+keeps+the+app+going.&currency_code=USD) | [Join The Discord](https://discord.gg/QcZ5jcFPeU) | [Follow Me on AL](https://anilist.co/user/Preminence/)
 
-## [ChangeLog](https://github.com/Sigrec/TsundokuApp/blob/main/ChangeLog.txt) (Right Click Exe → Properties → Details to see current File Version)
+## [ChangeLog](https://github.com/Sigrec/Tsundoku/blob/main/ChangeLog.txt) (Right Click Exe → Properties → Details to see current File Version)
 ***
->[**Windows Download** (Current Supported Version = V1.9.2.1)](https://github.com/Sigrec/TsundokuApp/releases/tag/v1.9.2.1)\
+>[**Windows Download** (Current Supported Version = V2.0.0.0)](https://github.com/Sigrec/Tsundoku/releases/tag/v2.0.0.0)\
 [**Mac Download (Not Supported Yet Need Someone To Test For Me Add me on Discord if Interested & DM)** (Current Supported Version = X)](https://www.dropbox.com/sh/3e0po3d4l1sv8va/AAAgEbiPM86QQtkTcvvGWEVva?dl=0)\
 Download the folder into your desired location (need to keep the executable folder with your UserData.json and Covers folder otherwise it will generate new ones), then pin the exe to your taskbar. Make sure to keep the ExtraSeries.json file in the same folder as well otherwise it will crash if you try and add any series in it like "Radiant"
 ***

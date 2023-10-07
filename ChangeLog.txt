@@ -4,9 +4,9 @@ Legend
 ⌛ -> Completed performance/library update
 ✍️ -> Additional Info about a Change
 📜 -> Higher level identifier for feature changes
-❌ -> Inprogress feature
+❌ -> Inprogress feature will be fixed in later release
 
-V2.0.0.0 - PST
+V2.0.0.0 - October 7th, 2023 @ 3:23PM PST
 ✅ Logs now output to TsundokuLogs.log file in folder, and are cleared everytime the application is started to prevent overflow
 ✅ Windows besides "Theme" window now stay on top of main collection window
 ✅ Windows now open full sized if your monitor height is large enough
@@ -20,6 +20,7 @@ V2.0.0.0 - PST
 🔥 Fixed issue where opening covers or screenshots folder would open a random directory if the directories are not already present
 🔥 Fixed issue with listbox selection where styling would bug out and you were not able to select & deselect a item without clicking the text itself
 🔥 Fixed Mangadex desc parsing issue
+❌ ComboboxItem Styles not applying properly in Theme & AdvancedQuery
 📜✅❌ Added new "Scrape" Window that allows users to scrape multiple websites to get the website that contains the lowest price volume in USD for each volume of a series. Includes filtering out OOS and PO entires as well. Currently only supports websites that have USD.
     - ✅ Added 4 new toggle buttons in the user settings window to determine if the user is a member of RightStufAnime, Banres & Noble, BooksAMillion, and/or Kinokuniya
     - ✅ Updated UserData JSON schema to include Memberships dictionary in the User & Changed Series "Score" to appropiate naming convention "Rating"
@@ -40,7 +41,6 @@ V2.0.0.0 - PST
 📜 Changes to "Theme" Window
     - 🔥 Fixed window border issue not being curved on the bottom
     - 🔥 Themes now save after creation to prevent them from being lost during a crash
-❌ ComboboxItem Styles not applying properly in Theme & AdvancedQuery
 
 V1.9.2.1 - September 3rd, 2023 @ 8:56PM PST
 🔥 Fixed issue where you couldn't reload the cover when searching or filtering
