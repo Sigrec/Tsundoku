@@ -10,12 +10,12 @@ TODO:
 ❌ Fix Issue where dropdown in advanced search query stays after untoggling it
 ❌ ComboboxItem Styles not applying properly in Theme & AdvancedQuery
 
-V2.1.0.0 - October 9th, 2023 @ 3:23PM PST
+V2.1.0.0 - October 9th, 2023 @ 5:21PM PST
 ✅ Updated Default theme
 ⌛ Removed default theme from UserData
 📜 Changes to "Stats" Window
     - 🔥 Fixed theme coloring issue in pie charts
-    - ✅ Added new Demographic "Unknown" to pir chart
+    - ✅ Added new Demographic "Unknown" to pie chart
 📜 Changes to "Theme" Window
     - 🔥 Fixed issues with saving/deleting a theme
 

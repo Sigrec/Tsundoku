@@ -450,17 +450,6 @@ namespace Tsundoku.ViewModels
             }
 
             JsonNode userData = JsonNode.Parse(File.ReadAllText(USER_DATA_FILEPATH));
-            JsonArray themes = userData["SavedThemes"].AsArray();
-            for (int x = 0; x < themes.Count; x++)
-            {
-                if (themes.ElementAt(x)["ThemeName"].ToString().Equals("Test"))
-                {   
-                    foreach (var val in themes.ElementAt(x).AsObject())
-                    {
-                        LOGGER.Info(val.Value + ",");
-                    }
-                }
-            }
 
             if (userData["CurDataVersion"] == null || userData["CurDataVersion"].GetValue<double>() == 0 || userData["CurDataVersion"].GetValue<double>() < SCHEMA_VERSION)
             {
