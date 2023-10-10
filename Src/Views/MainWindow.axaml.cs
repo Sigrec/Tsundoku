@@ -434,10 +434,10 @@ namespace Tsundoku.Views
             {
                 CollectionViewModel.UpdateCurFilter(CollectionFilterSelector.SelectedItem as ComboBoxItem);
             }
-            else
-            {
-                (sender as ComboBox).SelectedIndex = CollectionViewModel.FilterIndex;
-            }
+            // else
+            // {
+            //     (sender as ComboBox).SelectedIndex = MainwindowViewModel.FilterIndex;
+            // }
         }
 
         /// <summary>
@@ -448,7 +448,7 @@ namespace Tsundoku.Views
             if ((sender as ComboBox).IsDropDownOpen)
             {
                 Series curSeries = (Series)((ComboBox)sender).DataContext;
-                string demographic = (sender as ComboBox).SelectedItem as string;
+                Demographic demographic = Series.GetSeriesDemographic((sender as ComboBox).SelectedItem as string);
                 
                 // Update Demographic Chart Values
                 MainWindowViewModel.UserCollection.First(series => series == curSeries).Demographic = demographic;

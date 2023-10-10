@@ -14,7 +14,7 @@
         Classes="menu"
 		MaxWidth="626"
 		MinWidth="626"
-		MaxHeight="1010"
+		MaxHeight="1025"
 		Topmost="true"
 		WindowStartupLocation="2"
 		CanResize="true">
@@ -43,11 +43,11 @@
 				<controls:ValueStat Grid.Row="3" Grid.Column="0" HorizontalAlignment="Center" Text="{CompiledBinding CollectionPrice}" Title="Collection Value" Icon="fa-solid fa-sack-dollar" PointerPressed="CopyTextAsync"/>
 				<TextBlock Text="Distributions" TextDecorations="Underline" FontSize="25" FontWeight="Bold" Classes="menu" Grid.Row="4" Grid.Column="0" Margin="5,0,0,5"/>
 				<StackPanel Orientation="Horizontal" Grid.Row="5" Grid.Column="0" HorizontalAlignment="Center" Spacing="10">
-					<Border Background="{CompiledBinding CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" Width="280" Height="375" Margin="0,0,0,0" HorizontalAlignment="Left">
+					<Border Background="{CompiledBinding CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" Width="280" Height="390" HorizontalAlignment="Left">
 						<Border CornerRadius="8" ClipToBounds="True">
 							<StackPanel Spacing="3">
-								<TextBlock Text="Demographic" TextDecorations="Underline" FontSize="22" FontWeight="Bold" Classes="menu" HorizontalAlignment="Center" Margin="0,10,0,0"/>
-								<lvc:PieChart Series="{CompiledBinding Demographics}" Height="210" TooltipPosition="Hidden"/>
+								<TextBlock Text="Demographic" TextDecorations="Underline" FontSize="22" FontWeight="Bold" Classes="menu" HorizontalAlignment="Center" Margin="0,10,0,-10"/>
+								<lvc:PieChart Series="{CompiledBinding Demographics}" Height="210" TooltipPosition="Hidden" Margin="0,0,0,-10"/>
 								<Border CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" ClipToBounds="True" Width="165" Height="24" OpacityMask="White">
 									<TextBlock Background="{CompiledBinding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}" Classes="menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
 									<TextBlock.Text>
@@ -88,14 +88,24 @@
 										</TextBlock.Text>
 									</TextBlock>
 								</Border>
+                                <Border CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" ClipToBounds="True" Width="165" Height="24">
+									<TextBlock Background="{CompiledBinding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}" Classes="menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
+									<TextBlock.Text>
+											<MultiBinding StringFormat="Unknown {0}% ({1})" Mode="OneWay">
+												<Binding Path="UnknownPercentage"/>
+												<Binding Path="UnknownCount.Value"/>
+											</MultiBinding>
+										</TextBlock.Text>
+									</TextBlock>
+								</Border>
 							</StackPanel>
 						</Border>
 					</Border>
-					<Border Background="{CompiledBinding CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" Width="280" Height="375" Margin="0,0,0,0" HorizontalAlignment="Right">
+					<Border Background="{CompiledBinding CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" Width="280" Height="390" HorizontalAlignment="Right">
 						<Border CornerRadius="8" ClipToBounds="True">
 							<StackPanel Spacing="3">
-								<TextBlock Text="Status" TextDecorations="Underline" FontSize="22" FontWeight="Bold" Classes="menu" HorizontalAlignment="Center" Margin="0,10,0,0"/>
-								<lvc:PieChart Series="{CompiledBinding StatusDistribution}" Height="210" TooltipPosition="Hidden"/>
+								<TextBlock Text="Status" TextDecorations="Underline" FontSize="22" FontWeight="Bold" Classes="menu" HorizontalAlignment="Center" Margin="0,10,0,-10"/>
+								<lvc:PieChart Series="{CompiledBinding StatusDistribution}" Height="210" TooltipPosition="Hidden" Margin="0,0,0,-10"/>
 								<Border CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" ClipToBounds="True" Width="165" Height="24">
 									<TextBlock Background="{CompiledBinding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}" Classes="menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
 										<TextBlock.Text>

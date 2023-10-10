@@ -27,7 +27,7 @@ namespace Tsundoku.Views
                 CanUpdate = false;
                 IsOpen ^= true;
 
-                if (Screens.Primary.WorkingArea.Height < 1010)
+                if (Screens.Primary.WorkingArea.Height < 1025)
                 {
                     this.Height = 550;
                 }
@@ -59,6 +59,10 @@ namespace Tsundoku.Views
             PieSeries<ObservableValue> JoseiObject = (PieSeries<ObservableValue>)CollectionStatsVM.Demographics[3];
             JoseiObject.Fill = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.DividerColor));
             JoseiObject.Stroke = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.DividerColor));
+
+            PieSeries<ObservableValue> UnknownObject = (PieSeries<ObservableValue>)CollectionStatsVM.Demographics[4];
+            UnknownObject.Fill = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.SeriesCardDescColor == CollectionStatsVM.CurrentTheme.MenuTextColor ? CollectionStatsVM.CurrentTheme.SeriesCardTitleColor : CollectionStatsVM.CurrentTheme.SeriesCardDescColor));
+            UnknownObject.Stroke = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.DividerColor));
 
             PieSeries<ObservableValue> OngoingObject = (PieSeries<ObservableValue>)CollectionStatsVM.StatusDistribution[0];
             OngoingObject.Fill = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.MenuBGColor));

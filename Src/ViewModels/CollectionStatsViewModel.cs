@@ -15,16 +15,17 @@ namespace Tsundoku.ViewModels
     public partial class CollectionStatsViewModel : ViewModelBase
     {
         public ObservableCollection<ISeries> Demographics { get; set; } = new ObservableCollection<ISeries>();
-        public ObservableValue ShounenCount { get; set; } = new ObservableValue(MainWindowViewModel.UserCollection.Count(series => !string.IsNullOrWhiteSpace(series.Demographic) && series.Demographic.Equals("Shounen")));
-        public ObservableValue SeinenCount { get; set; } = new ObservableValue(MainWindowViewModel.UserCollection.Count(series => !string.IsNullOrWhiteSpace(series.Demographic) && series.Demographic.Equals("Seinen")));
-        public ObservableValue ShoujoCount { get; set; } = new ObservableValue(MainWindowViewModel.UserCollection.Count(series => !string.IsNullOrWhiteSpace(series.Demographic) && series.Demographic.Equals("Shoujo")));
-        public ObservableValue JoseiCount { get; set; } = new ObservableValue(MainWindowViewModel.UserCollection.Count(series => !string.IsNullOrWhiteSpace(series.Demographic) && series.Demographic.Equals("Josei")));
+        public ObservableValue ShounenCount { get; set; } = new ObservableValue(MainWindowViewModel.UserCollection.Count(series => series.Demographic == Demographic.Shounen));
+        public ObservableValue SeinenCount { get; set; } = new ObservableValue(MainWindowViewModel.UserCollection.Count(series => series.Demographic == Demographic.Seinen));
+        public ObservableValue ShoujoCount { get; set; } = new ObservableValue(MainWindowViewModel.UserCollection.Count(series => series.Demographic == Demographic.Shoujo));
+        public ObservableValue JoseiCount { get; set; } = new ObservableValue(MainWindowViewModel.UserCollection.Count(series => series.Demographic == Demographic.Josei));
+        public ObservableValue UnknownCount { get; set; } = new ObservableValue(MainWindowViewModel.UserCollection.Count(series => series.Demographic == Demographic.Unknown));
 
         public ObservableCollection<ISeries> StatusDistribution { get; set; } = new ObservableCollection<ISeries>();
-        public ObservableValue OngoingCount { get; set; } = new ObservableValue(MainWindowViewModel.UserCollection.Count(series => !series.Status.Equals("Error") && series.Status.Equals("Ongoing")));
-        public ObservableValue FinishedCount { get; set; } = new ObservableValue(MainWindowViewModel.UserCollection.Count(series => !series.Status.Equals("Error") && series.Status.Equals("Finished")));
-        public ObservableValue CancelledCount { get; set; } = new ObservableValue(MainWindowViewModel.UserCollection.Count(series => !series.Status.Equals("Error") && series.Status.Equals("Cancelled")));
-        public ObservableValue HiatusCount { get; set; } = new ObservableValue(MainWindowViewModel.UserCollection.Count(series => !series.Status.Equals("Error") && series.Status.Equals("Hiatus")));
+        public ObservableValue OngoingCount { get; set; } = new ObservableValue(MainWindowViewModel.UserCollection.Count(series => series.Status == Status.Ongoing));
+        public ObservableValue FinishedCount { get; set; } = new ObservableValue(MainWindowViewModel.UserCollection.Count(series => series.Status == Status.Finished));
+        public ObservableValue CancelledCount { get; set; } = new ObservableValue(MainWindowViewModel.UserCollection.Count(series => series.Status == Status.Cancelled));
+        public ObservableValue HiatusCount { get; set; } = new ObservableValue(MainWindowViewModel.UserCollection.Count(series => series.Status == Status.Hiatus));
 
         public ObservableCollection<ISeries> RatingDistribution { get; set; } = new ObservableCollection<ISeries>();
         public ObservableCollection<Axis> RatingXAxes { get; set; } = new ObservableCollection<Axis>();
@@ -65,6 +66,7 @@ namespace Tsundoku.ViewModels
         [Reactive] public decimal SeinenPercentage { get; set; }
         [Reactive] public decimal ShoujoPercentage { get; set; }
         [Reactive] public decimal JoseiPercentage { get; set; }
+        [Reactive] public decimal UnknownPercentage { get; set; }
         [Reactive] public uint UsersNumVolumesCollected { get; set; }
         [Reactive] public uint UsersNumVolumesToBeCollected { get; set; }
         private List<double?> RatingArray = new List<double?>(10);
@@ -85,13 +87,11 @@ namespace Tsundoku.ViewModels
         /// </summary>
         public void UpdateDemographicChartValues()
         {
-            ShounenCount.Value = MainWindowViewModel.UserCollection.Count(series => !string.IsNullOrWhiteSpace(series.Demographic) && series.Demographic.Equals("Shounen"));
-
-            SeinenCount.Value = MainWindowViewModel.UserCollection.Count(series => !string.IsNullOrWhiteSpace(series.Demographic) && series.Demographic.Equals("Seinen"));
-
-            ShoujoCount.Value = MainWindowViewModel.UserCollection.Count(series => !string.IsNullOrWhiteSpace(series.Demographic) && series.Demographic.Equals("Shoujo"));
-
-            JoseiCount.Value = MainWindowViewModel.UserCollection.Count(series => !string.IsNullOrWhiteSpace(series.Demographic) && series.Demographic.Equals("Josei"));
+            ShounenCount.Value = MainWindowViewModel.UserCollection.Count(series => series.Demographic == Demographic.Shounen);
+            SeinenCount.Value = MainWindowViewModel.UserCollection.Count(series => series.Demographic == Demographic.Seinen);
+            ShoujoCount.Value = MainWindowViewModel.UserCollection.Count(series => series.Demographic == Demographic.Shoujo);
+            JoseiCount.Value = MainWindowViewModel.UserCollection.Count(series => series.Demographic == Demographic.Josei);
+            UnknownCount.Value = MainWindowViewModel.UserCollection.Count(series => series.Demographic == Demographic.Unknown);
         }
 
         /// <summary>
@@ -118,6 +118,11 @@ namespace Tsundoku.ViewModels
             { 
                 Values = new ObservableCollection<ObservableValue> { JoseiCount },
                 Name = "Josei"
+            });
+            Demographics.Add(new PieSeries<ObservableValue>
+            { 
+                Values = new ObservableCollection<ObservableValue> { UnknownCount },
+                Name = "Unknown"
             });
 
             StatusDistribution.Add(new PieSeries<ObservableValue> 
@@ -182,13 +187,10 @@ namespace Tsundoku.ViewModels
         /// </summary>
         public void UpdateStatusChartValues()
         {
-            OngoingCount.Value = MainWindowViewModel.UserCollection.Count(series => !series.Status.Equals("Error") && series.Status.Equals("Ongoing"));
-
-            FinishedCount.Value = MainWindowViewModel.UserCollection.Count(series => !series.Status.Equals("Error") && series.Status.Equals("Finished"));
-
-            CancelledCount.Value = MainWindowViewModel.UserCollection.Count(series => !series.Status.Equals("Error") && series.Status.Equals("Cancelled"));
-
-            HiatusCount.Value = MainWindowViewModel.UserCollection.Count(series => !series.Status.Equals("Error") && series.Status.Equals("Hiatus"));
+            OngoingCount.Value = MainWindowViewModel.UserCollection.Count(series => series.Status == Status.Ongoing);
+            FinishedCount.Value = MainWindowViewModel.UserCollection.Count(series => series.Status == Status.Finished);
+            CancelledCount.Value = MainWindowViewModel.UserCollection.Count(series => series.Status == Status.Cancelled);
+            HiatusCount.Value = MainWindowViewModel.UserCollection.Count(series => series.Status == Status.Hiatus);
         }
 
         /// <summary>
@@ -250,11 +252,11 @@ namespace Tsundoku.ViewModels
         /// </summary>
         public void UpdateDemographicPercentages()
         {
-            int actualCount = MainWindowViewModel.UserCollection.Count(series => !string.IsNullOrWhiteSpace(series.Demographic));
-            ShounenPercentage = Math.Round(Convert.ToDecimal(actualCount != 0 && ShounenCount.Value != double.NaN ? ShounenCount.Value / actualCount * 100 : 0), 2);
-            SeinenPercentage = Math.Round(Convert.ToDecimal(actualCount != 0 && SeinenCount.Value != double.NaN ? SeinenCount.Value / actualCount * 100 : 0), 2);
-            ShoujoPercentage = Math.Round(Convert.ToDecimal(actualCount != 0 && ShoujoCount.Value != double.NaN ? ShoujoCount.Value / actualCount * 100 : 0), 2);
-            JoseiPercentage = Math.Round(Convert.ToDecimal(actualCount != 0 && JoseiCount.Value != double.NaN ? JoseiCount.Value / actualCount * 100 : 0), 2);
+            ShounenPercentage = Math.Round(Convert.ToDecimal(MainWindowViewModel.UserCollection.Count != 0 && ShounenCount.Value != double.NaN ? ShounenCount.Value / MainWindowViewModel.UserCollection.Count * 100 : 0), 2);
+            SeinenPercentage = Math.Round(Convert.ToDecimal(MainWindowViewModel.UserCollection.Count != 0 && SeinenCount.Value != double.NaN ? SeinenCount.Value / MainWindowViewModel.UserCollection.Count * 100 : 0), 2);
+            ShoujoPercentage = Math.Round(Convert.ToDecimal(MainWindowViewModel.UserCollection.Count != 0 && ShoujoCount.Value != double.NaN ? ShoujoCount.Value / MainWindowViewModel.UserCollection.Count * 100 : 0), 2);
+            JoseiPercentage = Math.Round(Convert.ToDecimal(MainWindowViewModel.UserCollection.Count != 0 && JoseiCount.Value != double.NaN ? JoseiCount.Value / MainWindowViewModel.UserCollection.Count * 100 : 0), 2);
+            UnknownPercentage = Math.Round(Convert.ToDecimal(MainWindowViewModel.UserCollection.Count != 0 && UnknownCount.Value != double.NaN ? UnknownCount.Value / MainWindowViewModel.UserCollection.Count * 100 : 0), 2);
         }
 
         /// <summary>

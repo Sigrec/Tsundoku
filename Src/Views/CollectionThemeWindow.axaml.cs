@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Interactivity;
@@ -5,8 +6,6 @@ using Avalonia.Media;
 using Avalonia.ReactiveUI;
 using DynamicData;
 using ReactiveUI;
-using System;
-using System.Linq;
 using Tsundoku.Models;
 using Tsundoku.ViewModels;
 
@@ -16,7 +15,7 @@ namespace Tsundoku.Views
     {
         public ThemeSettingsViewModel? ThemeSettingsVM => DataContext as ThemeSettingsViewModel;
         private TsundokuTheme NewTheme;
-        public bool IsOpen, ThemeChanged;
+        public bool IsOpen, ThemeChanged = false;
         MainWindow CollectionWindow;
 
         public CollectionThemeWindow () 
@@ -30,7 +29,8 @@ namespace Tsundoku.Views
                 NewTheme = ThemeSettingsVM.CurrentTheme.Cloning();
                 IsOpen ^= true;
                 ThemeChanged = false;
-                ThemeSettingsVM.CurThemeIndex = ThemeSettingsViewModel.MainUser.SavedThemes.IndexOf(ThemeSettingsVM.CurrentTheme);
+                int index = ThemeSettingsViewModel.UserThemesDisplay.IndexOf(ThemeSettingsVM.CurrentTheme.ThemeName);
+                ThemeSettingsVM.CurThemeIndex = index != -1 ? index : ThemeSettingsViewModel.UserThemesDisplay.IndexOf("Default");
                 ApplyColors();
             };
 
@@ -188,50 +188,47 @@ namespace Tsundoku.Views
             if (!string.IsNullOrWhiteSpace(NewThemeName.Text) && !NewThemeName.Text.Equals("Default", StringComparison.OrdinalIgnoreCase))
             {
                 NewTheme.ThemeName = NewThemeName.Text;
-                if (!NewTheme.Equals(ThemeSettingsVM.CurrentTheme))
+                LOGGER.Debug("Check1");
+                bool duplicateCheck = false;
+                TsundokuTheme replaceTheme = NewTheme.Cloning(); 
+                // Checks if the new theme already exists (some other theme has the same name as what the theme the user is currently trying to save)
+                for (int x = 0; x < ViewModelBase.MainUser.SavedThemes.Count; x++)
                 {
-                    bool duplicateCheck = false;
-                    TsundokuTheme replaceTheme; 
-                    // Checks if the new theme already exists (some other theme has the same name as what the theme the user is currently trying to save)
-                    for (int x = 0; x < ThemeSettingsViewModel.MainUser.SavedThemes.Count; x++)
+                    if (NewTheme.ThemeName.Equals(ViewModelBase.MainUser.SavedThemes[x].ThemeName))
                     {
-                        if (NewTheme.ThemeName.Equals(ThemeSettingsViewModel.MainUser.SavedThemes[x].ThemeName))
-                        {
-                            LOGGER.Info($"{NewTheme.ThemeName} Already Exists Replacing Theme");
-                            duplicateCheck = true;
-                            replaceTheme = NewTheme.Cloning();
+                        LOGGER.Info($"{NewTheme.ThemeName} Already Exists Replacing Theme");
+                        duplicateCheck = true;
 
-                            for (int y = 0; y < ThemeSettingsViewModel.MainUser.SavedThemes.Count; y++)
+                        for (int y = 0; y < ViewModelBase.MainUser.SavedThemes.Count; y++)
+                        {
+                            if (y != x)
                             {
-                                if (y != x)
-                                {
-                                    ThemeSettingsViewModel.MainUser.SavedThemes[x] = replaceTheme;
-                                    ThemeSettingsViewModel.UserThemesDisplay.Insert(x, replaceTheme.ThemeName);
-                                    LOGGER.Info($"Replaced Theme \"{NewTheme.ThemeName}\"");
-                                    ThemeChanged = true;
-                                    ThemeSelector.SelectedIndex = x;
-                                    return;
-                                }
+                                ViewModelBase.MainUser.SavedThemes[x] = replaceTheme;
+                                // ThemeSettingsViewModel.UserThemesDisplay.Remove(NewTheme.ThemeName);
+                                ThemeSettingsViewModel.UserThemesDisplay.Replace(ViewModelBase.MainUser.SavedThemes[x].ThemeName, NewTheme.ThemeName);
+                                LOGGER.Info($"Replaced Theme \"{NewTheme.ThemeName}\"");
+                                ThemeChanged = true;
+                                ThemeSelector.SelectedIndex = x;
+                                return;
                             }
                         }
                     }
+                }
 
-                    if (!duplicateCheck)
-                    {
-                        replaceTheme = NewTheme.Cloning();
-                        int index = ThemeSettingsViewModel.MainUser.SavedThemes.BinarySearch(replaceTheme);
-                        index = index < 0 ? ~index : index;
-                        ViewModelBase.MainUser.SavedThemes.Insert(index, replaceTheme);
-                        ThemeSettingsViewModel.UserThemesDisplay.Insert(index, replaceTheme.ThemeName);
-                        LOGGER.Info($"Added New Theme \"{NewTheme.ThemeName}\"");
-                        ThemeChanged = true;
-                        ThemeSelector.SelectedIndex = index;
-                    }
+                if (!duplicateCheck)
+                {
+                    int index = ViewModelBase.MainUser.SavedThemes.BinarySearch(replaceTheme);
+                    index = index < 0 ? ~index : index;
+                    ViewModelBase.MainUser.SavedThemes.Insert(index, replaceTheme);
+                    ThemeSettingsViewModel.UserThemesDisplay.Insert(index, replaceTheme.ThemeName);
+                    LOGGER.Info($"Added New Theme \"{NewTheme.ThemeName}\"");
+                    ThemeChanged = true;
+                    ThemeSelector.SelectedIndex = index;
                 }
             }
             else
             {
-                LOGGER.Warn($"Empty or Invalid Theme Name {NewTheme.ThemeName}");
+                LOGGER.Warn($"Empty or Invalid Theme Name {NewThemeName.Text}");
             }
         }
 
@@ -241,8 +238,9 @@ namespace Tsundoku.Views
         private async void SaveNewTheme(object sender, RoutedEventArgs args)
         {
             AddTheme();
-            await File.WriteAllTextAsync(MainWindowViewModel.USER_DATA_FILEPATH, JsonSerializer.Serialize(ViewModelBase.MainUser, ViewModelBase.options));
-            LOGGER.Debug($"Saved \"{NewTheme.ThemeName}\" Theme Async");
+            MainWindowViewModel.SaveUsersData();
+            ViewModelBase.MainUser.SavedThemes.Add(TsundokuTheme.DEFAULT_THEME);
+            ViewModelBase.MainUser.SavedThemes = new ObservableCollection<TsundokuTheme>(ViewModelBase.MainUser.SavedThemes.OrderBy(theme => theme.ThemeName));
         }
 
         /// <summary>
@@ -250,14 +248,14 @@ namespace Tsundoku.Views
         /// </summary>
         private void RemoveSavedTheme(object sender, RoutedEventArgs args)
         {
-            if (ThemeSettingsViewModel.MainUser.SavedThemes.Count > 1 && !ThemeSelector.SelectedItem.ToString().Equals("Default"))
+            if (!ThemeSelector.SelectedItem.ToString().Equals("Default"))
             {
-                int curIndex = ThemeSettingsViewModel.MainUser.SavedThemes.IndexOf(CollectionWindow.CollectionViewModel.CurrentTheme);
-                ThemeSettingsViewModel.MainUser.SavedThemes.RemoveAt(curIndex);
+                LOGGER.Info($"Removed Theme \"{ThemeSelector.SelectedItem}\"");
+                int curIndex = ViewModelBase.MainUser.SavedThemes.IndexOf(CollectionWindow.CollectionViewModel.CurrentTheme);
+                ViewModelBase.MainUser.SavedThemes.RemoveAt(curIndex);
                 ThemeSettingsViewModel.UserThemesDisplay.RemoveAt(curIndex);
                 ThemeChanged = true;
                 ThemeSelector.SelectedIndex = curIndex == 0 ? curIndex : --curIndex;
-                LOGGER.Info($"Removed Theme {ThemeSettingsViewModel.MainUser.SavedThemes[curIndex].ThemeName} From Saved Themes");
             }
         }
 
@@ -269,17 +267,21 @@ namespace Tsundoku.Views
             if (ThemeSelector.IsDropDownOpen || ThemeChanged)
             {
                 string toThemeName = ThemeSelector.SelectedItem.ToString();
-                CollectionWindow.CollectionViewModel.CurrentTheme = ThemeSettingsViewModel.MainUser.SavedThemes.Single(theme => theme.ThemeName.Equals(toThemeName));
+                CollectionWindow.CollectionViewModel.CurrentTheme = ViewModelBase.MainUser.SavedThemes.Single(theme => theme.ThemeName.Equals(toThemeName));
+
                 ThemeSettingsVM.CurrentTheme = CollectionWindow.CollectionViewModel.CurrentTheme;
+
                 CollectionWindow.CollectionViewModel.newSeriesWindow.AddNewSeriesVM.CurrentTheme = CollectionWindow.CollectionViewModel.CurrentTheme;
+
                 CollectionWindow.CollectionViewModel.settingsWindow.UserSettingsVM.CurrentTheme = CollectionWindow.CollectionViewModel.CurrentTheme;
+
                 CollectionWindow.CollectionViewModel.collectionStatsWindow.CollectionStatsVM.CurrentTheme = CollectionWindow.CollectionViewModel.CurrentTheme;
+
                 CollectionWindow.CollectionViewModel.priceAnalysisWindow.PriceAnalysisVM.CurrentTheme = CollectionWindow.CollectionViewModel.CurrentTheme;
                 
                 CollectionWindow.CollectionViewModel.collectionStatsWindow.UpdateChartColors();
-
-                LOGGER.Info($"Theme Changed To \"{toThemeName}\"");
                 ApplyColors();
+                LOGGER.Info($"Theme Changed To \"{toThemeName}\"");
                 ThemeChanged = false;
             }
         }

@@ -20,6 +20,6 @@
   "VolumesRead": 0,
   "Cost": 0,
   "Rating": -1,
-  "Demographic": null,
+  "Demographic": "Unknown",
   "IsFavorite": false
 }

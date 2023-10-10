@@ -2,8 +2,8 @@
 using GraphQL.Client.Http;
 using GraphQL.Client.Serializer.SystemTextJson;
 using System.Net.Http.Headers;
-using System.Text;
 using System.Text.RegularExpressions;
+using Tsundoku.Models;
 
 namespace Tsundoku.Helpers
 {
@@ -29,7 +29,7 @@ namespace Tsundoku.Helpers
 		/// <param name="format">The format of the series either manga or light novel</param>
 		/// <param name="pageNum">The current page number of the GraphQL query</param>
 		/// <returns></returns>
-        public static async Task<JsonDocument?> GetSeriesByTitleAsync(string title, string format, int pageNum)
+        public static async Task<JsonDocument?> GetSeriesByTitleAsync(string title, Format format, int pageNum)
 		{
 			try
 			{
@@ -71,7 +71,7 @@ namespace Tsundoku.Helpers
 					Variables = new
 					{
 						title,
-						format,
+                        format,
 						pageNum
 					}
 				};
@@ -100,7 +100,7 @@ namespace Tsundoku.Helpers
 		/// <param name="format">The format of the series either manga or light novel</param>
 		/// <param name="pageNum">The current page number of the GraphQL query</param>
 		/// <returns></returns>
-		public static async Task<JsonDocument?> GetSeriesByIDAsync(int seriesId, string format, int pageNum)
+		public static async Task<JsonDocument?> GetSeriesByIDAsync(int seriesId, Format format, int pageNum)
 		{
 			try
 			{

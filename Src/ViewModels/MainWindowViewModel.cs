@@ -11,7 +11,6 @@ using Avalonia.Media.Imaging;
 using DynamicData;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
-using System.Text;
 using System.Linq.Dynamic.Core;
 using System.Windows.Input;
 using MangaLightNovelWebScrape.Websites.America;
@@ -22,7 +21,7 @@ namespace Tsundoku.ViewModels
     public partial class MainWindowViewModel : ViewModelBase
     {
         public const string USER_DATA_FILEPATH = @"UserData.json";
-        private const double SCHEMA_VERSION = 2.0;
+        private const double SCHEMA_VERSION = 2.1;
         private static bool CanFilter = true;
         public static ObservableCollection<Series> SearchedCollection { get; set; } = [];
         public static List<Series> UserCollection { get; set; } = [];
@@ -35,7 +34,7 @@ namespace Tsundoku.ViewModels
         [Reactive] public string CurLanguage { get; set; }
         [Reactive] public string CurFilter { get; set; } = "None";
         [Reactive] public int LanguageIndex { get; set; }
-        [Reactive] public int FilterIndex { get; set; }
+        public static int FilterIndex { get; set; }
         [Reactive] public string AdvancedSearchQueryErrorMessage { get; set; }
 
         public AddNewSeriesWindow newSeriesWindow;
@@ -65,7 +64,6 @@ namespace Tsundoku.ViewModels
             // Helpers.ExtensionMethods.PrintCultures();
             // Helpers.ExtensionMethods.PrintCurrencySymbols();
 
-            LOGGER.Info("Starting TsundOku");
             LoadUserData();
             ConfigureWindows();
 
@@ -202,6 +200,11 @@ namespace Tsundoku.ViewModels
             FilterCollection(CurFilter);
         }
 
+        public string GetFilter()
+        {
+            return CurFilter;
+        }
+
         /// <summary>
         /// Filters the users collection based on the selected preset filter
         /// </summary>
@@ -219,19 +222,19 @@ namespace Tsundoku.ViewModels
                     switch (filter)
                     {
                         case "Ongoing":
-                            FilteredCollection = UserCollection.Where(series => series.Status.Equals("Ongoing"));
+                            FilteredCollection = UserCollection.Where(series => series.Status == Status.Ongoing);
                             LOGGER.Info($"Filtered Collection by {filter}");
                             break;
                         case "Finished":
-                            FilteredCollection = UserCollection.Where(series => series.Status.Equals("Finished"));
+                            FilteredCollection = UserCollection.Where(series => series.Status == Status.Finished);
                             LOGGER.Info($"Filtered Collection by {filter}");
                             break;
                         case "Hiatus":
-                            FilteredCollection = UserCollection.Where(series => series.Status.Equals("Hiatus"));
+                            FilteredCollection = UserCollection.Where(series => series.Status == Status.Hiatus);
                             LOGGER.Info($"Filtered Collection by {filter}");
                             break;
                         case "Cancelled":
-                            FilteredCollection = UserCollection.Where(series => series.Status.Equals("Cancelled"));
+                            FilteredCollection = UserCollection.Where(series => series.Status == Status.Cancelled);
                             LOGGER.Info($"Filtered Collection by {filter}");
                             break;
                         case "Complete":
@@ -247,27 +250,27 @@ namespace Tsundoku.ViewModels
                             LOGGER.Info($"Filtered Collection by {filter}");
                             break;
                         case "Manga":
-                            FilteredCollection = UserCollection.Where(series => series.Format.Equals("Manga") || series.Format.Equals("Manhwa") || series.Format.Equals("Manhua") || series.Format.Equals("Manfra") || series.Format.Equals("Comic"));
+                            FilteredCollection = UserCollection.Where(series => series.Format != Format.Novel);
                             LOGGER.Info($"Filtered Collection by {filter}");
                             break;
                         case "Novel":
-                            FilteredCollection = UserCollection.Where(series => series.Format.Equals("Novel"));
+                            FilteredCollection = UserCollection.Where(series => series.Format == Format.Novel);
                             LOGGER.Info($"Filtered Collection by {filter}");
                             break;
                         case "Shounen":
-                            FilteredCollection = UserCollection.Where(series => !string.IsNullOrWhiteSpace(series.Demographic) && series.Demographic.Equals("Shounen"));
+                            FilteredCollection = UserCollection.Where(series => series.Demographic == Demographic.Shounen);
                             LOGGER.Info($"Filtered Collection by {filter}");
                             break;
                         case "Shoujo":
-                            FilteredCollection = UserCollection.Where(series => !string.IsNullOrWhiteSpace(series.Demographic) &&series.Demographic.Equals("Shoujo"));
+                            FilteredCollection = UserCollection.Where(series => series.Demographic == Demographic.Shoujo);
                             LOGGER.Info($"Filtered Collection by {filter}");
                             break;
                         case "Seinen":
-                            FilteredCollection = UserCollection.Where(series => !string.IsNullOrWhiteSpace(series.Demographic) &&series.Demographic.Equals("Seinen"));
+                            FilteredCollection = UserCollection.Where(series => series.Demographic == Demographic.Seinen);
                             LOGGER.Info($"Filtered Collection by {filter}");
                             break;
                         case "Josei":
-                            FilteredCollection = UserCollection.Where(series => !string.IsNullOrWhiteSpace(series.Demographic) &&series.Demographic.Equals("Josei"));
+                            FilteredCollection = UserCollection.Where(series => series.Demographic == Demographic.Josei);
                             LOGGER.Info($"Filtered Collection by {filter}");
                             break;
                         case "Read":
@@ -416,6 +419,7 @@ namespace Tsundoku.ViewModels
         /// </summary>
         private void LoadUserData()
         {
+            LOGGER.Info("Starting Tsundoku");
             if (!File.Exists(USER_DATA_FILEPATH))
             {
                 LOGGER.Info("Creating New User");
@@ -434,7 +438,7 @@ namespace Tsundoku.ViewModels
                                 { BooksAMillion.WEBSITE_TITLE, false },
                                 { KinokuniyaUSA.WEBSITE_TITLE , false }
                             }, 
-                            [TsundokuTheme.DEFAULT_THEME], 
+                            [], 
                             UserCollection
                         );
                 UserName = MainUser.UserName;
@@ -444,25 +448,31 @@ namespace Tsundoku.ViewModels
                 MainUser.UserIcon = Convert.FromBase64String("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");
                 SaveUsersData();
             }
-            
-            FileStream fRead = new(USER_DATA_FILEPATH, FileMode.Open, FileAccess.Read, FileShare.Read);
-            //MainUser = JsonSerializer.Deserialize(fRead, Context.Default.User);
-            MainUser = JsonSerializer.Deserialize<User>(fRead, options);
-            fRead.Flush();
-            fRead.Close();
 
-            if (MainUser.CurDataVersion == 0 || MainUser.CurDataVersion < SCHEMA_VERSION)
+            JsonNode userData = JsonNode.Parse(File.ReadAllText(USER_DATA_FILEPATH));
+            JsonArray themes = userData["SavedThemes"].AsArray();
+            for (int x = 0; x < themes.Count; x++)
             {
-                VersionUpdate();
-                UpdateDefaultTheme();
+                if (themes.ElementAt(x)["ThemeName"].ToString().Equals("Test"))
+                {   
+                    foreach (var val in themes.ElementAt(x).AsObject())
+                    {
+                        LOGGER.Info(val.Value + ",");
+                    }
+                }
+            }
+
+            if (userData["CurDataVersion"] == null || userData["CurDataVersion"].GetValue<double>() == 0 || userData["CurDataVersion"].GetValue<double>() < SCHEMA_VERSION)
+            {
+                VersionUpdate(userData);
                 updatedVersion = false;
-                FileStream fReadUpdate = new(USER_DATA_FILEPATH, FileMode.Open, FileAccess.Read, FileShare.Read);
-                //MainUser = JsonSerializer.Deserialize(fReadUpdate, Context.Default.User);
-                MainUser = JsonSerializer.Deserialize<User>(fReadUpdate, options);
-                fReadUpdate.Flush();
-                fReadUpdate.Close();
                 LOGGER.Info("Reloading User Data");
             }
+            
+            //MainUser = JsonSerializer.Deserialize(userData, Context.Default.User);
+            MainUser = JsonSerializer.Deserialize<User>(userData, options);
+            MainUser.SavedThemes.Add(TsundokuTheme.DEFAULT_THEME);
+            MainUser.SavedThemes = new ObservableCollection<TsundokuTheme>(MainUser.SavedThemes.OrderBy(theme => theme.ThemeName));
 
             LOGGER.Info($"Loading {MainUser.UserName}'s Data");
             UserName = MainUser.UserName;
@@ -471,7 +481,8 @@ namespace Tsundoku.ViewModels
             CurDisplay = MainUser.Display;
             CurCurrency = MainUser.Currency;
             LanguageIndex = Array.IndexOf(AVAILABLE_LANGUAGES, CurLanguage);
-            CurrentTheme = MainUser.SavedThemes.Single(x => x.ThemeName == MainUser.MainTheme).Cloning();
+            CurrentTheme = !MainUser.MainTheme.Equals("Default") ? MainUser.SavedThemes.Single(x => x.ThemeName == MainUser.MainTheme).Cloning() : TsundokuTheme.DEFAULT_THEME;
+            
             if (MainUser.UserIcon != null && MainUser.UserIcon.Length > 0)
             {
                 UserIcon = new Bitmap(new MemoryStream(MainUser.UserIcon)).CreateScaledBitmap(new PixelSize(USER_ICON_WIDTH, USER_ICON_HEIGHT), BitmapInterpolationMode.HighQuality);
@@ -489,26 +500,9 @@ namespace Tsundoku.ViewModels
             }
         }
 
-        /// <summary>
-        /// Updates the default TsundokuTheme
-        /// </summary>
-        private static void UpdateDefaultTheme()
-        {
-            for(int x = 0; x < MainUser.SavedThemes.Count; x++)
-            {
-                if (MainUser.SavedThemes[x].ThemeName.Equals("Default"))
-                {
-                    MainUser.SavedThemes[x] = TsundokuTheme.DEFAULT_THEME;
-                    LOGGER.Info("Updated Default Theme");
-                    break;
-                }
-            }
-        }
-
         [RequiresUnreferencedCode("Calls System.Text.Json.JsonSerializer.Serialize<TValue>(TValue, JsonSerializerOptions)")]
-        private static bool VersionUpdate()
+        private static bool VersionUpdate(JsonNode userData)
         {
-            JsonNode userData = JsonNode.Parse(File.ReadAllText(USER_DATA_FILEPATH));
             JsonNode series;
             JsonArray collectionJsonArray = userData[nameof(UserCollection)].AsArray();
             
@@ -658,6 +652,29 @@ namespace Tsundoku.ViewModels
                 updatedVersion = true;
             }
 
+            if (curVersion < 2.1) // 2.1 Version updates empty demographics from null or empty string to "Unknown" & removes Default thme from file
+            {
+                for (int x = 0; x < collectionJsonArray.Count; x++)
+                {
+                    series = collectionJsonArray.ElementAt(x).AsObject();
+                    if (string.IsNullOrWhiteSpace(series["Demographic"]?.ToString()))
+                    {
+                        series["Demographic"] = Demographic.Unknown.ToString();
+                    }
+                }
+                JsonArray themes = userData["SavedThemes"].AsArray();
+                for (int x = 0; x < themes.Count; x++)
+                {
+                    if (themes.ElementAt(x)["ThemeName"].ToString().Equals("Default"))
+                    {   
+                        themes.RemoveAt(x);
+                    }
+                }
+                userData["CurDataVersion"] = 2.1;
+                LOGGER.Info("Updated Users Data to v2.1");
+                updatedVersion = true;
+            }
+
             File.WriteAllText(USER_DATA_FILEPATH, userData.ToString());
             return updatedVersion;
         }
@@ -667,6 +684,7 @@ namespace Tsundoku.ViewModels
         {
             LOGGER.Info($"Saving {MainUser?.UserName}'s Data");
             MainUser.UserCollection = UserCollection;
+            MainUser.SavedThemes.Remove(TsundokuTheme.DEFAULT_THEME);
 
             File.WriteAllText(USER_DATA_FILEPATH, JsonSerializer.Serialize(MainUser, options));
             //File.WriteAllText(USER_DATA_FILEPATH, JsonSerializer.Serialize(MainUser, Context.Default.User));

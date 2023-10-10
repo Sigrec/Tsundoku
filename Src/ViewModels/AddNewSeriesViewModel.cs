@@ -40,7 +40,7 @@ namespace Tsundoku.ViewModels
                         CurLanguages.Clear();
                         AdditionalLanguagesToolTipText = CurLanguages.ToString();
                     }
-                    break;
+                    return;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -56,7 +56,7 @@ namespace Tsundoku.ViewModels
         /// <param name="maxVolCount">The max # of volumes this series currently has</param>
         /// <param name="additionalLanguages">Additional languages to get more info for from Mangadex</param>
         /// <returns>Whether the series can be added to the users collection or not</returns>
-        public static async Task<bool> GetSeriesDataAsync(string title, string bookType, ushort curVolCount, ushort maxVolCount, ObservableCollection<string> additionalLanguages)
+        public static async Task<bool> GetSeriesDataAsync(string title, Format bookType, ushort curVolCount, ushort maxVolCount, ObservableCollection<string> additionalLanguages)
         {
             Series? newSeries = await Series.CreateNewSeriesCardAsync(title, bookType, maxVolCount, curVolCount,  additionalLanguages);
             
@@ -71,9 +71,14 @@ namespace Tsundoku.ViewModels
 
                     int index = MainWindowViewModel.UserCollection.BinarySearch(newSeries, new SeriesComparer(MainUser.CurLanguage));
                     index = index < 0 ? ~index : index;
-                    LOGGER.Info(index);
                     if (MainWindowViewModel.UserCollection.Count == MainWindowViewModel.SearchedCollection.Count)
                     {
+                        MainWindowViewModel.SearchedCollection.Insert(index, newSeries);
+                    }
+                    else if (DetermineFilter(newSeries, AVAILABLE_COLLECTION_FILTERS[MainWindowViewModel.FilterIndex]))
+                    {
+                        int searchedIndex = MainWindowViewModel.SearchedCollection.ToList().BinarySearch(newSeries, new SeriesComparer(MainUser.CurLanguage));
+                        searchedIndex = searchedIndex < 0 ? ~searchedIndex : searchedIndex;
                         MainWindowViewModel.SearchedCollection.Insert(index, newSeries);
                     }
                     MainWindowViewModel.UserCollection.Insert(index, newSeries);
@@ -102,6 +107,45 @@ namespace Tsundoku.ViewModels
         public static ObservableCollection<string> ConvertSelectedLangList(ObservableCollection<ListBoxItem> SelectedLangs)
         {
             return new ObservableCollection<string>(SelectedLangs.Select(lang => lang.Content.ToString()).OfType<string>());
+        }
+
+        public static bool DetermineFilter(Series newSeries, string filter)
+        {
+        switch (filter)
+            {
+                case "Ongoing":
+                    return newSeries.Status == Status.Ongoing;
+                case "Finished":
+                    return newSeries.Status == Status.Finished;
+                case "Hiatus":
+                    return newSeries.Status == Status.Hiatus;
+                case "Cancelled":
+                    return newSeries.Status == Status.Cancelled;
+                case "Complete":
+                    return newSeries.MaxVolumeCount == newSeries.CurVolumeCount;
+                case "Incomplete":
+                    return newSeries.MaxVolumeCount != newSeries.CurVolumeCount;;
+                case "Manga":
+                    return newSeries.Format != Format.Novel;
+                case "Novel":
+                    return newSeries.Format == Format.Novel;
+                case "Shounen":
+                    return newSeries.Demographic == Demographic.Shounen;
+                case "Shoujo":
+                    return newSeries.Demographic == Demographic.Shoujo;
+                case "Seinen":
+                    return newSeries.Demographic == Demographic.Seinen;
+                case "Josei":
+                    return newSeries.Demographic == Demographic.Josei;
+                case "Read":
+                case "Unread":
+                case "Rating":
+                case "Cost":
+                case "Query":
+                case "None":
+                default:
+                    return false;
+            }
         }
     }
 }
