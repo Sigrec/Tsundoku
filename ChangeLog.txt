@@ -21,7 +21,7 @@ V2.2.0.0 - October 18th
 🔥 Fixed issue where Demographic stats is not updating
 🔥 Fixed issue where the Demographic for a series is not loaded properly
 ✅ Series are now properly added when searching
-⌛ Added virutalization to collection, improving loading time for the collection (fitler, search, startup), theme & language change time, and memory usage
+⌛ Added virtualization to collection, improving loading time for the collection (filter, search, startup), theme & language change time, and memory usage
 
 V2.1.0.0 - October 9th, 2023 @ 5:21PM PST
 ✅ Updated Default theme
