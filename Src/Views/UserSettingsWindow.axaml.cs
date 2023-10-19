@@ -40,7 +40,7 @@ namespace Tsundoku.Views
                 e.Cancel = true;
             };
 
-            this.WhenAnyValue(x => x.RightStufAnimeButton.IsChecked, (member) => member != null && member == true).Subscribe(x => UserSettingsVM.RightStufAnimeMember = x);
+            this.WhenAnyValue(x => x.IndigoButton.IsChecked, (member) => member != null && member == true).Subscribe(x => UserSettingsVM.IndigoMember = x);
             this.WhenAnyValue(x => x.BarnesAndNobleButton.IsChecked, (member) => member != null && member == true).Subscribe(x => UserSettingsVM.BarnesAndNobleMember = x);
             this.WhenAnyValue(x => x.BooksAMillionButton.IsChecked, (member) => member != null && member == true).Subscribe(x => UserSettingsVM.BooksAMillionMember = x);
             this.WhenAnyValue(x => x.KinokuniyaUSAButton.IsChecked, (member) => member != null && member == true).Subscribe(x => UserSettingsVM.KinokuniyaUSAMember = x);

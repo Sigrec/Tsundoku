@@ -15,14 +15,14 @@ using System.Linq.Dynamic.Core;
 using System.Windows.Input;
 using MangaLightNovelWebScrape.Websites.America;
 using Avalonia.Collections;
+using MangaLightNovelWebScrape.Websites.Canada;
 
 namespace Tsundoku.ViewModels
 {
-    // TODO High Memory Usage might be due to Scape Having all objects created when instantiating MasterScrape
     public partial class MainWindowViewModel : ViewModelBase
     {
         public const string USER_DATA_FILEPATH = @"UserData.json";
-        private const double SCHEMA_VERSION = 2.1;
+        private const double SCHEMA_VERSION = 2.2;
         private static bool CanFilter = true;
         public static AvaloniaList<Series> SearchedCollection { get; set; } = [];
         public static List<Series> UserCollection { get; set; } = [];
@@ -438,9 +438,9 @@ namespace Tsundoku.ViewModels
                             "$0.00", 
                             new Dictionary<string, bool>
                             {
-                                { RightStufAnime.WEBSITE_TITLE, false },
                                 { BarnesAndNoble.WEBSITE_TITLE , false },
                                 { BooksAMillion.WEBSITE_TITLE, false },
+                                { Indigo.WEBSITE_TITLE, false },
                                 { KinokuniyaUSA.WEBSITE_TITLE , false }
                             }, 
                             [], 
@@ -627,7 +627,6 @@ namespace Tsundoku.ViewModels
             {
                 userData["Memberships"] = new JsonObject
                 {
-                    [RightStufAnime.WEBSITE_TITLE] = false,
                     [BarnesAndNoble.WEBSITE_TITLE] = false,
                     [BooksAMillion.WEBSITE_TITLE] = false,
                     [KinokuniyaUSA.WEBSITE_TITLE] = false
@@ -666,6 +665,16 @@ namespace Tsundoku.ViewModels
                 }
                 userData["CurDataVersion"] = 2.1;
                 LOGGER.Info("Updated Users Data to v2.1");
+                updatedVersion = true;
+            }
+
+            if (curVersion < 2.2)
+            {
+                userData["Memberships"].AsObject().Remove("RightStufAnime");
+                userData["Memberships"].AsObject().Add(new KeyValuePair<string, JsonNode?>(Indigo.WEBSITE_TITLE, false));
+
+                userData["CurDataVersion"] = 2.2;
+                LOGGER.Info("Updated Users Data to v2.2");
                 updatedVersion = true;
             }
 

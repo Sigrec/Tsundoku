@@ -101,10 +101,6 @@
                                 <Setter Property="Margin" Value="3"/>
                             </Style>
                         </WrapPanel.Styles>
-					<ToggleButton Name="RightStufAnimeButton"
-								  IsChecked="{Binding RightStufAnimeMember}"
-							      Theme="{StaticResource MenuToggleButton}"
-							      Content="RightStufAnime"/>
 					<ToggleButton Name="BarnesAndNobleButton"
 								  IsChecked="{Binding BarnesAndNobleMember}"
 							      Theme="{StaticResource MenuToggleButton}"
@@ -117,6 +113,10 @@
 								  IsChecked="{Binding KinokuniyaUSAMember}"
 							      Theme="{StaticResource MenuToggleButton}"
 							      Content="Kinokuniya USA"/>
+                    <ToggleButton Name="IndigoButton"
+								  IsChecked="{Binding IndigoMember}"
+							      Theme="{StaticResource MenuToggleButton}"
+							      Content="Indigo"/>
 					</WrapPanel>
                 </StackPanel>
 				<StackPanel Spacing="5">

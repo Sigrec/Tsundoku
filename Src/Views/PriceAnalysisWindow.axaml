@@ -89,7 +89,7 @@
 							  Height="185"
 							  Width="220">
 						<!-- <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Amazon USA"/> -->
-						<ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="RightStufAnime"/>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Indigo"/>
 						<ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Barnes &#x26; Noble"/>
 						<ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Books-A-Million"/>
 						<ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="InStockTrades"/>

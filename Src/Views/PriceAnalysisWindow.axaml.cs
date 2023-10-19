@@ -9,6 +9,8 @@ using System.Reactive.Linq;
 using Avalonia.Input;
 using MangaLightNovelWebScrape.Websites.America;
 using static Src.Models.Constants;
+using MangaLightNovelWebScrape.Websites;
+using MangaLightNovelWebScrape.Websites.Canada;
 
 namespace Tsundoku.Views
 {
@@ -78,12 +80,11 @@ namespace Tsundoku.Views
                             "Exclude OOS" => EXCLUDE_OOS_FILTER,
                             _ => EXCLUDE_NONE_FILTER
                         }, 
-                        Scrape.GenerateWebsiteList(PriceAnalysisVM.SelectedWebsites.Select(site => site.Content.ToString()).ToList()), 
-                        ViewModelBase.MainUser.Memberships[RightStufAnime.WEBSITE_TITLE], 
+                        Scrape.GenerateWebsiteList(PriceAnalysisVM.SelectedWebsites.Select(site => site.Content.ToString()).ToList()),
                         ViewModelBase.MainUser.Memberships[BarnesAndNoble.WEBSITE_TITLE], 
                         ViewModelBase.MainUser.Memberships[BooksAMillion.WEBSITE_TITLE], 
                         ViewModelBase.MainUser.Memberships[KinokuniyaUSA.WEBSITE_TITLE],
-                        false
+                        ViewModelBase.MainUser.Memberships[Indigo.WEBSITE_TITLE]
                     );
                 StartScrapeButton.IsEnabled = PriceAnalysisVM.IsAnalyzeButtonEnabled;
                 LOGGER.Info($"Scrape Finished");

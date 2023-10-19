@@ -42,7 +42,7 @@ Of course I understand if you do not trust me but I promise there is nothing mal
 ***
 ## Links to Buy Manga (List in Order of Value Proposition)
 ***English***
-- [RightStufAnime](https://www.rightstufanime.com/)
+- [Indigo](https://www.Indigo.com/)
 - [RobertsAnimeCornerStore](https://www.animecornerstore.com/graphicnovels1.html)
 - [InStockTrades](https://www.instocktrades.com/)
 - [Barnes & Noble](https://www.barnesandnoble.com/b/books/graphic-novels-comics/manga/_/N-1sZ29Z8q8Zucc)
