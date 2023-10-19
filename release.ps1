@@ -39,7 +39,6 @@ if (Test-Path $outDir) {
 Push-Location $projDir
 try {
     Write-Output "Restoring:"
-    dotnet restore --source C:\MangaLightNovelWebScrape\Src\bin\Release --source https://api.nuget.org/v3/index.json
     dotnet build -c Release
     Write-Output "Publishing:"
     $msBuildVerbosityArg = "/v:m"
