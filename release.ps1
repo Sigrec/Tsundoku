@@ -92,8 +92,7 @@ try {
     git add -A
     Write-Output "Committing..."
     git commit -m "Update to v$version"
-
-    # Push.
+    Write-Output "Pushing..."
     git push
 } finally {
     Pop-Location
