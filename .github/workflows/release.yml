@@ -16,7 +16,10 @@ jobs:
         run: |
           git config --global url."https://user:${{ secrets.GITHUB_TOKEN }}@github".insteadOf https://github
           git config --global user.name github-actions
-          git config --global user.email github-actions@github.com          
+          git config --global user.email github-actions@github.com
+          
+      - name: Add local package source for Scrape
+        run: dotnet nuget add source C:\MangaLightNovelWebScrape\Src\bin\Release --name Scrape
 
       - name: Run release script
         shell: pwsh
