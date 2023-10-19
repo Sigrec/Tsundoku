@@ -30,10 +30,7 @@ Write-Output "Version: $version"
 # Clean output directory.
 $publishDir = "bin/publish"
 $outDir = "$projDir/$publishDir"
-Write-Output -Path "../$outDir"
-Write-Output -Path "./$outDir"
-Write-Output -Path "/$outDir"
-Write-Output -Path "$outDir"
+Write-Output "$outDir"
 if (Test-Path $outDir) {
     Remove-Item -Path $outDir -Recurse
 }
