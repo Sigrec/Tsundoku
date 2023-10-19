@@ -4,7 +4,7 @@
 
 ## [ChangeLog](https://github.com/Sigrec/Tsundoku/blob/main/ChangeLog.txt) (Right Click Exe → Properties → Details to see current File Version)
 ***
->[**Windows Download** (Current Supported Version = V2.1.0.0)](https://Sigrec.github.io/Tsundoku/Tsundoku.application)\
+>[**Windows Download** (Current Supported Version = V2.2.0.0)](https://Sigrec.github.io/Tsundoku/Tsundoku.application)\
 [**Mac Download (Not Supported Yet Need Someone To Test For Me Add me on Discord if Interested & DM)** (Current Supported Version = X)](https://www.dropbox.com/sh/3e0po3d4l1sv8va/AAAgEbiPM86QQtkTcvvGWEVva?dl=0)\
 Download the folder into your desired location (need to keep the executable folder with your UserData.json and Covers folder otherwise it will generate new ones), then pin the exe to your taskbar. Make sure to keep the ExtraSeries.json file in the same folder as well otherwise it will crash if you try and add any series in it like "Radiant"
 ***
