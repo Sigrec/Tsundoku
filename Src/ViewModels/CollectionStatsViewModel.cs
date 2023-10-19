@@ -73,6 +73,7 @@ namespace Tsundoku.ViewModels
 
         public CollectionStatsViewModel()
         {
+            this.CurrentTheme = MainUser.SavedThemes.First(theme => theme.ThemeName.Equals(MainUser.MainTheme));
             GenerateStats();
 
             this.WhenAnyValue(x => x.MeanRating).Subscribe(x => MainUser.MeanRating = x);
@@ -268,7 +269,6 @@ namespace Tsundoku.ViewModels
             UpdateDemographicPercentages();
             UpdateRatingChartValues();
 
-            // LOGGER.Debug("Generate Stats");
             uint testVolumesRead = 0, testUsersNumVolumesCollected = 0, testUsersNumVolumesToBeCollected = 0;
             decimal testCollectionPrice = 0, testMeanRating = 0, countMeanRating = 0;
             foreach (Series x in MainWindowViewModel.UserCollection)

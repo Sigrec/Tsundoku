@@ -193,7 +193,6 @@
                                 Height="35"
                                 Width="185"
                                 SelectedIndex="{CompiledBinding FilterIndex}"
-                                AutoScrollToSelectedItem="True"
                                 Theme="{StaticResource MenuComboBox}">
                             <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">None</ComboBoxItem>
                             <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Query</ComboBoxItem>
@@ -234,23 +233,19 @@
             
             <!-- Collection -->
             <ScrollViewer Name="CollectionTheme" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" DockPanel.Dock="Bottom" Background="{CompiledBinding CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}"> 
-                <ItemsControl Name="CollectionItems" Margin="0,50,0,50" ItemsSource="{CompiledBinding SearchedCollection}" HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <WrapPanel/>
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-
-                    <ItemsControl.ItemTemplate>
+                <ItemsRepeater Name="CollectionItems" Margin="20,50,20,50" ItemsSource="{CompiledBinding SearchedCollection}" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <ItemsRepeater.Layout>
+                        <UniformGridLayout MinItemHeight="290" ItemsJustification="Center" ItemsStretch="None" Orientation="Horizontal"/>
+                    </ItemsRepeater.Layout>
+                    <ItemsRepeater.ItemTemplate>
                         <!-- Full Card Display -->
-                        <DataTemplate x:DataType="{x:Type local:Series}">
-                            <Border Background="Transparent" Margin="20" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 15 6 #B3000000">
-                                <Border CornerRadius="8" ClipToBounds="True">
+                        <DataTemplate>
+                            <Border Background="Transparent" Margin="20" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 15 6 #B3000000" Width="{CompiledBinding Source={x:Static local:Constants.CARD_WIDTH}}">
+                                <Border CornerRadius="8" ClipToBounds="True" Width="{CompiledBinding Source={x:Static local:Constants.CARD_WIDTH}}">
                                     <DockPanel Width="{CompiledBinding Source={x:Static local:Constants.CARD_WIDTH}}" LastChildFill="True">
 
                                         <!-- Left Side Card -->
-                                        <Canvas Name="{CompiledBinding Link}"
-                                                PointerPressed="OpenSiteLink"
+                                        <Canvas PointerPressed="OpenSiteLink"
                                                 OpacityMask="White"
                                                 Cursor="Hand"
                                                 DockPanel.Dock="Left"
@@ -270,13 +265,11 @@
                                             <Image Height="{CompiledBinding Source={x:Static local:Constants.IMAGE_HEIGHT}}"
                                                     Width="{CompiledBinding Source={x:Static local:Constants.LEFT_SIDE_CARD_WIDTH}}"
                                                     Source="{CompiledBinding CoverBitMap}"
-                                                    ClipToBounds="True"
-                                                    Name="SeriesCover">
+                                                    ClipToBounds="True">
                                             </Image>
 
                                             <!-- Bottom Left Side Card -->
-                                            <TextBlock Name="StatusAndFormat"
-                                                        Canvas.Bottom="0"
+                                            <TextBlock Canvas.Bottom="0"
                                                         Classes.mouseover="{CompiledBinding $parent.IsPointerOver}"
                                                         Classes.nomouseover="{Binding !$parent.IsPointerOver}"
                                                         Width="{CompiledBinding Source={x:Static local:Constants.LEFT_SIDE_CARD_WIDTH}}"
@@ -295,10 +288,9 @@
                                         </Canvas>
 
                                         <!-- Right Side Series Card -->
-                                        <Grid Width="{CompiledBinding Source={x:Static local:Constants.RIGHT_SIDE_CARD_WIDTH}}" DockPanel.Dock="Right" RowDefinitions="*, 40" Name="GridTest">
+                                        <Grid Width="{CompiledBinding Source={x:Static local:Constants.RIGHT_SIDE_CARD_WIDTH}}" DockPanel.Dock="Right" RowDefinitions="*, 40">
                                             <!-- Top Right Side Card Series Edit-->
-                                            <Grid Name="EditPane" 
-                                                Height="{CompiledBinding Source={x:Static local:Constants.TOP_SECTION_CARD_HEIGHT}}" 
+                                            <Grid Height="{CompiledBinding Source={x:Static local:Constants.TOP_SECTION_CARD_HEIGHT}}" 
                                                 Grid.Row="0" 
                                                 Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneBGColor, Converter={StaticResource ConvertColor}}" 
                                                 ColumnDefinitions="*, 75" 
@@ -387,8 +379,7 @@
                                             </Grid>
 
                                             <!-- Top Right Side Stats Pane -->
-                                            <Grid Name="StatsPane"
-                                                Height="{CompiledBinding Source={x:Static local:Constants.TOP_SECTION_CARD_HEIGHT}}" 
+                                            <Grid Height="{CompiledBinding Source={x:Static local:Constants.TOP_SECTION_CARD_HEIGHT}}" 
                                                 Grid.Row="0" 
                                                 Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneBGColor, Converter={StaticResource ConvertColor}}" 
                                                 IsVisible="false"
@@ -414,19 +405,15 @@
                                                                 <Setter Property="BorderBrush" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
                                                                 <Setter Property="TextBlock.Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsIconHoverColor, Converter={StaticResource ConvertColor}}"/>
                                                             </Style>
-
-                                                            <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter, ^:pressed /template/ ContentPresenter#PART_ContentPresenter">
-                                                                <Setter Property="Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsBGColor, Converter={StaticResource ConvertColor}}"/>
-                                                                <Setter Property="BorderBrush" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsBorderColor, Converter={StaticResource ConvertColor}}"/>
-                                                                <Setter Property="TextBlock.Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsIconColor, Converter={StaticResource ConvertColor}}"/>
-                                                            </Style>
                                                         </Style>
                                                     </Style>
 
-                                                    <Style Selector="Button:pointerover /template/ ContentPresenter">
-                                                        <Setter Property="Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsBGHoverColor, Converter={StaticResource ConvertColor}}"/>
-                                                        <Setter Property="BorderBrush" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
-                                                        <Setter Property="TextBlock.Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsIconHoverColor, Converter={StaticResource ConvertColor}}"/>
+                                                    <Style Selector="Button">
+                                                        <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                                                            <Setter Property="Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsBGHoverColor, Converter={StaticResource ConvertColor}}"/>
+                                                            <Setter Property="BorderBrush" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
+                                                            <Setter Property="TextBlock.Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsIconColor, Converter={StaticResource ConvertColor}}"/>
+                                                        </Style>
                                                     </Style>
                                                 </Grid.Styles>
                                                 <StackPanel Margin="10,7,0,0" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="1">
@@ -476,7 +463,7 @@
                                                                 Mask="000000000.00"/>
                                                 </StackPanel>
                                                 <StackPanel Margin="10,7,0,0" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="1">
-                                                    <TextBlock Text="{Binding Rating, StringFormat='Rating {0}/10.0'}"
+                                                    <TextBlock Text="{CompiledBinding Rating, StringFormat='Rating {0}/10.0'}"
                                                             Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesCardTitleColor, Converter={StaticResource ConvertColor}}"
                                                             FontWeight="Bold"
                                                             HorizontalAlignment="Center"
@@ -499,9 +486,9 @@
                                                 <StackPanel Margin="0,10,10,0" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="1">
                                                     <StackPanel.Styles>
                                                         <Style Selector="ComboBox">
-                                                            <Setter Property="Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.MenuButtonBGColor, Converter={StaticResource ConvertColor}}"/>
-                                                            <Setter Property="BorderBrush" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.MenuButtonBorderColor, Converter={StaticResource ConvertColor}}"/>
-                                                            <Setter Property="Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"/>
+                                                            <Setter Property="Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsBGColor, Converter={StaticResource ConvertColor}}"/>
+                                                            <Setter Property="BorderBrush" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsBorderColor, Converter={StaticResource ConvertColor}}"/>
+                                                            <Setter Property="Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsIconColor, Converter={StaticResource ConvertColor}}"/>
 
                                                             <Style Selector="^ ScrollBar:vertical">
                                                                 <Style Selector="^ /template/ Rectangle#TrackRect">
@@ -599,8 +586,7 @@
                                                             FontWeight="Bold"
                                                             HorizontalAlignment="Center"
                                                             FontSize="15"/>
-                                                    <ComboBox Name="GenreSelector"
-                                                            SelectionChanged="DemographicChanged"
+                                                    <ComboBox SelectionChanged="DemographicChanged"
                                                             Height="35"
                                                             FontWeight="Bold"
                                                             FontSize="15"
@@ -649,24 +635,22 @@
                                             </Grid>
 
                                             <!-- Top Right Side Card Series Data-->
-                                            <DockPanel Height="{CompiledBinding Source={x:Static local:Constants.TOP_SECTION_CARD_HEIGHT}}" 
-                                                    Grid.Row="0" 
-                                                    LastChildFill="True"
-                                                    Width="{CompiledBinding Source={x:Static local:Constants.RIGHT_SIDE_CARD_WIDTH}}" 
-                                                    Name="SeriesCardData"
+                                            <Grid Height="{CompiledBinding Source={x:Static local:Constants.TOP_SECTION_CARD_HEIGHT}}" 
+                                                    Grid.Row="0"
+                                                    Width="{CompiledBinding Source={x:Static local:Constants.RIGHT_SIDE_CARD_WIDTH}}"
+                                                    Grid.RowDefinitions="Auto,Auto,*"
                                                     Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesCardBGColor, Converter={StaticResource ConvertColor}}">
-                                                <TextBlock DockPanel.Dock="Top"
+                                                <TextBlock Grid.Row="0"
                                                         TextWrapping="Wrap"
                                                         Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesCardTitleColor, Converter={StaticResource ConvertColor}}"
                                                         FontWeight="Bold"
                                                         FontSize="23"
                                                         MaxHeight="{CompiledBinding Source={x:Static local:Constants.TOP_SECTION_CARD_HEIGHT}}"
                                                         PointerPressed="CopySeriesTitleAsync"
-                                                        Name="SeriesTitle"
                                                         Padding="8,1,7,6"
                                                         Cursor="Hand"
                                                         TextAlignment="Left"
-                                                        MaxLines="3"
+                                                        MaxLines="4"
                                                         LineHeight="24.0">
                                                     <TextBlock.Text>
                                                         <MultiBinding Converter="{StaticResource ConvertTitle}">
@@ -675,10 +659,10 @@
                                                         </MultiBinding>
                                                     </TextBlock.Text>
                                                 </TextBlock>
-                                                <TextBlock DockPanel.Dock="Top"
-                                                            TextWrapping="Wrap"
-                                                            Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesCardStaffColor, Converter={StaticResource ConvertColor}}"
-                                                            Padding="9,0,4,2">
+                                                <TextBlock TextWrapping="Wrap"
+                                                            Grid.Row="1"
+                                                           Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesCardStaffColor, Converter={StaticResource ConvertColor}}"
+                                                           Padding="9,0,4,2">
                                                     <TextBlock.Text>
                                                         <MultiBinding Converter="{StaticResource ConvertStaff}" Mode="OneWay">
                                                             <Binding Path="Staff"/>
@@ -686,14 +670,17 @@
                                                         </MultiBinding>
                                                     </TextBlock.Text>
                                                 </TextBlock>
-                                                <ScrollViewer VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled" DockPanel.Dock="Bottom" IsScrollChainingEnabled="false">
+                                                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                                              HorizontalScrollBarVisibility="Disabled"
+                                                              IsScrollChainingEnabled="false"
+                                                              Grid.Row="2">
                                                     <TextBlock TextWrapping="Wrap"
                                                                 Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesCardDescColor, Converter={StaticResource ConvertColor}}"
                                                                 Opacity="0.9"
-                                                                Text="{Binding Description}"
-                                                                Padding="10,-2,6,10"/>
+                                                                Text="{CompiledBinding Description}"
+                                                                Padding="10,-2,15,10"/>
                                                 </ScrollViewer>
-                                            </DockPanel>
+                                            </Grid>
 
 										<!-- Bottom Right Side Card -->
 										<StackPanel Height="{CompiledBinding Source={x:Static local:Constants.BOTTOM_SECTION_CARD_HEIGHT}}"
@@ -701,17 +688,15 @@
 													Width="{CompiledBinding Source={x:Static local:Constants.RIGHT_SIDE_CARD_WIDTH}}"
 													Orientation="Horizontal"
 													Grid.Row="1"
-													Name="BottomRightSideCard"
 													HorizontalAlignment="Stretch"
 													VerticalAlignment="Stretch">
 											<StackPanel.Styles>
-												<Style Selector="#EditSeriesButton:pointerover /template/ ContentPresenter, #EditSeriesStatsButton:pointerover /template/ ContentPresenter">
+												<Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
 													<Setter Property="TextBlock.Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesButtonIconHoverColor, Converter={StaticResource ConvertColor}}"/>
 													<Setter Property="Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
 												</Style>
 											</StackPanel.Styles>
-											<Button Name="EditSeriesButton"
-													Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesButtonBGColor, Converter={StaticResource ConvertColor}}"
+											<Button Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesButtonBGColor, Converter={StaticResource ConvertColor}}"
 													FontSize="23"
 													BorderThickness="0"
 													BorderBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesButtonIconColor, Converter={StaticResource ConvertColor}}"
@@ -747,8 +732,7 @@
 															 Minimum="0"
 															 CornerRadius="4"
 															 Margin="7,0,0,0"
-															 Maximum="{CompiledBinding MaxVolumeCount}"
-															 Name="VolumeProgress"/>
+															 Maximum="{CompiledBinding MaxVolumeCount}"/>
 												<StackPanel Orientation="Horizontal" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center" Margin="10,0,0,0">
 													<Button Background="Transparent"
 														Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressTextColor, Converter={StaticResource ConvertColor}}"
@@ -762,10 +746,8 @@
 														Click="SubtractVolume"
 														VerticalAlignment="Center"
 														HorizontalAlignment="Center"
-														Name="DecrementButton"
 														Content="-"/>
-													<TextBlock Name="VolumeCount" 
-																TextAlignment="Center" 
+													<TextBlock TextAlignment="Center" 
 																FontSize="16" 
 																FontWeight="Bold" 
 																Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressTextColor, Converter={StaticResource ConvertColor}}"
@@ -790,12 +772,10 @@
 															HorizontalAlignment="Center"
 															VerticalContentAlignment="Center"
 															HorizontalContentAlignment="Center"
-															Name="IncrementButton"
 															Content="+"/>
 												</StackPanel>
 											</Grid>
-											<Button Name="EditSeriesStatsButton"
-													Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesButtonBGColor, Converter={StaticResource ConvertColor}}"
+											<Button Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesButtonBGColor, Converter={StaticResource ConvertColor}}"
 													FontSize="23"
 													BorderThickness="0"
 													BorderBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesButtonIconColor, Converter={StaticResource ConvertColor}}"
@@ -810,8 +790,8 @@
                                 </Border>
                             </Border>
                         </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                    </ItemsRepeater.ItemTemplate>
+                </ItemsRepeater>
 		    </ScrollViewer>
 	    </DockPanel>
     </Panel>

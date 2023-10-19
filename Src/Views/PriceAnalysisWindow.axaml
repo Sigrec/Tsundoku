@@ -24,6 +24,7 @@
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
                 <ResourceInclude Source="/Styles/PriceAnalysisControlThemes.xaml"/>
+                <ResourceInclude Source="/Styles/SubWindowControlThemes.xaml"/>
 			</ResourceDictionary.MergedDictionaries>
 		</ResourceDictionary>
 	</Window.Resources>

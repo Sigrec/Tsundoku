@@ -22,7 +22,6 @@ namespace Tsundoku.Views
         private static readonly StockStatus[] EXCLUDE_BOTH_FILTER = [ StockStatus.PO, StockStatus.OOS ];
         private static readonly StockStatus[] EXCLUDE_PO_FILTER = [ StockStatus.PO ];
         private static readonly StockStatus[] EXCLUDE_OOS_FILTER = [ StockStatus.OOS ];
-        MainWindow CollectionWindow;
 
         public PriceAnalysisWindow()
         {
@@ -30,8 +29,6 @@ namespace Tsundoku.Views
             DataContext = new PriceAnalysisViewModel();
             Opened += (s, e) =>
             {
-                CollectionWindow = (MainWindow)((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).MainWindow;
-                PriceAnalysisVM.CurrentTheme = CollectionWindow.CollectionViewModel.CurrentTheme;
                 IsOpen ^= true;
                 if (Screens.Primary.WorkingArea.Height < 611)
                 {

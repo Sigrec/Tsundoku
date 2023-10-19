@@ -79,7 +79,7 @@ namespace Tsundoku.Helpers
                 short rateCheck = RateLimitCheck(response.AsGraphQLHttpResponse().ResponseHeaders);
 				if (rateCheck != -1)
                 {
-                    LOGGER.Info($"Waiting {rateCheck} Seconds for Rate Limit");
+                    LOGGER.Info($"Waiting {rateCheck} Seconds for Rate Limit To Reset");
                     await Task.Delay(rateCheck * 1000);
                     response = await AniListClient.SendQueryAsync<JsonDocument?>(queryRequest);
                 }
@@ -151,7 +151,7 @@ namespace Tsundoku.Helpers
                 short rateCheck = RateLimitCheck(response.AsGraphQLHttpResponse().ResponseHeaders);
 				if (rateCheck != -1)
                 {
-                    LOGGER.Info($"Waiting {rateCheck} Seconds for Rate Limit");
+                    LOGGER.Info($"Waiting {rateCheck} Seconds for Rate Limit To Reset");
                     await Task.Delay(rateCheck * 1000);
                     response = await AniListClient.SendQueryAsync<JsonDocument?>(queryRequest);
                 }
@@ -168,7 +168,7 @@ namespace Tsundoku.Helpers
         {
             responseHeaders.TryGetValues("X-RateLimit-Remaining", out var rateRemainingValues);
             _ = short.TryParse(rateRemainingValues?.FirstOrDefault(), out var rateRemaining);
-            LOGGER.Info($"Rate Remaining = {rateRemaining}");
+            LOGGER.Debug($"Rate Remaining = {rateRemaining}");
             if (rateRemaining > 0)
             {
                 return -1;

@@ -16,7 +16,7 @@ namespace Tsundoku.ViewModels
 
         public PriceAnalysisViewModel()
         {
-
+            this.CurrentTheme = MainUser.SavedThemes.First(theme => theme.ThemeName.Equals(MainUser.MainTheme));
         }
     }
 }

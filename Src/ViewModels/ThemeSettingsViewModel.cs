@@ -15,6 +15,7 @@ namespace Tsundoku.ViewModels
 
         public ThemeSettingsViewModel()
         {
+            this.CurrentTheme = MainUser.SavedThemes.First(theme => theme.ThemeName.Equals(MainUser.MainTheme));
             this.WhenAnyValue(x => x.ThemeName, x => !string.IsNullOrWhiteSpace(x) && !x.Equals("Default", StringComparison.OrdinalIgnoreCase)).Subscribe(x => IsSaveThemeButtonEnabled = x);
             this.WhenAnyValue(x => x.CurrentTheme).Subscribe(x => CurThemeIndex = MainUser.SavedThemes.IndexOf(x));
             UserThemesDisplay = new ObservableCollection<string>(MainUser.SavedThemes.OrderBy(theme => theme.ThemeName).Select(theme => theme.ThemeName));

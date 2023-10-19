@@ -14,6 +14,7 @@ using System.Text.RegularExpressions;
 using System.Linq.Dynamic.Core;
 using System.Windows.Input;
 using MangaLightNovelWebScrape.Websites.America;
+using Avalonia.Collections;
 
 namespace Tsundoku.ViewModels
 {
@@ -23,33 +24,33 @@ namespace Tsundoku.ViewModels
         public const string USER_DATA_FILEPATH = @"UserData.json";
         private const double SCHEMA_VERSION = 2.1;
         private static bool CanFilter = true;
-        public static ObservableCollection<Series> SearchedCollection { get; set; } = [];
+        public static AvaloniaList<Series> SearchedCollection { get; set; } = [];
         public static List<Series> UserCollection { get; set; } = [];
         private static IEnumerable<Series> FilteredCollection { get; set; } = [];
         [Reactive] public string SearchText { get; set; }
         [Reactive] public string AdvancedSearchText { get; set; }
         [Reactive] public bool LanguageChanged { get; set; } = false;
-        public bool SearchIsBusy { get; set; } = false;
         [Reactive] public Bitmap? UserIcon { get; set; }
         [Reactive] public string CurLanguage { get; set; }
-        [Reactive] public string CurFilter { get; set; } = "None";
         [Reactive] public int LanguageIndex { get; set; }
-        public static int FilterIndex { get; set; }
+        [Reactive] public int FilterIndex { get; set; }
+        public static bool SearchIsBusy { get; set; } = false;
+        public static string CurSearchText;
         [Reactive] public string AdvancedSearchQueryErrorMessage { get; set; }
 
-        public AddNewSeriesWindow newSeriesWindow;
+        public static AddNewSeriesWindow newSeriesWindow;
         public ReactiveCommand<Unit, Unit> OpenAddNewSeriesWindow { get; set; }
 
-        public SettingsWindow settingsWindow;
+        public static SettingsWindow settingsWindow;
         public ReactiveCommand<Unit, Unit> OpenSettingsWindow { get; set; }
 
-        public CollectionThemeWindow themeSettingsWindow;
+        public static CollectionThemeWindow themeSettingsWindow;
         public ReactiveCommand<Unit, Unit> OpenThemeSettingsWindow { get; set; }
 
-        public PriceAnalysisWindow priceAnalysisWindow;
+        public static PriceAnalysisWindow priceAnalysisWindow;
         public ReactiveCommand<Unit, Unit> OpenPriceAnalysisWindow { get; set; }
 
-        public CollectionStatsWindow collectionStatsWindow;
+        public static  CollectionStatsWindow collectionStatsWindow;
         public ReactiveCommand<Unit, Unit> OpenCollectionStatsWindow { get; set; }
         public ICommand StartAdvancedSearch { get; }
         private static StringBuilder AdvancedFilterExpression = new StringBuilder();
@@ -63,7 +64,6 @@ namespace Tsundoku.ViewModels
         {
             // Helpers.ExtensionMethods.PrintCultures();
             // Helpers.ExtensionMethods.PrintCurrencySymbols();
-
             LoadUserData();
             ConfigureWindows();
 
@@ -71,6 +71,7 @@ namespace Tsundoku.ViewModels
             this.WhenAnyValue(x => x.CurLanguage).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => LanguageIndex = AVAILABLE_LANGUAGES.IndexOf(x));
             this.WhenAnyValue(x => x.CurFilter).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => FilterIndex = AVAILABLE_COLLECTION_FILTERS.IndexOf(x));
             this.WhenAnyValue(x => x.SearchText).Throttle(TimeSpan.FromMilliseconds(500)).ObserveOn(RxApp.MainThreadScheduler).Subscribe(SearchCollection);
+            this.WhenAnyValue(x => x.SearchText).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => CurSearchText = x);
             this.WhenAnyValue(x => x.CurrentTheme).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.MainTheme = x.ThemeName);
             this.WhenAnyValue(x => x.CurDisplay).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.Display = x);
             this.WhenAnyValue(x => x.UserName).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.UserName = x);
@@ -203,6 +204,11 @@ namespace Tsundoku.ViewModels
         public string GetFilter()
         {
             return CurFilter;
+        }
+
+        public static void UserIsSearching(bool value)
+        {
+            SearchIsBusy = value;
         }
 
         /// <summary>
@@ -404,8 +410,7 @@ namespace Tsundoku.ViewModels
                 "Read" => $"series.VolumesRead {logicType} {filterValue}",
                 "CurVolumes" => $"series.CurVolumeCount {logicType} {filterValue}",
                 "MaxVolumes" => $"series.MaxVolumeCount {logicType} {filterValue}",
-                "Demographic" => $"(series.Demographic != null && series.Demographic.Equals(\"{filterValue}\"))",
-                "Format" or "Status" => $"series.{filterName}.Equals(\"{filterValue}\")",
+                "Format" or "Status" or "Demographic" => $"series.{filterName} == {filterName}.{filterValue}",
                 "Series" => filterValue.Equals("Complete") ? "series.MaxVolumeCount == series.CurVolumeCount" : "series.CurVolumeCount < series.MaxVolumeCount",
                 "Favorite" => filterValue.Equals("True") ? $"series.IsFavorite" : $"!series.IsFavorite",
                 "Notes" => $"(!string.IsNullOrWhiteSpace(series.SeriesNotes) && series.SeriesNotes.Contains(\"{filterValue[1..^1]}\"))",

@@ -17,7 +17,11 @@ namespace Tsundoku.ViewModels
         public ObservableCollection<ListBoxItem> SelectedAdditionalLanguages { get; set; } = new ObservableCollection<ListBoxItem>();
         private static readonly HttpClient AddCoverHttpClient = new HttpClient();
         private static readonly StringBuilder CurLanguages = new StringBuilder();
-        public AddNewSeriesViewModel() => SelectedAdditionalLanguages.CollectionChanged += AdditionalLanguagesCollectionChanged;
+        public AddNewSeriesViewModel()
+        {
+            this.CurrentTheme = MainUser.SavedThemes.First(theme => theme.ThemeName.Equals(MainUser.MainTheme));
+            SelectedAdditionalLanguages.CollectionChanged += AdditionalLanguagesCollectionChanged;
+        }
 
         private void AdditionalLanguagesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
@@ -67,25 +71,34 @@ namespace Tsundoku.ViewModels
 
                 if (!duplicateSeriesCheck)
                 {
-                    LOGGER.Info($"\nAdding New Series -> \"{title}\" | {bookType} | {curVolCount} | {maxVolCount}");
+                    LOGGER.Info($"\nAdding New Series -> \"{title}\" | {bookType} | {curVolCount} | {maxVolCount}\n{newSeries}");
 
                     int index = MainWindowViewModel.UserCollection.BinarySearch(newSeries, new SeriesComparer(MainUser.CurLanguage));
                     index = index < 0 ? ~index : index;
+                    LOGGER.Debug(index);
                     if (MainWindowViewModel.UserCollection.Count == MainWindowViewModel.SearchedCollection.Count)
                     {
+                        LOGGER.Debug("No Filter Insert");
                         MainWindowViewModel.SearchedCollection.Insert(index, newSeries);
                     }
-                    else if (DetermineFilter(newSeries, AVAILABLE_COLLECTION_FILTERS[MainWindowViewModel.FilterIndex]))
+                    else if (DetermineFilter(newSeries, ((Views.MainWindow)((Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).MainWindow).CollectionViewModel.CurFilter) || (MainWindowViewModel.SearchIsBusy && (newSeries.Titles.Values.AsParallel().Any(title => title.Contains(MainWindowViewModel.CurSearchText, StringComparison.OrdinalIgnoreCase)) || newSeries.Staff.Values.AsParallel().Any(staff => staff.Contains(MainWindowViewModel.CurSearchText, StringComparison.OrdinalIgnoreCase)))))
                     {
                         int searchedIndex = MainWindowViewModel.SearchedCollection.ToList().BinarySearch(newSeries, new SeriesComparer(MainUser.CurLanguage));
                         searchedIndex = searchedIndex < 0 ? ~searchedIndex : searchedIndex;
-                        MainWindowViewModel.SearchedCollection.Insert(index, newSeries);
+                        if (MainWindowViewModel.SearchedCollection.Count == 0 || searchedIndex == MainWindowViewModel.SearchedCollection.Count)
+                        {
+                            MainWindowViewModel.SearchedCollection.Add(newSeries);
+                        }
+                        else
+                        {
+                            MainWindowViewModel.SearchedCollection.Insert(searchedIndex, newSeries);
+                        }
                     }
                     MainWindowViewModel.UserCollection.Insert(index, newSeries);
                 }
                 else
                 {
-                    LOGGER.Info($"{title} Already Exists");
+                    LOGGER.Info($"{title} Already Exists Not Adding");
                 }
             }
             return duplicateSeriesCheck;
@@ -111,7 +124,7 @@ namespace Tsundoku.ViewModels
 
         public static bool DetermineFilter(Series newSeries, string filter)
         {
-        switch (filter)
+            switch (filter)
             {
                 case "Ongoing":
                     return newSeries.Status == Status.Ongoing;
@@ -143,6 +156,7 @@ namespace Tsundoku.ViewModels
                 case "Cost":
                 case "Query":
                 case "None":
+                case "Favorites":
                 default:
                     return false;
             }

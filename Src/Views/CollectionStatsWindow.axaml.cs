@@ -13,7 +13,6 @@ namespace Tsundoku.Views
         public CollectionStatsViewModel? CollectionStatsVM => DataContext as CollectionStatsViewModel;
         public bool IsOpen = false;
         public bool CanUpdate = true; // On First Update
-        MainWindow CollectionWindow;
 
         public CollectionStatsWindow()
         {
@@ -21,8 +20,6 @@ namespace Tsundoku.Views
             DataContext = new CollectionStatsViewModel();
             Opened += (s, e) =>
             {
-                CollectionWindow = (MainWindow)((Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).MainWindow;
-                CollectionStatsVM.CurrentTheme = CollectionWindow.CollectionViewModel.CurrentTheme;
                 if (CanUpdate) { UpdateChartColors(); }
                 CanUpdate = false;
                 IsOpen ^= true;

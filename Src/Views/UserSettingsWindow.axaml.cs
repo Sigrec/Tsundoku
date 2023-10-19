@@ -24,7 +24,6 @@ namespace Tsundoku.Views
             Opened += (s, e) =>
             {
                 CollectionWindow = (MainWindow)((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).MainWindow;
-                UserSettingsVM.CurrentTheme = CollectionWindow.CollectionViewModel.CurrentTheme;
                 IsOpen ^= true;
 
                 if (Screens.Primary.WorkingArea.Height < 955)
@@ -54,7 +53,7 @@ namespace Tsundoku.Views
                 string newCurrency = (CurrencySelector.SelectedItem as ComboBoxItem).Content.ToString();
                 currencyLength = CollectionWindow.CollectionViewModel.CurCurrency.Length;
                 CollectionWindow.CollectionViewModel.CurCurrency = newCurrency;
-                CollectionWindow.CollectionViewModel.collectionStatsWindow.CollectionStatsVM.CollectionPrice = $"{newCurrency}{ CollectionWindow.CollectionViewModel.collectionStatsWindow.CollectionStatsVM.CollectionPrice[currencyLength..]}";
+                MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.CollectionPrice = $"{newCurrency}{ MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.CollectionPrice[currencyLength..]}";
                 ViewModelBase.MainUser.Currency = newCurrency;
                 LOGGER.Info($"Currency Changed To {newCurrency}");
             }

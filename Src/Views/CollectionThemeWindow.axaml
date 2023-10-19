@@ -23,6 +23,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceInclude Source="/Styles/ThemeSettingsControlThemes.xaml"/>
+                <ResourceInclude Source="/Styles/SubWindowControlThemes.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>

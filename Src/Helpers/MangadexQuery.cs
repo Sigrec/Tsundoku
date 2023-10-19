@@ -32,7 +32,7 @@ namespace Tsundoku.Helpers
         {
             try
             {
-                LOGGER.Info($"MangaDex Getting Series By Title Async w/ {title.Replace(" ", "%20")}");
+                LOGGER.Debug($"MangaDex Getting Series By Title Async w/ \"{title.Replace(" ", "%20")}\"");
                 var response = await MangadexClient.GetStringAsync($"manga?title={title.Replace(" ", "%20")}");
                 return JsonDocument.Parse(response);
             }
@@ -52,7 +52,7 @@ namespace Tsundoku.Helpers
         {
             try
             {
-                LOGGER.Info($"MangaDex Getting Series Async w/ Id {id}");
+                LOGGER.Debug($"MangaDex Getting Series Async w/ Id \"{id}\"");
                 var response = await MangadexClient.GetStringAsync($"manga/{id}");
                 return JsonDocument.Parse(response);
             }
@@ -72,7 +72,7 @@ namespace Tsundoku.Helpers
         {
             try
             {
-                LOGGER.Info($"MangaDex Getting Author Async w/ Id {id}");
+                LOGGER.Debug($"MangaDex Getting Author Async w/ Id \"{id}\"");
                 var response = await MangadexClient.GetStringAsync($"author/{id}");
                 return JsonDocument.Parse(response).RootElement.GetProperty("data").GetProperty("attributes").GetProperty("name").GetString();
             }
@@ -92,7 +92,7 @@ namespace Tsundoku.Helpers
         {
             try
             {
-                LOGGER.Info($"MangaDex Getting Cover Async w/ Id {id}");
+                LOGGER.Debug($"MangaDex Getting Cover Async w/ Id \"{id}\"");
                 var response = await MangadexClient.GetStringAsync($"cover/{id}");
                 JsonElement data = JsonDocument.Parse(response).RootElement.GetProperty("data");
                 if (data.ValueKind == JsonValueKind.Array)
@@ -119,7 +119,14 @@ namespace Tsundoku.Helpers
 		{
 			if (data.ValueKind == JsonValueKind.Array) // Collection
 			{
-				return data.EnumerateArray().ElementAt(0).GetProperty("attributes").GetProperty("altTitles").EnumerateArray();
+				if (data.EnumerateArray().Any())
+                {
+                    return data.EnumerateArray().ElementAt(0).GetProperty("attributes").GetProperty("altTitles").EnumerateArray();
+                }
+                else
+                {
+                    return new JsonElement.ArrayEnumerator();
+                }
 			}
 			else
 			{

@@ -5,6 +5,7 @@ using Avalonia.Media.Imaging;
 using MangaLightNovelWebScrape;
 using System.Runtime.InteropServices;
 using System.Globalization;
+using System.Diagnostics;
 
 namespace Tsundoku.Models
 {
@@ -52,6 +53,7 @@ namespace Tsundoku.Models
 		[JsonConverter(typeof(JsonStringEnumConverter))] public Demographic Demographic { get; set; }
 		public bool IsFavorite { get; set; } = false;
 
+        [JsonConstructor]
 		public Series(Dictionary<string, string> Titles, Dictionary<string, string> Staff, string Description, Format Format, Status Status, string Cover, Uri Link, ushort MaxVolumeCount, ushort CurVolumeCount, decimal Rating, Demographic Demographic, Bitmap CoverBitMap)
         {
             this.Titles = Titles;
@@ -68,18 +70,18 @@ namespace Tsundoku.Models
 			this.CoverBitMap = CoverBitMap;
         }
 
-		/// <summary>
-		/// All Chinese or Taiwanese series use "Chinese (Simplified)" and go to "Chinese"
-		/// </summary>
-		/// <param name="title">Title or ID of the series the user wants to add to their collection</param>
-		/// <param name="bookType">Booktype of the series the user wants to add, either Manga or Light Novel</param>
-		/// <param name="maxVolCount">Current max volume count of the series</param>
-		/// <param name="minVolCount">Current volume count the user has for the series</param>
-		/// <param name="ALQuery">AniListQuery object for the AniList HTTP Client</param>
-		/// <param name="MD_Query">MangaDexQuery object for the MangaDex HTTP client</param>
-		/// <param name="additionalLanguages">List of additional languages to query for</param>
-		/// <returns></returns>
-		public static async Task<Series?> CreateNewSeriesCardAsync(string title, Format bookType, ushort maxVolCount, ushort minVolCount, ObservableCollection<string> additionalLanguages)
+        /// <summary>
+        /// All Chinese or Taiwanese series use "Chinese (Simplified)" and go to "Chinese"
+        /// </summary>
+        /// <param name="title">Title or ID of the series the user wants to add to their collection</param>
+        /// <param name="bookType">Booktype of the series the user wants to add, either Manga or Light Novel</param>
+        /// <param name="maxVolCount">Current max volume count of the series</param>
+        /// <param name="minVolCount">Current volume count the user has for the series</param>
+        /// <param name="ALQuery">AniListQuery object for the AniList HTTP Client</param>
+        /// <param name="MD_Query">MangaDexQuery object for the MangaDex HTTP client</param>
+        /// <param name="additionalLanguages">List of additional languages to query for</param>
+        /// <returns></returns>
+        public static async Task<Series?> CreateNewSeriesCardAsync(string title, Format bookType, ushort maxVolCount, ushort minVolCount, ObservableCollection<string> additionalLanguages)
         {
 			JsonDocument? seriesDataDoc;
 			int pageNum = 1;
@@ -110,7 +112,7 @@ namespace Tsundoku.Models
 			Restart:
 			if (isAniListID || (!isMangaDexId && seriesDataDoc != null))
 			{
-				LOGGER.Info("Valid AniList Query");
+				LOGGER.Debug("Valid AniList Query");
                 string nativeStaff = string.Empty, fullStaff = string.Empty;
 				JsonElement seriesData = seriesDataDoc.RootElement.GetProperty("Media");
 				nativeTitle = seriesData.GetProperty("title").GetProperty("native").GetString();
@@ -439,10 +441,10 @@ namespace Tsundoku.Models
         {
             return demographic switch
             {
-                "shounen" => Demographic.Shounen,
-                "shoujo" => Demographic.Shoujo,
-                "josei" => Demographic.Josei,
-                "seinen" => Demographic.Seinen,
+                "shounen" or "Shounen" => Demographic.Shounen,
+                "shoujo" or "Shoujo" => Demographic.Shoujo,
+                "josei" or "Josei"=> Demographic.Josei,
+                "seinen" or "Seinen" => Demographic.Seinen,
                 _ => Demographic.Unknown
             };
         }
@@ -518,7 +520,7 @@ namespace Tsundoku.Models
 						{
 							if (synonyms.Current.TryGetProperty("en", out altTitle))
 							{
-								LOGGER.Debug(coverLink);
+
 								newPath = @$"Covers\{ExtensionMethods.RemoveInPlaceCharArray(string.Concat(altTitle.GetString().Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries))).Replace(",", string.Empty)}_{bookType.ToString().ToUpper()}.{coverLink[^3..]}";
 								break;
 							}
@@ -577,28 +579,12 @@ namespace Tsundoku.Models
 			GC.SuppressFinalize(this);
 		}
 
-        public override bool Equals(object? obj)
-        {
-            return obj is Series series &&
-                   EqualityComparer<Dictionary<string, string>>.Default.Equals(Titles, series.Titles) &&
-                   EqualityComparer<Dictionary<string, string>>.Default.Equals(Staff, series.Staff) &&
-                   Description == series.Description &&
-                   Format == series.Format &&
-                   Status == series.Status &&
-                   Cover == series.Cover &&
-                   Link == series.Link;
-        }
-
-        public bool Equals(Series? other)
+        public bool Equals(Series other)
         {
             return other is not null &&
-                   EqualityComparer<Dictionary<string, string>>.Default.Equals(Titles, other.Titles) &&
-                   EqualityComparer<Dictionary<string, string>>.Default.Equals(Staff, other.Staff) &&
-                   Description == other.Description &&
+                   Titles["Romaji"].Equals(other.Titles["Romaji"]) &&
                    Format == other.Format &&
-                   Status == other.Status &&
-                   Cover == other.Cover &&
-                   EqualityComparer<Uri>.Default.Equals(Link, other.Link);
+                   Status == other.Status;
         }
 
         public override int GetHashCode()
@@ -615,6 +601,14 @@ namespace Tsundoku.Models
         {
             return !(left == right);
         }
+
+        public override bool Equals(object obj) => Equals(obj as Series);
+
+        // public override bool Equals(object obj)
+        // {
+        //     return Equals(obj as Series);
+        // }
+
     }
 
     // [JsonSerializable(typeof(Series))]

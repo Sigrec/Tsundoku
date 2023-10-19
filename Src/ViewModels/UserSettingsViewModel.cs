@@ -1,7 +1,6 @@
 using ReactiveUI.Fody.Helpers;
 using ReactiveUI;
 using System.Reactive.Linq;
-using System.Text;
 using Tsundoku.Models;
 using System.Windows.Input;
 using MangaLightNovelWebScrape.Websites.America;
@@ -21,6 +20,7 @@ namespace Tsundoku.ViewModels
 
         public UserSettingsViewModel()
         {
+            this.CurrentTheme = MainUser.SavedThemes.First(theme => theme.ThemeName.Equals(MainUser.MainTheme));
             CurCurrency = MainUser.Currency;
             ExportToSpreadSheetAsyncCommand = ReactiveCommand.CreateFromTask(ExportToSpreadSheetAsync);
 

@@ -32,45 +32,51 @@ namespace Tsundoku.Tests
         }
 
         [AvaloniaTest]
+        public async Task NotOnMangaDex_AniList_Test()
+        {
+            Assert.That((await Series.CreateNewSeriesCardAsync("-0.5˚C", Constants.Format.Manga, 5, 0, [])).ToString(), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesModel\SeriesModelTestData\0.5C.json")));
+        }
+
+        [AvaloniaTest]
         public async Task Novel_AniList_Test()
         {
-            Assert.That((await Series.CreateNewSeriesCardAsync("Classroom of the Elite", Constants.Format.Novel, 14, 0, [])).ToString(), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesModel\SeriesModelTestData\CoTE.json")));
+            Assert.That((await Series.CreateNewSeriesCardAsync("Classroom of the Elite", Constants.Format.Novel, 14, 0, [])).ToString().Replace("\r\n", "\n"), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesModel\SeriesModelTestData\CoTE.json")));
         }
 
         [AvaloniaTest]
         public async Task MangaDexID_HasNativeStaff_Test()
         {
-            Assert.That((await Series.CreateNewSeriesCardAsync("32d76d19-8a05-4db0-9fc2-e0b0648fe9d0", Constants.Format.Manga, 2, 0, [])).ToString(), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesModel\SeriesModelTestData\SoloLeveling.json")));
+            Assert.That((await Series.CreateNewSeriesCardAsync("32d76d19-8a05-4db0-9fc2-e0b0648fe9d0", Constants.Format.Manga, 2, 0, [])).ToString().Replace("\r\n", "\n"), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesModel\SeriesModelTestData\SoloLeveling.json")));
         }
 
         [AvaloniaTest]
         public async Task MangaDexID_NoNativeStaff_Test()
         {
-            Assert.That((await Series.CreateNewSeriesCardAsync("c0189f4a-dee6-48f4-abbe-53a4359cbcfb", Constants.Format.Manga, 2, 0, [])).ToString(), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesModel\SeriesModelTestData\AtTheNorthernFort.json")));
+            Assert.That((await Series.CreateNewSeriesCardAsync("c0189f4a-dee6-48f4-abbe-53a4359cbcfb", Constants.Format.Manga, 2, 0, [])).ToString().Replace("\r\n", "\n"), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesModel\SeriesModelTestData\AtTheNorthernFort.json")));
         }
 
         [AvaloniaTest]
         public async Task MultipleAdditionalLangTitle_AniListLink_Test()
         {
-            Assert.That((await Series.CreateNewSeriesCardAsync("Rent-A-Girlfriend", Constants.Format.Manga, 18, 0, ["Arabic", "Chinese", "French", "Korean", "Russian", "Spanish"])).ToString(), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesModel\SeriesModelTestData\Rent-A-Girlfriend.json")));
+            Assert.That((await Series.CreateNewSeriesCardAsync("Rent-A-Girlfriend", Constants.Format.Manga, 18, 0, ["Arabic", "Chinese", "French", "Korean", "Russian", "Spanish"])).ToString().Replace("\r\n", "\n"), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesModel\SeriesModelTestData\Rent-A-Girlfriend.json")));
         }
 
         [AvaloniaTest]
         public async Task SimilarNotEquals_AniList_Test()
         {
-            Assert.That((await Series.CreateNewSeriesCardAsync("dont toy with me miss nagatoro", Constants.Format.Manga, 5, 0, [])).ToString(), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesModel\SeriesModelTestData\IjiranaideNagatoro-san.json")));
+            Assert.That((await Series.CreateNewSeriesCardAsync("dont toy with me miss nagatoro", Constants.Format.Manga, 5, 0, [])).ToString().Replace("\r\n", "\n"), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesModel\SeriesModelTestData\IjiranaideNagatoro-san.json")));
         }
 
         [AvaloniaTest]
         public async Task Radiant_MangaDexTitle_Test()
         {
-            Assert.That((await Series.CreateNewSeriesCardAsync("Radiant", Constants.Format.Manga, 18, 0, [])).ToString(), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesModel\SeriesModelTestData\Radiant.json")));
+            Assert.That((await Series.CreateNewSeriesCardAsync("Radiant", Constants.Format.Manga, 18, 0, [])).ToString().Replace("\r\n", "\n"), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesModel\SeriesModelTestData\Radiant.json")));
         }
 
         [AvaloniaTest]
         public async Task TheBeginningAfterTheEnd_NoDemographic_MangaDexTitle_Test()
         {
-            Assert.That((await Series.CreateNewSeriesCardAsync("The Beginning After The End", Constants.Format.Manga, 5, 0, [])).ToString(), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesModel\SeriesModelTestData\TBATE.json")));
+            Assert.That((await Series.CreateNewSeriesCardAsync("The Beginning After The End", Constants.Format.Manga, 5, 0, [])).ToString().Replace("\r\n", "\n"), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesModel\SeriesModelTestData\TBATE.json")));
         }
 
         [Test]
@@ -219,6 +225,23 @@ namespace Tsundoku.Tests
                 Assert.That(Series.GetSeriesStatus("HIATUS"), Is.EqualTo(Constants.Status.Hiatus));
                 Assert.That(Series.GetSeriesStatus("hiatus"), Is.EqualTo(Constants.Status.Hiatus));
                 Assert.That(Series.GetSeriesStatus("UNICORN"), Is.EqualTo(Constants.Status.Error));
+            });
+        }
+
+        [Test]
+        [Parallelizable(scope: ParallelScope.Self)]
+        public void GetSeriesDemographics_Test()
+        {
+            Assert.Multiple(() =>
+            {
+                Assert.That(Series.GetSeriesDemographic("shounen"), Is.EqualTo(Constants.Demographic.Shounen));
+                Assert.That(Series.GetSeriesDemographic("Shounen"), Is.EqualTo(Constants.Demographic.Shounen));
+                Assert.That(Series.GetSeriesDemographic("shoujo"), Is.EqualTo(Constants.Demographic.Shoujo));
+                Assert.That(Series.GetSeriesDemographic("Shoujo"), Is.EqualTo(Constants.Demographic.Shoujo));
+                Assert.That(Series.GetSeriesDemographic("josei"), Is.EqualTo(Constants.Demographic.Josei));
+                Assert.That(Series.GetSeriesDemographic("Josei"), Is.EqualTo(Constants.Demographic.Josei));
+                Assert.That(Series.GetSeriesDemographic("seinen"), Is.EqualTo(Constants.Demographic.Seinen));
+                Assert.That(Series.GetSeriesDemographic("Seinen"), Is.EqualTo(Constants.Demographic.Seinen));
             });
         }
 

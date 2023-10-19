@@ -1,0 +1,23 @@
+{
+  "Titles": {
+    "Romaji": "-0.5\u02DAC",
+    "Korean": "-0.5\u02DAC"
+  },
+  "Staff": {
+    "Romaji": "Ttakjeongbeolle | Yeoneo",
+    "Korean": "\uB531\uC815\uBC8C\uB808 | \uC5F0\uC5B4"
+  },
+  "Description": "",
+  "Format": "Manhwa",
+  "Status": "Finished",
+  "Cover": "Covers\\-0.5\u02DAC_MANHWA.jpg",
+  "Link": "https://anilist.co/manga/100921",
+  "SeriesNotes": null,
+  "MaxVolumeCount": 5,
+  "CurVolumeCount": 0,
+  "VolumesRead": 0,
+  "Cost": 0,
+  "Rating": -1,
+  "Demographic": "Unknown",
+  "IsFavorite": false
+}

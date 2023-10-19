@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Collections.Generic;
 
 namespace Tsundoku.Models
@@ -18,7 +19,6 @@ namespace Tsundoku.Models
         public static readonly string[] ADVANCED_SEARCH_FILTERS = ["Rating==", "Rating>=", "Rating<=", "Status==Finished", "Status==Ongoing", "Status==Cancelled", "Status==Hiatus", "Format==Manga", "Format==Novel", "Demographic==Shounen", "Demographic==Shoujo", "Demographic==Seinen", "Demographic==Josei", "Notes==", "Cost==", "Cost>=", "Cost<=", "Read==", "Read>=", "Read<=", "CurVolumes==", "CurVolumes>=", "CurVolumes<=", "MaxVolumes==", "MaxVolumes>=", "MaxVolumes<=", "Series==Complete", "Series==InComplete", "Favorite==True", "Favorite==False"];
         public const ushort MENU_LENGTH = 400;
 		public static readonly string[] VALID_STAFF_ROLES = ["Story & Art", "Story", "Art", "Original Creator", "Character Design", "Cover Illustration", "Illustration", "Mechanical Design", "Original Story", "Original Character Design", "Original Story"];
-		public static readonly string[] DEMOGRAPHICS = ["Shounen", "Shoujo", "Seinen", "Josei", "Unknown"];
 		public static readonly string[] AVAILABLE_LANGUAGES = ["Romaji", "English", "Japanese", "Arabic", "Azerbaijan", "Bengali", "Bulgarian", "Burmese", "Catalan", "Chinese", "Croatian", "Czech", "Danish", "Dutch", "Esperanto", "Estonian", "Filipino", "Finnish", "French", "German", "Greek", "Hebrew", "Hindi", "Hungarian", "Indonesian", "Italian", "Kazakh", "Korean", "Latin", "Lithuanian", "Malay", "Mongolian", "Nepali", "Norwegian", "Persian", "Polish", "Portuguese", "Romanian", "Russian", "Serbian", "Slovak", "Spanish", "Swedish", "Tamil", "Thai", "Turkish", "Ukrainian", "Vietnamese"];
 		public static readonly string[] AVAILABLE_CURRENCY = ["$", "€", "£", "¥", "₣", "₹", "₱", "₩", "₽", "₺", "₫", "฿", "₸", "₼", "₾", "₻", "Rp", "RM", "﷼", "د.إ", "د. ك"];
 		public static readonly string[] AVAILABLE_COLLECTION_FILTERS = ["None", "Query", "Favorites", "Complete", "Incomplete", "Ongoing", "Finished", "Hiatus", "Cancelled", "Shounen", "Shoujo", "Seinen", "Josei", "Manga", "Novel", "Read", "Unread", "Rating", "Cost"];
@@ -56,6 +56,30 @@ namespace Tsundoku.Models
             Shoujo,
             Unknown
         }
+        public static readonly Demographic[] DEMOGRAPHICS = Demographic.GetValues<Demographic>();
+
+        // public enum CollectionFilter
+        // {
+        //     Ongoing,
+        //     Finished,
+        //     Hiatus,
+        //     Cancelled,
+        //     Complete,
+        //     Incomplete,
+        //     Favorites,
+        //     Manga,
+        //     Novel,
+        //     Shounen,
+        //     Shoujo,
+        //     Seinen,
+        //     Josei,
+        //     Read,
+        //     Unread,
+        //     Rating,
+        //     Cost,
+        //     Query,
+        //     None
+        // }
 
         public readonly static Dictionary<string, string> ANILIST_LANG_CODES = new()
 		{

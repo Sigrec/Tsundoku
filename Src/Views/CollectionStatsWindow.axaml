@@ -19,9 +19,13 @@
 		WindowStartupLocation="2"
 		CanResize="true">
 
-	<Window.DataContext>
-		<vm:CollectionStatsViewModel />
-	</Window.DataContext>
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="/Styles/SubWindowControlThemes.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
 
 	<Window.Styles>
 		<StyleInclude Source="/Controls/ValueStat.axaml"/>

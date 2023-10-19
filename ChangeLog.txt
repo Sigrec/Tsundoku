@@ -7,8 +7,21 @@ Legend
 ❌ -> Inprogress feature will be fixed in later release
 
 TODO:
-❌ Fix Issue where dropdown in advanced search query stays after untoggling it
 ❌ ComboboxItem Styles not applying properly in Theme & AdvancedQuery
+❌ Fix style of scrollbar in Description
+
+V2.2.0.0 - October 18th
+🔥 Toggle buttons style fixed when hovering over or pressing if it is already selected in all windows
+🔥 Fixed issue with Advanced Search/Query not working
+🔥 App no longer crashes when adding a series while filtering or searching the collection and there are no series returned
+🔥 Fixed issue where you could add duplicate series
+🔥 Fixed issue where filter isn't reset when searching
+🔥 Fixed issue where currency would sometimes be cut off
+🔥 App no longer crashes when adding a series that is not from Japan and exists on AniList but not on MangaDex
+🔥 Fixed issue where Demographic stats is not updating
+🔥 Fixed issue where the Demographic for a series is not loaded properly
+✅ Series are now properly added when searching
+⌛ Added virutalization to collection, improving loading time for the collection (fitler, search, startup), theme & language change time, and memory usage
 
 V2.1.0.0 - October 9th, 2023 @ 5:21PM PST
 ✅ Updated Default theme
@@ -19,7 +32,7 @@ V2.1.0.0 - October 9th, 2023 @ 5:21PM PST
 📜 Changes to "Theme" Window
     - 🔥 Fixed issues with saving/deleting a theme
 
-V2.0.0.0 - October 7th, 2023 @ 3:23PM PST
+V2.0.0.0 - October 7th
 ✅ Logs now output to TsundokuLogs.log file in folder, and are cleared everytime the application is started to prevent overflow
 ✅ Windows besides "Theme" window now stay on top of main collection window
 ✅ Windows now open full sized if your monitor height is large enough
@@ -54,13 +67,13 @@ V2.0.0.0 - October 7th, 2023 @ 3:23PM PST
     - 🔥 Fixed window border issue not being curved on the bottom
     - 🔥 Themes now save after creation to prevent them from being lost during a crash
 
-V1.9.2.1 - September 3rd, 2023 @ 8:56PM PST
+V1.9.2.1 - September 3rd
 🔥 Fixed issue where you couldn't reload the cover when searching or filtering
 🔥 Fixed issue where covers would sometimes not reload after changing them in the Covers folder (this is due to images sometimes having to be downloaded initially)
 🔥 Fixed wrong key command in settings window from CTRL+R+C to correct cone CTRL+R to reload covers
 🔥 Fixed search bar text size being too small
 
-V1.9.1.1 - September 3rd, 2023 @ 9:28AM PST
+V1.9.1.1 - September 3rd
 ✅ Refactored Stats Window Color Layout
 ✅ Adding slight spacing above series title
 ✅ Rearranged settings windows button order
@@ -68,13 +81,13 @@ V1.9.1.1 - September 3rd, 2023 @ 9:28AM PST
 ⌛ Improved performance of cover reload functionality
 🔥 Fixed minimum height & width of main collection window
 
-V1.9.1.0 - August 29th, 2023 @ 9:48AM PST
+V1.9.1.0 - August 29th
 ✅ Fields in the AddNewSeries Window now clear after adding a series
 🔥 "AddNewSeries" Button now is disabled properly until conditions are met
 🔥 Theme Generation Buttons now are disabled properly until conditions are met
 🔥 Fixed issue where Currency symbol was not being saved
 
-V1.9.0.0 - August 28th, 2023 @ 2:57PM PST 
+V1.9.0.0 - August 28th
 ⌛ Upgraded Avalonia to 11.0.4
 ✅ Changed currency list, if you need one added send me a message on discord or create a ticket in Git
 🔥 Fixed issue where you could run multiple instances of the application at the same time
@@ -84,7 +97,7 @@ V1.9.0.0 - August 28th, 2023 @ 2:57PM PST
 🔥 Fixed Settings Window max height being to large
 🔥 Fixed theme selection after deleting a theme, now correctly changes
 
-V1.8.0.0 - August 14th, 2023 @ 11:54AM PST
+V1.8.0.0 - August 14th
 ✅ Changed "Query" to "Add Series" for the button to open the window to add a new series
 ✅ Added option to Reload covers in app (CTRL+R), this allows users to change covers see the changes without having to restart
 🔥 Changed & Fixed Theme Settings Names for UI Changes from previous release
@@ -93,13 +106,13 @@ V1.8.0.0 - August 14th, 2023 @ 11:54AM PST
 🔥 Fixed issue where adding a new series using a title that wasn't exactly the same caused the app to crash
 🔥 Fixed card issue when series title is very long and blocks out everything else (Currently the title just gets cut off at 3 lines, better functionality will be made in the future)
 
-V1.7.1.0 - July 26th, 2023 @ 11:37AM PST
+V1.7.1.0 - July 26th
 🔥 HotFix for new users where the app doesn't start
 🔥 Fixed Crash where Opening Icon Selector and not selecting causes crash
 ✅ Added https://www.youtube.com/@DanielPeppers to youtubers section
 ✅ Increased ProgressBar Text Size
 
-V1.7.0.0 - July 9th, 2023 @ 7:50PM PST
+V1.7.0.0 - July 9th
 🔥 Fixed pie chart hovering label being cut off
 🔥 Fixed bug with collection filter sometimes skipping series
 🔥 Fixed most color scheming issues of various controls in all windows
@@ -108,20 +121,20 @@ V1.7.0.0 - July 9th, 2023 @ 7:50PM PST
 ✅ Can now upload a image to use as your icon by clicking
 ✅ Updated Menu Layout
 
-V1.6.3.0 - July 2nd, 2023 @ 4:20PM PST
+V1.6.3.0 - July 2nd
 🔥 HotFix for users whose current version is less than 1.5, app now starts as expected
 🔥 HotFix can now scroll in stats window and resize up to a set size
 
-V1.6.2.0 - June 24th, 2023 @ 3:17PM PST
+V1.6.2.0 - June 24th
 🔥 Fixed crash when creating a new theme
 ✅ Avalonia Lib Upgrade + Other Lib Upgrades
 ✅ Upgrade to .NET 7.0 Framework
 ✅ Uses AL Web Link if available & Queried from MangaDex
 
-V1.6.1.0 - June 20th, 2023 @ 6:22AM PST
+V1.6.1.0 - June 20th
 🔥 HotFix for app being unable to load (crashes) on clean install
 
-V1.6.0.0 - June 4th, 2023 @ 1:36PM PST
+V1.6.0.0 - June 4th
 ✅ Added 2 new pie charts to the stats window showing distribution for demograhics and status for a series
 ✅ Added bar/cartesian chart to the stats window showing distribution of scores in collection
 ✅ Slight Changes to Menu Layout
@@ -130,7 +143,7 @@ V1.6.0.0 - June 4th, 2023 @ 1:36PM PST
 ✅ Refactoring AniList & MangaDex Requests to increase performance
 ✅ Refactored a bunch of methods to prevent them from running on the UI Thread to increase performance
 
-V1.5.2.0 - May 20th, 2023 @ 9:29PM PST
+V1.5.2.0 - May 20th
 🔥 Fixed crash for new users (Need to delete current UserData.json file)
 🔥 Fixed issue with MangaDexQuery when querying for Covers
 ✅ Changed "Read X" to "Read X Volumes" in series stats save panel
@@ -138,12 +151,12 @@ V1.5.2.0 - May 20th, 2023 @ 9:29PM PST
 ✅ Can now copy any of the stats to clipboard by clicking on the stats box
 ✅ Realigned Username so it's centered
 
-V1.5.1.0 - April 20th, 2023 @ 12:11PM PST
+V1.5.1.0 - April 20th
 🔥 Fixed Crash Bug When Adding a Series that is not on MangaDex or AniList or Is not Specific Enough to Determine Correct Series
 ✅ Series Stats TextBoxes now clear After Saving Besides Score
 ✅ Series Volume Count TextBoxes now clear After Saving
 
-V1.5.0.0 - Apr 17th, 2023 @ 4:51PM PST
+V1.5.0.0 - Apr 17th
 🔥 Fixed Default Theme to Accommodate Layout Changes
 🔥 Fixed crash and bug related to the color pickers in theme settings window
 🔥 Fixed Issue when # of Staff exceeds 25 and the others do not get pulled
@@ -163,27 +176,27 @@ V1.5.0.0 - Apr 17th, 2023 @ 4:51PM PST
 ✅ Non-Japanese series now also grab there respective Japanese titles (ex Solo Leveling) [Need to Re-Add these series to get them]
 ✅ Lowered the font size of "Status | Format" to accomdate longer text
 
-V1.4.4.2 - Feb 9th, 2023 @ 11:28AM PST
+V1.4.4.2 - Feb 9th
 🔥 HotFix for another description parsing issue (found with SPYxFAMILY description) [Re-add series if you think it has this issue or any other previous parsing issue]
 
-V1.4.4.1 - Feb 9th, 2023 @ 8:19AM PST
+V1.4.4.1 - Feb 9th
 🔥 Fixed possible crash when deleting a series with weird permissions
 ✅ Updated some libraries
 
-V1.4.3.1 - Feb 3rd, 2023 @ 12:38PM PST
+V1.4.3.1 - Feb 3rd
 ✅ Added manga youtubers tab to settings window with 6 manga youtubers
 
-V1.4.2.1 - Jan 30th, 2023 @ 10:30AM PST
+V1.4.2.1 - Jan 30th
 🔥 Fixed crash issue when exporting to Spreadsheet when user has more than 149 series in their collection
 ✅ Added error message popups for generating a new theme and adding a new series when user inputs invalid values into the fields or is missing values
 
-V1.4.1.2 - Jan 25th, 2023 @ 5:49PM PST
+V1.4.1.2 - Jan 25th
 🔥 HotFix for series staff parsing issue where a role is untrimmed (found when adding Bungou Stray Dogs manga) [Re-add series if you think it has this issue or any other previous parsing issue]
 
-V1.4.1.1 - Jan 22nd, 2023 @ 1:33PM PST
+V1.4.1.1 - Jan 22nd
 🔥 HotFix for another description parsing issue
 
-V1.4.1.0 - Jan 22nd, 2023 @ 12:11PM PST
+V1.4.1.0 - Jan 22nd
 ✅ Added tooltips to menu/nav bar buttons and dropdown
 ✅ Added more controls info to "User Settings" window
 ✅ Added button in "User Settings" Window to open Screenshots Folder
@@ -191,75 +204,75 @@ V1.4.1.0 - Jan 22nd, 2023 @ 12:11PM PST
 ✅ Added a theme generator to Theme Window (Will Add More Theme Types Later)
 ✅ Applied some themeing to dropdown buttons
 
-V1.4.0.0 - Jan 16th, 2023 @ 5:14PM PST
+V1.4.0.0 - Jan 16th
 ✅ Changed "Complete" Status to "Finished" for series
 ✅ Added join discord button to "User Settings" window
 ✅ Can now filter your collection using the dropdown under the language dropdown
 ✅ Can TavbNavigate in "AddNewSeriesWindow" (Was crashing before if it does crash for you let me know ASAP so I revert if needed)
 ✅ Changes to window state behavior to fix a bug
 
-V1.3.3.0 - Jan 16th, 2023 @ 11:48AM PST
+V1.3.3.0 - Jan 16th
 🔥 Fixed English & Romaji Sorting to be case insensitive (Refresh your sort)
 🔥 Fixed series description scrolling, no longer scrolls collection if user scrolls to end of description
 ✅ Slightly increased title font size
 
-V1.3.2.0 - Jan 15th, 2023 @ 3:08PM PST
+V1.3.2.0 - Jan 15th
 ✅ QoL changes to User Settings Windows (Added Controls Section and New Formatting)
 
-V1.3.1.0 - Jan 14th, 2023 @ 12:PM PST
+V1.3.1.0 - Jan 14th
 🔥 Fixed triple line break issue with some series description
 
-V1.3.0.0 - Jan 13th, 2023 @ 6:53PM PST
+V1.3.0.0 - Jan 13th
 🔥 Fixed issue where series where all of the names are identical (Getsuyoubi no Tawawa Example) you could only add 1 of them -> Fix is to use the series AL ID #
 ✅ Made Toggling OFF/Disabling FullScreen keep the previous window size/state before user toggled ON FullScreen
 
-V1.2.3.0 - Jan 7th, 2023 @ 3:38PM PST
+V1.2.3.0 - Jan 7th
 🔥 Fixed padding in title text on the left
 ✅ Slightly lowered title text font size
 
-V1.2.2.0 - Jan 1st, 2023 @ 4:41PM PST
+V1.2.2.0 - Jan 1st
 🔥 Fixed Native sorting to use japanese culture
 
-V1.2.1.1 - Dec 31st, 2022 @ 10:47AM PST
+V1.2.1.1 - Dec 31st
 ✅ Added donation button for those who wanna support
 
-V1.2.1.0 - Dec 20th, 2022 @ 4:25PM PST
+V1.2.1.0 - Dec 20th
 ✅ Added color theme styling to scrollbar
 ✅ Screenshots now go into a "Screenshots" folder
 ✅ Fixed Default theme color scheme
 ✅ Added AniList Support for Taiwanese Manga (Will show up as Manhua since Chinese and Taiwanese use Mandarin)
 
-V1.2.0.0 - Dec 18th, 2022 @ 4:57PM PST
+V1.2.0.0 - Dec 18th
 🔥 Fixed Menu Dropdown controls (language and display change) background taking from search bar background color
 ✅ StatusAndBookType (left side bottom of a series card) hover colors now work as intended
 
-V1.1.0.4 - Dec 18th, 2022 @ 2:37PM PST
+V1.1.0.4 - Dec 18th
 ✅ Screenshot now also includes the theme name in the file name
 ✅ Keeps previous window state after exiting fullscreen with F11 instead of going to maximized state
 ✅ Color wheels no longer stuck/hidden when window moves to the front (seconadry windwos no longer topmost)
 
-V1.1.0.3 - Dec 17th, 2022 @ 8:35PM PST
+V1.1.0.3 - Dec 17th
 🔥 Fixed description from having excessive line breaks at the end
 ✅ Changed edit pane icon
 
-V1.1.0.2 - Dec 17th, 2022 @ 2:30PM PST
+V1.1.0.2 - Dec 17th
 🔥 Fixed divider color taking from button color and not the divider color
 ✅ No longer crashes when a user doesn't have the "ExtraSeries.json" file in there executables folder/directory
 
-V1.1.0.1 - Dec 17th, 2022 @ 11:00AMPST
+V1.1.0.1 - Dec 17th
 🔥 Fixed description encoding not converting ampersand (if you see some text like "&rsquo;" then this fixes that you just need to delete and re-add the series)
 
-V1.1.0.0 - Dec 16th, 2022 @ 5:45PM PST
+V1.1.0.0 - Dec 16th
 ✅ Implented a way to add series that do not exist on AniList for example Radiant (french manga) can now be added [Requests are through github issues -> https://github.com/Sigrec/TsundokuApp/issues]
 ✅ Can now Toggle Fullscreen with "F11"
 ✅ Can now Capture a Screenshot of your Collection with "CTRL+P" (Better to go fullscreen first)
 ✅ Can now Save Collection with "CTRL+S"
 
-V1.0.3.0 - Dec 15th, 2022 @ 7:52PM PST
+V1.0.3.0 - Dec 15th
 🔥 Fixed issue where 2 series could have the same file extension so they used the same image
 ✅ Made it so incase there is some error and the collection numbers are messed up it re-calculates the numbers based on current series in collection
 
-V1.0.2.0 - Dec 15th, 2022 @ 12:08AM PST
+V1.0.2.0 - Dec 15th
 🔥 Fixed issue where if you add a series while you are searching it crashes
 🔥 Fixed line break in description so it correctly double line breaks when it is supposed to
 ✅ Theme name now clears when closing the theme editing window

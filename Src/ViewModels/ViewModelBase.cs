@@ -11,6 +11,8 @@ namespace Tsundoku.ViewModels
         [Reactive] public string CurCurrency { get; set; }
         [Reactive] public string UserName { get; set; }
         [Reactive] public string CurDisplay { get; set; }
+        [Reactive] public string CurFilter { get; set; }
+        public static string Filter { get; set; }
         public static User? MainUser { get; set; }
         public static bool updatedVersion = false;
 
@@ -23,7 +25,7 @@ namespace Tsundoku.ViewModels
 
         public ViewModelBase()
         {
-            
+            CurFilter = "None";
         }
 
         public static void OpenSiteLink(string link)
