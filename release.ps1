@@ -30,6 +30,7 @@ Write-Output "Version: $version"
 # Clean output directory.
 $publishDir = "bin/publish"
 $outDir = "$projDir/$publishDir"
+Write-Output "../$outDir"
 Write-Output "./$outDir"
 Write-Output "/$outDir"
 Write-Output "$outDir"
@@ -85,7 +86,7 @@ try {
 
     # Copy new application files.
     Write-Output "Copying new files..."
-    Copy-Item -Path "./$outDir/Application Files","./$outDir/$appName.application" `
+    Copy-Item -Path "../$outDir/Application Files","../$outDir/$appName.application" `
         -Destination . -Recurse
 
     # Stage and commit.

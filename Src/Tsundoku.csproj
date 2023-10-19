@@ -24,7 +24,6 @@
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<Version>2.2.0</Version>
 		<FileVersion>2.2.0.0</FileVersion>
-        <AssemblyVersion>2.2.0.0</AssemblyVersion>
 		<PackageIcon>Assets\Icons\Tsundoku-Logo.png</PackageIcon>
 		<RepositoryUrl>https://github.com/Sigrec/Tsundoku</RepositoryUrl>
         <LangVersion>preview</LangVersion>
@@ -108,9 +107,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Assets\Icons\Tsundoku-Logo.png">
+    <Content Update="Assets\Icons\Tsundoku-Logo.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
-    </None>
+    </Content>
   </ItemGroup>
 </Project>
