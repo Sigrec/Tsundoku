@@ -25,7 +25,6 @@ Write-Output "Tag: $tag"
 
 # Parse tag into a three-number version.
 $version = $tag.Split('-')[0].TrimStart('v')
-$version = "$version.0"
 Write-Output "Version: $version"
 
 # Clean output directory.
