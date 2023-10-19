@@ -15,6 +15,7 @@
 		<StartupObject>Tsundoku.Program</StartupObject>
 		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
 		<PublishTrimmed>true</PublishTrimmed>
+        <SelfContained>true</SelfContained>
 		<ProduceReferenceAssembly>True</ProduceReferenceAssembly>
 		<PublishReadyToRun>True</PublishReadyToRun>
 		<Optimize>True</Optimize>
@@ -23,7 +24,7 @@
 		<IncludeSymbols>False</IncludeSymbols>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<Version>2.2.0</Version>
-		<FileVersion>2.2.0.0</FileVersion>
+		<FileVersion>2.2.0.1</FileVersion>
 		<!-- <PackageIcon>Assets\Icons\Tsundoku-Logo.png</PackageIcon> -->
 		<RepositoryUrl>https://github.com/Sigrec/Tsundoku</RepositoryUrl>
         <LangVersion>preview</LangVersion>
