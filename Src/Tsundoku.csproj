@@ -25,7 +25,7 @@
 		<Version>2.2.0</Version>
 		<FileVersion>2.2.0.0</FileVersion>
 		<PackageIcon>Assets\Icons\Tsundoku-Logo.png</PackageIcon>
-		<RepositoryUrl>https://github.com/Sigrec/TsundokuApp</RepositoryUrl>
+		<RepositoryUrl>https://github.com/Sigrec/Tsundoku</RepositoryUrl>
 		<LangVersion>preview</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
