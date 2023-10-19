@@ -37,18 +37,22 @@ if (Test-Path $outDir) {
 # Publish the application.
 Push-Location $projDir
 try {
-    Write-Output "Restoring:"
-    dotnet build -c Release
+    # Write-Output "Restoring:"
+    # dotnet build -c Release
+    # Write-Output "Publishing:"
+    # $msBuildVerbosityArg = "/v:m"
+    # if ($env:CI) {
+    #     $msBuildVerbosityArg = ""
+    # }
+    # & dotnet publish --self-contained true `
+    #     -p:PublishDir=$publishDir -p:PublishProfile=ClickOnceProfile `
+    #     -p:ApplicationVersion=$version -p:Configuration=Release `
+    #     -p:PublishUrl=$publishDir `
+    #     $msBuildVerbosityArg
     Write-Output "Publishing:"
-    $msBuildVerbosityArg = "/v:m"
-    if ($env:CI) {
-        $msBuildVerbosityArg = ""
-    }
-    & dotnet publish --self-contained true `
+    & dotnet publish -c Release --sc true -v diag`
         -p:PublishDir=$publishDir -p:PublishProfile=ClickOnceProfile `
-        -p:ApplicationVersion=$version -p:Configuration=Release `
-        -p:PublishUrl=$publishDir `
-        $msBuildVerbosityArg
+        -p:PublishUrl=$publishDir -p:ApplicationVersion=$version `
 
     # Measure publish size.
     $publishSize = (Get-ChildItem -Path "$publishDir/Application Files" -Recurse | Measure-Object -Property Length -Sum).Sum / 1Mb
