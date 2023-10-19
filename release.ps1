@@ -14,10 +14,10 @@ $ErrorActionPreference = "Stop"
 Write-Output "Working directory: $pwd"
 
 # Find MSBuild.
-$msBuildPath = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" `
-    -latest -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe `
-    -prerelease | select-object -first 1
-Write-Output "MSBuild: $((Get-Command $msBuildPath).Path)"
+# $msBuildPath = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" `
+#     -latest -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe `
+#     -prerelease | select-object -first 1
+# Write-Output "MSBuild: $((Get-Command $msBuildPath).Path)"
 
 # Load current Git tag.
 $tag = $(git describe --tags)
@@ -45,8 +45,8 @@ try {
     if ($env:CI) {
         $msBuildVerbosityArg = ""
     }
-    & dotnet publish --self-contained true -o $publishDir `
-        -p:PublishProfile=ClickOnceProfile `
+    & dotnet publish --self-contained true `
+        -p:PublishDir=$publishDir -p:PublishProfile=ClickOnceProfile `
         -p:ApplicationVersion=$version -p:Configuration=Release `
         -p:PublishUrl=$publishDir `
         $msBuildVerbosityArg
