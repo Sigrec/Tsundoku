@@ -13,11 +13,11 @@ $ErrorActionPreference = "Stop"
 
 Write-Output "Working directory: $pwd"
 
-# Find MSBuild.
-# $msBuildPath = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" `
-#     -latest -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe `
-#     -prerelease | select-object -first 1
-# Write-Output "MSBuild: $((Get-Command $msBuildPath).Path)"
+Write-Output "Finding MSBuild..."
+$msBuildPath = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" `
+    -latest -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe `
+    -prerelease | select-object -first 1
+Write-Output "MSBuild: $((Get-Command $msBuildPath).Path)"
 
 # Load current Git tag.
 $tag = $(git describe --tags)
@@ -37,22 +37,17 @@ if (Test-Path $outDir) {
 # Publish the application.
 Push-Location $projDir
 try {
-    # Write-Output "Restoring:"
-    # dotnet build -c Release
-    # Write-Output "Publishing:"
-    # $msBuildVerbosityArg = "/v:m"
-    # if ($env:CI) {
-    #     $msBuildVerbosityArg = ""
-    # }
-    # & dotnet publish --self-contained true `
-    #     -p:PublishDir=$publishDir -p:PublishProfile=ClickOnceProfile `
-    #     -p:ApplicationVersion=$version -p:Configuration=Release `
-    #     -p:PublishUrl=$publishDir `
-    #     $msBuildVerbosityArg
+    Write-Output "Restoring:"
+    dotnet build -c Release
     Write-Output "Publishing:"
-    & dotnet publish -c Release --sc true -v n`
-        -p:PublishDir=$publishDir -p:PublishProfile=ClickOnceProfile `
-        -p:PublishUrl=$publishDir -p:ApplicationVersion=$version `
+    $msBuildVerbosityArg = "/v:m"
+    if ($env:CI) {
+        $msBuildVerbosityArg = ""
+    }
+    & $msBuildPath /target:publish /p:PublishProfile=ClickOnceProfile `
+        /p:ApplicationVersion=$version /p:Configuration=Release `
+        /p:PublishDir=$publishDir /p:PublishUrl=$publishDir /p:SelfContained=True `
+        $msBuildVerbosityArg
 
     # Measure publish size.
     $publishSize = (Get-ChildItem -Path "$publishDir/Application Files" -Recurse | Measure-Object -Property Length -Sum).Sum / 1Mb
