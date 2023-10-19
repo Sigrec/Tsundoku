@@ -39,7 +39,7 @@ if (Test-Path $outDir) {
 Push-Location $projDir
 try {
     Write-Output "Restoring:"
-    dotnet build -c Release --packages C:\Users\Sean\.nuget\packages
+    dotnet build -c Release
     Write-Output "Publishing:"
     $msBuildVerbosityArg = "/v:m"
     if ($env:CI) {
