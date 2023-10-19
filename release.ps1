@@ -29,7 +29,7 @@ $version = "$version.0"
 Write-Output "Version: $version"
 
 # Clean output directory.
-$publishDir = "bin/Publish"
+$publishDir = "bin/publish"
 $outDir = "$projDir/$publishDir"
 Write-Output "./$outDir"
 Write-Output "/$outDir"
