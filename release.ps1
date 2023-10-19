@@ -6,7 +6,7 @@ param (
 )
 
 $appName = "Tsundoku" # 👈 Replace with your application project name.
-$projDir = "C:\Tsundoku\Src\Tsundoku.csproj" # 👈 Replace with your project directory (where .csproj resides).
+$projDir = "C:\Tsundoku\Src\" # 👈 Replace with your project directory (where .csproj resides).
 
 Set-StrictMode -version 2.0
 $ErrorActionPreference = "Stop"
