@@ -82,7 +82,7 @@ try {
 
     # Copy new application files.
     Write-Output "Copying new files..."
-    Copy-Item -Path "$outDir/Application Files","$outDir/$appName.application" `
+    Copy-Item -Path "../$outDir/Application Files","../$outDir/$appName.application" `
         -Destination . -Recurse
 
     # Stage and commit.
