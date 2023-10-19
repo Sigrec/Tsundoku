@@ -45,14 +45,15 @@ try {
     if ($env:CI) {
         $msBuildVerbosityArg = ""
     }
-    & $msBuildPath /target:publish /p:PublishProfile=ClickOnceProfile `
-        /p:ApplicationVersion=$version /p:Configuration=Release `
-        /p:PublishDir=$publishDir /p:PublishUrl=$publishDir `
+    & dotnet publish --self-contained true -o $publishDir `
+        -p:PublishProfile=ClickOnceProfile `
+        -p:ApplicationVersion=$version -p:Configuration=Release `
+        -p:PublishUrl=$publishDir `
         $msBuildVerbosityArg
 
-    # Measure publish size.
-    # $publishSize = (Get-ChildItem -Path "$publishDir/Application Files" -Recurse | Measure-Object -Property Length -Sum).Sum / 1Mb
-    # Write-Output ("Published size: {0:N2} MB" -f $publishSize)
+    Measure publish size.
+    $publishSize = (Get-ChildItem -Path "$publishDir/Application Files" -Recurse | Measure-Object -Property Length -Sum).Sum / 1Mb
+    Write-Output ("Published size: {0:N2} MB" -f $publishSize)
 }
 finally {
     Pop-Location
