@@ -6,7 +6,7 @@ param (
 )
 
 $appName = "Tsundoku" # 👈 Replace with your application project name.
-$projDir = "C:\Tsundoku\Src\" # 👈 Replace with your project directory (where .csproj resides).
+$projDir = "C:\Tsundoku\Src" # 👈 Replace with your project directory (where .csproj resides).
 
 Set-StrictMode -version 2.0
 $ErrorActionPreference = "Stop"
@@ -29,7 +29,7 @@ $version = "$version.0"
 Write-Output "Version: $version"
 
 # Clean output directory.
-$publishDir = "bin/publish"
+$publishDir = "bin/Publish"
 $outDir = "$projDir/$publishDir"
 if (Test-Path $outDir) {
     Remove-Item -Path $outDir -Recurse
