@@ -50,7 +50,7 @@ try {
     #     -p:PublishUrl=$publishDir `
     #     $msBuildVerbosityArg
     Write-Output "Publishing:"
-    & dotnet publish -c Release --sc true -v diag`
+    & dotnet publish -c Release --sc true -v n`
         -p:PublishDir=$publishDir -p:PublishProfile=ClickOnceProfile `
         -p:PublishUrl=$publishDir -p:ApplicationVersion=$version `
 
