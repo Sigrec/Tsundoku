@@ -29,7 +29,7 @@ $version = "$version.0"
 Write-Output "Version: $version"
 
 # Clean output directory.
-$publishDir = "bin/publish"
+$publishDir = "bin/Publish"
 $outDir = "$projDir/$publishDir"
 if (Test-Path $outDir) {
     Remove-Item -Path $outDir -Recurse
@@ -51,8 +51,7 @@ try {
         $msBuildVerbosityArg
 
     # Measure publish size.
-    $publishSize = (Get-ChildItem -Path "$publishDir/Application Files" -Recurse |
-        Measure-Object -Property Length -Sum).Sum / 1Mb
+    $publishSize = (Get-ChildItem -Path "$publishDir/Application Files" -Recurse | Measure-Object -Property Length -Sum).Sum / 1Mb
     Write-Output ("Published size: {0:N2} MB" -f $publishSize)
 }
 finally {
