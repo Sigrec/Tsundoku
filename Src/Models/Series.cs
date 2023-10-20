@@ -148,7 +148,6 @@ namespace Tsundoku.Models
 				// Loop while there are still staff to check
 				while(hasNextPage)
 				{
-                    LOGGER.Info($"{romajiTitle} has More Staff");
 					JsonDocument? moreStaffQuery;
 					if (int.TryParse(title, out seriesId))
 					{

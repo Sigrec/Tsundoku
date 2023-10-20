@@ -20,12 +20,15 @@ namespace Tsundoku.Views
     {
         public MainWindowViewModel? CollectionViewModel => DataContext as MainWindowViewModel;
         WindowState previousWindowState;
-        private static readonly List<FilePickerFileType> fileOptions = [FilePickerFileTypes.ImageAll];
+        private static readonly FilePickerFileType fileOptions = new FilePickerFileType("All Images")
+        {
+            Patterns = new string[4] { "*.png", "*.jpg", "*.jpeg", "*.crdownload" }
+        };
         private static readonly List<Series> CoverChangedSeriesList = [];
-        private static readonly FileSystemWatcherEx coverFolderWatcher = new(@"Covers")
+        private static readonly FileSystemWatcherEx CoverFolderWatcher = new FileSystemWatcherEx(@"Covers")
         {
             IncludeSubdirectories = false,
-            NotifyFilter = NotifyFilters.FileName
+            NotifyFilter = NotifyFilters.FileName,
         };
         private static StringBuilder newSearchText = new StringBuilder();
         private static string itemString;
@@ -34,6 +37,25 @@ namespace Tsundoku.Views
         {
             InitializeComponent();
             SetupAdvancedSearchBar(" & ");
+
+            CoverFolderWatcher.OnCreated += static (s, e) =>
+            {
+                string path = e.FullPath.Replace(".crdownload", "");
+                if (!ViewModelBase.updatedVersion && (!path.EndsWith(".jpg") || !path.EndsWith(".png")))
+                {
+                    Series series = MainWindowViewModel.SearchedCollection.AsParallel().Single(series => series.Cover.Equals(path));
+                    if (series != null && !CoverChangedSeriesList.Contains(series))
+                    {
+                        CoverChangedSeriesList.Add(series);
+                        LOGGER.Info($"Added \"{series.Titles["Romaji"]}\" to Cover Change List");
+                    }
+                    else
+                    {
+                        LOGGER.Info($"\"{series.Titles["Romaji"]}\" Cover Changed Again");
+                    }
+                }
+            };
+            CoverFolderWatcher.Start();
 
             KeyDown += (s, e) => 
             {
@@ -63,10 +85,6 @@ namespace Tsundoku.Views
                 else if (e.KeyModifiers == KeyModifiers.Control && e.Key == Key.R)
                 {
                     LOGGER.Info("Reloading Covers");
-                    if (CollectionViewModel.CurFilter != "None")
-                    {
-                        CollectionViewModel.FilterCollection("None");
-                    }
                     
                     if (CoverChangedSeriesList.Count != 0)
                     {
@@ -87,25 +105,6 @@ namespace Tsundoku.Views
                     AdvancedSearchPopup.IsVisible ^= true;
                 }
             };
-
-            coverFolderWatcher.OnCreated += static (s, e) =>
-            {
-                e.FullPath = e.FullPath.Replace(".crdownload", "");
-                if (!(!ViewModelBase.updatedVersion || (!e.FullPath.EndsWith(".jpg") && !e.FullPath.EndsWith(".png"))))
-                {
-                    Series series = MainWindowViewModel.UserCollection.SingleOrDefault(series => series.Cover.Equals(e.FullPath));
-                    if (series != null && !CoverChangedSeriesList.Contains(series))
-                    {
-                        CoverChangedSeriesList.Add(series);
-                        LOGGER.Info($"{e.FullPath} Changed");
-                    }
-                    else
-                    {
-                        LOGGER.Info($"{e.FullPath} Changed Again");
-                    }
-                }
-            };
-            coverFolderWatcher.Start();
 
             Closing += (s, e) =>
             {
@@ -166,11 +165,6 @@ namespace Tsundoku.Views
             }
         }
 
-        private void UnShow_AdvancedSearchPopup(object sender, PointerPressedEventArgs args)
-        {
-            AdvancedSearchPopup.IsVisible = false;
-        }
-
         /// <summary>
         /// Reloads Covers for Series where the cover was changed
         /// </summary>
@@ -182,14 +176,15 @@ namespace Tsundoku.Views
                 // If the image does not exist in the covers folder then don't create a bitmap for it
                 if (CoverChangedSeriesList.Contains(MainWindowViewModel.UserCollection[x]))
                 {
-                    int index = MainWindowViewModel.SearchedCollection.IndexOf(MainWindowViewModel.UserCollection[x]);
-                    MainWindowViewModel.SearchedCollection.Remove(MainWindowViewModel.UserCollection[x]);
                     Bitmap newCover = new Bitmap(MainWindowViewModel.UserCollection[x].Cover).CreateScaledBitmap(new PixelSize(LEFT_SIDE_CARD_WIDTH, IMAGE_HEIGHT), BitmapInterpolationMode.HighQuality);
                     newCover.Save(MainWindowViewModel.UserCollection[x].Cover, 100);
+
                     MainWindowViewModel.UserCollection[x].CoverBitMap = newCover;
+                    int index = MainWindowViewModel.SearchedCollection.IndexOf(MainWindowViewModel.UserCollection[x]);
+                    MainWindowViewModel.SearchedCollection.Remove(MainWindowViewModel.UserCollection[x]);
                     MainWindowViewModel.SearchedCollection.Insert(index, MainWindowViewModel.UserCollection[x]);
                     cache++;
-                    LOGGER.Info($"Updated {MainWindowViewModel.UserCollection[x].Titles["Romaji"]} Cover");
+                    LOGGER.Info($"Updated Cover for \"{MainWindowViewModel.UserCollection[x].Titles["Romaji"]}\"");
                 }
                 else if (cache == CoverChangedSeriesList.Count)
                 {
@@ -212,7 +207,7 @@ namespace Tsundoku.Views
                 uint volumesReadVal = Convert.ToUInt32(volumesRead), countVolumesRead = 0;
                 curSeries.VolumesRead = volumesReadVal;
                 ((TextBlock)stackPanels.ElementAt(0).GetLogicalChildren().ElementAt(0)).Text = $"Read {volumesReadVal} Vol(s)";
-                LOGGER.Info($"Updated # of Volumes Read for {curSeries.Titles["Romaji"]} to {volumesReadVal}");
+                LOGGER.Info($"Updated # of Volumes Read for \"{curSeries.Titles["Romaji"]}\" to {volumesReadVal}");
                 volumesReadVal = 0;
                 foreach (Series x in CollectionsMarshal.AsSpan(MainWindowViewModel.UserCollection.ToList()))
                 {
@@ -232,7 +227,7 @@ namespace Tsundoku.Views
                 decimal costVal = Convert.ToDecimal(cost);
                 curSeries.Cost = costVal;
                 ((TextBlock)stackPanels.ElementAt(1).GetLogicalChildren().ElementAt(0)).Text = $"Cost {CollectionViewModel.CurCurrency}{costVal}";
-                LOGGER.Info($"Updated Cost for {curSeries.Titles["Romaji"]} to {CollectionViewModel.CurCurrency}{costVal}");
+                LOGGER.Info($"Updated Cost for \"{curSeries.Titles["Romaji"]}\" to {CollectionViewModel.CurCurrency}{costVal}");
                 costVal = 0;
                 foreach (Series x in MainWindowViewModel.UserCollection)
                 {
@@ -256,7 +251,7 @@ namespace Tsundoku.Views
                     MainWindowViewModel.UserCollection.First(series => series == curSeries).Rating = ratingVal;
                     MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UpdateRatingChartValues();
 
-                    LOGGER.Info($"Updated rating for {curSeries.Titles["Romaji"]} to {ratingVal}/10.0");
+                    LOGGER.Info($"Updated rating for \"{curSeries.Titles["Romaji"]}\" to {ratingVal}/10.0");
                     ratingVal = 0;
                     foreach (Series x in CollectionsMarshal.AsSpan(MainWindowViewModel.UserCollection.ToList()))
                     {
@@ -314,7 +309,7 @@ namespace Tsundoku.Views
                     {
                         MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UsersNumVolumesCollected = MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UsersNumVolumesCollected - curSeries.CurVolumeCount + curVolumeChange;
                         MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UsersNumVolumesToBeCollected = MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UsersNumVolumesToBeCollected - (uint)(curSeries.MaxVolumeCount - curSeries.CurVolumeCount) + (uint)(maxVolumeChange - curVolumeChange);
-                        LOGGER.Info($"Changed Series Values For {curSeries.Titles["Romaji"]} From {curSeries.CurVolumeCount}/{curSeries.MaxVolumeCount} -> {curVolumeChange}/{maxVolumeChange}");
+                        LOGGER.Info($"Changed Series Values For \"{curSeries.Titles["Romaji"]}\" From {curSeries.CurVolumeCount}/{curSeries.MaxVolumeCount} -> {curVolumeChange}/{maxVolumeChange}");
                         curSeries.CurVolumeCount = curVolumeChange;
                         curSeries.MaxVolumeCount = maxVolumeChange;
 
@@ -377,7 +372,7 @@ namespace Tsundoku.Views
                 }
                 MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.MeanRating = countrating != 0 ? decimal.Round(ratingVal / countrating, 1) : 0;
                 
-                LOGGER.Info($"Removed {curSeries.Titles["Romaji"]} From Collection");
+                LOGGER.Info($"Removed \"{curSeries.Titles["Romaji"]}\" From Collection");
                 MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.SeriesCount = (uint)MainWindowViewModel.UserCollection.Count;
 
                 MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UpdateDemographicChartValues();
@@ -438,13 +433,12 @@ namespace Tsundoku.Views
                 Demographic demographic = Series.GetSeriesDemographic((sender as ComboBox).SelectedItem.ToString());
                 
                 // Update Demographic Chart Values
-                // MainWindowViewModel.UserCollection.First(series => series == curSeries).Demographic = demographic;
                 curSeries.Demographic = demographic;
                 MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UpdateDemographicChartValues();
                 MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UpdateDemographicPercentages();
                 
                 curSeries.Demographic = demographic;
-                LOGGER.Info($"Changed Demographic for {curSeries.Titles["Romaji"]} to {demographic}");
+                LOGGER.Info($"Changed Demographic for \"{curSeries.Titles["Romaji"]}\" to {demographic}");
             }
         }
 
@@ -469,8 +463,9 @@ namespace Tsundoku.Views
         {
             LOGGER.Info("Closing Tsundoku");
             CollectionViewModel.SearchText = "";
+            MainWindowViewModel.SaveUsersData();
             Helpers.DiscordRP.Deinitialize();
-            coverFolderWatcher.Dispose();
+            CoverFolderWatcher.Dispose();
 
             if (MainWindowViewModel.newSeriesWindow != null)
             {
@@ -502,7 +497,6 @@ namespace Tsundoku.Views
                 MainWindowViewModel.collectionStatsWindow.Close();
             }
 
-            MainWindowViewModel.SaveUsersData();
             NLog.LogManager.Shutdown();
             App.Mutex.Dispose();
         }
@@ -522,12 +516,12 @@ namespace Tsundoku.Views
         {
             var file = await this.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions {
                 AllowMultiple = false,
-                FileTypeFilter = fileOptions
+                FileTypeFilter = new List<FilePickerFileType>() { fileOptions }
             });
             if (file.Count > 0)
             {
                 CollectionViewModel.UserIcon = new Bitmap(file[0].Path.LocalPath).CreateScaledBitmap(new PixelSize(USER_ICON_WIDTH, USER_ICON_HEIGHT), BitmapInterpolationMode.HighQuality);
-                LOGGER.Debug($"Changed Users Icon to {file[0].Path.LocalPath}");
+                LOGGER.Info($"Changed Users Icon to {file[0].Path.LocalPath}");
             }
         }
 
@@ -573,7 +567,7 @@ namespace Tsundoku.Views
                 MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UsersNumVolumesToBeCollected--;
                 curSeries.CurVolumeCount += 1;
                 TextBlock volumeDisplay = (TextBlock)((Button)sender).GetLogicalSiblings().ElementAt(1);
-                string log = $"Adding 1 Volume To {curSeries.Titles["Romaji"]} : {volumeDisplay.Text} -> ";
+                string log = $"Adding 1 Volume To \"{curSeries.Titles["Romaji"]}\" : {volumeDisplay.Text} -> ";
                 volumeDisplay.Text = curSeries.CurVolumeCount + "/" + curSeries.MaxVolumeCount;
                 LOGGER.Info(log + volumeDisplay.Text);
 
@@ -593,7 +587,7 @@ namespace Tsundoku.Views
                 MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UsersNumVolumesToBeCollected++;
                 curSeries.CurVolumeCount -= 1;
                 TextBlock volumeDisplay = (TextBlock)((Button)sender).GetLogicalSiblings().ElementAt(1);
-                string log = $"Removing 1 Volume From {curSeries.Titles["Romaji"]} : {volumeDisplay.Text} -> ";
+                string log = $"Removing 1 Volume From \"{curSeries.Titles["Romaji"]}\" : {volumeDisplay.Text} -> ";
                 volumeDisplay.Text = curSeries.CurVolumeCount + "/" + curSeries.MaxVolumeCount;
                 LOGGER.Info(log + volumeDisplay.Text);
 

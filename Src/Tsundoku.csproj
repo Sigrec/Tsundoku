@@ -3,7 +3,6 @@
 		<OutputType>WinExe</OutputType>
 		<TargetFramework>net7.0</TargetFramework>
 		<Nullable>enable</Nullable>
-		<TrimMode>partial</TrimMode>
 		<AvaloniaNameGeneratorBehavior>InitializeComponent</AvaloniaNameGeneratorBehavior>
 		<AvaloniaNameGeneratorIsEnabled>true</AvaloniaNameGeneratorIsEnabled>
 		<AvaloniaNameGeneratorFilterByPath>*</AvaloniaNameGeneratorFilterByPath>
@@ -12,12 +11,13 @@
 		<StartupObject>Tsundoku.Program</StartupObject>
 		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
 		<PublishTrimmed>true</PublishTrimmed>
+		<TrimMode>partial</TrimMode>
 		<PublishReadyToRun>True</PublishReadyToRun>
 		<Optimize>True</Optimize>
 		<SelfContained>True</SelfContained>
 		<IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
-		<Version>2.2.0</Version>
-		<FileVersion>2.2.0.0</FileVersion>
+		<Version>2.2.1</Version>
+		<FileVersion>2.2.1.0</FileVersion>
 		<!-- <PackageIcon>Assets\Icons\Tsundoku-Logo.png</PackageIcon> -->
 		<RepositoryUrl>https://github.com/Sigrec/Tsundoku</RepositoryUrl>
         <LangVersion>preview</LangVersion>
@@ -52,6 +52,7 @@
         <None Remove="Assets\DiscordRPImage.png" />
         <None Remove="Assets\Example.jpg" />
         <None Remove="Assets\Icons\Tsundoku-Logo.ico" />
+        <None Remove="Assets\Icons\Tsundoku-Logo.png" />
         <None Remove="TsundokuLogs.log" />
         <None Remove="UserData.json" />
         <AvaloniaResource Include="Assets\Icons\Tsundoku-Logo.ico" />
@@ -61,42 +62,7 @@
 			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 			<ExcludeFromSingleFile>false</ExcludeFromSingleFile>
 		</Content>
-		<!-- <None Content="*.dll">
-			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
-			<ExcludeFromSingleFile>false</ExcludeFromSingleFile>
-		</None> -->
-		<!-- <AvaloniaResource Include="Covers/**" />
-        <AvaloniaXaml Remove="Covers\**" />
-        <Compile Remove="Covers\**" />
-        <EmbeddedResource Remove="Covers\**" />
-        <None Remove="Covers\**" />
-        <AvaloniaResource Remove="Assets\TsundokuExample.jpg" />
-		<AvaloniaResource Include="UserData.json" />
-		<Compile Remove="Assets\Covers\**" />
-		<EmbeddedResource Remove="Assets\Cover\**" />
-	    <Content Update="UserData.json">
-			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
-			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-		</Content>
-	    <Content Update="Covers/">
-			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
-			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-		</Content> -->
-        <!-- <None Remove="*.dll">
-			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
-			<ExcludeFromSingleFile>false</ExcludeFromSingleFile>
-		</None> -->
 	</ItemGroup>
-
-    <!-- <ItemGroup>
-        <Content Include="Assets\Icons\Tsundoku-Logo.ico" Pack="true" />
-    </ItemGroup> -->
-	
-  <!-- <ItemGroup>
-	  <Content Include="NLog.config">
-		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Content>
-  </ItemGroup> -->
 	
   <ItemGroup>
     <!--This helps with theme dll-s trimming.

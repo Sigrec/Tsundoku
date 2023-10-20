@@ -9,6 +9,11 @@ Legend
 TODO:
 ❌ ComboboxItem Styles not applying properly in Theme & AdvancedQuery
 ❌ Fix style of scrollbar in Description & enabled it
+❌ Fix style of stats
+
+V2.2.1.0 - October 20th
+🔥 Fixed issue where covers were not reloading and were not saved correctly
+⌛ Changed log level to Info instead of Debug
 
 V2.2.0.0 - October 19th
 🔥 Toggle buttons style fixed when hovering over or pressing if it is already selected in all windows

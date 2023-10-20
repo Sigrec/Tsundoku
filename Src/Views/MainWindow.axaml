@@ -32,7 +32,7 @@
     <!-- Advanced Search Popup -->
     <Panel>
         <Panel Name="AdvancedSearchPopup" ZIndex="1" IsVisible="false">
-            <Rectangle Fill="Black" Opacity="0.55" PointerPressed="UnShow_AdvancedSearchPopup"/>
+            <Rectangle Fill="Black" Opacity="0.55"/>
             <StackPanel Margin="0,165,0,0" HorizontalAlignment="Center" VerticalAlignment="Top">
                 <StackPanel Orientation="Horizontal" Spacing="5">
                     <AutoCompleteBox Name="AdvancedSearchBar"
@@ -230,7 +230,7 @@
                     </StackPanel>
                 </Grid>
             </Border>
-            
+            <!-- TODO Issue w/ virtualization where refreshing covers causes height to bug -->
             <!-- Collection -->
             <ScrollViewer Name="CollectionTheme" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" DockPanel.Dock="Bottom" Background="{CompiledBinding CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}"> 
                 <ItemsRepeater Name="CollectionItems" Margin="20,50,20,50" ItemsSource="{CompiledBinding SearchedCollection}" HorizontalAlignment="Center" VerticalAlignment="Center">

@@ -4,7 +4,7 @@
 
 ## [ChangeLog](https://github.com/Sigrec/Tsundoku/blob/main/ChangeLog.txt) (Right Click Exe → Properties → Details to see current File Version)
 ***
->[**Windows Download** (Current Supported Version = V2.2.0.0)](https://github.com/Sigrec/Tsundoku/releases/tag/v2.2.0.0)\
+>[**Windows Download** (Current Supported Version = V2.2.1.0)](https://github.com/Sigrec/Tsundoku/releases/tag/v2.2.1.0)\
 [**Mac Download (Not Supported Yet Need Someone To Test For Me Add me on Discord if Interested & DM)** (Current Supported Version = X)](https://www.dropbox.com/sh/3e0po3d4l1sv8va/AAAgEbiPM86QQtkTcvvGWEVva?dl=0)\
 Download the folder into your desired location (need to keep the executable folder with your UserData.json and Covers folder otherwise it will generate new ones), then pin the exe to your taskbar.
 ***
@@ -36,26 +36,30 @@ Of course I understand if you do not trust me but I promise there is nothing mal
 ***Manga Streaming***
 - [MangaDex](https://mangadex.org/)
 - [MangaSee](https://mangasee123.com/)
+- [MangaReader](https://mangareader.to/)
 
 ***Anime Streaming***
-- [9Anime](https://9anime.to/)
+- [AniWave](https://aniwave.to/home)
+- [GoGoAnime](https://gogoanimehd.io/)
 ***
 ## Links to Buy Manga (List in Order of Value Proposition)
-***English***
-- [Indigo](https://www.Indigo.com/)
+***English (America)***
+- [CrunchyRoll](https://store.crunchyroll.com/collections/manga-books/)
 - [RobertsAnimeCornerStore](https://www.animecornerstore.com/graphicnovels1.html)
 - [InStockTrades](https://www.instocktrades.com/)
 - [Barnes & Noble](https://www.barnesandnoble.com/b/books/graphic-novels-comics/manga/_/N-1sZ29Z8q8Zucc)
 - [Books A Million](https://www.booksamillion.com/manga)
 - [Amazon](https://www.amazon.com/Manga-Comics-Graphic-Novels-Books/b?node=4367)
 - [Indigo (Canada)](https://www.chapters.indigo.ca/en-ca/comic-book-shop/manga/)
-
-***English & Japanese***
 - [Kinokuniya](https://united-states.kinokuniya.com/)
+
+***English (Canada)***
+- [Indigo](https://www.Indigo.com/)
 
 ***Japanese***
 - [CD Japan](https://www.cdjapan.co.jp/)
 - [Amazon Japan](https://www.amazon.co.jp/)
+- [Kinokuniya](https://united-states.kinokuniya.com/)
 - [Honto](https://honto.jp/)
 ***
 ## Twitter Accounts to Follow for Manga News
