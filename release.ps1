@@ -37,7 +37,7 @@ if (Test-Path $outDir) {
 # Publish the application.
 Push-Location $projDir
 try {
-    Write-Output "Restoring:"
+    Write-Output "Building:"
     dotnet build -c Release
     Write-Output "Publishing:"
     $msBuildVerbosityArg = "/v:m"
