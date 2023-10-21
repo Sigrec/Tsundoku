@@ -139,6 +139,9 @@
                             </Style>
                         </WrapPanel.Styles>
                         <Button Theme="{StaticResource UserSettingsButton}"
+                                Click="OpenApplicationFolder" 
+                                Content="Open Application Folder"/>
+                        <Button Theme="{StaticResource UserSettingsButton}"
                                 Click="OpenCoversFolder" 
                                 Content="Open Covers Folder"/>
                         <Button Theme="{StaticResource UserSettingsButton}"
@@ -147,9 +150,9 @@
                         <Button Theme="{StaticResource UserSettingsButton}"
                                 Click="JoinDiscord"
                                 Content="Join Discord"/>
-                        <Button Theme="{StaticResource UserSettingsButton}"
+                        <!-- <Button Theme="{StaticResource UserSettingsButton}"
                                 Click="ReportBug"
-                                Content="Report Issue/Bug"/>
+                                Content="Report Issue/Bug"/> -->
                         <Button Name="ExportToSpreadSheetButton"
                                 Theme="{StaticResource UserSettingsButton}"
                                 Command="{Binding ExportToSpreadSheetAsyncCommand}"

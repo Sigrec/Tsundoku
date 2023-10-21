@@ -72,6 +72,13 @@ namespace Tsundoku.Views
                 ViewModelBase.OpenSiteLink(@"https://mangadex.org/");
             });
         }
+        
+        public void OpenApplicationFolder(object sender, RoutedEventArgs args)
+        {
+            Task.Run(() =>{
+                Process.Start("explorer.exe", @$"{Path.GetDirectoryName(Path.GetFullPath(@"Covers"))}");
+            });
+        }
 
         public void OpenCoversFolder(object sender, RoutedEventArgs args)
         {

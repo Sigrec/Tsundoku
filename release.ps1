@@ -5,6 +5,13 @@ param (
     [switch]$OnlyBuild=$false
 )
 
+$Folder = '../bin/Release'
+if (Test-Path -Path $Folder) {
+    "Path exists!"
+} else {
+    "Path doesn't exist."
+}
+
 $appName = "Tsundoku" # 👈 Replace with your application project name.
 $projDir = "Src" # 👈 Replace with your project directory (where .csproj resides).
 
