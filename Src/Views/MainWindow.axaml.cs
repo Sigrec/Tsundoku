@@ -498,7 +498,7 @@ namespace Tsundoku.Views
             }
 
             NLog.LogManager.Shutdown();
-            // App.Mutex.Dispose();
+            App.DisposeMutex();
         }
 
         /// <summary>

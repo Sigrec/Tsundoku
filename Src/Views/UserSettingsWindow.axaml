@@ -140,7 +140,7 @@
                         </WrapPanel.Styles>
                         <Button Theme="{StaticResource UserSettingsButton}"
                                 Click="OpenApplicationFolder" 
-                                Content="Open Application Folder"/>
+                                Content="Open App Folder"/>
                         <Button Theme="{StaticResource UserSettingsButton}"
                                 Click="OpenCoversFolder" 
                                 Content="Open Covers Folder"/>
