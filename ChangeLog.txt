@@ -11,6 +11,9 @@ TODO:
 ❌ Fix style of scrollbar in Description & enabled it
 ❌ Fix style of stats
 
+V2.2.1.1 - October 21st
+📜 Change application to Installer
+
 V2.2.1.0 - October 20th
 🔥 Fixed issue where covers were not reloading and were not saved correctly
 ⌛ Changed log level to Info instead of Debug
