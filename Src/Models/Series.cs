@@ -244,12 +244,16 @@ namespace Tsundoku.Models
 							englishTitle = attributes.GetProperty("title").GetProperty("en").GetString();
 							englishAltTitle = GetAltTitle("en", altTitles);
 							japaneseAltTitle = GetAltTitle("ja", altTitles);
-							if (
-								data.GetArrayLength() == 1 
-								|| EntryModel.Similar(title, englishTitle, !string.IsNullOrWhiteSpace(englishTitle) && title.Length > englishTitle.Length ? englishTitle.Length / 6 : title.Length / 6) != -1 
-								|| EntryModel.Similar(title, englishAltTitle, !string.IsNullOrWhiteSpace(englishAltTitle) && title.Length > englishAltTitle.Length ? englishAltTitle.Length / 6 : title.Length / 6) != -1 
-								|| EntryModel.Similar(title, japaneseAltTitle, !string.IsNullOrWhiteSpace(japaneseAltTitle) && title.Length > japaneseAltTitle.Length ? japaneseAltTitle.Length / 6 : title.Length / 6) != -1
-								)
+							if (!IsSeriesDigitalOnly(title, englishTitle, englishAltTitle)
+                                && (
+                                    data.GetArrayLength() == 1
+                                    || (
+                                            EntryModel.Similar(title, englishTitle, !string.IsNullOrWhiteSpace(englishTitle) && title.Length > englishTitle.Length ? englishTitle.Length / 6 : title.Length / 6) != -1 
+                                            || EntryModel.Similar(title, englishAltTitle, !string.IsNullOrWhiteSpace(englishAltTitle) && title.Length > englishAltTitle.Length ? englishAltTitle.Length / 6 : title.Length / 6) != -1 
+                                            || EntryModel.Similar(title, japaneseAltTitle, !string.IsNullOrWhiteSpace(japaneseAltTitle) && title.Length > japaneseAltTitle.Length ? japaneseAltTitle.Length / 6 : title.Length / 6) != -1
+                                    )
+                                )
+                            )
 							{
 								data = series;
 								notFoundCondition = false;
@@ -265,8 +269,16 @@ namespace Tsundoku.Models
 					}
 					else
 					{
-						attributes = data.GetProperty("attributes");
-						altTitles = attributes.GetProperty("altTitles").EnumerateArray();
+                        attributes = data.GetProperty("attributes");
+                        altTitles = attributes.GetProperty("altTitles").EnumerateArray();
+                        englishTitle = attributes.GetProperty("title").GetProperty("en").GetString();
+						englishAltTitle = GetAltTitle("en", altTitles);
+
+                        if (IsSeriesDigitalOnly(title, englishTitle, englishAltTitle))
+                        {
+                            LOGGER.Warn("{} is a Digital Only Series", title);
+                            return null;
+                        }
 					}
 
 					relationships = data.GetProperty("relationships").EnumerateArray();
@@ -278,18 +290,17 @@ namespace Tsundoku.Models
 					countryOfOrigin = attributes.GetProperty("originalLanguage").GetString();
 					string coverLink = @$"https://uploads.mangadex.org/covers/{curMangaDexId}/{await MangadexQuery.GetCoverAsync(relationships.Single(x => x.GetProperty("type").GetString().Equals("cover_art")).GetProperty("id").GetString())}";
 					coverPath = CreateCoverFilePath(coverLink, romajiTitle, bookType, altTitles, Site.MangaDex);
-
 					demographic = GetSeriesDemographic(attributes.GetProperty("publicationDemographic").GetString());
 
 					if (altTitles.Any())
 					{
-						LOGGER.Info("Series has no Alternate Titles");
+						LOGGER.Debug("Series has no Alternate Titles");
 					}
 
 					newTitles = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
 					{
 						{ "Romaji", romajiTitle },
-						{ "English", !countryOfOrigin.Equals("en") ? GetAltTitle("en", altTitles) : romajiTitle }
+						{ "English",  englishTitle.Equals(englishAltTitle) || string.IsNullOrWhiteSpace(englishAltTitle) || countryOfOrigin.Equals("en") ? englishTitle : englishAltTitle }
 					};
 
 					// Get the Japanese title if the series is not a Japanese Comic
@@ -381,7 +392,20 @@ namespace Tsundoku.Models
 			return null;
         }
 
-        ///
+        private static bool IsSeriesDigitalOnly(string title, string englishTitle, string englishAltTitle)
+        {
+            return 
+            (
+                !(
+                    title.Contains("Digital", StringComparison.OrdinalIgnoreCase)
+                    || englishAltTitle.Contains("Digital", StringComparison.OrdinalIgnoreCase)
+                    || englishAltTitle.Contains("Official Colored", StringComparison.OrdinalIgnoreCase)
+                    || title.Contains("Official Colored", StringComparison.OrdinalIgnoreCase)
+                )
+                && englishTitle.Contains("Digital", StringComparison.OrdinalIgnoreCase)
+            );
+        }        
+        
 		private static void AddAdditionalLanguages(ref Dictionary<string, string> newTitles, ObservableCollection<string> additionalLanguages, List<JsonElement> altTitles)
 		{
             Span<string> mangaDexLang = CollectionsMarshal.AsSpan(MANGADEX_LANG_CODES.Where(lang => additionalLanguages.Contains(lang.Value)).Select(lang => lang.Key).ToList());

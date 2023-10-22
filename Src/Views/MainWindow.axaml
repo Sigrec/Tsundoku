@@ -374,7 +374,7 @@
                                                             Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsIconColor, Converter={StaticResource ConvertColor}}" 
                                                             i:Attached.Icon="fa-repeat" 
                                                             Margin="3,0,0,10"
-                                                            Click="ChangeSeriesVolumeCountsAsync"/>
+                                                            Click="ChangeSeriesVolumeCounts"/>
                                                 </StackPanel>
                                             </Grid>
 

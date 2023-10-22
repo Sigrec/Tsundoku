@@ -10,10 +10,13 @@ TODO:
 ❌ ComboboxItem Styles not applying properly in Theme & AdvancedQuery
 ❌ Fix style of scrollbar in Description & enabled it
 
-V2.2.2.0 - October 21st
-📜 Change application to Installer
+V2.2.2.0 - October 22nd
+🔥 Prevented adding of Digital only series like Colored versions of a series from MangaDex
+🔥 Fixed styling of stats cards
+🔥 Fixed issue where MangaDex querying would not get correct english title
+🔥 Fixed issue where covers would be considered for reload when adding a series
+🔥 Fixed issue where deleting a series would cause the series next it to open the edit pane
 ✅ Add button to open folder in which the application rests
-✅ Fix styling of stats cards
 
 V2.2.1.0 - October 20th
 🔥 Fixed issue where covers were not reloading and were not saved correctly

@@ -41,7 +41,7 @@ namespace Tsundoku.Views
             CoverFolderWatcher.OnCreated += static (s, e) =>
             {
                 string path = e.FullPath.Replace(".crdownload", "");
-                if (!ViewModelBase.updatedVersion && (!path.EndsWith(".jpg") || !path.EndsWith(".png")))
+                if (!ViewModelBase.newCoverCheck && (!path.EndsWith(".jpg") || !path.EndsWith(".png")))
                 {
                     Series series = MainWindowViewModel.SearchedCollection.AsParallel().Single(series => series.Cover.Equals(path));
                     if (series != null && !CoverChangedSeriesList.Contains(series))
@@ -197,7 +197,7 @@ namespace Tsundoku.Views
         /// <summary>
         /// Saves the stats for the series when the button is clicked
         /// </summary>
-        public void SaveStats(object sender, RoutedEventArgs args)
+        private void SaveStats(object sender, RoutedEventArgs args)
         {
             Series curSeries = (Series)((Button)sender).DataContext;
             var stackPanels = ((Button)sender).GetLogicalSiblings();
@@ -293,7 +293,7 @@ namespace Tsundoku.Views
             MainWindowViewModel.UserIsSearching(true);
         }
 
-        private async void ChangeSeriesVolumeCountsAsync(object sender, RoutedEventArgs args)
+        private async void ChangeSeriesVolumeCounts(object sender, RoutedEventArgs args)
         {
             var result = await Observable.Start(() => 
             {
@@ -338,6 +338,8 @@ namespace Tsundoku.Views
 
         private async void RemoveSeries(object sender, RoutedEventArgs args)
         {
+            // Close the edit pane before removing
+            (sender as Button).FindLogicalAncestorOfType<Grid>(false).IsVisible = false;
             var result = await Observable.Start(() => 
             {
                 Series curSeries = MainWindowViewModel.UserCollection.Single(series => series == (Series)((Button)sender).DataContext);
@@ -385,11 +387,19 @@ namespace Tsundoku.Views
 
         private void ShowEditPane(object sender, RoutedEventArgs args)
         {
+            if (((sender as Button).FindLogicalAncestorOfType<Grid>(false).GetLogicalChildren().ElementAt(1) as Grid).IsVisible)
+            {
+                ((sender as Button).FindLogicalAncestorOfType<Grid>(false).GetLogicalChildren().ElementAt(1) as Grid).IsVisible = false;
+            }
             ((Button)sender).FindLogicalAncestorOfType<Grid>(false).FindLogicalDescendantOfType<Grid>(false).IsVisible ^= true;
         }
 
         private void ShowStatsPane(object sender, RoutedEventArgs args)
         {
+            if (((Button)sender).FindLogicalAncestorOfType<Grid>(false).FindLogicalDescendantOfType<Grid>(false).IsVisible)
+            {
+                ((Button)sender).FindLogicalAncestorOfType<Grid>(false).FindLogicalDescendantOfType<Grid>(false).IsVisible = false;
+            }
             ((sender as Button).FindLogicalAncestorOfType<Grid>(false).GetLogicalChildren().ElementAt(1) as Grid).IsVisible ^= true;
         }
 

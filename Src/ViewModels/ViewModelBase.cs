@@ -15,6 +15,7 @@ namespace Tsundoku.ViewModels
         public static string Filter { get; set; }
         public static User? MainUser { get; set; }
         public static bool updatedVersion = false;
+        public static bool newCoverCheck = false;
 
         public static readonly JsonSerializerOptions options = new()
         { 
