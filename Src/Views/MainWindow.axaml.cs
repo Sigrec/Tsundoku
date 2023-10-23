@@ -114,7 +114,7 @@ namespace Tsundoku.Views
 
         public void SetupAdvancedSearchBar(string delimeter)
         {
-            AdvancedSearchBar.ItemsSource = ADVANCED_SEARCH_FILTERS.OrderBy(x => x);
+            AdvancedSearchBar.ItemsSource = ADVANCED_SEARCH_FILTERS;
             AdvancedSearchBar.FilterMode = AutoCompleteFilterMode.Custom;
             AdvancedSearchBar.MinimumPopulateDelay = new TimeSpan(TimeSpan.TicksPerSecond / 2); // Might just remove this delay in the end
             AdvancedSearchBar.ItemSelector = (query, item) =>
@@ -133,12 +133,7 @@ namespace Tsundoku.Views
                 {
                     return itemString.StartsWith(query, StringComparison.OrdinalIgnoreCase);
                 }
-
-                if (query.Contains(itemString))
-                {
-                    return false;
-                }
-                else if (itemString.Last() != '=' && query.Contains(itemString[..itemString.IndexOf("==")]))
+                else if (query.Contains(itemString) || itemString.Last() != '=' && query.Contains(itemString[..itemString.IndexOf("==")]))
                 {
                     return false;
                 }
@@ -156,14 +151,18 @@ namespace Tsundoku.Views
                 return AdvancedSearchBar.IsVisible && itemString.StartsWith(query[(query.LastIndexOf(delimeter) + delimeter.Length)..], StringComparison.OrdinalIgnoreCase);
             };
         }
+        private void UnShowAdvancedSearchPopup(object sender, PointerPressedEventArgs args)
+        {
+            AdvancedSearchPopup.IsVisible = false;
+        }
 
         private void RemoveErrorMessage(object sender, KeyEventArgs args)
         {
-            if (!string.IsNullOrEmpty(CollectionViewModel.AdvancedSearchQueryErrorMessage))
+            if (!string.IsNullOrWhiteSpace(CollectionViewModel.AdvancedSearchQueryErrorMessage))
             {
                 CollectionViewModel.AdvancedSearchQueryErrorMessage = string.Empty;
             }
-        }
+        }   
 
         /// <summary>
         /// Reloads Covers for Series where the cover was changed

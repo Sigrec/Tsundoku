@@ -1,6 +1,7 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
 					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 					xmlns:vm="clr-namespace:Tsundoku.ViewModels"
+                    xmlns:local="clr-namespace:Tsundoku.Models"
 					x:DataType="vm:ViewModelBase">
 
     <ControlTheme x:Key="QuerySearchBox" TargetType="AutoCompleteBox">
@@ -37,7 +38,7 @@
                             DataValidationErrors.Errors="{TemplateBinding (DataValidationErrors.Errors)}" />
                     <Popup Name="PART_Popup" 
                             WindowManagerAddShadowHint="False"
-                            MinWidth="{Binding Bounds.Width, RelativeSource={RelativeSource TemplatedParent}}" 
+                            MinWidth="{Binding Bounds.Width, RelativeSource={RelativeSource TemplatedParent}}"
                             MaxHeight="{TemplateBinding MaxDropDownHeight}"
                             IsLightDismissEnabled="True"
                             PlacementTarget="{TemplateBinding}">

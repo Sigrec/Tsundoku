@@ -31,7 +31,7 @@
 
     <!-- Advanced Search Popup -->
     <Panel>
-        <Panel Name="AdvancedSearchPopup" ZIndex="1" IsVisible="false">
+        <Panel Name="AdvancedSearchPopup" ZIndex="1" IsVisible="false" PointerPressed="UnShowAdvancedSearchPopup">
             <Rectangle Fill="Black" Opacity="0.55"/>
             <StackPanel Margin="0,165,0,0" HorizontalAlignment="Center" VerticalAlignment="Top">
                 <StackPanel Orientation="Horizontal" Spacing="5">
@@ -40,6 +40,7 @@
                                 Classes="query"
                                 KeyUp="RemoveErrorMessage"
                                 Theme="{StaticResource QuerySearchBox}"
+                                MinimumPrefixLength="0"
                                 Watermark="Advanced Search Query..."/>
                     <Button Name="AdvancedSearchQueryButton"
                             IsDefault="True"

@@ -28,7 +28,7 @@ namespace Tsundoku.ViewModels
         public static List<Series> UserCollection { get; set; } = [];
         private static IEnumerable<Series> FilteredCollection { get; set; } = [];
         [Reactive] public string SearchText { get; set; }
-        [Reactive] public string AdvancedSearchText { get; set; }
+        [Reactive] public string AdvancedSearchText { get; set; } = string.Empty;
         [Reactive] public bool LanguageChanged { get; set; } = false;
         [Reactive] public Bitmap? UserIcon { get; set; }
         [Reactive] public string CurLanguage { get; set; }
