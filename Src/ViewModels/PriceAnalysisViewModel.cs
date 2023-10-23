@@ -19,11 +19,6 @@ namespace Tsundoku.ViewModels
 
         public PriceAnalysisViewModel()
         {
-            AnalyzedList.Add(new EntryModel("World Trigger Vol 1", "$0.00", StockStatus.IS, "Crunchyroll"));
-            AnalyzedList.Add(new EntryModel("World Trigger Vol 1", "$0.00", StockStatus.IS, "Crunchyroll"));
-            AnalyzedList.Add(new EntryModel("World Trigger Vol 1", "$0.00", StockStatus.IS, "Crunchyroll"));
-            AnalyzedList.Add(new EntryModel("World Trigger Vol 1", "$0.00", StockStatus.IS, "Crunchyroll"));
-            AnalyzedList.Add(new EntryModel("World Trigger Vol 1", "$0.00", StockStatus.IS, "Crunchyroll"));
             this.CurrentTheme = MainUser.SavedThemes.First(theme => theme.ThemeName.Equals(MainUser.MainTheme));
             SelectedWebsites.CollectionChanged += WebsiteCollectionChanged;
         }
