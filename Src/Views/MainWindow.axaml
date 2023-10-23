@@ -122,7 +122,6 @@
                                 Width="95"
                                 Height="35"
                                 FontSize="15"
-                                IsEnabled="false"
                                 Command="{CompiledBinding OpenPriceAnalysisWindow}"/>
                         <Button Name="DonateButton"
                                 Theme="{StaticResource MenuButton}"

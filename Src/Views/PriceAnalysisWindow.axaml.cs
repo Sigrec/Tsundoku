@@ -1,5 +1,4 @@
 using Avalonia.Controls;
-using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Interactivity;
 using Tsundoku.ViewModels;
 using MangaLightNovelWebScrape;
@@ -9,7 +8,6 @@ using System.Reactive.Linq;
 using Avalonia.Input;
 using MangaLightNovelWebScrape.Websites.America;
 using static Src.Models.Constants;
-using MangaLightNovelWebScrape.Websites;
 using MangaLightNovelWebScrape.Websites.Canada;
 
 namespace Tsundoku.Views
@@ -20,10 +18,6 @@ namespace Tsundoku.Views
         public bool IsOpen = false, Manga;
         public readonly MasterScrape Scrape = new MasterScrape().DisableDebugMode();
         private string ScrapeTitle;
-        private static readonly StockStatus[] EXCLUDE_NONE_FILTER = [];
-        private static readonly StockStatus[] EXCLUDE_BOTH_FILTER = [ StockStatus.PO, StockStatus.OOS ];
-        private static readonly StockStatus[] EXCLUDE_PO_FILTER = [ StockStatus.PO ];
-        private static readonly StockStatus[] EXCLUDE_OOS_FILTER = [ StockStatus.OOS ];
 
         public PriceAnalysisWindow()
         {
@@ -32,10 +26,6 @@ namespace Tsundoku.Views
             Opened += (s, e) =>
             {
                 IsOpen ^= true;
-                if (Screens.Primary.WorkingArea.Height < 611)
-                {
-                    this.Height = 500;
-                }
             };
 
             Closing += (s, e) =>
@@ -47,7 +37,7 @@ namespace Tsundoku.Views
                 e.Cancel = true;
             };
 
-            this.WhenAnyValue(x => x.TitleBox.Text, x => x.MangaButton.IsChecked, x => x.NovelButton.IsChecked, x => x.PriceAnalysisVM.CurBrowser, x => x.PriceAnalysisVM.WebsitesSelected, (title, manga, novel, browser, websites) => !string.IsNullOrWhiteSpace(title) && !(manga == false && novel == false) && !string.IsNullOrWhiteSpace(browser) && websites).Subscribe(x => PriceAnalysisVM.IsAnalyzeButtonEnabled = x);
+            this.WhenAnyValue(x => x.TitleBox.Text, x => x.MangaButton.IsChecked, x => x.NovelButton.IsChecked, x => x.BrowserSelector.SelectedItem, x => x.PriceAnalysisVM.WebsitesSelected, x => x.RegionSelector.SelectedItem, (title, manga, novel, browser, websites, region) => !string.IsNullOrWhiteSpace(title) && !(manga == false && novel == false) && browser != null && websites && region != null).Subscribe(x => PriceAnalysisVM.IsAnalyzeButtonEnabled = x);
         }
 
         private void IsMangaButtonClicked(object sender, RoutedEventArgs args)
@@ -67,18 +57,18 @@ namespace Tsundoku.Views
                 ScrapeTitle = TitleBox.Text;
 
                 StartScrapeButton.IsEnabled = false;
-                LOGGER.Info($"Started Scrape For {TitleBox.Text} on {PriceAnalysisVM.CurBrowser} Browser w/ {(StockFilterSelector.SelectedItem as ComboBoxItem).Content} Filter & Websites = [{string.Join(", ", PriceAnalysisVM.SelectedWebsites.Select(site => site.Content.ToString()))}] & Memberships = {string.Join(" | ", ViewModelBase.MainUser.Memberships)}");
-                Scrape.Browser = MasterScrape.GetBrowserFromString(PriceAnalysisVM.CurBrowser);
-                Scrape.Region = Region.America;
+                Scrape.Browser = MasterScrape.GetBrowserFromString((BrowserSelector.SelectedItem as ComboBoxItem).Content.ToString());
+                Scrape.Region = MasterScrape.GetRegionFromString((RegionSelector.SelectedItem as ComboBoxItem).Content.ToString());
+                LOGGER.Info($"Started Scrape For {TitleBox.Text} on {Scrape.Browser} Browser w/ Region = {Scrape.Region} {(StockFilterSelector.SelectedItem as ComboBoxItem).Content} Filter & Websites = [{string.Join(", ", PriceAnalysisVM.SelectedWebsites.Select(site => site.Content.ToString()))}] & Memberships = {string.Join(" | ", ViewModelBase.MainUser.Memberships)}");
                 await Scrape.InitializeScrapeAsync(
                         TitleBox.Text, 
                         MangaButton.IsChecked != null && MangaButton.IsChecked.Value ? BookType.Manga : BookType.LightNovel, 
                         (StockFilterSelector.SelectedItem as ComboBoxItem).Content.ToString() switch
                         {
-                            "Exclude PO & OOS" => EXCLUDE_BOTH_FILTER,
-                            "Exclude PO" => EXCLUDE_PO_FILTER,
-                            "Exclude OOS" => EXCLUDE_OOS_FILTER,
-                            _ => EXCLUDE_NONE_FILTER
+                            "Exclude PO & OOS" => MasterScrape.EXCLUDE_BOTH_FILTER,
+                            "Exclude PO" => MasterScrape.EXCLUDE_PO_FILTER,
+                            "Exclude OOS" => MasterScrape.EXCLUDE_OOS_FILTER,
+                            _ => MasterScrape.EXCLUDE_NONE_FILTER
                         }, 
                         Scrape.GenerateWebsiteList(PriceAnalysisVM.SelectedWebsites.Select(site => site.Content.ToString()).ToList()),
                         ViewModelBase.MainUser.Memberships[BarnesAndNoble.WEBSITE_TITLE], 
@@ -91,6 +81,8 @@ namespace Tsundoku.Views
 
                 PriceAnalysisVM.AnalyzedList.Clear();
                 PriceAnalysisVM.AnalyzedList.AddRange(Scrape.GetResults());
+
+                this.Height = this.MaxHeight;
             }
             catch (Exception e)
             {
@@ -98,13 +90,13 @@ namespace Tsundoku.Views
             }
         }
 
-        private void BrowserChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if ((sender as ComboBox).IsDropDownOpen)
-            {
-                PriceAnalysisVM.CurBrowser = (BrowserSelector.SelectedItem as ComboBoxItem).Content.ToString();
-            }
-        }
+        // private void BrowserChanged(object sender, SelectionChangedEventArgs e)
+        // {
+        //     if ((sender as ComboBox).IsDropDownOpen)
+        //     {
+        //         PriceAnalysisVM.CurBrowser = (BrowserSelector.SelectedItem as ComboBoxItem).Content.ToString();
+        //     }
+        // }
 
         private void WebsiteSelectionChanged(object sender, SelectionChangedEventArgs e)
         {

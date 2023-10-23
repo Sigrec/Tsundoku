@@ -44,6 +44,12 @@
         </Style>
     </Style>
 
+    <Style Selector="DataGridRow.menu">
+        <Style Selector="^:pointerover /template/ Rectangle#BackgroundRectangle">
+			<Setter Property="Fill" Value="Aqua" />
+		</Style>
+    </Style>
+
 	<Style Selector="Border.menu">
 		<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}"/>
 		<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}"/>
