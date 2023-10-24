@@ -102,7 +102,7 @@
 					 Classes="menu"
 					 BorderThickness="2"
 					 TextWrapping="Wrap"
-					 Watermark="Title | AniList ID | MangaDex ID"/>
+					 Watermark="Title or AniList ID or MangaDex ID"/>
 			<TextBlock Text="Cur Volumes" Grid.Row="3" Grid.Column="0" FontSize="20" FontWeight="Bold" Classes="menu" Margin="0,0,0,1"/>
 			<MaskedTextBox Name="CurVolCount"
 						   Width="182"

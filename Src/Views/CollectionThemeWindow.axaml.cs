@@ -30,7 +30,7 @@ namespace Tsundoku.Views
                 ThemeChanged = false;
                 int index = ThemeSettingsViewModel.UserThemesDisplay.IndexOf(ThemeSettingsVM.CurrentTheme.ThemeName);
                 ThemeSettingsVM.CurThemeIndex = index != -1 ? index : ThemeSettingsViewModel.UserThemesDisplay.IndexOf("Default");
-                ApplyColors();
+                // ApplyColors();
                 MenuColorChanges();
                 CollectionColorChanges();
             };
@@ -456,7 +456,7 @@ namespace Tsundoku.Views
             Collection_BG.ColorChanged += (sender, e) =>
             {
                 // CollectionWindow.CollectionTheme.Background = new SolidColorBrush(Collection_BG.Color);
-                Collection_BG_Button.Background = new SolidColorBrush(Collection_BG.Color);
+                // (App.DESKTOP.MainWindow.DataContext as MainWindowViewModel).CurrentTheme.CollectionBGColor = Collection_BG.Color.ToUInt32();
                 NewTheme.CollectionBGColor = Collection_BG.Color.ToUInt32();
             };
 

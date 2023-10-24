@@ -64,6 +64,7 @@
 			<Setter Property="TextBlock.Foreground" Value="{CompiledBinding CurrentTheme.UsernameColor, Converter={StaticResource ConvertColor}}"/>
 		</Style>
 	</Style>
+    
     <Style Selector="ComboBox.Theme > ComboBoxItem">
         <Style Selector="^">
             <Setter Property="TextBlock.Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"/>

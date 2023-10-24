@@ -16,8 +16,8 @@
 		<Optimize>True</Optimize>
 		<SelfContained>True</SelfContained>
 		<IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
-		<Version>2.3.0</Version>
-		<FileVersion>2.3.0.0</FileVersion>
+		<Version>2.2.3</Version>
+		<FileVersion>2.2.3.0</FileVersion>
 		<!-- <PackageIcon>Assets\Icons\Tsundoku-Logo.png</PackageIcon> -->
 		<RepositoryUrl>https://github.com/Sigrec/Tsundoku</RepositoryUrl>
         <LangVersion>preview</LangVersion>

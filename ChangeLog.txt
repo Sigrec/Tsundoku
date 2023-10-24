@@ -11,10 +11,10 @@ TODO:
 ❌ Fix style of scrollbar in Description & enabled it
 ❌ Fix virtualization issue where adding a series sometimes causes the control height to bug
 
-V2.3.0.0 - October 22nd
+V2.2.3.0 - October 22nd
 ✅ Can now click outside of the Advanced Search control to close it
-✅ Enabled new "Scrape" Window that allows users to scrape multiple websites based on region to get the website that contains the lowest price volume in USD for each volume of a series. Includes filtering out OOS and PO entires as well. Currently only supports websites that have USD. This feature can break at anytime since it uses website dom data that I have no control over but if u see a issue just let me know.
-    - ✅ Added 4 new toggle buttons in the user settings window to determine if the user is a member of Indigo, Banres & Noble, BooksAMillion, and/or Kinokuniya
+✅ Enabled new "Scrape" Window that allows users to scrape multiple websites based on region to get the website that contains the lowest price volume in USD for each volume of a series. Includes filtering out OOS and PO entries as well. Currently only supports websites that have USD. This feature can break at anytime since it uses website dom data that I have no control over but if u see a issue just let me know.
+    - ✅ Added 4 new toggle buttons in the user settings window to determine if the user is a member of Indigo, Barnes & Noble, BooksAMillion, and/or Kinokuniya
     - ✅ Updated UserData JSON schema to include Memberships dictionary in the user
     - ✅ Hovering over "Enter Title" & "Websites" above input boxes now shows what is selected
     - ✍️ Other regions are underworks and will be added in later releases

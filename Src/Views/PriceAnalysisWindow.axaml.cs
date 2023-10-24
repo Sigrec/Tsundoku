@@ -17,7 +17,6 @@ namespace Tsundoku.Views
         public PriceAnalysisViewModel? PriceAnalysisVM => DataContext as PriceAnalysisViewModel;
         public bool IsOpen = false, Manga;
         public readonly MasterScrape Scrape = new MasterScrape().DisableDebugMode();
-        private string ScrapeTitle;
 
         public PriceAnalysisWindow()
         {
@@ -54,8 +53,6 @@ namespace Tsundoku.Views
         {
             try
             {
-                ScrapeTitle = TitleBox.Text;
-
                 StartScrapeButton.IsEnabled = false;
                 Scrape.Browser = MasterScrape.GetBrowserFromString((BrowserSelector.SelectedItem as ComboBoxItem).Content.ToString());
                 Scrape.Region = MasterScrape.GetRegionFromString((RegionSelector.SelectedItem as ComboBoxItem).Content.ToString());
@@ -80,9 +77,8 @@ namespace Tsundoku.Views
                 LOGGER.Info($"Scrape Finished");
 
                 PriceAnalysisVM.AnalyzedList.Clear();
-                PriceAnalysisVM.AnalyzedList.AddRange(Scrape.GetResults());
-
-                this.Height = this.MaxHeight;
+                PriceAnalysisVM.AnalyzedList.AddRange(Scrape.GetResults()); 
+                this.SizeToContent = SizeToContent.Height;
             }
             catch (Exception e)
             {

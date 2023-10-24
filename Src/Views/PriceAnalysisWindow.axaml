@@ -32,7 +32,7 @@
 
 	<Border Classes="menu" BorderThickness="3" CornerRadius="0,0,8,8" ClipToBounds="True">
 		<ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"> 
-			<Grid ColumnDefinitions="Auto,10,Auto,10,200" RowDefinitions="Auto,Auto,Auto,Auto,10,Auto" Margin="20,10,20,20" ShowGridLines="false" HorizontalAlignment="Center">
+			<Grid ColumnDefinitions="Auto,10,Auto,10,200" RowDefinitions="Auto,Auto,Auto,Auto,10,Auto" Margin="20,10,20,20" HorizontalAlignment="Center" ShowGridLines="false">
 				<StackPanel Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3">
 					<TextBlock Text="Enter Title" FontSize="20" FontWeight="Bold" Classes="menu" Margin="0,0,0,3" ToolTip.Tip="{CompiledBinding #TitleBox.Text}"/>
 					<TextBox Name="TitleBox"
@@ -40,7 +40,7 @@
 							Classes="menu"
 							Width="390"
 							FontSize="18"
-                            Height="37"
+                            Height="38"
 							FontWeight="Bold"
 							TextWrapping="NoWrap"
 							VerticalAlignment="Center"
@@ -163,7 +163,7 @@
 						  ItemsSource="{CompiledBinding AnalyzedList}"
 						  Classes="menu"
                           MaxWidth="635"
-						  MaxHeight="340"
+						  MaxHeight="345"
                           CornerRadius="0"
                           BorderThickness="2"
 						  ClipToBounds="False"

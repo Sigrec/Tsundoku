@@ -3,7 +3,6 @@ using System.Collections.Specialized;
 using Avalonia.Controls;
 using MangaLightNovelWebScrape;
 using ReactiveUI.Fody.Helpers;
-using static Src.Models.Constants;
 
 namespace Tsundoku.ViewModels
 {

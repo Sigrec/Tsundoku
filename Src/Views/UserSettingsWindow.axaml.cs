@@ -61,28 +61,32 @@ namespace Tsundoku.Views
 
         public void OpenAniListLink(object sender, RoutedEventArgs args)
         {
-            Task.Run(() =>{
+            Task.Run(() =>
+            {
                 ViewModelBase.OpenSiteLink(@"https://anilist.co/");
             });
         }
 
         public void OpenMangadexLink(object sender, RoutedEventArgs args)
         {
-            Task.Run(() =>{
+            Task.Run(() =>
+            {
                 ViewModelBase.OpenSiteLink(@"https://mangadex.org/");
             });
         }
         
         public void OpenApplicationFolder(object sender, RoutedEventArgs args)
         {
-            Task.Run(() =>{
+            Task.Run(() =>
+            {
                 Process.Start("explorer.exe", @$"{Path.GetDirectoryName(Path.GetFullPath(@"Covers"))}");
             });
         }
 
         public void OpenCoversFolder(object sender, RoutedEventArgs args)
         {
-            Task.Run(() =>{
+            Task.Run(() =>
+            {
                 if (!Directory.Exists(@"Covers"))
                 {
                     Directory.CreateDirectory(@"Covers");
