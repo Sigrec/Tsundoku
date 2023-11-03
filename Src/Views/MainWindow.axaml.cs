@@ -308,11 +308,11 @@ namespace Tsundoku.Views
                     {
                         MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UsersNumVolumesCollected = MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UsersNumVolumesCollected - curSeries.CurVolumeCount + curVolumeChange;
                         MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UsersNumVolumesToBeCollected = MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UsersNumVolumesToBeCollected - (uint)(curSeries.MaxVolumeCount - curSeries.CurVolumeCount) + (uint)(maxVolumeChange - curVolumeChange);
-                        LOGGER.Info($"Changed Series Values For \"{curSeries.Titles["Romaji"]}\" From {curSeries.CurVolumeCount}/{curSeries.MaxVolumeCount} -> {curVolumeChange}/{maxVolumeChange}");
+                        LOGGER.Info($"Changed Series Volume Values For \"{curSeries.Titles["Romaji"]}\" From {curSeries.CurVolumeCount}/{curSeries.MaxVolumeCount} -> {curVolumeChange}/{maxVolumeChange}");
                         curSeries.CurVolumeCount = curVolumeChange;
                         curSeries.MaxVolumeCount = maxVolumeChange;
 
-                        var parentControl = (sender as Button).FindLogicalAncestorOfType<DockPanel>(false).GetLogicalChildren().ElementAt(1).GetLogicalChildren().ElementAt(3);
+                        var parentControl = (sender as Button).FindLogicalAncestorOfType<Grid>(false).GetLogicalSiblings().ElementAt(3);
                         ((TextBlock)parentControl.FindLogicalDescendantOfType<StackPanel>(false).GetLogicalChildren().ElementAt(1)).Text = curSeries.CurVolumeCount + "/" + curSeries.MaxVolumeCount;
                         
                         ProgressBar seriesProgressBar = parentControl.FindLogicalDescendantOfType<ProgressBar>(false);

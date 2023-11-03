@@ -203,7 +203,7 @@
                     </WrapPanel>
                 </StackPanel>
                 <StackPanel Spacing="5">
-                    <TextBlock Text="© v2.2.3.0"
+                    <TextBlock Text="© v2.2.4.0"
                                Cursor="Hand"
                                PointerPressed="OpenReleasesPage"
                                TextDecorations="Underline"
