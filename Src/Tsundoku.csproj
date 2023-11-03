@@ -16,8 +16,8 @@
 		<Optimize>True</Optimize>
 		<SelfContained>True</SelfContained>
 		<IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
-		<Version>2.2.3</Version>
-		<FileVersion>2.2.3.0</FileVersion>
+		<Version>2.2.4</Version>
+		<FileVersion>2.2.4.0</FileVersion>
 		<!-- <PackageIcon>Assets\Icons\Tsundoku-Logo.png</PackageIcon> -->
 		<RepositoryUrl>https://github.com/Sigrec/Tsundoku</RepositoryUrl>
         <LangVersion>preview</LangVersion>
@@ -82,7 +82,7 @@
     <PackageReference Include="DiscordRichPresence" Version="1.2.1.24" />
     <PackageReference Include="GraphQL.Client" Version="6.0.1" />
 	<PackageReference Include="GraphQL.Client.Serializer.SystemTextJson" Version="6.0.1" />
-	<PackageReference Include="MangaAndLightNovelWebScrape" Version="1.0.1" />
+	<PackageReference Include="MangaAndLightNovelWebScrape" Version="1.1.3" />
     <PackageReference Include="NLog" Version="5.2.5" />
 	<PackageReference Include="FileWatcherEx" Version="2.5.0" />
     <PackageReference Include="Projektanker.Icons.Avalonia.FontAwesome" Version="8.3.0" />

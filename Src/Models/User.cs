@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using static MangaAndLightNovelWebScrape.Models.Constants;
 
 namespace Tsundoku.Models
 {
@@ -15,12 +16,13 @@ namespace Tsundoku.Models
         public decimal MeanRating { get; set; }
         public uint VolumesRead { get; set; }
         public string CollectionPrice { get; set; }
+        [JsonConverter(typeof(JsonStringEnumConverter))] public Region Region { get; set; }
         public Dictionary<string, bool> Memberships { get; set; }
         public byte[] UserIcon { get; set; }
         public ObservableCollection<TsundokuTheme> SavedThemes { get; set; }
         public List<Series> UserCollection { get; set; }
 
-        public User(string UserName, string CurLanguage, string MainTheme, string Display, double CurDataVersion, string Currency, string CollectionPrice,  Dictionary<string, bool> Memberships, ObservableCollection<TsundokuTheme> SavedThemes, List<Series> UserCollection)
+        public User(string UserName, string CurLanguage, string MainTheme, string Display, double CurDataVersion, string Currency, string CollectionPrice, Region Region, Dictionary<string, bool> Memberships, ObservableCollection<TsundokuTheme> SavedThemes, List<Series> UserCollection)
         {
             this.UserName = UserName;
             this.CurLanguage = CurLanguage;
@@ -29,6 +31,7 @@ namespace Tsundoku.Models
             this.Currency = Currency;
             this.MainTheme = MainTheme;
             this.CollectionPrice = CollectionPrice;
+            this.Region = Region;
             this.SavedThemes = SavedThemes;
             this.UserCollection = UserCollection;
             this.Memberships = Memberships;

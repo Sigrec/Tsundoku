@@ -3,9 +3,7 @@ using ReactiveUI;
 using System.Reactive.Linq;
 using Tsundoku.Models;
 using System.Windows.Input;
-using MangaLightNovelWebScrape.Websites.America;
-using MangaLightNovelWebScrape.Websites.Canada;
-
+using MangaAndLightNovelWebScrape.Websites;
 namespace Tsundoku.ViewModels
 {
     public class UserSettingsViewModel : ViewModelBase
@@ -37,16 +35,16 @@ namespace Tsundoku.ViewModels
         {
             await Task.Run(() =>
             {
-                string file = @"TsundokuCollection.csv";
+                string COLLECTION_FILE = @"TsundokuCollection.csv";
                 StringBuilder output = new();
                 string[] headers = ["Title", "Staff", "Format", "Status", "Cur Volumes", "Max Volumes", "Demographic", "Cost", "Rating", "Volumes Read", "Notes"];
                 output.AppendLine(string.Join(",", headers));
 
                 foreach (Series curSeries in MainWindowViewModel.UserCollection)
                 {
-                    output.AppendLine(string.Join(",", new string[] { 
-                        curSeries.Titles.ContainsKey(MainUser.CurLanguage) ? curSeries.Titles[MainUser.CurLanguage] : curSeries.Titles["Romaji"], 
-                        curSeries.Staff.ContainsKey(MainUser.CurLanguage) ? curSeries.Staff[MainUser.CurLanguage] : curSeries.Staff["Romaji"], 
+                    output.AppendLine(string.Join(",", [ 
+                        $"\"{(curSeries.Titles.ContainsKey(MainUser.CurLanguage) ? curSeries.Titles[MainUser.CurLanguage] : curSeries.Titles["Romaji"])}{(MainUser.CurLanguage == "Romaji" || !curSeries.Titles.ContainsKey(MainUser.CurLanguage) || (curSeries.Titles.ContainsKey(MainUser.CurLanguage) && curSeries.Titles["Romaji"].Equals(curSeries.Titles[MainUser.CurLanguage], StringComparison.OrdinalIgnoreCase)) ? string.Empty : $" ({curSeries.Titles["Romaji"]})")}\"",
+                        $"{(MainUser.CurLanguage == "Romaji" || !curSeries.Staff.ContainsKey(MainUser.CurLanguage) || (curSeries.Staff.ContainsKey(MainUser.CurLanguage) && curSeries.Staff["Romaji"].Equals(curSeries.Staff[MainUser.CurLanguage], StringComparison.OrdinalIgnoreCase)) ? curSeries.Staff["Romaji"] : $"\"{curSeries.Staff[MainUser.CurLanguage]} ({curSeries.Staff["Romaji"]}")})\"", 
                         curSeries.Format.ToString(), 
                         curSeries.Status.ToString(), 
                         curSeries.CurVolumeCount.ToString(), 
@@ -54,13 +52,13 @@ namespace Tsundoku.ViewModels
                         curSeries.Demographic.ToString(), 
                         $"{MainUser.Currency}{curSeries.Cost}", 
                         curSeries.Rating.ToString(), 
-                        $"{curSeries.VolumesRead}", 
-                        curSeries.SeriesNotes }));
+                        curSeries.VolumesRead.ToString(), 
+                        curSeries.SeriesNotes ]));
                 }
 
                 try
                 {
-                    System.IO.File.WriteAllTextAsync(file, output.ToString(), Encoding.UTF8);
+                    File.WriteAllTextAsync(COLLECTION_FILE, output.ToString(), Encoding.UTF8);
                     LOGGER.Info($"Exported {MainUser.UserName}'s Data To -> TsundokuCollection.csv");
                 }
                 catch (Exception ex)

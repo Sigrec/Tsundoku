@@ -13,17 +13,19 @@ using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using System.Linq.Dynamic.Core;
 using System.Windows.Input;
-using MangaLightNovelWebScrape.Websites.America;
+using MangaAndLightNovelWebScrape.Websites;
 using Avalonia.Collections;
-using MangaLightNovelWebScrape.Websites.Canada;
+using Microsoft.CodeAnalysis;
+using static MangaAndLightNovelWebScrape.Models.Constants;
 
 namespace Tsundoku.ViewModels
 {
     public partial class MainWindowViewModel : ViewModelBase
     {
         public const string USER_DATA_FILEPATH = @"UserData.json";
-        private const double SCHEMA_VERSION = 2.2;
+        private const double SCHEMA_VERSION = 2.4;
         private static bool CanFilter = true;
+        private static bool UpdatedCovers = false;
         public static AvaloniaList<Series> SearchedCollection { get; set; } = [];
         public static List<Series> UserCollection { get; set; } = [];
         private static IEnumerable<Series> FilteredCollection { get; set; } = [];
@@ -162,6 +164,7 @@ namespace Tsundoku.ViewModels
                 }
                 return Task.CompletedTask;
             });
+            priceAnalysisWindow.PriceAnalysisVM.CurRegion = MainUser.Region;
 
             collectionStatsWindow = new CollectionStatsWindow();
             OpenCollectionStatsWindow = ReactiveCommand.CreateFromTask(() =>
@@ -435,7 +438,8 @@ namespace Tsundoku.ViewModels
                             "Card", 
                             SCHEMA_VERSION, 
                             "$", 
-                            "$0.00", 
+                            "$0.00",
+                            Region.America,
                             new Dictionary<string, bool>
                             {
                                 { BarnesAndNoble.WEBSITE_TITLE , false },
@@ -488,7 +492,17 @@ namespace Tsundoku.ViewModels
                 // If the image does not exist in the covers folder then don't create a bitmap for it
                 if(File.Exists(x.Cover))
                 {
-                    x.CoverBitMap = new Bitmap(x.Cover);
+                    Bitmap loadedBitmap = new Bitmap(x.Cover);
+                    if (!UpdatedCovers && loadedBitmap.Size.Width != LEFT_SIDE_CARD_WIDTH && loadedBitmap.Size.Height != IMAGE_HEIGHT)
+                    {
+                        x.CoverBitMap = loadedBitmap.CreateScaledBitmap(new PixelSize(LEFT_SIDE_CARD_WIDTH, IMAGE_HEIGHT), BitmapInterpolationMode.HighQuality);
+                        x.CoverBitMap.Save(x.Cover, 100);
+                        LOGGER.Info($"Scaling {x.Titles["Romaji"]} Cover");
+                    }
+                    else
+                    {
+                        x.CoverBitMap = loadedBitmap;
+                    }
                 }
                 SearchedCollection.Add(x);
             }
@@ -620,6 +634,7 @@ namespace Tsundoku.ViewModels
                 }
                 userData["CurDataVersion"] = 1.9;
                 LOGGER.Info("Updated Users Data to v1.9");
+                UpdatedCovers = true;
                 updatedVersion = true;
             }
 
@@ -675,6 +690,14 @@ namespace Tsundoku.ViewModels
 
                 userData["CurDataVersion"] = 2.2;
                 LOGGER.Info("Updated Users Data to v2.2");
+                updatedVersion = true;
+            }
+
+            if (curVersion < 2.4) // Add Region property to User
+            {
+                userData.AsObject().Add(new KeyValuePair<string, JsonNode?>("Region", Region.America.ToString()));
+                userData["CurDataVersion"] = 2.4;
+                LOGGER.Info("Updated Users Data to v2.4");
                 updatedVersion = true;
             }
 

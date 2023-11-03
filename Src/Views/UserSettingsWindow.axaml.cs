@@ -3,10 +3,7 @@ using Avalonia.Interactivity;
 using Tsundoku.ViewModels;
 using Avalonia.Controls;
 using System.Diagnostics;
-using System;
-using System.Threading.Tasks;
 using ReactiveUI;
-using System.IO;
 
 namespace Tsundoku.Views
 {
@@ -57,6 +54,13 @@ namespace Tsundoku.Views
                 ViewModelBase.MainUser.Currency = newCurrency;
                 LOGGER.Info($"Currency Changed To {newCurrency}");
             }
+        }
+        private void OpenReleasesPage(object sender, PointerPressedEventArgs args)
+        {
+            Task.Run(() =>
+            {
+                ViewModelBase.OpenSiteLink(@"https://github.com/Sigrec/Tsundoku/releases");
+            });
         }
 
         public void OpenAniListLink(object sender, RoutedEventArgs args)

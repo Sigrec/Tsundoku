@@ -232,7 +232,7 @@
             </Border>
             <!-- TODO Issue w/ virtualization where refreshing covers causes height to bug -->
             <!-- Collection -->
-            <ScrollViewer Name="CollectionTheme" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" DockPanel.Dock="Bottom" Background="{CompiledBinding CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}"> 
+            <ScrollViewer Name="CollectionTheme" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" DockPanel.Dock="Bottom" Theme="{StaticResource CollectionScroll}"> 
                 <ItemsRepeater Name="CollectionItems" Margin="20,50,20,50" ItemsSource="{CompiledBinding SearchedCollection}" HorizontalAlignment="Center" VerticalAlignment="Center">
                     <ItemsRepeater.Layout>
                         <UniformGridLayout MinItemHeight="290" ItemsJustification="Center" ItemsStretch="None" Orientation="Horizontal"/>
@@ -649,6 +649,56 @@
                                                     Grid.RowDefinitions="Auto,Auto,*"
                                                     Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesCardBGColor, Converter={StaticResource ConvertColor}}"
                                                     ShowGridLines="false">
+                                                <Grid.Styles>
+                                                    <Style Selector="ScrollBar:vertical">
+                                                        <Style Selector="^ /template/ Rectangle#TrackRect">
+                                                            <Setter Property="Fill" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}" />
+                                                        </Style>
+                                                        <Style Selector="^ /template/ Thumb">
+                                                            <Setter Property="Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" />
+                                                            <Style Selector="^:pointerover /template/ Border">
+                                                                <Setter Property="Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" />
+                                                            </Style>
+                                                            <Style Selector="^:pressed /template/ Border">
+                                                                <Setter Property="Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" />
+                                                            </Style>
+                                                        </Style>
+
+                                                        <Style Selector="^[IsExpanded=true]">
+                                                            <Style Selector="^ /template/ Thumb">
+                                                                <Setter Property="Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" />
+                                                            </Style>
+
+                                                            <Style Selector="^ /template/ PathIcon">
+                                                                <Setter Property="Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" />
+                                                            </Style>
+                                                        </Style>
+
+                                                        <Style Selector="^ /template/ RepeatButton#PART_LineUpButton, ^ /template/ RepeatButton#PART_LineDownButton">
+                                                            <Setter Property="TextElement.Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}"/>
+                                                            <Style Selector="^:pointerover">
+                                                                <Setter Property="TextElement.Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
+
+                                                                <Style Selector="^ /template/ ContentPresenter" >
+                                                                    <Setter Property="Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}"/>
+                                                                </Style>
+                                                                <Style Selector="^ PathIcon">
+                                                                    <Setter Property="Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}" />
+                                                                </Style>
+                                                            </Style>
+
+                                                            <Style Selector="^:pressed">
+                                                                <Setter Property="TextElement.Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}"/>
+                                                                <Style Selector="^ /template/ ContentPresenter" >
+                                                                    <Setter Property="Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" />
+                                                                </Style>
+                                                                <Style Selector="^ PathIcon">
+                                                                    <Setter Property="Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}" />
+                                                                </Style>
+                                                            </Style>
+                                                        </Style>
+                                                    </Style>
+                                                </Grid.Styles>
                                                 <!-- <Border Grid.Row="0" BorderBrush="Red" BorderThickness="1"> -->
                                                 <TextBlock Grid.Row="0"
                                                         TextWrapping="Wrap"
@@ -689,7 +739,7 @@
                                                                 Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesCardDescColor, Converter={StaticResource ConvertColor}}"
                                                                 Opacity="0.9"
                                                                 Text="{CompiledBinding Description}"
-                                                                Padding="10,-2,15,10"/>
+                                                                Padding="10,-2,20,10"/>
                                                 </ScrollViewer>
                                             </Grid>
 

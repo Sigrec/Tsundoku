@@ -1,25 +1,32 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Reactive.Linq;
+using Avalonia.Collections;
 using Avalonia.Controls;
-using MangaLightNovelWebScrape;
+using MangaAndLightNovelWebScrape;
+using MangaAndLightNovelWebScrape.Websites;
+using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+using static MangaAndLightNovelWebScrape.Models.Constants;
 
 namespace Tsundoku.ViewModels
 {
     public class PriceAnalysisViewModel : ViewModelBase
     {
-        public ObservableCollection<EntryModel> AnalyzedList { get; set; } = new ObservableCollection<EntryModel>();
+        public AvaloniaList<EntryModel> AnalyzedList { get; set; } = new AvaloniaList<EntryModel>();
         [Reactive] public int BrowserIndex { get; set; }
         [Reactive] public bool IsAnalyzeButtonEnabled { get; set; } = false;
         [Reactive] public bool WebsitesSelected { get; set; }
         [Reactive] public string WebsitesToolTipText { get; set; }
-        public ObservableCollection<ListBoxItem> SelectedWebsites { get; } = [];
+        [Reactive] public int CurRegionIndex { get; set; }
+        public AvaloniaList<ListBoxItem> SelectedWebsites { get; } = [];
         private static readonly StringBuilder CurWebsites = new StringBuilder();
-
+        private static readonly Region[] RegionList = [ Region.America, Region.Canada ];
         public PriceAnalysisViewModel()
         {
             this.CurrentTheme = MainUser.SavedThemes.First(theme => theme.ThemeName.Equals(MainUser.MainTheme));
             SelectedWebsites.CollectionChanged += WebsiteCollectionChanged;
+            this.WhenAnyValue(x => x.CurRegion).Subscribe(x => CurRegionIndex = Array.IndexOf(RegionList, x));
         }
 
         private void WebsiteCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)

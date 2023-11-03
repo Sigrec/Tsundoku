@@ -2,10 +2,9 @@ using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 using Tsundoku.Helpers;
 using Avalonia.Media.Imaging;
-using MangaLightNovelWebScrape;
+using MangaAndLightNovelWebScrape;
 using System.Runtime.InteropServices;
 using System.Globalization;
-using System.Diagnostics;
 
 namespace Tsundoku.Models
 {

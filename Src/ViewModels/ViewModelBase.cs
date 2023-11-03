@@ -2,6 +2,7 @@ using System.Diagnostics;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Tsundoku.Models;
+using static MangaAndLightNovelWebScrape.Models.Constants;
 
 namespace Tsundoku.ViewModels
 {
@@ -12,6 +13,7 @@ namespace Tsundoku.ViewModels
         [Reactive] public string UserName { get; set; }
         [Reactive] public string CurDisplay { get; set; }
         [Reactive] public string CurFilter { get; set; }
+        [Reactive] public Region CurRegion { get; set; }
         public static string Filter { get; set; }
         public static User? MainUser { get; set; }
         public static bool updatedVersion = false;

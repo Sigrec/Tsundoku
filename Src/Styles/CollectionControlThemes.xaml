@@ -82,31 +82,6 @@
         </Style> -->
     </ControlTheme>
 
-    <ControlTheme x:Key="FluentScrollBarThumb" TargetType="Thumb">
-		<Setter Property="Background" Value="{CompiledBinding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}"/>
-		<Setter Property="Template">
-			<Setter.Value>
-			<ControlTemplate>
-				<Border Background="{TemplateBinding Background}"
-						CornerRadius="{TemplateBinding CornerRadius}"/>
-			</ControlTemplate>
-			</Setter.Value>
-		</Setter>
-		<Setter Property="Transitions">
-			<Transitions>
-			<CornerRadiusTransition Property="CornerRadius" Duration="0:0:0.1" />
-			<TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.1" />
-			</Transitions>
-		</Setter>
-
-		<Style Selector="^:pointerover /template/ Border">
-			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" />
-		</Style>
-		<Style Selector="^:pressed  /template/ Border">
-			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" />
-		</Style>
-	</ControlTheme>
-
 	<ControlTheme x:Key="FluentScrollBarLineButton" TargetType="RepeatButton">
 		<Setter Property="Opacity" Value="0" />
 		<Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}"/>
@@ -141,7 +116,7 @@
 		</Style>
 	</ControlTheme>
 
-	<ControlTheme x:Key="{x:Type ScrollBar}" TargetType="ScrollBar">
+	<ControlTheme x:Key="CollectionScrollBar" TargetType="ScrollBar">
 		<Setter Property="MinWidth" Value="{DynamicResource ScrollBarSize}" />
 		<Setter Property="MinHeight" Value="{DynamicResource ScrollBarSize}" />
 		<Setter Property="Background" Value="{DynamicResource ScrollBarBackground}" />
@@ -243,4 +218,54 @@
 			</Style>
 		</Style>
 	</ControlTheme>
+
+    <ControlTheme x:Key="CollectionScroll" TargetType="ScrollViewer">
+        <Setter Property="Background" Value="{CompiledBinding CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="*,Auto">
+                        <ScrollContentPresenter Name="PART_ContentPresenter"
+                                                Grid.Row="0"
+                                                Grid.Column="0"
+                                                Grid.RowSpan="2"
+                                                Grid.ColumnSpan="2"
+                                                Background="{TemplateBinding Background}"
+                                                HorizontalSnapPointsType="{TemplateBinding HorizontalSnapPointsType}"
+                                                VerticalSnapPointsType="{TemplateBinding VerticalSnapPointsType}"
+                                                HorizontalSnapPointsAlignment="{TemplateBinding HorizontalSnapPointsAlignment}"
+                                                VerticalSnapPointsAlignment="{TemplateBinding VerticalSnapPointsAlignment}"
+                                                Padding="{TemplateBinding Padding}"
+                                                ScrollViewer.IsScrollInertiaEnabled="{TemplateBinding IsScrollInertiaEnabled}">
+                            <ScrollContentPresenter.GestureRecognizers>
+                            <ScrollGestureRecognizer CanHorizontallyScroll="{Binding CanHorizontallyScroll, ElementName=PART_ContentPresenter}"
+                                                    CanVerticallyScroll="{Binding CanVerticallyScroll, ElementName=PART_ContentPresenter}"
+                                                    IsScrollInertiaEnabled="{Binding (ScrollViewer.IsScrollInertiaEnabled), ElementName=PART_ContentPresenter}"/>
+                            </ScrollContentPresenter.GestureRecognizers>
+                        </ScrollContentPresenter>
+                        <ScrollBar Name="PART_HorizontalScrollBar"
+                                    Orientation="Horizontal"
+                                    Grid.Row="1" />
+                        <ScrollBar Name="PART_VerticalScrollBar"
+                                    Orientation="Vertical"
+                                    Theme="{StaticResource CollectionScrollBar}"
+                                    Grid.Column="1" />
+                        <Panel x:Name="PART_ScrollBarsSeparator"
+                                Grid.Row="1"
+                                Grid.Column="1"
+                                Background="{DynamicResource ScrollViewerScrollBarsSeparatorBackground}"
+                                Opacity="0">
+                            <Panel.Transitions>
+                                <Transitions>
+                                    <DoubleTransition Property="Opacity" Duration="0:0:0.1" />
+                                </Transitions>
+                            </Panel.Transitions>
+                        </Panel>
+                    </Grid>
+                </ControlTemplate>
+            </Setter>
+
+            <Style Selector="^[IsExpanded=true] /template/ Panel#PART_ScrollBarsSeparator">
+                <Setter Property="Opacity" Value="1" />
+            </Style>
+    </ControlTheme>
 </ResourceDictionary>

@@ -1,14 +1,12 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Tsundoku.ViewModels;
-using MangaLightNovelWebScrape;
+using MangaAndLightNovelWebScrape;
 using DynamicData;
 using ReactiveUI;
 using System.Reactive.Linq;
-using Avalonia.Input;
-using MangaLightNovelWebScrape.Websites.America;
-using static Src.Models.Constants;
-using MangaLightNovelWebScrape.Websites.Canada;
+using MangaAndLightNovelWebScrape.Websites;
+using static MangaAndLightNovelWebScrape.Models.Constants;
 
 namespace Tsundoku.Views
 {
@@ -54,9 +52,9 @@ namespace Tsundoku.Views
             try
             {
                 StartScrapeButton.IsEnabled = false;
-                Scrape.Browser = MasterScrape.GetBrowserFromString((BrowserSelector.SelectedItem as ComboBoxItem).Content.ToString());
-                Scrape.Region = MasterScrape.GetRegionFromString((RegionSelector.SelectedItem as ComboBoxItem).Content.ToString());
-                LOGGER.Info($"Started Scrape For {TitleBox.Text} on {Scrape.Browser} Browser w/ Region = {Scrape.Region} {(StockFilterSelector.SelectedItem as ComboBoxItem).Content} Filter & Websites = [{string.Join(", ", PriceAnalysisVM.SelectedWebsites.Select(site => site.Content.ToString()))}] & Memberships = {string.Join(" | ", ViewModelBase.MainUser.Memberships)}");
+                Scrape.Browser = MangaAndLightNovelWebScrape.Helpers.GetBrowserFromString((BrowserSelector.SelectedItem as ComboBoxItem).Content.ToString());
+                Scrape.Region = MangaAndLightNovelWebScrape.Helpers.GetRegionFromString((RegionSelector.SelectedItem as ComboBoxItem).Content.ToString());
+                LOGGER.Info($"Started Scrape For \"{TitleBox.Text}\" on {Scrape.Browser} Browser w/ Region = \"{Scrape.Region}\" & \"{(StockFilterSelector.SelectedItem as ComboBoxItem).Content} Filter\" & Websites = [{string.Join(", ", PriceAnalysisVM.SelectedWebsites.Select(site => site.Content.ToString()))}] & Memberships = ({string.Join(" & ", ViewModelBase.MainUser.Memberships)})");
                 await Scrape.InitializeScrapeAsync(
                         TitleBox.Text, 
                         MangaButton.IsChecked != null && MangaButton.IsChecked.Value ? BookType.Manga : BookType.LightNovel, 
@@ -86,13 +84,16 @@ namespace Tsundoku.Views
             }
         }
 
-        // private void BrowserChanged(object sender, SelectionChangedEventArgs e)
-        // {
-        //     if ((sender as ComboBox).IsDropDownOpen)
-        //     {
-        //         PriceAnalysisVM.CurBrowser = (BrowserSelector.SelectedItem as ComboBoxItem).Content.ToString();
-        //     }
-        // }
+        private void RegionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (RegionSelector.IsDropDownOpen)
+            {
+                Region newRegion = MangaAndLightNovelWebScrape.Helpers.GetRegionFromString((RegionSelector.SelectedItem as ComboBoxItem).Content.ToString());
+                LOGGER.Info("Region Changed to {}", newRegion.ToString());
+                ViewModelBase.MainUser.Region = newRegion;
+                PriceAnalysisVM.CurRegion = newRegion;
+            }
+        }
 
         private void WebsiteSelectionChanged(object sender, SelectionChangedEventArgs e)
         {

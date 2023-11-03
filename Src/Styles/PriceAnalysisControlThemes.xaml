@@ -363,6 +363,7 @@
 							Orientation="Vertical"
 							Grid.Column="2"
 							Grid.Row="1"
+                            Theme="{StaticResource ReverseCollectionScrollBar}"
 							Width="{DynamicResource ScrollBarSize}" />
 
 				<Grid Grid.Column="1"

@@ -25,13 +25,12 @@
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
                 <ResourceInclude Source="/Styles/PriceAnalysisControlThemes.xaml"/>
-                <ResourceInclude Source="/Styles/SubWindowControlThemes.xaml"/>
 			</ResourceDictionary.MergedDictionaries>
 		</ResourceDictionary>
 	</Window.Resources>
 
 	<Border Classes="menu" BorderThickness="3" CornerRadius="0,0,8,8" ClipToBounds="True">
-		<ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"> 
+		<ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Theme="{StaticResource ReverseCollectionScroll}"> 
 			<Grid ColumnDefinitions="Auto,10,Auto,10,200" RowDefinitions="Auto,Auto,Auto,Auto,10,Auto" Margin="20,10,20,20" HorizontalAlignment="Center" ShowGridLines="false">
 				<StackPanel Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3">
 					<TextBlock Text="Enter Title" FontSize="20" FontWeight="Bold" Classes="menu" Margin="0,0,0,3" ToolTip.Tip="{CompiledBinding #TitleBox.Text}"/>
@@ -90,35 +89,102 @@
                                ToolTip.IsEnabled="{CompiledBinding WebsitesToolTipText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
 					<ListBox Name="WebsiteSelector"
                              Height="262"
-							  Theme="{StaticResource QueryListBox}"
-							  SelectionMode="Multiple,Toggle"
-							  SelectionChanged="WebsiteSelectionChanged"
-							  SelectedItems="{CompiledBinding SelectedWebsites}">
-						<!-- <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Amazon USA"/> -->
-						<!-- <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Indigo"/> -->
-						<ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Barnes &#x26; Noble"/>
-						<ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Books-A-Million"/>
-                        <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Crunchyroll"/>
-						<ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="InStockTrades"/>
-						<ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Kinokuniya USA"/>
-						<ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="RobertsAnimeCornerStore"/>
-						<!-- <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Amazon Japan"/> -->
-						<!-- <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="CDJapan"/> -->
-						<!-- <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Indigo"/> -->
-					</ListBox>
+							 Theme="{StaticResource QueryListBox}"
+							 SelectionMode="Multiple,Toggle"
+							 SelectionChanged="WebsiteSelectionChanged"
+							 SelectedItems="{CompiledBinding SelectedWebsites}">
+                        <!-- <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Amazon USA">
+                            <ToolTip.Tip>
+                                <StackPanel>
+                                    <TextBlock Text="America"/>
+                                </StackPanel>
+                            </ToolTip.Tip>
+                        </ListBoxItem> -->
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Barnes &#x26; Noble">
+                            <ToolTip.Tip>
+                                <StackPanel>
+                                    <TextBlock Text="America"/>
+                                </StackPanel>
+                            </ToolTip.Tip>
+                        </ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Books-A-Million">
+                            <ToolTip.Tip>
+                                <StackPanel>
+                                    <TextBlock Text="America"/>
+                                </StackPanel>
+                            </ToolTip.Tip>
+                        </ListBoxItem>
+                        <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Crunchyroll">
+                            <ToolTip.Tip>
+                                <StackPanel>
+                                    <TextBlock Text="America"/>
+                                </StackPanel>
+                            </ToolTip.Tip>
+                        </ListBoxItem>
+                        <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Indigo">
+                            <ToolTip.Tip>
+                                <StackPanel>
+                                    <TextBlock Text="Canada"/>
+                                </StackPanel>
+                            </ToolTip.Tip>
+                        </ListBoxItem> 
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="InStockTrades">
+                            <ToolTip.Tip>
+                                <StackPanel>
+                                    <TextBlock Text="America"/>
+                                </StackPanel>
+                            </ToolTip.Tip>
+                        </ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Kinokuniya USA">
+                            <ToolTip.Tip>
+                                <StackPanel>
+                                    <TextBlock Text="America"/>
+                                </StackPanel>
+                            </ToolTip.Tip>
+                        </ListBoxItem>
+						<ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="RobertsAnimeCornerStore">
+                            <ToolTip.Tip>
+                                <StackPanel>
+                                    <TextBlock Text="America"/>
+                                </StackPanel>
+                            </ToolTip.Tip>
+                        </ListBoxItem>
+                        <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="SciFier">
+                            <ToolTip.Tip>
+                                <StackPanel>
+                                    <TextBlock Text="America | Canada"/>
+                                </StackPanel>
+                            </ToolTip.Tip>
+                        </ListBoxItem> 
+						<!-- <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Amazon Japan">
+                            <ToolTip.Tip>
+                                <StackPanel>
+                                    <TextBlock Text="Japan"/>
+                                </StackPanel>
+                            </ToolTip.Tip>
+                        </ListBoxItem> -->
+						<!-- <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="CDJapan">
+                            <ToolTip.Tip>
+                                <StackPanel>
+                                    <TextBlock Text="Japan"/>
+                                </StackPanel>
+                            </ToolTip.Tip>
+                        </ListBoxItem> -->
+                    </ListBox>
 				</StackPanel>
                 <StackPanel Grid.Column="0" Grid.Row="2">
 					<TextBlock Text="Select Region" FontSize="20" FontWeight="Bold" Classes="menu" Margin="0,0,0,3"/>
 					<ComboBox Name="RegionSelector"
 							  Height="37"
 							  Width="182"
-							  SelectedIndex="0"
+							  SelectedIndex="{CompiledBinding CurRegionIndex}"
 							  AutoScrollToSelectedItem="True"
 							  HorizontalAlignment="Left"
+                              SelectionChanged="RegionChanged"
 							  Theme="{StaticResource MenuComboBox}">
 						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="America"/>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Canada"/>
                         <!-- <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Britain"/>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Canada"/>
 						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Japan"/>
                         <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Europe"/> -->
 					</ComboBox>
