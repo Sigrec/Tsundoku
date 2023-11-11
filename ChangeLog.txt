@@ -8,8 +8,25 @@ Legend
 
 TODO:
 ❌ ComboboxItem Styles not applying properly in Theme & AdvancedQuery
-❌ Fix style of scrollbar in Description & enabled it
 ❌ Fix virtualization issue where adding a series sometimes causes the control height to bug
+
+V2.2.5.0 - November 
+🔥 Fixed issue where cover would not reload if you changed a cover of a series that is not currently in the search
+🔥 Fixed issue where changing "Collection BG" color wouldn't apply to the color in the window
+🔥 Fixed issue where upon first opening theme settings window the colors are not set
+✅ Replacing covers no longer checks for specific file extension so it can be either jpg or png when changing
+
+V2.2.4.0 - November 3rd
+🔥 Fixed Exporting to Spreadsheet so data is formatted correctly and includes Romaji if it's not currently romaji
+✅ Version Credits in User Settings window now opens the link to the releases
+✅ Now checks every time the app is opened whether images have been scaled and saved to fit the format
+✅ Fixed style of scrollbar in Description & enabled it
+📜 Price Analysis Window
+    - ✅ Added "Canada" to regions
+    - ✅ Added SciFier & Indigo Websites
+    - ✅ Added "Region" to user data
+    - ✅ Added tooltip of each websites Region in which the sites work on
+    - 🔥 Updated Scrape package to v1.1.3 (https://github.com/Sigrec/MangaAndLightNovelWebScrape/releases/tag/v1.1.3)
 
 V2.2.3.0 - October 22nd
 ✅ Can now click outside of the Advanced Search control to close it
