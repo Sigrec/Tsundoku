@@ -2,13 +2,14 @@ using System.Collections.ObjectModel;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Interactivity;
+using Avalonia.LogicalTree;
 using Avalonia.Media;
 using Avalonia.ReactiveUI;
+using Avalonia.VisualTree;
 using DynamicData;
 using ReactiveUI;
 using Tsundoku.Models;
 using Tsundoku.ViewModels;
-using Avalonia.LogicalTree;
 
 namespace Tsundoku.Views
 {
@@ -17,20 +18,23 @@ namespace Tsundoku.Views
         public ThemeSettingsViewModel? ThemeSettingsVM => DataContext as ThemeSettingsViewModel;
         private TsundokuTheme NewTheme;
         public bool IsOpen, ThemeChanged = false;
+       MainWindow CollectionWindow;
 
         public CollectionThemeWindow () 
         {
             InitializeComponent();
             DataContext = new ThemeSettingsViewModel();
+
             Opened += (s, e) =>
             {
+                CollectionWindow = (MainWindow)((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).MainWindow;
                 NewTheme = ThemeSettingsVM.CurrentTheme.Cloning();
-                ThemeSettingsVM.CurrentTheme = NewTheme;
+                // ThemeSettingsVM.CurrentTheme = NewTheme;
                 IsOpen ^= true;
                 ThemeChanged = false;
                 int index = ThemeSettingsViewModel.UserThemesDisplay.IndexOf(ThemeSettingsVM.CurrentTheme.ThemeName);
                 ThemeSettingsVM.CurThemeIndex = index != -1 ? index : ThemeSettingsViewModel.UserThemesDisplay.IndexOf("Default");
-                // ApplyColors();
+                ApplyColors();
                 MenuColorChanges();
                 CollectionColorChanges();
             };
@@ -42,6 +46,7 @@ namespace Tsundoku.Views
                 Topmost = false;
                 IsOpen ^= true;
                 e.Cancel = true;
+                CollectionWindow.CollectionViewModel.CurrentTheme = ThemeSettingsVM.CurrentTheme;
             };
 
             this.WhenAnyValue(x => x.NewThemeName.Text, x => x.MainColor1.Mask.Length, x => x.MainColor2.Mask.Length, x => x.TextColor1.Mask.Length, x => x.TextColor2.Mask.Length, x => x.AccentColor1.Mask.Length, x => x.AccentColor2.Mask.Length, (name, mc1 ,mc2, tc1, tc2, ac1, ac2) => !string.IsNullOrWhiteSpace(name) && !name.Equals("Default", StringComparison.OrdinalIgnoreCase) && mc1 != 7 && mc2 != 7 && tc1 != 7 && tc2 != 7 && ac1 != 7 && ac2 != 7).Subscribe(x => ThemeSettingsVM.IsGenerateThemeButtonEnabled = x);
@@ -286,7 +291,7 @@ namespace Tsundoku.Views
         }
 
         /// <summary>
-        /// Applies the theme colors of the theme to the corresponding variable
+        /// Updates the color of the buttons
         /// </summary>
         private void ApplyColors()
         {
@@ -455,14 +460,13 @@ namespace Tsundoku.Views
         {
             Collection_BG.ColorChanged += (sender, e) =>
             {
-                // CollectionWindow.CollectionTheme.Background = new SolidColorBrush(Collection_BG.Color);
                 // (App.DESKTOP.MainWindow.DataContext as MainWindowViewModel).CurrentTheme.CollectionBGColor = Collection_BG.Color.ToUInt32();
+                Collection_BG_Button.Background = new SolidColorBrush(Collection_BG.Color);
                 NewTheme.CollectionBGColor = Collection_BG.Color.ToUInt32();
             };
 
             Status_And_BookType_BG.ColorChanged += (sender, e) =>
             {
-                // CollectionWindow.CollectionTheme.FindLogicalDescendantOfType<TextBlock>(false).Background = new SolidColorBrush(Status_And_BookType_BG.Color);
                 // ((MainWindowViewModel)CollectionWindow.CollectionTheme.DataContext).CurrentTheme.StatusAndBookTypeBGColor = Status_And_BookType_BG.Color.ToUInt32();
                 // var dt = CollectionWindow.CollectionItems.ItemTemplate;
                 // LOGGER.Debug(dt.Build(Avalonia.Controls.Control).Background);
@@ -495,10 +499,14 @@ namespace Tsundoku.Views
 
             SeriesCard_BG.ColorChanged += (sender, e) =>
             {
-                // var control = CollectionWindow.CollectionItems.GetLogicalChildren().ElementAt(0);
-                // control.FindLogicalDescendantOfType<DockPanel>(true).FindLogicalDescendantOfType<DockPanel>(false).Background = new SolidColorBrush(SeriesCard_BG.Color);
+                // foreach (var x in CollectionWindow.CollectionItems.GetLogicalChildren())
+                // {
+                //     (x.FindLogicalDescendantOfType<Grid>(false).FindLogicalDescendantOfType<Grid>(false).GetLogicalChildren().ElementAt(2) as Grid).Background = new SolidColorBrush(SeriesCard_BG.Color);
+                // }
                 SeriesCard_BG_Button.Background = new SolidColorBrush(SeriesCard_BG.Color);
                 NewTheme.SeriesCardBGColor = SeriesCard_BG.Color.ToUInt32();
+                LOGGER.Info(NewTheme.SeriesCardBGColor);
+                // CollectionWindow.CollectionViewModel.CurrentTheme = NewTheme;
             };
 
             SeriesCard_Title.ColorChanged += (sender, e) =>

@@ -36,7 +36,7 @@ namespace Tsundoku.Models
 		/// <summary>
 		/// Path to the cover for a series
 		/// </summary>
-		public string Cover { get; }
+		public string Cover { get; set; }
 
         /// <summary>
         /// Link to the AniList or MangaDex page for this series

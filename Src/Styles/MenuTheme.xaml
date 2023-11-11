@@ -66,24 +66,23 @@
 	</Style>
     
     <Style Selector="ComboBox.Theme > ComboBoxItem">
-        <Style Selector="^">
-            <Setter Property="TextBlock.Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"/>
-		</Style>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor, Converter={StaticResource ConvertColor}}"/>
         
         <Style Selector="^:pressed /template/ ContentPresenter">
 			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
-			<Setter Property="TextBlock.Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
+			<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
 		</Style>
 
 		<Style Selector="^:pointerover /template/ ContentPresenter">
 			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
-			<Setter Property="TextBlock.Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
+			<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
 		</Style>
 
 		<Style Selector="^:selected">
 			<Style Selector="^ /template/ ContentPresenter">
 				<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
-				<Setter Property="TextBlock.Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
+				<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
 			</Style>
 
             <!-- <Style Selector="^:disabled /template/ ContentPresenter">

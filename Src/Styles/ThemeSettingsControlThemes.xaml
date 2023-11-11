@@ -3,4 +3,5 @@
 					xmlns:vm="clr-namespace:Tsundoku.ViewModels"
                     xmlns:model="clr-namespace:Tsundoku.Models"
 					x:DataType="vm:ThemeSettingsViewModel">
+
 </ResourceDictionary>

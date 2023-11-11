@@ -490,19 +490,32 @@ namespace Tsundoku.ViewModels
             foreach (Series x in UserCollection)
             {
                 // If the image does not exist in the covers folder then don't create a bitmap for it
-                if(File.Exists(x.Cover))
+                string newCoverPath = x.Cover[..^3] + (x.Cover[^3..].Equals("jpg") ? "png" : "jpg");
+                bool coverCheck = File.Exists(x.Cover);
+                bool secondCoverCheck = File.Exists(newCoverPath);
+                if (secondCoverCheck && coverCheck)
                 {
-                    Bitmap loadedBitmap = new Bitmap(x.Cover);
+                    newCoverCheck = true;
+                    File.Delete(newCoverPath);
+                    newCoverCheck = false;
+                    LOGGER.Info("Removed {} File", newCoverPath);
+                }
+
+                if(coverCheck || secondCoverCheck)
+                {
+                    coverCheck = File.Exists(x.Cover);
+                    Bitmap loadedBitmap = new Bitmap(coverCheck ? x.Cover : newCoverPath);
                     if (!UpdatedCovers && loadedBitmap.Size.Width != LEFT_SIDE_CARD_WIDTH && loadedBitmap.Size.Height != IMAGE_HEIGHT)
                     {
                         x.CoverBitMap = loadedBitmap.CreateScaledBitmap(new PixelSize(LEFT_SIDE_CARD_WIDTH, IMAGE_HEIGHT), BitmapInterpolationMode.HighQuality);
-                        x.CoverBitMap.Save(x.Cover, 100);
-                        LOGGER.Info($"Scaling {x.Titles["Romaji"]} Cover");
+                        x.CoverBitMap.Save(coverCheck ? x.Cover : newCoverPath, 100);
+                        LOGGER.Info("Scaling {} Cover Image", x.Titles["Romaji"]);
                     }
                     else
                     {
                         x.CoverBitMap = loadedBitmap;
                     }
+                    x.Cover = coverCheck ? x.Cover : newCoverPath;
                 }
                 SearchedCollection.Add(x);
             }

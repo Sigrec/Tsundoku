@@ -1,5 +1,4 @@
 using Avalonia.Controls;
-using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
 using System.ComponentModel;
@@ -13,6 +12,7 @@ using System.Runtime.InteropServices;
 using Avalonia.Platform.Storage;
 using Avalonia.Media.Imaging;
 using FileWatcherEx;
+using Avalonia.Logging;
 
 namespace Tsundoku.Views
 {
@@ -41,9 +41,25 @@ namespace Tsundoku.Views
             CoverFolderWatcher.OnCreated += static (s, e) =>
             {
                 string path = e.FullPath.Replace(".crdownload", "");
-                if (!ViewModelBase.newCoverCheck && (!path.EndsWith(".jpg") || !path.EndsWith(".png")))
+                LOGGER.Debug("{} | {} | {} | {}", path, !ViewModelBase.newCoverCheck, path.EndsWith("jpg", StringComparison.OrdinalIgnoreCase), path.EndsWith("png", StringComparison.OrdinalIgnoreCase));
+                if (!ViewModelBase.newCoverCheck && (path.EndsWith("jpg", StringComparison.OrdinalIgnoreCase) || path.EndsWith("png", StringComparison.OrdinalIgnoreCase)))
                 {
-                    Series series = MainWindowViewModel.SearchedCollection.AsParallel().Single(series => series.Cover.Equals(path));
+                    string pathFileExtension = path[^3..];
+                    Series series = MainWindowViewModel.SearchedCollection.AsParallel().SingleOrDefault(series => series.Cover.Equals(path)) ?? MainWindowViewModel.UserCollection.AsParallel().SingleOrDefault(series => series.Cover.Equals(path));
+                    
+                    if (series == null)
+                    { 
+                        string newPath = path[..^3] + (pathFileExtension.Equals("jpg") ? "png" : "jpg");
+                        series = MainWindowViewModel.SearchedCollection.AsParallel().SingleOrDefault(series => series.Cover.Equals(newPath)) ?? MainWindowViewModel.UserCollection.AsParallel().SingleOrDefault(series => series.Cover.Equals(newPath));
+                    }
+
+                    if (!series.Cover[^3..].Equals(pathFileExtension))
+                    {
+                        series.Cover = series.Cover[..^3] + pathFileExtension;
+                        File.Delete(series.Cover[..^3] + (pathFileExtension.Equals("jpg") ? "png" : "jpg"));
+                        LOGGER.Info("Changed File Extention for {} to {}", series.Titles["Romaji"], pathFileExtension);
+                    }
+
                     if (series != null && !CoverChangedSeriesList.Contains(series))
                     {
                         CoverChangedSeriesList.Add(series);

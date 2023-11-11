@@ -9,6 +9,7 @@
 	<Application.Resources>
 		<ResourceDictionary>
 			<cv:ColorConverter x:Key="ConvertColor"/>
+            <cv:HsvColorConverter x:Key="ConvertHsvColor"/>
 			<ResourceDictionary.MergedDictionaries>
 				<ResourceInclude Source="/Styles/UniversalNavControlThemes.xaml"/>
 			</ResourceDictionary.MergedDictionaries>
