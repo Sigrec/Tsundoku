@@ -10,7 +10,7 @@ TODO:
 ❌ ComboboxItem Styles not applying properly in Theme & AdvancedQuery
 ❌ Fix virtualization issue where adding a series sometimes causes the control height to bug
 
-V2.2.5.0 - November 
+V2.2.5.0 - November 14th
 🔥 Fixed issue where cover would not reload if you changed a cover of a series that is not currently in the search
 🔥 Fixed issue where changing "Collection BG" color wouldn't apply to the color in the window
 🔥 Fixed issue where upon first opening theme settings window the colors are not set
