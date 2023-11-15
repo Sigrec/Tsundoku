@@ -505,7 +505,7 @@ namespace Tsundoku.Views
                 // }
                 SeriesCard_BG_Button.Background = new SolidColorBrush(SeriesCard_BG.Color);
                 NewTheme.SeriesCardBGColor = SeriesCard_BG.Color.ToUInt32();
-                LOGGER.Info(NewTheme.SeriesCardBGColor);
+                // LOGGER.Info(NewTheme.SeriesCardBGColor);
                 // CollectionWindow.CollectionViewModel.CurrentTheme = NewTheme;
             };
 
