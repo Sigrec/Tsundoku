@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using System.Text.Json.Serialization.Metadata;
+using System.Text.Unicode;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Tsundoku.Models;
@@ -18,13 +20,6 @@ namespace Tsundoku.ViewModels
         public static User? MainUser { get; set; }
         public static bool updatedVersion = false;
         public static bool newCoverCheck = false;
-
-        public static readonly JsonSerializerOptions options = new()
-        { 
-            WriteIndented = true,
-            ReadCommentHandling = JsonCommentHandling.Disallow,
-            AllowTrailingCommas = true,
-        };
 
         public ViewModelBase()
         {

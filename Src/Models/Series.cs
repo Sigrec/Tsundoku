@@ -16,6 +16,14 @@ namespace Tsundoku.Models
         [GeneratedRegex("^.*(?= \\(.*\\))")] private static partial Regex FullStaffRegex();
 		[GeneratedRegex("[a-z\\d]{8}-[a-z\\d]{4}-[a-z\\d]{4}-[a-z\\d]{4}-[a-z\\d]{11,}")] private static partial Regex MangaDexIDRegex();
 
+        private static SeriesModelContext SeriesJsonModel = new SeriesModelContext(new JsonSerializerOptions()
+        { 
+            WriteIndented = true,
+            ReadCommentHandling = JsonCommentHandling.Disallow,
+            AllowTrailingCommas = true,
+            Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        });
+
 		[JsonIgnore] private bool disposedValue;
 		[JsonIgnore] public string Synonyms { get; }
 		[JsonIgnore] public Bitmap CoverBitMap { get; set; }
@@ -26,12 +34,12 @@ namespace Tsundoku.Models
 		/// <summary>
 		/// The format of the series (Manga, Manhwa, Manhua, Manfra, Comic, or Novel)
 		/// </summary>
-		[JsonConverter(typeof(JsonStringEnumConverter))] public Format Format { get; }
+		public Format Format { get; }
 
 		/// <summary>
 		/// The serialization status of the series (Finished, Ongoing, Hiatus, Cancelled, or Error)
 		/// </summary>
-		[JsonConverter(typeof(JsonStringEnumConverter))] public Status Status { get; }
+		public Status Status { get; }
 
 		/// <summary>
 		/// Path to the cover for a series
@@ -49,7 +57,7 @@ namespace Tsundoku.Models
 		public uint VolumesRead { get; set; }
 		public decimal Cost { get; set; }
 		public decimal Rating { get; set; }
-		[JsonConverter(typeof(JsonStringEnumConverter))] public Demographic Demographic { get; set; }
+		public Demographic Demographic { get; set; }
 		public bool IsFavorite { get; set; } = false;
 
         [JsonConstructor]
@@ -109,7 +117,7 @@ namespace Tsundoku.Models
 
 			// AniList Query Check
 			Restart:
-			if (isAniListID || (!isMangaDexId && seriesDataDoc != null))
+			if ((!isMangaDexId || isAniListID) && seriesDataDoc != null)
 			{
 				LOGGER.Debug("Valid AniList Query");
                 string nativeStaff = string.Empty, fullStaff = string.Empty;
@@ -243,7 +251,7 @@ namespace Tsundoku.Models
 							englishTitle = attributes.GetProperty("title").GetProperty("en").GetString();
 							englishAltTitle = GetAltTitle("en", altTitles);
 							japaneseAltTitle = GetAltTitle("ja", altTitles);
-							if (!IsSeriesDigitalOnly(title, englishTitle, englishAltTitle)
+							if (!IsSeriesInvalid(title, englishTitle, englishAltTitle)
                                 && (
                                     data.GetArrayLength() == 1
                                     || (
@@ -273,9 +281,9 @@ namespace Tsundoku.Models
                         englishTitle = attributes.GetProperty("title").GetProperty("en").GetString();
 						englishAltTitle = GetAltTitle("en", altTitles);
 
-                        if (IsSeriesDigitalOnly(title, englishTitle, englishAltTitle))
+                        if (IsSeriesInvalid(title, englishTitle, englishAltTitle))
                         {
-                            LOGGER.Warn("{} is a Digital Only Series", title);
+                            LOGGER.Warn("{} is a Invalid Series", title);
                             return null;
                         }
 					}
@@ -288,7 +296,7 @@ namespace Tsundoku.Models
 					link = !attributes.GetProperty("links").TryGetProperty("al", out JsonElement aniListId) ? @$"https://mangadex.org/title/{curMangaDexId}" : @$"https://anilist.co/manga/{aniListId}";
 					countryOfOrigin = attributes.GetProperty("originalLanguage").GetString();
 					string coverLink = @$"https://uploads.mangadex.org/covers/{curMangaDexId}/{await MangadexQuery.GetCoverAsync(relationships.Single(x => x.GetProperty("type").GetString().Equals("cover_art")).GetProperty("id").GetString())}";
-					coverPath = CreateCoverFilePath(coverLink, romajiTitle, bookType, altTitles, Site.MangaDex);
+					coverPath = CreateCoverFilePath(coverLink, romajiTitle, GetCorrectFormat(countryOfOrigin), altTitles, Site.MangaDex);
 					demographic = GetSeriesDemographic(attributes.GetProperty("publicationDemographic").GetString());
 
 					if (altTitles.Any())
@@ -391,12 +399,13 @@ namespace Tsundoku.Models
 			return null;
         }
 
-        private static bool IsSeriesDigitalOnly(string title, string englishTitle, string englishAltTitle)
+        private static bool IsSeriesInvalid(string title, string englishTitle, string englishAltTitle)
         {
             return 
             (
                 !(
                     title.Contains("Digital", StringComparison.OrdinalIgnoreCase)
+                    || title.Contains("Fan Colored", StringComparison.OrdinalIgnoreCase)
                     || englishAltTitle.Contains("Digital", StringComparison.OrdinalIgnoreCase)
                     || englishAltTitle.Contains("Official Colored", StringComparison.OrdinalIgnoreCase)
                     || title.Contains("Official Colored", StringComparison.OrdinalIgnoreCase)
@@ -553,23 +562,23 @@ namespace Tsundoku.Models
 			return newPath;
 		}
 
-        // public override string ToString()
-        // {
-        //     if (this != null)
-		// 	{
-		// 		return JsonSerializer.Serialize(this, Context.Default.Series);
-		// 	}
-		// 	return "Null Series";
-        // }
-
         public override string ToString()
         {
             if (this != null)
 			{
-				return JsonSerializer.Serialize(this, ViewModels.ViewModelBase.options);
+				return JsonSerializer.Serialize(this, typeof(Series), SeriesJsonModel);
 			}
 			return "Null Series";
         }
+
+        // public override string ToString()
+        // {
+        //     if (this != null)
+		// 	{
+		// 		return JsonSerializer.Serialize(this, ViewModels.ViewModelBase.options);
+		// 	}
+		// 	return "Null Series";
+        // }UseStringEnumConverter = true
 
         protected virtual void Dispose(bool disposing)
 		{
@@ -605,8 +614,7 @@ namespace Tsundoku.Models
         {
             return other is not null &&
                    Titles["Romaji"].Equals(other.Titles["Romaji"]) &&
-                   Format == other.Format &&
-                   Status == other.Status;
+                   Format == other.Format;
         }
 
         public override int GetHashCode()
@@ -625,20 +633,13 @@ namespace Tsundoku.Models
         }
 
         public override bool Equals(object obj) => Equals(obj as Series);
-
-        // public override bool Equals(object obj)
-        // {
-        //     return Equals(obj as Series);
-        // }
-
     }
 
-    // [JsonSerializable(typeof(Series))]
-    // [JsonSourceGenerationOptions(WriteIndented = true, AllowTrailingCommas = true, ReadCommentHandling = JsonCommentHandling.Disallow)]
-    // internal partial class Context : JsonSerializerContext
-    // {
-        
-    // }
+    [JsonSerializable(typeof(Series))]
+    [JsonSourceGenerationOptions(UseStringEnumConverter = true)]
+    internal partial class SeriesModelContext : JsonSerializerContext
+    {
+    }
 
     class SeriesComparer(string curLang) : IComparer<Series>
     {

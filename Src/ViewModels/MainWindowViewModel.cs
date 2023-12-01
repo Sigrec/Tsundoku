@@ -72,7 +72,7 @@ namespace Tsundoku.ViewModels
             this.WhenAnyValue(x => x.CurLanguage).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.CurLanguage = x);
             this.WhenAnyValue(x => x.CurLanguage).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => LanguageIndex = AVAILABLE_LANGUAGES.IndexOf(x));
             this.WhenAnyValue(x => x.CurFilter).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => FilterIndex = AVAILABLE_COLLECTION_FILTERS.IndexOf(x));
-            this.WhenAnyValue(x => x.SearchText).Throttle(TimeSpan.FromMilliseconds(500)).ObserveOn(RxApp.MainThreadScheduler).Subscribe(SearchCollection);
+            this.WhenAnyValue(x => x.SearchText).Throttle(TimeSpan.FromMilliseconds(600)).ObserveOn(RxApp.MainThreadScheduler).Subscribe(SearchCollection);
             this.WhenAnyValue(x => x.SearchText).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => CurSearchText = x);
             this.WhenAnyValue(x => x.CurrentTheme).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.MainTheme = x.ThemeName);
             this.WhenAnyValue(x => x.CurDisplay).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.Display = x);
@@ -467,8 +467,8 @@ namespace Tsundoku.ViewModels
                 LOGGER.Info("Reloading User Data");
             }
             
-            //MainUser = JsonSerializer.Deserialize(userData, Context.Default.User);
-            MainUser = JsonSerializer.Deserialize<User>(userData, options);
+            MainUser = JsonSerializer.Deserialize(userData, typeof(User), User.UserJsonModel) as User;
+            // MainUser = JsonSerializer.Deserialize<User>(userData, options);
             MainUser.SavedThemes.Add(TsundokuTheme.DEFAULT_THEME);
             MainUser.SavedThemes = new ObservableCollection<TsundokuTheme>(MainUser.SavedThemes.OrderBy(theme => theme.ThemeName));
 
@@ -495,9 +495,7 @@ namespace Tsundoku.ViewModels
                 bool secondCoverCheck = File.Exists(newCoverPath);
                 if (secondCoverCheck && coverCheck)
                 {
-                    newCoverCheck = true;
                     File.Delete(newCoverPath);
-                    newCoverCheck = false;
                     LOGGER.Info("Removed {} File", newCoverPath);
                 }
 
@@ -721,12 +719,11 @@ namespace Tsundoku.ViewModels
         [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "A New file will always be created if it doesn't exist before serialization")]
         public static void SaveUsersData()
         {
-            LOGGER.Info($"Saving {MainUser?.UserName}'s Data");
+            LOGGER.Info($"Saving \"{MainUser?.UserName}'s\" Data");
             MainUser.UserCollection = UserCollection;
             MainUser.SavedThemes.Remove(TsundokuTheme.DEFAULT_THEME);
-
-            File.WriteAllText(USER_DATA_FILEPATH, JsonSerializer.Serialize(MainUser, options));
-            //File.WriteAllText(USER_DATA_FILEPATH, JsonSerializer.Serialize(MainUser, Context.Default.User));
+    
+            File.WriteAllText(USER_DATA_FILEPATH, JsonSerializer.Serialize(MainUser, typeof(User), User.UserJsonModel));
         }
     }
 }

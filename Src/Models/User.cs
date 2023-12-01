@@ -16,11 +16,18 @@ namespace Tsundoku.Models
         public decimal MeanRating { get; set; }
         public uint VolumesRead { get; set; }
         public string CollectionPrice { get; set; }
-        [JsonConverter(typeof(JsonStringEnumConverter))] public Region Region { get; set; }
+        public Region Region { get; set; }
         public Dictionary<string, bool> Memberships { get; set; }
         public byte[] UserIcon { get; set; }
         public ObservableCollection<TsundokuTheme> SavedThemes { get; set; }
         public List<Series> UserCollection { get; set; }
+        internal static UserModelContext UserJsonModel = new UserModelContext(new JsonSerializerOptions()
+        { 
+            WriteIndented = true,
+            ReadCommentHandling = JsonCommentHandling.Disallow,
+            AllowTrailingCommas = true,
+            Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        });
 
         public User(string UserName, string CurLanguage, string MainTheme, string Display, double CurDataVersion, string Currency, string CollectionPrice, Region Region, Dictionary<string, bool> Memberships, ObservableCollection<TsundokuTheme> SavedThemes, List<Series> UserCollection)
         {
@@ -47,10 +54,9 @@ namespace Tsundoku.Models
         }
     }
 
-    // [JsonSerializable(typeof(User))]
-    // [JsonSourceGenerationOptions(WriteIndented = true, AllowTrailingCommas = true, ReadCommentHandling = JsonCommentHandling.Disallow)]
-    // internal partial class Context : JsonSerializerContext
-    // {
-        
-    // }
+    [JsonSerializable(typeof(User))]
+    [JsonSourceGenerationOptions(UseStringEnumConverter = true)]
+    internal partial class UserModelContext : JsonSerializerContext
+    {
+    }
 }

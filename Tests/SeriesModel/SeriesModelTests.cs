@@ -148,6 +148,13 @@ namespace Tsundoku.Tests
 
         [Test]
         [Parallelizable(scope: ParallelScope.Self)]
+        public void ParseDescription_MangaDex_Links_Test()
+        {
+            Assert.That(MangadexQuery.ParseMangadexDescription("Kinoshita Kazuya is a regular college student who was just dumped by his girlfriend for another guy. Feeling down in the dumps, he decides to use an app called Diamond to hire Mizuhara Chizuru, a rental girlfriend, to make himself feel better. From their first meeting, she seems to be the perfect girl for him, but is there more to her than meets the eye? And how will their not quite typical relationship develop?\n\n---\n**Links:**\n\n- Alternative Official English - [K MANGA](https://kmanga.kodansha.com/title/10001/episode/312699) (U.S. Only), [Kodansha](https://kodansha.us/series/rent-a-girlfriend/)"), Is.EqualTo("Kinoshita Kazuya is a regular college student who was just dumped by his girlfriend for another guy. Feeling down in the dumps, he decides to use an app called Diamond to hire Mizuhara Chizuru, a rental girlfriend, to make himself feel better. From their first meeting, she seems to be the perfect girl for him, but is there more to her than meets the eye? And how will their not quite typical relationship develop?"));
+        }
+
+        [Test]
+        [Parallelizable(scope: ParallelScope.Self)]
         public void ParseDescription_AniList_UnnecessaryBreakRemoval_Test()
         {
             Assert.Multiple(() =>

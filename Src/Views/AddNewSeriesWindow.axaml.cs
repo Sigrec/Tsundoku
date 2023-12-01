@@ -67,6 +67,7 @@ namespace Tsundoku.Views
         public async void OnButtonClicked(object sender, RoutedEventArgs args)
         {
             AddSeriesButton.IsEnabled = false;
+            ViewModelBase.newCoverCheck = true;
             bool validSeries = await AddNewSeriesViewModel.GetSeriesDataAsync(TitleBox.Text.Trim(), (MangaButton.IsChecked == true) ? Format.Manga : Format.Novel, CurVolNum, MaxVolNum, AddNewSeriesViewModel.ConvertSelectedLangList(AddNewSeriesVM.SelectedAdditionalLanguages));
             if (!validSeries) // Boolean returns whether the series added is a duplicate
             {

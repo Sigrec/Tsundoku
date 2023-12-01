@@ -32,13 +32,14 @@ namespace Tsundoku.Views
         };
         private static StringBuilder newSearchText = new StringBuilder();
         private static string itemString;
+        private static readonly TimeSpan AdvancedSearchPopulateDelay = new TimeSpan(TimeSpan.TicksPerSecond / 4);
 
         public MainWindow()
         {
             InitializeComponent();
             SetupAdvancedSearchBar(" & ");
 
-            CoverFolderWatcher.OnCreated += static (s, e) =>
+            CoverFolderWatcher.OnCreated += (s, e) =>
             {
                 string path = e.FullPath.Replace(".crdownload", "");
                 LOGGER.Debug("{} | {} | {} | {}", path, !ViewModelBase.newCoverCheck, path.EndsWith("jpg", StringComparison.OrdinalIgnoreCase), path.EndsWith("png", StringComparison.OrdinalIgnoreCase));
@@ -70,6 +71,7 @@ namespace Tsundoku.Views
                         LOGGER.Info($"\"{series.Titles["Romaji"]}\" Cover Changed Again");
                     }
                 }
+                ViewModelBase.newCoverCheck = false;
             };
             CoverFolderWatcher.Start();
 
@@ -118,21 +120,24 @@ namespace Tsundoku.Views
                 }
                 else if (e.KeyModifiers == KeyModifiers.Control && e.Key == Key.F)
                 {
+                    if (AdvancedSearchPopup.IsVisible)
+                    {
+                        AdvancedSearchBar.MinimumPopulateDelay = TimeSpan.Zero;
+                        AdvancedSearchBar.Text = string.Empty;
+                        AdvancedSearchBar.MinimumPopulateDelay = AdvancedSearchPopulateDelay;
+                    };
                     AdvancedSearchPopup.IsVisible ^= true;
                 }
             };
 
-            Closing += (s, e) =>
-            {
-                SaveOnClose();
-            };
+            Closing += (s, e) => { SaveOnClose(); };
         }
 
         public void SetupAdvancedSearchBar(string delimeter)
         {
             AdvancedSearchBar.ItemsSource = ADVANCED_SEARCH_FILTERS;
             AdvancedSearchBar.FilterMode = AutoCompleteFilterMode.Custom;
-            AdvancedSearchBar.MinimumPopulateDelay = new TimeSpan(TimeSpan.TicksPerSecond / 2); // Might just remove this delay in the end
+            AdvancedSearchBar.MinimumPopulateDelay = AdvancedSearchPopulateDelay; // Might just remove this delay in the end
             AdvancedSearchBar.ItemSelector = (query, item) =>
             {
                 newSearchText.Clear();
@@ -373,7 +378,7 @@ namespace Tsundoku.Views
                     File.SetAttributes(curSeries.Cover, FileAttributes.Normal);
                     File.Delete(curSeries.Cover);
                     curSeries.Dispose();
-                    LOGGER.Info($"Deleted Cover -> {curSeries.Cover}");
+                    LOGGER.Info("Deleted Cover -> {}", curSeries.Cover);
                 }
 
                 // Update Mean rating
@@ -576,7 +581,7 @@ namespace Tsundoku.Views
         private async void CopySeriesTitleAsync(object sender, PointerPressedEventArgs args)
         {
             string title = ((TextBlock)sender).Text;
-            LOGGER.Info($"Copying {title} to Clipboard");
+            LOGGER.Info("Copying {} to Clipboard", title);
             await TextCopy.ClipboardService.SetTextAsync(title);
         }
 

@@ -1,9 +1,9 @@
 ﻿using GraphQL;
 using GraphQL.Client.Http;
+using GraphQL.Client.Serializer.Newtonsoft;
 using GraphQL.Client.Serializer.SystemTextJson;
 using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
-using Tsundoku.Models;
 
 namespace Tsundoku.Helpers
 {
@@ -12,7 +12,7 @@ namespace Tsundoku.Helpers
 		private static readonly string USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.66 Safari/537.36";
 		private static GraphQLHttpClient AniListClient = new GraphQLHttpClient("https://graphql.anilist.co", new SystemTextJsonSerializer());
         private bool disposedValue;
-        [GeneratedRegex("\\(Source: [\\S\\s]+|\\<.*?\\>")] private static partial Regex AniListDescRegex();
+        [GeneratedRegex(@"\(Source: [\S\s]+|\<.*?\>")] private static partial Regex AniListDescRegex();
 
 		static AniListQuery()
 		{
@@ -21,6 +21,7 @@ namespace Tsundoku.Helpers
 			AniListClient.HttpClient.DefaultRequestHeaders.Add("Accept", "application/json");
 			AniListClient.HttpClient.DefaultRequestHeaders.Add("UserAgent", USER_AGENT);
 		}
+
 
 		/// <summary>
 		/// Gets a AniList series by a title
@@ -80,7 +81,7 @@ namespace Tsundoku.Helpers
 				if (rateCheck != -1)
                 {
                     LOGGER.Info($"Waiting {rateCheck} Seconds for Rate Limit To Reset");
-                    await Task.Delay(rateCheck * 1000);
+                    await Task.Delay(TimeSpan.FromSeconds(rateCheck));
                     response = await AniListClient.SendQueryAsync<JsonDocument?>(queryRequest);
                 }
                 return response.Data;
@@ -88,7 +89,7 @@ namespace Tsundoku.Helpers
 			}
 			catch(Exception e)
 			{
-				LOGGER.Error($"AniList GetSeriesByTitle w/ {title} Request Failed \n{e.Message}");
+				LOGGER.Error("AniList GetSeriesByTitle w/ {} Request Failed -> {}", title, e.Message);
 			}
 			return null;
 		}
@@ -152,14 +153,14 @@ namespace Tsundoku.Helpers
 				if (rateCheck != -1)
                 {
                     LOGGER.Info($"Waiting {rateCheck} Seconds for Rate Limit To Reset");
-                    await Task.Delay(rateCheck * 1000);
+                    await Task.Delay(TimeSpan.FromSeconds(rateCheck));
                     response = await AniListClient.SendQueryAsync<JsonDocument?>(queryRequest);
                 }
                 return response.Data;
 			}
 			catch(Exception e)
 			{
-				LOGGER.Error($"AniList GetSeriesById w/ {seriesId} Request Failed {e.Message}");
+				LOGGER.Error("AniList GetSeriesById w/ {} Request Failed -> {}", seriesId, e.Message);
 			}
 			return null;
 		}
@@ -168,7 +169,7 @@ namespace Tsundoku.Helpers
         {
             responseHeaders.TryGetValues("X-RateLimit-Remaining", out var rateRemainingValues);
             _ = short.TryParse(rateRemainingValues?.FirstOrDefault(), out var rateRemaining);
-            LOGGER.Debug($"Rate Remaining = {rateRemaining}");
+            LOGGER.Info($"AniList Rate Remaining = {rateRemaining}");
             if (rateRemaining > 0)
             {
                 return -1;

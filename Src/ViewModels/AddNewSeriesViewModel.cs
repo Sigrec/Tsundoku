@@ -71,7 +71,8 @@ namespace Tsundoku.ViewModels
 
                 if (!duplicateSeriesCheck)
                 {
-                    LOGGER.Info($"\nAdding New Series -> \"{title}\" | {bookType} | {curVolCount} | {maxVolCount}\n{newSeries}");
+                    LOGGER.Info($"\nAdding New Series -> \"{title}\" | \"{bookType}\" | {curVolCount} | {maxVolCount}\n{newSeries}");
+                    // File.WriteAllText(@"TestSeries.json", newSeries.ToString());
 
                     int index = MainWindowViewModel.UserCollection.BinarySearch(newSeries, new SeriesComparer(MainUser.CurLanguage));
                     index = index < 0 ? ~index : index;
@@ -97,7 +98,7 @@ namespace Tsundoku.ViewModels
                 }
                 else
                 {
-                    LOGGER.Info($"{newSeries.Titles["Romaji"]} Already Exists Not Adding");
+                    LOGGER.Info("{} Already Exists Not Adding", newSeries.Titles["Romaji"]);
                 }
             }
             return duplicateSeriesCheck;
@@ -105,8 +106,6 @@ namespace Tsundoku.ViewModels
 
         public static async Task<Bitmap> SaveCoverAsync(string newPath, string coverLink)
         {
-            newCoverCheck = true;
-            //using (FileStream fs = new(newPath, FileMode.Create, FileAccess.Write));
             HttpResponseMessage response = await AddCoverHttpClient.GetAsync(new Uri(coverLink));
             using (FileStream fs = new(newPath, FileMode.Create, FileAccess.Write))
             {
@@ -114,7 +113,6 @@ namespace Tsundoku.ViewModels
             }
 			Bitmap newCover = new Bitmap(newPath).CreateScaledBitmap(new PixelSize(LEFT_SIDE_CARD_WIDTH, IMAGE_HEIGHT), BitmapInterpolationMode.HighQuality);
 			newCover.Save(newPath, 100);
-            newCoverCheck = false;
             return newCover;
         }
 

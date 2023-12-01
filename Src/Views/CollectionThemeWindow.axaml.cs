@@ -41,12 +41,15 @@ namespace Tsundoku.Views
 
             Closing += (s, e) =>
             {
-                ((CollectionThemeWindow)s).Hide();
-                NewThemeName.Text = "";
-                Topmost = false;
-                IsOpen ^= true;
+                if (IsOpen) 
+                { 
+                    ((CollectionThemeWindow)s).Hide();
+                    NewThemeName.Text = "";
+                    Topmost = false;
+                    IsOpen ^= true;
+                    CollectionWindow.CollectionViewModel.CurrentTheme = ThemeSettingsVM.CurrentTheme;
+                }
                 e.Cancel = true;
-                CollectionWindow.CollectionViewModel.CurrentTheme = ThemeSettingsVM.CurrentTheme;
             };
 
             this.WhenAnyValue(x => x.NewThemeName.Text, x => x.MainColor1.Mask.Length, x => x.MainColor2.Mask.Length, x => x.TextColor1.Mask.Length, x => x.TextColor2.Mask.Length, x => x.AccentColor1.Mask.Length, x => x.AccentColor2.Mask.Length, (name, mc1 ,mc2, tc1, tc2, ac1, ac2) => !string.IsNullOrWhiteSpace(name) && !name.Equals("Default", StringComparison.OrdinalIgnoreCase) && mc1 != 7 && mc2 != 7 && tc1 != 7 && tc2 != 7 && ac1 != 7 && ac2 != 7).Subscribe(x => ThemeSettingsVM.IsGenerateThemeButtonEnabled = x);

@@ -37,7 +37,6 @@ namespace Tsundoku.Models
             Cancelled,
             Error
         }
-
         public enum Format
         {
             Manga,
@@ -47,7 +46,6 @@ namespace Tsundoku.Models
             Comic,
             Novel
         }
-
         public enum Demographic
         {
             Shounen,
@@ -56,7 +54,7 @@ namespace Tsundoku.Models
             Shoujo,
             Unknown
         }
-        public static readonly Demographic[] DEMOGRAPHICS = Demographic.GetValues<Demographic>();
+        public static readonly Demographic[] DEMOGRAPHICS = Enum.GetValues<Demographic>();
 
         // public enum CollectionFilter
         // {
