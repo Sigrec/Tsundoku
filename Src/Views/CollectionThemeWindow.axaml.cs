@@ -2,10 +2,9 @@ using System.Collections.ObjectModel;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Interactivity;
-using Avalonia.LogicalTree;
 using Avalonia.Media;
 using Avalonia.ReactiveUI;
-using Avalonia.VisualTree;
+using ReactiveUI.Fody.Helpers;
 using DynamicData;
 using ReactiveUI;
 using Tsundoku.Models;
@@ -16,9 +15,9 @@ namespace Tsundoku.Views
     public partial class CollectionThemeWindow : ReactiveWindow<ThemeSettingsViewModel>
     {
         public ThemeSettingsViewModel? ThemeSettingsVM => DataContext as ThemeSettingsViewModel;
-        private TsundokuTheme NewTheme;
+        private TsundokuTheme NewTheme { get; set; }
         public bool IsOpen, ThemeChanged = false;
-       MainWindow CollectionWindow;
+        MainWindow CollectionWindow;
 
         public CollectionThemeWindow () 
         {
@@ -48,6 +47,9 @@ namespace Tsundoku.Views
                     Topmost = false;
                     IsOpen ^= true;
                     CollectionWindow.CollectionViewModel.CurrentTheme = ThemeSettingsVM.CurrentTheme;
+                    ApplyColors();
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
                 }
                 e.Cancel = true;
             };
@@ -264,6 +266,19 @@ namespace Tsundoku.Views
             }
         }
 
+        private void UpdateMainWindowColors(TsundokuTheme newTheme)
+        {
+            CollectionWindow.CollectionViewModel.CurrentTheme = newTheme;
+        }
+        private void UpdateAllWindowColors(TsundokuTheme newTheme)
+        {
+            UpdateMainWindowColors(newTheme);
+            MainWindowViewModel.newSeriesWindow.AddNewSeriesVM.CurrentTheme = newTheme;
+            MainWindowViewModel.settingsWindow.UserSettingsVM.CurrentTheme = newTheme;
+            MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.CurrentTheme = newTheme;
+            MainWindowViewModel.priceAnalysisWindow.PriceAnalysisVM.CurrentTheme = newTheme;
+            MainWindowViewModel.collectionStatsWindow.UpdateChartColors();
+        }
 
         private void ChangeTheme()
         {
@@ -271,7 +286,7 @@ namespace Tsundoku.Views
             ThemeSettingsVM.CurrentTheme = ViewModelBase.MainUser.SavedThemes.Single(theme => theme.ThemeName.Equals(toThemeName));
 
             // Update Windows
-            ((MainWindow)((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).MainWindow).CollectionViewModel.CurrentTheme = ThemeSettingsVM.CurrentTheme;
+            CollectionWindow.CollectionViewModel.CurrentTheme = ThemeSettingsVM.CurrentTheme;
             MainWindowViewModel.newSeriesWindow.AddNewSeriesVM.CurrentTheme = ThemeSettingsVM.CurrentTheme;
             MainWindowViewModel.settingsWindow.UserSettingsVM.CurrentTheme = ThemeSettingsVM.CurrentTheme;
             MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.CurrentTheme = ThemeSettingsVM.CurrentTheme;
@@ -290,6 +305,8 @@ namespace Tsundoku.Views
             if (ThemeSelector.IsDropDownOpen || ThemeChanged)
             {
                 ChangeTheme();
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
             }
         }
 
@@ -351,101 +368,86 @@ namespace Tsundoku.Views
         {
             Menu_BG.ColorChanged += (sender, e) =>
             {
-                // CollectionWindow.Navigation.Background = new SolidColorBrush(Menu_BG.Color);
                 Menu_BG_Button.Background = new SolidColorBrush(Menu_BG.Color);
                 NewTheme.MenuBGColor = Menu_BG.Color.ToUInt32();
+                UpdateAllWindowColors(NewTheme.Cloning());
             };
 
             Username.ColorChanged += (sender, e) =>
             {
-                // CollectionWindow.Username.Foreground = new SolidColorBrush(Username.Color);
                 Username_Button.Background = new SolidColorBrush(Username.Color);
                 NewTheme.UsernameColor = Username.Color.ToUInt32();
+                UpdateAllWindowColors(NewTheme.Cloning());
             };
 
             Menu_Text.ColorChanged += (sender, e) =>
             {
-                // CollectionWindow.NumVolumesCollected.Foreground = new SolidColorBrush(Menu_Text.Color);
-                // CollectionWindow.NumVolumesToBeCollected.Foreground = new SolidColorBrush(Menu_Text.Color);
-                // CollectionWindow.SearchCollectionHeader.Foreground = new SolidColorBrush(Menu_Text.Color);
                 Menu_Text_Button.Background = new SolidColorBrush(Menu_Text.Color);
                 NewTheme.MenuTextColor = Menu_Text.Color.ToUInt32();
+                UpdateAllWindowColors(NewTheme.Cloning());
             };
 
             SearchBar_BG.ColorChanged += (sender, e) =>
             {
-                // CollectionWindow.SearchBar.Background = new SolidColorBrush(SearchBar_BG.Color);
                 SearchBar_BG_Button.Background = new SolidColorBrush(SearchBar_BG.Color);
                 NewTheme.SearchBarBGColor = SearchBar_BG.Color.ToUInt32();
+                UpdateAllWindowColors(NewTheme.Cloning());
             };
 
             SearchBar_Border.ColorChanged += (sender, e) =>
             {
-                // CollectionWindow.SearchBar.BorderBrush = new SolidColorBrush(SearchBar_Border.Color);
                 SearchBar_Border_Button.Background = new SolidColorBrush(SearchBar_Border.Color);
                 NewTheme.SearchBarBorderColor = SearchBar_Border.Color.ToUInt32();
+                UpdateAllWindowColors(NewTheme.Cloning());
             };
 
             SearchBar_Text.ColorChanged += (sender, e) =>
             {
-                // CollectionWindow.SearchBar.Foreground = new SolidColorBrush(SearchBar_Text.Color);
                 SearchBar_Text_Button.Background = new SolidColorBrush(SearchBar_Text.Color);
                 NewTheme.SearchBarTextColor = SearchBar_Text.Color.ToUInt32();
+                UpdateAllWindowColors(NewTheme.Cloning());
             };
 
             Divider.ColorChanged += (sender, e) =>
             {
-                // CollectionWindow.Navigation.BorderBrush = new SolidColorBrush(Divider.Color);
                 Divider_Button.Background = new SolidColorBrush(Divider.Color);
                 NewTheme.DividerColor = Divider.Color.ToUInt32();
+                UpdateAllWindowColors(NewTheme.Cloning());
             };
 
             MenuButton_BG.ColorChanged += (sender, e) =>
             {
-                // SolidColorBrush menuButtonBG = new SolidColorBrush(MenuButton_BG.Color);
-                // CollectionWindow.SettingsButton.Background = menuButtonBG;
-                // CollectionWindow.ThemeButton.Background = menuButtonBG;
-                // CollectionWindow.AddNewSeriesButton.Background = menuButtonBG;
-                // CollectionWindow.DisplaySelector.Background = menuButtonBG;
-                // CollectionWindow.LanguageSelector.Background = menuButtonBG;
                 MenuButton_BG_Button.Background = new SolidColorBrush(MenuButton_BG.Color);
                 NewTheme.MenuButtonBGColor = MenuButton_BG.Color.ToUInt32();
+                UpdateAllWindowColors(NewTheme.Cloning());
             };
 
             MenuButton_BG_Hover.ColorChanged += (sender, e) =>
             {
                 MenuButton_BG_Hover_Button.Background = new SolidColorBrush(MenuButton_BG_Hover.Color);
                 NewTheme.MenuButtonBGHoverColor = MenuButton_BG_Hover.Color.ToUInt32();
+                UpdateAllWindowColors(NewTheme.Cloning());
             };
 
             MenuButton_Border.ColorChanged += (sender, e) =>
             {
-                // SolidColorBrush menuButtonBorder = new SolidColorBrush(MenuButton_Border.Color);
-                // CollectionWindow.SettingsButton.BorderBrush = menuButtonBorder;
-                // CollectionWindow.ThemeButton.BorderBrush = menuButtonBorder;
-                // CollectionWindow.AddNewSeriesButton.BorderBrush = menuButtonBorder;
-                // CollectionWindow.DisplaySelector.BorderBrush = menuButtonBorder;
-                // CollectionWindow.LanguageSelector.BorderBrush = menuButtonBorder;
                 MenuButton_Border_Button.Background = new SolidColorBrush(MenuButton_Border.Color);
                 NewTheme.MenuButtonBorderColor = MenuButton_Border.Color.ToUInt32();
+                UpdateAllWindowColors(NewTheme.Cloning());
             };
 
             MenuButton_Border_Hover.ColorChanged += (sender, e) =>
             {
                 MenuButton_Border_Hover_Button.Background = new SolidColorBrush(MenuButton_Border_Hover.Color);
                 NewTheme.MenuButtonBorderHoverColor = MenuButton_Border_Hover.Color.ToUInt32();
+                UpdateAllWindowColors(NewTheme.Cloning());
             };
 
             MenuButton_IconAndText.ColorChanged += (sender, e) =>
             {
-                // SolidColorBrush menuButtonTextAndIconColor = new SolidColorBrush(MenuButton_IconAndText.Color);
-                // CollectionWindow.SettingsButton.Foreground = menuButtonTextAndIconColor;
-                // CollectionWindow.ThemeButton.Foreground = menuButtonTextAndIconColor;
-                // CollectionWindow.AddNewSeriesButton.Foreground = menuButtonTextAndIconColor;
-                // CollectionWindow.DisplaySelector.Foreground = menuButtonTextAndIconColor;
-                // CollectionWindow.LanguageSelector.Foreground = menuButtonTextAndIconColor;
                 MenuButton_IconAndText_Button.Background = new SolidColorBrush(MenuButton_IconAndText.Color);
                 NewTheme.MenuButtonTextAndIconColor = MenuButton_IconAndText.Color.ToUInt32();
+                UpdateAllWindowColors(NewTheme.Cloning());
             };
 
             MenuButton_IconAndText_Hover.ColorChanged += (sender, e) =>
@@ -453,6 +455,7 @@ namespace Tsundoku.Views
                 //CollectionWindow.SettingsButton.PointerEntered += new EventHandler<Avalonia.Input.PointerEventArgs>(Button_PointerEnter);
                 MenuButton_IconAndText_Hover_Button.Background = new SolidColorBrush(MenuButton_IconAndText_Hover.Color);
                 NewTheme.MenuButtonTextAndIconHoverColor = MenuButton_IconAndText_Hover.Color.ToUInt32();
+                UpdateAllWindowColors(NewTheme.Cloning());
             };
         }
 
@@ -463,20 +466,16 @@ namespace Tsundoku.Views
         {
             Collection_BG.ColorChanged += (sender, e) =>
             {
-                // (App.DESKTOP.MainWindow.DataContext as MainWindowViewModel).CurrentTheme.CollectionBGColor = Collection_BG.Color.ToUInt32();
                 Collection_BG_Button.Background = new SolidColorBrush(Collection_BG.Color);
                 NewTheme.CollectionBGColor = Collection_BG.Color.ToUInt32();
+                UpdateAllWindowColors(NewTheme.Cloning());
             };
 
             Status_And_BookType_BG.ColorChanged += (sender, e) =>
             {
-                // ((MainWindowViewModel)CollectionWindow.CollectionTheme.DataContext).CurrentTheme.StatusAndBookTypeBGColor = Status_And_BookType_BG.Color.ToUInt32();
-                // var dt = CollectionWindow.CollectionItems.ItemTemplate;
-                // LOGGER.Debug(dt.Build(Avalonia.Controls.Control).Background);
-                //dt.Build.Background = new SolidColorBrush(Status_And_BookType_BG.Color);
-                // var test = CollectionWindow.CollectionItems.DataContext.;
                 Status_And_BookType_BG_Button.Background = new SolidColorBrush(Status_And_BookType_BG.Color);
                 NewTheme.StatusAndBookTypeBGColor = Status_And_BookType_BG.Color.ToUInt32();
+                UpdateMainWindowColors(NewTheme.Cloning());
             };
 
             Status_And_BookType_BG_Hover.ColorChanged += (sender, e) =>
@@ -484,6 +483,7 @@ namespace Tsundoku.Views
                 //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(Status_And_BookType_BG_Hover.Color);
                 Status_And_BookType_BG_Hover_Button.Background = new SolidColorBrush(Status_And_BookType_BG_Hover.Color);
                 NewTheme.StatusAndBookTypeBGHoverColor = Status_And_BookType_BG_Hover.Color.ToUInt32();
+                UpdateMainWindowColors(NewTheme.Cloning());
             };
 
             Status_And_BookType_Text.ColorChanged += (sender, e) =>
@@ -491,6 +491,7 @@ namespace Tsundoku.Views
                 //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(Status_And_BookType_Text.Color);
                 Status_And_BookType_Text_Button.Background = new SolidColorBrush(Status_And_BookType_Text.Color);
                 NewTheme.StatusAndBookTypeTextColor = Status_And_BookType_Text.Color.ToUInt32();
+                UpdateMainWindowColors(NewTheme.Cloning());
             };
 
             Status_And_BookType_Text_Hover.ColorChanged += (sender, e) =>
@@ -498,6 +499,7 @@ namespace Tsundoku.Views
                 //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(Status_And_BookType_Text_Hover.Color);
                 Status_And_BookType_Text_Hover_Button.Background = new SolidColorBrush(Status_And_BookType_Text_Hover.Color);
                 NewTheme.StatusAndBookTypeTextHoverColor = Status_And_BookType_Text_Hover.Color.ToUInt32();
+                UpdateMainWindowColors(NewTheme.Cloning());
             };
 
             SeriesCard_BG.ColorChanged += (sender, e) =>
@@ -508,8 +510,7 @@ namespace Tsundoku.Views
                 // }
                 SeriesCard_BG_Button.Background = new SolidColorBrush(SeriesCard_BG.Color);
                 NewTheme.SeriesCardBGColor = SeriesCard_BG.Color.ToUInt32();
-                // LOGGER.Info(NewTheme.SeriesCardBGColor);
-                // CollectionWindow.CollectionViewModel.CurrentTheme = NewTheme;
+                UpdateMainWindowColors(NewTheme.Cloning());
             };
 
             SeriesCard_Title.ColorChanged += (sender, e) =>
@@ -517,6 +518,7 @@ namespace Tsundoku.Views
                 //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesCard_Title.Color);
                 SeriesCard_Title_Button.Background = new SolidColorBrush(SeriesCard_Title.Color);
                 NewTheme.SeriesCardTitleColor = SeriesCard_Title.Color.ToUInt32();
+                UpdateMainWindowColors(NewTheme.Cloning());
             };
 
             SeriesCard_Staff.ColorChanged += (sender, e) =>
@@ -524,6 +526,7 @@ namespace Tsundoku.Views
                 //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesCard_Staff.Color);
                 SeriesCard_Staff_Button.Background = new SolidColorBrush(SeriesCard_Staff.Color);
                 NewTheme.SeriesCardStaffColor = SeriesCard_Staff.Color.ToUInt32();
+                UpdateMainWindowColors(NewTheme.Cloning());
             };
 
             SeriesCard_Desc.ColorChanged += (sender, e) =>
@@ -531,6 +534,7 @@ namespace Tsundoku.Views
                 //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesCard_Desc.Color);
                 SeriesCard_Desc_Button.Background = new SolidColorBrush(SeriesCard_Desc.Color);
                 NewTheme.SeriesCardDescColor = SeriesCard_Desc.Color.ToUInt32();
+                UpdateMainWindowColors(NewTheme.Cloning());
             };
 
             SeriesProgress_BG.ColorChanged += (sender, e) =>
@@ -538,6 +542,7 @@ namespace Tsundoku.Views
                 //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesProgress_BG.Color);
                 SeriesProgress_BG_Button.Background = new SolidColorBrush(SeriesProgress_BG.Color);
                 NewTheme.SeriesProgressBGColor = SeriesProgress_BG.Color.ToUInt32();
+                UpdateMainWindowColors(NewTheme.Cloning());
             };
 
             SeriesProgress_Bar.ColorChanged += (sender, e) =>
@@ -545,6 +550,7 @@ namespace Tsundoku.Views
                 //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesProgress_Bar.Color);
                 SeriesProgress_Bar_Button.Background = new SolidColorBrush(SeriesProgress_Bar.Color);
                 NewTheme.SeriesProgressBarColor = SeriesProgress_Bar.Color.ToUInt32();
+                UpdateMainWindowColors(NewTheme.Cloning());
             };
 
             SeriesProgress_Bar_BG.ColorChanged += (sender, e) =>
@@ -552,6 +558,7 @@ namespace Tsundoku.Views
                 //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesProgress_Bar_BG.Color);
                 SeriesProgress_Bar_BG_Button.Background = new SolidColorBrush(SeriesProgress_Bar_BG.Color);
                 NewTheme.SeriesProgressBarBGColor = SeriesProgress_Bar_BG.Color.ToUInt32();
+                UpdateMainWindowColors(NewTheme.Cloning());
             };
 
             SeriesProgress_Bar_Border.ColorChanged += (sender, e) =>
@@ -559,6 +566,7 @@ namespace Tsundoku.Views
                 //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesProgress_Bar_Border.Color);
                 SeriesProgress_Bar_Border_Button.Background = new SolidColorBrush(SeriesProgress_Bar_Border.Color);
                 NewTheme.SeriesProgressBarBorderColor = SeriesProgress_Bar_Border.Color.ToUInt32();
+                UpdateMainWindowColors(NewTheme.Cloning());
             };
 
             SeriesProgress_Text.ColorChanged += (sender, e) =>
@@ -566,6 +574,7 @@ namespace Tsundoku.Views
                 //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesProgress_Text.Color);
                 SeriesProgress_Text_Button.Background = new SolidColorBrush(SeriesProgress_Text.Color);
                 NewTheme.SeriesProgressTextColor = SeriesProgress_Text.Color.ToUInt32();
+                UpdateMainWindowColors(NewTheme.Cloning());
             };
 
             SeriesProgress_Buttons_Hover.ColorChanged += (sender, e) =>
@@ -573,6 +582,7 @@ namespace Tsundoku.Views
                 //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesProgress_Buttons_Hover.Color);
                 SeriesProgress_Buttons_Hover_Button.Background = new SolidColorBrush(SeriesProgress_Buttons_Hover.Color);
                 NewTheme.SeriesProgressButtonsHoverColor = SeriesProgress_Buttons_Hover.Color.ToUInt32();
+                UpdateMainWindowColors(NewTheme.Cloning());
             };
 
             SeriesButton_BG.ColorChanged += (sender, e) =>
@@ -580,6 +590,7 @@ namespace Tsundoku.Views
                 //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesButton_BG.Color);
                 SeriesButton_BG_Button.Background = new SolidColorBrush(SeriesButton_BG.Color);
                 NewTheme.SeriesButtonBGColor = SeriesButton_BG.Color.ToUInt32();
+                UpdateMainWindowColors(NewTheme.Cloning());
             };
 
             SeriesButton_BG_Hover.ColorChanged += (sender, e) =>
@@ -587,6 +598,7 @@ namespace Tsundoku.Views
                 //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesButton_BG_Hover.Color);
                 SeriesButton_BG_Hover_Button.Background = new SolidColorBrush(SeriesButton_BG_Hover.Color);
                 NewTheme.SeriesButtonBGHoverColor = SeriesButton_BG_Hover.Color.ToUInt32();
+                UpdateMainWindowColors(NewTheme.Cloning());
             };
 
             SeriesButton_Icon.ColorChanged += (sender, e) =>
@@ -594,6 +606,7 @@ namespace Tsundoku.Views
                 //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesButton_Icon.Color);
                 SeriesButton_Icon_Button.Background = new SolidColorBrush(SeriesButton_Icon.Color);
                 NewTheme.SeriesButtonIconColor = SeriesButton_Icon.Color.ToUInt32();
+                UpdateMainWindowColors(NewTheme.Cloning());
             };
 
             SeriesButton_Icon_Hover.ColorChanged += (sender, e) =>
@@ -601,6 +614,7 @@ namespace Tsundoku.Views
                 //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesButton_Icon_Hover.Color);
                 SeriesButton_Icon_Hover_Button.Background = new SolidColorBrush(SeriesButton_Icon_Hover.Color);
                 NewTheme.SeriesButtonIconHoverColor = SeriesButton_Icon_Hover.Color.ToUInt32();
+                UpdateMainWindowColors(NewTheme.Cloning());
             };
 
             SeriesEditPane_BG.ColorChanged += (sender, e) =>
@@ -608,6 +622,7 @@ namespace Tsundoku.Views
                 //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesEditPane_BG.Color);
                 SeriesEditPane_BG_Button.Background = new SolidColorBrush(SeriesEditPane_BG.Color);
                 NewTheme.SeriesEditPaneBGColor = SeriesEditPane_BG.Color.ToUInt32();
+                UpdateMainWindowColors(NewTheme.Cloning());
             };
 
             SeriesNotes_BG.ColorChanged += (sender, e) =>
@@ -615,6 +630,7 @@ namespace Tsundoku.Views
                 //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesNotes_BG.Color);
                 SeriesNotes_BG_Button.Background = new SolidColorBrush(SeriesNotes_BG.Color);
                 NewTheme.SeriesNotesBGColor = SeriesNotes_BG.Color.ToUInt32();
+                UpdateMainWindowColors(NewTheme.Cloning());
             };
 
             SeriesNotes_Border.ColorChanged += (sender, e) =>
@@ -622,6 +638,7 @@ namespace Tsundoku.Views
                 //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesNotes_Border.Color);
                 SeriesNotes_Border_Button.Background = new SolidColorBrush(SeriesNotes_Border.Color);
                 NewTheme.SeriesNotesBorderColor = SeriesNotes_Border.Color.ToUInt32();
+                UpdateMainWindowColors(NewTheme.Cloning());
             };
 
             SeriesNotes_Text.ColorChanged += (sender, e) =>
@@ -629,6 +646,7 @@ namespace Tsundoku.Views
                 //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesNotes_Text.Color);
                 SeriesNotes_Text_Button.Background = new SolidColorBrush(SeriesNotes_Text.Color);
                 NewTheme.SeriesNotesTextColor = SeriesNotes_Text.Color.ToUInt32();
+                UpdateMainWindowColors(NewTheme.Cloning());
             };
 
             SeriesEditPane_Buttons_BG.ColorChanged += (sender, e) =>
@@ -636,6 +654,7 @@ namespace Tsundoku.Views
                 //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesEditPane_Buttons_BG.Color);
                 SeriesEditPane_Buttons_BG_Button.Background = new SolidColorBrush(SeriesEditPane_Buttons_BG.Color);
                 NewTheme.SeriesEditPaneButtonsBGColor = SeriesEditPane_Buttons_BG.Color.ToUInt32();
+                UpdateMainWindowColors(NewTheme.Cloning());
             };
 
             SeriesEditPane_Buttons_BG_Hover.ColorChanged += (sender, e) =>
@@ -643,6 +662,7 @@ namespace Tsundoku.Views
                 //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesEditPane_Buttons_BG_Hover.Color);
                 SeriesEditPane_Buttons_BG_Hover_Button.Background = new SolidColorBrush(SeriesEditPane_Buttons_BG_Hover.Color);
                 NewTheme.SeriesEditPaneButtonsBGHoverColor = SeriesEditPane_Buttons_BG_Hover.Color.ToUInt32();
+                UpdateMainWindowColors(NewTheme.Cloning());
             };
 
             SeriesEditPane_Buttons_Border.ColorChanged += (sender, e) =>
@@ -650,6 +670,7 @@ namespace Tsundoku.Views
                 //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesEditPane_Buttons_Border.Color);
                 SeriesEditPane_Buttons_Border_Button.Background = new SolidColorBrush(SeriesEditPane_Buttons_Border.Color);
                 NewTheme.SeriesEditPaneButtonsBorderColor = SeriesEditPane_Buttons_Border.Color.ToUInt32();
+                UpdateMainWindowColors(NewTheme.Cloning());
             };
 
             SeriesEditPane_Buttons_Border_Hover.ColorChanged += (sender, e) =>
@@ -657,6 +678,7 @@ namespace Tsundoku.Views
                 //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesEditPane_Buttons_Border_Hover.Color);
                 SeriesEditPane_Buttons_Border_Hover_Button.Background = new SolidColorBrush(SeriesEditPane_Buttons_Border_Hover.Color);
                 NewTheme.SeriesEditPaneButtonsBorderHoverColor = SeriesEditPane_Buttons_Border_Hover.Color.ToUInt32();
+                UpdateMainWindowColors(NewTheme.Cloning());
             };
 
             SeriesEditPane_Buttons_Icon.ColorChanged += (sender, e) =>
@@ -664,6 +686,7 @@ namespace Tsundoku.Views
                 //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesEditPane_Buttons_Icon.Color);
                 SeriesEditPane_Buttons_Icon_Button.Background = new SolidColorBrush(SeriesEditPane_Buttons_Icon.Color);
                 NewTheme.SeriesEditPaneButtonsIconColor = SeriesEditPane_Buttons_Icon.Color.ToUInt32();
+                UpdateMainWindowColors(NewTheme.Cloning());
             };
 
             SeriesEditPane_Buttons_Icon_Hover.ColorChanged += (sender, e) =>
@@ -671,6 +694,7 @@ namespace Tsundoku.Views
                 //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesEditPane_Buttons_Icon_Hover.Color);
                 SeriesEditPane_Buttons_Icon_Hover_Button.Background = new SolidColorBrush(SeriesEditPane_Buttons_Icon_Hover.Color);
                 NewTheme.SeriesEditPaneButtonsIconHoverColor = SeriesEditPane_Buttons_Icon_Hover.Color.ToUInt32();
+                UpdateMainWindowColors(NewTheme.Cloning());
             };
         }
     }

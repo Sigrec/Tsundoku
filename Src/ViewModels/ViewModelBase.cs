@@ -1,6 +1,4 @@
 using System.Diagnostics;
-using System.Text.Json.Serialization.Metadata;
-using System.Text.Unicode;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Tsundoku.Models;

@@ -295,35 +295,93 @@
                                               Grid.Column="1"
                                               Width="{CompiledBinding Source={x:Static local:Constants.RIGHT_SIDE_CARD_WIDTH}}"
                                               DockPanel.Dock="Right" 
-                                              RowDefinitions="*, 40"
+                                              RowDefinitions="Auto, 40"
                                               ShowGridLines="false">
+                                            <Grid.Styles>
+                                                <Style Selector="ScrollViewer">
+                                                    <Setter Property="IsScrollChainingEnabled" Value="false"/>
+                                                </Style>
+                                                <Style Selector="ScrollBar:vertical">
+                                                    <Style Selector="^ /template/ Rectangle#TrackRect">
+                                                        <Setter Property="Fill" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}" />
+                                                    </Style>
+
+                                                    <Style Selector="^ /template/ Thumb">
+                                                        <Setter Property="Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" />
+                                                        <Style Selector="^:pointerover /template/ Border">
+                                                            <Setter Property="Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" />
+                                                        </Style>
+                                                        <Style Selector="^:pressed /template/ Border">
+                                                            <Setter Property="Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" />
+                                                        </Style>
+                                                    </Style>
+
+                                                    <Style Selector="^[IsExpanded=true]">
+                                                        <Style Selector="^ /template/ Thumb">
+                                                            <Setter Property="Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" />
+                                                        </Style>
+
+                                                        <Style Selector="^ /template/ PathIcon">
+                                                            <Setter Property="Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" />
+                                                        </Style>
+                                                    </Style>
+
+                                                    <Style Selector="^ /template/ RepeatButton#PART_LineUpButton, ^ /template/ RepeatButton#PART_LineDownButton">
+                                                        <Setter Property="TextElement.Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}"/>
+                                                        <Style Selector="^:pointerover">
+                                                            <Setter Property="TextElement.Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
+
+                                                            <Style Selector="^ /template/ ContentPresenter" >
+                                                                <Setter Property="Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}"/>
+                                                            </Style>
+                                                            <Style Selector="^ PathIcon">
+                                                                <Setter Property="Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}" />
+                                                            </Style>
+                                                        </Style>
+
+                                                        <Style Selector="^:pressed">
+                                                            <Setter Property="TextElement.Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}"/>
+                                                            <Style Selector="^ /template/ ContentPresenter" >
+                                                                <Setter Property="Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" />
+                                                            </Style>
+                                                            <Style Selector="^ PathIcon">
+                                                                <Setter Property="Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}" />
+                                                            </Style>
+                                                        </Style>
+                                                    </Style>
+                                                </Style>
+                                            </Grid.Styles>
                                             <!-- Top Right Side Card Series Edit-->
                                             <Grid Height="{CompiledBinding Source={x:Static local:Constants.TOP_SECTION_CARD_HEIGHT}}" 
                                                 Grid.Row="0" 
                                                 Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneBGColor, Converter={StaticResource ConvertColor}}" 
-                                                ColumnDefinitions="*, 75" 
+                                                ColumnDefinitions="*,75" 
                                                 IsVisible="false"
                                                 ZIndex="1">
                                                 <Grid.Styles>
-                                                    <Style Selector="TextBox:pointerover /template/ Border#PART_BorderElement, TextBox:focus /template/ Border#PART_BorderElement">
-                                                        <Setter Property="Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesNotesBGColor, Converter={StaticResource ConvertColor}}"/>
-                                                        <Setter Property="BorderBrush" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesNotesBorderColor, Converter={StaticResource ConvertColor}}"/>
+                                                    <Style Selector="TextBox">
+                                                        <Style Selector="^:pointerover /template/ Border#PART_BorderElement, ^:focus /template/ Border#PART_BorderElement">
+                                                            <Setter Property="Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesNotesBGColor, Converter={StaticResource ConvertColor}}"/>
+                                                            <Setter Property="BorderBrush" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesNotesBorderColor, Converter={StaticResource ConvertColor}}"/>
+                                                        </Style>
                                                     </Style>
                                                 </Grid.Styles>
                                                 <TextBox Grid.Column="0"
-                                                            MinHeight="{CompiledBinding Source={x:Static local:Constants.USER_NOTES_HEIGHT}}"
-                                                            MinWidth="{CompiledBinding Source={x:Static local:Constants.USER_NOTES_WIDTH}}" 
-                                                            Margin="8"
-                                                            Text="{CompiledBinding SeriesNotes}"
-                                                            AcceptsReturn="True" 
-                                                            TextWrapping="Wrap"
-                                                            BorderThickness="2"
-                                                            BorderBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesNotesBorderColor, Converter={StaticResource ConvertColor}}"
-                                                            FontWeight="Bold"
-                                                            Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesNotesTextColor, Converter={StaticResource ConvertColor}}"
-                                                            Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesNotesBGColor, Converter={StaticResource ConvertColor}}"
-                                                            SelectionBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesNotesTextColor, Converter={StaticResource ConvertColor}}"
-                                                            SelectionForegroundBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesNotesBGColor, Converter={StaticResource ConvertColor}}"/>
+                                                         MinHeight="{CompiledBinding Source={x:Static local:Constants.USER_NOTES_HEIGHT}}"
+                                                         MinWidth="{CompiledBinding Source={x:Static local:Constants.USER_NOTES_WIDTH}}" 
+                                                         Margin="8"
+                                                         Text="{CompiledBinding SeriesNotes}"
+                                                         AcceptsReturn="True" 
+                                                         TextWrapping="Wrap"
+                                                         BorderThickness="2"
+                                                         TextAlignment="Left"
+                                                         HorizontalContentAlignment="Left"
+                                                         BorderBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesNotesBorderColor, Converter={StaticResource ConvertColor}}"
+                                                         FontWeight="Bold"
+                                                         Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesNotesTextColor, Converter={StaticResource ConvertColor}}"
+                                                         Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesNotesBGColor, Converter={StaticResource ConvertColor}}"
+                                                         SelectionBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesNotesTextColor, Converter={StaticResource ConvertColor}}"
+                                                         SelectionForegroundBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesNotesBGColor, Converter={StaticResource ConvertColor}}"/>
                                                 <StackPanel Grid.Column="1" Spacing="10" VerticalAlignment="Center" HorizontalAlignment="Center">
                                                     <StackPanel.Styles>
                                                         <Style Selector="Button:pointerover /template/ ContentPresenter">
@@ -507,7 +565,7 @@
                                                                 </Style>
                                                             </Style>
 
-                                                            <Style Selector="^ Thumb:pointerover /template/ Border">
+                                                            <Style Selector="^ Thumb:pointerover /template/ Border, ^ Thumb:pressed /template/ Border">
                                                                 <Setter Property="Background" Value="{Binding CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" />
                                                             </Style>
 
@@ -649,56 +707,6 @@
                                                     Grid.RowDefinitions="Auto,Auto,*"
                                                     Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesCardBGColor, Converter={StaticResource ConvertColor}}"
                                                     ShowGridLines="false">
-                                                <Grid.Styles>
-                                                    <Style Selector="ScrollBar:vertical">
-                                                        <Style Selector="^ /template/ Rectangle#TrackRect">
-                                                            <Setter Property="Fill" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}" />
-                                                        </Style>
-                                                        <Style Selector="^ /template/ Thumb">
-                                                            <Setter Property="Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" />
-                                                            <Style Selector="^:pointerover /template/ Border">
-                                                                <Setter Property="Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" />
-                                                            </Style>
-                                                            <Style Selector="^:pressed /template/ Border">
-                                                                <Setter Property="Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" />
-                                                            </Style>
-                                                        </Style>
-
-                                                        <Style Selector="^[IsExpanded=true]">
-                                                            <Style Selector="^ /template/ Thumb">
-                                                                <Setter Property="Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" />
-                                                            </Style>
-
-                                                            <Style Selector="^ /template/ PathIcon">
-                                                                <Setter Property="Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" />
-                                                            </Style>
-                                                        </Style>
-
-                                                        <Style Selector="^ /template/ RepeatButton#PART_LineUpButton, ^ /template/ RepeatButton#PART_LineDownButton">
-                                                            <Setter Property="TextElement.Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}"/>
-                                                            <Style Selector="^:pointerover">
-                                                                <Setter Property="TextElement.Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.MenuButtonTextAndIconHoverColor, Converter={StaticResource ConvertColor}}"/>
-
-                                                                <Style Selector="^ /template/ ContentPresenter" >
-                                                                    <Setter Property="Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}"/>
-                                                                </Style>
-                                                                <Style Selector="^ PathIcon">
-                                                                    <Setter Property="Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}" />
-                                                                </Style>
-                                                            </Style>
-
-                                                            <Style Selector="^:pressed">
-                                                                <Setter Property="TextElement.Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}"/>
-                                                                <Style Selector="^ /template/ ContentPresenter" >
-                                                                    <Setter Property="Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" />
-                                                                </Style>
-                                                                <Style Selector="^ PathIcon">
-                                                                    <Setter Property="Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}" />
-                                                                </Style>
-                                                            </Style>
-                                                        </Style>
-                                                    </Style>
-                                                </Grid.Styles>
                                                 <!-- <Border Grid.Row="0" BorderBrush="Red" BorderThickness="1"> -->
                                                 <TextBlock Grid.Row="0"
                                                         TextWrapping="Wrap"
@@ -721,7 +729,7 @@
                                                 </TextBlock>
                                                 <!-- </Border> -->
                                                 <TextBlock TextWrapping="Wrap"
-                                                            Grid.Row="1"
+                                                           Grid.Row="1"
                                                            Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesCardStaffColor, Converter={StaticResource ConvertColor}}"
                                                            Padding="9,0,4,2">
                                                     <TextBlock.Text>
@@ -733,7 +741,6 @@
                                                 </TextBlock>
                                                 <ScrollViewer VerticalScrollBarVisibility="Auto"
                                                               HorizontalScrollBarVisibility="Disabled"
-                                                              IsScrollChainingEnabled="false"
                                                               Grid.Row="2">
                                                     <TextBlock TextWrapping="Wrap"
                                                                 Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesCardDescColor, Converter={StaticResource ConvertColor}}"

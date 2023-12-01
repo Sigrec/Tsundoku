@@ -1,7 +1,11 @@
+using System.ComponentModel;
+using ReactiveUI.Fody.Helpers;
+
 namespace Tsundoku.Models
 {
-    public class TsundokuTheme : ICloneable, IComparable
+    public class TsundokuTheme : ICloneable, IComparable, IDisposable
     {
+        [JsonIgnore] private bool disposedValue;
         public string ThemeName { get; set; }
         public uint MenuBGColor { get; set; }
         public uint UsernameColor { get; set; }
@@ -212,5 +216,35 @@ namespace Tsundoku.Models
         {
             return Cloning();
         }
+
+        protected virtual void Dispose(bool disposing)
+		{
+			if (!disposedValue)
+			{
+				if (disposing)
+				{
+					// dispose managed state (managed objects)
+					
+				}
+
+				// free unmanaged resources (unmanaged objects) and override finalizer
+				// set large fields to null
+				disposedValue = true;
+			}
+		}
+
+		// Override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
+		// ~Series()
+		// {
+		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+		//     Dispose(disposing: false);
+		// }
+
+		public void Dispose()
+		{
+			// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+			Dispose(disposing: true);
+			GC.SuppressFinalize(this);
+		}
     }
 }

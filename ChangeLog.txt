@@ -8,18 +8,21 @@ Legend
 
 TODO:
 ❌ ComboboxItem Styles not applying properly in Theme & AdvancedQuery
-❌ Fix virtualization issue where adding a series sometimes causes the control height to bug
+❌ Fix padding issue in Series Note w/ Scrollbar
 ❌ Fix issue where clicking would sometimes cause the the main window to scroll up (https://github.com/AvaloniaUI/Avalonia/issues/7593)
 
-V2.2.6.0
+V2.2.6.0 - December 1st
 ✅ Upgraded to .NET 8.0 & updated other libraries
-✅ Unicode data is now encoded in the UserData.json file instead of it being in unicode format
-⌛ Lowered minimum delay for Advanced Search
+✅ Unicode data is now encoded in the UserData.json file instead of it being in Unicode format
+✅ Users now no longer need to save every time theme colors are changed, colors are updated live
+⌛ Lowered minimum delay for Advanced Search key entry
 🔥 Fixed issue where cover file name does not append correct comic format name
-🔥 Fixed issue when closing application it would lag due to a error
+🔥 Fixed issue when closing application, it would lag due to a error
 🔥 Added additional series description parsing for MangaDex
 🔥 Fixed issue where adding a new series causes it to be counted as a possible series to change the cover for
-🔥 Fixed issue where closing Advanced Search Popup with list open causes the list to stay open, now closes as intended
+🔥 Fixed issue where closing Advanced Search Popup with list open with CTRL+F causes the list to stay open, now closes as intended
+🔥 Fixed missing styling to series note scrollbar
+🔥 Fixed virtualization issue that caused title or staff to be cut off when changing collection (searching, filtering, etc.)
 
 V2.2.5.0 - November 14th
 🔥 Fixed issue where cover would not reload if you changed a cover of a series that is not currently in the search
