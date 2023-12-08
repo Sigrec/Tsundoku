@@ -31,9 +31,12 @@ namespace Tsundoku.Views
 
             Closing += (s, e) =>
             {
-                ((SettingsWindow)s).Hide();
-                Topmost = false;
-                IsOpen ^= true;
+                if (IsOpen)
+                {
+                    ((SettingsWindow)s).Hide();
+                    Topmost = false;
+                    IsOpen ^= true;
+                }
                 e.Cancel = true;
             };
 

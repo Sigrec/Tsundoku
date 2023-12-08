@@ -7,14 +7,6 @@
 	<Style Selector="controls|TsundokuPieChart">
 		<Setter Property="Template">
 			<ControlTemplate>
-				<!-- <Border Background="{CompiledBinding CurrentTheme.CollectionBGColor, Converter={StaticResource ConvertColor}}" Margin="20" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 15 6 #B3000000" Width="250" Height="250">
-					<Border CornerRadius="8" ClipToBounds="True">
-						<StackPanel>
-							<TextBlock Text="{TemplateBinding ChartTitle}" FontSize="22" FontWeight="Bold" Classes="menu" HorizontalAlignment="Center" Margin="0,10,0,0"/>
-							<lvc:PieChart Series="{TemplateBinding ChartData}" Width="250" Height="250"/>
-						</StackPanel>
-					</Border>
-				</Border> -->
 				<StackPanel>
 					<TextBlock Text="{TemplateBinding ChartTitle}" FontSize="22" FontWeight="Bold" Classes="menu" HorizontalAlignment="Center" Margin="0,10,0,0"/>
 					<lvc:PieChart Series="{TemplateBinding ChartData}" Width="250" Height="250"/>

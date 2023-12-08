@@ -1,6 +1,5 @@
 ﻿using GraphQL;
 using GraphQL.Client.Http;
-using GraphQL.Client.Serializer.Newtonsoft;
 using GraphQL.Client.Serializer.SystemTextJson;
 using System.Net.Http.Headers;
 using System.Text.RegularExpressions;

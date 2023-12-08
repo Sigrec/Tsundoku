@@ -22,7 +22,7 @@ namespace Tsundoku.ViewModels
     public partial class MainWindowViewModel : ViewModelBase
     {
         public const string USER_DATA_FILEPATH = @"UserData.json";
-        private const double SCHEMA_VERSION = 2.4;
+        private const double SCHEMA_VERSION = 2.5;
         private static bool CanFilter = true;
         private static bool UpdatedCovers = false;
         public static AvaloniaList<Series> SearchedCollection { get; set; } = [];
@@ -342,7 +342,7 @@ namespace Tsundoku.ViewModels
         }
 
         // Basic Test Query Demographic==Seinen Format==Manga Series==Complete Favorite==True
-        private async void AdvancedSearchCollection(string AdvancedSearchQuery)
+        public async void AdvancedSearchCollection(string AdvancedSearchQuery)
         {
             if (!string.IsNullOrWhiteSpace(AdvancedSearchQuery) && AdvancedQueryRegex().IsMatch(AdvancedSearchQuery))
             {
@@ -363,14 +363,14 @@ namespace Tsundoku.ViewModels
                         AdvancedFilterExpression.AppendFormat("{0} && ", ParseAdvancedFilter(advFilter[1].Value, advFilter[2].Value, advFilter[3].Value));
                     }
                     AdvancedFilterExpression.Insert(0, "series => ").Remove(AdvancedFilterExpression.Length - 4, 4);
-                    LOGGER.Debug($"'{AdvancedSearchQuery}' = '{AdvancedFilterExpression}'");
+                    LOGGER.Debug($" Initial Query = \"{AdvancedSearchQuery}\" -> \"{AdvancedFilterExpression}\"");
                     try
                     {
                         FilteredCollection = UserCollection.AsQueryable().Where(AdvancedFilterExpression.ToString()); 
                     }
                     catch (Exception)
                     {
-                        AdvancedSearchQueryErrorMessage = "Inputted Incorrectly Formatted Advanced Search Query!";
+                        AdvancedSearchQueryErrorMessage = "Incorrectly Formatted Advanced Search Query!";
                         LOGGER.Warn("User Inputted Incorrectly Formatted Advanced Search Query");
                     }
                     finally
@@ -711,7 +711,34 @@ namespace Tsundoku.ViewModels
                 updatedVersion = true;
             }
 
-            File.WriteAllText(USER_DATA_FILEPATH, userData.ToString());
+            if (curVersion < 2.5)
+            {
+                LOGGER.Debug("Updating to v2.5");
+                for (int x = 0; x < collectionJsonArray.Count; x++)
+                {
+                    series = collectionJsonArray.ElementAt(x).AsObject();
+                    string[] coverFileName = series["Cover"].ToString().Split('_');
+                    string format = series["Format"].ToString().ToUpper();
+                    string oldCoverFileName = series["Cover"].ToString();
+                    if (!coverFileName[1].StartsWith(format) && File.Exists(oldCoverFileName))
+                    {
+                        series["Cover"] = $@"{coverFileName[0]}_{format}.{oldCoverFileName.Substring(oldCoverFileName.Length - 3)}";
+                        File.Move(oldCoverFileName, series["Cover"].ToString());
+                        LOGGER.Debug("Updated {} Cover File Name", series["Titles"]["Romaji"].ToString());
+                    }
+                }
+                userData["CurDataVersion"] = 2.5;
+                LOGGER.Info("Updated Users Data to v2.5");
+                updatedVersion = true;
+            }
+
+            File.WriteAllText(USER_DATA_FILEPATH, JsonSerializer.Serialize(userData, new JsonSerializerOptions()
+            { 
+                WriteIndented = true,
+                ReadCommentHandling = JsonCommentHandling.Disallow,
+                AllowTrailingCommas = true,
+                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            }));
             return updatedVersion;
         }
 

@@ -1,6 +1,3 @@
-using System;
-using System.Collections.ObjectModel;
-using System.Text;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using ReactiveUI;
@@ -25,9 +22,12 @@ namespace Tsundoku.Views
 
             Closing += (s, e) =>
             {
-                ((AddNewSeriesWindow)s).Hide();
-                IsOpen ^= true;
-                Topmost = false;
+                if (IsOpen)
+                {
+                    ((AddNewSeriesWindow)s).Hide();
+                    IsOpen ^= true;
+                    Topmost = false;
+                }
                 e.Cancel = true;
             };
 

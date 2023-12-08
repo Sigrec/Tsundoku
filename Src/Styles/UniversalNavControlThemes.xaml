@@ -93,7 +93,8 @@
                                     BorderThickness="2"
                                     CornerRadius="2">
                                 <ScrollViewer HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
-                                            VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}">
+                                            VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}"
+                                            Theme="{StaticResource ReverseCollectionScroll}">
                                 <ItemsPresenter Name="PART_ItemsPresenter"
                                                 Margin="{DynamicResource ComboBoxDropdownContentMargin}"
                                                 ItemsPanel="{TemplateBinding ItemsPanel}" />
@@ -605,7 +606,7 @@
     </ControlTheme>
 
     <ControlTheme x:Key="ReverseCollectionScroll" TargetType="ScrollViewer">
-        <Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}" />
+        <Setter Property="Background" Value="Transparent" />
             <Setter Property="Template">
                 <ControlTemplate>
                     <Grid ColumnDefinitions="*,Auto" RowDefinitions="*,Auto">

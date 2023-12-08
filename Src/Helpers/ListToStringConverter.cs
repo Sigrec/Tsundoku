@@ -1,21 +1,20 @@
 using System.Globalization;
-using Avalonia.Controls;
 using Avalonia.Data.Converters;
 
 namespace Tsundoku.Helpers
 {
-    public class ComboBoxListConverter : IValueConverter
+    public class ListToStringConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is List<string>)
             {
-                List<ComboBoxItem> itemList = new List<ComboBoxItem>();
-                foreach (string themeName in value as List<string>)
+                StringBuilder listAsString = new StringBuilder();
+                foreach (string filter in value as List<string>)
                 {
-                    itemList.Add(new ComboBoxItem { Content = themeName });
+                    listAsString.AppendLine(filter);
                 }
-                return itemList;
+                return listAsString.ToString().Trim();
             }
             throw new NotSupportedException();
         }

@@ -2,7 +2,6 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Tsundoku.ViewModels;
 using MangaAndLightNovelWebScrape;
-using DynamicData;
 using ReactiveUI;
 using System.Reactive.Linq;
 using MangaAndLightNovelWebScrape.Websites;
@@ -27,10 +26,13 @@ namespace Tsundoku.Views
 
             Closing += (s, e) =>
             {
-                ((PriceAnalysisWindow)s).Hide();
-                TitleBox.Text = string.Empty;
-                Topmost = false;
-                IsOpen ^= true;
+                if (IsOpen)
+                {
+                    ((PriceAnalysisWindow)s).Hide();
+                    TitleBox.Text = string.Empty;
+                    Topmost = false;
+                    IsOpen ^= true;
+                }
                 e.Cancel = true;
             };
 

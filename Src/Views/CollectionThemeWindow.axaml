@@ -40,7 +40,7 @@
 									<Button Name="Menu_BG_Button" Background="{CompiledBinding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
 										<Button.Flyout>
 											<Flyout Placement="Bottom">  
-												<ColorView Name="Menu_BG"/>
+												<ColorView Name="Menu_BG" Color="{CompiledBinding CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}"/>
 											</Flyout>
 										</Button.Flyout>
 									</Button>

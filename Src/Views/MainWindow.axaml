@@ -23,6 +23,7 @@
 		<ResourceDictionary>
 			<cv:TitleLangConverter x:Key="ConvertTitle"/>
 			<cv:StaffLangConverter x:Key="ConvertStaff"/>
+            <cv:ListToStringConverter x:Key="ListToString"/>
 			<ResourceDictionary.MergedDictionaries>
 				<ResourceInclude Source="/Styles/CollectionControlThemes.xaml"/>
 			</ResourceDictionary.MergedDictionaries>
@@ -46,9 +47,16 @@
                             IsDefault="True"
                             FontSize="20"
                             Height="35"
-                            i:Attached.Icon="fa-magnifying-glass" 
+                            i:Attached.Icon="fa-magnifying-glass"
+                            ToolTip.Placement="Left"
+                            ToolTip.HorizontalOffset="-510"
+                            ToolTip.VerticalOffset="300"
                             Theme="{StaticResource MenuButton}"
-                            Command="{CompiledBinding StartAdvancedSearch}"/>
+                            Command="{CompiledBinding StartAdvancedSearch}">
+                        <ToolTip.Tip>
+                            <TextBlock Text="{CompiledBinding Source={x:Static local:Constants.ADVANCED_SEARCH_FILTERS}, Converter={StaticResource ListToString}}" FontSize="15"/>
+                        </ToolTip.Tip>
+                    </Button>
                 </StackPanel>
                 <TextBlock Name="AdvancedSearchQueryErrorMessage"
                         Text="{CompiledBinding AdvancedSearchQueryErrorMessage}"
@@ -138,6 +146,10 @@
                                 Width="185"
                                 SelectedIndex="{CompiledBinding LanguageIndex}"
                                 AutoScrollToSelectedItem="True"
+                                ToolTip.Placement="Left"
+                                ToolTip.Tip="Change Language"
+                                ToolTip.HorizontalOffset="-5"
+                                ToolTip.VerticalOffset="0"
                                 Theme="{StaticResource MenuComboBox}">
                             <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Romaji</ComboBoxItem>
                             <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">English</ComboBoxItem>
@@ -193,6 +205,10 @@
                                 Height="35"
                                 Width="185"
                                 SelectedIndex="{CompiledBinding FilterIndex}"
+                                ToolTip.Placement="Left"
+                                ToolTip.Tip="Change Sort/Filter"
+                                ToolTip.HorizontalOffset="-5"
+                                ToolTip.VerticalOffset="0"
                                 Theme="{StaticResource MenuComboBox}">
                             <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">None</ComboBoxItem>
                             <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Query</ComboBoxItem>

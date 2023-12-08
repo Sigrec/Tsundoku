@@ -4,7 +4,6 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using DynamicData;
 using ReactiveUI;
 using Tsundoku.Models;
@@ -28,7 +27,6 @@ namespace Tsundoku.Views
             {
                 CollectionWindow = (MainWindow)((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).MainWindow;
                 NewTheme = ThemeSettingsVM.CurrentTheme.Cloning();
-                // ThemeSettingsVM.CurrentTheme = NewTheme;
                 IsOpen ^= true;
                 ThemeChanged = false;
                 int index = ThemeSettingsViewModel.UserThemesDisplay.IndexOf(ThemeSettingsVM.CurrentTheme.ThemeName);
@@ -47,7 +45,6 @@ namespace Tsundoku.Views
                     Topmost = false;
                     IsOpen ^= true;
                     CollectionWindow.CollectionViewModel.CurrentTheme = ThemeSettingsVM.CurrentTheme;
-                    ApplyColors();
                     GC.Collect();
                     GC.WaitForPendingFinalizers();
                 }
@@ -263,6 +260,8 @@ namespace Tsundoku.Views
                 ThemeSettingsViewModel.UserThemesDisplay.RemoveAt(curIndex);
                 ThemeChanged = true;
                 ThemeSelector.SelectedIndex = curIndex == 0 ? curIndex : --curIndex;
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
             }
         }
 
@@ -286,12 +285,7 @@ namespace Tsundoku.Views
             ThemeSettingsVM.CurrentTheme = ViewModelBase.MainUser.SavedThemes.Single(theme => theme.ThemeName.Equals(toThemeName));
 
             // Update Windows
-            CollectionWindow.CollectionViewModel.CurrentTheme = ThemeSettingsVM.CurrentTheme;
-            MainWindowViewModel.newSeriesWindow.AddNewSeriesVM.CurrentTheme = ThemeSettingsVM.CurrentTheme;
-            MainWindowViewModel.settingsWindow.UserSettingsVM.CurrentTheme = ThemeSettingsVM.CurrentTheme;
-            MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.CurrentTheme = ThemeSettingsVM.CurrentTheme;
-            MainWindowViewModel.priceAnalysisWindow.PriceAnalysisVM.CurrentTheme = ThemeSettingsVM.CurrentTheme;
-            MainWindowViewModel.collectionStatsWindow.UpdateChartColors();
+            UpdateAllWindowColors(ThemeSettingsVM.CurrentTheme);
             ApplyColors();
 
             LOGGER.Info($"Theme Changed To \"{toThemeName}\"");
@@ -305,8 +299,6 @@ namespace Tsundoku.Views
             if (ThemeSelector.IsDropDownOpen || ThemeChanged)
             {
                 ChangeTheme();
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
             }
         }
 
@@ -534,7 +526,7 @@ namespace Tsundoku.Views
                 //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesCard_Desc.Color);
                 SeriesCard_Desc_Button.Background = new SolidColorBrush(SeriesCard_Desc.Color);
                 NewTheme.SeriesCardDescColor = SeriesCard_Desc.Color.ToUInt32();
-                UpdateMainWindowColors(NewTheme.Cloning());
+                UpdateAllWindowColors(NewTheme.Cloning());
             };
 
             SeriesProgress_BG.ColorChanged += (sender, e) =>

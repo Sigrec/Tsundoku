@@ -1,10 +1,10 @@
-using Avalonia.Input;
 using LiveChartsCore.Defaults;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
 using Tsundoku.ViewModels;
 using Avalonia.ReactiveUI;
-using System.Drawing;
+using System.Reactive.Subjects;
+using Avalonia.Media;
 
 namespace Tsundoku.Views
 {
@@ -13,6 +13,7 @@ namespace Tsundoku.Views
         public CollectionStatsViewModel? CollectionStatsVM => DataContext as CollectionStatsViewModel;
         public bool IsOpen = false;
         public bool CanUpdate = true; // On First Update
+        Subject<SolidColorBrush> UnknownRectangleColorSource = new Subject<SolidColorBrush>();
 
         public CollectionStatsWindow()
         {
@@ -20,6 +21,7 @@ namespace Tsundoku.Views
             DataContext = new CollectionStatsViewModel();
             Opened += (s, e) =>
             {
+                var sub = UnknownRectangle.Bind(Avalonia.Controls.Shapes.Rectangle.FillProperty, UnknownRectangleColorSource);
                 if (CanUpdate) { UpdateChartColors(); }
                 CanUpdate = false;
                 IsOpen ^= true;
@@ -32,9 +34,12 @@ namespace Tsundoku.Views
 
             Closing += (s, e) =>
             {
-                ((CollectionStatsWindow)s).Hide();
-                IsOpen ^= true;
-                Topmost = false;
+                if (IsOpen)
+                {
+                    ((CollectionStatsWindow)s).Hide();
+                    IsOpen ^= true;
+                    Topmost = false;
+                }
                 e.Cancel = true;
             };
         }
@@ -59,6 +64,7 @@ namespace Tsundoku.Views
 
             PieSeries<ObservableValue> UnknownObject = (PieSeries<ObservableValue>)CollectionStatsVM.Demographics[4];
             UnknownObject.Fill = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.SeriesCardDescColor == CollectionStatsVM.CurrentTheme.MenuTextColor ? CollectionStatsVM.CurrentTheme.SeriesCardTitleColor : CollectionStatsVM.CurrentTheme.SeriesCardDescColor));
+            UnknownRectangleColorSource.OnNext(new SolidColorBrush(CollectionStatsVM.CurrentTheme.SeriesCardDescColor == CollectionStatsVM.CurrentTheme.MenuTextColor ? CollectionStatsVM.CurrentTheme.SeriesCardTitleColor : CollectionStatsVM.CurrentTheme.SeriesCardDescColor));
             UnknownObject.Stroke = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.DividerColor));
 
             PieSeries<ObservableValue> OngoingObject = (PieSeries<ObservableValue>)CollectionStatsVM.StatusDistribution[0];
@@ -77,7 +83,7 @@ namespace Tsundoku.Views
             HiatusObject.Fill = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.MenuTextColor));
             HiatusObject.Stroke = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.DividerColor));
 
-            Color behindBarColor = Color.FromArgb((int)CollectionStatsVM.CurrentTheme.MenuButtonBGColor);
+            Color behindBarColor = Color.FromUInt32(CollectionStatsVM.CurrentTheme.MenuButtonBGColor);
             ColumnSeries<ObservableValue> BarBehindObject = (ColumnSeries<ObservableValue>)CollectionStatsVM.RatingDistribution[0];
             BarBehindObject.Fill = new SolidColorPaint(new SkiaSharp.SKColor(behindBarColor.R, behindBarColor.G, behindBarColor.B, 120));
 
