@@ -745,7 +745,7 @@ namespace Tsundoku.ViewModels
         [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "A New file will always be created if it doesn't exist before serialization")]
         public static void SaveUsersData()
         {
-            LOGGER.Info($"Saving \"{MainUser?.UserName}'s\" Data");
+            LOGGER.Info($"Saving \"{MainUser?.UserName}'s\" Collection Data");
             MainUser.UserCollection = UserCollection;
             MainUser.SavedThemes.Remove(TsundokuTheme.DEFAULT_THEME);
     

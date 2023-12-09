@@ -11,7 +11,6 @@ namespace Tsundoku.Helpers
         })
         {
             BaseAddress = new Uri("https://api.mangadex.org/"),
-            DefaultRequestVersion = HttpVersion.Version30,
             DefaultVersionPolicy = HttpVersionPolicy.RequestVersionExact
         };
 

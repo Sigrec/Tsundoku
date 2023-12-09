@@ -17,7 +17,7 @@
 		<SelfContained>True</SelfContained>
 		<IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
 		<Version>2.2.7</Version>
-		<FileVersion>2.2.7.0</FileVersion>
+		<FileVersion>2.2.7.1</FileVersion>
 		<!-- <PackageIcon>Assets\Icons\Tsundoku-Logo.png</PackageIcon> -->
 		<RepositoryUrl>https://github.com/Sigrec/Tsundoku</RepositoryUrl>
         <LangVersion>preview</LangVersion>

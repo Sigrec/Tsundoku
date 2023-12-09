@@ -11,6 +11,9 @@ TODO:
 ❌ Fix padding issue in Series Note w/ Scrollbar
 ❌ Fix issue where clicking would sometimes cause the the main window to scroll up (https://github.com/AvaloniaUI/Avalonia/issues/7593)
 
+V2.2.7.1 - December 9th
+🔥 Fixed issue where MangaDex call would fail due to version policy mismatch
+
 V2.2.7.0 - December 8th
 ⌛ Updated Avalonia to v11.0.6 (hopefully this resolves some virtualization issues)
 ✅ Added tooltips to ComboBox's in the collection window
