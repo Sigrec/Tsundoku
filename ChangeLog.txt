@@ -12,14 +12,14 @@ TODO:
 ❌ Fix issue where clicking would sometimes cause the the main window to scroll up (https://github.com/AvaloniaUI/Avalonia/issues/7593)
 
 V2.2.7.0 - December 8th
-⌛ Updated Avalonia to v11.0.6 (hopefully this resolves some virutalization issues)
+⌛ Updated Avalonia to v11.0.6 (hopefully this resolves some virtualization issues)
 ✅ Added tooltips to ComboBox's in the collection window
 ✅ Added colors to pie chart legend
-✅ Added tooltip to Advanced Search Query button to show all available quries
-🔥 Fixed bug where "Unknown" color in demographic stats does not get updated propertly
+✅ Added tooltip to Advanced Search Query button to show all available queries
+🔥 Fixed bug where "Unknown" color in demographic stats does not get updated properly
 🔥 Added "Demographic==Unknown" to advanced search as a query option
 🔥 Updated all cover file names to correct comic format name for the previous fix in v2.2.6.0
-🔥 Fixed issue where scrollbar was not being styled in combobox dropdowns in the collection window
+🔥 Fixed issue where scrollbar was not being styled in ComboBox dropdowns in the collection window
 
 V2.2.6.0 - December 1st
 ✅ Upgraded to .NET 8.0 & updated other libraries
