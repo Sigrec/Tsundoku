@@ -49,9 +49,9 @@ namespace Tsundoku.Models
         public enum Demographic
         {
             Shounen,
-            Josei,
-            Seinen,
             Shoujo,
+            Seinen,
+            Josei,
             Unknown
         }
         public static readonly Demographic[] DEMOGRAPHICS = Enum.GetValues<Demographic>();

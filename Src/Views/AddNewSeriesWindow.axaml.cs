@@ -1,6 +1,8 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using LiveChartsCore;
 using ReactiveUI;
+using Tsundoku.Models;
 using Tsundoku.ViewModels;
 
 namespace Tsundoku.Views
@@ -53,6 +55,10 @@ namespace Tsundoku.Views
             TitleBox.Text = string.Empty;
             CurVolCount.Text = string.Empty;
             MaxVolCount.Text = string.Empty;
+            DemographicCombobox.SelectedIndex = 4;
+            VolumesRead.Text = string.Empty;
+            Rating.Text = string.Empty;
+            Cost.Text = string.Empty;
         }
 
         private static ushort ConvertNumText(string value)
@@ -68,20 +74,17 @@ namespace Tsundoku.Views
         {
             AddSeriesButton.IsEnabled = false;
             ViewModelBase.newCoverCheck = true;
-            bool validSeries = await AddNewSeriesViewModel.GetSeriesDataAsync(TitleBox.Text.Trim(), (MangaButton.IsChecked == true) ? Format.Manga : Format.Novel, CurVolNum, MaxVolNum, AddNewSeriesViewModel.ConvertSelectedLangList(AddNewSeriesVM.SelectedAdditionalLanguages));
+            _ = uint.TryParse(VolumesRead.Text.Replace("_", ""), out uint volumesRead);
+            _ = decimal.TryParse(Rating.Text[..4].Replace("_", "0"), out decimal rating);
+            _ = decimal.TryParse(Cost.Text.Replace("_", "0"), out decimal cost);
+            bool validSeries = await AddNewSeriesViewModel.GetSeriesDataAsync(TitleBox.Text.Trim(), (MangaButton.IsChecked == true) ? Format.Manga : Format.Novel, CurVolNum, MaxVolNum, AddNewSeriesViewModel.ConvertSelectedLangList(AddNewSeriesVM.SelectedAdditionalLanguages), Series.GetSeriesDemographic((DemographicCombobox.SelectedItem as ComboBoxItem).Content.ToString()), volumesRead, !Rating.Text[..4].StartsWith("__._") ? rating : -1, cost);
             if (!validSeries) // Boolean returns whether the series added is a duplicate
             {
-                // Update Basic
+                // Update User Stats
                 MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UsersNumVolumesCollected += CurVolNum;
                 MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UsersNumVolumesToBeCollected += (uint)(MaxVolNum - CurVolNum);
                 MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.SeriesCount = (uint)MainWindowViewModel.UserCollection.Count;
-
-                // Update user stats
-                MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UpdateStatusChartValues();
-                MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UpdateStatusPercentages();
-                MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UpdateDemographicChartValues();
-                MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UpdateDemographicPercentages();
-                MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UpdateRatingChartValues();
+                MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UpdateAllStats();
 
                 // Clear the fields in this window
                 ClearFields();

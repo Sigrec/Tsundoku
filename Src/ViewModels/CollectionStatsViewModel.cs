@@ -260,6 +260,57 @@ namespace Tsundoku.ViewModels
             UnknownPercentage = Math.Round(Convert.ToDecimal(MainWindowViewModel.UserCollection.Count != 0 && UnknownCount.Value != double.NaN ? UnknownCount.Value / MainWindowViewModel.UserCollection.Count * 100 : 0), 2);
         }
 
+        public void UpdateCollectionPrice()
+        {
+            decimal costVal = decimal.Zero;
+            foreach (Series x in MainWindowViewModel.UserCollection)
+            {
+                costVal = decimal.Add(costVal, x.Cost);
+            }
+            CollectionPrice = $"{CurCurrency}{decimal.Round(costVal, 2)}";
+        }
+
+        public void UpdateCollectionVolumesRead()
+        {
+            uint volumesRead = 0;
+            foreach (Series x in MainWindowViewModel.UserCollection)
+            {
+                volumesRead += x.VolumesRead;
+            }
+            VolumesRead = volumesRead;
+        }
+
+        public void UpdateCollectionRating()
+        {
+            // MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UpdateRatingChartValues();
+            decimal rating = decimal.Zero;
+            uint countRating = 0;
+            foreach (Series x in MainWindowViewModel.UserCollection.ToList())
+            {
+                if (x.Rating >= 0)
+                {
+                    rating = decimal.Add(rating, x.Rating);
+                    countRating++;
+                }
+            }
+            MeanRating = decimal.Round(decimal.Divide(rating, countRating), 1);
+        }
+
+        public void UpdateAllStats()
+        {
+            UpdateCollectionPrice();
+            UpdateCollectionVolumesRead();
+            UpdateCollectionRating();
+
+            UpdateStatusChartValues();
+            UpdateStatusPercentages();
+
+            UpdateDemographicChartValues();
+            UpdateDemographicPercentages();
+            
+            UpdateRatingChartValues();
+        }
+
         /// <summary>
         /// Generates all of the values for the users stats
         /// </summary>

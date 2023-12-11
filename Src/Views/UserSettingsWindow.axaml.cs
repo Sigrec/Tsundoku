@@ -53,6 +53,7 @@ namespace Tsundoku.Views
                 string newCurrency = (CurrencySelector.SelectedItem as ComboBoxItem).Content.ToString();
                 currencyLength = CollectionWindow.CollectionViewModel.CurCurrency.Length;
                 CollectionWindow.CollectionViewModel.CurCurrency = newCurrency;
+                MainWindowViewModel.newSeriesWindow.AddNewSeriesVM.CurCurrency = newCurrency;
                 MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.CollectionPrice = $"{newCurrency}{ MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.CollectionPrice[currencyLength..]}";
                 ViewModelBase.MainUser.Currency = newCurrency;
                 LOGGER.Info($"Currency Changed To {newCurrency}");

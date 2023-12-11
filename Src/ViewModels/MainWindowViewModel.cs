@@ -51,7 +51,7 @@ namespace Tsundoku.ViewModels
         public static PriceAnalysisWindow priceAnalysisWindow;
         public ReactiveCommand<Unit, Unit> OpenPriceAnalysisWindow { get; set; }
 
-        public static  CollectionStatsWindow collectionStatsWindow;
+        public static CollectionStatsWindow collectionStatsWindow;
         public ReactiveCommand<Unit, Unit> OpenCollectionStatsWindow { get; set; }
         public ICommand StartAdvancedSearch { get; }
         private static StringBuilder AdvancedFilterExpression = new StringBuilder();
@@ -467,7 +467,6 @@ namespace Tsundoku.ViewModels
             }
             
             MainUser = JsonSerializer.Deserialize(userData, typeof(User), User.UserJsonModel) as User;
-            // MainUser = JsonSerializer.Deserialize<User>(userData, options);
             MainUser.SavedThemes.Add(TsundokuTheme.DEFAULT_THEME);
             MainUser.SavedThemes = new ObservableCollection<TsundokuTheme>(MainUser.SavedThemes.OrderBy(theme => theme.ThemeName));
 

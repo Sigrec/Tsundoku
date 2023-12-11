@@ -10,6 +10,13 @@ TODO:
 ❌ ComboboxItem Styles not applying properly in Theme & AdvancedQuery
 ❌ Fix padding issue in Series Note w/ Scrollbar
 ❌ Fix issue where clicking would sometimes cause the the main window to scroll up (https://github.com/AvaloniaUI/Avalonia/issues/7593)
+❌ Add stats to AddSeries window so users can input everything all at once
+
+V2.2.8.0 - December 11th
+✅ Added stats to AddSeries window so users can input everything all at once
+✅ "Additional Languages" ToolTip (Hover over the title) in AddSeries Window now sorts languages in alphabetical order regardless of selection order
+🔥 Fixed issue where app would crash when clicking "Save Stats" button
+🔥 Stats, Cost & Rating underscores, now act as a 0 (ex: inputting __444._4 for Cost stat becomes 444.04 instead of 444.4)
 
 V2.2.7.1 - December 9th
 🔥 Fixed issue where MangaDex call would fail due to version policy mismatch

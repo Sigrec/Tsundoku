@@ -222,46 +222,39 @@ namespace Tsundoku.Views
             string volumesRead = ((MaskedTextBox)stackPanels.ElementAt(0).GetLogicalChildren().ElementAt(1)).Text.Replace("_", "");
             if (!string.IsNullOrWhiteSpace(volumesRead))
             {
-                uint volumesReadVal = Convert.ToUInt32(volumesRead), countVolumesRead = 0;
-                curSeries.VolumesRead = volumesReadVal;
-                ((TextBlock)stackPanels.ElementAt(0).GetLogicalChildren().ElementAt(0)).Text = $"Read {volumesReadVal} Vol(s)";
-                LOGGER.Info($"Updated # of Volumes Read for \"{curSeries.Titles["Romaji"]}\" to {volumesReadVal}");
-                volumesReadVal = 0;
-                foreach (Series x in CollectionsMarshal.AsSpan(MainWindowViewModel.UserCollection.ToList()))
+                uint volumesReadVal = Convert.ToUInt32(volumesRead);
+                if (curSeries.VolumesRead != volumesReadVal)
                 {
-                    volumesReadVal += x.VolumesRead;
-                    if (x.VolumesRead != 0)
-                    {
-                        countVolumesRead++;
-                    }
+                    curSeries.VolumesRead = volumesReadVal;
+                    ((TextBlock)stackPanels.ElementAt(0).GetLogicalChildren().ElementAt(0)).Text = $"Read {volumesReadVal} Vol(s)";
+                    LOGGER.Info($"Updated # of Volumes Read for \"{curSeries.Titles["Romaji"]}\" to {volumesReadVal}");
+                    volumesReadVal = 0;
+                    MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UpdateCollectionVolumesRead();
+                    ((MaskedTextBox)stackPanels.ElementAt(0).GetLogicalChildren().ElementAt(1)).Text = "";
                 }
-                MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.VolumesRead = volumesReadVal;
-                ((MaskedTextBox)stackPanels.ElementAt(0).GetLogicalChildren().ElementAt(1)).Text = "";
             }
+            LOGGER.Debug("Passed Volumes Read Check");
 
-            string cost = ((MaskedTextBox)stackPanels.ElementAt(1).GetLogicalChildren().ElementAt(1)).Text.Replace("_", "");
-            if (!cost.Equals("."))
+            string costText = ((MaskedTextBox)stackPanels.ElementAt(1).GetLogicalChildren().ElementAt(1)).Text;
+            decimal costVal = Convert.ToDecimal(costText.Replace("_", "0"));
+            LOGGER.Debug("Test2 = {}", costText);
+            if (decimal.Compare(costVal, 0) >= 0 && curSeries.Cost != costVal && !costText.Equals("_________.__"))
             {
-                decimal costVal = Convert.ToDecimal(cost);
                 curSeries.Cost = costVal;
                 ((TextBlock)stackPanels.ElementAt(1).GetLogicalChildren().ElementAt(0)).Text = $"Cost {CollectionViewModel.CurCurrency}{costVal}";
                 LOGGER.Info($"Updated Cost for \"{curSeries.Titles["Romaji"]}\" to {CollectionViewModel.CurCurrency}{costVal}");
-                costVal = 0;
-                foreach (Series x in MainWindowViewModel.UserCollection)
-                {
-                    costVal += x.Cost;
-                }
-                MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.CollectionPrice = $"{CollectionViewModel.CurCurrency}{decimal.Round(costVal, 2)}";
+                MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UpdateCollectionPrice();
                 ((MaskedTextBox)stackPanels.ElementAt(1).GetLogicalChildren().ElementAt(1)).Text = "";
             }
+            LOGGER.Debug("Passed Cost Check");
 
-            string rating = ((MaskedTextBox)stackPanels.ElementAt(2).GetLogicalChildren().ElementAt(1)).Text[..4].Replace("_", "");
-            if (!rating.Equals("."))
+            string ratingValText = ((MaskedTextBox)stackPanels.ElementAt(2).GetLogicalChildren().ElementAt(1)).Text;
+            LOGGER.Debug("Test1 = {}", ratingValText);
+            decimal ratingVal = Convert.ToDecimal(ratingValText[..4].Replace("_", "0"));
+            if (decimal.Compare(ratingVal, 0) >= 0 && curSeries.Rating != ratingVal && !ratingValText.StartsWith("__._"))
             {
-                decimal ratingVal = Convert.ToDecimal(rating);
                 if (decimal.Compare(ratingVal, new decimal(10.0)) <= 0)
                 {
-                    int countrating = 0;
                     curSeries.Rating = ratingVal;
                     ((TextBlock)stackPanels.ElementAt(2).GetLogicalChildren().ElementAt(0)).Text = $"Rating {ratingVal}/10.0";
                     
@@ -269,24 +262,16 @@ namespace Tsundoku.Views
                     MainWindowViewModel.UserCollection.First(series => series == curSeries).Rating = ratingVal;
                     MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UpdateRatingChartValues();
 
-                    LOGGER.Info($"Updated rating for \"{curSeries.Titles["Romaji"]}\" to {ratingVal}/10.0");
-                    ratingVal = 0;
-                    foreach (Series x in CollectionsMarshal.AsSpan(MainWindowViewModel.UserCollection.ToList()))
-                    {
-                        if (x.Rating >= 0)
-                        {
-                            ratingVal += x.Rating;
-                            countrating++;
-                        }
-                    }
-                    MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.MeanRating = decimal.Round(ratingVal / countrating, 1);
+                    LOGGER.Info($"Updated rating for \"{curSeries.Titles["Romaji"]}\" to {decimal.Round(ratingVal, 1)}/10.0");
+                    MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UpdateCollectionRating();
                     ((MaskedTextBox)stackPanels.ElementAt(1).GetLogicalChildren().ElementAt(1)).Text = "";
                 }
                 else
                 {
-                    LOGGER.Warn($"Rating Value {ratingVal} larger than 10.0");
+                    LOGGER.Warn($"Rating Value {ratingVal} is larger than 10.0");
                 }
             }
+            LOGGER.Debug("Passed Rating Check");
         }
 
         /// <summary>

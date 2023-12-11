@@ -19,6 +19,7 @@ namespace Tsundoku.ViewModels
         private static readonly StringBuilder CurLanguages = new StringBuilder();
         public AddNewSeriesViewModel()
         {
+            this.CurCurrency = MainUser.Currency;
             this.CurrentTheme = MainUser.SavedThemes.First(theme => theme.ThemeName.Equals(MainUser.MainTheme));
             SelectedAdditionalLanguages.CollectionChanged += AdditionalLanguagesCollectionChanged;
         }
@@ -31,19 +32,17 @@ namespace Tsundoku.ViewModels
                 case NotifyCollectionChangedAction.Remove:
                     if (SelectedAdditionalLanguages != null && SelectedAdditionalLanguages.Any())
                     {
-                        for (int x = 0; x < SelectedAdditionalLanguages.Count - 1; x++)
+                        foreach (ListBoxItem lang in SelectedAdditionalLanguages.OrderBy(lang => lang.Content.ToString()))
                         {
-                            CurLanguages.AppendLine(SelectedAdditionalLanguages[x].Content.ToString());
+                            CurLanguages.AppendLine(lang.Content.ToString());
                         }
-                        CurLanguages.Append(SelectedAdditionalLanguages.Last().Content.ToString());
-                        AdditionalLanguagesToolTipText = CurLanguages.ToString();
-                        CurLanguages.Clear();
+                        AdditionalLanguagesToolTipText = CurLanguages.ToString().Trim();
                     }
                     else
                     {
-                        CurLanguages.Clear();
-                        AdditionalLanguagesToolTipText = CurLanguages.ToString();
+                        AdditionalLanguagesToolTipText = string.Empty;
                     }
+                    CurLanguages.Clear();
                     return;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -60,9 +59,9 @@ namespace Tsundoku.ViewModels
         /// <param name="maxVolCount">The max # of volumes this series currently has</param>
         /// <param name="additionalLanguages">Additional languages to get more info for from Mangadex</param>
         /// <returns>Whether the series can be added to the users collection or not</returns>
-        public static async Task<bool> GetSeriesDataAsync(string title, Format bookType, ushort curVolCount, ushort maxVolCount, ObservableCollection<string> additionalLanguages)
+        public static async Task<bool> GetSeriesDataAsync(string title, Format bookType, ushort curVolCount, ushort maxVolCount, ObservableCollection<string> additionalLanguages, Demographic demographic = Demographic.Unknown, uint volumesRead = 0, decimal rating = -1, decimal cost = 0)
         {
-            Series? newSeries = await Series.CreateNewSeriesCardAsync(title, bookType, maxVolCount, curVolCount,  additionalLanguages);
+            Series? newSeries = await Series.CreateNewSeriesCardAsync(title, bookType, maxVolCount, curVolCount, additionalLanguages, demographic, volumesRead, rating, cost);
             
             bool duplicateSeriesCheck = true;
             if (newSeries != null)

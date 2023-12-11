@@ -61,7 +61,7 @@ namespace Tsundoku.Models
 		public bool IsFavorite { get; set; } = false;
 
         [JsonConstructor]
-		public Series(Dictionary<string, string> Titles, Dictionary<string, string> Staff, string Description, Format Format, Status Status, string Cover, Uri Link, ushort MaxVolumeCount, ushort CurVolumeCount, decimal Rating, Demographic Demographic, Bitmap CoverBitMap)
+		public Series(Dictionary<string, string> Titles, Dictionary<string, string> Staff, string Description, Format Format, Status Status, string Cover, Uri Link, ushort MaxVolumeCount, ushort CurVolumeCount, decimal Rating, uint VolumesRead, decimal Cost, Demographic Demographic, Bitmap CoverBitMap)
         {
             this.Titles = Titles;
 			this.Staff = Staff;
@@ -73,6 +73,8 @@ namespace Tsundoku.Models
             this.MaxVolumeCount = MaxVolumeCount;
             this.CurVolumeCount = CurVolumeCount;
 			this.Rating = Rating;
+            this.VolumesRead = VolumesRead;
+            this.Cost = Cost;
 			this.Demographic = Demographic;
 			this.CoverBitMap = CoverBitMap;
         }
@@ -88,7 +90,7 @@ namespace Tsundoku.Models
         /// <param name="MD_Query">MangaDexQuery object for the MangaDex HTTP client</param>
         /// <param name="additionalLanguages">List of additional languages to query for</param>
         /// <returns></returns>
-        public static async Task<Series?> CreateNewSeriesCardAsync(string title, Format bookType, ushort maxVolCount, ushort minVolCount, ObservableCollection<string> additionalLanguages)
+        public static async Task<Series?> CreateNewSeriesCardAsync(string title, Format bookType, ushort maxVolCount, ushort minVolCount, ObservableCollection<string> additionalLanguages, Demographic demographic = Demographic.Unknown, uint volumesRead = 0, decimal rating = -1, decimal cost = 0)
         {
 			JsonDocument? seriesDataDoc;
 			int pageNum = 1;
@@ -148,6 +150,7 @@ namespace Tsundoku.Models
 				// If available on AniList and is not a Japanese series get the Japanese title from Mangadex
 				if (!bookType.Equals("NOVEL") && (countryOfOrigin.Equals("KR") || countryOfOrigin.Equals("CW") || countryOfOrigin.Equals("TW")))
 				{
+                    LOGGER.Info("Getting Japanese Title for Non-Japanese Series");
 					mangaDexAltTitles = MangadexQuery.GetAdditionalMangaDexTitleList((await MangadexQuery.GetSeriesByTitleAsync(romajiTitle)).RootElement.GetProperty("data"));
 					japaneseTitle = GetAltTitle("ja", mangaDexAltTitles);
 				}
@@ -220,8 +223,10 @@ namespace Tsundoku.Models
 						new Uri(seriesData.GetProperty("siteUrl").GetString()),
 						maxVolCount,
 						minVolCount,
-						-1,
-						Demographic.Unknown,
+						rating,
+                        volumesRead,
+                        cost,
+						demographic,
 						await ViewModels.AddNewSeriesViewModel.SaveCoverAsync(coverPath, seriesData.GetProperty("coverImage").GetProperty("extraLarge").GetString())
 					);
 			}
@@ -238,7 +243,6 @@ namespace Tsundoku.Models
 					JsonElement data = seriesDataDoc.RootElement.GetProperty("data");
 					JsonElement attributes = data;
                     Status Status;
-                    Demographic demographic;
 					string description = string.Empty, link = string.Empty, englishAltTitle = string.Empty, japaneseAltTitle = string.Empty;
 					JsonElement.ArrayEnumerator altTitles = new(), relationships = new();
 
@@ -388,7 +392,9 @@ namespace Tsundoku.Models
                         new Uri(link),
                         maxVolCount,
                         minVolCount,
-                        -1,
+                        rating,
+                        volumesRead,
+                        cost,
                         demographic,
 						await ViewModels.AddNewSeriesViewModel.SaveCoverAsync(coverPath, coverLink)
 					);
