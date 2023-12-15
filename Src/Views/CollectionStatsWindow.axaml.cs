@@ -5,6 +5,7 @@ using Tsundoku.ViewModels;
 using Avalonia.ReactiveUI;
 using System.Reactive.Subjects;
 using Avalonia.Media;
+using SkiaSharp;
 
 namespace Tsundoku.Views
 {
@@ -47,58 +48,56 @@ namespace Tsundoku.Views
         public void UpdateChartColors()
         {
             PieSeries<ObservableValue> ShounenObject = (PieSeries<ObservableValue>)CollectionStatsVM.Demographics[0];
-            ShounenObject.Fill = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.MenuBGColor));
-            ShounenObject.Stroke = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.DividerColor));
+            ShounenObject.Fill = new SolidColorPaint(SKColor.Parse(CollectionStatsVM.CurrentTheme.MenuBGColor));
+            ShounenObject.Stroke = new SolidColorPaint(SKColor.Parse(CollectionStatsVM.CurrentTheme.DividerColor));
 
             PieSeries<ObservableValue> SeinenObject = (PieSeries<ObservableValue>)CollectionStatsVM.Demographics[1];
-            SeinenObject.Fill = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.MenuButtonBGColor));
-            SeinenObject.Stroke = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.DividerColor));
+            SeinenObject.Fill = new SolidColorPaint(SKColor.Parse(CollectionStatsVM.CurrentTheme.MenuButtonBGColor));
+            SeinenObject.Stroke = new SolidColorPaint(SKColor.Parse(CollectionStatsVM.CurrentTheme.DividerColor));
 
             PieSeries<ObservableValue> ShoujoObject = (PieSeries<ObservableValue>)CollectionStatsVM.Demographics[2];
-            ShoujoObject.Fill = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.MenuTextColor));
-            ShoujoObject.Stroke = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.DividerColor));
+            ShoujoObject.Fill = new SolidColorPaint(SKColor.Parse(CollectionStatsVM.CurrentTheme.MenuTextColor));
+            ShoujoObject.Stroke = new SolidColorPaint(SKColor.Parse(CollectionStatsVM.CurrentTheme.DividerColor));
 
             PieSeries<ObservableValue> JoseiObject = (PieSeries<ObservableValue>)CollectionStatsVM.Demographics[3];
-            JoseiObject.Fill = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.DividerColor));
-            JoseiObject.Stroke = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.DividerColor));
+            JoseiObject.Fill = new SolidColorPaint(SKColor.Parse(CollectionStatsVM.CurrentTheme.DividerColor));
+            JoseiObject.Stroke = new SolidColorPaint(SKColor.Parse(CollectionStatsVM.CurrentTheme.DividerColor));
 
             PieSeries<ObservableValue> UnknownObject = (PieSeries<ObservableValue>)CollectionStatsVM.Demographics[4];
-            UnknownObject.Fill = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.SeriesCardDescColor == CollectionStatsVM.CurrentTheme.MenuTextColor ? CollectionStatsVM.CurrentTheme.SeriesCardTitleColor : CollectionStatsVM.CurrentTheme.SeriesCardDescColor));
-            UnknownRectangleColorSource.OnNext(new SolidColorBrush(CollectionStatsVM.CurrentTheme.SeriesCardDescColor == CollectionStatsVM.CurrentTheme.MenuTextColor ? CollectionStatsVM.CurrentTheme.SeriesCardTitleColor : CollectionStatsVM.CurrentTheme.SeriesCardDescColor));
-            UnknownObject.Stroke = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.DividerColor));
+            UnknownObject.Fill = new SolidColorPaint(SKColor.Parse(CollectionStatsVM.CurrentTheme.SeriesCardDescColor == CollectionStatsVM.CurrentTheme.MenuTextColor ? CollectionStatsVM.CurrentTheme.SeriesCardTitleColor : CollectionStatsVM.CurrentTheme.SeriesCardDescColor));
+            UnknownRectangleColorSource.OnNext(SolidColorBrush.Parse(CollectionStatsVM.CurrentTheme.SeriesCardDescColor == CollectionStatsVM.CurrentTheme.MenuTextColor ? CollectionStatsVM.CurrentTheme.SeriesCardTitleColor : CollectionStatsVM.CurrentTheme.SeriesCardDescColor));
+            UnknownObject.Stroke = new SolidColorPaint(SKColor.Parse(CollectionStatsVM.CurrentTheme.DividerColor));
 
             PieSeries<ObservableValue> OngoingObject = (PieSeries<ObservableValue>)CollectionStatsVM.StatusDistribution[0];
-            OngoingObject.Fill = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.MenuBGColor));
-            OngoingObject.Stroke = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.DividerColor));
+            OngoingObject.Fill = new SolidColorPaint(SKColor.Parse(CollectionStatsVM.CurrentTheme.MenuBGColor));
+            OngoingObject.Stroke = new SolidColorPaint(SKColor.Parse(CollectionStatsVM.CurrentTheme.DividerColor));
             
             PieSeries<ObservableValue> FinishedObject = (PieSeries<ObservableValue>)CollectionStatsVM.StatusDistribution[1];
-            FinishedObject.Fill = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.MenuButtonBGColor));
-            FinishedObject.Stroke = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.DividerColor));
+            FinishedObject.Fill = new SolidColorPaint(SKColor.Parse(CollectionStatsVM.CurrentTheme.MenuButtonBGColor));
+            FinishedObject.Stroke = new SolidColorPaint(SKColor.Parse(CollectionStatsVM.CurrentTheme.DividerColor));
 
             PieSeries<ObservableValue> CancelledObject = (PieSeries<ObservableValue>)CollectionStatsVM.StatusDistribution[2];
-            CancelledObject.Fill = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.DividerColor));
-            CancelledObject.Stroke = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.DividerColor));
+            CancelledObject.Fill = new SolidColorPaint(SKColor.Parse(CollectionStatsVM.CurrentTheme.DividerColor));
+            CancelledObject.Stroke = new SolidColorPaint(SKColor.Parse(CollectionStatsVM.CurrentTheme.DividerColor));
 
             PieSeries<ObservableValue> HiatusObject = (PieSeries<ObservableValue>)CollectionStatsVM.StatusDistribution[3];
-            HiatusObject.Fill = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.MenuTextColor));
-            HiatusObject.Stroke = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.DividerColor));
+            HiatusObject.Fill = new SolidColorPaint(SKColor.Parse(CollectionStatsVM.CurrentTheme.MenuTextColor));
+            HiatusObject.Stroke = new SolidColorPaint(SKColor.Parse(CollectionStatsVM.CurrentTheme.DividerColor));
 
-            Color behindBarColor = Color.FromUInt32(CollectionStatsVM.CurrentTheme.MenuButtonBGColor);
+            // Color behindBarColor = Color.Parse(CollectionStatsVM.CurrentTheme.MenuButtonBGColor);
             ColumnSeries<ObservableValue> BarBehindObject = (ColumnSeries<ObservableValue>)CollectionStatsVM.RatingDistribution[0];
-            BarBehindObject.Fill = new SolidColorPaint(new SkiaSharp.SKColor(behindBarColor.R, behindBarColor.G, behindBarColor.B, 120));
+            BarBehindObject.Fill = new SolidColorPaint(SKColor.Parse(CollectionStatsVM.CurrentTheme.MenuButtonBGColor));
 
             ColumnSeries<ObservableValue> BarObject = (ColumnSeries<ObservableValue>)CollectionStatsVM.RatingDistribution[1];
-            BarObject.Fill = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.MenuBGColor));
-            BarObject.DataLabelsPaint = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.MenuTextColor));
-            BarObject.Stroke = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.DividerColor));
+            BarObject.Fill = new SolidColorPaint(SKColor.Parse(CollectionStatsVM.CurrentTheme.MenuBGColor));
+            BarObject.DataLabelsPaint = new SolidColorPaint(SKColor.Parse(CollectionStatsVM.CurrentTheme.MenuTextColor));
+            BarObject.Stroke = new SolidColorPaint(SKColor.Parse(CollectionStatsVM.CurrentTheme.DividerColor));
 
             Axis XAxisObject = CollectionStatsVM.RatingXAxes[0];
-            XAxisObject.LabelsPaint = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.MenuTextColor));
-            XAxisObject.TicksPaint = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.MenuTextColor));
+            XAxisObject.LabelsPaint = new SolidColorPaint(SKColor.Parse(CollectionStatsVM.CurrentTheme.MenuTextColor));
+            XAxisObject.TicksPaint = new SolidColorPaint(SKColor.Parse(CollectionStatsVM.CurrentTheme.MenuTextColor));
 
-            CollectionStatsVM.RatingYAxes[0].SeparatorsPaint = new SolidColorPaint(new SkiaSharp.SKColor(CollectionStatsVM.CurrentTheme.DividerColor));
-
-            LOGGER.Info("Updated Chart Colors ");
+            CollectionStatsVM.RatingYAxes[0].SeparatorsPaint = new SolidColorPaint(SKColor.Parse(CollectionStatsVM.CurrentTheme.DividerColor));
         }
 
         private async void CopyTextAsync(object sender, PointerPressedEventArgs args)

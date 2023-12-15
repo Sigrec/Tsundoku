@@ -6,6 +6,7 @@ CurrentCultures.txt
 OldUserData.json
 UserData.json
 Screenshots/
+Themes/
 *.csv
 
 ## Ignore Visual Studio temporary files, build results, and

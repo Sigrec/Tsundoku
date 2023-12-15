@@ -8,9 +8,9 @@ namespace Tsundoku.Helpers
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is uint v)
+            if (value is string hex)
             {
-                return new SolidColorBrush(v);
+                return SolidColorBrush.Parse(hex);
             }
             throw new NotSupportedException();
         }

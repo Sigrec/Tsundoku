@@ -522,9 +522,6 @@ namespace Tsundoku.Views
             ViewModelBase.OpenSiteLink(((sender as Canvas).DataContext as Series).Link.ToString());
         }
         
-        /// <summary>
-        /// Allows the user to pick a image file to for their icon
-        /// </summary>
         private async void ChangeUserIcon(object sender, PointerPressedEventArgs args)
         {
             var file = await this.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions {

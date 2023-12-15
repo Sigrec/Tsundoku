@@ -147,6 +147,9 @@
                                 Click="OpenScreenshotsFolder" 
                                 Content="Open Screenshots Folder"/>
                         <Button Theme="{StaticResource UserSettingsButton}"
+                                Click="OpenThemesFolder" 
+                                Content="Open Themes Folder"/>
+                        <Button Theme="{StaticResource UserSettingsButton}"
                                 Click="JoinDiscord"
                                 Content="Join Discord"/>
                         <!-- <Button Theme="{StaticResource UserSettingsButton}"

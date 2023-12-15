@@ -7,93 +7,93 @@ namespace Tsundoku.Models
     {
         [JsonIgnore] private bool disposedValue;
         public string ThemeName { get; set; }
-        public uint MenuBGColor { get; set; }
-        public uint UsernameColor { get; set; }
-        public uint MenuTextColor { get; set; }
-        public uint SearchBarBGColor { get; set; }
-        public uint SearchBarBorderColor { get; set; }
-        public uint SearchBarTextColor { get; set; }
-        public uint DividerColor { get; set; }
-        public uint MenuButtonBGColor { get; set; } 
-        public uint MenuButtonBGHoverColor { get; set; }
-        public uint MenuButtonBorderColor { get; set; }
-        public uint MenuButtonBorderHoverColor { get; set; }
-        public uint MenuButtonTextAndIconColor { get; set; }
-        public uint MenuButtonTextAndIconHoverColor { get; set; }
-        public uint CollectionBGColor { get; set; }
-        public uint StatusAndBookTypeBGColor { get; set; }
-        public uint StatusAndBookTypeBGHoverColor { get; set; }
-        public uint StatusAndBookTypeTextColor { get; set; }
-        public uint StatusAndBookTypeTextHoverColor { get; set; }
-        public uint SeriesCardBGColor { get; set; }
-        public uint SeriesCardTitleColor { get; set; }
-        public uint SeriesCardStaffColor { get; set; }
-        public uint SeriesCardDescColor { get; set; }
-        public uint SeriesProgressBGColor { get; set; }
-        public uint SeriesProgressBarColor { get; set; }
-        public uint SeriesProgressBarBGColor { get; set; }
-        public uint SeriesProgressBarBorderColor { get; set; }
-        public uint SeriesProgressTextColor { get; set; }
-        public uint SeriesProgressButtonsHoverColor { get; set; }
-        public uint SeriesButtonBGColor { get; set; }
-        public uint SeriesButtonBGHoverColor { get; set; }
-        public uint SeriesButtonIconColor { get; set; }
-        public uint SeriesButtonIconHoverColor { get; set; }
-        public uint SeriesEditPaneBGColor { get; set; }
-        public uint SeriesNotesBGColor  { get; set; }
-        public uint SeriesNotesBorderColor { get; set; }
-        public uint SeriesNotesTextColor { get; set; }
-        public uint SeriesEditPaneButtonsBGColor { get; set; }
-        public uint SeriesEditPaneButtonsBGHoverColor { get; set; }
-        public uint SeriesEditPaneButtonsBorderColor { get; set; }
-        public uint SeriesEditPaneButtonsBorderHoverColor { get; set; }
-        public uint SeriesEditPaneButtonsIconColor { get; set; }
-        public uint SeriesEditPaneButtonsIconHoverColor { get; set; }
+        public string MenuBGColor { get; set; }
+        public string UsernameColor { get; set; }
+        public string MenuTextColor { get; set; }
+        public string SearchBarBGColor { get; set; }
+        public string SearchBarBorderColor { get; set; }
+        public string SearchBarTextColor { get; set; }
+        public string DividerColor { get; set; }
+        public string MenuButtonBGColor { get; set; } 
+        public string MenuButtonBGHoverColor { get; set; }
+        public string MenuButtonBorderColor { get; set; }
+        public string MenuButtonBorderHoverColor { get; set; }
+        public string MenuButtonTextAndIconColor { get; set; }
+        public string MenuButtonTextAndIconHoverColor { get; set; }
+        public string CollectionBGColor { get; set; }
+        public string StatusAndBookTypeBGColor { get; set; }
+        public string StatusAndBookTypeBGHoverColor { get; set; }
+        public string StatusAndBookTypeTextColor { get; set; }
+        public string StatusAndBookTypeTextHoverColor { get; set; }
+        public string SeriesCardBGColor { get; set; }
+        public string SeriesCardTitleColor { get; set; }
+        public string SeriesCardStaffColor { get; set; }
+        public string SeriesCardDescColor { get; set; }
+        public string SeriesProgressBGColor { get; set; }
+        public string SeriesProgressBarColor { get; set; }
+        public string SeriesProgressBarBGColor { get; set; }
+        public string SeriesProgressBarBorderColor { get; set; }
+        public string SeriesProgressTextColor { get; set; }
+        public string SeriesProgressButtonsHoverColor { get; set; }
+        public string SeriesButtonBGColor { get; set; }
+        public string SeriesButtonBGHoverColor { get; set; }
+        public string SeriesButtonIconColor { get; set; }
+        public string SeriesButtonIconHoverColor { get; set; }
+        public string SeriesEditPaneBGColor { get; set; }
+        public string SeriesNotesBGColor  { get; set; }
+        public string SeriesNotesBorderColor { get; set; }
+        public string SeriesNotesTextColor { get; set; }
+        public string SeriesEditPaneButtonsBGColor { get; set; }
+        public string SeriesEditPaneButtonsBGHoverColor { get; set; }
+        public string SeriesEditPaneButtonsBorderColor { get; set; }
+        public string SeriesEditPaneButtonsBorderHoverColor { get; set; }
+        public string SeriesEditPaneButtonsIconColor { get; set; }
+        public string SeriesEditPaneButtonsIconHoverColor { get; set; }
 
         public static readonly TsundokuTheme DEFAULT_THEME = new TsundokuTheme(
             "Default", //ThemeName
-            4280296237,
-            4290035163,
-            4290035163,
-            4284638304,
-            4292859294,
-            4290035163,
-            4292859294,
-            4284638304,
-            4281085250,
-            4292859294,
-            4292859294,
-            4290035163,
-            4284638304,
-            4281085250,
-            4284638304,
-            4292859294,
-            4293717228,
-            4284638304,
-            4280296237,
-            4292859294,
-            4290035163,
-            4293717228,
-            4284638304,
-            4292859294,
-            4280296237,
-            4293717228,
-            4293717228,
-            4280296237,
-            4284638304,
-            4284638304,
-            4293717228,
-            4292859294,
-            4280296237,
-            4284638304,
-            4292859294,
-            4290035163,
-            4281085250,
-            4284638304,
-            4292859294,
-            4292859294,
-            4284638304,
-            4290035163
+            "#ff20232d",
+            "#ffb4bddb",
+            "#ffb4bddb",
+            "#ff626460",
+            "#ffdfd59e",
+            "#ffb4bddb",
+            "#ffdfd59e",
+            "#ff626460",
+            "#ff2c2d42",
+            "#ffdfd59e",
+            "#ffdfd59e",
+            "#ffb4bddb",
+            "#ff626460",
+            "#ff2c2d42",
+            "#ff626460",
+            "#ffdfd59e",
+            "#ffececec",
+            "#ff626460",
+            "#ff20232d",
+            "#ffdfd59e",
+            "#ffb4bddb",
+            "#ffececec",
+            "#ff626460",
+            "#ffdfd59e",
+            "#ff20232d",
+            "#ffececec",
+            "#ffececec",
+            "#ff20232d",
+            "#ff626460",
+            "#ff626460",
+            "#ffececec",
+            "#ffdfd59e",
+            "#ff20232d",
+            "#ff626460",
+            "#ffdfd59e",
+            "#ffb4bddb",
+            "#ff2c2d42",
+            "#ff626460",
+            "#ffdfd59e",
+            "#ffdfd59e",
+            "#ff626460",
+            "#ffb4bddb"
         );
 
         public TsundokuTheme()
@@ -107,7 +107,7 @@ namespace Tsundoku.Models
         }
 
         [JsonConstructor]
-        public TsundokuTheme(string themeName, uint menuBGColor, uint usernameColor, uint menuTextColor, uint searchBarBGColor, uint searchBarBorderColor, uint searchBarTextColor, uint dividerColor, uint menuButtonBGColor, uint menuButtonBGHoverColor, uint menuButtonBorderColor, uint menuButtonBorderHoverColor, uint menuButtonTextAndIconColor, uint menuButtonTextAndIconHoverColor, uint collectionBGColor, uint statusAndBookTypeBGColor, uint statusAndBookTypeBGHoverColor, uint statusAndBookTypeTextColor, uint statusAndBookTypeTextHoverColor, uint seriesCardBGColor, uint seriesCardTitleColor, uint seriesCardStaffColor, uint seriesCardDescColor, uint seriesProgressBGColor, uint seriesProgressBarColor, uint seriesProgressBarBGColor, uint seriesProgressBarBorderColor, uint seriesProgressTextColor, uint seriesProgressButtonsHoverColor, uint seriesButtonBGColor, uint seriesButtonBGHoverColor, uint seriesButtonIconColor, uint seriesButtonIconHoverColor, uint seriesEditPaneBGColor, uint seriesNotesBGColor, uint seriesNotesBorderColor, uint seriesNotesTextColor, uint seriesEditPaneButtonsBGColor, uint seriesEditPaneButtonsBGHoverColor, uint seriesEditPaneButtonsBorderColor, uint seriesEditPaneButtonsBorderHoverColor, uint seriesEditPaneButtonsIconColor, uint seriesEditPaneButtonsIconHoverColor) : this(themeName)
+        public TsundokuTheme(string themeName, string menuBGColor, string usernameColor, string menuTextColor, string searchBarBGColor, string searchBarBorderColor, string searchBarTextColor, string dividerColor, string menuButtonBGColor, string menuButtonBGHoverColor, string menuButtonBorderColor, string menuButtonBorderHoverColor, string menuButtonTextAndIconColor, string menuButtonTextAndIconHoverColor, string collectionBGColor, string statusAndBookTypeBGColor, string statusAndBookTypeBGHoverColor, string statusAndBookTypeTextColor, string statusAndBookTypeTextHoverColor, string seriesCardBGColor, string seriesCardTitleColor, string seriesCardStaffColor, string seriesCardDescColor, string seriesProgressBGColor, string seriesProgressBarColor, string seriesProgressBarBGColor, string seriesProgressBarBorderColor, string seriesProgressTextColor, string seriesProgressButtonsHoverColor, string seriesButtonBGColor, string seriesButtonBGHoverColor, string seriesButtonIconColor, string seriesButtonIconHoverColor, string seriesEditPaneBGColor, string seriesNotesBGColor, string seriesNotesBorderColor, string seriesNotesTextColor, string seriesEditPaneButtonsBGColor, string seriesEditPaneButtonsBGHoverColor, string seriesEditPaneButtonsBorderColor, string seriesEditPaneButtonsBorderHoverColor, string seriesEditPaneButtonsIconColor, string seriesEditPaneButtonsIconHoverColor) : this(themeName)
         {
             MenuBGColor = menuBGColor;
             UsernameColor = usernameColor;

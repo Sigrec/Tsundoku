@@ -114,6 +114,17 @@ namespace Tsundoku.Views
             });
         }
 
+        public void OpenThemesFolder(object sender, RoutedEventArgs args)
+        {
+            Task.Run(() =>{
+                if (!Directory.Exists(@"Themes"))
+                {
+                    Directory.CreateDirectory(@"Themes");
+                }
+                Process.Start("explorer.exe", @"Themes");
+            });
+        }
+
         public void ChangeUsername(object sender, RoutedEventArgs args)
         {
             if (!string.IsNullOrWhiteSpace(UsernameChange.Text))

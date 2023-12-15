@@ -83,17 +83,18 @@
                                    Cursor="Hand"
                                    PointerPressed="ChangeUserIcon"
                                    ClipToBounds="True"
+                                   ToolTip.Tip="Change Icon"
                                    Name="IconImage">
                             </Image>
                         </Border>
                         <TextBlock Name="Username" 
-                                    FontSize="24" 
-                                    FontWeight="Bold"
-                                    TextAlignment="Center"
-                                    HorizontalAlignment="Left"
-                                    VerticalAlignment="Center" 
-                                    Text="{CompiledBinding UserName, Mode=OneWay}"
-                                    Classes="username"/>
+                                   FontSize="24"
+                                   FontWeight="Bold"
+                                   TextAlignment="Left"
+                                   HorizontalAlignment="Left"
+                                   VerticalAlignment="Center"
+                                   Text="{CompiledBinding UserName, Mode=OneWay}"
+                                   Classes="username"/>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Grid.Row="1" Orientation="Horizontal" Spacing="5" VerticalAlignment="Bottom" HorizontalAlignment="Left">
                         <Button Name="SettingsButton"
