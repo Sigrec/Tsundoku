@@ -23,7 +23,7 @@ namespace Tsundoku.ViewModels
     public partial class MainWindowViewModel : ViewModelBase
     {
         public const string USER_DATA_FILEPATH = @"UserData.json";
-        private const double SCHEMA_VERSION = 2.6;
+        private const double SCHEMA_VERSION = 3.0;
         private static bool CanFilter = true;
         private static bool UpdatedCovers = false;
         public static AvaloniaList<Series> SearchedCollection { get; set; } = [];
@@ -730,9 +730,9 @@ namespace Tsundoku.ViewModels
                 updatedVersion = true;
             }
 
-            if (curVersion < 2.6) // Update the colors in themes to hex string
+            if (curVersion < 3.0) // Update the colors in themes to hex string
             {
-                LOGGER.Debug("Updating to v2.6");
+                LOGGER.Debug("Updating to v3.0");
                 for (int x = 0; x < themeJsonArray.Count; x++)
                 {
                     theme = themeJsonArray.ElementAt(x).AsObject();
@@ -741,8 +741,8 @@ namespace Tsundoku.ViewModels
                         theme[property.Name] = Avalonia.Media.Color.FromUInt32(uint.Parse(theme[property.Name].ToString())).ToString();
                     }
                 }
-                userData["CurDataVersion"] = 2.6;
-                LOGGER.Info("Updated Users Data to v2.6");
+                userData["CurDataVersion"] = 3.0;
+                LOGGER.Info("Updated Users Data to v3.0");
                 updatedVersion = true;
             }
 

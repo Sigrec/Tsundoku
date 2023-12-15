@@ -263,6 +263,7 @@ namespace Tsundoku.Views
 
         private async void ImportCurrentTheme(object sender, RoutedEventArgs args)
         {
+            Directory.CreateDirectory(@"Themes");
             var file = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions {
                 SuggestedStartLocation = StorageProvider.TryGetFolderFromPathAsync(@"Themes").Result,
                 AllowMultiple = false,
