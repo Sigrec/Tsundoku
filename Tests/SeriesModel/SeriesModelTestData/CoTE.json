@@ -16,9 +16,9 @@
   "SeriesNotes": null,
   "MaxVolumeCount": 14,
   "CurVolumeCount": 0,
-  "VolumesRead": 0,
-  "Cost": 0,
-  "Rating": -1,
-  "Demographic": "Unknown",
+  "VolumesRead": 4,
+  "Cost": 5000.65,
+  "Rating": 5.6,
+  "Demographic": "Seinen",
   "IsFavorite": false
 }

@@ -40,7 +40,7 @@ namespace Tsundoku.Tests
         [AvaloniaTest]
         public async Task Novel_AniList_Test()
         {
-            Assert.That((await Series.CreateNewSeriesCardAsync("Classroom of the Elite", Constants.Format.Novel, 14, 0, [])).ToString(), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesModel\SeriesModelTestData\CoTE.json")));
+            Assert.That((await Series.CreateNewSeriesCardAsync("Classroom of the Elite", Constants.Format.Novel, 14, 0, [], Constants.Demographic.Seinen, 4, (decimal)5.6, (decimal)5000.65)).ToString(), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesModel\SeriesModelTestData\CoTE.json")));
         }
 
         [AvaloniaTest]

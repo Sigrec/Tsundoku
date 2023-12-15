@@ -301,10 +301,7 @@ namespace Tsundoku.Models
 					countryOfOrigin = attributes.GetProperty("originalLanguage").GetString();
 					string coverLink = @$"https://uploads.mangadex.org/covers/{curMangaDexId}/{await MangadexQuery.GetCoverAsync(relationships.Single(x => x.GetProperty("type").GetString().Equals("cover_art")).GetProperty("id").GetString())}";
 					coverPath = CreateCoverFilePath(coverLink, romajiTitle, GetCorrectFormat(countryOfOrigin), altTitles, Site.MangaDex);
-					if (demographic == Demographic.Unknown) // Only check for the demographic if user didn't set it
-                    {
-                        GetSeriesDemographic(attributes.GetProperty("publicationDemographic").GetString());
-                    }
+					demographic = GetSeriesDemographic(attributes.GetProperty("publicationDemographic").GetString());
 
 					if (altTitles.Any())
 					{
