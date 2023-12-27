@@ -53,6 +53,7 @@ Of course I understand if you do not trust me but I promise there is nothing mal
 - [Amazon](https://www.amazon.com/Manga-Comics-Graphic-Novels-Books/b?node=4367)
 - [Kinokuniya](https://united-states.kinokuniya.com/)
 - [SciFier](https://scifier.com/)
+- [MerryManga](https://www.merrymanga.com/)
 
 ***English (Canada)***
 - [Indigo](https://www.Indigo.com/)

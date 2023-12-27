@@ -14,7 +14,7 @@ TODO:
 v3.1.0.0 - December 27th
 ✅ Added Britain Region & 2 new websites Waterstones (Britain) & MerryManga (America) to scrape
 ✅ Added new stock status filters to scrape & additional stock status Backorder (BO)
-🔥 Updated package for scrape window fixing alot of bugs 
+🔥 Updated package for scrape window fixing a lot of bugs 
 🔥 Fixed opacity in stats bar graph
 
 v3.0.0.0 - December 15th
