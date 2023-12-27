@@ -11,6 +11,12 @@ TODO:
 ❌ Fix padding issue in Series Note w/ Scrollbar
 ❌ Fix issue where clicking would sometimes cause the the main window to scroll up (https://github.com/AvaloniaUI/Avalonia/issues/7593)
 
+v3.1.0.0 - December 27th
+✅ Added Britain Region & 2 new websites Waterstones (Britain) & MerryManga (America) to scrape
+✅ Added new stock status filters to scrape & additional stock status Backorder (BO)
+🔥 Updated package for scrape window fixing alot of bugs 
+🔥 Fixed opacity in stats bar graph
+
 v3.0.0.0 - December 15th
 ✅ Added tooltip to icon for better indication that it is clickable
 ✅ Increased username max length to 20

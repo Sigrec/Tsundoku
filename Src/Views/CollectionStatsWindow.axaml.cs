@@ -84,9 +84,9 @@ namespace Tsundoku.Views
             HiatusObject.Fill = new SolidColorPaint(SKColor.Parse(CollectionStatsVM.CurrentTheme.MenuTextColor));
             HiatusObject.Stroke = new SolidColorPaint(SKColor.Parse(CollectionStatsVM.CurrentTheme.DividerColor));
 
-            // Color behindBarColor = Color.Parse(CollectionStatsVM.CurrentTheme.MenuButtonBGColor);
+            Color behindBarColor = Color.Parse(CollectionStatsVM.CurrentTheme.MenuButtonBGColor);
             ColumnSeries<ObservableValue> BarBehindObject = (ColumnSeries<ObservableValue>)CollectionStatsVM.RatingDistribution[0];
-            BarBehindObject.Fill = new SolidColorPaint(SKColor.Parse(CollectionStatsVM.CurrentTheme.MenuButtonBGColor));
+            BarBehindObject.Fill = new SolidColorPaint(new SKColor(behindBarColor.R, behindBarColor.G, behindBarColor.B, 120));
 
             ColumnSeries<ObservableValue> BarObject = (ColumnSeries<ObservableValue>)CollectionStatsVM.RatingDistribution[1];
             BarObject.Fill = new SolidColorPaint(SKColor.Parse(CollectionStatsVM.CurrentTheme.MenuBGColor));

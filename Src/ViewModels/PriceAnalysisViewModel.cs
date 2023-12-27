@@ -4,6 +4,7 @@ using System.Reactive.Linq;
 using Avalonia.Collections;
 using Avalonia.Controls;
 using MangaAndLightNovelWebScrape;
+using MangaAndLightNovelWebScrape.Models;
 using MangaAndLightNovelWebScrape.Websites;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -21,12 +22,11 @@ namespace Tsundoku.ViewModels
         [Reactive] public int CurRegionIndex { get; set; }
         public AvaloniaList<ListBoxItem> SelectedWebsites { get; } = [];
         private static readonly StringBuilder CurWebsites = new StringBuilder();
-        private static readonly Region[] RegionList = [ Region.America, Region.Canada ];
         public PriceAnalysisViewModel()
         {
             this.CurrentTheme = MainUser.SavedThemes.First(theme => theme.ThemeName.Equals(MainUser.MainTheme));
             SelectedWebsites.CollectionChanged += WebsiteCollectionChanged;
-            this.WhenAnyValue(x => x.CurRegion).Subscribe(x => CurRegionIndex = Array.IndexOf(RegionList, x));
+            this.WhenAnyValue(x => x.CurRegion).Subscribe(x => CurRegionIndex = Array.IndexOf(Enum.GetValues<Region>(), x));
         }
 
         private void WebsiteCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)

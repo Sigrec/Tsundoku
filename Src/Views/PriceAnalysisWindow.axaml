@@ -100,8 +100,10 @@
                         <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Indigo" ToolTip.Tip="Canada"/>
 						<ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="InStockTrades" ToolTip.Tip="America"/>
 						<ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Kinokuniya USA" ToolTip.Tip="America"/>
+                        <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="MerryManga" ToolTip.Tip="America"/>
 						<ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="RobertsAnimeCornerStore" ToolTip.Tip="America"/>
-                        <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="SciFier" ToolTip.Tip="America | Canada"/>
+                        <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="SciFier" ToolTip.Tip="America | Britain | Canada"/>
+                        <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Waterstones" ToolTip.Tip="Britain"/>
 						<!-- <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Amazon Japan" ToolTip.Tip="Japan"/>-->
 						<!-- <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="CDJapan" ToolTip.Tip="Japan"/> -->
                     </ListBox>
@@ -117,25 +119,30 @@
                               SelectionChanged="RegionChanged"
 							  Theme="{StaticResource MenuComboBox}">
 						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="America"/>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Britain"/>
                         <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Canada"/>
-                        <!-- <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Britain"/>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Japan"/>
+						<!-- <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Japan"/>
                         <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Europe"/> -->
 					</ComboBox>
 				</StackPanel>
 				<StackPanel Grid.Column="2" Grid.Row="2">
-					<TextBlock Text="Stock Status Filters" FontSize="20" FontWeight="Bold" Classes="menu" Margin="0,0,0,3"/>
+					<TextBlock Text="Stock Status Filters" FontSize="20" FontWeight="Bold" Classes="menu" Margin="0,0,0,3" ToolTip.Tip="OOS (Out of Stock) | PO (Pre-Order) | BO (Backorder)"/>
 					<ComboBox Name="StockFilterSelector"
 							  Height="37"
 							  Width="182"
 							  SelectedIndex="0"
 							  AutoScrollToSelectedItem="True"
 							  HorizontalAlignment="Left"
+                              ToolTip.Tip="OOS (Out of Stock) | PO (Pre-Order) | BO (Backorder)"
 							  Theme="{StaticResource MenuComboBox}">
 						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Exclude None"/>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Exclude PO &#x26; OOS"/>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Exclude PO &#x26; OOS &#x26; BO"/>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Exclude OOS &#x26; PO"/>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Exclude OOS &#x26; BO"/>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Exclude PO &#x26; BO"/>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Exclude OOS"/>
 						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Exclude PO"/>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Exclude OOS"/>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Exclude BO"/>
 					</ComboBox>
 				</StackPanel>
 				<StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" HorizontalAlignment="Center">

@@ -2,7 +2,7 @@
 ### [Donate](https://www.paypal.com/donate/?business=JAYCVEJGDF4GY&no_recurring=0&item_name=Anyone+amount+helps+and+keeps+the+app+going.&currency_code=USD) | [Join The Discord](https://discord.gg/QcZ5jcFPeU) | [Follow Me on AL](https://anilist.co/user/Preminence/)
 ### [ChangeLog](https://github.com/Sigrec/Tsundoku/blob/main/ChangeLog.txt) (Right Click Exe → Properties → Details to see current File Version)
 ***
->[**Windows Download** (Current Supported Version = v3.0.0.0)](https://github.com/Sigrec/Tsundoku/releases/tag/v3.0.0.0)\
+>[**Windows Download** (Current Supported Version = v3.1.0.0)](https://github.com/Sigrec/Tsundoku/releases/tag/v3.1.0.0)\
 [**Mac Download (Not Supported Yet Need Someone To Test For Me Add me on Discord if Interested & DM)** (Current Supported Version = X)](https://www.dropbox.com/sh/3e0po3d4l1sv8va/AAAgEbiPM86QQtkTcvvGWEVva?dl=0)\
 If you lose or delete the UserData.json file you will lose your entire collection, so do not delete it, otherwise you  will have to start over again (you can create a backup if needed), the Covers folder is visible incase a user wants to change the image shown for a particular series, just make sure u copy the EXACT name and extension (either jpg or png) from the image file.
 

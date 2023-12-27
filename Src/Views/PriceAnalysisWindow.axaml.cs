@@ -6,6 +6,7 @@ using ReactiveUI;
 using System.Reactive.Linq;
 using MangaAndLightNovelWebScrape.Websites;
 using static MangaAndLightNovelWebScrape.Models.Constants;
+using Src.Models;
 
 namespace Tsundoku.Views
 {
@@ -13,7 +14,7 @@ namespace Tsundoku.Views
     {
         public PriceAnalysisViewModel? PriceAnalysisVM => DataContext as PriceAnalysisViewModel;
         public bool IsOpen = false, Manga;
-        public readonly MasterScrape Scrape = new MasterScrape().DisableDebugMode();
+        public readonly MasterScrape Scrape = new MasterScrape(StockStatusFilter.EXCLUDE_NONE_FILTER);
 
         public PriceAnalysisWindow()
         {
@@ -57,16 +58,20 @@ namespace Tsundoku.Views
                 Scrape.Browser = MangaAndLightNovelWebScrape.Helpers.GetBrowserFromString((BrowserSelector.SelectedItem as ComboBoxItem).Content.ToString());
                 Scrape.Region = MangaAndLightNovelWebScrape.Helpers.GetRegionFromString((RegionSelector.SelectedItem as ComboBoxItem).Content.ToString());
                 LOGGER.Info($"Started Scrape For \"{TitleBox.Text}\" on {Scrape.Browser} Browser w/ Region = \"{Scrape.Region}\" & \"{(StockFilterSelector.SelectedItem as ComboBoxItem).Content} Filter\" & Websites = [{string.Join(", ", PriceAnalysisVM.SelectedWebsites.Select(site => site.Content.ToString()))}] & Memberships = ({string.Join(" & ", ViewModelBase.MainUser.Memberships)})");
+                Scrape.Filter = (StockFilterSelector.SelectedItem as ComboBoxItem).Content.ToString() switch
+                                {
+                                    "Exclude PO & OOS & BO" => StockStatusFilter.EXCLUDE_ALL_FILTER,
+                                    "Exclude OOS & PO" => StockStatusFilter.EXCLUDE_OOS_AND_PO_FILTER,
+                                    "Exclude OOS & BO" => StockStatusFilter.EXCLUDE_OOS_AND_BO_FILTER,
+                                    "Exclude PO & BO" => StockStatusFilter.EXCLUDE_PO_AND_BO_FILTER,
+                                    "Exclude OOS" => StockStatusFilter.EXCLUDE_OOS_FILTER,
+                                    "Exclude PO" => StockStatusFilter.EXCLUDE_PO_FILTER,
+                                    "Exclude bo" => StockStatusFilter.EXCLUDE_BO_FILTER,
+                                    _ => StockStatusFilter.EXCLUDE_NONE_FILTER
+                                };
                 await Scrape.InitializeScrapeAsync(
                         TitleBox.Text, 
                         MangaButton.IsChecked != null && MangaButton.IsChecked.Value ? BookType.Manga : BookType.LightNovel, 
-                        (StockFilterSelector.SelectedItem as ComboBoxItem).Content.ToString() switch
-                        {
-                            "Exclude PO & OOS" => MasterScrape.EXCLUDE_BOTH_FILTER,
-                            "Exclude PO" => MasterScrape.EXCLUDE_PO_FILTER,
-                            "Exclude OOS" => MasterScrape.EXCLUDE_OOS_FILTER,
-                            _ => MasterScrape.EXCLUDE_NONE_FILTER
-                        }, 
                         Scrape.GenerateWebsiteList(PriceAnalysisVM.SelectedWebsites.Select(site => site.Content.ToString()).ToList()),
                         ViewModelBase.MainUser.Memberships[BarnesAndNoble.WEBSITE_TITLE], 
                         ViewModelBase.MainUser.Memberships[BooksAMillion.WEBSITE_TITLE], 
