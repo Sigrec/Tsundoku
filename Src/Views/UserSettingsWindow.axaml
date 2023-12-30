@@ -187,10 +187,10 @@
                                 Click="OpenYoutuberSite" 
                                 Name="DanielPeppers"
                                 Content="Daniel Peppers"/>
-                        <Button Theme="{StaticResource UserSettingsButton}"
+                        <!-- <Button Theme="{StaticResource UserSettingsButton}"
                                 Click="OpenYoutuberSite" 
                                 Name="BasedSempai"
-                                Content="Based Sempai"/>
+                                Content="Based Sempai"/> -->
                         <Button Theme="{StaticResource UserSettingsButton}"
                                 Click="OpenYoutuberSite" 
                                 Name="Ararawgi"
@@ -206,7 +206,7 @@
                     </WrapPanel>
                 </StackPanel>
                 <StackPanel Spacing="5">
-                    <TextBlock Text="© v2.2.7.0"
+                    <TextBlock Text="© v3.1.0.0"
                                Cursor="Hand"
                                PointerPressed="OpenReleasesPage"
                                TextDecorations="Underline"

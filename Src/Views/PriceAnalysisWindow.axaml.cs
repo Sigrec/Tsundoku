@@ -60,7 +60,7 @@ namespace Tsundoku.Views
                 LOGGER.Info($"Started Scrape For \"{TitleBox.Text}\" on {Scrape.Browser} Browser w/ Region = \"{Scrape.Region}\" & \"{(StockFilterSelector.SelectedItem as ComboBoxItem).Content} Filter\" & Websites = [{string.Join(", ", PriceAnalysisVM.SelectedWebsites.Select(site => site.Content.ToString()))}] & Memberships = ({string.Join(" & ", ViewModelBase.MainUser.Memberships)})");
                 Scrape.Filter = (StockFilterSelector.SelectedItem as ComboBoxItem).Content.ToString() switch
                                 {
-                                    "Exclude PO & OOS & BO" => StockStatusFilter.EXCLUDE_ALL_FILTER,
+                                    "Exclude All" => StockStatusFilter.EXCLUDE_ALL_FILTER,
                                     "Exclude OOS & PO" => StockStatusFilter.EXCLUDE_OOS_AND_PO_FILTER,
                                     "Exclude OOS & BO" => StockStatusFilter.EXCLUDE_OOS_AND_BO_FILTER,
                                     "Exclude PO & BO" => StockStatusFilter.EXCLUDE_PO_AND_BO_FILTER,

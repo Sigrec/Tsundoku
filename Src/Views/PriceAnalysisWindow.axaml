@@ -136,7 +136,7 @@
                               ToolTip.Tip="OOS (Out of Stock) | PO (Pre-Order) | BO (Backorder)"
 							  Theme="{StaticResource MenuComboBox}">
 						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Exclude None"/>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Exclude PO &#x26; OOS &#x26; BO"/>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Exclude All"/>
                         <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Exclude OOS &#x26; PO"/>
                         <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Exclude OOS &#x26; BO"/>
                         <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Exclude PO &#x26; BO"/>

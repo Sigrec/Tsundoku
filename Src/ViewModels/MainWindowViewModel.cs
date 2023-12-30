@@ -23,7 +23,6 @@ namespace Tsundoku.ViewModels
     public partial class MainWindowViewModel : ViewModelBase
     {
         public const string USER_DATA_FILEPATH = @"UserData.json";
-        private const double SCHEMA_VERSION = 3.0;
         private static bool CanFilter = true;
         private static bool UpdatedCovers = false;
         public static AvaloniaList<Series> SearchedCollection { get; set; } = [];
