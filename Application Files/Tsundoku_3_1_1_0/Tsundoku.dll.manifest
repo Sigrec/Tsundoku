@@ -3291,7 +3291,7 @@
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>qNx1y1pjG3JjFDXr4Jeik4IuUDsRWAOoRrK27jxlVIg=</dsig:DigestValue>
+      <dsig:DigestValue>B83RnyFa2eVnWKUppKHsZm6vFFZFrZBbXQVny5OYZ8U=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Tsundoku.exe" size="146944">
@@ -3300,7 +3300,7 @@
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>k9TV3qhOHBEeemdPEk6/QEeZviqNYLQqjInweMA9fhY=</dsig:DigestValue>
+      <dsig:DigestValue>eTkv1cFDUO8wjVQYSbSb/7fBxJttvH9qhUorfxhBe54=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Tsundoku.runtimeconfig.json" size="1268">
