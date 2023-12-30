@@ -11,9 +11,6 @@ TODO:
 ❌ Fix padding issue in Series Note w/ Scrollbar
 ❌ Fix issue where clicking would sometimes cause the the main window to scroll up (https://github.com/AvaloniaUI/Avalonia/issues/7593)
 
-v3.1.1.0 - December 30th
-⌛ Moved application to online downloader and updater
-
 v3.1.0.0 - December 27th
 ✅ Added Britain Region & 2 new websites Waterstones (Britain) & MerryManga (America) to scrape
 ✅ Added new stock status filters to scrape & additional stock status Backorder (BO)
