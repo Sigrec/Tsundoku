@@ -237,7 +237,6 @@ namespace Tsundoku.Views
 
             string costText = ((MaskedTextBox)stackPanels.ElementAt(1).GetLogicalChildren().ElementAt(1)).Text;
             decimal costVal = Convert.ToDecimal(costText.Replace("_", "0"));
-            LOGGER.Debug("Test2 = {}", costText);
             if (decimal.Compare(costVal, 0) >= 0 && curSeries.Cost != costVal && !costText.Equals("_________.__"))
             {
                 curSeries.Cost = costVal;
@@ -249,7 +248,6 @@ namespace Tsundoku.Views
             LOGGER.Debug("Passed Cost Check");
 
             string ratingValText = ((MaskedTextBox)stackPanels.ElementAt(2).GetLogicalChildren().ElementAt(1)).Text;
-            LOGGER.Debug("Test1 = {}", ratingValText);
             decimal ratingVal = Convert.ToDecimal(ratingValText[..4].Replace("_", "0"));
             if (decimal.Compare(ratingVal, 0) >= 0 && curSeries.Rating != ratingVal && !ratingValText.StartsWith("__._"))
             {
@@ -346,13 +344,6 @@ namespace Tsundoku.Views
             var result = await Observable.Start(() => 
             {
                 Series curSeries = MainWindowViewModel.UserCollection.Single(series => series == (Series)((Button)sender).DataContext);
-                MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UsersNumVolumesCollected -= curSeries.CurVolumeCount;
-                MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UsersNumVolumesToBeCollected -= (uint)(curSeries.MaxVolumeCount - curSeries.CurVolumeCount);
-
-                // Update Stats Window
-                MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.VolumesRead -= curSeries.VolumesRead;
-                MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.CollectionPrice = $"{CollectionViewModel.CurCurrency}{decimal.Round(Convert.ToDecimal(MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.CollectionPrice[CollectionViewModel.CurCurrency.Length..]) - curSeries.Cost, 2)}";
-
                 MainWindowViewModel.SearchedCollection.Remove(curSeries);
                 MainWindowViewModel.UserCollection.Remove(curSeries);
 
@@ -363,28 +354,9 @@ namespace Tsundoku.Views
                     curSeries.Dispose();
                     LOGGER.Info("Deleted Cover -> {}", curSeries.Cover);
                 }
-
-                // Update Mean rating
-                int countrating = 0;
-                decimal ratingVal = 0;
-                foreach (Series x in CollectionsMarshal.AsSpan(MainWindowViewModel.UserCollection.ToList()))
-                {
-                    if (x.Rating >= 0)
-                    {
-                        ratingVal += x.Rating;
-                        countrating++;
-                    }
-                }
-                MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.MeanRating = countrating != 0 ? decimal.Round(ratingVal / countrating, 1) : 0;
                 
                 LOGGER.Info($"Removed \"{curSeries.Titles["Romaji"]}\" From Collection");
-                MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.SeriesCount = (uint)MainWindowViewModel.UserCollection.Count;
-
-                MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UpdateDemographicChartValues();
-                MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UpdateDemographicPercentages();
-                MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UpdateStatusChartValues();
-                MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UpdateStatusPercentages();
-                MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UpdateRatingChartValues();
+                MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UpdateAllStats(curSeries.CurVolumeCount, (uint)(curSeries.MaxVolumeCount - curSeries.CurVolumeCount));
             }, RxApp.MainThreadScheduler);
         }
 

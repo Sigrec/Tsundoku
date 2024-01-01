@@ -81,10 +81,7 @@ namespace Tsundoku.Views
             if (!validSeries) // Boolean returns whether the series added is a duplicate
             {
                 // Update User Stats
-                MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UsersNumVolumesCollected += CurVolNum;
-                MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UsersNumVolumesToBeCollected += (uint)(MaxVolNum - CurVolNum);
-                MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.SeriesCount = (uint)MainWindowViewModel.UserCollection.Count;
-                MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UpdateAllStats();
+                MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UpdateAllStats(CurVolNum, (uint)(MaxVolNum - CurVolNum));
 
                 // Clear the fields in this window
                 ClearFields();

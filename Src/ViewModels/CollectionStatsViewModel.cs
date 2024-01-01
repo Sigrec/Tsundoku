@@ -9,6 +9,7 @@ using LiveChartsCore.Defaults;
 using LiveChartsCore.SkiaSharpView;
 using Tsundoku.Models;
 using System.Collections.Generic;
+using Avalonia.Logging;
 
 namespace Tsundoku.ViewModels
 {
@@ -74,6 +75,7 @@ namespace Tsundoku.ViewModels
         public CollectionStatsViewModel()
         {
             this.CurrentTheme = MainUser.SavedThemes.First(theme => theme.ThemeName.Equals(MainUser.MainTheme));
+            this.CurCurrency = MainUser.Currency;
             GenerateStats();
 
             this.WhenAnyValue(x => x.MeanRating).Subscribe(x => MainUser.MeanRating = x);
@@ -225,6 +227,7 @@ namespace Tsundoku.ViewModels
             RatingArray.Add(TenRatingCount.Value);
 
             MaxRatingCount.Value = RatingArray.Max();
+            // if (MaxRatingCount.Value % 2 != 0) { MaxRatingCount.Value = MaxRatingCount.Value + 1; }
             MaxRatingCount1.Value = MaxRatingCount.Value;
             MaxRatingCount2.Value = MaxRatingCount.Value;
             MaxRatingCount3.Value = MaxRatingCount.Value;
@@ -296,8 +299,12 @@ namespace Tsundoku.ViewModels
             MeanRating = decimal.Round(decimal.Divide(rating, countRating), 1);
         }
 
-        public void UpdateAllStats()
+        public void UpdateAllStats(uint additionalCurVols, uint additionalVolToBeCol)
         {
+            UsersNumVolumesCollected += additionalCurVols;
+            UsersNumVolumesToBeCollected += additionalVolToBeCol;
+            SeriesCount = (uint)MainUser.UserCollection.Count;
+            
             UpdateCollectionPrice();
             UpdateCollectionVolumesRead();
             UpdateCollectionRating();
