@@ -18,7 +18,6 @@
 		<IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
 		<Version>3.1.1</Version>
 		<FileVersion>3.1.1.0</FileVersion>
-		<!-- <PackageIcon>Assets\Icons\Tsundoku-Logo.png</PackageIcon> -->
 		<RepositoryUrl>https://github.com/Sigrec/Tsundoku</RepositoryUrl>
         <LangVersion>preview</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
