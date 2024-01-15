@@ -17,6 +17,7 @@ using MangaAndLightNovelWebScrape.Websites;
 using Avalonia.Collections;
 using static MangaAndLightNovelWebScrape.Models.Constants;
 using System.Reflection;
+using Src.Helpers;
 
 namespace Tsundoku.ViewModels
 {
@@ -54,7 +55,6 @@ namespace Tsundoku.ViewModels
         public static CollectionStatsWindow collectionStatsWindow;
         public ReactiveCommand<Unit, Unit> OpenCollectionStatsWindow { get; set; }
         public ICommand StartAdvancedSearch { get; }
-        private static StringBuilder AdvancedFilterExpression = new StringBuilder();
 
         [GeneratedRegex(@"(\w+)(==|<=|>=)(\d+|\w+|\'(?:.*?)\')")] public static partial Regex AdvancedQueryRegex();
         
@@ -79,12 +79,6 @@ namespace Tsundoku.ViewModels
             this.WhenAnyValue(x => x.UserIcon).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.UserIcon = User.ImageToByteArray(x));
 
             StartAdvancedSearch = ReactiveCommand.Create(() => AdvancedSearchCollection(AdvancedSearchText));
-        }
-
-        private void LanguageChange(string lang)
-        {
-            MainUser.CurLanguage = lang;
-            LanguageIndex = AVAILABLE_LANGUAGES.IndexOf(lang);
         }
 
         /// <summary>
@@ -357,13 +351,15 @@ namespace Tsundoku.ViewModels
                     var AdvancedSearchMatches = AdvancedQueryRegex().Matches(AdvancedSearchQuery.Trim()).OrderBy(x => x.Value);
                     GroupCollection advFilter;
 
+                    StringBuilder AdvancedFilterExpression = new StringBuilder();
+                    AdvancedFilterExpression.Append("series => ");
                     foreach (Match SearchFilter in AdvancedSearchMatches)
                     {
                         advFilter = SearchFilter.Groups;
                         AdvancedFilterExpression.AppendFormat("{0} && ", ParseAdvancedFilter(advFilter[1].Value, advFilter[2].Value, advFilter[3].Value));
                     }
-                    AdvancedFilterExpression.Insert(0, "series => ").Remove(AdvancedFilterExpression.Length - 4, 4);
-                    LOGGER.Debug($" Initial Query = \"{AdvancedSearchQuery}\" -> \"{AdvancedFilterExpression}\"");
+                    AdvancedFilterExpression.Remove(AdvancedFilterExpression.Length - 4, 4);
+                    LOGGER.Info($" Initial Query = \"{AdvancedSearchQuery}\" -> \"{AdvancedFilterExpression}\"");
                     try
                     {
                         FilteredCollection = UserCollection.AsQueryable().Where(AdvancedFilterExpression.ToString()); 
@@ -413,8 +409,8 @@ namespace Tsundoku.ViewModels
                 "CurVolumes" => $"series.CurVolumeCount {logicType} {filterValue}",
                 "MaxVolumes" => $"series.MaxVolumeCount {logicType} {filterValue}",
                 "Format" or "Status" or "Demographic" => $"series.{filterName} == {filterName}.{filterValue}",
-                "Series" => filterValue.Equals("Complete") ? "series.MaxVolumeCount == series.CurVolumeCount" : "series.CurVolumeCount < series.MaxVolumeCount",
-                "Favorite" => filterValue.Equals("True") ? $"series.IsFavorite" : $"!series.IsFavorite",
+                "Series" => $"series.MaxVolumeCount {(filterValue.Equals("Complete") ? "==" : "<")} series.CurVolumeCount",
+                "Favorite" => $"{(filterValue.Equals("True") ? '!' : "")}series.IsFavorite",
                 "Notes" => $"(!string.IsNullOrWhiteSpace(series.SeriesNotes) && series.SeriesNotes.Contains(\"{filterValue[1..^1]}\"))",
                 _ => string.Empty,
             };
@@ -458,10 +454,12 @@ namespace Tsundoku.ViewModels
             }
 
             JsonNode userData = JsonNode.Parse(File.ReadAllText(USER_DATA_FILEPATH));
+            // JsonNode userData = JsonNode.Parse(File.ReadAllText(USER_DATA_FILEPATH));
 
-            if (userData["CurDataVersion"] == null || userData["CurDataVersion"].GetValue<double>() == 0 || userData["CurDataVersion"].GetValue<double>() < SCHEMA_VERSION)
+            // userData["CurDataVersion"].GetValue<double>() == 0 ||
+            if (userData["CurDataVersion"] == null || userData["CurDataVersion"].GetValue<double>() < SCHEMA_VERSION)
             {
-                VersionUpdate(userData);
+                VersionUpdate(userData, false);
                 updatedVersion = false;
                 LOGGER.Info("Reloading User Data");
             }
@@ -518,7 +516,7 @@ namespace Tsundoku.ViewModels
         }
 
         [RequiresUnreferencedCode("Calls System.Text.Json.JsonSerializer.Serialize<TValue>(TValue, JsonSerializerOptions)")]
-        private static bool VersionUpdate(JsonNode userData)
+        public static bool VersionUpdate(JsonNode userData, bool isImport)
         {
             JsonNode series;
             JsonNode theme;
@@ -582,7 +580,7 @@ namespace Tsundoku.ViewModels
                     }
                 }
                 userData["CurDataVersion"] = 1.5;
-                LOGGER.Info("Updated Users Data to v1.5");
+                TsundokuLogger.Info(LOGGER, "Updated Users Data to v1.5", !isImport);
                 updatedVersion = true;        
             }
 
@@ -598,7 +596,7 @@ namespace Tsundoku.ViewModels
                 }
 
                 userData["CurDataVersion"] = 1.6;
-                LOGGER.Info("Updated Users Data to v1.6");
+                TsundokuLogger.Info(LOGGER, "Updated Users Data to v1.6", !isImport);
                 updatedVersion = true;  
             }
 
@@ -608,7 +606,7 @@ namespace Tsundoku.ViewModels
 
                 userData.AsObject().Add(nameof(UserIcon), defaultFileByte);
                 userData["CurDataVersion"] = 1.7;
-                LOGGER.Info("Updated Users Data to v1.7");
+                TsundokuLogger.Info(LOGGER, "Updated Users Data to v1.7", !isImport);
                 updatedVersion = true;
             }
 
@@ -624,7 +622,7 @@ namespace Tsundoku.ViewModels
                 }
 
                 userData["CurDataVersion"] = 1.8;
-                LOGGER.Info("Updated Users Data to v1.8");
+                TsundokuLogger.Info(LOGGER, "Updated Users Data to v1.8", !isImport);
                 updatedVersion = true;  
             }
 
@@ -641,7 +639,7 @@ namespace Tsundoku.ViewModels
                     }
                 }
                 userData["CurDataVersion"] = 1.9;
-                LOGGER.Info("Updated Users Data to v1.9");
+                TsundokuLogger.Info(LOGGER, "Updated Users Data to v1.9", !isImport);
                 UpdatedCovers = true;
                 updatedVersion = true;
             }
@@ -664,7 +662,7 @@ namespace Tsundoku.ViewModels
                 userData.AsObject().Remove("MeanScore");
 
                 userData["CurDataVersion"] = 2.0;
-                LOGGER.Info("Updated Users Data to v2.0");
+                TsundokuLogger.Info(LOGGER, "Updated Users Data to v2.0", !isImport);
                 updatedVersion = true;
             }
 
@@ -687,7 +685,7 @@ namespace Tsundoku.ViewModels
                     }
                 }
                 userData["CurDataVersion"] = 2.1;
-                LOGGER.Info("Updated Users Data to v2.1");
+                TsundokuLogger.Info(LOGGER, "Updated Users Data to v2.1", !isImport);
                 updatedVersion = true;
             }
 
@@ -697,7 +695,7 @@ namespace Tsundoku.ViewModels
                 userData["Memberships"].AsObject().Add(new KeyValuePair<string, JsonNode?>(Indigo.WEBSITE_TITLE, false));
 
                 userData["CurDataVersion"] = 2.2;
-                LOGGER.Info("Updated Users Data to v2.2");
+                TsundokuLogger.Info(LOGGER, "Updated Users Data to v2.2", !isImport);
                 updatedVersion = true;
             }
 
@@ -705,7 +703,7 @@ namespace Tsundoku.ViewModels
             {
                 userData.AsObject().Add(new KeyValuePair<string, JsonNode?>("Region", Region.America.ToString()));
                 userData["CurDataVersion"] = 2.4;
-                LOGGER.Info("Updated Users Data to v2.4");
+                TsundokuLogger.Info(LOGGER, "Updated Users Data to v2.4", !isImport);
                 updatedVersion = true;
             }
 
@@ -725,13 +723,12 @@ namespace Tsundoku.ViewModels
                     }
                 }
                 userData["CurDataVersion"] = 2.5;
-                LOGGER.Info("Updated Users Data to v2.5");
+                TsundokuLogger.Info(LOGGER, "Updated Users Data to v2.5", !isImport);
                 updatedVersion = true;
             }
 
             if (curVersion < 3.0) // Update the colors in themes to hex string
             {
-                LOGGER.Debug("Updating to v3.0");
                 for (int x = 0; x < themeJsonArray.Count; x++)
                 {
                     theme = themeJsonArray.ElementAt(x).AsObject();
@@ -741,17 +738,20 @@ namespace Tsundoku.ViewModels
                     }
                 }
                 userData["CurDataVersion"] = 3.0;
-                LOGGER.Info("Updated Users Data to v3.0");
+                TsundokuLogger.Info(LOGGER, "Updated Users Data to v3.0", !isImport);
                 updatedVersion = true;
             }
 
-            File.WriteAllText(USER_DATA_FILEPATH, JsonSerializer.Serialize(userData, new JsonSerializerOptions()
-            { 
-                WriteIndented = true,
-                ReadCommentHandling = JsonCommentHandling.Disallow,
-                AllowTrailingCommas = true,
-                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-            }));
+            if (!isImport)
+            {
+                File.WriteAllText(USER_DATA_FILEPATH, JsonSerializer.Serialize(userData, new JsonSerializerOptions()
+                { 
+                    WriteIndented = true,
+                    ReadCommentHandling = JsonCommentHandling.Disallow,
+                    AllowTrailingCommas = true,
+                    Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                }));
+            }
             return updatedVersion;
         }
 

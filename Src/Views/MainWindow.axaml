@@ -341,6 +341,10 @@
                                                         <Style Selector="^ /template/ PathIcon">
                                                             <Setter Property="Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.DividerColor, Converter={StaticResource ConvertColor}}" />
                                                         </Style>
+
+                                                        <Style Selector="^ /template/ Rectangle#TrackRect">
+                                                            <Setter Property="Fill" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.MenuBGColor, Converter={StaticResource ConvertColor}}" />
+                                                        </Style>
                                                     </Style>
 
                                                     <Style Selector="^ /template/ RepeatButton#PART_LineUpButton, ^ /template/ RepeatButton#PART_LineDownButton">

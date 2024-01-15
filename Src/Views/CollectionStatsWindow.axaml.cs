@@ -23,6 +23,7 @@ namespace Tsundoku.Views
             Opened += (s, e) =>
             {
                 var sub = UnknownRectangle.Bind(Avalonia.Controls.Shapes.Rectangle.FillProperty, UnknownRectangleColorSource);
+                UnknownRectangleColorSource.OnNext(SolidColorBrush.Parse(CollectionStatsVM.CurrentTheme.SeriesCardDescColor == CollectionStatsVM.CurrentTheme.MenuTextColor ? CollectionStatsVM.CurrentTheme.SeriesCardTitleColor : CollectionStatsVM.CurrentTheme.SeriesCardDescColor));
                 if (CanUpdate) { UpdateChartColors(); }
                 CanUpdate = false;
                 IsOpen ^= true;
@@ -65,7 +66,6 @@ namespace Tsundoku.Views
 
             PieSeries<ObservableValue> UnknownObject = (PieSeries<ObservableValue>)CollectionStatsVM.Demographics[4];
             UnknownObject.Fill = new SolidColorPaint(SKColor.Parse(CollectionStatsVM.CurrentTheme.SeriesCardDescColor == CollectionStatsVM.CurrentTheme.MenuTextColor ? CollectionStatsVM.CurrentTheme.SeriesCardTitleColor : CollectionStatsVM.CurrentTheme.SeriesCardDescColor));
-            UnknownRectangleColorSource.OnNext(SolidColorBrush.Parse(CollectionStatsVM.CurrentTheme.SeriesCardDescColor == CollectionStatsVM.CurrentTheme.MenuTextColor ? CollectionStatsVM.CurrentTheme.SeriesCardTitleColor : CollectionStatsVM.CurrentTheme.SeriesCardDescColor));
             UnknownObject.Stroke = new SolidColorPaint(SKColor.Parse(CollectionStatsVM.CurrentTheme.DividerColor));
 
             PieSeries<ObservableValue> OngoingObject = (PieSeries<ObservableValue>)CollectionStatsVM.StatusDistribution[0];

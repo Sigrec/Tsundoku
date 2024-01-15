@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using NLog;
 using NLog.Config;
 
@@ -18,5 +19,10 @@ namespace Src.Helpers
 			LogManager.Configuration = XmlLoggingConfiguration.CreateFromXmlString(xml);
             LOGGER = LogManager.GetLogger("TsundokuLogs");
 		}
+
+        public static void Info(Logger newLogger, string text, bool canPrint)
+        {
+            if (canPrint) { newLogger.Info(text); }
+        }
     }
 }

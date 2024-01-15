@@ -42,12 +42,13 @@
                                 Classes="menu"
                                 FontSize="15"
                                 MaxLength="20"
+                                Height="35"
                                 Watermark="Enter New Username..."
                                 Text="{CompiledBinding UsernameText}"
                                 BorderThickness="2"/>
                         <Button FontSize="18"
                                 BorderThickness="2"
-                                Classes="menu"
+                                Theme="{StaticResource UserSettingsButton}"
                                 i:Attached.Icon="fa-check" 
                                 Click="ChangeUsername"
                                 IsEnabled="{Binding IsChangeUsernameButtonEnabled}"/>
@@ -187,26 +188,18 @@
                                 Click="OpenYoutuberSite" 
                                 Name="DanielPeppers"
                                 Content="Daniel Peppers"/>
-                        <!-- <Button Theme="{StaticResource UserSettingsButton}"
-                                Click="OpenYoutuberSite" 
-                                Name="BasedSempai"
-                                Content="Based Sempai"/> -->
                         <Button Theme="{StaticResource UserSettingsButton}"
                                 Click="OpenYoutuberSite" 
                                 Name="Ararawgi"
                                 Content="Ararawgi"/>
                         <Button Theme="{StaticResource UserSettingsButton}"
                                 Click="OpenYoutuberSite" 
-                                Name="meettheweebfamily1202"
+                                Name="meettheweebfamily"
                                 Content="Meet the Weeb Family"/>
-                        <Button Theme="{StaticResource UserSettingsButton}"
-                                Click="OpenYoutuberSite" 
-                                Name="MangaHunter"
-                                Content="Sam's Sidequest"/>
                     </WrapPanel>
                 </StackPanel>
                 <StackPanel Spacing="5">
-                    <TextBlock Text="© v3.1.0.0"
+                    <TextBlock Text="© v3.1.2"
                                Cursor="Hand"
                                PointerPressed="OpenReleasesPage"
                                TextDecorations="Underline"
@@ -224,6 +217,11 @@
                                 HorizontalAlignment="Center"
                                 Name="MangadexCredit"
                                 Content="Mangadex"/>
+                        <Button Theme="{StaticResource UserSettingsButton}"
+                                Click="UploadUserData" 
+                                HorizontalAlignment="Center"
+                                Name="ImportUserData"
+                                Content="Import"/>
                     </StackPanel>
                 </StackPanel>
             </StackPanel>

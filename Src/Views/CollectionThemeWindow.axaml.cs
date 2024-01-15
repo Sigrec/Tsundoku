@@ -20,7 +20,7 @@ namespace Tsundoku.Views
         MainWindow CollectionWindow;
         private static readonly FilePickerFileType fileOptions = new FilePickerFileType("JSON Source File")
         {
-            Patterns = new string[1] { "*.json" }
+            Patterns = [ "*.json" ]
         };
 
         public CollectionThemeWindow () 
@@ -55,8 +55,10 @@ namespace Tsundoku.Views
                 }
                 e.Cancel = true;
             };
+            bool? test = true;
+            bool test2 = test != null && test == true;
 
-            this.WhenAnyValue(x => x.NewThemeName.Text, x => x.MainColor1.Mask.Length, x => x.MainColor2.Mask.Length, x => x.TextColor1.Mask.Length, x => x.TextColor2.Mask.Length, x => x.AccentColor1.Mask.Length, x => x.AccentColor2.Mask.Length, (name, mc1 ,mc2, tc1, tc2, ac1, ac2) => !string.IsNullOrWhiteSpace(name) && !name.Equals("Default", StringComparison.OrdinalIgnoreCase) && mc1 != 7 && mc2 != 7 && tc1 != 7 && tc2 != 7 && ac1 != 7 && ac2 != 7).Subscribe(x => ThemeSettingsVM.IsGenerateThemeButtonEnabled = x);
+            this.WhenAnyValue(x => x.NewThemeName.Text, x => x.MainColor1.Text, x => x.MainColor2.Text, x => x.TextColor1.Text, x => x.TextColor2.Text, x => x.AccentColor1.Text, x => x.AccentColor2.Text, (name, mc1 ,mc2, tc1, tc2, ac1, ac2) => !string.IsNullOrWhiteSpace(name) && !name.Equals("Default", StringComparison.OrdinalIgnoreCase) && !mc1.Contains('_') && !mc2.Contains('_') && !tc1.Contains('_') && !tc2.Contains('_') && !ac1.Contains('_') && !ac2.Contains('_')).Subscribe(x => ThemeSettingsVM.IsGenerateThemeButtonEnabled = x);
         }
 
         /// <summary>
@@ -64,6 +66,7 @@ namespace Tsundoku.Views
         /// </summary>
         private void ClearThemeValues(object sender, RoutedEventArgs args)
         {
+            // LOGGER.Info("MaskFull? = {}", !string.IsNullOrWhiteSpace(NewThemeName.Text) && !NewThemeName.Text.Equals("Default", StringComparison.OrdinalIgnoreCase) && MainColor1.MaskFull == true && MainColor2.MaskFull == true && TextColor1.MaskFull == true && TextColor2.MaskFull == true && AccentColor1.MaskFull == true && AccentColor2.MaskFull == true);
             MainColor1.Clear();
             MainColor2.Clear();
             TextColor1.Clear();

@@ -128,7 +128,7 @@ namespace Tsundoku.Views
                 }
             };
 
-            Closing += (s, e) => { SaveOnClose(); };
+            Closing += (s, e) => { SaveOnClose(ViewModelBase.isReloading); };
         }
 
         public void SetupAdvancedSearchBar(string delimeter)
@@ -444,11 +444,12 @@ namespace Tsundoku.Views
         //     }
         // }
 
-        public void SaveOnClose()
+        public void SaveOnClose(bool isReloading)
         {
             LOGGER.Info("Closing Tsundoku");
+            Console.WriteLine("Closing Tsundoku");
             CollectionViewModel.SearchText = "";
-            MainWindowViewModel.SaveUsersData();
+            if (!isReloading) { MainWindowViewModel.SaveUsersData(); }
             Helpers.DiscordRP.Deinitialize();
             CoverFolderWatcher.Dispose();
 

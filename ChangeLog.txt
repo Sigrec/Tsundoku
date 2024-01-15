@@ -9,8 +9,15 @@ Legend
 TODO:
 ❌ ComboboxItem Styles not applying properly in Theme & AdvancedQuery windows
 ❌ Fix padding issue in Series Note w/ Scrollbar
-❌ Fix issue where clicking would sometimes cause the the main window to scroll up (https://github.com/AvaloniaUI/Avalonia/issues/7593)
-❌ Import data file in the settings
+❌ Fix issue where clicking or minimizing would sometimes cause the the main window to scroll up (https://github.com/AvaloniaUI/Avalonia/issues/7593)
+
+v3.1.2.0 - January 15th
+✅ Added "Import" button to settings to allow importation of collection data
+🔥 Fixed issue where theme generation buttons were enabled even though fields were empty
+🔥 Fixed issue where "Unknown" color legend would disappear when closing then re-opening for the first time
+🔥 Fixed "Meet the Weeb Family" youtube link
+🔥 Fixed styling of scroll bar in Series Notes
+✍️ Removed "Sam's Sidequest" youtube link since channel is no longer animanga focused
 
 v3.1.1.0 - January 1st
 🔥 Correctly updates all states when deleting a series

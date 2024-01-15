@@ -1,3 +1,4 @@
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 
@@ -16,14 +17,12 @@ namespace Tsundoku
         public override void OnFrameworkInitializationCompleted()
         {
             const string appName = "Tsundoku";
-            bool createdNew;
-
-            _mutex = new Mutex(true, appName, out createdNew);
+            _mutex = new Mutex(true, appName, out bool createdNew);
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 if (!createdNew)
                 {
-                    desktop.Shutdown();
+                    desktop.TryShutdown();
                 }
                 else
                 {

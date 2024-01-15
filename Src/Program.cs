@@ -1,7 +1,6 @@
 using System.Runtime.CompilerServices;
 using Avalonia.ReactiveUI;
 using Projektanker.Icons.Avalonia.FontAwesome;
-using System;
 using Projektanker.Icons.Avalonia;
 
 namespace Tsundoku
@@ -13,7 +12,7 @@ namespace Tsundoku
         // yet and stuff might break.
         [STAThread]
         public static void Main(string[] args){
-            BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+            BuildAvaloniaApp().StartWithClassicDesktopLifetime(args, Avalonia.Controls.ShutdownMode.OnMainWindowClose);
         }
 
         // Avalonia configuration, don't remove; also used by visual designer.

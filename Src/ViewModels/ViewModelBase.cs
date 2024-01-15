@@ -18,6 +18,7 @@ namespace Tsundoku.ViewModels
         public static User? MainUser { get; set; }
         public static bool updatedVersion = false;
         public static bool newCoverCheck = false;
+        public static bool isReloading = false;
         public const string TsundokoCurVersion = "3.1.0.0";
         public const double SCHEMA_VERSION = 3.0;
 
