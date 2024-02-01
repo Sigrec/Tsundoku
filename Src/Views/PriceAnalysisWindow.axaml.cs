@@ -66,7 +66,7 @@ namespace Tsundoku.Views
                                     "Exclude PO & BO" => StockStatusFilter.EXCLUDE_PO_AND_BO_FILTER,
                                     "Exclude OOS" => StockStatusFilter.EXCLUDE_OOS_FILTER,
                                     "Exclude PO" => StockStatusFilter.EXCLUDE_PO_FILTER,
-                                    "Exclude bo" => StockStatusFilter.EXCLUDE_BO_FILTER,
+                                    "Exclude BO" => StockStatusFilter.EXCLUDE_BO_FILTER,
                                     _ => StockStatusFilter.EXCLUDE_NONE_FILTER
                                 };
                 await Scrape.InitializeScrapeAsync(
@@ -82,7 +82,8 @@ namespace Tsundoku.Views
                 LOGGER.Info($"Scrape Finished");
 
                 PriceAnalysisVM.AnalyzedList.Clear();
-                PriceAnalysisVM.AnalyzedList.AddRange(Scrape.GetResults()); 
+                PriceAnalysisVM.AnalyzedList.AddRange(Scrape.GetResults());
+                AnalysisDataGrid.Columns[3].Width = DataGridLength.SizeToCells;
                 this.SizeToContent = SizeToContent.Height;
             }
             catch (Exception e)

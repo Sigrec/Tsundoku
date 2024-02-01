@@ -102,8 +102,9 @@
 						<ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Kinokuniya USA" ToolTip.Tip="America"/>
                         <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="MerryManga" ToolTip.Tip="America"/>
 						<ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="RobertsAnimeCornerStore" ToolTip.Tip="America"/>
-                        <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="SciFier" ToolTip.Tip="America | Britain | Canada"/>
+                        <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="SciFier" ToolTip.Tip="America | Britain | Canada | Europe | Australia"/>
                         <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Waterstones" ToolTip.Tip="Britain"/>
+                        <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Wordery" ToolTip.Tip="America | Britain | Canada | Europe | Australia"/>
 						<!-- <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Amazon Japan" ToolTip.Tip="Japan"/>-->
 						<!-- <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="CDJapan" ToolTip.Tip="Japan"/> -->
                     </ListBox>
@@ -119,10 +120,11 @@
                               SelectionChanged="RegionChanged"
 							  Theme="{StaticResource MenuComboBox}">
 						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="America"/>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Australia"/>
                         <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Britain"/>
                         <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Canada"/>
-						<!-- <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Japan"/>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Europe"/> -->
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Europe"/>
+						<!-- <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Japan"/> -->
 					</ComboBox>
 				</StackPanel>
 				<StackPanel Grid.Column="2" Grid.Row="2">

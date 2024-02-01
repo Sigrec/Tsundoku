@@ -22,11 +22,13 @@ namespace Tsundoku.ViewModels
         [Reactive] public int CurRegionIndex { get; set; }
         public AvaloniaList<ListBoxItem> SelectedWebsites { get; } = [];
         private static readonly StringBuilder CurWebsites = new StringBuilder();
+        private static readonly Region[] RegionArray = [ Region.America, Region.Australia, Region.Britain, Region.Canada, Region.Europe ];
         public PriceAnalysisViewModel()
         {
             this.CurrentTheme = MainUser.SavedThemes.First(theme => theme.ThemeName.Equals(MainUser.MainTheme));
             SelectedWebsites.CollectionChanged += WebsiteCollectionChanged;
-            this.WhenAnyValue(x => x.CurRegion).Subscribe(x => CurRegionIndex = Array.IndexOf(Enum.GetValues<Region>(), x));
+            this.WhenAnyValue(x => x.CurRegion).Subscribe(x => CurRegionIndex = Array.IndexOf(RegionArray, x));
+            //this.WhenAnyValue(x => x.CurRegion).Subscribe(x => CurRegionIndex = Array.IndexOf(Enum.GetValues<Region>(), x));
         }
 
         private void WebsiteCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)

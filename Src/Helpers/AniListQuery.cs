@@ -9,12 +9,13 @@ namespace Tsundoku.Helpers
     public partial class AniListQuery : IDisposable
 	{
 		private static readonly string USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.66 Safari/537.36";
-		private static GraphQLHttpClient AniListClient = new GraphQLHttpClient("https://graphql.anilist.co", new SystemTextJsonSerializer());
+		private static readonly GraphQLHttpClient AniListClient;
         private bool disposedValue;
         [GeneratedRegex(@"\(Source: [\S\s]+|\<.*?\>")] private static partial Regex AniListDescRegex();
 
 		static AniListQuery()
 		{
+            AniListClient = new GraphQLHttpClient("https://graphql.anilist.co", new SystemTextJsonSerializer());
 			AniListClient.HttpClient.DefaultRequestHeaders.Add("RequestType", "POST");
 			AniListClient.HttpClient.DefaultRequestHeaders.Add("ContentType", "application/json");
 			AniListClient.HttpClient.DefaultRequestHeaders.Add("Accept", "application/json");

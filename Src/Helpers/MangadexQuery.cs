@@ -5,20 +5,21 @@ namespace Tsundoku.Helpers
 {
     public partial class MangadexQuery
     {
-        private static readonly HttpClient MangadexClient = new HttpClient(new SocketsHttpHandler
-        {
-            PooledConnectionLifetime = TimeSpan.FromMinutes(5)
-        })
-        {
-            BaseAddress = new Uri("https://api.mangadex.org/"),
-            DefaultVersionPolicy = HttpVersionPolicy.RequestVersionExact
-        };
+        private static readonly HttpClient MangadexClient;
 
         private static readonly string USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36 Edg/116.0.1938.62";
         [GeneratedRegex(@"- Winner.*$|\n\n\n---[\S\s.]*|\n\n\*\*[\S\s.]*|\[Official.*?\].*|\[Wikipedia.*?\].*|\n\n---\n\*\*Links:\*\*\n\n.*")] private static partial Regex MangaDexDescRegex();
 
         static MangadexQuery()
         {
+            MangadexClient = new HttpClient(new SocketsHttpHandler
+            {
+                PooledConnectionLifetime = TimeSpan.FromMinutes(5)
+            })
+            {
+                BaseAddress = new Uri("https://api.mangadex.org/"),
+                DefaultVersionPolicy = HttpVersionPolicy.RequestVersionExact
+            };
             MangadexClient.DefaultRequestHeaders.Add("User-Agent", USER_AGENT);
         }
 
