@@ -83,7 +83,7 @@
     <PackageReference Include="GraphQL.Client" Version="6.0.2" />
 	<PackageReference Include="GraphQL.Client.Serializer.SystemTextJson" Version="6.0.2" />
     <PackageReference Include="GraphQL.Client.Serializer.Newtonsoft" Version="6.0.2" />
-	<PackageReference Include="MangaAndLightNovelWebScrape" Version="1.1.6" />
+	<PackageReference Include="MangaAndLightNovelWebScrape" Version="1.2.1" />
     <PackageReference Include="NLog" Version="5.2.8" />
 	<PackageReference Include="FileWatcherEx" Version="2.6.0" />
     <PackageReference Include="Projektanker.Icons.Avalonia.FontAwesome" Version="9.0.1" />

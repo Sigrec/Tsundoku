@@ -225,9 +225,10 @@ namespace Tsundoku.Views
                 uint volumesReadVal = Convert.ToUInt32(volumesRead);
                 if (curSeries.VolumesRead != volumesReadVal)
                 {
+                    LOGGER.Info($"Updating # of Volumes Read for \"{curSeries.Titles["Romaji"]}\" from {curSeries.VolumesRead} to {volumesReadVal}");
+
                     curSeries.VolumesRead = volumesReadVal;
                     ((TextBlock)stackPanels.ElementAt(0).GetLogicalChildren().ElementAt(0)).Text = $"Read {volumesReadVal} Vol(s)";
-                    LOGGER.Info($"Updated # of Volumes Read for \"{curSeries.Titles["Romaji"]}\" to {volumesReadVal}");
                     volumesReadVal = 0;
                     MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UpdateCollectionVolumesRead();
                     ((MaskedTextBox)stackPanels.ElementAt(0).GetLogicalChildren().ElementAt(1)).Text = "";
@@ -239,9 +240,10 @@ namespace Tsundoku.Views
             decimal costVal = Convert.ToDecimal(costText.Replace("_", "0"));
             if (decimal.Compare(costVal, 0) >= 0 && curSeries.Cost != costVal && !costText.Equals("_________.__"))
             {
+                LOGGER.Info($"Updating Cost for \"{curSeries.Titles["Romaji"]}\" from {curSeries.Cost} to {CollectionViewModel.CurCurrency}{costVal}");
+
                 curSeries.Cost = costVal;
                 ((TextBlock)stackPanels.ElementAt(1).GetLogicalChildren().ElementAt(0)).Text = $"Cost {CollectionViewModel.CurCurrency}{costVal}";
-                LOGGER.Info($"Updated Cost for \"{curSeries.Titles["Romaji"]}\" to {CollectionViewModel.CurCurrency}{costVal}");
                 MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UpdateCollectionPrice();
                 ((MaskedTextBox)stackPanels.ElementAt(1).GetLogicalChildren().ElementAt(1)).Text = "";
             }
@@ -253,6 +255,8 @@ namespace Tsundoku.Views
             {
                 if (decimal.Compare(ratingVal, new decimal(10.0)) <= 0)
                 {
+                    LOGGER.Info($"Updating rating for \"{curSeries.Titles["Romaji"]}\" from \"{curSeries.Rating}/10.0\" to \"{decimal.Round(ratingVal, 1)}/10.0\"");
+
                     curSeries.Rating = ratingVal;
                     ((TextBlock)stackPanels.ElementAt(2).GetLogicalChildren().ElementAt(0)).Text = $"Rating {ratingVal}/10.0";
                     
@@ -260,7 +264,6 @@ namespace Tsundoku.Views
                     MainWindowViewModel.UserCollection.First(series => series == curSeries).Rating = ratingVal;
                     MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UpdateRatingChartValues();
 
-                    LOGGER.Info($"Updated rating for \"{curSeries.Titles["Romaji"]}\" to {decimal.Round(ratingVal, 1)}/10.0");
                     MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UpdateCollectionRating();
                     ((MaskedTextBox)stackPanels.ElementAt(1).GetLogicalChildren().ElementAt(1)).Text = "";
                 }
