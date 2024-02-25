@@ -16,8 +16,8 @@
 		<Optimize>True</Optimize>
 		<SelfContained>True</SelfContained>
 		<IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
-		<Version>3.3.0</Version>
-		<FileVersion>3.3.0.0</FileVersion>
+		<Version>4.0.0</Version>
+		<FileVersion>4.0.0.0</FileVersion>
 		<RepositoryUrl>https://github.com/Sigrec/Tsundoku</RepositoryUrl>
         <LangVersion>preview</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>

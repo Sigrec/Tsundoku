@@ -11,6 +11,13 @@ TODO:
 ❌ Fix padding issue in Series Note w/ Scrollbar
 ❌ Fix issue where clicking or minimizing would sometimes cause the the main window to scroll up (https://github.com/AvaloniaUI/Avalonia/issues/7593)
 
+v4.0.0.0 - February
+✅ Changed Series Card Edit Button Icon to a Gear
+✅ Updated Series Card Progress Section Layout
+✅ Updated Series Card Edit Pane Layout
+✅ Removed "SeriesButtonBGColor" & SeriesButtonBGHoverColor" Colors, replaced with "SeriesProgressBGColor"
+🔥 Fixed issue where changing menu colors and collection bg color wouldn't revert back if not saved after closing theme window
+
 v3.3.0.0 - February 26th
 ⌛ Updated Avalonia to v11.0.9
 ✅ Updated styling of "Series Stat" Layout

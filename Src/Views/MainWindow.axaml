@@ -372,7 +372,7 @@
                                                     </Style>
                                                 </Style>
                                             </Grid.Styles>
-                                            <!-- Top Right Side Card Series Edit-->
+                                            <!-- Top Right Side Card Series Edit Pane-->
                                             <Grid Height="{CompiledBinding Source={x:Static local:Constants.TOP_SECTION_CARD_HEIGHT}}" 
                                                 Grid.Row="0" 
                                                 Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneBGColor, Converter={StaticResource ConvertColor}}" 
@@ -465,45 +465,85 @@
                                                 </StackPanel>
                                             </Grid>
 
-                                            <!-- Top Right Side Stats Pane -->
+                                            <!-- Top Right Side Card Series Settings Pane -->
                                             <Grid Height="{CompiledBinding Source={x:Static local:Constants.TOP_SECTION_CARD_HEIGHT}}" 
                                                 Grid.Row="0" 
                                                 Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneBGColor, Converter={StaticResource ConvertColor}}" 
                                                 IsVisible="false"
-                                                RowDefinitions="Auto,Auto,18,40"
-                                                ColumnDefinitions="118,118,118"
+                                                RowDefinitions="Auto,*,*"
+                                                ColumnDefinitions="177.5,177.5"
                                                 ZIndex="1">
                                                 <Grid.Styles>
                                                     <Style Selector="TextBox:pointerover /template/ Border#PART_BorderElement, TextBox:focus /template/ Border#PART_BorderElement">
                                                         <Setter Property="Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesNotesBGColor, Converter={StaticResource ConvertColor}}"/>
                                                         <Setter Property="BorderBrush" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesNotesBorderColor, Converter={StaticResource ConvertColor}}"/>
                                                     </Style>
+                                                </Grid.Styles>
+                                                <StackPanel Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="5" Margin="22,15,22,0">
+                                                    <StackPanel.Styles>
+                                                        <Style Selector="ToggleButton">
+                                                            <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter, ^:pressed /template/ ContentPresenter#PART_ContentPresenter">
+                                                                <Setter Property="Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsBGHoverColor, Converter={StaticResource ConvertColor}}"/>
+                                                                <Setter Property="BorderBrush" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
+                                                                <Setter Property="TextBlock.Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsIconHoverColor, Converter={StaticResource ConvertColor}}"/>
+                                                            </Style>
 
-                                                    <Style Selector="ToggleButton">
-                                                        <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter, ^:pressed /template/ ContentPresenter#PART_ContentPresenter">
-                                                            <Setter Property="Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsBGHoverColor, Converter={StaticResource ConvertColor}}"/>
-                                                            <Setter Property="BorderBrush" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
-                                                            <Setter Property="TextBlock.Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsIconHoverColor, Converter={StaticResource ConvertColor}}"/>
+                                                            <Style Selector="^:checked">
+                                                                <Style Selector="^ /template/ ContentPresenter#PART_ContentPresenter">
+                                                                    <Setter Property="Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsBGHoverColor, Converter={StaticResource ConvertColor}}"/>
+                                                                    <Setter Property="BorderBrush" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
+                                                                    <Setter Property="TextBlock.Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsIconHoverColor, Converter={StaticResource ConvertColor}}"/>
+                                                                </Style>
+                                                            </Style>
                                                         </Style>
 
-                                                        <Style Selector="^:checked">
-                                                            <Style Selector="^ /template/ ContentPresenter#PART_ContentPresenter">
+                                                        <Style Selector="Button">
+                                                            <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
                                                                 <Setter Property="Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsBGHoverColor, Converter={StaticResource ConvertColor}}"/>
                                                                 <Setter Property="BorderBrush" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
                                                                 <Setter Property="TextBlock.Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsIconHoverColor, Converter={StaticResource ConvertColor}}"/>
                                                             </Style>
                                                         </Style>
-                                                    </Style>
-
-                                                    <Style Selector="Button">
-                                                        <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-                                                            <Setter Property="Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsBGHoverColor, Converter={StaticResource ConvertColor}}"/>
-                                                            <Setter Property="BorderBrush" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsBorderHoverColor, Converter={StaticResource ConvertColor}}"/>
-                                                            <Setter Property="TextBlock.Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsIconColor, Converter={StaticResource ConvertColor}}"/>
-                                                        </Style>
-                                                    </Style>
-                                                </Grid.Styles>
-                                                <StackPanel Margin="22,10,0,0" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Left" VerticalAlignment="Center" Spacing="1">
+                                                    </StackPanel.Styles>
+                                                    <Button i:Attached.Icon="fa-solid fa-image"
+                                                        Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsBGColor, Converter={StaticResource ConvertColor}}"
+                                                        BorderBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsBorderColor, Converter={StaticResource ConvertColor}}" 
+                                                        BorderThickness="2"
+                                                        FontWeight="Bold"
+                                                        FontSize="22"
+                                                        VerticalContentAlignment="Center"
+                                                        HorizontalContentAlignment="Center"
+                                                        VerticalAlignment="Center"
+                                                        HorizontalAlignment="Center"
+                                                        Click="ChangeSeriesCover"
+                                                        Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsIconColor, Converter={StaticResource ConvertColor}}">
+                                                    </Button>
+                                                    <Button i:Attached.Icon="fa-solid fa-floppy-disk"
+                                                            Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsBGColor, Converter={StaticResource ConvertColor}}"
+                                                            BorderBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsBorderColor, Converter={StaticResource ConvertColor}}" 
+                                                            BorderThickness="2"
+                                                            FontWeight="Bold"
+                                                            FontSize="22"
+                                                            VerticalContentAlignment="Center"
+                                                            HorizontalContentAlignment="Center"
+                                                            VerticalAlignment="Center"
+                                                            HorizontalAlignment="Center"
+                                                            Click="SaveStats"
+                                                            Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsIconColor, Converter={StaticResource ConvertColor}}"/>
+                                                    <ToggleButton i:Attached.Icon="fa-solid fa-star"
+                                                            IsChecked="{Binding IsFavorite, Mode=TwoWay}"
+                                                            Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsBGColor, Converter={StaticResource ConvertColor}}"
+                                                            BorderBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsBorderColor, Converter={StaticResource ConvertColor}}" 
+                                                            BorderThickness="2"
+                                                            FontWeight="Bold"
+                                                            FontSize="22"
+                                                            VerticalContentAlignment="Center"
+                                                            HorizontalContentAlignment="Center"
+                                                            VerticalAlignment="Center"
+                                                            HorizontalAlignment="Center"
+                                                            Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsIconColor, Converter={StaticResource ConvertColor}}"/>
+                                                </StackPanel>
+                                                <StackPanel Margin="22,10,0,0" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="1">
                                                     <TextBlock Text="{Binding VolumesRead, StringFormat='Read {0} Vol(s)'}"
                                                             Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesCardTitleColor, Converter={StaticResource ConvertColor}}"
                                                             FontWeight="Bold"
@@ -523,7 +563,7 @@
                                                                 SelectionForegroundBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesNotesBGColor, Converter={StaticResource ConvertColor}}"
                                                                 Mask="000"/>
                                                 </StackPanel>
-                                                <StackPanel Margin="0,10,22,0" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Right" VerticalAlignment="Center" Spacing="1">
+                                                <StackPanel Margin="0,10,22,0" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="1">
                                                     <TextBlock Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesCardTitleColor, Converter={StaticResource ConvertColor}}"
                                                             FontWeight="Bold"
                                                             HorizontalAlignment="Center"
@@ -549,7 +589,7 @@
                                                                 SelectionForegroundBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesNotesBGColor, Converter={StaticResource ConvertColor}}"
                                                                 Mask="000000000.00"/>
                                                 </StackPanel>
-                                                <StackPanel Margin="22,10,0,0" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Left" VerticalAlignment="Center" Spacing="1">
+                                                <StackPanel Margin="22,0,0,15" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="1">
                                                     <TextBlock Text="{CompiledBinding Rating, StringFormat='Rating {0}/10.0'}"
                                                             Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesCardTitleColor, Converter={StaticResource ConvertColor}}"
                                                             FontWeight="Bold"
@@ -570,7 +610,7 @@
                                                                 HidePromptOnLeave="True"
                                                                 Mask="90.0/1\0.\0"/>
                                                 </StackPanel>
-                                                <StackPanel Margin="0,10,22,0" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Right" VerticalAlignment="Center" Spacing="1">
+                                                <StackPanel Margin="0,0,22,15" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="1">
                                                     <StackPanel.Styles>
                                                         <Style Selector="ComboBox">
                                                             <Setter Property="Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsBGColor, Converter={StaticResource ConvertColor}}"/>
@@ -685,60 +725,9 @@
                                                             HorizontalAlignment="Center"
                                                             AutoScrollToSelectedItem="True"/>
                                                 </StackPanel>
-                                                <Button Content="Cover"
-                                                        Grid.Row="3"
-                                                        Grid.Column="0"
-                                                        Width="106"
-                                                        Height="40"
-                                                        Margin="8,0,0,0"
-                                                        Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsBGColor, Converter={StaticResource ConvertColor}}"
-                                                        BorderBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsBorderColor, Converter={StaticResource ConvertColor}}" 
-                                                        BorderThickness="2"
-                                                        FontWeight="Bold"
-                                                        FontSize="17"
-                                                        VerticalContentAlignment="Center"
-                                                        HorizontalContentAlignment="Center"
-                                                        VerticalAlignment="Center"
-                                                        HorizontalAlignment="Center"
-                                                        Click="ChangeCover"
-                                                        Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsIconColor, Converter={StaticResource ConvertColor}}"/>
-                                                <Button Content="Save Stats"
-                                                        Grid.Row="3"
-                                                        Grid.Column="1"
-                                                        Width="106"
-                                                        Height="40"
-                                                        Margin="-2,0,0,0"
-                                                        Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsBGColor, Converter={StaticResource ConvertColor}}"
-                                                        BorderBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsBorderColor, Converter={StaticResource ConvertColor}}" 
-                                                        BorderThickness="2"
-                                                        FontWeight="Bold"
-                                                        FontSize="17"
-                                                        VerticalContentAlignment="Center"
-                                                        HorizontalContentAlignment="Center"
-                                                        VerticalAlignment="Center"
-                                                        HorizontalAlignment="Center"
-                                                        Click="SaveStats"
-                                                        Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsIconColor, Converter={StaticResource ConvertColor}}"/>
-                                                <ToggleButton Content="Favorite"
-                                                        Grid.Row="3"
-                                                        Grid.Column="2"
-                                                        Width="106"
-                                                        Height="40"
-                                                        Margin="-8,0,0,0"
-                                                        IsChecked="{Binding IsFavorite, Mode=TwoWay}"
-                                                        Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsBGColor, Converter={StaticResource ConvertColor}}"
-                                                        BorderBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsBorderColor, Converter={StaticResource ConvertColor}}" 
-                                                        BorderThickness="2"
-                                                        FontWeight="Bold"
-                                                        FontSize="17"
-                                                        VerticalContentAlignment="Center"
-                                                        HorizontalContentAlignment="Center"
-                                                        VerticalAlignment="Center"
-                                                        HorizontalAlignment="Center"
-                                                        Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsIconColor, Converter={StaticResource ConvertColor}}"/>
                                             </Grid>
 
-                                            <!-- Top Right Side Card Series Data-->
+                                            <!-- Top Right Side Card Series Data Pane -->
                                             <Grid Height="{CompiledBinding Source={x:Static local:Constants.TOP_SECTION_CARD_HEIGHT}}" 
                                                     Grid.Row="0"
                                                     Width="{CompiledBinding Source={x:Static local:Constants.RIGHT_SIDE_CARD_WIDTH}}"
@@ -789,30 +778,29 @@
                                             </Grid>
 
 										    <!-- Bottom Right Side Card -->
-                                            <StackPanel Height="{CompiledBinding Source={x:Static local:Constants.BOTTOM_SECTION_CARD_HEIGHT}}"
-                                                        Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressBGColor, Converter={StaticResource ConvertColor}}"
-                                                        Width="{CompiledBinding Source={x:Static local:Constants.RIGHT_SIDE_CARD_WIDTH}}"
-                                                        Orientation="Horizontal"
-                                                        Grid.Row="1"
-                                                        HorizontalAlignment="Stretch"
-                                                        VerticalAlignment="Stretch">
-                                                <StackPanel.Styles>
+                                            <Grid Height="{CompiledBinding Source={x:Static local:Constants.BOTTOM_SECTION_CARD_HEIGHT}}"
+                                                  Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressBGColor, Converter={StaticResource ConvertColor}}"
+                                                  Width="{CompiledBinding Source={x:Static local:Constants.RIGHT_SIDE_CARD_WIDTH}}"
+                                                  Grid.Row="1"
+                                                  ColumnDefinitions="Auto,Auto,Auto">
+                                                <Grid.Styles>
                                                     <Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                                                        <Setter Property="Background" Value="Transparent"/>
                                                         <Setter Property="TextBlock.Foreground" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesButtonIconHoverColor, Converter={StaticResource ConvertColor}}"/>
-                                                        <Setter Property="Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesButtonBGHoverColor, Converter={StaticResource ConvertColor}}"/>
                                                     </Style>
-                                                </StackPanel.Styles>
-                                                <Button Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesButtonBGColor, Converter={StaticResource ConvertColor}}"
-                                                        FontSize="23"
+                                                </Grid.Styles>
+                                                <Button Grid.Column="0"
+                                                        Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressBGColor, Converter={StaticResource ConvertColor}}"
+                                                        FontSize="27"
                                                         BorderThickness="0"
+                                                        HorizontalContentAlignment="Center"
                                                         BorderBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesButtonIconColor, Converter={StaticResource ConvertColor}}"
                                                         Height="{CompiledBinding Source={x:Static local:Constants.BOTTOM_SECTION_CARD_HEIGHT}}"
-                                                        Width="45"
                                                         CornerRadius="0"
                                                         Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesButtonIconColor, Converter={StaticResource ConvertColor}}"
-                                                        i:Attached.Icon="fa-solid fa-pen-to-square"
+                                                        i:Attached.Icon="fa-solid fa-square-pen"
                                                         Click="ShowEditPane"/>
-                                                <Grid ColumnDefinitions="Auto" RowDefinitions="40" Width="265">
+                                                <Grid ColumnDefinitions="Auto" RowDefinitions="40" HorizontalAlignment="Center" Grid.Column="1">
                                                     <Grid.Styles>
                                                         <Style Selector="Button">
                                                             <Style Selector="^:pointerover /template/ ContentPresenter">
@@ -822,7 +810,7 @@
                                                         </Style>
                                                     </Grid.Styles>
                                                     <ProgressBar Height="30"
-                                                                Width="250"
+                                                                Width="266"
                                                                 Grid.Row="0"
                                                                 Grid.Column="0"
                                                                 Value="{CompiledBinding CurVolumeCount}"
@@ -837,7 +825,6 @@
                                                                 FontSize="15"
                                                                 Minimum="0"
                                                                 CornerRadius="4"
-                                                                Margin="7,0,0,0"
                                                                 Maximum="{CompiledBinding MaxVolumeCount}"/>
                                                     <StackPanel Orientation="Horizontal" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center" Margin="10,0,0,0">
                                                         <Button Background="Transparent"
@@ -881,16 +868,17 @@
                                                                 Content="+"/>
                                                     </StackPanel>
                                                 </Grid>
-                                                <Button Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesButtonBGColor, Converter={StaticResource ConvertColor}}"
-                                                        FontSize="23"
+                                                <Button Grid.Column="2"
+                                                        Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesProgressBGColor, Converter={StaticResource ConvertColor}}"
+                                                        FontSize="27"
                                                         BorderThickness="0"
+                                                        HorizontalContentAlignment="Center"
                                                         BorderBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesButtonIconColor, Converter={StaticResource ConvertColor}}"
                                                         Height="{CompiledBinding Source={x:Static local:Constants.BOTTOM_SECTION_CARD_HEIGHT}}"
-                                                        Width="45"
                                                         Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesButtonIconColor, Converter={StaticResource ConvertColor}}"
-                                                        i:Attached.Icon="fa-solid fa-square-poll-vertical"
+                                                        i:Attached.Icon="fa-solid fa-square-plus"
                                                         Click="ShowStatsPane"/>
-                                            </StackPanel>
+                                            </Grid>
                                         </Grid>
                                     </Grid>
                                 </Border>

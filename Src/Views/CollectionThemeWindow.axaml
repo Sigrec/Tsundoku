@@ -1,24 +1,23 @@
 <Window xmlns="https://github.com/avaloniaui"
-	xmlns:vm="using:Tsundoku.ViewModels"
-	xmlns:c="using:Tsundoku.CustomControls"
-	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:cv="clr-namespace:Tsundoku.Helpers"
-	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-	xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
-	xmlns:controls="clr-namespace:Tsundoku.Controls"
-	x:Class="Tsundoku.Views.CollectionThemeWindow"
-	Icon="\Assets\Icons\Tsundoku-Logo.ico"
-	Title="Theme Settings"
-	FontFamily="Segoe UI"
-	WindowState="2"
-	Classes="menu"
-    Topmost="true"
-	WindowStartupLocation="2"
-	KeyboardNavigation.TabNavigation="None"
-	x:DataType="vm:ThemeSettingsViewModel"
-	CanResize="true">
-
+        xmlns:vm="using:Tsundoku.ViewModels"
+        xmlns:c="using:Tsundoku.CustomControls"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:cv="clr-namespace:Tsundoku.Helpers"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+        xmlns:controls="clr-namespace:Tsundoku.Controls"
+        x:Class="Tsundoku.Views.CollectionThemeWindow"
+        Icon="\Assets\Icons\Tsundoku-Logo.ico"
+        Title="Theme Settings"
+        FontFamily="Segoe UI"
+        WindowState="2"
+        Classes="menu"
+        Topmost="true"
+        WindowStartupLocation="2"
+        KeyboardNavigation.TabNavigation="None"
+        x:DataType="vm:ThemeSettingsViewModel"
+        CanResize="true">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -434,34 +433,6 @@
                                             <Button.Flyout>
                                                 <Flyout Placement="Bottom">
                                                     <ColorView Name="SeriesProgress_Buttons_Hover"/>
-                                                </Flyout>
-                                            </Button.Flyout>
-                                        </Button>
-                                    </Border>
-                                </Border>
-                            </StackPanel>
-                            <StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
-                                <TextBlock Text="Series Button BG" FontSize="12" FontWeight="Bold" Classes="menu"/>
-                                <Border Classes="menu" BorderThickness="2">
-                                    <Border Classes="menu" BorderThickness="2" Margin="2">	
-                                        <Button Name="SeriesButton_BG_Button" Background="{CompiledBinding CurrentTheme.SeriesButtonBGColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
-                                            <Button.Flyout>
-                                                <Flyout Placement="Bottom">
-                                                    <ColorView Name="SeriesButton_BG"/>
-                                                </Flyout>
-                                            </Button.Flyout>
-                                        </Button>
-                                    </Border>
-                                </Border>
-                            </StackPanel>
-                            <StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
-                                <TextBlock Text="Series Button BG (Hover)" FontSize="12" FontWeight="Bold" Classes="menu"/>
-                                <Border Classes="menu" BorderThickness="2">
-                                    <Border Classes="menu" BorderThickness="2" Margin="2">	
-                                        <Button Name="SeriesButton_BG_Hover_Button" Background="{CompiledBinding CurrentTheme.SeriesButtonBGHoverColor, Converter={StaticResource ConvertColor}}" Margin="2" Cursor="Hand" HorizontalAlignment="Left" Height="20" Width="210" CornerRadius="0">
-                                            <Button.Flyout>
-                                                <Flyout Placement="Bottom">
-                                                    <ColorView Name="SeriesButton_BG_Hover"/>
                                                 </Flyout>
                                             </Button.Flyout>
                                         </Button>
