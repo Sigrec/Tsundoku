@@ -8,11 +8,9 @@ using Tsundoku.ViewModels;
 using System.Reactive.Linq;
 using Avalonia.ReactiveUI;
 using ReactiveUI;
-using System.Runtime.InteropServices;
 using Avalonia.Platform.Storage;
 using Avalonia.Media.Imaging;
 using FileWatcherEx;
-using Avalonia.Threading;
 
 namespace Tsundoku.Views
 {
@@ -61,7 +59,7 @@ namespace Tsundoku.Views
                         LOGGER.Info("Changed File Extention for {} to {}", series.Titles["Romaji"], pathFileExtension);
                     }
 
-                    if (series != null && !CoverChangedSeriesList.Contains(series))
+                    if (!CoverChangedSeriesList.Contains(series))
                     {
                         CoverChangedSeriesList.Add(series);
                         LOGGER.Info($"Added \"{series.Titles["Romaji"]}\" to Cover Change List");
@@ -171,6 +169,7 @@ namespace Tsundoku.Views
                 return AdvancedSearchBar.IsVisible && itemString.StartsWith(query[(query.LastIndexOf(delimeter) + delimeter.Length)..], StringComparison.OrdinalIgnoreCase);
             };
         }
+        
         private void UnShowAdvancedSearchPopup(object sender, PointerPressedEventArgs args)
         {
             AdvancedSearchPopup.IsVisible = false;
@@ -189,21 +188,15 @@ namespace Tsundoku.Views
         /// </summary>
         private static void ReloadCoverBitmaps()
         {
+            LOGGER.Debug("Reloading Cover Bitmaps");
             uint cache = 0;
             for (int x = 0; x < MainWindowViewModel.UserCollection.Count; x++)
             {
                 // If the image does not exist in the covers folder then don't create a bitmap for it
                 if (CoverChangedSeriesList.Contains(MainWindowViewModel.UserCollection[x]))
                 {
-                    Bitmap newCover = new Bitmap(MainWindowViewModel.UserCollection[x].Cover).CreateScaledBitmap(new PixelSize(LEFT_SIDE_CARD_WIDTH, IMAGE_HEIGHT), BitmapInterpolationMode.HighQuality);
-                    newCover.Save(MainWindowViewModel.UserCollection[x].Cover, 100);
-
-                    MainWindowViewModel.UserCollection[x].CoverBitMap = newCover;
-                    int index = MainWindowViewModel.SearchedCollection.IndexOf(MainWindowViewModel.UserCollection[x]);
-                    MainWindowViewModel.SearchedCollection.Remove(MainWindowViewModel.UserCollection[x]);
-                    MainWindowViewModel.SearchedCollection.Insert(index, MainWindowViewModel.UserCollection[x]);
+                    MainWindowViewModel.ChangeCover(MainWindowViewModel.UserCollection[x], MainWindowViewModel.UserCollection[x].Cover);
                     cache++;
-                    LOGGER.Info($"Updated Cover for \"{MainWindowViewModel.UserCollection[x].Titles["Romaji"]}\"");
                 }
                 else if (cache == CoverChangedSeriesList.Count)
                 {
@@ -211,6 +204,37 @@ namespace Tsundoku.Views
                 }
             }
             CoverChangedSeriesList.Clear();
+        }
+
+        private async void ChangeCover(object sender, RoutedEventArgs args)
+        {
+            ViewModelBase.newCoverCheck = true;
+            var file = await this.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions {
+                AllowMultiple = false,
+                FileTypeFilter = new List<FilePickerFileType>() { new FilePickerFileType("Images") { Patterns = ["*.png", "*.jpg"] } }
+            });
+            if (file.Count > 0)
+            {
+                for (int x = 0; x < MainWindowViewModel.UserCollection.Count; x++)
+                {
+                    if (MainWindowViewModel.UserCollection[x] == (Series)((Button)sender).DataContext)
+                    {
+                        Series curSeries = MainWindowViewModel.UserCollection[x];
+
+                        string filePath = file[0].Path.LocalPath;
+                        string fileExtension = filePath[^3..];
+                        if (!curSeries.Cover.EndsWith(fileExtension))
+                        {
+                            MainWindowViewModel.DeleteCover(curSeries);
+                            curSeries.Cover = curSeries.Cover.Remove(curSeries.Cover.Length - 3, 3) + fileExtension;
+                        };
+
+                        MainWindowViewModel.ChangeCover(curSeries, filePath);
+                        (sender as Button).FindLogicalAncestorOfType<Grid>(false).IsVisible = false;
+                        break;
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -351,14 +375,7 @@ namespace Tsundoku.Views
                 MainWindowViewModel.SearchedCollection.Remove(curSeries);
                 MainWindowViewModel.UserCollection.Remove(curSeries);
 
-                if (File.Exists(curSeries.Cover))
-                {
-                    File.SetAttributes(curSeries.Cover, FileAttributes.Normal);
-                    File.Delete(curSeries.Cover);
-                    curSeries.Dispose();
-                    LOGGER.Info("Deleted Cover -> {}", curSeries.Cover);
-                }
-                
+                MainWindowViewModel.DeleteCover(curSeries);
                 LOGGER.Info($"Removed \"{curSeries.Titles["Romaji"]}\" From Collection");
                 MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UpdateAllStats(curSeries.CurVolumeCount, (uint)(curSeries.MaxVolumeCount - curSeries.CurVolumeCount));
             }, RxApp.MainThreadScheduler);
@@ -503,7 +520,7 @@ namespace Tsundoku.Views
         {
             var file = await this.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions {
                 AllowMultiple = false,
-                FileTypeFilter = new List<FilePickerFileType>() { fileOptions }
+                FileTypeFilter = new List<FilePickerFileType>() { new FilePickerFileType("Images") { Patterns = ["*.png", "*.jpg", "*.jpeg", "*.crdownload"] } }
             });
             if (file.Count > 0)
             {

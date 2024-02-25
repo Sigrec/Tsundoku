@@ -11,8 +11,10 @@ TODO:
 ❌ Fix padding issue in Series Note w/ Scrollbar
 ❌ Fix issue where clicking or minimizing would sometimes cause the the main window to scroll up (https://github.com/AvaloniaUI/Avalonia/issues/7593)
 
-v3.3.0.0 - 
+v3.3.0.0 - February 26th
 ⌛ Updated Avalonia to v11.0.9
+✅ Updated styling of "Series Stat" Layout
+✅ Added new button to change the cover of a series in "Series Stat" pane
 📜 PriceAnalysisWindow
 - ✅ Button no longer clickable when websites don't match region
 
