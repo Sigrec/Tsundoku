@@ -471,7 +471,7 @@
                                                 Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneBGColor, Converter={StaticResource ConvertColor}}" 
                                                 IsVisible="false"
                                                 RowDefinitions="Auto,Auto,18,40"
-                                                ColumnDefinitions="177.5,177.5"
+                                                ColumnDefinitions="118,118,118"
                                                 ZIndex="1">
                                                 <Grid.Styles>
                                                     <Style Selector="TextBox:pointerover /template/ Border#PART_BorderElement, TextBox:focus /template/ Border#PART_BorderElement">
@@ -503,7 +503,7 @@
                                                         </Style>
                                                     </Style>
                                                 </Grid.Styles>
-                                                <StackPanel Margin="10,7,0,0" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="1">
+                                                <StackPanel Margin="22,10,0,0" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Left" VerticalAlignment="Center" Spacing="1">
                                                     <TextBlock Text="{Binding VolumesRead, StringFormat='Read {0} Vol(s)'}"
                                                             Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesCardTitleColor, Converter={StaticResource ConvertColor}}"
                                                             FontWeight="Bold"
@@ -523,7 +523,7 @@
                                                                 SelectionForegroundBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesNotesBGColor, Converter={StaticResource ConvertColor}}"
                                                                 Mask="000"/>
                                                 </StackPanel>
-                                                <StackPanel Margin="0,10,10,0" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="1">
+                                                <StackPanel Margin="0,10,22,0" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Right" VerticalAlignment="Center" Spacing="1">
                                                     <TextBlock Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesCardTitleColor, Converter={StaticResource ConvertColor}}"
                                                             FontWeight="Bold"
                                                             HorizontalAlignment="Center"
@@ -549,7 +549,7 @@
                                                                 SelectionForegroundBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesNotesBGColor, Converter={StaticResource ConvertColor}}"
                                                                 Mask="000000000.00"/>
                                                 </StackPanel>
-                                                <StackPanel Margin="10,7,0,0" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="1">
+                                                <StackPanel Margin="22,10,0,0" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Left" VerticalAlignment="Center" Spacing="1">
                                                     <TextBlock Text="{CompiledBinding Rating, StringFormat='Rating {0}/10.0'}"
                                                             Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesCardTitleColor, Converter={StaticResource ConvertColor}}"
                                                             FontWeight="Bold"
@@ -570,7 +570,7 @@
                                                                 HidePromptOnLeave="True"
                                                                 Mask="90.0/1\0.\0"/>
                                                 </StackPanel>
-                                                <StackPanel Margin="0,10,10,0" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="1">
+                                                <StackPanel Margin="0,10,22,0" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Right" VerticalAlignment="Center" Spacing="1">
                                                     <StackPanel.Styles>
                                                         <Style Selector="ComboBox">
                                                             <Setter Property="Background" Value="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsBGColor, Converter={StaticResource ConvertColor}}"/>
@@ -685,15 +685,32 @@
                                                             HorizontalAlignment="Center"
                                                             AutoScrollToSelectedItem="True"/>
                                                 </StackPanel>
-                                                <Button Content="Save Stats"
+                                                <Button Content="Cover"
                                                         Grid.Row="3"
                                                         Grid.Column="0"
-                                                        Width="115"
+                                                        Width="106"
                                                         Height="40"
+                                                        Margin="8,0,0,0"
                                                         Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsBGColor, Converter={StaticResource ConvertColor}}"
                                                         BorderBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsBorderColor, Converter={StaticResource ConvertColor}}" 
                                                         BorderThickness="2"
-                                                        Margin="13,0,0,0"
+                                                        FontWeight="Bold"
+                                                        FontSize="17"
+                                                        VerticalContentAlignment="Center"
+                                                        HorizontalContentAlignment="Center"
+                                                        VerticalAlignment="Center"
+                                                        HorizontalAlignment="Center"
+                                                        Click="ChangeCover"
+                                                        Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsIconColor, Converter={StaticResource ConvertColor}}"/>
+                                                <Button Content="Save Stats"
+                                                        Grid.Row="3"
+                                                        Grid.Column="1"
+                                                        Width="106"
+                                                        Height="40"
+                                                        Margin="-2,0,0,0"
+                                                        Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsBGColor, Converter={StaticResource ConvertColor}}"
+                                                        BorderBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsBorderColor, Converter={StaticResource ConvertColor}}" 
+                                                        BorderThickness="2"
                                                         FontWeight="Bold"
                                                         FontSize="17"
                                                         VerticalContentAlignment="Center"
@@ -704,14 +721,14 @@
                                                         Foreground="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsIconColor, Converter={StaticResource ConvertColor}}"/>
                                                 <ToggleButton Content="Favorite"
                                                         Grid.Row="3"
-                                                        Grid.Column="1"
-                                                        Width="115"
+                                                        Grid.Column="2"
+                                                        Width="106"
                                                         Height="40"
+                                                        Margin="-8,0,0,0"
                                                         IsChecked="{Binding IsFavorite, Mode=TwoWay}"
                                                         Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsBGColor, Converter={StaticResource ConvertColor}}"
                                                         BorderBrush="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneButtonsBorderColor, Converter={StaticResource ConvertColor}}" 
                                                         BorderThickness="2"
-                                                        Margin="0,0,9,0"
                                                         FontWeight="Bold"
                                                         FontSize="17"
                                                         VerticalContentAlignment="Center"

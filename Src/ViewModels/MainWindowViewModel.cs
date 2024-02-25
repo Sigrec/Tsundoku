@@ -503,7 +503,7 @@ namespace Tsundoku.ViewModels
                     {
                         x.CoverBitMap = loadedBitmap.CreateScaledBitmap(new PixelSize(LEFT_SIDE_CARD_WIDTH, IMAGE_HEIGHT), BitmapInterpolationMode.HighQuality);
                         x.CoverBitMap.Save(coverCheck ? x.Cover : newCoverPath, 100);
-                        LOGGER.Info("Scaling {} Cover Image", x.Titles["Romaji"]);
+                        LOGGER.Debug("Scaling {} Cover Image", x.Titles["Romaji"]);
                     }
                     else
                     {
@@ -763,6 +763,33 @@ namespace Tsundoku.ViewModels
             MainUser.SavedThemes.Remove(TsundokuTheme.DEFAULT_THEME);
     
             File.WriteAllText(USER_DATA_FILEPATH, JsonSerializer.Serialize(MainUser, typeof(User), User.UserJsonModel));
+        }
+
+        /// <summary>
+        /// Changes the cover for series
+        /// </summary>
+        /// <param name="series">The series to change the cover for</param>
+        /// <param name="newBitmapPath">The path to the new cover</param>
+        public static void ChangeCover(Series series, string newBitmapPath) {
+            Bitmap newCover = new Bitmap(newBitmapPath).CreateScaledBitmap(new PixelSize(LEFT_SIDE_CARD_WIDTH, IMAGE_HEIGHT), BitmapInterpolationMode.HighQuality);
+            newCover.Save(series.Cover, 100);
+
+            // Update Current Viewed Collection
+            series.CoverBitMap = newCover;
+            int index = SearchedCollection.IndexOf(series);
+            SearchedCollection.Remove(series);
+            SearchedCollection.Insert(index, series);
+            LOGGER.Info("Updated Cover for {}", series.Titles["Romaji"]);
+        }
+
+        public static void DeleteCover(Series series)
+        {
+            if (File.Exists(series.Cover))
+            {
+                File.SetAttributes(series.Cover, FileAttributes.Normal);
+                File.Delete(series.Cover);
+                series.Dispose();
+            }
         }
     }
 }
