@@ -1,11 +1,8 @@
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Reactive.Linq;
 using Avalonia.Collections;
 using Avalonia.Controls;
 using MangaAndLightNovelWebScrape;
-using MangaAndLightNovelWebScrape.Models;
-using MangaAndLightNovelWebScrape.Websites;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using static MangaAndLightNovelWebScrape.Models.Constants;
@@ -17,7 +14,7 @@ namespace Tsundoku.ViewModels
         public AvaloniaList<EntryModel> AnalyzedList { get; set; } = new AvaloniaList<EntryModel>();
         [Reactive] public int BrowserIndex { get; set; }
         [Reactive] public bool IsAnalyzeButtonEnabled { get; set; } = false;
-        [Reactive] public bool WebsitesSelected { get; set; }
+        [Reactive] public bool WebsitesSelected { get; set; } = false;
         [Reactive] public string WebsitesToolTipText { get; set; }
         [Reactive] public int CurRegionIndex { get; set; }
         public AvaloniaList<ListBoxItem> SelectedWebsites { get; } = [];

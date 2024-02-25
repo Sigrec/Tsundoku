@@ -12,6 +12,7 @@ using System.Runtime.InteropServices;
 using Avalonia.Platform.Storage;
 using Avalonia.Media.Imaging;
 using FileWatcherEx;
+using Avalonia.Threading;
 
 namespace Tsundoku.Views
 {

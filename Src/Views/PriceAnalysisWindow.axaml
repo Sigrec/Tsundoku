@@ -91,7 +91,7 @@
                              Height="262"
 							 Theme="{StaticResource QueryListBox}"
 							 SelectionMode="Multiple,Toggle"
-							 SelectionChanged="WebsiteSelectionChanged"
+                             SelectionChanged="WebsiteSelectionChanged"
 							 SelectedItems="{CompiledBinding SelectedWebsites}">
                         <!-- <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Amazon Japan" ToolTip.Tip="Japan"/>-->
                         <!-- <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Amazon USA" ToolTip.Tip="America"/> -->
