@@ -524,7 +524,7 @@ namespace Tsundoku.Views
             LOGGER.Info($"Opening PayPal Donation Lionk");
             try
             {
-                Process.Start(new ProcessStartInfo("https://www.paypal.com/donate/?business=JAYCVEJGDF4GY&no_recurring=0&item_name=Anyone+amount+helps+and+keeps+the+app+going.&currency_code=USD") { UseShellExecute = true });
+                Process.Start(new ProcessStartInfo("https://paypal.me/Preminence8?country.x=US&locale.x=en_US") { UseShellExecute = true });
             }
             catch (Win32Exception noBrowser)
             {

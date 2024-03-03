@@ -15,9 +15,9 @@ using System.Linq.Dynamic.Core;
 using System.Windows.Input;
 using MangaAndLightNovelWebScrape.Websites;
 using Avalonia.Collections;
-using static MangaAndLightNovelWebScrape.Models.Constants;
 using System.Reflection;
 using Src.Helpers;
+using MangaAndLightNovelWebScrape.Enums;
 
 namespace Tsundoku.ViewModels
 {

@@ -2,7 +2,6 @@ using System.Diagnostics;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Tsundoku.Models;
-using static MangaAndLightNovelWebScrape.Models.Constants;
 
 namespace Tsundoku.ViewModels
 {

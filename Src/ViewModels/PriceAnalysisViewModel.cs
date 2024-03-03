@@ -5,7 +5,6 @@ using Avalonia.Controls;
 using MangaAndLightNovelWebScrape;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using static MangaAndLightNovelWebScrape.Models.Constants;
 
 namespace Tsundoku.ViewModels
 {

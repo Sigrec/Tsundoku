@@ -5,3 +5,4 @@ global using System.Text.Json;
 global using Avalonia;
 global using System.Text;
 global using Avalonia.Input;
+global using MangaAndLightNovelWebScrape.Enums;
