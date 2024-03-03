@@ -5,8 +5,7 @@ using MangaAndLightNovelWebScrape;
 using ReactiveUI;
 using System.Reactive.Linq;
 using MangaAndLightNovelWebScrape.Websites;
-using static MangaAndLightNovelWebScrape.Models.Constants;
-using Src.Models;
+using MangaAndLightNovelWebScrape.Models;
 using System.Collections;
 
 namespace Tsundoku.Views
@@ -90,27 +89,18 @@ namespace Tsundoku.Views
                 StartScrapeButton.IsEnabled = false;
                 Scrape.Browser = MangaAndLightNovelWebScrape.Helpers.GetBrowserFromString((BrowserSelector.SelectedItem as ComboBoxItem).Content.ToString());
                 Scrape.Region = MangaAndLightNovelWebScrape.Helpers.GetRegionFromString((RegionSelector.SelectedItem as ComboBoxItem).Content.ToString());
-                scrapeScenario = $"Started Scrape For \"{TitleBox.Text}\" on {Scrape.Browser} Browser w/ Region = \"{Scrape.Region}\" & \"{(StockFilterSelector.SelectedItem as ComboBoxItem).Content} Filter\" & Websites = [{string.Join(", ", PriceAnalysisVM.SelectedWebsites.Select(site => site.Content.ToString()))}] & Memberships = ({string.Join(" & ", ViewModelBase.MainUser.Memberships)})";
-                LOGGER.Info(scrapeScenario);
-                Scrape.Filter = (StockFilterSelector.SelectedItem as ComboBoxItem).Content.ToString() switch
-                                {
-                                    "Exclude All" => StockStatusFilter.EXCLUDE_ALL_FILTER,
-                                    "Exclude OOS & PO" => StockStatusFilter.EXCLUDE_OOS_AND_PO_FILTER,
-                                    "Exclude OOS & BO" => StockStatusFilter.EXCLUDE_OOS_AND_BO_FILTER,
-                                    "Exclude PO & BO" => StockStatusFilter.EXCLUDE_PO_AND_BO_FILTER,
-                                    "Exclude OOS" => StockStatusFilter.EXCLUDE_OOS_FILTER,
-                                    "Exclude PO" => StockStatusFilter.EXCLUDE_PO_FILTER,
-                                    "Exclude BO" => StockStatusFilter.EXCLUDE_BO_FILTER,
-                                    _ => StockStatusFilter.EXCLUDE_NONE_FILTER
-                                }; // GetStockStatusFilterFromString((StockFilterSelector.SelectedItem as ComboBoxItem).Content.ToString());
+                Scrape.Filter = MangaAndLightNovelWebScrape.Helpers.GetStockStatusFilterFromString((StockFilterSelector.SelectedItem as ComboBoxItem).Content.ToString());
+                Scrape.IsBarnesAndNobleMember = ViewModelBase.MainUser.Memberships[BarnesAndNoble.WEBSITE_TITLE];
+                Scrape.IsBooksAMillionMember = ViewModelBase.MainUser.Memberships[BooksAMillion.WEBSITE_TITLE];
+                Scrape.IsKinokuniyaUSAMember = ViewModelBase.MainUser.Memberships[KinokuniyaUSA.WEBSITE_TITLE];
+                Scrape.IsIndigoMember = ViewModelBase.MainUser.Memberships[Indigo.WEBSITE_TITLE];
+
+                LOGGER.Info($"Started Scrape For \"{TitleBox.Text}\" on {Scrape.Browser} Browser w/ Region = \"{Scrape.Region}\" & \"{(StockFilterSelector.SelectedItem as ComboBoxItem).Content} Filter\" & Websites = [{string.Join(", ", PriceAnalysisVM.SelectedWebsites.Select(site => site.Content.ToString()))}] & Memberships = ({string.Join(" & ", ViewModelBase.MainUser.Memberships)})");
+                
                 await Scrape.InitializeScrapeAsync(
                         TitleBox.Text, 
                         MangaButton.IsChecked != null && MangaButton.IsChecked.Value ? BookType.Manga : BookType.LightNovel, 
-                        Scrape.GenerateWebsiteList(PriceAnalysisVM.SelectedWebsites.Select(site => site.Content.ToString()).ToList()),
-                        ViewModelBase.MainUser.Memberships[BarnesAndNoble.WEBSITE_TITLE], 
-                        ViewModelBase.MainUser.Memberships[BooksAMillion.WEBSITE_TITLE], 
-                        ViewModelBase.MainUser.Memberships[KinokuniyaUSA.WEBSITE_TITLE],
-                        ViewModelBase.MainUser.Memberships[Indigo.WEBSITE_TITLE]
+                        Scrape.GenerateWebsiteList(PriceAnalysisVM.SelectedWebsites.Select(site => site.Content.ToString()).ToList())
                     );
                 StartScrapeButton.IsEnabled = PriceAnalysisVM.IsAnalyzeButtonEnabled;
                 LOGGER.Info($"Scrape Finished");

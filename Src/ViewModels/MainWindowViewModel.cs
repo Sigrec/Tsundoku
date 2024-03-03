@@ -15,9 +15,9 @@ using System.Linq.Dynamic.Core;
 using System.Windows.Input;
 using MangaAndLightNovelWebScrape.Websites;
 using Avalonia.Collections;
-using static MangaAndLightNovelWebScrape.Models.Constants;
 using System.Reflection;
 using Src.Helpers;
+using MangaAndLightNovelWebScrape.Enums;
 
 namespace Tsundoku.ViewModels
 {
@@ -60,7 +60,6 @@ namespace Tsundoku.ViewModels
         
         // TODO Add genres?
         // TODO Manual Entry Option?
-        // TODO Add export/import for themes
         public MainWindowViewModel()
         {
             // Helpers.ExtensionMethods.PrintCultures();
@@ -141,6 +140,7 @@ namespace Tsundoku.ViewModels
             });
 
             priceAnalysisWindow = new PriceAnalysisWindow();
+            priceAnalysisWindow.PriceAnalysisVM.CurRegion = MainUser.Region;
             OpenPriceAnalysisWindow = ReactiveCommand.CreateFromTask(() =>
             {
                 if (priceAnalysisWindow.WindowState == WindowState.Minimized) 
@@ -157,7 +157,6 @@ namespace Tsundoku.ViewModels
                 }
                 return Task.CompletedTask;
             });
-            priceAnalysisWindow.PriceAnalysisVM.CurRegion = MainUser.Region;
 
             collectionStatsWindow = new CollectionStatsWindow();
             OpenCollectionStatsWindow = ReactiveCommand.CreateFromTask(() =>
@@ -211,7 +210,7 @@ namespace Tsundoku.ViewModels
         /// Filters the users collection based on the selected preset filter
         /// </summary>
         /// <param name="filter">The filter preset chosen</param>
-        public async void FilterCollection(string filter)
+        public void FilterCollection(string filter)
         {
             if (CanFilter)
             {
@@ -220,86 +219,84 @@ namespace Tsundoku.ViewModels
                     SearchIsBusy = false;
                     SearchText = string.Empty;
                 }
-                await Task.Run(() => {
-                    switch (filter)
-                    {
-                        case "Ongoing":
-                            FilteredCollection = UserCollection.Where(series => series.Status == Status.Ongoing);
-                            LOGGER.Info($"Filtered Collection by {filter}");
-                            break;
-                        case "Finished":
-                            FilteredCollection = UserCollection.Where(series => series.Status == Status.Finished);
-                            LOGGER.Info($"Filtered Collection by {filter}");
-                            break;
-                        case "Hiatus":
-                            FilteredCollection = UserCollection.Where(series => series.Status == Status.Hiatus);
-                            LOGGER.Info($"Filtered Collection by {filter}");
-                            break;
-                        case "Cancelled":
-                            FilteredCollection = UserCollection.Where(series => series.Status == Status.Cancelled);
-                            LOGGER.Info($"Filtered Collection by {filter}");
-                            break;
-                        case "Complete":
-                            FilteredCollection = UserCollection.Where(series => series.CurVolumeCount == series.MaxVolumeCount);
-                            LOGGER.Info($"Filtered Collection by {filter}");
-                            break;
-                        case "Incomplete":
-                            FilteredCollection = UserCollection.Where(series => series.CurVolumeCount != series.MaxVolumeCount);
-                            LOGGER.Info($"Filtered Collection by {filter}");
-                            break;
-                        case "Favorites":
-                            FilteredCollection = UserCollection.Where(series => series.IsFavorite);
-                            LOGGER.Info($"Filtered Collection by {filter}");
-                            break;
-                        case "Manga":
-                            FilteredCollection = UserCollection.Where(series => series.Format != Format.Novel);
-                            LOGGER.Info($"Filtered Collection by {filter}");
-                            break;
-                        case "Novel":
-                            FilteredCollection = UserCollection.Where(series => series.Format == Format.Novel);
-                            LOGGER.Info($"Filtered Collection by {filter}");
-                            break;
-                        case "Shounen":
-                            FilteredCollection = UserCollection.Where(series => series.Demographic == Demographic.Shounen);
-                            LOGGER.Info($"Filtered Collection by {filter}");
-                            break;
-                        case "Shoujo":
-                            FilteredCollection = UserCollection.Where(series => series.Demographic == Demographic.Shoujo);
-                            LOGGER.Info($"Filtered Collection by {filter}");
-                            break;
-                        case "Seinen":
-                            FilteredCollection = UserCollection.Where(series => series.Demographic == Demographic.Seinen);
-                            LOGGER.Info($"Filtered Collection by {filter}");
-                            break;
-                        case "Josei":
-                            FilteredCollection = UserCollection.Where(series => series.Demographic == Demographic.Josei);
-                            LOGGER.Info($"Filtered Collection by {filter}");
-                            break;
-                        case "Read":
-                            FilteredCollection = UserCollection.Where(series => series.VolumesRead != 0);
-                            LOGGER.Info($"Filtered Collection by {filter}");
-                            break;
-                        case "Unread":
-                            FilteredCollection = UserCollection.Where(series => series.VolumesRead == 0);
-                            LOGGER.Info($"Filtered Collection by {filter}");
-                            break;
-                        case "Rating":
-                            FilteredCollection = UserCollection.OrderByDescending(series => series.Rating);
-                            LOGGER.Info($"Sorted Collection by {filter}");
-                            break;
-                        case "Cost":
-                            FilteredCollection = UserCollection.OrderByDescending(series => series.Cost);
-                            LOGGER.Info($"Sorted Collection by {filter}");
-                            break;
-                        case "Query":
-                            return;
-                        case "None":
-                        default:
-                            FilteredCollection = UserCollection;
-                            LOGGER.Info($"Removing Sort/Filter");
-                            break;
-                    }
-                });
+                switch (filter)
+                {
+                    case "Ongoing":
+                        FilteredCollection = UserCollection.Where(series => series.Status == Status.Ongoing);
+                        LOGGER.Info($"Filtered Collection by {filter}");
+                        break;
+                    case "Finished":
+                        FilteredCollection = UserCollection.Where(series => series.Status == Status.Finished);
+                        LOGGER.Info($"Filtered Collection by {filter}");
+                        break;
+                    case "Hiatus":
+                        FilteredCollection = UserCollection.Where(series => series.Status == Status.Hiatus);
+                        LOGGER.Info($"Filtered Collection by {filter}");
+                        break;
+                    case "Cancelled":
+                        FilteredCollection = UserCollection.Where(series => series.Status == Status.Cancelled);
+                        LOGGER.Info($"Filtered Collection by {filter}");
+                        break;
+                    case "Complete":
+                        FilteredCollection = UserCollection.Where(series => series.CurVolumeCount == series.MaxVolumeCount);
+                        LOGGER.Info($"Filtered Collection by {filter}");
+                        break;
+                    case "Incomplete":
+                        FilteredCollection = UserCollection.Where(series => series.CurVolumeCount != series.MaxVolumeCount);
+                        LOGGER.Info($"Filtered Collection by {filter}");
+                        break;
+                    case "Favorites":
+                        FilteredCollection = UserCollection.Where(series => series.IsFavorite);
+                        LOGGER.Info($"Filtered Collection by {filter}");
+                        break;
+                    case "Manga":
+                        FilteredCollection = UserCollection.Where(series => series.Format != Format.Novel);
+                        LOGGER.Info($"Filtered Collection by {filter}");
+                        break;
+                    case "Novel":
+                        FilteredCollection = UserCollection.Where(series => series.Format == Format.Novel);
+                        LOGGER.Info($"Filtered Collection by {filter}");
+                        break;
+                    case "Shounen":
+                        FilteredCollection = UserCollection.Where(series => series.Demographic == Demographic.Shounen);
+                        LOGGER.Info($"Filtered Collection by {filter}");
+                        break;
+                    case "Shoujo":
+                        FilteredCollection = UserCollection.Where(series => series.Demographic == Demographic.Shoujo);
+                        LOGGER.Info($"Filtered Collection by {filter}");
+                        break;
+                    case "Seinen":
+                        FilteredCollection = UserCollection.Where(series => series.Demographic == Demographic.Seinen);
+                        LOGGER.Info($"Filtered Collection by {filter}");
+                        break;
+                    case "Josei":
+                        FilteredCollection = UserCollection.Where(series => series.Demographic == Demographic.Josei);
+                        LOGGER.Info($"Filtered Collection by {filter}");
+                        break;
+                    case "Read":
+                        FilteredCollection = UserCollection.Where(series => series.VolumesRead != 0);
+                        LOGGER.Info($"Filtered Collection by {filter}");
+                        break;
+                    case "Unread":
+                        FilteredCollection = UserCollection.Where(series => series.VolumesRead == 0);
+                        LOGGER.Info($"Filtered Collection by {filter}");
+                        break;
+                    case "Rating":
+                        FilteredCollection = UserCollection.OrderByDescending(series => series.Rating);
+                        LOGGER.Info($"Sorted Collection by {filter}");
+                        break;
+                    case "Cost":
+                        FilteredCollection = UserCollection.OrderByDescending(series => series.Cost);
+                        LOGGER.Info($"Sorted Collection by {filter}");
+                        break;
+                    case "Query":
+                        return;
+                    case "None":
+                    default:
+                        FilteredCollection = UserCollection;
+                        LOGGER.Info($"Removing Sort/Filter");
+                        break;
+                }
                 SearchedCollection.Clear();
                 SearchedCollection.AddRange(FilteredCollection);
             }
@@ -362,7 +359,9 @@ namespace Tsundoku.ViewModels
                     LOGGER.Info($" Initial Query = \"{AdvancedSearchQuery}\" -> \"{AdvancedFilterExpression}\"");
                     try
                     {
-                        FilteredCollection = UserCollection.AsQueryable().Where(AdvancedFilterExpression.ToString()); 
+#pragma warning disable IL2026 // Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code
+                        FilteredCollection = UserCollection.AsQueryable().Where(AdvancedFilterExpression.ToString());
+#pragma warning restore IL2026 // Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code
                     }
                     catch (Exception)
                     {
@@ -375,7 +374,7 @@ namespace Tsundoku.ViewModels
                     }
                 });
 
-                if (FilterCollection != null && FilteredCollection.Any())
+                if (FilteredCollection.Any())
                 {
                     if (!CurFilter.Equals("Query"))
                     {
@@ -461,7 +460,6 @@ namespace Tsundoku.ViewModels
             {
                 VersionUpdate(userData, false);
                 updatedVersion = false;
-                LOGGER.Info("Reloading User Data");
             }
             
             MainUser = JsonSerializer.Deserialize(userData, typeof(User), User.UserJsonModel) as User;
@@ -742,6 +740,18 @@ namespace Tsundoku.ViewModels
                 updatedVersion = true;
             }
 
+            if (curVersion < 4.0) // Remove "SeriesButtonBGColor" & SeriesButtonBGHoverColor" Colors from Themes
+            {
+                for (int x = 0; x < themeJsonArray.Count; x++)
+                {
+                    themeJsonArray.ElementAt(x).AsObject().Remove("SeriesButtonBGColor");
+                    themeJsonArray.ElementAt(x).AsObject().Remove("SeriesButtonBGHoverColor");
+                }
+                userData["CurDataVersion"] = 4.0;
+                TsundokuLogger.Info(LOGGER, "Updated Users Data to v4.0", !isImport);
+                updatedVersion = true;
+            }
+
             if (!isImport)
             {
                 File.WriteAllText(USER_DATA_FILEPATH, JsonSerializer.Serialize(userData, new JsonSerializerOptions()
@@ -790,6 +800,15 @@ namespace Tsundoku.ViewModels
                 File.Delete(series.Cover);
                 series.Dispose();
             }
+        }
+
+        public static void DeleteSeries(Series series)
+        {
+            DeleteCover(series);
+            SearchedCollection.Remove(series);
+            UserCollection.Remove(series);
+            collectionStatsWindow.CollectionStatsVM.UpdateAllStats(series.CurVolumeCount, (uint)(series.MaxVolumeCount - series.CurVolumeCount));
+            LOGGER.Info("Removed {} From Collection", series.Titles["Romaji"]);
         }
     }
 }

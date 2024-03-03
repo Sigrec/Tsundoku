@@ -206,7 +206,7 @@ namespace Tsundoku.Views
             CoverChangedSeriesList.Clear();
         }
 
-        private async void ChangeCover(object sender, RoutedEventArgs args)
+        private async void ChangeSeriesCover(object sender, RoutedEventArgs args)
         {
             ViewModelBase.newCoverCheck = true;
             var file = await this.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions {
@@ -243,8 +243,8 @@ namespace Tsundoku.Views
         private void SaveStats(object sender, RoutedEventArgs args)
         {
             Series curSeries = (Series)((Button)sender).DataContext;
-            var stackPanels = ((Button)sender).GetLogicalSiblings();
-            string volumesRead = ((MaskedTextBox)stackPanels.ElementAt(0).GetLogicalChildren().ElementAt(1)).Text.Replace("_", "");
+            var stackPanels = ((Button)sender).GetLogicalParent<StackPanel>().GetLogicalParent<Grid>().GetLogicalChildren();
+            string volumesRead = (stackPanels.ElementAt(1).GetLogicalChildren().ElementAt(1) as MaskedTextBox).Text.Replace("_", "");
             if (!string.IsNullOrWhiteSpace(volumesRead))
             {
                 uint volumesReadVal = Convert.ToUInt32(volumesRead);
@@ -253,28 +253,28 @@ namespace Tsundoku.Views
                     LOGGER.Info($"Updating # of Volumes Read for \"{curSeries.Titles["Romaji"]}\" from {curSeries.VolumesRead} to {volumesReadVal}");
 
                     curSeries.VolumesRead = volumesReadVal;
-                    ((TextBlock)stackPanels.ElementAt(0).GetLogicalChildren().ElementAt(0)).Text = $"Read {volumesReadVal} Vol(s)";
+                    (stackPanels.ElementAt(1).GetLogicalChildren().ElementAt(0) as TextBlock).Text = $"Read {volumesReadVal} Vol(s)";
                     volumesReadVal = 0;
                     MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UpdateCollectionVolumesRead();
-                    ((MaskedTextBox)stackPanels.ElementAt(0).GetLogicalChildren().ElementAt(1)).Text = "";
+                    ((MaskedTextBox)stackPanels.ElementAt(1).GetLogicalChildren().ElementAt(1)).Text = "";
                 }
             }
             LOGGER.Debug("Passed Volumes Read Check");
 
-            string costText = ((MaskedTextBox)stackPanels.ElementAt(1).GetLogicalChildren().ElementAt(1)).Text;
+            string costText = ((MaskedTextBox)stackPanels.ElementAt(2).GetLogicalChildren().ElementAt(1)).Text;
             decimal costVal = Convert.ToDecimal(costText.Replace("_", "0"));
             if (decimal.Compare(costVal, 0) >= 0 && curSeries.Cost != costVal && !costText.Equals("_________.__"))
             {
                 LOGGER.Info($"Updating Cost for \"{curSeries.Titles["Romaji"]}\" from {curSeries.Cost} to {CollectionViewModel.CurCurrency}{costVal}");
 
                 curSeries.Cost = costVal;
-                ((TextBlock)stackPanels.ElementAt(1).GetLogicalChildren().ElementAt(0)).Text = $"Cost {CollectionViewModel.CurCurrency}{costVal}";
+                ((TextBlock)stackPanels.ElementAt(2).GetLogicalChildren().ElementAt(0)).Text = $"Cost {CollectionViewModel.CurCurrency}{costVal}";
                 MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UpdateCollectionPrice();
-                ((MaskedTextBox)stackPanels.ElementAt(1).GetLogicalChildren().ElementAt(1)).Text = "";
+                ((MaskedTextBox)stackPanels.ElementAt(2).GetLogicalChildren().ElementAt(1)).Text = "";
             }
             LOGGER.Debug("Passed Cost Check");
 
-            string ratingValText = ((MaskedTextBox)stackPanels.ElementAt(2).GetLogicalChildren().ElementAt(1)).Text;
+            string ratingValText = ((MaskedTextBox)stackPanels.ElementAt(3).GetLogicalChildren().ElementAt(1)).Text;
             decimal ratingVal = Convert.ToDecimal(ratingValText[..4].Replace("_", "0"));
             if (decimal.Compare(ratingVal, 0) >= 0 && curSeries.Rating != ratingVal && !ratingValText.StartsWith("__._"))
             {
@@ -283,14 +283,14 @@ namespace Tsundoku.Views
                     LOGGER.Info($"Updating rating for \"{curSeries.Titles["Romaji"]}\" from \"{curSeries.Rating}/10.0\" to \"{decimal.Round(ratingVal, 1)}/10.0\"");
 
                     curSeries.Rating = ratingVal;
-                    ((TextBlock)stackPanels.ElementAt(2).GetLogicalChildren().ElementAt(0)).Text = $"Rating {ratingVal}/10.0";
+                    ((TextBlock)stackPanels.ElementAt(3).GetLogicalChildren().ElementAt(0)).Text = $"Rating {ratingVal}/10.0";
+                    ((MaskedTextBox)stackPanels.ElementAt(3).GetLogicalChildren().ElementAt(1)).Text = "";
                     
                     // Update rating Distribution Chart
                     MainWindowViewModel.UserCollection.First(series => series == curSeries).Rating = ratingVal;
                     MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UpdateRatingChartValues();
 
                     MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UpdateCollectionRating();
-                    ((MaskedTextBox)stackPanels.ElementAt(1).GetLogicalChildren().ElementAt(1)).Text = "";
                 }
                 else
                 {
@@ -368,35 +368,23 @@ namespace Tsundoku.Views
         private async void RemoveSeries(object sender, RoutedEventArgs args)
         {
             // Close the edit pane before removing
-            (sender as Button).FindLogicalAncestorOfType<Grid>(false).IsVisible = false;
+            (sender as Button).FindLogicalAncestorOfType<Grid>(false).IsVisible &= false;
             var result = await Observable.Start(() => 
             {
-                Series curSeries = MainWindowViewModel.UserCollection.Single(series => series == (Series)((Button)sender).DataContext);
-                MainWindowViewModel.SearchedCollection.Remove(curSeries);
-                MainWindowViewModel.UserCollection.Remove(curSeries);
-
-                MainWindowViewModel.DeleteCover(curSeries);
-                LOGGER.Info($"Removed \"{curSeries.Titles["Romaji"]}\" From Collection");
-                MainWindowViewModel.collectionStatsWindow.CollectionStatsVM.UpdateAllStats(curSeries.CurVolumeCount, (uint)(curSeries.MaxVolumeCount - curSeries.CurVolumeCount));
+                MainWindowViewModel.DeleteSeries((Series)((Button)sender).DataContext);
             }, RxApp.MainThreadScheduler);
         }
 
         private void ShowEditPane(object sender, RoutedEventArgs args)
         {
-            if (((sender as Button).FindLogicalAncestorOfType<Grid>(false).GetLogicalChildren().ElementAt(1) as Grid).IsVisible)
-            {
-                ((sender as Button).FindLogicalAncestorOfType<Grid>(false).GetLogicalChildren().ElementAt(1) as Grid).IsVisible = false;
-            }
-            ((Button)sender).FindLogicalAncestorOfType<Grid>(false).FindLogicalDescendantOfType<Grid>(false).IsVisible ^= true;
+            ((sender as Button).FindLogicalAncestorOfType<Grid>(false).FindLogicalAncestorOfType<Grid>(false).GetLogicalChildren().ElementAt(1) as Grid).IsVisible &= false;
+            ((Button)sender).FindLogicalAncestorOfType<Grid>(false).FindLogicalAncestorOfType<Grid>(false).FindLogicalDescendantOfType<Grid>(false).IsVisible ^= true;
         }
 
         private void ShowStatsPane(object sender, RoutedEventArgs args)
         {
-            if (((Button)sender).FindLogicalAncestorOfType<Grid>(false).FindLogicalDescendantOfType<Grid>(false).IsVisible)
-            {
-                ((Button)sender).FindLogicalAncestorOfType<Grid>(false).FindLogicalDescendantOfType<Grid>(false).IsVisible = false;
-            }
-            ((sender as Button).FindLogicalAncestorOfType<Grid>(false).GetLogicalChildren().ElementAt(1) as Grid).IsVisible ^= true;
+            ((Button)sender).FindLogicalAncestorOfType<Grid>(false).FindLogicalAncestorOfType<Grid>(false).FindLogicalDescendantOfType<Grid>(false).IsVisible &= false;
+            ((sender as Button).FindLogicalAncestorOfType<Grid>(false).FindLogicalAncestorOfType<Grid>(false).GetLogicalChildren().ElementAt(1) as Grid).IsVisible ^= true;
         }
 
         /// <summary>
@@ -468,7 +456,6 @@ namespace Tsundoku.Views
         public void SaveOnClose(bool isReloading)
         {
             LOGGER.Info("Closing Tsundoku");
-            Console.WriteLine("Closing Tsundoku");
             CollectionViewModel.SearchText = "";
             if (!isReloading) { MainWindowViewModel.SaveUsersData(); }
             Helpers.DiscordRP.Deinitialize();
@@ -537,7 +524,7 @@ namespace Tsundoku.Views
             LOGGER.Info($"Opening PayPal Donation Lionk");
             try
             {
-                Process.Start(new ProcessStartInfo("https://www.paypal.com/donate/?business=JAYCVEJGDF4GY&no_recurring=0&item_name=Anyone+amount+helps+and+keeps+the+app+going.&currency_code=USD") { UseShellExecute = true });
+                Process.Start(new ProcessStartInfo("https://paypal.me/Preminence8?country.x=US&locale.x=en_US") { UseShellExecute = true });
             }
             catch (Win32Exception noBrowser)
             {

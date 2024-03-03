@@ -4,7 +4,6 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:vm="using:Tsundoku.ViewModels"
 		xmlns:models="using:MangaAndLightNovelWebScrape.EntryModel"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Tsundoku.Views.PriceAnalysisWindow"
         Icon="\Assets\Icons\Tsundoku-Logo.ico"
         Title="Price Analysis"
@@ -19,8 +18,7 @@
         Topmost="true"
 		WindowStartupLocation="2"
 		KeyboardNavigation.TabNavigation="Cycle"
-		x:DataType="vm:PriceAnalysisViewModel">
-		
+		x:DataType="vm:PriceAnalysisViewModel">	
 	<Window.Resources>
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>

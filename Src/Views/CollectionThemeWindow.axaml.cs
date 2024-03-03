@@ -16,12 +16,9 @@ namespace Tsundoku.Views
     {
         public ThemeSettingsViewModel? ThemeSettingsVM => DataContext as ThemeSettingsViewModel;
         private TsundokuTheme NewTheme { get; set; }
+        private TsundokuTheme SelectedTheme { get; set; }
         public bool IsOpen, ThemeChanged = false;
         MainWindow CollectionWindow;
-        private static readonly FilePickerFileType fileOptions = new FilePickerFileType("JSON Source File")
-        {
-            Patterns = [ "*.json" ]
-        };
 
         public CollectionThemeWindow () 
         {
@@ -32,11 +29,15 @@ namespace Tsundoku.Views
             {
                 CollectionWindow = (MainWindow)((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).MainWindow;
                 NewTheme = ThemeSettingsVM.CurrentTheme.Cloning();
+                SelectedTheme = CollectionWindow.CollectionViewModel.CurrentTheme.Cloning();
                 IsOpen ^= true;
                 ThemeChanged = false;
+
                 int index = ThemeSettingsViewModel.UserThemesDisplay.IndexOf(ThemeSettingsVM.CurrentTheme.ThemeName);
                 ThemeSettingsVM.CurThemeIndex = index != -1 ? index : ThemeSettingsViewModel.UserThemesDisplay.IndexOf("Default");
-                ApplyColors();
+
+                // Apply colors before applying listeners
+                // ApplyColors();
                 MenuColorChanges();
                 CollectionColorChanges();
             };
@@ -49,14 +50,10 @@ namespace Tsundoku.Views
                     NewThemeName.Text = "";
                     Topmost = false;
                     IsOpen ^= true;
-                    CollectionWindow.CollectionViewModel.CurrentTheme = ThemeSettingsVM.CurrentTheme;
-                    GC.Collect();
-                    GC.WaitForPendingFinalizers();
+                    UpdateAllWindowColors(SelectedTheme);
                 }
                 e.Cancel = true;
             };
-            bool? test = true;
-            bool test2 = test != null && test == true;
 
             this.WhenAnyValue(x => x.NewThemeName.Text, x => x.MainColor1.Text, x => x.MainColor2.Text, x => x.TextColor1.Text, x => x.TextColor2.Text, x => x.AccentColor1.Text, x => x.AccentColor2.Text, (name, mc1 ,mc2, tc1, tc2, ac1, ac2) => !string.IsNullOrWhiteSpace(name) && !name.Equals("Default", StringComparison.OrdinalIgnoreCase) && !mc1.Contains('_') && !mc2.Contains('_') && !tc1.Contains('_') && !tc2.Contains('_') && !ac1.Contains('_') && !ac2.Contains('_')).Subscribe(x => ThemeSettingsVM.IsGenerateThemeButtonEnabled = x);
         }
@@ -114,9 +111,7 @@ namespace Tsundoku.Views
             NewTheme.SeriesProgressBarBGColor = Color.Parse(MainColor1.Text).ToString();
             NewTheme.SeriesProgressBarBorderColor = Color.Parse(TextColor2.Text).ToString();
             NewTheme.SeriesProgressTextColor = Color.Parse(TextColor2.Text).ToString();
-            NewTheme.SeriesProgressButtonsHoverColor = Color.Parse(MainColor1.Text).ToString(); 
-            NewTheme.SeriesButtonBGColor = Color.Parse(AccentColor2.Text).ToString();
-            NewTheme.SeriesButtonBGHoverColor = Color.Parse(AccentColor2.Text).ToString();
+            NewTheme.SeriesProgressButtonsHoverColor = Color.Parse(MainColor1.Text).ToString();
             NewTheme.SeriesButtonIconColor = Color.Parse(TextColor2.Text).ToString();
             NewTheme.SeriesButtonIconHoverColor = Color.Parse(AccentColor1.Text).ToString();
             NewTheme.SeriesEditPaneBGColor = Color.Parse(MainColor1.Text).ToString();
@@ -174,8 +169,6 @@ namespace Tsundoku.Views
             NewTheme.SeriesProgressBarBorderColor = Color.Parse(TextColor2.Text).ToString();
             NewTheme.SeriesProgressTextColor = Color.Parse(TextColor2.Text).ToString();
             NewTheme.SeriesProgressButtonsHoverColor = Color.Parse(MainColor1.Text).ToString();
-            NewTheme.SeriesButtonBGColor = Color.Parse(AccentColor2.Text).ToString();
-            NewTheme.SeriesButtonBGHoverColor = Color.Parse(AccentColor2.Text).ToString();
             NewTheme.SeriesButtonIconColor = Color.Parse(TextColor2.Text).ToString();
             NewTheme.SeriesButtonIconHoverColor = Color.Parse(MainColor1.Text).ToString();
             NewTheme.SeriesEditPaneBGColor = Color.Parse(MainColor1.Text).ToString();
@@ -270,7 +263,7 @@ namespace Tsundoku.Views
             var file = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions {
                 SuggestedStartLocation = StorageProvider.TryGetFolderFromPathAsync(@"Themes").Result,
                 AllowMultiple = false,
-                FileTypeFilter = new List<FilePickerFileType>() { fileOptions }
+                FileTypeFilter = new List<FilePickerFileType>() { new FilePickerFileType("JSON") { Patterns = [ "*.json" ] } }
             });
             if (file.Count > 0)
             {
@@ -334,8 +327,9 @@ namespace Tsundoku.Views
             // Update Windows
             UpdateAllWindowColors(ViewModelBase.MainUser.SavedThemes.Single(theme => theme.ThemeName.Equals(toThemeName)));
             ApplyColors();
+            SelectedTheme = CollectionWindow.CollectionViewModel.CurrentTheme.Cloning();
 
-            LOGGER.Info($"Theme Changed To \"{toThemeName}\"");
+            LOGGER.Info("Theme Changed To {}", toThemeName);
             ThemeChanged = false;
         }
         /// <summary>
@@ -382,8 +376,6 @@ namespace Tsundoku.Views
             SeriesProgress_Bar_Border.Color = Color.Parse(ThemeSettingsVM.CurrentTheme.SeriesProgressBarBorderColor);
             SeriesProgress_Text.Color = Color.Parse(ThemeSettingsVM.CurrentTheme.SeriesProgressTextColor);
             SeriesProgress_Buttons_Hover.Color = Color.Parse(ThemeSettingsVM.CurrentTheme.SeriesProgressButtonsHoverColor);
-            SeriesButton_BG.Color = Color.Parse(ThemeSettingsVM.CurrentTheme.SeriesButtonBGColor);
-            SeriesButton_BG_Hover.Color = Color.Parse(ThemeSettingsVM.CurrentTheme.SeriesButtonBGHoverColor);
             SeriesButton_Icon.Color = Color.Parse(ThemeSettingsVM.CurrentTheme.SeriesButtonIconColor);
             SeriesButton_Icon_Hover.Color = Color.Parse(ThemeSettingsVM.CurrentTheme.SeriesButtonIconHoverColor);
             SeriesEditPane_BG.Color = Color.Parse(ThemeSettingsVM.CurrentTheme.SeriesEditPaneBGColor);
@@ -409,8 +401,7 @@ namespace Tsundoku.Views
             {
                 Menu_BG_Button.Background = new SolidColorBrush(Menu_BG.Color);
                 NewTheme.MenuBGColor = Menu_BG.Color.ToString();
-                if (!ThemeChanged) { if (!ThemeChanged) { UpdateAllWindowColors(NewTheme.Cloning()); } }
-                LOGGER.Debug("TEST");
+                if (!ThemeChanged) { UpdateAllWindowColors(NewTheme.Cloning()); }
             };
 
             Username.ColorChanged += (sender, e) =>
@@ -622,22 +613,6 @@ namespace Tsundoku.Views
                 //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesProgress_Buttons_Hover.Color);
                 SeriesProgress_Buttons_Hover_Button.Background = new SolidColorBrush(SeriesProgress_Buttons_Hover.Color);
                 NewTheme.SeriesProgressButtonsHoverColor = SeriesProgress_Buttons_Hover.Color.ToString();
-                if (!ThemeChanged) { UpdateMainWindowColors(NewTheme.Cloning()); }
-            };
-
-            SeriesButton_BG.ColorChanged += (sender, e) =>
-            {
-                //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesButton_BG.Color);
-                SeriesButton_BG_Button.Background = new SolidColorBrush(SeriesButton_BG.Color);
-                NewTheme.SeriesButtonBGColor = SeriesButton_BG.Color.ToString();
-                if (!ThemeChanged) { UpdateMainWindowColors(NewTheme.Cloning()); }
-            };
-
-            SeriesButton_BG_Hover.ColorChanged += (sender, e) =>
-            {
-                //CollectionWindow.CollectionTheme.Background = new SolidColorBrush(SeriesButton_BG_Hover.Color);
-                SeriesButton_BG_Hover_Button.Background = new SolidColorBrush(SeriesButton_BG_Hover.Color);
-                NewTheme.SeriesButtonBGHoverColor = SeriesButton_BG_Hover.Color.ToString();
                 if (!ThemeChanged) { UpdateMainWindowColors(NewTheme.Cloning()); }
             };
 

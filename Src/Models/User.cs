@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using static MangaAndLightNovelWebScrape.Models.Constants;
 
 namespace Tsundoku.Models
 {

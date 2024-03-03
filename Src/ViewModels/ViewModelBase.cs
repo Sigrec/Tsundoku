@@ -2,7 +2,6 @@ using System.Diagnostics;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Tsundoku.Models;
-using static MangaAndLightNovelWebScrape.Models.Constants;
 
 namespace Tsundoku.ViewModels
 {
@@ -19,8 +18,8 @@ namespace Tsundoku.ViewModels
         public static bool updatedVersion = false;
         public static bool newCoverCheck = false;
         public static bool isReloading = false;
-        public const string TsundokoCurVersion = "3.1.3.0";
-        public const double SCHEMA_VERSION = 3.0;
+        public const string TsundokoCurVersion = "4.0.0.0";
+        public const double SCHEMA_VERSION = 4.0;
 
         public ViewModelBase()
         {
