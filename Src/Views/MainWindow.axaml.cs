@@ -317,10 +317,7 @@ namespace Tsundoku.Views
             }
         }
 
-        private void SearchCollection(object sender, KeyEventArgs args)
-        {
-            MainWindowViewModel.UserIsSearching(true);
-        }
+        private void SearchCollection(object sender, KeyEventArgs args) => MainWindowViewModel.UserIsSearching(true);
 
         private async void ChangeSeriesVolumeCounts(object sender, RoutedEventArgs args)
         {

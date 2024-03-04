@@ -17,7 +17,6 @@ using MangaAndLightNovelWebScrape.Websites;
 using Avalonia.Collections;
 using System.Reflection;
 using Src.Helpers;
-using MangaAndLightNovelWebScrape.Enums;
 
 namespace Tsundoku.ViewModels
 {

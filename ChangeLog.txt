@@ -11,6 +11,9 @@ TODO:
 ❌ Fix padding issue in Series Note w/ Scrollbar
 ❌ Fix issue where clicking or minimizing would sometimes cause the the main window to scroll up (https://github.com/AvaloniaUI/Avalonia/issues/7593)
 
+v4.X.X.X - March
+❌ Fixed issue where sorting/filtering would keep other pane showing even though it's a dif series
+
 v4.0.0.0 - March 3rd
 ✅ Changed Series Card Edit Button Icon to a Gear
 ✅ Updated Series Card Progress Section Layout
