@@ -10,6 +10,7 @@ namespace Tsundoku.ViewModels
     public class AddNewSeriesViewModel : ViewModelBase
     {
         [Reactive] public string TitleText { get; set; }
+        [Reactive] public string CoverImageUrl { get; set; }
         [Reactive] public string MaxVolumeCount { get; set; }
         [Reactive] public string CurVolumeCount { get; set; }
         [Reactive] public string AdditionalLanguagesToolTipText { get; set; }
