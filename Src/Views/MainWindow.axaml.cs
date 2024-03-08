@@ -18,10 +18,6 @@ namespace Tsundoku.Views
     {
         public MainWindowViewModel? CollectionViewModel => DataContext as MainWindowViewModel;
         WindowState previousWindowState;
-        private static readonly FilePickerFileType fileOptions = new FilePickerFileType("All Images")
-        {
-            Patterns = new string[4] { "*.png", "*.jpg", "*.jpeg", "*.crdownload" }
-        };
         private static readonly List<Series> CoverChangedSeriesList = [];
         private static readonly FileSystemWatcherEx CoverFolderWatcher = new FileSystemWatcherEx(@"Covers")
         {
@@ -374,14 +370,20 @@ namespace Tsundoku.Views
 
         private void ShowEditPane(object sender, RoutedEventArgs args)
         {
-            ((sender as Button).FindLogicalAncestorOfType<Grid>(false).FindLogicalAncestorOfType<Grid>(false).GetLogicalChildren().ElementAt(1) as Grid).IsVisible &= false;
-            ((Button)sender).FindLogicalAncestorOfType<Grid>(false).FindLogicalAncestorOfType<Grid>(false).FindLogicalDescendantOfType<Grid>(false).IsVisible ^= true;
+            Series curSeries = (Series)(sender as Button).DataContext;
+            curSeries.IsStatsPaneOpen &= false;
+            curSeries.IsEditPaneOpen ^= true;
+            ((sender as Button).FindLogicalAncestorOfType<Grid>(false).FindLogicalAncestorOfType<Grid>(false).GetLogicalChildren().ElementAt(1) as Grid).IsVisible = curSeries.IsStatsPaneOpen;
+            ((Button)sender).FindLogicalAncestorOfType<Grid>(false).FindLogicalAncestorOfType<Grid>(false).FindLogicalDescendantOfType<Grid>(false).IsVisible = curSeries.IsEditPaneOpen;
         }
 
         private void ShowStatsPane(object sender, RoutedEventArgs args)
         {
-            ((Button)sender).FindLogicalAncestorOfType<Grid>(false).FindLogicalAncestorOfType<Grid>(false).FindLogicalDescendantOfType<Grid>(false).IsVisible &= false;
-            ((sender as Button).FindLogicalAncestorOfType<Grid>(false).FindLogicalAncestorOfType<Grid>(false).GetLogicalChildren().ElementAt(1) as Grid).IsVisible ^= true;
+            Series curSeries = (Series)(sender as Button).DataContext;
+            curSeries.IsEditPaneOpen &= false;
+            curSeries.IsStatsPaneOpen ^= true;
+            ((Button)sender).FindLogicalAncestorOfType<Grid>(false).FindLogicalAncestorOfType<Grid>(false).FindLogicalDescendantOfType<Grid>(false).IsVisible = curSeries.IsEditPaneOpen;
+            ((sender as Button).FindLogicalAncestorOfType<Grid>(false).FindLogicalAncestorOfType<Grid>(false).GetLogicalChildren().ElementAt(1) as Grid).IsVisible = curSeries.IsStatsPaneOpen;
         }
 
         /// <summary>

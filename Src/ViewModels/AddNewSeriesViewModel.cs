@@ -4,6 +4,9 @@ using Avalonia.Media.Imaging;
 using System.Collections.ObjectModel;
 using Avalonia.Controls;
 using System.Collections.Specialized;
+using OpenQA.Selenium;
+using System.Net;
+using System.Net.Http.Headers;
 
 namespace Tsundoku.ViewModels
 {
@@ -16,7 +19,6 @@ namespace Tsundoku.ViewModels
         [Reactive] public string AdditionalLanguagesToolTipText { get; set; }
         [Reactive] public bool IsAddSeriesButtonEnabled { get; set; } = false;
         public ObservableCollection<ListBoxItem> SelectedAdditionalLanguages { get; set; } = new ObservableCollection<ListBoxItem>();
-        private static readonly HttpClient AddCoverHttpClient = new HttpClient();
         private static readonly StringBuilder CurLanguages = new StringBuilder();
         public AddNewSeriesViewModel()
         {
@@ -60,10 +62,9 @@ namespace Tsundoku.ViewModels
         /// <param name="maxVolCount">The max # of volumes this series currently has</param>
         /// <param name="additionalLanguages">Additional languages to get more info for from Mangadex</param>
         /// <returns>Whether the series can be added to the users collection or not</returns>
-        public static async Task<bool> GetSeriesDataAsync(string title, Format bookType, ushort curVolCount, ushort maxVolCount, ObservableCollection<string> additionalLanguages, Demographic demographic = Demographic.Unknown, uint volumesRead = 0, decimal rating = -1, decimal cost = 0)
+        public static async Task<bool> GetSeriesDataAsync(string title, Format bookType, ushort curVolCount, ushort maxVolCount, ObservableCollection<string> additionalLanguages, string customImageUrl, Demographic demographic = Demographic.Unknown, uint volumesRead = 0, decimal rating = -1, decimal cost = 0)
         {
-            Series? newSeries = await Series.CreateNewSeriesCardAsync(title, bookType, maxVolCount, curVolCount, additionalLanguages, demographic, volumesRead, rating, cost);
-            
+            Series? newSeries = await Series.CreateNewSeriesCardAsync(title, bookType, maxVolCount, curVolCount, additionalLanguages, customImageUrl, demographic, volumesRead, rating, cost);
             bool duplicateSeriesCheck = true;
             if (newSeries != null)
             {
@@ -72,8 +73,6 @@ namespace Tsundoku.ViewModels
                 if (!duplicateSeriesCheck)
                 {
                     LOGGER.Info($"\nAdding New Series -> \"{title}\" | \"{bookType}\" | {curVolCount} | {maxVolCount}\n{newSeries}");
-                    // File.WriteAllText(@"TestSeries.json", newSeries.ToString());
-
                     int index = MainWindowViewModel.UserCollection.BinarySearch(newSeries, new SeriesComparer(MainUser.CurLanguage));
                     index = index < 0 ? ~index : index;
                     if (MainWindowViewModel.UserCollection.Count == MainWindowViewModel.SearchedCollection.Count)
@@ -104,16 +103,32 @@ namespace Tsundoku.ViewModels
             return duplicateSeriesCheck;
         }
 
-        public static async Task<Bitmap> SaveCoverAsync(string newPath, string coverLink)
+        public static async Task<Bitmap> SaveCoverAsync(string newPath, string coverLink, string customImageUrl)
         {
-            HttpResponseMessage response = await AddCoverHttpClient.GetAsync(new Uri(coverLink));
-            using (FileStream fs = new(newPath, FileMode.Create, FileAccess.Write))
+            Bitmap newCover;
+            byte[] imageByteArray;
+            try
             {
-                await response.Content.CopyToAsync(fs);
+                if (!string.IsNullOrWhiteSpace(customImageUrl) && (customImageUrl.EndsWith("jpg") || customImageUrl.EndsWith("png")) && Uri.TryCreate(customImageUrl, UriKind.RelativeOrAbsolute, out Uri uri))
+                {
+                    imageByteArray = await MainWindowViewModel.AddCoverHttpClient.GetByteArrayAsync(uri);
+                }
+                else
+                {
+                    imageByteArray = await MainWindowViewModel.AddCoverHttpClient.GetByteArrayAsync(coverLink);
+                }
+                Stream imageStream = new MemoryStream(imageByteArray);
+                newCover = new Bitmap(imageStream).CreateScaledBitmap(new PixelSize(LEFT_SIDE_CARD_WIDTH, IMAGE_HEIGHT), BitmapInterpolationMode.HighQuality);
+                newCover.Save(newPath, 100);
+                imageStream.Flush();
+                imageStream.Close();
+                return newCover;
             }
-			Bitmap newCover = new Bitmap(newPath).CreateScaledBitmap(new PixelSize(LEFT_SIDE_CARD_WIDTH, IMAGE_HEIGHT), BitmapInterpolationMode.HighQuality);
-			newCover.Save(newPath, 100);
-            return newCover;
+            catch (Exception ex)
+            {
+                LOGGER.Error("{} \n {}", ex.Message, ex.StackTrace);
+            }
+            return null;
         }
 
         public static ObservableCollection<string> ConvertSelectedLangList(ObservableCollection<ListBoxItem> SelectedLangs)

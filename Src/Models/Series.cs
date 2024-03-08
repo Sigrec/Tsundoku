@@ -10,11 +10,11 @@ namespace Tsundoku.Models
 {
     public partial class Series : IDisposable, IEquatable<Series?>
     {
-		[GeneratedRegex("[\\w]")] private static partial Regex AlphaNumericOnlyRegex();
-        [GeneratedRegex(" \\(.*\\)")] private static partial Regex StaffRegex();
-        [GeneratedRegex(" \\((.*)\\)")] private static partial Regex NativeStaffRegex();
-        [GeneratedRegex("^.*(?= \\(.*\\))")] private static partial Regex FullStaffRegex();
-		[GeneratedRegex("[a-z\\d]{8}-[a-z\\d]{4}-[a-z\\d]{4}-[a-z\\d]{4}-[a-z\\d]{11,}")] private static partial Regex MangaDexIDRegex();
+		[GeneratedRegex(@"[a-z0-9]")] private static partial Regex AlphaNumericOnlyRegex();
+        [GeneratedRegex(@" \(.*\)")] private static partial Regex StaffRegex();
+        [GeneratedRegex(@" \((.*)\)")] private static partial Regex NativeStaffRegex();
+        [GeneratedRegex(@"^.*(?= \(.*\))")] private static partial Regex FullStaffRegex();
+		[GeneratedRegex(@"[a-z\d]{8}-[a-z\d]{4}-[a-z\d]{4}-[a-z\d]{4}-[a-z\d]{11,}")] private static partial Regex MangaDexIDRegex();
 
         private static SeriesModelContext SeriesJsonModel = new SeriesModelContext(new JsonSerializerOptions()
         { 
@@ -59,6 +59,8 @@ namespace Tsundoku.Models
 		public decimal Rating { get; set; }
 		public Demographic Demographic { get; set; }
 		public bool IsFavorite { get; set; } = false;
+        [JsonIgnore] public bool IsStatsPaneOpen { get; set; } = false;
+        [JsonIgnore] public bool IsEditPaneOpen { get; set; } = false;
 
         [JsonConstructor]
 		public Series(Dictionary<string, string> Titles, Dictionary<string, string> Staff, string Description, Format Format, Status Status, string Cover, Uri Link, ushort MaxVolumeCount, ushort CurVolumeCount, decimal Rating, uint VolumesRead, decimal Cost, Demographic Demographic, Bitmap CoverBitMap)
@@ -90,7 +92,7 @@ namespace Tsundoku.Models
         /// <param name="MD_Query">MangaDexQuery object for the MangaDex HTTP client</param>
         /// <param name="additionalLanguages">List of additional languages to query for</param>
         /// <returns></returns>
-        public static async Task<Series?> CreateNewSeriesCardAsync(string title, Format bookType, ushort maxVolCount, ushort minVolCount, ObservableCollection<string> additionalLanguages, Demographic demographic = Demographic.Unknown, uint volumesRead = 0, decimal rating = -1, decimal cost = 0)
+        public static async Task<Series?> CreateNewSeriesCardAsync(string title, Format bookType, ushort maxVolCount, ushort minVolCount, ObservableCollection<string> additionalLanguages, string customImageUrl = "", Demographic demographic = Demographic.Unknown, uint volumesRead = 0, decimal rating = -1, decimal cost = 0)
         {
 			JsonDocument? seriesDataDoc;
 			int pageNum = 1;
@@ -145,7 +147,7 @@ namespace Tsundoku.Models
 				filteredBookType = bookType == Format.Manga ? GetCorrectFormat(countryOfOrigin) : Format.Novel;
 				nativeStaff = GetSeriesStaff(seriesData.GetProperty("staff").GetProperty("edges"), "native", filteredBookType, romajiTitle, new StringBuilder());
 				fullStaff = GetSeriesStaff(seriesData.GetProperty("staff").GetProperty("edges"), "full", filteredBookType, romajiTitle, new StringBuilder());
-				coverPath = CreateCoverFilePath(seriesData.GetProperty("coverImage").GetProperty("extraLarge").GetString(), romajiTitle, filteredBookType, seriesData.GetProperty("synonyms").EnumerateArray(), Site.AniList);
+				coverPath = CreateCoverFilePath(seriesData.GetProperty("coverImage").GetProperty("extraLarge").GetString(), romajiTitle, filteredBookType, seriesData.GetProperty("id").GetUInt64().ToString());
 
 				// If available on AniList and is not a Japanese series get the Japanese title from Mangadex
 				if (!bookType.Equals("NOVEL") && (countryOfOrigin.Equals("KR") || countryOfOrigin.Equals("CW") || countryOfOrigin.Equals("TW")))
@@ -227,7 +229,7 @@ namespace Tsundoku.Models
                         volumesRead,
                         cost,
 						demographic,
-						await ViewModels.AddNewSeriesViewModel.SaveCoverAsync(coverPath, seriesData.GetProperty("coverImage").GetProperty("extraLarge").GetString())
+                        string.IsNullOrWhiteSpace(customImageUrl) ? await ViewModels.AddNewSeriesViewModel.SaveCoverAsync(coverPath, seriesData.GetProperty("coverImage").GetProperty("extraLarge").GetString(), customImageUrl) : await ViewModels.AddNewSeriesViewModel.SaveCoverAsync(coverPath, seriesData.GetProperty("coverImage").GetProperty("extraLarge").GetString(), customImageUrl)
 					);
 			}
 			else if (isMangaDexId || bookType == Format.Manga) // MangadexQuery
@@ -300,7 +302,8 @@ namespace Tsundoku.Models
 					link = !attributes.GetProperty("links").TryGetProperty("al", out JsonElement aniListId) ? @$"https://mangadex.org/title/{curMangaDexId}" : @$"https://anilist.co/manga/{aniListId}";
 					countryOfOrigin = attributes.GetProperty("originalLanguage").GetString();
 					string coverLink = @$"https://uploads.mangadex.org/covers/{curMangaDexId}/{await MangadexQuery.GetCoverAsync(relationships.Single(x => x.GetProperty("type").GetString().Equals("cover_art")).GetProperty("id").GetString())}";
-					coverPath = CreateCoverFilePath(coverLink, romajiTitle, GetCorrectFormat(countryOfOrigin), altTitles, Site.MangaDex);
+                    LOGGER.Debug("COVER LINK = {}", coverLink);
+					coverPath = CreateCoverFilePath(coverLink, romajiTitle, GetCorrectFormat(countryOfOrigin), curMangaDexId);
 					demographic = GetSeriesDemographic(attributes.GetProperty("publicationDemographic").GetString());
 
 					if (altTitles.Any())
@@ -396,7 +399,7 @@ namespace Tsundoku.Models
                         volumesRead,
                         cost,
                         demographic,
-						await ViewModels.AddNewSeriesViewModel.SaveCoverAsync(coverPath, coverLink)
+						string.IsNullOrWhiteSpace(customImageUrl) ? await ViewModels.AddNewSeriesViewModel.SaveCoverAsync(coverPath, coverLink, string.Empty) : await ViewModels.AddNewSeriesViewModel.SaveCoverAsync(coverPath, coverLink, customImageUrl)
 					);
 				}
 			}
@@ -531,40 +534,20 @@ namespace Tsundoku.Models
 			return staffList.ToString(0, staffList.Length - 3);
 		}
 
-		public static string CreateCoverFilePath(string coverLink, string title, Format bookType, JsonElement.ArrayEnumerator synonyms, Site queryType)
+		public static string CreateCoverFilePath(string coverLink, string title, Format bookType, string seriesId)
 		{
-			string newPath = @$"Covers\{ExtensionMethods.RemoveInPlaceCharArray(string.Concat(title.Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries))).Replace(",", string.Empty)}_{bookType.ToString().ToUpper()}.{coverLink[^3..]}";
             Directory.CreateDirectory(@"Covers");
+            string coverName = ExtensionMethods.RemoveInPlaceCharArray(string.Concat(title.Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries))).Replace(",", string.Empty);
+            string format = bookType.ToString().ToUpper();
+			string newPath = @$"Covers\{coverName}_{format}.{coverLink[^3..]}";
+            LOGGER.Debug("(0) {}", newPath);
 
-			// Check and see if the series will generate a duplicate file name
-            if (File.Exists(newPath))
+            if (File.Exists(@$"Covers\{coverName}_{format}.jpg") || File.Exists(@$"Covers\{coverName}_{format}.png"))
             {
-                switch (queryType)
-				{
-					case Site.AniList:
-						while(synonyms.MoveNext())
-						{
-							if (AlphaNumericOnlyRegex().IsMatch(synonyms.Current.GetString()))
-							{
-								newPath = @$"Covers\{ExtensionMethods.RemoveInPlaceCharArray(string.Concat(synonyms.Current.GetString().Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries))).Replace(",", string.Empty)}_{bookType.ToString().ToUpper()}.{coverLink[^3..]}";
-								break;
-							}
-						}
-						break;
-					case Site.MangaDex:
-						JsonElement altTitle;
-						while(synonyms.MoveNext())
-						{
-							if (synonyms.Current.TryGetProperty("en", out altTitle))
-							{
-
-								newPath = @$"Covers\{ExtensionMethods.RemoveInPlaceCharArray(string.Concat(altTitle.GetString().Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries))).Replace(",", string.Empty)}_{bookType.ToString().ToUpper()}.{coverLink[^3..]}";
-								break;
-							}
-						}
-						break;
-				}
+                newPath = @$"Covers\{coverName}_{seriesId}_{format}.{coverLink[^3..]}";
             }
+            LOGGER.Debug("(1) {}", newPath);
+
 			return newPath;
 		}
 

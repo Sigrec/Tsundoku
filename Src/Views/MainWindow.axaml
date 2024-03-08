@@ -377,7 +377,7 @@
                                                 Grid.Row="0" 
                                                 Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneBGColor, Converter={StaticResource ConvertColor}}" 
                                                 ColumnDefinitions="*,75" 
-                                                IsVisible="false"
+                                                IsVisible="{CompiledBinding IsEditPaneOpen}"
                                                 ZIndex="1">
                                                 <Grid.Styles>
                                                     <Style Selector="TextBox">
@@ -465,11 +465,11 @@
                                                 </StackPanel>
                                             </Grid>
 
-                                            <!-- Top Right Side Card Series Settings Pane -->
+                                            <!-- Top Right Side Card Series Stats Pane -->
                                             <Grid Height="{CompiledBinding Source={x:Static local:Constants.TOP_SECTION_CARD_HEIGHT}}" 
                                                 Grid.Row="0" 
                                                 Background="{Binding #CollectionTheme.DataContext.CurrentTheme.SeriesEditPaneBGColor, Converter={StaticResource ConvertColor}}" 
-                                                IsVisible="false"
+                                                IsVisible="{CompiledBinding IsStatsPaneOpen}"
                                                 RowDefinitions="Auto,*,*"
                                                 ColumnDefinitions="177.5,177.5"
                                                 ZIndex="1">

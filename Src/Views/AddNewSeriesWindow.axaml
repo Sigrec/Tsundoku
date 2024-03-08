@@ -31,7 +31,7 @@
                        FontSize="20" 
                        FontWeight="Bold" 
                        Classes="menu" 
-                       Margin="0,0,0,3" 
+                       Margin="2,0,0,3" 
                        ToolTip.Tip="{CompiledBinding AdditionalLanguagesToolTipText}" 
                        ToolTip.IsEnabled="{CompiledBinding AdditionalLanguagesToolTipText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
 			<ListBox Name="AdditionalLangSelector"
@@ -89,7 +89,7 @@
 						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Ukranian</ListBoxItem>
 						<ListBoxItem Theme="{StaticResource QueryListBoxItem}">Vietnamese</ListBoxItem>
 			</ListBox>
-			<TextBlock Text="Enter Title or ID" Grid.Row="0" Grid.Column="0" FontSize="20" FontWeight="Bold" Classes="menu" Margin="0,0,0,1" ToolTip.Tip="{CompiledBinding TitleText}"/>
+			<TextBlock Text="Enter Title or ID" Grid.Row="0" Grid.Column="0" FontSize="20" FontWeight="Bold" Classes="menu" Margin="2,0,0,1" ToolTip.Tip="{CompiledBinding TitleText}"/>
 			<TextBox Name="TitleBox"
 					 FontSize="18"
 					 Grid.Row="1"
@@ -103,7 +103,7 @@
 					 BorderThickness="2"
 					 TextWrapping="Wrap"
 					 Watermark="Title or AniList ID or MangaDex ID"/>
-			<TextBlock Text="Cur Volumes" Grid.Row="3" Grid.Column="0" FontSize="20" FontWeight="Bold" Classes="menu" Margin="0,0,0,1"/>
+			<TextBlock Text="Cur Volumes" Grid.Row="3" Grid.Column="0" FontSize="20" FontWeight="Bold" Classes="menu" Margin="2,0,0,1"/>
 			<MaskedTextBox Name="CurVolCount"
 						   Width="182"
 						   Classes="menu"
@@ -132,7 +132,7 @@
 					   Grid.Column="0"
 					   FontSize="20"
 					   FontWeight="Bold"
-					   Margin="0,0,0,3"
+					   Margin="2,0,0,3"
 					   Classes="menu"/>
 			<StackPanel Orientation="Horizontal" Width="180" Grid.Row="7" Grid.Column="0" Spacing="5" Margin="0,0,10,0">
 				<ToggleButton Name="MangaButton"
@@ -146,7 +146,7 @@
 							  Theme="{StaticResource MenuToggleButton}"
 							  Content="Novel"/>
 			</StackPanel>
-            <TextBlock Text="Demographic"
+            <TextBlock Text="Demographic [O]"
                        FontWeight="Bold"
                        FontSize="20"
                        Grid.Row="6"
@@ -166,12 +166,12 @@
                 <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Josei</ComboBoxItem>
                 <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Unknown</ComboBoxItem>
             </ComboBox>
-            <TextBlock Text="Volumes Read"
+            <TextBlock Text="Volumes Read [O]"
                        FontWeight="Bold"
                        FontSize="20"
                        Grid.Row="9"
 					   Grid.Column="0"
-                       Margin="0,0,0,3"
+                       Margin="2,0,0,3"
                        Classes="menu"/>
             <MaskedTextBox Name="VolumesRead"
                            HorizontalAlignment="Left"
@@ -184,7 +184,7 @@
 						   FontSize="18"
 						   Mask="000"
 						   MaxLength="3"/>
-            <TextBlock Text="Rating"
+            <TextBlock Text="Rating [O]"
                        FontWeight="Bold"
                        FontSize="20"
                        Grid.Row="9"
@@ -200,12 +200,12 @@
 						   FontWeight="Bold"
 						   FontSize="18"
                            Mask="90.0/1\0.\0"/>
-            <TextBlock Text="{CompiledBinding CurCurrency, StringFormat='Cost ({0})'}"
+            <TextBlock Text="{CompiledBinding CurCurrency, StringFormat='Cost ({0}) [O]'}"
 					   Grid.Row="12"
 					   Grid.Column="0"
 					   FontSize="20"
 					   FontWeight="Bold"
-					   Margin="0,0,0,3"
+					   Margin="2,0,0,3"
 					   Classes="menu"/>
             <MaskedTextBox Name="Cost"
                            HorizontalAlignment="Left"
@@ -218,7 +218,7 @@
 						   FontWeight="Bold"
 						   FontSize="18"
                            Mask="000000000.00"/>
-			<TextBlock Text="Query"
+			<TextBlock Text="Add Series"
 					   Grid.Row="12"
 					   Grid.Column="2"
 					   FontSize="20"
@@ -236,9 +236,10 @@
 					Grid.Row="13"
 					Grid.Column="2">
 			</Button>
-            <TextBlock Text="Replacement Cover Image" Grid.Row="15" Grid.Column="0" Grid.ColumnSpan="3" FontSize="20" FontWeight="Bold" Classes="menu" Margin="2,0,0,3" ToolTip.Tip="{CompiledBinding CoverImageUrl}"/>
-			<TextBox Name="CoverImageUrl"
+            <TextBlock Text="Cover Image [O]" Grid.Row="15" Grid.Column="0" Grid.ColumnSpan="3" FontSize="20" FontWeight="Bold" Classes="menu" Margin="2,0,0,3" ToolTip.Tip="{CompiledBinding CoverImageUrl}"/>
+			<TextBox Name="CoverImageUrlTextBox"
 					 FontSize="18"
+                     Width="612"
 					 Grid.Row="16"
 					 Grid.Column="0"
 					 Grid.ColumnSpan="5"

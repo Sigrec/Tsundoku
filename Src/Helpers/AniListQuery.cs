@@ -3,12 +3,12 @@ using GraphQL.Client.Http;
 using GraphQL.Client.Serializer.SystemTextJson;
 using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
+using Tsundoku.ViewModels;
 
 namespace Tsundoku.Helpers
 {
     public partial class AniListQuery : IDisposable
 	{
-		private static readonly string USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.66 Safari/537.36";
 		private static readonly GraphQLHttpClient AniListClient;
         private bool disposedValue;
         [GeneratedRegex(@"\(Source: [\S\s]+|\<.*?\>")] private static partial Regex AniListDescRegex();
@@ -19,7 +19,7 @@ namespace Tsundoku.Helpers
 			AniListClient.HttpClient.DefaultRequestHeaders.Add("RequestType", "POST");
 			AniListClient.HttpClient.DefaultRequestHeaders.Add("ContentType", "application/json");
 			AniListClient.HttpClient.DefaultRequestHeaders.Add("Accept", "application/json");
-			AniListClient.HttpClient.DefaultRequestHeaders.Add("UserAgent", USER_AGENT);
+			AniListClient.HttpClient.DefaultRequestHeaders.Add("UserAgent", ViewModelBase.USER_AGENT);
 		}
 
 
@@ -39,13 +39,13 @@ namespace Tsundoku.Helpers
 					Query = @"
 						query ($title: String, $format: MediaFormat, $pageNum: Int) {
 						  Media(search: $title, format: $format) {
+                              id
 							  countryOfOrigin
 							  title {
 							    romaji
 							    english
 							    native
 							  }
-							  synonyms
 							  staff(sort: RELEVANCE, perPage: 25, page: $pageNum) {
 							    pageInfo {
 								  hasNextPage
@@ -110,13 +110,13 @@ namespace Tsundoku.Helpers
 					Query = @"
 						query ($seriesId: Int, $format: MediaFormat, $pageNum: Int) {
 						  Media(id: $seriesId, format: $format) {
+                              id
 							  countryOfOrigin
 							  title {
 							    romaji
 							    english
 							    native
 							  }
-							  synonyms
 							  staff(sort: RELEVANCE, perPage: 25, page: $pageNum) {
 							    pageInfo {
 								  hasNextPage

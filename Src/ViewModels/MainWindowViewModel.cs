@@ -55,6 +55,14 @@ namespace Tsundoku.ViewModels
         public ReactiveCommand<Unit, Unit> OpenCollectionStatsWindow { get; set; }
         public ICommand StartAdvancedSearch { get; }
 
+        public static readonly HttpClient AddCoverHttpClient = new HttpClient(new SocketsHttpHandler
+        {
+            PooledConnectionLifetime = TimeSpan.FromMinutes(5)
+        })
+        {
+            DefaultVersionPolicy = HttpVersionPolicy.RequestVersionExact
+        };
+
         [GeneratedRegex(@"(\w+)(==|<=|>=)(\d+|\w+|\'(?:.*?)\')")] public static partial Regex AdvancedQueryRegex();
         
         // TODO Add genres?
@@ -65,6 +73,7 @@ namespace Tsundoku.ViewModels
             // Helpers.ExtensionMethods.PrintCurrencySymbols();
             LoadUserData();
             ConfigureWindows();
+            AddCoverHttpClient.DefaultRequestHeaders.Add("User-Agent", USER_AGENT);
 
             this.WhenAnyValue(x => x.CurLanguage).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.CurLanguage = x);
             this.WhenAnyValue(x => x.CurLanguage).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => LanguageIndex = AVAILABLE_LANGUAGES.IndexOf(x));
@@ -476,7 +485,10 @@ namespace Tsundoku.ViewModels
             
             if (MainUser.UserIcon != null && MainUser.UserIcon.Length > 0)
             {
-                UserIcon = new Bitmap(new MemoryStream(MainUser.UserIcon)).CreateScaledBitmap(new PixelSize(USER_ICON_WIDTH, USER_ICON_HEIGHT), BitmapInterpolationMode.HighQuality);
+                MemoryStream iconByteStream = new MemoryStream(MainUser.UserIcon);
+                UserIcon = new Bitmap(iconByteStream).CreateScaledBitmap(new PixelSize(USER_ICON_WIDTH, USER_ICON_HEIGHT), BitmapInterpolationMode.HighQuality);
+                iconByteStream.Flush();
+                iconByteStream.Close();
             }
 
             // Pre allocate the bitmaps for every image so it is not remade every pass.

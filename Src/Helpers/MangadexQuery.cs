@@ -6,8 +6,6 @@ namespace Tsundoku.Helpers
     public partial class MangadexQuery
     {
         private static readonly HttpClient MangadexClient;
-
-        private static readonly string USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36 Edg/116.0.1938.62";
         [GeneratedRegex(@"- Winner.*$|\n\n\n---[\S\s.]*|\n\n\*\*[\S\s.]*|\[Official.*?\].*|\[Wikipedia.*?\].*|\n\n---\n\*\*Links:\*\*\n\n.*")] private static partial Regex MangaDexDescRegex();
 
         static MangadexQuery()
@@ -20,7 +18,7 @@ namespace Tsundoku.Helpers
                 BaseAddress = new Uri("https://api.mangadex.org/"),
                 DefaultVersionPolicy = HttpVersionPolicy.RequestVersionExact
             };
-            MangadexClient.DefaultRequestHeaders.Add("User-Agent", USER_AGENT);
+            MangadexClient.DefaultRequestHeaders.Add("User-Agent", ViewModels.ViewModelBase.USER_AGENT);
         }
 
         /// <summary>
@@ -84,7 +82,7 @@ namespace Tsundoku.Helpers
         }
 
         /// <summary>
-        /// ttp request to get cover image for a MangaDex series by ID
+        /// http request to get cover image for a MangaDex series by ID
         /// </summary>
         /// <param name="id">The id used to query the cover</param>
         /// <returns></returns>

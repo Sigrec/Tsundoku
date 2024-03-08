@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Avalonia.Media.Imaging;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Tsundoku.Models;
@@ -20,6 +21,7 @@ namespace Tsundoku.ViewModels
         public static bool isReloading = false;
         public const string TsundokoCurVersion = "4.0.0.0";
         public const double SCHEMA_VERSION = 4.0;
+        public const string USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.66 Safari/537.36";
 
         public ViewModelBase()
         {
