@@ -71,7 +71,8 @@
                                 KeyUp="RemoveErrorMessage"
                                 Theme="{StaticResource QuerySearchBox}"
                                 MinimumPrefixLength="0"
-                                Watermark="Advanced Search Query..."/>
+                                Watermark="Advanced Search Query...">
+                    </AutoCompleteBox>
                     <Button Name="AdvancedSearchQueryButton"
                             IsDefault="True"
                             FontSize="20"

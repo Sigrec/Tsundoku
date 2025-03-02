@@ -48,14 +48,14 @@ namespace Tsundoku.Tests
         public async Task MangaDexID_HasNativeStaff_Test()
         {
             Series series = await Series.CreateNewSeriesCardAsync("32d76d19-8a05-4db0-9fc2-e0b0648fe9d0", Constants.Format.Manga, 2, 0, []);
-            Console.WriteLine(series.ToString());
             Assert.That(series.ToString(), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesModel\SeriesModelTestData\SoloLeveling.json")));
         }
 
         [AvaloniaTest]
         public async Task MangaDexID_NoNativeStaff_Test()
         {
-            Assert.That((await Series.CreateNewSeriesCardAsync("c0189f4a-dee6-48f4-abbe-53a4359cbcfb", Constants.Format.Manga, 2, 0, [])).ToString(), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesModel\SeriesModelTestData\AtTheNorthernFort.json")));
+            Series series  = await Series.CreateNewSeriesCardAsync("c0189f4a-dee6-48f4-abbe-53a4359cbcfb", Constants.Format.Manga, 2, 0, []);
+            Assert.That(series.ToString(), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesModel\SeriesModelTestData\AtTheNorthernFort.json")));
         }
 
         [AvaloniaTest]
@@ -73,13 +73,15 @@ namespace Tsundoku.Tests
         [AvaloniaTest]
         public async Task Radiant_MangaDexTitle_Test()
         {
-            Assert.That((await Series.CreateNewSeriesCardAsync("Radiant", Constants.Format.Manga, 18, 0, [])).ToString(), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesModel\SeriesModelTestData\Radiant.json")));
+            Series series = await Series.CreateNewSeriesCardAsync("Radiant", Constants.Format.Manga, 18, 0, []);
+            Assert.That(series.ToString(), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesModel\SeriesModelTestData\Radiant.json")));
         }
 
         [AvaloniaTest]
         public async Task TheBeginningAfterTheEnd_NoDemographic_MangaDexTitle_Test()
         {
-            Assert.That((await Series.CreateNewSeriesCardAsync("The Beginning After The End", Constants.Format.Manga, 5, 0, [])).ToString(), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesModel\SeriesModelTestData\TBATE.json")));
+            Series series = await Series.CreateNewSeriesCardAsync("The Beginning After The End", Constants.Format.Manga, 5, 0, []);
+            Assert.That(series.ToString(), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesModel\SeriesModelTestData\TBATE.json")));
         }
 
         [Test]

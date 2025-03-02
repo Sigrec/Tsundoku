@@ -75,7 +75,6 @@ namespace Tsundoku.Views
                     MerryManga.WEBSITE_TITLE => MerryManga.REGION.HasFlag(region),
                     RobertsAnimeCornerStore.WEBSITE_TITLE => RobertsAnimeCornerStore.REGION.HasFlag(region),
                     SciFier.WEBSITE_TITLE => SciFier.REGION.HasFlag(region),
-                    SpeedyHen.WEBSITE_TITLE => SpeedyHen.REGION.HasFlag(region),
                     Waterstones.WEBSITE_TITLE => Waterstones.REGION.HasFlag(region),
                     _ => throw new NotImplementedException(),
                 };
@@ -101,9 +100,9 @@ namespace Tsundoku.Views
                 LOGGER.Info($"Started Scrape For \"{TitleBox.Text}\" on {Scrape.Browser} Browser w/ Region = \"{Scrape.Region}\" & \"{(StockFilterSelector.SelectedItem as ComboBoxItem).Content} Filter\" & Websites = [{string.Join(", ", ViewModel.SelectedWebsites.Select(site => site.Content.ToString()))}] & Memberships = ({string.Join(" & ", ViewModelBase.MainUser.Memberships)})");
                 
                 await Scrape.InitializeScrapeAsync(
-                    TitleBox.Text, 
-                    MangaButton.IsChecked != null && MangaButton.IsChecked.Value ? BookType.Manga : BookType.LightNovel, 
-                    Scrape.GenerateWebsiteList(ViewModel.SelectedWebsites.Select(site => site.Content.ToString()).ToList())
+                    title: TitleBox.Text, 
+                    bookType: MangaButton.IsChecked != null && MangaButton.IsChecked.Value ? BookType.Manga : BookType.LightNovel, 
+                    Scrape.GenerateWebsiteList([.. ViewModel.SelectedWebsites.Select(site => site.Content.ToString())])
                 );
                 StartScrapeButton.IsEnabled = ViewModel.IsAnalyzeButtonEnabled;
                 StartScrapeButton.Content = "Analyze"; 

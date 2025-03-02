@@ -13,10 +13,14 @@ TODO:
 ❌ Issue where clicking or minimizing would sometimes cause the the main window to scroll up when virtualization is enabled (https://github.com/AvaloniaUI/Avalonia/issues/7593)
 ❌ Stat to track whether still collecting or not?
 ❌ Fixed issue where sorting/searching/filtering collection would crash the app if user tries to change window state (minimize or maximize)
+❌ Button to create a bunch of printable labels (can be used when you are packing)
 
-v6.1.0.0 - 
-⌛ Upgrade .NET 8.0 to .NET 9.0
+v6.1.0.0 - Mar 3rd, 2025
+⌛ Upgrade .NET to .NET 9.0
+⌛ Upgrade Avalonia to 11.2.5
+🔥 Fixed issue where adding a series without specifying a publisher would crash the app
 ✅ Updated PayPal donation link
+✅ Updated WebScraping lib to fix a bunch of issues
 
 v6.0.0.0 - Oct 9th, 2024
 ✅ Added "Genre" series data

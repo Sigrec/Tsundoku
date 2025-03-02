@@ -90,14 +90,15 @@ namespace Tsundoku.Views
             _ = uint.TryParse(VolumesRead.Text.Replace("_", ""), out uint volumesRead);
             _ = decimal.TryParse(Rating.Text[..4].Replace("_", "0"), out decimal rating);
             _ = decimal.TryParse(ValueMaskedTextBox.Text[1..].Replace("_", "0"), out decimal seriesValue);
+            
             var validSeries = await AddNewSeriesViewModel.GetSeriesDataAsync(
                 TitleBox.Text.Trim(), 
                 (MangaButton.IsChecked == true) ? Format.Manga : Format.Novel, 
                 CurVolNum, 
                 MaxVolNum, 
-                AddNewSeriesViewModel.ConvertSelectedLangList(AddNewSeriesViewModel.SelectedAdditionalLanguages),
+                AddNewSeriesViewModel.SelectedAdditionalLanguages.Count != 0 ? AddNewSeriesViewModel.ConvertSelectedLangList(AddNewSeriesViewModel.SelectedAdditionalLanguages) : [],
                 !string.IsNullOrWhiteSpace(customImageUrl) ? customImageUrl.Trim() : string.Empty, 
-                PublisherTextBox.Text.Trim(), //Publisher
+                !string.IsNullOrWhiteSpace(PublisherTextBox.Text) ? PublisherTextBox.Text.Trim() : "Unknown", //Publisher
                 Series.GetSeriesDemographic((DemographicCombobox.SelectedItem as ComboBoxItem).Content.ToString()), 
                 volumesRead, 
                 !Rating.Text[..4].StartsWith("__._") ? rating : -1, 
