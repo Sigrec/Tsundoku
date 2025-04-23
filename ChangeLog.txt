@@ -15,7 +15,7 @@ TODO:
 ❌ Fixed issue where sorting/searching/filtering collection would crash the app if user tries to change window state (minimize or maximize)
 ❌ Button to create a bunch of printable labels (can be used when you are packing)?
 
-v6.2.0.0 - April 23rd
+v7.0.0.0 - April 23rd
 ⌛ Upgrade Avalonia to 11.2.8
 ⌛ All-Around Perf Improvements
 ✅ Updated application icon

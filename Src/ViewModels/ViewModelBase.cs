@@ -21,7 +21,7 @@ namespace Tsundoku.ViewModels
         public static bool updatedVersion = false;
         public static bool newCoverCheck = false;
         public static bool isReloading = false;
-        public const string CUR_TSUNDOKU_VERSION = "6.2.0.0";
+        public const string CUR_TSUNDOKU_VERSION = "7.0.0.0";
         public const double SCHEMA_VERSION = 5.2;
         public const string USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.66 Safari/537.36";
         public MainWindow CollectionWindow = (MainWindow)((Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).MainWindow;
