@@ -13,15 +13,16 @@ namespace Tsundoku.Helpers
 		private static readonly GraphQLHttpClient AniListClient;
         private bool disposedValue;
         [GeneratedRegex(@"\(Source: [\S\s]+|\<.*?\>|Note:.*")] private static partial Regex AniListDescRegex();
+        [GeneratedRegex(@" \(.*\)")] public static partial Regex StaffRegex();
 
 		static AniList()
-		{
+        {
             AniListClient = new GraphQLHttpClient("https://graphql.anilist.co", new SystemTextJsonSerializer());
-			AniListClient.HttpClient.DefaultRequestHeaders.Add("RequestType", "POST");
-			AniListClient.HttpClient.DefaultRequestHeaders.Add("ContentType", "application/json");
-			AniListClient.HttpClient.DefaultRequestHeaders.Add("Accept", "application/json");
-			AniListClient.HttpClient.DefaultRequestHeaders.Add("UserAgent", ViewModelBase.USER_AGENT);
-		}
+            AniListClient.HttpClient.DefaultRequestHeaders.Add("RequestType", "POST");
+            AniListClient.HttpClient.DefaultRequestHeaders.Add("ContentType", "application/json");
+            AniListClient.HttpClient.DefaultRequestHeaders.Add("Accept", "application/json");
+            AniListClient.HttpClient.DefaultRequestHeaders.Add("UserAgent", ViewModelBase.USER_AGENT);
+        }
 
 
 		/// <summary>
@@ -211,6 +212,96 @@ namespace Tsundoku.Helpers
                 return [];
             }
         }
+        
+        public static void ExtractTitlesFromAniList(JsonElement seriesData, ref Dictionary<string, string> newTitles)
+        {
+            string nativeTitle = seriesData.GetProperty("title").GetProperty("native").GetString();
+            string romajiTitle = seriesData.GetProperty("title").GetProperty("romaji").GetString();
+            string englishTitle = seriesData.GetProperty("title").GetProperty("english").GetString();
+
+            newTitles.Add("Romaji", romajiTitle);
+            newTitles.Add("English", englishTitle);
+            newTitles.Add("Japanese", nativeTitle);
+        }
+
+        public static void ExtractStaffFromAniList(JsonElement seriesData, ref string nativeStaff, ref string fullStaff)
+        {
+            nativeStaff = GetSeriesStaff(seriesData.GetProperty("staff").GetProperty("edges"), "native", Format.Manga, "", new StringBuilder());
+            fullStaff = GetSeriesStaff(seriesData.GetProperty("staff").GetProperty("edges"), "full", Format.Manga, "", new StringBuilder());
+        }
+
+        public static string GetCoverPath(string romajiTitle, JsonElement seriesData, bool isRefresh, ref uint dupeIndex)
+        {
+            string coverPath = !isRefresh ? 
+                CreateCoverFilePath(seriesData.GetProperty("coverImage").GetProperty("extraLarge").GetString(), romajiTitle, Format.Manga, ref dupeIndex) : 
+                string.Empty;
+            return coverPath;
+        }
+        
+        public static string GetSeriesStaff(JsonElement staffArray, string nameType, Format bookType, string title, StringBuilder staffList) {
+			foreach(JsonElement name in staffArray.EnumerateArray())
+            {
+				string staffRole = StaffRegex().Replace(name.GetProperty("role").GetString(), string.Empty).Trim();
+				JsonElement nameProperty = name.GetProperty("node").GetProperty("name");
+
+				// Don't include "Illustration" staff for manga that are not anthologies
+				if (
+					VALID_STAFF_ROLES.Contains(staffRole, StringComparer.OrdinalIgnoreCase) 
+					&& !(bookType != Format.Novel 
+                        && (
+                                staffRole.Equals("Illustration") 
+                                || staffRole.Equals("Cover Illustration")
+                            ) 
+                        && !title.Contains("Anthology")))
+                {
+					string newStaff = nameProperty.GetProperty(nameType).GetString();
+					string newStaffOther = nameProperty.GetProperty(nameType.Equals("native") ? "full" : "native").GetString();
+					if (string.IsNullOrWhiteSpace(newStaff) || !staffList.ToString().Contains(newStaff)) // Check to see if this staff member has multiple roles to only add them once
+					{
+						if (!string.IsNullOrWhiteSpace(newStaff))
+						{
+							staffList.AppendFormat("{0} | ", newStaff.Trim());
+						}
+						else if (!string.IsNullOrWhiteSpace(newStaffOther))
+						{
+							staffList.AppendFormat("{0} | ", newStaffOther.Trim());
+						}
+						else if (nameProperty.GetProperty("alternative").GetArrayLength() > 0) // If the staff member does not have a full or native name entry
+						{
+							staffList.AppendFormat("{0} | ", nameProperty.GetProperty("alternative")[0].GetString().Trim());
+						}
+					}
+					else
+					{
+						LOGGER.Info($"Duplicate Staff Entry For {newStaff}");
+					}
+                }
+            }
+			return staffList.ToString(0, staffList.Length - 3);
+		}
+
+        public static string CreateCoverFilePath(string coverLink, string title, Format bookType, ref uint dupeIndex)
+		{
+            Directory.CreateDirectory(@"Covers");
+            string coverName = ExtensionMethods.RemoveInPlaceCharArray(string.Concat(title.Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries))).Replace(",", string.Empty);
+            string format = bookType.ToString().ToUpper();
+            string extension = coverLink[^3..];
+			string newPath = @$"Covers\{coverName}_{format}.{extension}";
+
+            if (File.Exists(newPath))
+            {
+                uint count = 2;
+                newPath = @$"Covers\{coverName}_{format}_{count}.{extension}";
+                while (File.Exists(newPath))
+                {
+                    LOGGER.Info($"{newPath} Already Exists Creating New Path");
+                    count++;
+                    newPath = @$"Covers\{coverName}_{format}_{count}.{extension}";
+                }
+                dupeIndex = count;
+            }
+			return newPath;
+		}      
 
         protected virtual void Dispose(bool disposing)
         {
@@ -223,7 +314,7 @@ namespace Tsundoku.Helpers
 
                 // Free unmanaged resources (unmanaged objects) and override finalizer
                 // Set large fields to null
-				AniListClient.Dispose();
+                AniListClient.Dispose();
                 disposedValue = true;
             }
         }

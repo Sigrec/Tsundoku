@@ -298,21 +298,21 @@ namespace Tsundoku.Tests
         [Parallelizable(scope: ParallelScope.Self)]
         public async Task GetSeriesStaff_UntrimmedRole_Test()
         {
-            Assert.That(Series.GetSeriesStaff((await AniList.GetSeriesByTitleAsync("文豪ストレイドッグス", Constants.Format.Manga, 1)).RootElement.GetProperty("Media").GetProperty("staff").GetProperty("edges"), "full", Constants.Format.Manga, "Bungou Stray Dogs", new System.Text.StringBuilder()), Is.EqualTo("Kafka Asagiri | Harukawa35"));
+            Assert.That(AniList.GetSeriesStaff((await AniList.GetSeriesByTitleAsync("文豪ストレイドッグス", Constants.Format.Manga, 1)).RootElement.GetProperty("Media").GetProperty("staff").GetProperty("edges"), "full", Constants.Format.Manga, "Bungou Stray Dogs", new System.Text.StringBuilder()), Is.EqualTo("Kafka Asagiri | Harukawa35"));
         }
 
         [Test] // Testing with Bakemonogatari
         [Parallelizable(scope: ParallelScope.Self)]
         public async Task GetSeriesStaff_ToManyIllustrators_Test()
         {
-            Assert.That(Series.GetSeriesStaff((await AniList.GetSeriesByTitleAsync("化物語", Constants.Format.Manga, 1)).RootElement.GetProperty("Media").GetProperty("staff").GetProperty("edges"), "full", Constants.Format.Manga, "Bakemonogatari", new System.Text.StringBuilder()), Is.EqualTo("Ito Oogure | NISIOISIN | VOFAN | Akio Watanabe"));
+            Assert.That(AniList.GetSeriesStaff((await AniList.GetSeriesByTitleAsync("化物語", Constants.Format.Manga, 1)).RootElement.GetProperty("Media").GetProperty("staff").GetProperty("edges"), "full", Constants.Format.Manga, "Bakemonogatari", new System.Text.StringBuilder()), Is.EqualTo("Ito Oogure | NISIOISIN | VOFAN | Akio Watanabe"));
         }
 
         [Test]
         [Parallelizable(scope: ParallelScope.Self)]
         public async Task GetSeriesStaff_MultplieStaffForValidRole_Test()
         {
-            Assert.That(Series.GetSeriesStaff((await AniList.GetSeriesByTitleAsync("나 혼자만 레벨업", Constants.Format.Manga, 1)).RootElement.GetProperty("Media").GetProperty("staff").GetProperty("edges"), "full", Constants.Format.Manga, "Na Honjaman Level Up", new System.Text.StringBuilder()), Is.EqualTo("Chu-Gong | So-Ryeong Gi | Hyeon-Gun | Seong-Rak Jang"));
+            Assert.That(AniList.GetSeriesStaff((await AniList.GetSeriesByTitleAsync("나 혼자만 레벨업", Constants.Format.Manga, 1)).RootElement.GetProperty("Media").GetProperty("staff").GetProperty("edges"), "full", Constants.Format.Manga, "Na Honjaman Level Up", new System.Text.StringBuilder()), Is.EqualTo("Chu-Gong | So-Ryeong Gi | Hyeon-Gun | Seong-Rak Jang"));
         }
 
         [AvaloniaTest]
@@ -326,7 +326,7 @@ namespace Tsundoku.Tests
         [Parallelizable(scope: ParallelScope.Self)]
         public void GetSeriesStaff_AllNullStaffScenarios_Name_Test()
         {
-            Assert.That(Series.GetSeriesStaff(JsonDocument.Parse(File.ReadAllText(@"\Tsundoku\Tests\SeriesModel\SeriesModelTestData\staffNameTest.json")).RootElement.GetProperty("data").GetProperty("Media").GetProperty("staff").GetProperty("edges"), "full", Constants.Format.Novel, "86: Eighty Six", new System.Text.StringBuilder()), Is.EqualTo("Asato Asato | しらび | Ⅰ-Ⅳ"));
+            Assert.That(AniList.GetSeriesStaff(JsonDocument.Parse(File.ReadAllText(@"\Tsundoku\Tests\SeriesModel\SeriesModelTestData\staffNameTest.json")).RootElement.GetProperty("data").GetProperty("Media").GetProperty("staff").GetProperty("edges"), "full", Constants.Format.Novel, "86: Eighty Six", new System.Text.StringBuilder()), Is.EqualTo("Asato Asato | しらび | Ⅰ-Ⅳ"));
         }
     }
 }

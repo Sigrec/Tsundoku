@@ -1,6 +1,5 @@
 ﻿using ReactiveUI;
 using Tsundoku.Models;
-using System.Collections.ObjectModel;
 using Tsundoku.Views;
 using System.Reactive.Linq;
 using ReactiveUI.Fody.Helpers;
@@ -25,7 +24,7 @@ namespace Tsundoku.ViewModels
         private static bool UpdatedCovers = false;
         public static AvaloniaList<Series> SearchedCollection { get; set; } = [];
         public static List<Series> UserCollection { get; set; } = [];
-        private static IEnumerable<Series> FilteredCollection { get; set; } = [];
+        private static IEnumerable<Series> FilteredCollection { get; set; }
         [Reactive] public string SearchText { get; set; }
         [Reactive] public string NotificationText { get; set; }
 
@@ -70,7 +69,13 @@ namespace Tsundoku.ViewModels
 
             this.WhenAnyValue(x => x.CurLanguage).ObserveOn(RxApp.MainThreadScheduler).Subscribe(LanguageChangedUpdate);
             this.WhenAnyValue(x => x.CurFilter).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => FilterIndex = AVAILABLE_COLLECTION_FILTERS.IndexOf(x.GetStringValue()));
-            this.WhenAnyValue(x => x.SearchText).Throttle(TimeSpan.FromMilliseconds(600)).ObserveOn(RxApp.MainThreadScheduler).Subscribe(SearchCollection);
+
+            this.WhenAnyValue(x => x.SearchText)
+                .Throttle(TimeSpan.FromMilliseconds(600))
+                .DistinctUntilChanged()
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(SearchCollection);
+
             this.WhenAnyValue(x => x.SearchText).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => CurSearchText = x);
             this.WhenAnyValue(x => x.CurrentTheme).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.MainTheme = x.ThemeName);
             this.WhenAnyValue(x => x.UserName).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => MainUser.UserName = x);
@@ -280,7 +285,11 @@ namespace Tsundoku.ViewModels
                     CurFilter = TsundokuFilter.None;
                 }
 
-                FilteredCollection = UserCollection.Where(x => x.Publisher.Contains(searchText, StringComparison.OrdinalIgnoreCase) || x.Titles.Values.AsParallel().Any(title => title.Contains(searchText, StringComparison.OrdinalIgnoreCase)) || x.Staff.Values.AsParallel().Any(staff => staff.Contains(searchText, StringComparison.OrdinalIgnoreCase))); 
+                FilteredCollection = UserCollection.Where(x =>
+                    x.Publisher.Contains(searchText, StringComparison.OrdinalIgnoreCase)
+                    || x.Titles.Values.Any(title => title.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+                    || x.Staff.Values.Any(staff => staff.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+                ); 
                 
                 SearchedCollection.Clear();
                 SearchedCollection.AddRange(FilteredCollection);
@@ -327,9 +336,7 @@ namespace Tsundoku.ViewModels
                     LOGGER.Info($"Initial Query = \"{AdvancedSearchQuery}\" -> \"{AdvancedFilterExpression}\"");
                     try
                     {
-#pragma warning disable IL2026 // Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code
                         FilteredCollection = UserCollection.AsQueryable().Where(AdvancedFilterExpression.ToString());
-#pragma warning restore IL2026 // Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code
                     }
                     catch (Exception ex)
                     {

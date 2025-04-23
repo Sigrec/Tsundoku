@@ -8,6 +8,9 @@ namespace Tsundoku.Helpers
     {
         private static readonly HttpClient MangadexClient;
         [GeneratedRegex(@"(?:\n\n---\n\*\*Links:\*\*|\n\n\n---|\n\n\*\*|\[(?:Official|Wikipedia).*?\]|\n___\n|\r\n\s+\r\n)[\S\s]*|- Winner.*$")] private static partial Regex MangaDexDescRegex();
+        [GeneratedRegex(@"[a-z\d]{8}-[a-z\d]{4}-[a-z\d]{4}-[a-z\d]{4}-[a-z\d]{11,}")] public static partial Regex MangaDexIDRegex();
+        [GeneratedRegex(@" \((.*)\)")] public static partial Regex NativeStaffRegex();
+        [GeneratedRegex(@"^.*(?= \(.*\))")] public static partial Regex FullStaffRegex();
 
         static MangaDex()
         {
@@ -110,16 +113,31 @@ namespace Tsundoku.Helpers
             return null;
         }
 
+        public static bool IsSeriesInvalid(string title, string englishTitle, string englishAltTitle)
+        {
+            return 
+            (
+                !(
+                    title.Contains("Digital", StringComparison.OrdinalIgnoreCase)
+                    || title.Contains("Fan Colored", StringComparison.OrdinalIgnoreCase)
+                    || englishAltTitle.Contains("Digital", StringComparison.OrdinalIgnoreCase)
+                    || englishAltTitle.Contains("Official Colored", StringComparison.OrdinalIgnoreCase)
+                    || title.Contains("Official Colored", StringComparison.OrdinalIgnoreCase)
+                )
+                && englishTitle.Contains("Digital", StringComparison.OrdinalIgnoreCase)
+            );
+        }  
+
         /// <summary>
         /// Gets the additional/alternative titles for a MangaDex series
         /// </summary>
         /// <param name="data">The JSON data of the series from MangaDex</param>
         /// <returns></returns>
         public static JsonElement.ArrayEnumerator GetAdditionalMangaDexTitleList(JsonElement data)
-		{
-			if (data.ValueKind == JsonValueKind.Array) // Collection
-			{
-				if (data.EnumerateArray().Any())
+        {
+            if (data.ValueKind == JsonValueKind.Array) // Collection
+            {
+                if (data.EnumerateArray().Any())
                 {
                     return data.EnumerateArray().ElementAt(0).GetProperty("attributes").GetProperty("altTitles").EnumerateArray();
                 }
@@ -127,12 +145,12 @@ namespace Tsundoku.Helpers
                 {
                     return new JsonElement.ArrayEnumerator();
                 }
-			}
-			else
-			{
-				return data.GetProperty("attributes").GetProperty("altTitles").EnumerateArray();
-			}
-		}
+            }
+            else
+            {
+                return data.GetProperty("attributes").GetProperty("altTitles").EnumerateArray();
+            }
+        }
 
         public static HashSet<Genre> ParseGenreData(string romajiTitle, JsonElement tags)
         {
