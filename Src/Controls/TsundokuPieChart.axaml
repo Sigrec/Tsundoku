@@ -1,0 +1,17 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:lvc="using:LiveChartsCore.SkiaSharpView.Avalonia"
+		xmlns:vm="using:Tsundoku.ViewModels"
+        xmlns:controls="using:Tsundoku.Controls"
+		x:DataType="vm:CollectionStatsViewModel">
+	<Style Selector="controls|TsundokuPieChart">
+		<Setter Property="Template">
+			<ControlTemplate>
+				<StackPanel>
+					<TextBlock Text="{TemplateBinding ChartTitle}" FontSize="22" FontWeight="Bold" Classes="menu" HorizontalAlignment="Center" Margin="0,10,0,0"/>
+					<lvc:PieChart Series="{TemplateBinding ChartData}" Width="250" Height="250"/>
+				</StackPanel>
+			</ControlTemplate>
+		</Setter>
+	</Style>
+</Styles>

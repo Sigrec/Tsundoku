@@ -1,0 +1,335 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:vm="using:Tsundoku.ViewModels"
+		xmlns:v="using:Tsundoku.Views"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+        x:Class="Tsundoku.Views.AddNewSeriesWindow"
+		Icon="\Assets\Icons\Tsundoku-Logo.ico"
+        Title="Add New Series"
+		FontFamily="Segoe UI"
+		SizeToContent="WidthAndHeight"
+        Classes="menu"
+		WindowStartupLocation="2"
+		KeyboardNavigation.TabNavigation="Cycle"
+		x:DataType="vm:AddNewSeriesViewModel"
+		CanResize="false">
+
+	<Window.DataContext>
+		<vm:AddNewSeriesViewModel/>
+	</Window.DataContext>
+
+	<Border Classes="menu" BorderThickness="3" CornerRadius="0,0,8,8" ClipToBounds="True">
+		<Grid ColumnDefinitions="*,15,*,15,*" RowDefinitions="Auto,Auto,5,Auto,Auto,5,Auto,Auto,5,Auto,Auto,5,Auto,Auto,5,Auto,Auto,5,Auto,Auto" Margin="20,20,20,30" ShowGridLines="false">
+            <Grid.Styles>
+                <Style Selector="ScrollBar:vertical">
+                    <Style Selector="^ /template/ Rectangle#TrackRect">
+                        <Setter Property="Fill" Value="{CompiledBinding CurrentThemeInstance.CollectionBGColor}" />
+                    </Style>
+
+                    <Style Selector="^ /template/ Thumb">
+                        <Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.DividerColor}" />
+                        <Style Selector="^:pointerover /template/ Border">
+                            <Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.DividerColor}" />
+                        </Style>
+                        <Style Selector="^:pressed /template/ Border">
+                            <Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.DividerColor}" />
+                        </Style>
+                    </Style>
+
+                    <Style Selector="^[IsExpanded=true]">
+                        <Style Selector="^ /template/ Thumb">
+                            <Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.DividerColor}" />
+                        </Style>
+
+                        <Style Selector="^ /template/ PathIcon">
+                            <Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.DividerColor}" />
+                        </Style>
+
+                        <Style Selector="^ /template/ Rectangle#TrackRect">
+                            <Setter Property="Fill" Value="{CompiledBinding CurrentThemeInstance.MenuBGColor}" />
+                        </Style>
+                    </Style>
+
+                    <Style Selector="^ /template/ RepeatButton#PART_LineUpButton, ^ /template/ RepeatButton#PART_LineDownButton">
+                        <Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentThemeInstance.DividerColor}"/>
+                        <Style Selector="^:pointerover">
+                            <Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuButtonTextAndIconHoverColor}"/>
+
+                            <Style Selector="^ /template/ ContentPresenter" >
+                                <Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.DividerColor}"/>
+                            </Style>
+                            <Style Selector="^ PathIcon">
+                                <Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.CollectionBGColor}" />
+                            </Style>
+                        </Style>
+
+                        <Style Selector="^:pressed">
+                            <Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuBGColor}"/>
+                            <Style Selector="^ /template/ ContentPresenter" >
+                                <Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.DividerColor}" />
+                            </Style>
+                            <Style Selector="^ PathIcon">
+                                <Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.CollectionBGColor}" />
+                            </Style>
+                        </Style>
+                    </Style>
+                </Style>
+            </Grid.Styles>
+			<TextBlock Name="AdditionalLangTitle"
+                       HorizontalAlignment="Left" 
+                       Grid.Row="0" 
+                       Grid.Column="4" 
+                       Text="Additional Languages" 
+                       FontSize="20" 
+                       FontWeight="Bold" 
+                       Classes="menu" 
+                       Margin="2,0,0,3" 
+                       ToolTip.Tip="{CompiledBinding AdditionalLanguagesToolTipText}" 
+                       ToolTip.IsEnabled="{CompiledBinding AdditionalLanguagesToolTipText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+			<ListBox Name="AdditionalLangSelector"
+					 SelectedItems="{CompiledBinding SelectedAdditionalLanguages}"
+					 SelectionMode="Multiple,Toggle"
+					 Grid.Row="1"
+                     Height="510" 
+                     Width="206"
+					 Grid.RowSpan="19"
+					 Grid.Column="4"
+                     VerticalAlignment="Top"
+					 Theme="{StaticResource QueryListBox}">
+						<ListBoxItem Name="Arabic" Theme="{StaticResource QueryListBoxItem}">Arabic</ListBoxItem>
+						<ListBoxItem Name="Azerbaijan" Theme="{StaticResource QueryListBoxItem}">Azerbaijan</ListBoxItem>
+						<ListBoxItem Name="Bengali" Theme="{StaticResource QueryListBoxItem}">Bengali</ListBoxItem>
+						<ListBoxItem Name="Bulgarian" Theme="{StaticResource QueryListBoxItem}">Bulgarian</ListBoxItem>
+						<ListBoxItem Name="Burmese" Theme="{StaticResource QueryListBoxItem}">Burmese</ListBoxItem>
+						<ListBoxItem Name="Catalan" Theme="{StaticResource QueryListBoxItem}">Catalan</ListBoxItem>
+						<ListBoxItem Name="Chinese" Theme="{StaticResource QueryListBoxItem}">Chinese</ListBoxItem>
+						<ListBoxItem Name="Croatian" Theme="{StaticResource QueryListBoxItem}">Croatian</ListBoxItem>
+						<ListBoxItem Name="Czech" Theme="{StaticResource QueryListBoxItem}">Czech</ListBoxItem>
+						<ListBoxItem Name="Danish" Theme="{StaticResource QueryListBoxItem}">Danish</ListBoxItem>
+						<ListBoxItem Name="Dutch" Theme="{StaticResource QueryListBoxItem}">Dutch</ListBoxItem>
+						<ListBoxItem Name="Esperanto" Theme="{StaticResource QueryListBoxItem}">Esperanto</ListBoxItem>
+						<ListBoxItem Name="Estonian" Theme="{StaticResource QueryListBoxItem}">Estonian</ListBoxItem>
+						<ListBoxItem Name="Filipino" Theme="{StaticResource QueryListBoxItem}">Filipino</ListBoxItem>
+						<ListBoxItem Name="Finnish" Theme="{StaticResource QueryListBoxItem}">Finnish</ListBoxItem>
+						<ListBoxItem Name="French" Theme="{StaticResource QueryListBoxItem}">French</ListBoxItem>
+						<ListBoxItem Name="German" Theme="{StaticResource QueryListBoxItem}">German</ListBoxItem>
+						<ListBoxItem Name="Greek" Theme="{StaticResource QueryListBoxItem}">Greek</ListBoxItem>
+						<ListBoxItem Name="Hebrew" Theme="{StaticResource QueryListBoxItem}">Hebrew</ListBoxItem>
+						<ListBoxItem Name="Hindi" Theme="{StaticResource QueryListBoxItem}">Hindi</ListBoxItem>
+						<ListBoxItem Name="Hungarian" Theme="{StaticResource QueryListBoxItem}">Hungarian</ListBoxItem>
+						<ListBoxItem Name="Indonesian" Theme="{StaticResource QueryListBoxItem}">Indonesian</ListBoxItem>
+						<ListBoxItem Name="Italian" Theme="{StaticResource QueryListBoxItem}">Italian</ListBoxItem>
+						<ListBoxItem Name="Kazakh" Theme="{StaticResource QueryListBoxItem}">Kazakh</ListBoxItem>
+						<ListBoxItem Name="Korean" Theme="{StaticResource QueryListBoxItem}">Korean</ListBoxItem>
+						<ListBoxItem Name="Latin" Theme="{StaticResource QueryListBoxItem}">Latin</ListBoxItem>
+						<ListBoxItem Name="Lithuanian" Theme="{StaticResource QueryListBoxItem}">Lithuanian</ListBoxItem>
+						<ListBoxItem Name="Malay" Theme="{StaticResource QueryListBoxItem}">Malay</ListBoxItem>
+						<ListBoxItem Name="Mongolian" Theme="{StaticResource QueryListBoxItem}">Mongolian</ListBoxItem>
+						<ListBoxItem Name="Nepali" Theme="{StaticResource QueryListBoxItem}">Nepali</ListBoxItem>
+						<ListBoxItem Name="Norwegian" Theme="{StaticResource QueryListBoxItem}">Norwegian</ListBoxItem>
+						<ListBoxItem Name="Persian" Theme="{StaticResource QueryListBoxItem}">Persian</ListBoxItem>
+						<ListBoxItem Name="Polish" Theme="{StaticResource QueryListBoxItem}">Polish</ListBoxItem>
+						<ListBoxItem Name="Portuguese" Theme="{StaticResource QueryListBoxItem}">Portuguese</ListBoxItem>
+						<ListBoxItem Name="Romanian" Theme="{StaticResource QueryListBoxItem}">Romanian</ListBoxItem>
+						<ListBoxItem Name="Russian" Theme="{StaticResource QueryListBoxItem}">Russian</ListBoxItem>
+						<ListBoxItem Name="Serbian" Theme="{StaticResource QueryListBoxItem}">Serbian</ListBoxItem>
+						<ListBoxItem Name="Slovak" Theme="{StaticResource QueryListBoxItem}">Slovak</ListBoxItem>
+						<ListBoxItem Name="Spanish" Theme="{StaticResource QueryListBoxItem}">Spanish</ListBoxItem>
+						<ListBoxItem Name="Swedish" Theme="{StaticResource QueryListBoxItem}">Swedish</ListBoxItem>
+						<ListBoxItem Name="Tamil" Theme="{StaticResource QueryListBoxItem}">Tamil</ListBoxItem>
+						<ListBoxItem Name="Thai" Theme="{StaticResource QueryListBoxItem}">Thai</ListBoxItem>
+						<ListBoxItem Name="Turkish" Theme="{StaticResource QueryListBoxItem}">Turkish</ListBoxItem>
+						<ListBoxItem Name="Ukrainian" Theme="{StaticResource QueryListBoxItem}">Ukrainian</ListBoxItem>
+						<ListBoxItem Name="Vietnamese" Theme="{StaticResource QueryListBoxItem}">Vietnamese</ListBoxItem>
+			</ListBox>
+			<TextBlock Text="Enter Title or ID" Grid.Row="0" Grid.Column="0" FontSize="20" FontWeight="Bold" Classes="menu" Margin="2,0,0,1" ToolTip.Tip="{CompiledBinding TitleText}"/>
+			<TextBox Name="TitleBox"
+					 FontSize="18"
+					 Grid.Row="1"
+					 Width="518.5"
+					 Grid.Column="0"
+					 Grid.ColumnSpan="3"
+					 FontWeight="Bold"
+                     Height="74"
+					 Text="{CompiledBinding TitleText}"
+					 Classes="menu"
+					 BorderThickness="2"
+					 TextWrapping="Wrap"
+					 Watermark="Title or AniList/MangaDex ID..."/>
+            <TextBlock Text="Publisher" Grid.Row="3" Grid.Column="0" FontSize="20" FontWeight="Bold" Classes="menu" Margin="2,0,0,1" ToolTip.Tip="{CompiledBinding PublisherText}"/>
+			<TextBox Name="PublisherTextBox"
+					 FontSize="18"
+					 Grid.Row="4"
+					 Width="518"
+					 Grid.Column="0"
+					 Grid.ColumnSpan="3"
+					 FontWeight="Bold"
+                     Height="37"
+					 Text="{CompiledBinding PublisherText}"
+					 Classes="menu"
+                     ToolTip.Tip="Optional"
+					 BorderThickness="2"
+                     MaxLength="24"/>
+			<TextBlock Text="Cur Volumes" Grid.Row="6" Grid.Column="0" FontSize="20" FontWeight="Bold" Classes="menu" Margin="2,0,0,1"/>
+			<MaskedTextBox Name="CurVolCount"
+						   Width="247"
+						   Classes="menu"
+						   Grid.Row="7"
+						   Grid.Column="0"
+						   BorderThickness="2"
+						   FontWeight="Bold"
+						   Margin="0,0,10,0"
+						   FontSize="18"
+						   Mask="000"
+						   MaxLength="3"/>
+			<TextBlock Text="Max Volumes" Grid.Row="6" Grid.Column="2" FontSize="20" FontWeight="Bold" Classes="menu" Margin="2,0,0,1"/>
+			<MaskedTextBox Name="MaxVolCount"
+						   Width="247"
+						   Grid.Row="7"
+						   Grid.Column="2"
+						   Classes="menu"
+						   BorderThickness="2"
+						   FontWeight="Bold"
+						   FontSize="18"
+						   Mask="000"
+						   MaxLength="3"/>
+			<TextBlock HorizontalAlignment="Left"
+					   Text="Select Book Type"
+					   Grid.Row="9"
+					   Grid.Column="0"
+					   FontSize="20"
+					   FontWeight="Bold"
+					   Margin="2,0,0,3"
+					   Classes="menu"/>
+			<StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Width="180" Grid.Row="10" Grid.Column="0" Spacing="5" Margin="0,0,10,0">
+				<ToggleButton Name="MangaButton"
+						 	  Width="121"
+							  Checked="IsMangaButtonClicked"
+							  Theme="{StaticResource MenuToggleButton}"
+							  Content="Manga"/>
+				<ToggleButton Name="NovelButton"
+							  Width="121"
+							  Checked="IsNovelButtonClicked"
+							  Theme="{StaticResource MenuToggleButton}"
+							  Content="Novel"/>
+			</StackPanel>
+            <TextBlock Text="Demographic"
+                       FontWeight="Bold"
+                       FontSize="20"
+                       Grid.Row="9"
+					   Grid.Column="2"
+                       Margin="2,0,0,3"
+                       Classes="menu"/>
+            <ComboBox Name="DemographicCombobox"
+                      Theme="{StaticResource MenuComboBox}"
+                      SelectedIndex="4"
+                      ToolTip.Tip="Optional"
+                      Width="247"
+                      Height="37"
+                      Grid.Row="10"
+					  Grid.Column="2">
+                <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Shounen</ComboBoxItem>
+                <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Shoujo</ComboBoxItem>
+                <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Seinen</ComboBoxItem>
+                <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Josei</ComboBoxItem>
+                <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Unknown</ComboBoxItem>
+            </ComboBox>
+            <TextBlock Text="Volumes Read"
+                       FontWeight="Bold"
+                       FontSize="20"
+                       Grid.Row="12"
+					   Grid.Column="0"
+                       Margin="2,0,0,3"
+                       Classes="menu"/>
+            <MaskedTextBox Name="VolumesRead"
+                           HorizontalAlignment="Left"
+                           ToolTip.Tip="Optional"
+						   Width="247"
+						   Grid.Row="13"
+						   Grid.Column="0"
+						   Classes="menu"
+						   BorderThickness="2"
+						   FontWeight="Bold"
+						   FontSize="18"
+						   Mask="000"
+						   MaxLength="3"/>
+            <TextBlock Text="Rating"
+                       FontWeight="Bold"
+                       FontSize="20"
+                       Grid.Row="12"
+					   Grid.Column="2"
+                       Margin="2,0,0,3"
+                       Classes="menu"/>
+            <MaskedTextBox Name="Rating"
+						   Width="247"
+						   Grid.Row="13"
+						   Grid.Column="2"
+                           ToolTip.Tip="Optional"
+						   Classes="menu"
+						   BorderThickness="2"
+						   FontWeight="Bold"
+						   FontSize="18"
+                           HorizontalContentAlignment="Center"
+                           Mask="90.0/1\0.\0"/>
+            <TextBlock Text="Value"
+					   Grid.Row="15"
+					   Grid.Column="0"
+					   FontSize="20"
+					   FontWeight="Bold"
+					   Margin="2,0,0,3"
+					   Classes="menu"/>
+            <MaskedTextBox Name="ValueMaskedTextBox"
+                           HorizontalAlignment="Left"
+                           ToolTip.Tip="Optional"
+                           PromptChar=" "
+						   Width="247"
+						   Grid.Row="16"
+						   Grid.Column="0"
+						   Classes="menu"
+						   BorderThickness="2"
+                           HorizontalContentAlignment="Center"
+						   FontWeight="Bold"
+                           Mask="{Binding CurCurrencyInstance, StringFormat='{}{0}000000000000000000.00'}"
+						   FontSize="18"/>
+			<TextBlock Text="Add Series"
+					   Grid.Row="15"
+					   Grid.Column="2"
+					   FontSize="20"
+					   FontWeight="Bold"
+					   Margin="2,0,0,3"
+					   Classes="menu"/>
+			<Button Name="AddSeriesButton"
+					Content="Add New Series"
+					Click="OnAddSeriesButtonClicked"
+					Theme="{StaticResource MenuButton}"
+					Width="247"
+					Height="37"
+					IsEnabled="{CompiledBinding IsAddSeriesButtonEnabled}"
+					FontSize="18"
+					Grid.Row="16"
+					Grid.Column="2">
+			</Button>
+            <TextBlock Text="Cover Image" Grid.Row="18" Grid.Column="0" Grid.ColumnSpan="3" FontSize="20" FontWeight="Bold" Classes="menu" Margin="2,0,0,3" ToolTip.Tip="{CompiledBinding CoverImageUrl}"/>
+			<StackPanel Orientation="Horizontal" Spacing="5" Grid.Row="19" Grid.Column="0" Grid.ColumnSpan="4">
+                <TextBox Name="CoverImageUrlTextBox"
+					 FontSize="18"
+                     Width="474"
+					 FontWeight="Bold"
+                     Height="37"
+					 Text="{CompiledBinding CoverImageUrl}"
+					 Classes="menu"
+					 BorderThickness="2"
+                     ToolTip.Tip="Optional"
+					 Watermark="Optional Image Url (Hover Title to see Full Text)"/>
+                <ToggleButton Name="AllowDuplicateButton"
+                              IsChecked="{CompiledBinding AllowDuplicate, Mode=TwoWay}"
+                              FontSize="20"
+                              Theme="{StaticResource MenuToggleButton}"
+                              ToolTip.Tip="Allow Duplicate"
+                              i:Attached.Icon="fa-solid fa-clone"/>
+            </StackPanel>
+		</Grid>
+	</Border>
+</Window>

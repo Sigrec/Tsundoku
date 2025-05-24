@@ -1,0 +1,29 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:Tsundoku"
+			 xmlns:vm="using:Tsundoku.ViewModels"
+             xmlns:cv="clr-namespace:Tsundoku.Helpers"
+			 RequestedThemeVariant="Dark"
+			 x:DataType="vm:MainWindowViewModel"
+             x:Class="Tsundoku.App">
+	<Application.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceInclude Source="/Styles/UniversalNavControlThemes.xaml"/>
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>
+	</Application.Resources>
+
+    <Application.Styles>
+		<FluentTheme/>
+		<StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
+		<StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml" />
+		<StyleInclude Source="/Styles/MenuTheme.xaml" />
+    </Application.Styles>
+
+    <TrayIcon.Icons>
+		<TrayIcons>
+			<TrayIcon Icon="\Assets\Icons\Tsundoku-Logo.ico" ToolTipText="Tsundoku"/>
+		</TrayIcons>
+  	</TrayIcon.Icons>
+</Application>

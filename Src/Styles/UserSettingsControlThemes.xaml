@@ -1,0 +1,62 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					xmlns:vm="clr-namespace:Tsundoku.ViewModels"
+					x:DataType="vm:UserSettingsViewModel">
+
+    <ControlTheme x:Key="UserSettingsButton" TargetType="Button">
+		<Setter Property="HorizontalContentAlignment" Value="Center"/>
+		<Setter Property="VerticalContentAlignment" Value="Center"/>
+		<Setter Property="CornerRadius" Value="2"/>
+		<Setter Property="FontWeight" Value="Bold"/>
+		<Setter Property="FontSize" Value="15"/>
+		<Setter Property="BorderThickness" Value="2"/>
+		<Setter Property="Margin" Value="3"/>
+		<Setter Property="RenderTransform" Value="none" />
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+		<Setter Property="Padding" Value="{DynamicResource ButtonPadding}" />
+        <Setter Property="Cursor" Value="Hand"/>
+		<Setter Property="Transitions">
+			<Transitions>
+				<TransformOperationsTransition Property="RenderTransform" Duration="0:0:.075" />
+			</Transitions>
+		</Setter>
+        <Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBGColor}"/>
+        <Setter Property="BorderBrush" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBorderColor}"/>
+        <Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuButtonTextAndIconColor}"/>
+
+        <Setter Property="Template">
+			<ControlTemplate>
+				<ContentPresenter x:Name="PART_ContentPresenter"
+								Background="{TemplateBinding Background}"
+								BorderBrush="{TemplateBinding BorderBrush}"
+								BorderThickness="{TemplateBinding BorderThickness}"
+								CornerRadius="{TemplateBinding CornerRadius}"
+								Content="{TemplateBinding Content}"
+								ContentTemplate="{TemplateBinding ContentTemplate}"
+								Padding="{TemplateBinding Padding}"
+								RecognizesAccessKey="True"
+								HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+								VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+			</ControlTemplate>
+		</Setter>
+
+        <Style Selector="^:pointerover">
+			<Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBGHoverColor}"/>
+			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBorderHoverColor}"/>
+			<Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuButtonTextAndIconHoverColor}"/>
+		</Style>
+	
+		<Style Selector="^:pressed">
+			<Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBGHoverColor}"/>
+			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBorderHoverColor}"/>
+			<Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuButtonTextAndIconHoverColor}"/>
+            <Setter Property="RenderTransform" Value="scale(0.98)" />
+		</Style>
+
+        <Style Selector="^:disabled /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBGHoverColor}"/>
+            <Setter Property="BorderBrush" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBorderHoverColor}"/>
+            <Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuButtonTextAndIconHoverColor}"/>
+        </Style>
+	</ControlTheme>
+</ResourceDictionary>

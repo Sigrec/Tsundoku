@@ -1,0 +1,402 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+        xmlns:vm="clr-namespace:Tsundoku.ViewModels"
+        xmlns:local="clr-namespace:Tsundoku.Models"
+        x:Class="Tsundoku.Views.EditSeriesInfoWindow"
+        x:DataType="vm:EditSeriesInfoViewModel"
+        Classes="menu"
+        FontFamily="Segoe UI"
+        WindowStartupLocation="CenterScreen"
+        SizeToContent="WidthAndHeight"
+        CanResize="false">
+
+    <Border Classes="menu" BorderThickness="3" CornerRadius="0,0,8,8" ClipToBounds="True">
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Theme="{StaticResource ReverseCollectionScroll}"> 
+            <Grid
+                RowDefinitions="Auto,20,Auto,Auto,20,Auto,Auto,2,Auto,7,Auto"
+                ColumnDefinitions="*,15,*,15,*"
+                Margin="20,20,20,20"
+                ShowGridLines="false">
+                <StackPanel
+                    Grid.Column="0"
+                    Grid.ColumnSpan="3"
+                    Grid.Row="0"
+                    Width="540"
+                    Spacing="7"
+                    Orientation="Horizontal"
+                    Height="200">
+                    <TextBox
+                        Name="SeriesNotesTextBox"
+                        Width="476"
+                        Height="200"
+                        HorizontalAlignment="Left"
+                        Text="{CompiledBinding Series.SeriesNotes, Mode=TwoWay}"
+                        AcceptsReturn="True" 
+                        TextWrapping="Wrap"
+                        BorderThickness="2"
+                        Watermark="Notes..."
+                        ScrollViewer.IsScrollChainingEnabled="false"
+                        FontWeight="Bold"
+                        FontSize="16"
+                        Classes="menu"/>
+                    <StackPanel
+                        Spacing="10"
+                        Height="200"
+                        Width="55"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center">
+                        <Button
+                            Name="DeleteSeriesButton"
+                            BorderThickness="2"
+                            i:Attached.Icon="fa-trash-can"
+                            Cursor="Hand"
+                            FontSize="28" 
+                            Height="45"
+                            Padding="0,0,1,0"
+                            Theme="{StaticResource MenuButton}"
+                            Click="RemoveSeriesAsync"/>
+                        <MaskedTextBox
+                            Name="CurVolumeMaskedTextBox"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            Padding="1,0,0,0"
+                            BorderThickness="2"
+                            FontWeight="Bold"
+                            FontSize="18"
+                            MinWidth="55"
+                            MinHeight="40"
+                            TextAlignment="Center"
+                            MaxLength="3"
+                            ToolTip.Tip="Cur"
+                            Classes="menu"
+                            Mask="###"/>
+                        <MaskedTextBox 
+                            Name="MaxVolumeMaskedTextBox"
+                            HorizontalContentAlignment="Center"
+                            VerticalContentAlignment="Center"
+                            Padding="1,0,0,0"
+                            BorderThickness="2"
+                            FontWeight="Bold"
+                            FontSize="18"
+                            MinWidth="55"
+                            MinHeight="40"
+                            TextAlignment="Center"
+                            MaxLength="3"
+                            ToolTip.Tip="Max"
+                            Classes="menu"
+                            Mask="###"/>
+                        <Button
+                            Name="ChangeSeriesVolumeCountButton"
+                            BorderThickness="2" 
+                            i:Attached.Icon="fa-repeat"
+                            Cursor="Hand"
+                            FontSize="28" 
+                            Height="45"
+                            Padding="0,0,1,0"
+                            Theme="{StaticResource MenuButton}"
+                            Click="ChangeSeriesVolumeCountsAsync"/>
+                    </StackPanel>
+                </StackPanel>
+                <Line Grid.ColumnSpan="3" Grid.Column="0" Grid.Row="1" StartPoint="0,10" EndPoint="550,10" VerticalAlignment="Center" HorizontalAlignment="Center" Stroke="{CompiledBinding CurrentThemeInstance.DividerColor}" StrokeThickness="3"/>
+                <TextBlock
+                    Name="CoverImageTextBlock"
+                    Text="Cover Image"
+                    Grid.Row="2"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="3"
+                    FontSize="20"
+                    FontWeight="Bold"
+                    Classes="menu"
+                    TextDecorations="Underline"
+                    Margin="2,0,0,3"
+                    HorizontalAlignment="Left"
+                    ToolTip.Tip="{CompiledBinding CoverImageUrl}"/>
+                <StackPanel Orientation="Horizontal" Spacing="5" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3">
+                    <TextBox 
+                        Name="CoverImageUrlTextBox"
+                        FontSize="18"
+                        Width="450"
+                        FontWeight="Bold"
+                        Height="38"
+                        Text="{CompiledBinding CoverImageUrl}"
+                        Classes="menu"
+                        BorderThickness="2"
+                        ToolTip.Tip="Optional"
+                        Watermark="Image Url (Hover Title to see Full Text)"/>
+                    <Button 
+                        Name="ChangeCoverLinkButton"
+                        FontSize="20"
+                        Theme="{StaticResource MenuButton}"
+                        ToolTip.Tip="Change Cover From Link"
+                        VerticalContentAlignment="Center"
+                        HorizontalContentAlignment="Center"
+                        Click="ChangeCoverFromLinkAsync"
+                        i:Attached.Icon="fa-solid fa-circle-down"/>
+                    <Button 
+                        Name="ChangeCoverFileButton"
+                        i:Attached.Icon="fa-solid fa-image"
+                        FontSize="20"
+                        Click="ChangeSeriesCoverFromFileAsync"
+                        VerticalContentAlignment="Center"
+                        HorizontalContentAlignment="Center"
+                        ToolTip.Tip="Change Cover From File"
+                        Theme="{StaticResource MenuButton}"/>
+                </StackPanel>
+                <Line Grid.ColumnSpan="3" Grid.Column="0" Grid.Row="4" StartPoint="0,10" EndPoint="550,10" VerticalAlignment="Center" HorizontalAlignment="Center" Stroke="{CompiledBinding CurrentThemeInstance.DividerColor}" StrokeThickness="3"/>
+                <TextBlock
+                    Name="PublisherTextBlock"
+                    Grid.Row="5"
+                    Grid.Column="0"
+                    Classes="menu"
+                    FontWeight="Bold"
+                    Text="Publisher"
+                    TextDecorations="Underline" 
+                    HorizontalAlignment="Center"
+                    ToolTip.Tip="{CompiledBinding Series.Publisher}"
+                    Margin="0,0,0,3"
+                    FontSize="20"/>
+                <TextBox
+                    Name="PublisherTextBox"
+                    Grid.Row="6"
+                    Grid.Column="0"
+                    Height="38"
+                    Width="262"
+                    Classes="menu"
+                    BorderThickness="2"
+                    FontWeight="Bold"
+                    FontSize="17"
+                    TextAlignment="Center"
+                    AcceptsReturn="False"
+                    Text="{CompiledBinding Series.Publisher, Mode=OneTime}"
+                    HorizontalContentAlignment="Center"/>
+                <TextBlock
+                    Name="ValueTextBlock"
+                    Grid.Row="5"
+                    Grid.Column="2"
+                    Classes="menu"
+                    FontWeight="Bold"
+                    TextDecorations="Underline" 
+                    HorizontalAlignment="Center"
+                    Margin="0,0,0,3"
+                    FontSize="20">
+                    <TextBlock.Text>
+                        <MultiBinding StringFormat="{}{0}{1}">
+                            <Binding Path="CurCurrencyInstance"/>
+                            <Binding Path="Series.Value"/>
+                        </MultiBinding>
+                    </TextBlock.Text>
+                </TextBlock>
+                <MaskedTextBox
+                    Name="ValueMaskedTextBox"
+                    Grid.Row="6"
+                    Grid.Column="2"
+                    Height="38"
+                    Width="262"
+                    AcceptsReturn="False"
+                    BorderThickness="2"
+                    FontWeight="Bold"
+                    FontSize="17"
+                    TextAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    Mask="{Binding CurCurrencyInstance, StringFormat='{}{0}000000000000000000.00'}"
+                    VerticalContentAlignment="Center"
+                    Classes="menu"/>
+                <Grid 
+                    Grid.RowDefinitions="Auto,Auto"
+                    Grid.ColumnDefinitions="*,15,*,15,*"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="3"
+                    Grid.Row="8">
+                    <TextBlock
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        Name="RatingTextBlock"
+                        Text="{CompiledBinding Series.Rating, StringFormat='{}Rating {0}/10.0'}"
+                        TextDecorations="Underline" 
+                        FontWeight="Bold"
+                        Classes="menu"
+                        HorizontalAlignment="Center"
+                        Margin="0,0,0,3"
+                        FontSize="20"/>
+                    <MaskedTextBox
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Name="RatingMaskedTextBox"
+                        Height="38"
+                        Width="170"
+                        AcceptsReturn="False"
+                        BorderThickness="2"
+                        FontWeight="Bold"
+                        FontSize="17"
+                        TextAlignment="Left"
+                        Classes="menu"
+                        HorizontalContentAlignment="Center"
+                        HidePromptOnLeave="True"
+                        Mask="90.0/1\0.\0"/>
+                    <TextBlock
+                        Grid.Row="0"
+                        Grid.Column="2"
+                        Text="Demographic"
+                        TextDecorations="Underline"
+						Classes="menu"
+                        FontWeight="Bold"
+                        HorizontalAlignment="Center"
+                        Margin="0,0,0,3"
+                        FontSize="20"/>
+                    <ComboBox
+                        Name="DemographicComboBox"
+                        SelectionChanged="DemographicChanged"
+                        Grid.Row="1"
+                        Grid.Column="2"
+                        Theme="{StaticResource MenuComboBox}"
+                        Height="38"
+                        FontWeight="Bold"
+                        FontSize="17"
+                        Width="170"
+                        SelectedIndex="{CompiledBinding DemographicIndex}"
+                        BorderThickness="2"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center"
+                        Cursor="Hand"
+                        AutoScrollToSelectedItem="True">
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Shounen</ComboBoxItem>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Shoujo</ComboBoxItem>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Seinen</ComboBoxItem>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Josei</ComboBoxItem>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Unknown</ComboBoxItem>
+                    </ComboBox>
+                    <TextBlock
+                        Grid.Row="0"
+                        Grid.Column="4"
+                        Name="VolumesReadTextBlock"
+                        FontWeight="Bold"
+                        ToolTip.Tip="Volumes Read"
+                        HorizontalAlignment="Center"
+                        TextDecorations="Underline"
+                        Classes="menu"
+                        Margin="0,0,0,3"
+                        FontSize="20"/>
+                    <MaskedTextBox
+                        Grid.Row="1"
+                        Grid.Column="4"
+                        Name="VolumesReadMaskedTextBox"
+                        Height="38"
+                        Width="170"
+                        ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                        AcceptsReturn="False"
+                        TextWrapping="NoWrap"
+                        AcceptsTab="False"
+                        BorderThickness="2"
+                        FontWeight="Bold"
+                        FontSize="17"
+                        TextAlignment="Left"
+                        HorizontalContentAlignment="Center"
+                        Classes="menu"
+                        Mask="000"/>
+                </Grid>
+                <StackPanel
+                    Grid.Column="0"
+                    Grid.ColumnSpan="5"
+                    Grid.Row="10"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Margin="0,8,0,0"
+                    Spacing="10">
+                    <Button 
+                        FontSize="17"
+                        VerticalContentAlignment="Center"
+                        HorizontalContentAlignment="Center"
+                        ToolTip.Tip="Refresth Series Info"
+                        Click="RefreshSeriesAsync"
+                        Theme="{StaticResource MenuButton}">
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal" Spacing="3">
+                                <i:Icon Value="fa-solid fa-arrow-rotate-right" FontSize="20" Animation="Spin" />
+                                <TextBlock Text="Refresh"/>
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
+                    <Button
+                        FontSize="17"
+                        VerticalContentAlignment="Center"
+                        HorizontalContentAlignment="Center"
+                        ToolTip.Tip="Save Changed Data"
+                        Click="SaveStats"
+                        Theme="{StaticResource MenuButton}">
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal" Spacing="3">
+                                <i:Icon Value="fa-solid fa-floppy-disk" FontSize="20" />
+                                <TextBlock Text="Save" />
+                            </StackPanel>
+                        </Button.Content>
+                    </Button>
+                    <ToggleButton
+                        Name="FavoriteButton"
+                        IsChecked="{CompiledBinding Series.IsFavorite, Mode=TwoWay}"
+                        FontSize="17"
+                        VerticalContentAlignment="Center"
+                        HorizontalContentAlignment="Center"
+                        Click="ToggleSeriesFavoriteAsync"
+                        Theme="{StaticResource MenuToggleButton}">
+                        <Button.Content>
+                            <StackPanel Orientation="Horizontal" Spacing="3">
+                                <i:Icon Value="fa-solid fa-star" FontSize="20" />
+                                <TextBlock Text="Favorite"/>
+                            </StackPanel>
+                        </Button.Content>
+                    </ToggleButton>
+                </StackPanel>
+                <StackPanel
+                    Orientation="Vertical"
+                    Spacing="3"
+                    Margin="0,-8,0,0"
+                    Grid.Row="0"
+                    Grid.RowSpan="10"
+                    Grid.Column="4">
+                    <TextBlock
+                        Name="GenresTextBlock"
+                        HorizontalAlignment="Left"  
+                        Text="Genres" 
+                        FontSize="20" 
+                        FontWeight="Bold" 
+                        Classes="menu" 
+                        Margin="2,0,0,0"
+                        TextDecorations="Underline"
+                        ToolTip.Tip="{CompiledBinding GenresToolTipText}" 
+                        ToolTip.IsEnabled="{CompiledBinding GenresToolTipText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                    <ListBox
+                        Name="GenreSelector"
+                        SelectedItems="{CompiledBinding SelectedGenres}"
+                        SelectionMode="Multiple,Toggle"
+                        Height="424" 
+                        Width="186"
+                        VerticalAlignment="Top"
+                        Theme="{StaticResource QueryListBox}">
+                            <ListBoxItem Name="ActionListBoxItem" Theme="{StaticResource QueryListBoxItem}">Action</ListBoxItem>
+                            <ListBoxItem Name="AdventureListBoxItem" Theme="{StaticResource QueryListBoxItem}">Adventure</ListBoxItem>
+                            <ListBoxItem Name="ComedyListBoxItem" Theme="{StaticResource QueryListBoxItem}">Comedy</ListBoxItem>
+                            <ListBoxItem Name="DramaListBoxItem" Theme="{StaticResource QueryListBoxItem}">Drama</ListBoxItem>
+                            <ListBoxItem Name="EcchiListBoxItem" Theme="{StaticResource QueryListBoxItem}">Ecchi</ListBoxItem>
+                            <ListBoxItem Name="FantasyListBoxItem" Theme="{StaticResource QueryListBoxItem}">Fantasy</ListBoxItem>
+                            <ListBoxItem Name="HorrorListBoxItem" Theme="{StaticResource QueryListBoxItem}">Horror</ListBoxItem>
+                            <ListBoxItem Name="MahouShoujoListBoxItem" Theme="{StaticResource QueryListBoxItem}">Mahou Shoujo</ListBoxItem>
+                            <ListBoxItem Name="MechaListBoxItem" Theme="{StaticResource QueryListBoxItem}">Mecha</ListBoxItem>
+                            <ListBoxItem Name="MusicListBoxItem" Theme="{StaticResource QueryListBoxItem}">Music</ListBoxItem>
+                            <ListBoxItem Name="MysteryListBoxItem" Theme="{StaticResource QueryListBoxItem}">Mystery</ListBoxItem>
+                            <ListBoxItem Name="PsychologicalListBoxItem" Theme="{StaticResource QueryListBoxItem}">Psychological</ListBoxItem>
+                            <ListBoxItem Name="RomanceListBoxItem" Theme="{StaticResource QueryListBoxItem}">Romance</ListBoxItem>
+                            <ListBoxItem Name="SciFiListBoxItem" Theme="{StaticResource QueryListBoxItem}">Sci-Fi</ListBoxItem>
+                            <ListBoxItem Name="SliceOfLifeListBoxItem" Theme="{StaticResource QueryListBoxItem}">Slice of Life</ListBoxItem>
+                            <ListBoxItem Name="SportsListBoxItem" Theme="{StaticResource QueryListBoxItem}">Sports</ListBoxItem>
+                            <ListBoxItem Name="SupernaturalListBoxItem" Theme="{StaticResource QueryListBoxItem}">Supernatural</ListBoxItem>
+                            <ListBoxItem Name="ThrillerListBoxItem" Theme="{StaticResource QueryListBoxItem}">Thriller</ListBoxItem>
+                    </ListBox>
+                </StackPanel>
+            </Grid>
+        </ScrollViewer>
+    </Border>
+</Window>

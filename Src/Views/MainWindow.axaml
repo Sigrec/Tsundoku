@@ -1,0 +1,682 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:local="clr-namespace:Tsundoku.Models"
+        xmlns:vm="clr-namespace:Tsundoku.ViewModels"
+		xmlns:cv="clr-namespace:Tsundoku.Helpers"
+		xmlns:controls="clr-namespace:Tsundoku.Controls"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+        x:Class="Tsundoku.Views.MainWindow"
+        Icon="\Assets\Icons\Tsundoku-Logo.ico"
+        Title="Tsundoku"
+		Name="TsundokuWindow"
+		FontFamily="Segoe UI" 
+		MinWidth="1000"
+		MinHeight="500"
+		WindowStartupLocation="1"
+		WindowState="2"
+		KeyboardNavigation.TabNavigation="None"
+		x:DataType="vm:MainWindowViewModel">
+
+	<Window.Resources>
+		<ResourceDictionary>
+			<cv:TitleLangConverter x:Key="ConvertTitle"/>
+			<cv:StaffLangConverter x:Key="ConvertStaff"/>
+            <cv:ListToStringConverter x:Key="ListToString"/>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceInclude Source="/Styles/CollectionControlThemes.xaml"/>
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>
+	</Window.Resources>
+
+    <Panel Name="TsundokuPanel">
+        <!-- Notification Popup -->
+        <Border Name="NotificationPopup" ZIndex="2" IsVisible="false" BorderThickness="2" CornerRadius="8" ClipToBounds="True" BorderBrush="{CompiledBinding CurrentThemeInstance.MenuButtonBorderColor}" BoxShadow="0 0 15 6 #B3000000" Margin="0,20,0,0" Height="52" HorizontalAlignment="Center" VerticalAlignment="Top" Background="{CompiledBinding CurrentThemeInstance.CollectionBGColor}">
+            <Grid RowDefinitions="Auto" ColumnDefinitions="Auto,5,Auto,2,Auto" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10,0,10,0">
+                    <Grid.Styles>
+                        <Style Selector="Button">
+                            <Style Selector="^:pointerover /template/ ContentPresenter">
+                                <Setter Property="TextBlock.Foreground" Value="{CompiledBinding CurrentThemeInstance.SeriesProgressButtonsHoverColor}"/>
+                                <Setter Property="Background" Value="Transparent"/>
+                            </Style>
+                        </Style>
+                    </Grid.Styles>
+                    <i:Icon Grid.Row="0" Grid.Column="0" Value="fa-solid fa-bell" FontSize="25" FontWeight="Bold" Foreground="{CompiledBinding CurrentThemeInstance.MenuButtonTextAndIconColor}" Classes="menu"/>
+                    <TextBlock Grid.Row="0" Grid.Column="2" Text="{CompiledBinding NotificationText}" FontSize="20" TextAlignment="Center" FontWeight="Bold" TextWrapping="Wrap" Classes="menu" Foreground="{CompiledBinding CurrentThemeInstance.MenuButtonTextAndIconColor}" VerticalAlignment="Center"/>
+                    <Button Name="CloseNotificationPopupButton"
+                            Grid.Row="0"
+                            Grid.Column="4"
+                            IsDefault="True"
+                            FontSize="25"
+                            Background="{CompiledBinding CurrentThemeInstance.CollectionBGColor}"
+                            BorderThickness="0"
+                            HorizontalContentAlignment="Center"
+                            BorderBrush="{CompiledBinding CurrentThemeInstance.SeriesButtonIconColor}"
+                            Height="{CompiledBinding Source={x:Static local:Constants.BOTTOM_SECTION_CARD_HEIGHT}}"
+                            CornerRadius="0"
+                            Foreground="{CompiledBinding CurrentThemeInstance.SeriesButtonIconColor}"
+                            i:Attached.Icon="fa-solid fa-circle-xmark"
+                            Click="CloseNotificationPopup"/>
+            </Grid>
+        </Border>
+        <!-- Advanced Search Popup -->
+        <Panel Name="AdvancedSearchPopup" ZIndex="1" IsVisible="false" PointerPressed="UnShowAdvancedSearchPopup">
+            <Rectangle Fill="Black" Opacity="0.55"/>
+            <StackPanel Margin="0,165,0,0" HorizontalAlignment="Center" VerticalAlignment="Top">
+                <StackPanel Orientation="Horizontal" Spacing="5">
+                    <AutoCompleteBox 
+                        Name="AdvancedSearchBar"
+                        ItemsSource="{x:Static local:Constants.ADVANCED_SEARCH_FILTERS}" 
+                        Text="{CompiledBinding AdvancedSearchText}"
+                        Classes="query"
+                        KeyUp="RemoveErrorMessage"
+                        Theme="{StaticResource QuerySearchBox}"
+                        MinimumPrefixLength="0"
+                        FilterMode="Custom"
+                        Watermark="Advanced Search Query...">
+                    </AutoCompleteBox>
+                    <Button Name="AdvancedSearchQueryButton"
+                            IsDefault="True"
+                            FontSize="20"
+                            Height="35"
+                            i:Attached.Icon="fa-magnifying-glass"
+                            ToolTip.Placement="Left"
+                            ToolTip.HorizontalOffset="-510"
+                            ToolTip.VerticalOffset="300"
+                            Theme="{StaticResource MenuButton}"
+                            Command="{CompiledBinding StartAdvancedSearch}">
+                        <ToolTip.Tip>
+                            <TextBlock Text="{Binding Source={x:Static local:Constants.ADVANCED_SEARCH_FILTERS}, Converter={StaticResource ListToString}}" FontSize="15"/>
+                        </ToolTip.Tip>
+                    </Button>
+                </StackPanel>
+                <TextBlock Name="AdvancedSearchQueryErrorMessage"
+                        Text="{CompiledBinding AdvancedSearchQueryErrorMessage}"
+                        FontSize="20"
+                        HorizontalAlignment="Center"
+                        FontWeight="Bold"
+                        Foreground="{CompiledBinding CurrentThemeInstance.SearchBarTextColor}"/>
+            </StackPanel>
+        </Panel>
+
+        <DockPanel ZIndex="0">
+            <!-- Menu -->
+            <Border Name="Navigation" 
+                    DockPanel.Dock="Top" 
+                    Classes="menu"
+                    BorderThickness="0,0,0,3"
+                    Height="150">
+                <Grid Margin="0,15,0,15" ColumnDefinitions="*,Auto,10,*" RowDefinitions="Auto,Auto" HorizontalAlignment="Center" VerticalAlignment="Center" ShowGridLines="false">
+                    <StackPanel Margin="0,0,0,1" Orientation="Horizontal" Spacing="0,0,1,1" Grid.Column="1" Grid.Row="0" Height="{CompiledBinding Source={x:Static local:Constants.USER_ICON_HEIGHT}}" HorizontalAlignment="Left" VerticalAlignment="Center">
+                        <Border BorderThickness="2" BorderBrush="{CompiledBinding CurrentThemeInstance.UserIconBorderColor}" CornerRadius="2" ClipToBounds="True" Height="75">
+                            <Image Height="{CompiledBinding Source={x:Static local:Constants.USER_ICON_HEIGHT}}"
+                                   Width="{CompiledBinding Source={x:Static local:Constants.USER_ICON_WIDTH}}"
+                                   Source="{Binding UserIcon}"
+                                   Cursor="Hand"
+                                   PointerPressed="ChangeUserIcon"
+                                   ClipToBounds="True"
+                                   ToolTip.Tip="Change Icon"
+                                   Name="IconImage">
+                            </Image>
+                        </Border>
+                        <TextBlock Name="Username" 
+                                   FontSize="24"
+                                   FontWeight="Bold"
+                                   TextAlignment="Left"
+                                   HorizontalAlignment="Left"
+                                   VerticalAlignment="Center"
+                                   Text="{CompiledBinding UserName, Mode=OneWay}"
+                                   Classes="username"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Grid.Row="1" Orientation="Horizontal" Spacing="5" VerticalAlignment="Bottom" HorizontalAlignment="Left">
+                        <ToggleButton Name="SettingsButton"
+                                i:Attached.Icon="fa-solid fa-gear" 
+                                Width="45"
+                                Height="35"
+                                FontSize="20"
+                                Theme="{StaticResource MenuToggleButton}"
+                                ToolTip.Tip="Settings"
+                                ToolTip.Placement="Bottom"
+                                ToolTip.VerticalOffset="5"
+                                Cursor="Hand"
+                                Click="OpenSettingsDialog"/>
+                        <ToggleButton Name="UserNotesButton"
+                                i:Attached.Icon="fa-solid fa-note-sticky" 
+                                Width="45"
+                                Height="35"
+                                FontSize="20"
+                                Theme="{StaticResource MenuToggleButton}"
+                                ToolTip.Tip="Notes"
+                                ToolTip.Placement="Bottom"
+                                ToolTip.VerticalOffset="5"
+                                Cursor="Hand"
+                                Click="OpenUserNotesDialog"/>
+                        <ToggleButton Name="AddNewSeriesButton"
+                                Theme="{StaticResource MenuToggleButton}"
+                                i:Attached.Icon="fa-solid fa-square-plus" 
+                                Width="45"
+                                Height="35"
+                                FontSize="20"
+                                ToolTip.Tip="Add Series"
+                                ToolTip.Placement="Bottom"
+                                ToolTip.VerticalOffset="5"
+                                Cursor="Hand"
+                                Click="OpenAddSeriesDialog"/>
+                        <ToggleButton Name="ThemeButton" 
+                                Theme="{StaticResource MenuToggleButton}"
+                                i:Attached.Icon="fa-solid fa-swatchbook" 
+                                Width="45"
+                                Height="35"
+                                FontSize="20"
+                                ToolTip.Tip="Theme"
+                                ToolTip.Placement="Bottom"
+                                ToolTip.VerticalOffset="5"
+                                Cursor="Hand"
+                                Click="OpenThemeSettingsDialog"/>
+                        <ToggleButton Name="StatsButton"
+                                Theme="{StaticResource MenuToggleButton}"
+                                i:Attached.Icon="fa-solid fa-chart-simple" 
+                                Width="45"
+                                Height="35"
+                                FontSize="20"
+                                ToolTip.Tip="Stats"
+                                ToolTip.Placement="Bottom"
+                                ToolTip.VerticalOffset="5"
+                                Cursor="Hand"
+                                Click="OpenCollectionStatsDialog"/>
+                        <ToggleButton Name="AnalysisButton"
+                                Theme="{StaticResource MenuToggleButton}"
+                                i:Attached.Icon="fa-solid fa-table-list" 
+                                Width="45"
+                                Height="35"
+                                FontSize="20"
+                                ToolTip.Tip="Analysis"
+                                ToolTip.Placement="Bottom"
+                                ToolTip.VerticalOffset="5"
+                                Cursor="Hand"
+                                Click="OpenPriceAnalysisDialog"/>
+                        <Button Name="DonateButton"
+                                Theme="{StaticResource MenuButton}"
+                                i:Attached.Icon="fa-solid fa-circle-dollar-to-slot"
+                                Width="45"
+                                Height="35"
+                                FontSize="20"
+                                ToolTip.Tip="Donate"
+                                ToolTip.Placement="Bottom"
+                                ToolTip.VerticalOffset="5"
+                                Cursor="Hand"
+                                Click="OpenDonationLink"/>
+                    </StackPanel>
+                    <StackPanel HorizontalAlignment="Left" Grid.Column="3" Grid.Row="0" Grid.RowSpan="2" Spacing="6">
+                        <ComboBox Name="LanguageSelector"
+                                SelectionChanged="LanguageChanged"
+                                Height="35"
+                                Width="185"
+                                SelectedIndex="{CompiledBinding LanguageIndex}"
+                                AutoScrollToSelectedItem="True"
+                                ToolTip.Placement="Left"
+                                ToolTip.Tip="Change Language"
+                                ToolTip.HorizontalOffset="-5"
+                                ToolTip.VerticalOffset="0"
+                                Cursor="Hand"
+                                Theme="{StaticResource MenuComboBox}">
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Romaji</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">English</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Japanese</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Arabic</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Azerbaijan</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Bengali</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Bulgarian</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Burmese</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Catalan</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Chinese</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Croatian</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Czech</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Danish</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Dutch</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Esperanto</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Estonian</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Filipino</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Finnish</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">French</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">German</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Greek</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Hebrew</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Hindi</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Hungarian</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Indonesian</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Italian</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Kazakh</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Korean</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Latin</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Lithuanian</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Malay</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Mongolian</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Nepali</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Norwegian</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Persian</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Polish</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Portuguese</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Romanian</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Russian</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Serbian</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Slovak</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Spanish</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Swedish</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Tamil</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Thai</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Turkish</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Ukrainian</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Vietnamese</ComboBoxItem>
+                        </ComboBox>
+                        <ComboBox Name="CollectionFilterSelector"
+                                SelectionChanged="CollectionFilterChanged"
+                                Height="35"
+                                Width="185"
+                                SelectedIndex="{CompiledBinding FilterIndex}"
+                                ToolTip.Placement="Left"
+                                ToolTip.Tip="Change Sort/Filter"
+                                ToolTip.HorizontalOffset="-5"
+                                ToolTip.VerticalOffset="0"
+                                Cursor="Hand"
+                                Theme="{StaticResource MenuComboBox}">
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">None</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Query</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Favorites</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Complete</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Incomplete</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Ongoing</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Finished</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Hiatus</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Cancelled</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Shounen</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Shoujo</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Seinen</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Josei</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Manga</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Novel</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Action</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Adventure</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Comedy</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Drama</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Ecchi</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Fantasy</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Horror</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Mahou Shoujo</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Mecha</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Music</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Mystery</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Psychological</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Romance</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Sci-Fi</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Slice of Life</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Sports</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Supernatural</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Thriller</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Publisher</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Read</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Unread</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Rating</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Value</ComboBoxItem>
+                        </ComboBox>
+                        <TextBox Name="SearchBar" 
+                                Text="{CompiledBinding SearchText, Mode=TwoWay}"
+                                KeyUp="SearchCollection"
+                                Classes="menu"
+                                BorderThickness="2"
+                                Width="185"
+                                FontWeight="Bold"
+                                Watermark="Search..."
+                                Height="35"
+                                FontSize="15"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center">
+                        </TextBox>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- TODO Issue w/ virtualization where refreshing covers causes desc to bug -->
+            <!-- Collection -->
+            <ScrollViewer Name="CollectionTheme" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" DockPanel.Dock="Bottom" Theme="{StaticResource CollectionScroll}"> 
+                <ItemsControl Name="CollectionItems" Margin="20,50,20,50" ItemsSource="{CompiledBinding SearchedCollection}" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel ItemHeight="290" Orientation="Horizontal" HorizontalAlignment="Center"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <!-- Full Card Display -->
+                        <DataTemplate>
+                            <Border Background="Transparent" Margin="20" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 15 6 #B3000000" Width="{CompiledBinding Source={x:Static local:Constants.CARD_WIDTH}}">
+                                <Border CornerRadius="8" ClipToBounds="True" Width="{CompiledBinding Source={x:Static local:Constants.CARD_WIDTH}}">
+                                    <Grid Width="{CompiledBinding Source={x:Static local:Constants.CARD_WIDTH}}"
+                                          Grid.ColumnDefinitions="Auto,Auto"
+                                          ShowGridLines="false">
+                                        <Grid.Styles>
+                                            <Style Selector="ToolTip">
+                                                <Setter Property="Background" Value="{Binding DataContext.CurrentThemeInstance.StatusAndBookTypeBGColor, RelativeSource={RelativeSource AncestorType=Window}} RelativeSource={RelativeSource AncestorType=Window}}"/>
+                                                <Setter Property="BorderBrush" Value="{Binding DataContext.CurrentThemeInstance.MenuButtonBorderColor, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                                                <Setter Property="Foreground" Value="{Binding DataContext.CurrentThemeInstance.MenuButtonTextAndIconColor, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                                            </Style>
+                                        </Grid.Styles>
+
+                                        <!-- Left Side Card -->
+                                        <Canvas Grid.Column="0"
+                                                Grid.Row="0"
+                                                PointerPressed="OpenSiteLink"
+                                                OpacityMask="White"
+                                                Cursor="Hand"
+                                                Width="{CompiledBinding Source={x:Static local:Constants.LEFT_SIDE_CARD_WIDTH}}">
+                                            <Canvas.Styles>
+                                                <Style Selector="TextBlock.mouseover">
+                                                    <Setter Property="Background" Value="{Binding DataContext.CurrentThemeInstance.StatusAndBookTypeBGHoverColor, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                                                    <Setter Property="Foreground" Value="{Binding DataContext.CurrentThemeInstance.StatusAndBookTypeTextHoverColor, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                                                </Style>
+                                                <Style Selector="TextBlock.nomouseover">
+                                                    <Setter Property="Background" Value="{Binding DataContext.CurrentThemeInstance.StatusAndBookTypeBGColor, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                                                    <Setter Property="Foreground" Value="{Binding DataContext.CurrentThemeInstance.StatusAndBookTypeTextColor, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                                                </Style>
+                                            </Canvas.Styles>
+
+                                            <!-- Top Left Side Card -->
+                                            <Image Height="{CompiledBinding Source={x:Static local:Constants.IMAGE_HEIGHT}}"
+                                                    Width="{CompiledBinding Source={x:Static local:Constants.LEFT_SIDE_CARD_WIDTH}}"
+                                                    Source="{CompiledBinding CoverBitMap}"
+                                                    ClipToBounds="True">
+                                            </Image>
+
+                                            <!-- Bottom Left Side Card -->
+                                            <TextBlock 
+                                                Canvas.Bottom="0" 
+                                                Classes.mouseover="{CompiledBinding $parent.IsPointerOver}"
+                                                Classes.nomouseover="{Binding !$parent.IsPointerOver}"
+                                                Width="{CompiledBinding Source={x:Static local:Constants.LEFT_SIDE_CARD_WIDTH}}"
+                                                Height="{CompiledBinding Source={x:Static local:Constants.BOTTOM_SECTION_CARD_HEIGHT}}"
+                                                FontWeight="Bold"
+                                                FontSize="17"
+                                                TextAlignment="Center"
+                                                Padding="0,8,0,0">
+                                                <TextBlock.Text>
+                                                    <MultiBinding StringFormat="{}{0} | {1}" Mode="OneWay">
+                                                        <Binding Path="Status"/>
+                                                        <Binding Path="Format"/>
+                                                    </MultiBinding>
+                                                </TextBlock.Text>
+                                            </TextBlock>
+                                        </Canvas>
+
+                                        <!-- Right Side Series Card -->
+                                        <Grid Grid.Row="0"
+                                              Grid.Column="1"
+                                              Width="{CompiledBinding Source={x:Static local:Constants.RIGHT_SIDE_CARD_WIDTH}}"
+                                              DockPanel.Dock="Right" 
+                                              RowDefinitions="Auto, 40"
+                                              ShowGridLines="false">
+                                            <Grid.Styles>
+                                                <Style Selector="ScrollViewer">
+                                                    <Setter Property="IsScrollChainingEnabled" Value="false"/>
+                                                </Style>
+                                                <Style Selector="ScrollBar:vertical">
+                                                    <Style Selector="^ /template/ Rectangle#TrackRect">
+                                                        <Setter Property="Fill" Value="{Binding DataContext.CurrentThemeInstance.CollectionBGColor, RelativeSource={RelativeSource AncestorType=Window}}" />
+                                                    </Style>
+
+                                                    <Style Selector="^ /template/ Thumb">
+                                                        <Setter Property="Background" Value="{Binding DataContext.CurrentThemeInstance.DividerColor, RelativeSource={RelativeSource AncestorType=Window}}" />
+                                                        <Style Selector="^:pointerover /template/ Border">
+                                                            <Setter Property="Background" Value="{Binding DataContext.CurrentThemeInstance.DividerColor, RelativeSource={RelativeSource AncestorType=Window}}" />
+                                                        </Style>
+                                                        <Style Selector="^:pressed /template/ Border">
+                                                            <Setter Property="Background" Value="{Binding DataContext.CurrentThemeInstance.DividerColor, RelativeSource={RelativeSource AncestorType=Window}}" />
+                                                        </Style>
+                                                    </Style>
+
+                                                    <Style Selector="^[IsExpanded=true]">
+                                                        <Style Selector="^ /template/ Thumb">
+                                                            <Setter Property="Background" Value="{Binding DataContext.CurrentThemeInstance.DividerColor, RelativeSource={RelativeSource AncestorType=Window}}" />
+                                                        </Style>
+
+                                                        <Style Selector="^ /template/ PathIcon">
+                                                            <Setter Property="Foreground" Value="{Binding DataContext.CurrentThemeInstance.DividerColor, RelativeSource={RelativeSource AncestorType=Window}}" />
+                                                        </Style>
+
+                                                        <Style Selector="^ /template/ Rectangle#TrackRect">
+                                                            <Setter Property="Fill" Value="{Binding DataContext.CurrentThemeInstance.MenuBGColor, RelativeSource={RelativeSource AncestorType=Window}}" />
+                                                        </Style>
+                                                    </Style>
+
+                                                    <Style Selector="^ /template/ RepeatButton#PART_LineUpButton, ^ /template/ RepeatButton#PART_LineDownButton">
+                                                        <Setter Property="TextElement.Foreground" Value="{Binding DataContext.CurrentThemeInstance.DividerColor, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                                                        <Style Selector="^:pointerover">
+                                                            <Setter Property="TextElement.Foreground" Value="{Binding DataContext.CurrentThemeInstance.MenuButtonTextAndIconHoverColor, RelativeSource={RelativeSource AncestorType=Window}}"/>
+
+                                                            <Style Selector="^ /template/ ContentPresenter" >
+                                                                <Setter Property="Background" Value="{Binding DataContext.CurrentThemeInstance.DividerColor, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                                                            </Style>
+                                                            <Style Selector="^ PathIcon">
+                                                                <Setter Property="Foreground" Value="{Binding DataContext.CurrentThemeInstance.CollectionBGColor, RelativeSource={RelativeSource AncestorType=Window}}" />
+                                                            </Style>
+                                                        </Style>
+
+                                                        <Style Selector="^:pressed">
+                                                            <Setter Property="TextElement.Foreground" Value="{Binding DataContext.CurrentThemeInstance.MenuBGColor, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                                                            <Style Selector="^ /template/ ContentPresenter" >
+                                                                <Setter Property="Background" Value="{Binding DataContext.CurrentThemeInstance.DividerColor, RelativeSource={RelativeSource AncestorType=Window}}" />
+                                                            </Style>
+                                                            <Style Selector="^ PathIcon">
+                                                                <Setter Property="Foreground" Value="{Binding DataContext.CurrentThemeInstance.CollectionBGColor, RelativeSource={RelativeSource AncestorType=Window}}" />
+                                                            </Style>
+                                                        </Style>
+                                                    </Style>
+                                                </Style>
+                                            </Grid.Styles>
+
+                                            <!-- Top Right Side Card Series Data Pane -->
+                                            <Grid Height="{CompiledBinding Source={x:Static local:Constants.TOP_SECTION_CARD_HEIGHT}}" 
+                                                    Grid.Row="0"
+                                                    Width="{CompiledBinding Source={x:Static local:Constants.RIGHT_SIDE_CARD_WIDTH}}"
+                                                    Grid.RowDefinitions="Auto,Auto,Auto,*"
+                                                    Background="{Binding DataContext.CurrentThemeInstance.SeriesCardBGColor, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    ShowGridLines="false">
+                                                <Grid.Styles>
+                                                    <Style Selector="ScrollBar:vertical">
+                                                        <Style Selector="^[IsExpanded=true]">
+                                                            <Style Selector="^ /template/ Rectangle#TrackRect">
+                                                                <Setter Property="Fill" Value="{Binding DataContext.CurrentThemeInstance.CollectionBGColor, RelativeSource={RelativeSource AncestorType=Window}}" />
+                                                            </Style>
+                                                        </Style>
+                                                    </Style>
+                                                </Grid.Styles>
+                                                <!-- <Border Grid.Row="0" BorderBrush="Red" BorderThickness="1"> -->
+                                                <!-- MaxLength="24" -->
+                                                <TextBlock Grid.Row="0"
+                                                           Foreground="{Binding DataContext.CurrentThemeInstance.SeriesCardPublisherColor, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                           MaxLines="1"
+                                                           FontSize="15"
+                                                           Text="{CompiledBinding Publisher}"
+                                                           Padding="9,2,4,-1"/>
+                                                <TextBlock Grid.Row="1"
+                                                        TextWrapping="Wrap"
+                                                        Foreground="{Binding DataContext.CurrentThemeInstance.SeriesCardTitleColor, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                        FontWeight="Bold"
+                                                        FontSize="23"
+                                                        MaxHeight="{CompiledBinding Source={x:Static local:Constants.TOP_SECTION_CARD_HEIGHT}}"
+                                                        PointerPressed="CopySeriesTitleAsync"
+                                                        Padding="8,0,7,2"
+                                                        Cursor="Hand"
+                                                        TextAlignment="Left"
+                                                        TextTrimming="WordEllipsis"
+                                                        MaxLines="3"
+                                                        Width="{CompiledBinding Source={x:Static local:Constants.RIGHT_SIDE_CARD_WIDTH}}"
+                                                        LineHeight="25">
+                                                    <TextBlock.Text>
+                                                        <MultiBinding Converter="{StaticResource ConvertTitle}">
+                                                            <Binding Path="Titles"/>
+                                                            <Binding Path="#CollectionTheme.DataContext.CurLanguage"/>
+                                                        </MultiBinding>
+                                                    </TextBlock.Text>
+                                                    <ToolTip.Tip>
+                                                        <TextBlock TextWrapping="Wrap"
+                                                                FontWeight="Bold"
+                                                                FontSize="18"
+                                                                TextTrimming="None"
+                                                                MaxLines="100"
+                                                                LineHeight="25">
+                                                        <TextBlock.Text>
+                                                            <MultiBinding Converter="{StaticResource ConvertTitle}">
+                                                                <Binding Path="Titles"/>
+                                                                <Binding Path="#CollectionTheme.DataContext.CurLanguage"/>
+                                                                <Binding Path="DuplicateIndex"/>
+                                                            </MultiBinding>
+                                                            </TextBlock.Text>
+                                                        </TextBlock>
+                                                    </ToolTip.Tip>
+                                                </TextBlock>
+                                                <!-- </Border> -->
+                                                <TextBlock TextWrapping="Wrap"
+                                                           Grid.Row="2"
+                                                           Foreground="{Binding DataContext.CurrentThemeInstance.SeriesCardStaffColor, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                           MaxLines="2"
+                                                           TextTrimming="WordEllipsis"
+                                                           FontSize="15"
+                                                           Padding="9,0,4,3">
+                                                    <TextBlock.Text>
+                                                        <MultiBinding Converter="{StaticResource ConvertStaff}" Mode="OneWay">
+                                                            <Binding Path="Staff"/>
+                                                            <Binding Path="#CollectionTheme.DataContext.CurLanguage"/>
+                                                        </MultiBinding>
+                                                    </TextBlock.Text>
+                                                    <ToolTip.Tip>
+                                                        <TextBlock TextWrapping="Wrap"
+                                                                FontWeight="Bold"
+                                                                TextTrimming="None"
+                                                                MaxLines="100">
+                                                            <TextBlock.Text>
+                                                                <MultiBinding Converter="{StaticResource ConvertStaff}" Mode="OneWay">
+                                                                    <Binding Path="Staff"/>
+                                                                    <Binding Path="#CollectionTheme.DataContext.CurLanguage"/>
+                                                                </MultiBinding>
+                                                            </TextBlock.Text>
+                                                        </TextBlock>
+                                                    </ToolTip.Tip>
+                                                </TextBlock>
+                                                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                                              HorizontalScrollBarVisibility="Disabled"
+                                                              Grid.Row="3">
+                                                    <TextBlock TextWrapping="Wrap"
+                                                                Foreground="{Binding DataContext.CurrentThemeInstance.SeriesCardDescColor, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                Opacity="0.9"
+                                                                Text="{CompiledBinding Description}"
+                                                                Padding="10,-2,20,10"/>
+                                                </ScrollViewer>
+                                            </Grid>
+
+										    <!-- Bottom Right Side Card -->
+                                            <Grid Height="{CompiledBinding Source={x:Static local:Constants.BOTTOM_SECTION_CARD_HEIGHT}}"
+                                                  Background="{Binding DataContext.CurrentThemeInstance.SeriesProgressBGColor, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                  Width="{CompiledBinding Source={x:Static local:Constants.RIGHT_SIDE_CARD_WIDTH}}"
+                                                  Grid.Row="1"
+                                                  ColumnDefinitions="Auto,Auto">
+                                                <Grid.Styles>
+                                                    <Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                                                        <Setter Property="Background" Value="Transparent"/>
+                                                        <Setter Property="TextBlock.Foreground" Value="{Binding DataContext.CurrentThemeInstance.SeriesButtonIconHoverColor, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                                                    </Style>
+                                                </Grid.Styles>
+                                                <Grid ColumnDefinitions="Auto" RowDefinitions="40" HorizontalAlignment="Center" Grid.Column="0" Grid.ColumnSpan="1">
+                                                    <Grid.Styles>
+                                                        <Style Selector="Button">
+                                                            <Style Selector="^:pointerover /template/ ContentPresenter">
+                                                                <Setter Property="TextBlock.Foreground" Value="{Binding DataContext.CurrentThemeInstance.SeriesProgressButtonsHoverColor, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                                                                <Setter Property="Background" Value="Transparent"/>
+                                                            </Style>
+                                                        </Style>
+                                                    </Grid.Styles>
+                                                    <ProgressBar Height="30"
+                                                                Width="298"
+                                                                Margin="10,0,0,0"
+                                                                Grid.Row="0"
+                                                                Grid.Column="0"
+                                                                Value="{CompiledBinding CurVolumeCount}"
+                                                                Background="{Binding DataContext.CurrentThemeInstance.SeriesProgressBarBGColor, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                Foreground="{Binding DataContext.CurrentThemeInstance.SeriesProgressBarColor, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                BorderBrush="{Binding DataContext.CurrentThemeInstance.SeriesProgressBarBorderColor, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                BorderThickness="1.5"
+                                                                Orientation="Horizontal"
+                                                                Padding="2"
+                                                                FontWeight="Bold"
+                                                                VerticalAlignment="Center"
+                                                                HorizontalAlignment="Center"
+                                                                FontSize="15"
+                                                                Minimum="0"
+                                                                Maximum="{CompiledBinding MaxVolumeCount}"/>
+                                                    <StackPanel Orientation="Horizontal" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center" Margin="10,0,0,0">
+                                                        <Button Background="Transparent"
+                                                            Foreground="{Binding DataContext.CurrentThemeInstance.SeriesProgressTextColor, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                            FontWeight="Bold"
+                                                            Height="15"
+                                                            Width="32"
+                                                            FontSize="31"
+                                                            Margin="0,0,-17,0"
+                                                            Padding="-2,-17,0,0"
+                                                            Cursor="Hand"
+                                                            Click="SubtractVolume"
+                                                            VerticalAlignment="Center"
+                                                            HorizontalAlignment="Center"
+                                                            Content="-"/>
+                                                        <TextBlock TextAlignment="Center" 
+                                                                    FontSize="16" 
+                                                                    FontWeight="Bold" 
+                                                                    Foreground="{Binding DataContext.CurrentThemeInstance.SeriesProgressTextColor, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                    Margin="0,7.5,0,0">
+                                                            <TextBlock.Text>
+                                                                <MultiBinding StringFormat="{}{0}/{1}">
+                                                                    <Binding Path="CurVolumeCount"/>
+                                                                    <Binding Path="MaxVolumeCount"/>
+                                                                </MultiBinding>
+                                                            </TextBlock.Text>
+                                                        </TextBlock>
+                                                        <Button Background="Transparent"
+                                                                Foreground="{Binding DataContext.CurrentThemeInstance.SeriesProgressTextColor, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                FontWeight="Bold"
+                                                                Height="20"
+                                                                Width="21"
+                                                                FontSize="24"
+                                                                Cursor="Hand"
+                                                                Click="AddVolume"
+                                                                Padding="-6,-9.5,0,0"
+                                                                VerticalAlignment="Center"
+                                                                HorizontalAlignment="Center"
+                                                                VerticalContentAlignment="Center"
+                                                                HorizontalContentAlignment="Center"
+                                                                Content="+"/>
+                                                    </StackPanel>
+                                                </Grid>
+                                                <Button Grid.Column="1"
+                                                        Background="{Binding DataContext.CurrentThemeInstance.SeriesProgressBGColor, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                        FontSize="30"
+                                                        Margin="0,0,3,0"
+                                                        BorderThickness="0"
+                                                        HorizontalAlignment="Left"
+                                                        HorizontalContentAlignment="Center"
+                                                        BorderBrush="{Binding DataContext.CurrentThemeInstance.SeriesButtonIconColor, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                        Height="{CompiledBinding Source={x:Static local:Constants.BOTTOM_SECTION_CARD_HEIGHT}}"
+                                                        Foreground="{Binding DataContext.CurrentThemeInstance.SeriesButtonIconColor, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                        i:Attached.Icon="fa-solid fa-square-pen"
+                                                        Cursor="Hand"
+                                                        Click="OpenEditSeriesInfoWindow">
+                                                </Button>
+                                            </Grid>
+                                        </Grid>
+                                    </Grid>
+                                </Border>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+		    </ScrollViewer>
+	    </DockPanel>
+    </Panel>
+</Window>

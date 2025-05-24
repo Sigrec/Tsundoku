@@ -1,0 +1,121 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:vm="clr-namespace:Tsundoku.ViewModels"
+		x:DataType="vm:MainWindowViewModel">
+
+    <!-- <Style Selector="AutoCompleteBox.query">
+        <Style Selector=" ^ ListBox.query > ListBoxItem">
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="Foreground" Value="{Binding CurrentThemeInstance.MenuButtonTextAndIconColor}"/>
+            <Setter Property="Background" Value="Transparent"/>
+
+            <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                <Setter Property="Background" Value="{Binding CurrentThemeInstance.MenuButtonBGHoverColor}"/>
+                <Setter Property="BorderBrush" Value="{Binding CurrentThemeInstance.MenuButtonBorderHoverColor}"/>
+            </Style>
+
+            <Style Selector="^:pressed /template/ ContentPresenter#PART_ContentPresenter">
+                <Setter Property="Background" Value="{Binding CurrentThemeInstance.MenuButtonBGHoverColor}"/>
+                <Setter Property="BorderBrush" Value="{Binding CurrentThemeInstance.MenuButtonBorderHoverColor}"/>
+            </Style>
+
+            <Style Selector="^:selected">
+                <Style Selector="^ /template/ ContentPresenter#PART_ContentPresenter">
+                    <Setter Property="Background" Value="{Binding CurrentThemeInstance.MenuButtonBGHoverColor}"/>
+                    <Setter Property="BorderBrush" Value="{Binding CurrentThemeInstance.MenuButtonBorderHoverColor}"/>
+                </Style>
+
+                <Style Selector="^:not(:focus) /template/ ContentPresenter#PART_ContentPresenter">
+                    <Setter Property="Background" Value="{Binding CurrentThemeInstance.MenuButtonBGHoverColor}"/>
+                    <Setter Property="BorderBrush" Value="{Binding CurrentThemeInstance.MenuButtonBorderHoverColor}"/>
+                </Style>
+
+                <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                    <Setter Property="Background" Value="{Binding CurrentThemeInstance.MenuButtonBGColor}"/>
+                    <Setter Property="BorderBrush" Value="{Binding CurrentThemeInstance.MenuButtonBorderColor}"/>
+                </Style>
+
+                <Style Selector="^:pressed /template/ ContentPresenter#PART_ContentPresenter">
+                    <Setter Property="Background" Value="{Binding CurrentThemeInstance.MenuButtonBGColor}"/>
+                    <Setter Property="BorderBrush" Value="{Binding CurrentThemeInstance.MenuButtonBorderColor}"/>
+                </Style>
+            </Style>
+        </Style>
+    </Style> -->
+
+	<Style Selector="Border.menu">
+		<Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.MenuBGColor}"/>
+		<Setter Property="BorderBrush" Value="{CompiledBinding CurrentThemeInstance.DividerColor}"/>
+	</Style>
+
+	<Style Selector="TextBlock">
+		<Style Selector="^.menu">
+			<Setter Property="TextBlock.Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuTextColor}"/>
+		</Style>
+
+		<Style Selector="^.username">
+			<Setter Property="TextBlock.Foreground" Value="{CompiledBinding CurrentThemeInstance.UsernameColor}"/>
+		</Style>
+	</Style>
+    
+    <Style Selector="ComboBox.Theme > ComboBoxItem">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuButtonTextAndIconColor}"/>
+        
+        <Style Selector="^:pressed /template/ ContentPresenter">
+			<Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBGHoverColor}"/>
+			<Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuButtonTextAndIconHoverColor}"/>
+		</Style>
+
+		<Style Selector="^:pointerover /template/ ContentPresenter">
+			<Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBGHoverColor}"/>
+			<Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuButtonTextAndIconHoverColor}"/>
+		</Style>
+
+		<Style Selector="^:selected">
+			<Style Selector="^ /template/ ContentPresenter">
+				<Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBGHoverColor}"/>
+				<Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuButtonTextAndIconHoverColor}"/>
+			</Style>
+
+            <!-- <Style Selector="^:disabled /template/ ContentPresenter">
+                <Setter Property="Background" Value="{DynamicResource ComboBoxItemBackgroundSelectedDisabled}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource ComboBoxItemBorderBrushSelectedDisabled}" />
+                <Setter Property="TextBlock.Foreground" Value="{DynamicResource ComboBoxItemTextBlock.ForegroundSelectedDisabled}" />
+            </Style> -->
+
+            <Style Selector="^:pointerover /template/ ContentPresenter">
+                <Setter Property="Background" Value="{DynamicResource ComboBoxItemBackgroundSelectedPointerOver}" />
+                <Setter Property="TextBlock.Foreground" Value="{DynamicResource ComboBoxItemForegroundSelectedPointerOver}" />
+            </Style>
+
+            <Style Selector="^:pressed /template/ ContentPresenter">
+                <Setter Property="Background" Value="{DynamicResource ComboBoxItemBackgroundSelectedPressed}" />
+                <Setter Property="TextBlock.Foreground" Value="{DynamicResource ComboBoxItemForegroundSelectedPressed}" />
+            </Style>
+		</Style>
+    </Style>
+
+	<Style Selector="TextBox.menu, MaskedTextBox.menu">
+		<Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.SearchBarBGColor}"/>
+		<Setter Property="BorderBrush" Value="{CompiledBinding CurrentThemeInstance.SearchBarBorderColor}"/>
+		<Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.SearchBarTextColor}"/>
+		<Setter Property="SelectionBrush" Value="{CompiledBinding CurrentThemeInstance.SearchBarTextColor}"/>
+		<Setter Property="SelectionForegroundBrush" Value="{CompiledBinding CurrentThemeInstance.SearchBarBGColor}"/>
+
+		<Style Selector="^:pointerover /template/ Border#PART_BorderElement, ^:pointerover/template/ Border#PART_BorderElement">
+			<Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.SearchBarBGColor}"/>
+			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentThemeInstance.SearchBarBorderColor}"/>
+		</Style>
+
+		<Style Selector="^:focus /template/ Border#PART_BorderElement">
+			<Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.SearchBarBGColor}"/>
+			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentThemeInstance.SearchBarBorderColor}"/>
+		</Style>
+
+        <Style Selector="^ /template/ ScrollViewer#PART_ScrollViewer">
+			<Setter Property="Theme" Value="{StaticResource ReverseCollectionScroll}"/>
+		</Style>
+	</Style>
+</Styles>

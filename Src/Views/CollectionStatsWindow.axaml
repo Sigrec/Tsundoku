@@ -1,0 +1,310 @@
+<Window xmlns="https://github.com/avaloniaui"
+		xmlns:vm="using:Tsundoku.ViewModels"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:controls="clr-namespace:Tsundoku.Controls"
+		xmlns:charts="clr-namespace:Tsundoku.Views"
+		xmlns:lvc="using:LiveChartsCore.SkiaSharpView.Avalonia"
+        x:Class="Tsundoku.Views.CollectionStatsWindow"
+		x:DataType="vm:CollectionStatsViewModel"
+		Icon="\Assets\Icons\Tsundoku-Logo.ico"
+        Title="Stats"
+		FontFamily="Segoe UI"
+        Classes="menu"
+		SizeToContent="WidthAndHeight"
+		WindowStartupLocation="2"
+        WindowState="Maximized"
+        MinWidth="700"
+		CanResize="true">
+
+	<Window.Styles>
+		<StyleInclude Source="/Controls/ValueStat.axaml"/>
+	</Window.Styles>
+
+	<Border Classes="menu" BorderThickness="3" CornerRadius="0,0,8,8" ClipToBounds="True">
+		<ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Theme="{StaticResource ReverseCollectionScroll}"> 
+			<Grid RowDefinitions="Auto,Auto,Auto,20,Auto,20,Auto" ColumnDefinitions="*" Margin="20" VerticalAlignment="Center" HorizontalAlignment="Center">
+				<Border Name="StatsBG" Grid.Row="0" Grid.RowSpan="3" Grid.Column="0" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" Height="230" BoxShadow="0 0 10 3 #B3000000" HorizontalAlignment="Center">
+                    <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="Auto" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10">
+                        <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0" Margin="0,0,0,0" MaxWidth="626" HorizontalAlignment="Center">
+                            <controls:ValueStat Text="{CompiledBinding MeanRating}" Title="Mean Score" Icon="fa-solid fa-gauge-simple" PointerPressed="CopyTextAsync"/>
+                            <controls:ValueStat Text="{CompiledBinding VolumesRead}" Title="Volumes Read" Icon="fa-solid fa-book-open-reader" PointerPressed="CopyTextAsync"/>
+                            <controls:ValueStat Text="{CompiledBinding SeriesCount}" Title="Series Count" Icon="fa-solid fa-globe" PointerPressed="CopyTextAsync"/>
+                        </StackPanel>
+                        <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Center">
+                            <controls:ValueStat Text="{CompiledBinding UsersNumVolumesCollected}" Width="240" Title="Volumes Collected" Icon="fa-solid fa-bookmark" PointerPressed="CopyTextAsync"/>
+                            <controls:ValueStat Width="240" Text="{CompiledBinding UsersNumVolumesToBeCollected}" Title="Volumes To Be Collected" Icon="fa-regular fa-bookmark" PointerPressed="CopyTextAsync"/>
+                        </StackPanel>
+                        <controls:ValueStat Grid.Row="2" Grid.Column="0" HorizontalAlignment="Center" Text="{CompiledBinding CollectionPrice}" Title="Collection Value" Icon="fa-solid fa-sack-dollar" PointerPressed="CopyTextAsync"/>
+                    </Grid>
+                </Border>
+                <!-- Pie Charts -->
+                <Border Name="DistBGOne" Grid.Row="4" Grid.Column="0" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" HorizontalAlignment="Center">
+                    <WrapPanel Margin="10">
+                        <Border Background="{CompiledBinding CurrentThemeInstance.CollectionBGColor}" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" Width="570" Height="300" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10">
+                            <Border CornerRadius="8" ClipToBounds="True">
+                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="3">
+                                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="10" Margin="0,0,20,0">
+                                        <TextBlock  Grid.Row="0" Grid.Column="0" Text="Demographic" FontSize="22" FontWeight="Bold" Classes="menu" HorizontalAlignment="Center" Margin="0"/>
+                                        <Grid RowDefinitions="*,3,*,3,*,3,*,3,*" ColumnDefinitions="Auto,3,Auto" HorizontalAlignment="Center" VerticalAlignment="Center" ShowGridLines="false">
+                                            <Border Grid.Row="0" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentThemeInstance.DividerColor}" ClipToBounds="True" Width="24" Height="24">
+                                                <Rectangle Fill="{CompiledBinding CurrentThemeInstance.MenuBGColor}" ClipToBounds="True" Width="18" Height="18"/>
+                                            </Border>
+                                            <Border Grid.Row="0" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentThemeInstance.DividerColor}" ClipToBounds="True" Width="165" Height="24" OpacityMask="White">
+                                                <TextBlock Background="{CompiledBinding CurrentThemeInstance.MenuBGColor}" Classes="menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
+                                                    <TextBlock.Text>
+                                                        <MultiBinding StringFormat="Shounen {0}% ({1})" Mode="OneWay">
+                                                            <Binding Path="ShounenPercentage"/>
+                                                            <Binding Path="ShounenCount.Value"/>
+                                                        </MultiBinding>
+                                                    </TextBlock.Text>
+                                                </TextBlock>
+                                            </Border>
+                                            <Border Grid.Row="2" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentThemeInstance.DividerColor}" ClipToBounds="True" Width="24" Height="24">
+                                                <Rectangle Fill="{CompiledBinding CurrentThemeInstance.MenuTextColor}" ClipToBounds="True" Width="18" Height="18"/>
+                                            </Border>
+                                            <Border Grid.Row="2" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentThemeInstance.DividerColor}" ClipToBounds="True" Width="165" Height="24">
+                                                <TextBlock Background="{CompiledBinding CurrentThemeInstance.MenuBGColor}" Classes="menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
+                                                    <TextBlock.Text>
+                                                        <MultiBinding StringFormat="Shoujo {0}% ({1})" Mode="OneWay">
+                                                            <Binding Path="ShoujoPercentage"/>
+                                                            <Binding Path="ShoujoCount.Value"/>
+                                                        </MultiBinding>
+                                                    </TextBlock.Text>
+                                                </TextBlock>
+                                            </Border>
+                                            <Border Grid.Row="4" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentThemeInstance.DividerColor}" ClipToBounds="True" Width="24" Height="24">
+                                                <Rectangle Fill="{CompiledBinding CurrentThemeInstance.MenuButtonBGColor}" ClipToBounds="True" Width="18" Height="18"/>
+                                            </Border>
+                                            <Border Grid.Row="4" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentThemeInstance.DividerColor}" ClipToBounds="True" Width="165" Height="24">
+                                                <TextBlock Background="{CompiledBinding CurrentThemeInstance.MenuBGColor}" Classes="menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
+                                                    <TextBlock.Text>
+                                                        <MultiBinding StringFormat="Seinen {0}% ({1})" Mode="OneWay">
+                                                            <Binding Path="SeinenPercentage"/>
+                                                            <Binding Path="SeinenCount.Value"/>
+                                                        </MultiBinding>
+                                                    </TextBlock.Text>
+                                                </TextBlock>
+                                            </Border>
+                                            <Border Grid.Row="6" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentThemeInstance.DividerColor}" ClipToBounds="True" Width="24" Height="24">
+                                                <Rectangle Fill="{CompiledBinding CurrentThemeInstance.DividerColor}" ClipToBounds="True" Width="18" Height="18"/>
+                                            </Border>
+                                            <Border Grid.Row="6" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentThemeInstance.DividerColor}" ClipToBounds="True" Width="165" Height="24">
+                                                <TextBlock Background="{CompiledBinding CurrentThemeInstance.MenuBGColor}" Classes="menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
+                                                <TextBlock.Text>
+                                                        <MultiBinding StringFormat="Josei {0}% ({1})" Mode="OneWay">
+                                                            <Binding Path="JoseiPercentage"/>
+                                                            <Binding Path="JoseiCount.Value"/>
+                                                        </MultiBinding>
+                                                    </TextBlock.Text>
+                                                </TextBlock>
+                                            </Border>
+                                            <Border Grid.Row="8" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentThemeInstance.DividerColor}" ClipToBounds="True" Width="24" Height="24">
+                                                <Rectangle Name="UnknownRectangle" ClipToBounds="True" Width="18" Height="18"/>
+                                            </Border>
+                                            <Border Grid.Row="8" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentThemeInstance.DividerColor}" ClipToBounds="True" Width="165" Height="24">
+                                                <TextBlock Background="{CompiledBinding CurrentThemeInstance.MenuBGColor}" Classes="menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
+                                                <TextBlock.Text>
+                                                        <MultiBinding StringFormat="Unknown {0}% ({1})" Mode="OneWay">
+                                                            <Binding Path="UnknownPercentage"/>
+                                                            <Binding Path="UnknownCount.Value"/>
+                                                        </MultiBinding>
+                                                    </TextBlock.Text>
+                                                </TextBlock>
+                                            </Border>
+                                        </Grid>
+                                    </StackPanel>
+                                    <lvc:PieChart Series="{CompiledBinding Demographics}" Width="300" Height="300" TooltipPosition="Hidden" Margin="0,0,15,0"/>
+                                </StackPanel>
+                            </Border>
+                        </Border>
+                        <Border Background="{CompiledBinding CurrentThemeInstance.CollectionBGColor}" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" Width="570" Height="300"  HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10">
+                            <Border CornerRadius="8" ClipToBounds="True">
+                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="3">
+                                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="10" Margin="0,0,20,0">
+                                        <TextBlock Text="Status" FontSize="22" FontWeight="Bold" Classes="menu" HorizontalAlignment="Center" Margin="0"/>
+                                        <Grid RowDefinitions="*,3,*,3,*,3,*" ColumnDefinitions="Auto,3,Auto" HorizontalAlignment="Center" VerticalAlignment="Center" ShowGridLines="false">
+                                            <Border Grid.Row="0" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentThemeInstance.DividerColor}" ClipToBounds="True" Width="24" Height="24">
+                                                <Rectangle Fill="{CompiledBinding CurrentThemeInstance.MenuButtonBGColor}" ClipToBounds="True" Width="18" Height="18"/>
+                                            </Border>
+                                            <Border Grid.Row="0" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentThemeInstance.DividerColor}" ClipToBounds="True" Width="165" Height="24">
+                                                <TextBlock Background="{CompiledBinding CurrentThemeInstance.MenuBGColor}" Classes="menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
+                                                    <TextBlock.Text>
+                                                        <MultiBinding StringFormat="Finished {0}% ({1})" Mode="OneWay">
+                                                            <Binding Path="FinishedPercentage"/>
+                                                            <Binding Path="FinishedCount.Value"/>
+                                                        </MultiBinding>
+                                                    </TextBlock.Text>
+                                                </TextBlock>
+                                            </Border>
+                                            <Border Grid.Row="2" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentThemeInstance.DividerColor}" ClipToBounds="True" Width="24" Height="24">
+                                                <Rectangle Fill="{CompiledBinding CurrentThemeInstance.MenuBGColor}" ClipToBounds="True" Width="18" Height="18"/>
+                                            </Border>
+                                            <Border Grid.Row="2" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentThemeInstance.DividerColor}" ClipToBounds="True" Width="165" Height="24">
+                                                <TextBlock Background="{CompiledBinding CurrentThemeInstance.MenuBGColor}" Classes="menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
+                                                <TextBlock.Text>
+                                                        <MultiBinding StringFormat="Ongoing {0}% ({1})" Mode="OneWay">
+                                                            <Binding Path="OngoingPercentage"/>
+                                                            <Binding Path="OngoingCount.Value"/>
+                                                        </MultiBinding>
+                                                    </TextBlock.Text>
+                                                </TextBlock>
+                                            </Border>
+                                            <Border Grid.Row="4" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentThemeInstance.DividerColor}" ClipToBounds="True" Width="24" Height="24">
+                                                <Rectangle Fill="{CompiledBinding CurrentThemeInstance.MenuTextColor}" ClipToBounds="True" Width="18" Height="18"/>
+                                            </Border>
+                                            <Border Grid.Row="4" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentThemeInstance.DividerColor}" ClipToBounds="True" Width="165" Height="24">
+                                                <TextBlock Background="{CompiledBinding CurrentThemeInstance.MenuBGColor}" Classes="menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
+                                                <TextBlock.Text>
+                                                        <MultiBinding StringFormat="Hiatus {0}% ({1})" Mode="OneWay">
+                                                            <Binding Path="HiatusPercentage"/>
+                                                            <Binding Path="HiatusCount.Value"/>
+                                                        </MultiBinding>
+                                                    </TextBlock.Text>
+                                                </TextBlock>
+                                            </Border>
+                                            <Border Grid.Row="6" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentThemeInstance.DividerColor}" ClipToBounds="True" Width="24" Height="24">
+                                                <Rectangle Fill="{CompiledBinding CurrentThemeInstance.DividerColor}" ClipToBounds="True" Width="18" Height="18"/>
+                                            </Border>
+                                            <Border Grid.Row="6" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentThemeInstance.DividerColor}" ClipToBounds="True" Width="165" Height="24">
+                                                <TextBlock Background="{CompiledBinding CurrentThemeInstance.MenuBGColor}" Classes="menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
+                                                <TextBlock.Text>
+                                                        <MultiBinding StringFormat="Cancelled {0}% ({1})" Mode="OneWay">
+                                                            <Binding Path="CancelledPercentage"/>
+                                                            <Binding Path="CancelledCount.Value"/>
+                                                        </MultiBinding>
+                                                    </TextBlock.Text>
+                                                </TextBlock>
+                                            </Border>
+                                        </Grid>
+                                    </StackPanel>
+                                    <lvc:PieChart Series="{CompiledBinding StatusDistribution}" Width="300" Height="300" TooltipPosition="Hidden" Margin="0,0,15,0"/>
+                                </StackPanel>
+                            </Border>
+                        </Border>
+                        <Border Background="{CompiledBinding CurrentThemeInstance.CollectionBGColor}" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" Width="570" Height="300"  HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10">
+                            <Border CornerRadius="8" ClipToBounds="True">
+                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="3">
+                                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="10" Margin="0,0,20,0">
+                                        <TextBlock Text="Format" FontSize="22" FontWeight="Bold" Classes="menu" HorizontalAlignment="Center" Margin="0"/>
+                                        <Grid RowDefinitions="*,3,*,3,*,3,*,3,*,3,*" ColumnDefinitions="Auto,3,Auto" HorizontalAlignment="Center" VerticalAlignment="Center" ShowGridLines="false">
+                                            <Border Grid.Row="0" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentThemeInstance.DividerColor}" ClipToBounds="True" Width="24" Height="24">
+                                                <Rectangle Fill="{CompiledBinding CurrentThemeInstance.MenuBGColor}" ClipToBounds="True" Width="18" Height="18"/>
+                                            </Border>
+                                            <Border Grid.Row="0" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentThemeInstance.DividerColor}" ClipToBounds="True" Width="165" Height="24" OpacityMask="White">
+                                                <TextBlock Background="{CompiledBinding CurrentThemeInstance.MenuBGColor}" Classes="menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
+                                                    <TextBlock.Text>
+                                                        <MultiBinding StringFormat="Manga {0}% ({1})" Mode="OneWay">
+                                                            <Binding Path="MangaPercentage"/>
+                                                            <Binding Path="MangaCount.Value"/>
+                                                        </MultiBinding>
+                                                    </TextBlock.Text>
+                                                </TextBlock>
+                                            </Border>
+                                            <Border Grid.Row="2" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentThemeInstance.DividerColor}" ClipToBounds="True" Width="24" Height="24">
+                                                <Rectangle Fill="{CompiledBinding CurrentThemeInstance.MenuButtonBGColor}" ClipToBounds="True" Width="18" Height="18"/>
+                                            </Border>
+                                            <Border Grid.Row="2" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentThemeInstance.DividerColor}" ClipToBounds="True" Width="165" Height="24">
+                                                <TextBlock Background="{CompiledBinding CurrentThemeInstance.MenuBGColor}" Classes="menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
+                                                    <TextBlock.Text>
+                                                        <MultiBinding StringFormat="Manhwa {0}% ({1})" Mode="OneWay">
+                                                            <Binding Path="ManhwaPercentage"/>
+                                                            <Binding Path="ManhwaCount.Value"/>
+                                                        </MultiBinding>
+                                                    </TextBlock.Text>
+                                                </TextBlock>
+                                            </Border>
+                                            <Border Grid.Row="4" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentThemeInstance.DividerColor}" ClipToBounds="True" Width="24" Height="24">
+                                                <Rectangle Fill="{CompiledBinding CurrentThemeInstance.MenuTextColor}" ClipToBounds="True" Width="18" Height="18"/>
+                                            </Border>
+                                            <Border Grid.Row="4" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentThemeInstance.DividerColor}" ClipToBounds="True" Width="165" Height="24">
+                                                <TextBlock Background="{CompiledBinding CurrentThemeInstance.MenuBGColor}" Classes="menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
+                                                    <TextBlock.Text>
+                                                        <MultiBinding StringFormat="Manhua {0}% ({1})" Mode="OneWay">
+                                                            <Binding Path="ManhuaPercentage"/>
+                                                            <Binding Path="ManhuaCount.Value"/>
+                                                        </MultiBinding>
+                                                    </TextBlock.Text>
+                                                </TextBlock>
+                                            </Border>
+                                            <Border Grid.Row="6" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentThemeInstance.DividerColor}" ClipToBounds="True" Width="24" Height="24">
+                                                <Rectangle Name="ManfraRectangle" ClipToBounds="True" Width="18" Height="18"/>
+                                            </Border>
+                                            <Border Grid.Row="6" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentThemeInstance.DividerColor}" ClipToBounds="True" Width="165" Height="24">
+                                                <TextBlock Background="{CompiledBinding CurrentThemeInstance.MenuBGColor}" Classes="menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
+                                                <TextBlock.Text>
+                                                        <MultiBinding StringFormat="Manfra {0}% ({1})" Mode="OneWay">
+                                                            <Binding Path="ManfraPercentage"/>
+                                                            <Binding Path="ManfraCount.Value"/>
+                                                        </MultiBinding>
+                                                    </TextBlock.Text>
+                                                </TextBlock>
+                                            </Border>
+                                            <Border Grid.Row="8" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentThemeInstance.DividerColor}" ClipToBounds="True" Width="24" Height="24">
+                                                <Rectangle Name="ComicRectangle" ClipToBounds="True" Width="18" Height="18"/>
+                                            </Border>
+                                            <Border Grid.Row="8" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentThemeInstance.DividerColor}" ClipToBounds="True" Width="165" Height="24">
+                                                <TextBlock Background="{CompiledBinding CurrentThemeInstance.MenuBGColor}" Classes="menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
+                                                <TextBlock.Text>
+                                                        <MultiBinding StringFormat="Comic {0}% ({1})" Mode="OneWay">
+                                                            <Binding Path="ComicPercentage"/>
+                                                            <Binding Path="ComicCount.Value"/>
+                                                        </MultiBinding>
+                                                    </TextBlock.Text>
+                                                </TextBlock>
+                                            </Border>
+                                            <Border Grid.Row="10" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentThemeInstance.DividerColor}" ClipToBounds="True" Width="24" Height="24">
+                                                <Rectangle Fill="{CompiledBinding CurrentThemeInstance.DividerColor}" ClipToBounds="True" Width="18" Height="18"/>
+                                            </Border>
+                                            <Border Grid.Row="10" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentThemeInstance.DividerColor}" ClipToBounds="True" Width="165" Height="24">
+                                                <TextBlock Background="{CompiledBinding CurrentThemeInstance.MenuBGColor}" Classes="menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
+                                                <TextBlock.Text>
+                                                        <MultiBinding StringFormat="Novel {0}% ({1})" Mode="OneWay">
+                                                            <Binding Path="NovelPercentage"/>
+                                                            <Binding Path="NovelCount.Value"/>
+                                                        </MultiBinding>
+                                                    </TextBlock.Text>
+                                                </TextBlock>
+                                            </Border>
+                                        </Grid>
+                                    </StackPanel>
+                                    <lvc:PieChart Series="{CompiledBinding Formats}" Width="300" Height="300" TooltipPosition="Hidden" Margin="0,0,15,0"/>
+                                </StackPanel>
+                            </Border>
+                        </Border> 
+                    </WrapPanel>
+                </Border>
+                <!-- Bar Charts -->
+                <Border Name="DistBGTwo" Grid.Row="6" Grid.Column="0" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" HorizontalAlignment="Center">
+                    <WrapPanel Margin="10">
+                        <Border Background="{CompiledBinding CurrentThemeInstance.CollectionBGColor}" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" Width="570" Height="550" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10">
+                            <Border CornerRadius="8" ClipToBounds="True">
+                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                    <TextBlock Text="Ratings" FontSize="21" FontWeight="Bold" Classes="menu" HorizontalAlignment="Center" Margin="0,0,0,0"/>
+                                    <lvc:CartesianChart Series="{CompiledBinding RatingDistribution}" XAxes="{CompiledBinding RatingXAxes}" YAxes="{Binding RatingYAxes}" Width="570" Height="510"/>
+                                </StackPanel>
+                            </Border>
+                        </Border>
+                        <Border Background="{CompiledBinding CurrentThemeInstance.CollectionBGColor}" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" Width="570" Height="550" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10">
+                            <Border CornerRadius="8" ClipToBounds="True">
+                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                    <TextBlock Text="Volume Counts" FontSize="21" FontWeight="Bold" Classes="menu" HorizontalAlignment="Center" Margin="0,0,0,0"/>
+                                    <lvc:CartesianChart Series="{CompiledBinding VolumeCountDistribution}" XAxes="{CompiledBinding VolumeCountXAxes}" YAxes="{Binding VolumeCountYAxes}" Width="570" Height="510"/>
+                                </StackPanel>
+                            </Border>
+                        </Border>
+                        <Border Background="{CompiledBinding CurrentThemeInstance.CollectionBGColor}" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" Width="570" Height="550" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10">
+                            <Border CornerRadius="8" ClipToBounds="True">
+                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                    <TextBlock Text="Genres" FontSize="21" FontWeight="Bold" Classes="menu" HorizontalAlignment="Center" Margin="0,0,0,0"/>
+                                    <lvc:CartesianChart VerticalAlignment="Center" HorizontalAlignment="Center" Series="{CompiledBinding GenreDistribution}" XAxes="{CompiledBinding GenreXAxes}" YAxes="{Binding GenreYAxes}" Width="570" Height="510"/>
+                                </StackPanel>
+                            </Border>
+                        </Border>
+                    </WrapPanel>
+                </Border>
+			</Grid>
+		</ScrollViewer>
+	</Border>
+</Window>

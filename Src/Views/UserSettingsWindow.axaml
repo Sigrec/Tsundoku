@@ -1,0 +1,244 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:vm="using:Tsundoku.ViewModels"
+        xmlns:model="clr-namespace:Tsundoku.Models"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+        x:Class="Tsundoku.Views.SettingsWindow"
+        x:DataType="vm:UserSettingsViewModel"
+        Icon="\Assets\Icons\Tsundoku-Logo.ico"
+        Title="Settings"
+        FontFamily="Segoe UI"
+        MaxWidth="491"
+        MinWidth="491"
+        MaxHeight="865"
+        WindowStartupLocation="2"
+        KeyboardNavigation.TabNavigation="None">
+    
+    <Window.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="/Styles/UserSettingsControlThemes.xaml"/>
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>
+	</Window.Resources>
+
+    <Border Classes="menu" BorderThickness="3" CornerRadius="0,0,8,8" ClipToBounds="True">
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Theme="{StaticResource ReverseCollectionScroll}"> 
+            <StackPanel Margin="20,10,20,20" Spacing="10">
+                <StackPanel Spacing="5">
+                    <TextBlock Text="Change Username" 
+                               TextDecorations="Underline" 
+                               FontSize="20" 
+                               FontWeight="Bold"
+                               ToolTip.Tip="{CompiledBinding UsernameText}"
+                               Classes="menu"/>
+                    <StackPanel Orientation="Horizontal" Spacing="5">
+                        <TextBox Name="UsernameChange"
+                                Width="400"
+                                FontWeight="Bold"
+                                Classes="menu"
+                                FontSize="15"
+                                MaxLength="20"
+                                Height="35"
+                                Watermark="Enter New Username..."
+                                Text="{CompiledBinding UsernameText}"
+                                BorderThickness="2"/>
+                        <Button FontSize="18"
+                                BorderThickness="2"
+                                Theme="{StaticResource UserSettingsButton}"
+                                i:Attached.Icon="fa-check" 
+                                Click="ChangeUsername"
+                                IsEnabled="{Binding IsChangeUsernameButtonEnabled}"/>
+                    </StackPanel>
+                </StackPanel>
+                <StackPanel Spacing="5">
+                    <TextBlock Text="Currency" TextDecorations="Underline" FontSize="20" FontWeight="Bold" Classes="menu"/>
+                    <ComboBox Name="CurrencySelector"
+                              SelectionChanged="CurrencyChanged"
+                              SelectedIndex="{CompiledBinding CurrencyIndex}"
+                              Theme="{StaticResource MenuComboBox}"
+                              HorizontalAlignment="Left"
+							  Width="80"
+                              AutoScrollToSelectedItem="True">
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="$"/>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="€"/>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="£"/>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="¥"/>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₣"/>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₹"/>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₱"/>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₩"/>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₽"/>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₺"/>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₫"/>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="฿"/>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₸"/>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₼"/>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₾"/>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₻"/>
+						<!-- <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Rp"/>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="RM"/>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="﷼"/>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="د.إ"/>
+						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="د. ك"/> -->
+						<ComboBox.Resources>
+							<ResourceDictionary>
+								<ResourceDictionary.MergedDictionaries>
+									<ResourceInclude Source="/Styles/CollectionControlThemes.xaml"/>
+								</ResourceDictionary.MergedDictionaries>
+							</ResourceDictionary>
+						</ComboBox.Resources>
+					</ComboBox>
+                </StackPanel>
+                <StackPanel Spacing="5">
+                    <TextBlock Text="Memberships" TextDecorations="Underline" FontSize="20" FontWeight="Bold" Classes="menu"/>
+                    <WrapPanel Width="450" Margin="-5,0,0,0">
+						<WrapPanel.Styles>
+                            <Style Selector="ToggleButton">
+                                <Setter Property="Margin" Value="3"/>
+                            </Style>
+                        </WrapPanel.Styles>
+					<ToggleButton Name="BooksAMillionButton"
+								  IsChecked="{Binding BooksAMillionMember}"
+							      Theme="{StaticResource MenuToggleButton}"
+							      Content="Books-A-Million"/>
+					<ToggleButton Name="KinokuniyaUSAButton"
+								  IsChecked="{Binding KinokuniyaUSAMember}"
+							      Theme="{StaticResource MenuToggleButton}"
+							      Content="Kinokuniya USA"/>
+                    <ToggleButton Name="IndigoButton"
+								  IsChecked="{Binding IndigoMember}"
+							      Theme="{StaticResource MenuToggleButton}"
+							      Content="Indigo"/>
+					</WrapPanel>
+                </StackPanel>
+				<StackPanel Spacing="5">
+                    <TextBlock Text="Controls" TextDecorations="Underline" FontSize="20" FontWeight="Bold" Classes="menu"/>
+                    <TextBlock Text="Copy Title → Click Title on Series Card" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
+                    <TextBlock Text="Open Series Page → Click Series Image" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
+                    <TextBlock Text="Toggle Fullscreen → F11" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
+                    <TextBlock Text="Advanced Search → CTRL+F" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
+                    <TextBlock Text="Screenshot Collection → CTRL+P" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
+                    <TextBlock Text="Reload Filter/Sort on Collection → SHIFT+R" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
+                    <TextBlock Text="Save Collection (Auto Saves on Close) → CTRL+S" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
+                    <TextBlock Text="Reload Covers → CTRL+R" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
+                </StackPanel>
+                <StackPanel Spacing="5">
+                    <TextBlock Text="Settings" TextDecorations="Underline" FontSize="20" FontWeight="Bold" Classes="menu"/>
+                    <WrapPanel Width="450" Margin="-5,0,0,0">
+                        <WrapPanel.Styles>
+                            <Style Selector="Button">
+                                <Setter Property="Margin" Value="3"/>
+                                <Setter Property="FontSize" Value="20"/>
+                                <Setter Property="ToolTip.Placement" Value="Bottom"/>
+                                <Setter Property="ToolTip.VerticalOffset" Value="5"/>
+                            </Style>
+                        </WrapPanel.Styles>
+                        <Button Theme="{StaticResource UserSettingsButton}"
+                                Click="OpenApplicationFolder" 
+                                ToolTip.Tip="Open App Folder"
+                                i:Attached.Icon="fa-solid fa-folder-open" />
+                        <Button Theme="{StaticResource UserSettingsButton}"
+                                Click="OpenCoversFolder" 
+                                ToolTip.Tip="Open Covers Folder"
+                                i:Attached.Icon="fa-solid fa-image"/>
+                        <Button Theme="{StaticResource UserSettingsButton}"
+                                Click="OpenScreenshotsFolder" 
+                                ToolTip.Tip="Open Screenshots Folder"
+                                i:Attached.Icon="fa-solid fa-camera-retro"/>
+                        <Button Theme="{StaticResource UserSettingsButton}"
+                                Click="OpenThemesFolder" 
+                                ToolTip.Tip="Open Themes Folder"
+                                i:Attached.Icon="fa-solid fa-swatchbook"/>
+                        <Button Theme="{StaticResource UserSettingsButton}"
+                                Click="JoinDiscord"
+                                ToolTip.Tip="JoinDiscord"
+                                i:Attached.Icon="fa-brands fa-discord"/>
+                        <Button Theme="{StaticResource UserSettingsButton}"
+                                Click="ReportBug"
+                                ToolTip.Tip="Report Bug/Issue"
+                                i:Attached.Icon="fa-solid fa-bug"/>
+                        <Button Name="ExportToSpreadSheetButton"
+                                Theme="{StaticResource UserSettingsButton}"
+                                Command="{Binding ExportToSpreadSheetAsyncCommand}"
+                                ToolTip.Tip="Export to CSV"
+                                i:Attached.Icon="fa-solid fa-file-csv"/>
+                         <Button Theme="{StaticResource UserSettingsButton}"
+                                Click="OpenCoolorsSite"
+                                ToolTip.Tip="Open Coolors Website"
+                                i:Attached.Icon="fa-solid fa-palette"/>
+                    </WrapPanel>
+                </StackPanel>
+                <StackPanel Spacing="5">
+                    <TextBlock Text="Youtubers" TextDecorations="Underline" FontSize="20" FontWeight="Bold" Classes="menu"/>
+                    <WrapPanel Width="450" Margin="-5,0,0,0">
+                        <Button Theme="{StaticResource UserSettingsButton}"
+                                Click="OpenYoutuberSite"
+                                Name="EastCoastManga"
+                                Content="EastCoastManga"/>
+                        <Button Theme="{StaticResource UserSettingsButton}"
+                                Click="OpenYoutuberSite" 
+                                Name="PlasmsManga"
+                                Content="Plasm's Manga"/>
+                        <Button Theme="{StaticResource UserSettingsButton}"
+                                Click="OpenYoutuberSite" 
+                                Name="hvlmanga"
+                                Content="hvlmanga"/>
+                        <Button Theme="{StaticResource UserSettingsButton}"
+                                Click="OpenYoutuberSite" 
+                                Name="JakeThePog"
+                                Content="Jake The Pog"/>
+                        <Button Theme="{StaticResource UserSettingsButton}"
+                                Click="OpenYoutuberSite" 
+                                Name="DanielPeppers"
+                                Content="Daniel Peppers"/>
+                        <Button Theme="{StaticResource UserSettingsButton}"
+                                Click="OpenYoutuberSite" 
+                                Name="Ararawgi"
+                                Content="Ararawgi"/>
+                        <Button Theme="{StaticResource UserSettingsButton}"
+                                Click="OpenYoutuberSite" 
+                                Name="TheMangaSloth"
+                                Content="TheMangaSloth"/>
+                        <Button Theme="{StaticResource UserSettingsButton}"
+                                Click="OpenYoutuberSite" 
+                                Name="mangageekdom"
+                                Content="MANGA GEEKDOM"/>
+                        <Button Theme="{StaticResource UserSettingsButton}"
+                                Click="OpenYoutuberSite" 
+                                Name="meettheweebfamily"
+                                Content="Meet the Weeb Family"/>
+                    </WrapPanel>
+                </StackPanel>
+                <StackPanel Spacing="5">
+                    <TextBlock Text="{CompiledBinding Source={x:Static vm:ViewModelBase.CUR_TSUNDOKU_VERSION}, StringFormat='© v{0}'}"
+                               Cursor="Hand"
+                               PointerPressed="OpenReleasesPage"
+                               TextDecorations="Underline"
+                               FontSize="20"
+                               FontWeight="Bold"
+                               Classes="menu"/>
+                    <StackPanel Orientation="Horizontal" Width="450" Margin="-5,0,0,0">
+                        <Button Theme="{StaticResource UserSettingsButton}"
+                                Click="OpenAniListLink"
+                                HorizontalAlignment="Center"
+                                Name="AniListCredit"
+                                Content="AniList"/>
+                        <Button Theme="{StaticResource UserSettingsButton}"
+                                Click="OpenMangadexLink" 
+                                HorizontalAlignment="Center"
+                                Name="MangadexCredit"
+                                Content="Mangadex"/>
+                        <Button Theme="{StaticResource UserSettingsButton}"
+                                Click="UploadUserData" 
+                                HorizontalAlignment="Center"
+                                Name="ImportUserData"
+                                Content="Import"/>
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+    </Border>
+</Window>

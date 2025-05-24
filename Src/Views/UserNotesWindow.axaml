@@ -1,0 +1,90 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:Tsundoku.ViewModels"
+        x:Class="Tsundoku.Views.UserNotesWindow"
+        Title="Notes"
+        Icon="\Assets\Icons\Tsundoku-Logo.ico"
+        FontFamily="Segoe UI"
+        Classes="menu"
+        MinWidth="600"
+        MinHeight="400"
+        WindowStartupLocation="CenterScreen"
+        SizeToContent="WidthAndHeight"
+        x:DataType="vm:UserNotesWindowViewModel">
+
+    <Window.DataContext>
+		<vm:UserNotesWindowViewModel/>
+	</Window.DataContext>
+
+    <Window.Styles>
+        <Style Selector="ScrollBar:vertical">
+            <Style Selector="^ /template/ Rectangle#TrackRect">
+                <Setter Property="Fill" Value="{CompiledBinding CurrentThemeInstance.CollectionBGColor}" />
+            </Style>
+
+            <Style Selector="^ /template/ Thumb">
+                <Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.DividerColor}" />
+                <Style Selector="^:pointerover /template/ Border">
+                    <Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.DividerColor}" />
+                </Style>
+                <Style Selector="^:pressed /template/ Border">
+                    <Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.DividerColor}" />
+                </Style>
+            </Style>
+
+            <Style Selector="^[IsExpanded=true]">
+                <Style Selector="^ /template/ Thumb">
+                    <Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.DividerColor}" />
+                </Style>
+
+                <Style Selector="^ /template/ PathIcon">
+                    <Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.DividerColor}" />
+                </Style>
+
+                <Style Selector="^ /template/ Rectangle#TrackRect">
+                    <Setter Property="Fill" Value="{CompiledBinding CurrentThemeInstance.MenuBGColor}" />
+                </Style>
+            </Style>
+
+            <Style Selector="^ /template/ RepeatButton#PART_LineUpButton, ^ /template/ RepeatButton#PART_LineDownButton">
+                <Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentThemeInstance.DividerColor}"/>
+                <Style Selector="^:pointerover">
+                    <Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuButtonTextAndIconHoverColor}"/>
+
+                    <Style Selector="^ /template/ ContentPresenter" >
+                        <Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.DividerColor}"/>
+                    </Style>
+                    <Style Selector="^ PathIcon">
+                        <Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.CollectionBGColor}" />
+                    </Style>
+                </Style>
+
+                <Style Selector="^:pressed">
+                    <Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuBGColor}"/>
+                    <Style Selector="^ /template/ ContentPresenter" >
+                        <Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.DividerColor}" />
+                    </Style>
+                    <Style Selector="^ PathIcon">
+                        <Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.CollectionBGColor}" />
+                    </Style>
+                </Style>
+            </Style>
+        </Style>
+    </Window.Styles>
+
+    <Border Classes="menu" BorderThickness="3" CornerRadius="0,0,8,8" ClipToBounds="True" Padding="20">
+        <TextBox Name="UserNotes"
+                 Grid.Column="0"
+                FontWeight="Bold"
+                Classes="menu"
+                FontSize="18"
+                TextWrapping="Wrap"
+                Watermark="Notes..."
+                Text="{CompiledBinding Notes}"
+                AcceptsReturn="True"
+                AcceptsTab="True"
+                BorderThickness="2">
+        </TextBox>
+    </Border>
+</Window>
