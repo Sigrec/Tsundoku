@@ -8,33 +8,31 @@ using MangaAndLightNovelWebScrape.Websites;
 using MangaAndLightNovelWebScrape.Models;
 using System.Collections;
 using Avalonia.ReactiveUI;
-using Avalonia.Controls.ApplicationLifetimes;
 
 namespace Tsundoku.Views
 {
     public partial class PriceAnalysisWindow : ReactiveWindow<PriceAnalysisViewModel>
     {
+        private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
         public bool IsOpen = false, Manga;
-        private MainWindow CollectionWindow;
         public readonly MasterScrape Scrape = new MasterScrape(StockStatusFilter.EXCLUDE_NONE_FILTER);
 
 
-        public PriceAnalysisWindow()
+        public PriceAnalysisWindow(PriceAnalysisViewModel viewModel)
         {
+            ViewModel = viewModel;
             InitializeComponent();
-            DataContext = new PriceAnalysisViewModel();
+
             Opened += (s, e) =>
             {
                 IsOpen ^= true;
-                CollectionWindow = (MainWindow)((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).MainWindow;
             };
 
             Closing += (s, e) =>
             {
                 if (IsOpen)
                 {
-                    MainWindow.ResetMenuButton(CollectionWindow.AnalysisButton);
-                    ((PriceAnalysisWindow)s).Hide();
+                    this.Hide();
                     TitleBox.Text = string.Empty;
                     Topmost = false;
                     IsOpen ^= true;
@@ -55,7 +53,7 @@ namespace Tsundoku.Views
             MangaButton.IsChecked = false;
         }
 
-        private static bool IsWebsiteListValid(IList input)
+        private bool IsWebsiteListValid(IList input)
         {
             Region region = ViewModelBase.MainUser.Region;
             foreach (ListBoxItem website in input)
@@ -126,7 +124,7 @@ namespace Tsundoku.Views
                 Region newRegion = MangaAndLightNovelWebScrape.Helpers.GetRegionFromString((RegionSelector.SelectedItem as ComboBoxItem).Content.ToString());
                 LOGGER.Info("Region Changed to {}", newRegion.ToString());
                 ViewModelBase.MainUser.Region = newRegion;
-                ViewModel.CurRegion = newRegion;
+                ViewModelBase.MainUser.Region = newRegion;
             }
         }
 

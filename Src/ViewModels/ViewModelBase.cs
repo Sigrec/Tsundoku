@@ -1,28 +1,17 @@
+using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Tsundoku.Models;
-using Tsundoku.Views;
+using static Tsundoku.Models.TsundokuLanguageModel;
 
 namespace Tsundoku.ViewModels
 {
     public class ViewModelBase : ReactiveObject
     {
-        private static TsundokuTheme _currentTheme = new TsundokuTheme();
-        public static TsundokuTheme CurrentTheme
-        {
-            get => _currentTheme;
-            set
-            {
-                if (_currentTheme != value)
-                {
-                    _currentTheme = value;
-                    CurrentThemeChanged?.Invoke(null, EventArgs.Empty);
-                }
-            }
-        }
-        public static event EventHandler CurrentThemeChanged;
-        public TsundokuTheme CurrentThemeInstance => CurrentTheme;
+        private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
 
         private static string _curCurrency;
         public static string CurCurrency
@@ -40,33 +29,38 @@ namespace Tsundoku.ViewModels
 
         public static event EventHandler CurCurrencyChanged;
         public string CurCurrencyInstance => CurCurrency;
-
         [Reactive] public string UserName { get; set; }
         [Reactive] public string CurDisplay { get; set; }
-        [Reactive] public TsundokuFilter CurFilter { get; set; }
-        [Reactive] public string CurLanguage { get; set; }
         [Reactive] public Region CurRegion { get; set; }
         public static string Filter { get; set; }
         public static User? MainUser { get; set; }
         public static bool updatedVersion = false;
         public static bool newCoverCheck = false;
-        public static bool isReloading = false;
+        public bool isReloading = false;
         public const string CUR_TSUNDOKU_VERSION = "1.0.0";
         public const double SCHEMA_VERSION = 5.2;
-        public const string USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.66 Safari/537.36";
         public const string USER_DATA_FILEPATH = @"UserData.json";
-        public MainWindow CollectionWindow = (MainWindow)((Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).MainWindow;
+        
+        [Reactive] public TsundokuTheme CurrentTheme { get; private set; }
+        [Reactive] public User CurrentUser { get; private set; }
+        
+        protected readonly IUserService _userService;
+        protected readonly CompositeDisposable _disposables = new CompositeDisposable();
 
-        protected ViewModelBase()
+        protected ViewModelBase(IUserService userService)
         {
-            CurrentThemeChanged += OnCurrentThemeChanged;
+            _userService = userService;
+            _userService.CurrentTheme
+                .Where(theme => theme != null)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(theme => CurrentTheme = theme!)
+                .DisposeWith(_disposables);
+
+            _userService.CurrentUser
+                .Where(user => user != null) // Filters out the initial null from BehaviorSubject
+                .Subscribe(user => CurrentUser = user);
+
             CurCurrencyChanged += OnCurCurrencyChanged;
-            CurFilter = TsundokuFilter.None;
-        }
-
-        private void OnCurrentThemeChanged(object sender, EventArgs e)
-        {
-            this.RaisePropertyChanged(nameof(CurrentThemeInstance));
         }
 
         private void OnCurCurrencyChanged(object sender, EventArgs e)
@@ -76,10 +70,9 @@ namespace Tsundoku.ViewModels
 
         public virtual void Dispose()
         {
-            CurrentThemeChanged -= OnCurrentThemeChanged;
             CurCurrencyChanged -= OnCurCurrencyChanged;
         }
-        
+
         public static async Task OpenSiteLink(string link)
         {
             await Task.Run(() =>
@@ -95,6 +88,5 @@ namespace Tsundoku.ViewModels
                 }
             });
         }
-
     }
 }

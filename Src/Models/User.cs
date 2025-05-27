@@ -1,44 +1,48 @@
 using Avalonia.Media.Imaging;
 using MangaAndLightNovelWebScrape.Websites;
-using System.Collections.ObjectModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Nodes;
 using Tsundoku.Helpers;
-using Tsundoku.ViewModels;
+using Tsundoku.Converters;
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
+using static Tsundoku.Models.TsundokuLanguageModel;
+using System.Text.Encodings.Web;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Tsundoku.Models
 {
-    public class User
+    public class User : ReactiveObject
     {
-        public string UserName { get; set; }
-        public uint NumVolumesCollected { get; set; }
-        public uint NumVolumesToBeCollected { get; set; }
-        public string CurLanguage { get; set; }
-        public string Display { get; set; }
-        public string MainTheme { get; set; }
-        public double CurDataVersion { get; set; }
-        public string Currency { get; set; }
-        public decimal MeanRating { get; set; }
-        public uint VolumesRead { get; set; }
-        public string CollectionPrice { get; set; }
-        public Region Region { get; set; }
-        public Dictionary<string, bool> Memberships { get; set; }
-        public string Notes { get; set; }
-        public ObservableCollection<TsundokuTheme> SavedThemes { get; set; }
-        public List<Series> UserCollection { get; set; }
-        public byte[] UserIcon { get; set; }
-        [JsonIgnore] internal static UserModelContext UserJsonModel = new UserModelContext(new JsonSerializerOptions()
-        { 
-            WriteIndented = true,
-            ReadCommentHandling = JsonCommentHandling.Disallow,
-            AllowTrailingCommas = true,
-            Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-        });
+        public static readonly JsonSerializerOptions JSON_SERIALIZATION_OPTIONS = new JsonSerializerOptions(UserModelContext.Default.Options)
+        {
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+        };
+        private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
 
-        public User(string UserName, string CurLanguage, string MainTheme, string Display, double CurDataVersion, string Currency, string CollectionPrice, Region Region, Dictionary<string, bool> Memberships, ObservableCollection<TsundokuTheme> SavedThemes, List<Series> UserCollection)
+        [Reactive] public string UserName { get; set; } = "UserName";
+        [Reactive] public uint NumVolumesCollected { get; set; }
+        [Reactive] public uint NumVolumesToBeCollected { get; set; }
+        [Reactive] public TsundokuLanguage Language { get; set; } = TsundokuLanguage.Romaji;
+        [Reactive] public string Display { get; set; }
+        [Reactive] public string MainTheme { get; set; }
+        [Reactive] public double CurDataVersion { get; set; }
+        [Reactive] public string Currency { get; set; }
+        [Reactive] public decimal MeanRating { get; set; }
+        [Reactive] public uint VolumesRead { get; set; }
+        [Reactive] public string CollectionPrice { get; set; }
+        [Reactive] public Region Region { get; set; }
+        [Reactive] public Dictionary<string, bool> Memberships { get; set; }
+        [Reactive] public string Notes { get; set; }
+        public List<TsundokuTheme> SavedThemes { get; set; }
+        public List<Series> UserCollection { get; set; }
+
+        [JsonConverter(typeof(UserIconBitmapJsonConverter))]
+        [Reactive] public Bitmap? UserIcon { get; set; }
+
+        public User(string UserName, TsundokuLanguage Language, string MainTheme, string Display, double CurDataVersion, string Currency, string CollectionPrice, Region Region, Dictionary<string, bool> Memberships, List<TsundokuTheme> SavedThemes, List<Series> UserCollection)
         {
             this.UserName = UserName;
-            this.CurLanguage = CurLanguage;
+            this.Language = Language;
             this.Display = Display;
             this.CurDataVersion = CurDataVersion;
             this.Currency = Currency;
@@ -53,32 +57,10 @@ namespace Tsundoku.Models
             Notes = string.Empty;
         }
 
-        public static byte[] ImageToByteArray(Avalonia.Media.Imaging.Bitmap image)
+        [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "<Pending>")]
+        public string Serialize()
         {
-            using MemoryStream stream = new();
-            image.Save(stream, 100);
-            return stream.ToArray();
-        }
-
-        /// <summary>
-        /// Saves the current state of this User object to UserData.json,
-        /// located directly in the application's LocalState folder.
-        /// </summary>
-        public void SaveUserData()
-        {
-            string userDataFullPath = AppFileHelper.GetUserDataJsonPath();
-            LOGGER.Info($"Saving \"{UserName}'s\" Collection Data to {userDataFullPath}");
-
-            try
-            {
-                string jsonContent = JsonSerializer.Serialize(this, typeof(User), UserJsonModel);
-                File.WriteAllText(userDataFullPath, jsonContent, Encoding.UTF8); // Write to the correct path
-                LOGGER.Debug($"Successfully saved user data to: {userDataFullPath}");
-            }
-            catch (Exception ex)
-            {
-                LOGGER.Error(ex, $"Failed to save user data to {userDataFullPath}.");
-            }
+            return JsonSerializer.Serialize(this, JSON_SERIALIZATION_OPTIONS);
         }
 
         /// <summary>
@@ -88,15 +70,14 @@ namespace Tsundoku.Models
         /// <param name="isImport">Whether the data that needs to check for an update is an import</param>
         /// <param name="updatedCovers">Whether the covers </param>
         /// <returns></returns>
-        [RequiresUnreferencedCode("Calls System.Text.Json.JsonSerializer.Serialize<TValue>(TValue, JsonSerializerOptions)")]
-        public static bool UpdateSchemaVersion(JsonNode userData, bool isImport=false, bool updatedCovers=false)
+        public static bool UpdateSchemaVersion(JsonNode userData, bool isImport = false, bool updatedCovers = false)
         {
             bool updatedVersion = false;
             JsonObject series;
             JsonObject theme;
             JsonArray collectionJsonArray = userData[nameof(UserCollection)].AsArray();
             JsonArray themeJsonArray = userData["SavedThemes"].AsArray();
-            
+
             // For users who did not get the older update
             if (!userData.AsObject().ContainsKey("CurDataVersion"))
             {
@@ -111,38 +92,38 @@ namespace Tsundoku.Models
                 userData.AsObject().Add("VolumesRead", 0);
                 userData.AsObject().Add("CollectionPrice", "");
 
-                if (userData[nameof(CurLanguage)].ToString().Equals("Native"))
+                if (userData[nameof(Language)].ToString().Equals("Native"))
                 {
-                    userData[nameof(CurLanguage)] = "Japanese";
+                    userData[nameof(Language)] = "Japanese";
                 }
 
                 for (int x = 0; x < collectionJsonArray.Count; x++)
                 {
                     series = collectionJsonArray.ElementAt(x).AsObject();
                     series["Titles"] = new JsonObject
-					{
-						["Romaji"] = series["Titles"][0].ToString(),
+                    {
+                        ["Romaji"] = series["Titles"][0].ToString(),
                         ["English"] = series["Titles"][1].ToString(),
                         [series["Format"].ToString() switch
                         {
                             "Manhwa" => "Korean",
                             "Manhua" => "Chinese",
-                            _ => "Japanese"            
+                            _ => "Japanese"
                         }] = series["Titles"][2].ToString()
                     };
 
                     series["Staff"] = new JsonObject
-					{
-						["Romaji"] = series["Staff"][0].ToString(),
+                    {
+                        ["Romaji"] = series["Staff"][0].ToString(),
                         [series["Format"].ToString() switch
                         {
                             "Manhwa" => "Korean",
                             "Manhua" => "Chinese",
-                            _ => "Japanese"            
+                            _ => "Japanese"
                         }] = series["Staff"][1].ToString()
                     };
                     series.AsObject().Add("Score", 0);
-                    
+
                     if (series["Titles"]["Romaji"].ToString().Equals(series["Titles"]["English"].ToString()))
                     {
                         series["Titles"].AsObject().Remove("English");
@@ -155,7 +136,7 @@ namespace Tsundoku.Models
                 }
                 userData["CurDataVersion"] = 1.5;
                 LOGGER.Info("Updated Users Data to v1.5", !isImport);
-                updatedVersion = true;        
+                updatedVersion = true;
             }
 
             if (curVersion < 1.6) // 1.6 Version Upgrade fixes scores defaulting to 0 to -1 instead so it doesn't show up i stats
@@ -171,7 +152,7 @@ namespace Tsundoku.Models
 
                 userData["CurDataVersion"] = 1.6;
                 LOGGER.Info("Updated Users Data to v1.6", !isImport);
-                updatedVersion = true;  
+                updatedVersion = true;
             }
 
             if (curVersion < 1.7) // 1.7 Version Upgrade To accomdate adding user icon
@@ -185,7 +166,7 @@ namespace Tsundoku.Models
             }
 
             if (curVersion < 1.8) // 1.8 Version Upgrade to rename button color identifiers for TsundokuTheme change
-            {   
+            {
                 for (int x = 0; x < themeJsonArray.Count; x++)
                 {
                     theme = themeJsonArray.ElementAt(x).AsObject();
@@ -197,7 +178,7 @@ namespace Tsundoku.Models
 
                 userData["CurDataVersion"] = 1.8;
                 LOGGER.Info("Updated Users Data to v1.8", !isImport);
-                updatedVersion = true;  
+                updatedVersion = true;
             }
 
             if (curVersion < 1.9) // 1.9 Version Upgrade resizes all bitmaps in the users cover folder
@@ -254,7 +235,7 @@ namespace Tsundoku.Models
                 for (int x = 0; x < themes.Count; x++)
                 {
                     if (themes.ElementAt(x)["ThemeName"].ToString().Equals("Default"))
-                    {   
+                    {
                         themes.RemoveAt(x);
                     }
                 }
@@ -363,7 +344,7 @@ namespace Tsundoku.Models
                     {
                         theme.Add("UserIconBorderColor", theme["DividerColor"].ToString());
                     }
-                    else if(theme["UserIconBorderColor"] == null)
+                    else if (theme["UserIconBorderColor"] == null)
                     {
                         theme["UserIconBorderColor"] = theme["DividerColor"].ToString();
                     }
@@ -375,19 +356,22 @@ namespace Tsundoku.Models
 
             if (!isImport)
             {
-                File.WriteAllText(ViewModelBase.USER_DATA_FILEPATH, JsonSerializer.Serialize(userData, new JsonSerializerOptions()
-                { 
-                    WriteIndented = true,
-                    ReadCommentHandling = JsonCommentHandling.Disallow,
-                    AllowTrailingCommas = true,
-                    Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-                }));
+                AppFileHelper.WriteUserDataToFile(userData);
             }
             return updatedVersion;
         }
     }
 
     [JsonSerializable(typeof(User))]
-    [JsonSourceGenerationOptions(UseStringEnumConverter = true)]
+    [JsonSourceGenerationOptions(
+        UseStringEnumConverter = true,
+        WriteIndented = true,
+        ReadCommentHandling = JsonCommentHandling.Disallow,
+        AllowTrailingCommas = true,
+        PropertyNameCaseInsensitive = true,
+        DefaultIgnoreCondition = JsonIgnoreCondition.Never,
+        IncludeFields = false,
+        NumberHandling = JsonNumberHandling.AllowReadingFromString
+    )]
     internal partial class UserModelContext : JsonSerializerContext { }
 }

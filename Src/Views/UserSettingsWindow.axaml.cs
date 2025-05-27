@@ -1,41 +1,30 @@
-using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Interactivity;
 using Tsundoku.ViewModels;
 using Avalonia.Controls;
 using System.Diagnostics;
 using ReactiveUI;
 using Avalonia.Platform.Storage;
-using System.Diagnostics.CodeAnalysis;
 using Avalonia.ReactiveUI;
 using Tsundoku.Helpers;
-using Windows.Storage;
-using Windows.System;
 
 namespace Tsundoku.Views
 {
     public partial class SettingsWindow : ReactiveWindow<UserSettingsViewModel>
     {
+        private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
+        private readonly CollectionStatsViewModel _collectionStatsViewModel;
         public bool IsOpen = false;
         public int currencyLength = 0;
-        private static readonly FilePickerFileType fileOptions = new FilePickerFileType("JSON File")
-        {
-            Patterns = [ "*.json" ]
-        };
-        private static readonly FilePickerOpenOptions filePickerOptions =  new FilePickerOpenOptions {
-            AllowMultiple = false,
-            FileTypeFilter = new List<FilePickerFileType>() { fileOptions }
-        };
-        private MainWindow CollectionWindow;
         
-        public SettingsWindow()
+        public SettingsWindow(UserSettingsViewModel viewModel, CollectionStatsViewModel collectionStatsViewModel)
         {
+            ViewModel = viewModel;
             InitializeComponent();
-            DataContext = new UserSettingsViewModel();
+            _collectionStatsViewModel = collectionStatsViewModel;
+
             Opened += (s, e) =>
             {
                 IsOpen ^= true;
-                CollectionWindow = (MainWindow)((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).MainWindow;
-
                 if (Screens.Primary.WorkingArea.Height < 955)
                 {
                     this.Height = 550;
@@ -46,8 +35,7 @@ namespace Tsundoku.Views
             {
                 if (IsOpen)
                 {
-                    MainWindow.ResetMenuButton(CollectionWindow.SettingsButton);
-                    ((SettingsWindow)s).Hide();
+                    this.Hide();
                     Topmost = false;
                     IsOpen ^= true;
                 }
@@ -66,7 +54,7 @@ namespace Tsundoku.Views
                 string newCurrency = (CurrencySelector.SelectedItem as ComboBoxItem).Content.ToString();
                 currencyLength = ViewModelBase.CurCurrency.Length;
                 ViewModelBase.CurCurrency = newCurrency;
-                MainWindowViewModel.collectionStatsWindow.ViewModel.CollectionPrice = $"{newCurrency}{ MainWindowViewModel.collectionStatsWindow.ViewModel.CollectionPrice[currencyLength..]}";
+                _collectionStatsViewModel.CollectionPrice = $"{newCurrency}{ _collectionStatsViewModel.CollectionPrice[currencyLength..]}";
                 LOGGER.Info($"Currency Changed To {newCurrency}");
             }
         }
@@ -75,15 +63,26 @@ namespace Tsundoku.Views
         /// <summary>
         /// Allows user to upload a new Json file to be used as their new data, it additionall creates a backup file of the users last save
         /// </summary>
-        [RequiresUnreferencedCode("Calls Tsundoku.ViewModels.MainWindowViewModel.VersionUpdate(JsonNode)")]
         private async void UploadUserData(object sender, RoutedEventArgs args)
         {
-            IReadOnlyList<Avalonia.Platform.Storage.IStorageFile> file = await this.StorageProvider.OpenFilePickerAsync(filePickerOptions);
-            if (file.Count > 0)
+            IReadOnlyList<IStorageFile> files = await this.StorageProvider.OpenFilePickerAsync(
+                new FilePickerOpenOptions
+                {
+                    AllowMultiple = false,
+                    FileTypeFilter = new List<FilePickerFileType>
+                    {
+                        new FilePickerFileType("JSON File")
+                        {
+                            Patterns = [ "*.json" ]
+                        }
+                    }
+                }
+            );
+            if (files.Count == 1)
             {
-                UserSettingsViewModel.ImportUserData(file);
-                ((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).TryShutdown();
-                Process.Start(@$"{AppDomain.CurrentDomain.BaseDirectory}\Tsundoku.exe");
+                ViewModel.ImportUserData(files[0].Path.LocalPath);
+                // ((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).TryShutdown();
+                // Process.Start(@$"{AppDomain.CurrentDomain.BaseDirectory}\Tsundoku.exe");
             }
         }
 
@@ -117,7 +116,7 @@ namespace Tsundoku.Views
                         UseShellExecute = true, // Essential for letting the OS shell handle opening the folder
                         Verb = "open"           // Explicitly ask the shell to "open" the target
                     });
-                    LOGGER.Info($"Opened Tsundoku application data folder: {tsundokuAppFolderPath}");
+                    LOGGER.Debug($"Opened Tsundoku application data folder: {tsundokuAppFolderPath}");
                 }
                 catch (System.ComponentModel.Win32Exception ex)
                 {
@@ -154,7 +153,7 @@ namespace Tsundoku.Views
                         UseShellExecute = true, // Essential for letting the OS shell handle opening the folder
                         Verb = "open"           // Explicitly ask the shell to "open" the target
                     });
-                    LOGGER.Info($"Opened Covers folder: {coversPath}");
+                    LOGGER.Debug($"Opened Covers folder: {coversPath}");
                 }
                 catch (System.ComponentModel.Win32Exception ex)
                 {
@@ -191,7 +190,7 @@ namespace Tsundoku.Views
                         UseShellExecute = true,
                         Verb = "open"
                     });
-                    LOGGER.Info($"Opened Screenshots folder: {screenshotsPath}");
+                    LOGGER.Debug($"Opened Screenshots folder: {screenshotsPath}");
                 }
                 catch (System.ComponentModel.Win32Exception ex)
                 {
@@ -218,7 +217,7 @@ namespace Tsundoku.Views
                         UseShellExecute = true,
                         Verb = "open"
                     });
-                    LOGGER.Info($"Opened Themes folder: {themesPath}");
+                    LOGGER.Debug($"Opened Themes folder: {themesPath}");
                 }
                 catch (System.ComponentModel.Win32Exception ex)
                 {
@@ -237,7 +236,7 @@ namespace Tsundoku.Views
         {
             if (!string.IsNullOrWhiteSpace(UsernameChange.Text))
             {
-                CollectionWindow.ViewModel.UserName = UsernameChange.Text;
+                ViewModelBase.MainUser.UserName = UsernameChange.Text;
                 LOGGER.Info($"Username Changed To -> {UsernameChange.Text}");
             }
             else

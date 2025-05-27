@@ -8,7 +8,7 @@
 		<Setter Property="Template">
 			<ControlTemplate>
 				<StackPanel>
-					<TextBlock Text="{TemplateBinding ChartTitle}" FontSize="22" FontWeight="Bold" Classes="menu" HorizontalAlignment="Center" Margin="0,10,0,0"/>
+					<TextBlock Text="{TemplateBinding ChartTitle}" FontSize="22" FontWeight="Bold" Classes="Menu" HorizontalAlignment="Center" Margin="0,10,0,0"/>
 					<lvc:PieChart Series="{TemplateBinding ChartData}" Width="250" Height="250"/>
 				</StackPanel>
 			</ControlTemplate>

@@ -1,7 +1,7 @@
 using System.Globalization;
 using Avalonia.Data.Converters;
 
-namespace Tsundoku.Helpers
+namespace Tsundoku.Converters
 {
     public class ListToStringConverter : IValueConverter
     {

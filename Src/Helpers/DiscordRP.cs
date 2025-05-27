@@ -5,6 +5,7 @@ namespace Tsundoku.Helpers
 {
     internal class DiscordRP
     {
+        private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
         private static DiscordRpcClient client;
         private static string UserName;
 
@@ -12,7 +13,7 @@ namespace Tsundoku.Helpers
         {
             client = new DiscordRpcClient("1050229234674696252")
             {
-                Logger = new ConsoleLogger(LogLevel.Error, true)
+                Logger = new ConsoleLogger(DiscordRPC.Logging.LogLevel.Error, true)
             };
 
             client.OnReady += (sender, msg) =>

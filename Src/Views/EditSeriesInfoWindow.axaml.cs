@@ -1,6 +1,5 @@
 using System.Reactive.Linq;
 using Avalonia.Controls;
-using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Interactivity;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
@@ -9,50 +8,59 @@ using ReactiveUI;
 using Tsundoku.Helpers;
 using Tsundoku.Models;
 using Tsundoku.ViewModels;
+using static Tsundoku.Models.TsundokuLanguageModel;
 
 namespace Tsundoku.Views;
 
 public partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfoViewModel>
 {
-    private Series Series;
-    public EditSeriesInfoWindow()
+    private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
+    private readonly BitmapHelper _bitmapHelper;
+    private readonly MainWindowViewModel _mainWindowViewModel;
+    private readonly CollectionStatsViewModel _collectionStatsViewModel;
+    public EditSeriesInfoWindow(MainWindowViewModel mainWindowViewModel, CollectionStatsViewModel collectionStatsViewModel, BitmapHelper bitmapHelper)
     {
+        _bitmapHelper = bitmapHelper;
+        _mainWindowViewModel = mainWindowViewModel;
+        _collectionStatsViewModel = collectionStatsViewModel;
         InitializeComponent();
+
         Opened += (s, e) =>
-        {
-            Series = ViewModel!.Series;
-            ViewModel!.Button.Foreground = ViewModelBase.CurrentTheme.SeriesButtonIconHoverColor;
-            this.Title = $"{Series.Titles["Romaji"]} Info";
-            VolumesReadTextBlock.Text = $"{Series.VolumesRead} Vol{(Series.VolumesRead > 1 ? "s" : string.Empty)} Read";
+        {;
+            this.Title = $"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]} Info";
+            VolumesReadTextBlock.Text = $"{ViewModel.Series.VolumesRead} Vol{(ViewModel.Series.VolumesRead > 1 ? "s" : string.Empty)} Read";
             UpdateSelectedGenres();
             LOGGER.Debug("{} | {}", this.Height, this.Width);
         };
+    }
 
-        Closed += (s, e) =>
+    private void GenerateNewBitmap(Bitmap newCover, string path)
+    {
+        if (newCover != null)
         {
-            ViewModel!.Button.Foreground = ViewModelBase.CurrentTheme.SeriesButtonIconColor;
-        };
+            if (!ViewModel.Series.Cover.EndsWith(".png"))
+            {
+                ViewModel.Series.DeleteCover();
+                ViewModel.Series.Cover = Path.ChangeExtension(ViewModel.Series.Cover, ".png");
+            }
+
+            _mainWindowViewModel.ChangeCover(ViewModel.Series, newCover);
+            LOGGER.Info($"Changed Cover for \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\"");
+        }
+        else
+        {
+            LOGGER.Warn($"\"{path}\" is not a valid Image Url");
+        }
     }
 
     private async void ChangeCoverFromLinkAsync(object sender, RoutedEventArgs args)
     {
         string customImageUrl = CoverImageUrlTextBox.Text.Trim();
-        Bitmap newCover = await Common.GenerateAvaloniaBitmap(@$"{Series.Cover.Replace("\\\\", "\\")}", string.Empty, customImageUrl);
-        if (newCover != null)
-        {
-            string fileExtension = customImageUrl[^3..];
-            if (!Series.Cover.EndsWith(fileExtension))
-            {
-                Series.DeleteCover();
-                Series.Cover = Series.Cover.Remove(Series.Cover.Length - 3, 3) + fileExtension;
-            };
-            MainWindowViewModel.ChangeCover(Series, newCover);
-            LOGGER.Info($"Changed Cover for \"{Series.Titles["Romaji"]}\" to {customImageUrl}");
-        }
-        else
-        {
-            LOGGER.Warn($"\"{customImageUrl}\" is not a valid Image Url");
-        }
+        string fullCoverPath = AppFileHelper.GetFullCoverPath(ViewModel.Series.Cover);
+        Bitmap newCover = await _bitmapHelper.GenerateAvaloniaBitmapAsync(fullCoverPath, string.Empty, customImageUrl, true);
+
+        GenerateNewBitmap(newCover, customImageUrl);
+
         CoverImageUrlTextBox.Clear();
     }
 
@@ -64,18 +72,13 @@ public partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfoViewMod
         if (DemographicComboBox.IsDropDownOpen)
         {
             Demographic demographic = Series.GetSeriesDemographic((DemographicComboBox.SelectedItem as ComboBoxItem).Content.ToString());
-            Series.Demographic = demographic;
+            ViewModel.Series.Demographic = demographic;
 
-            MainWindowViewModel.collectionStatsWindow.ViewModel.UpdateDemographicChartValues();
-            MainWindowViewModel.collectionStatsWindow.ViewModel.UpdateDemographicPercentages();
+            _collectionStatsViewModel.UpdateDemographicChartValues();
+            _collectionStatsViewModel.UpdateDemographicPercentages();
 
-            LOGGER.Info($"Changed Demographic for \"{Series.Titles["Romaji"]}\" to {demographic}");
+            LOGGER.Info($"Changed Demographic for \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\" to {demographic}");
         }
-    }
-
-    private async void ToggleSeriesFavoriteAsync(object sender, RoutedEventArgs args)
-    {
-        await ((MainWindow)((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).MainWindow).ViewModel.RefreshCollection();
     }
 
     /// <summary>
@@ -87,15 +90,15 @@ public partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfoViewMod
         if (!string.IsNullOrWhiteSpace(volumesReadText))
         {
             bool isValidVolumesReadInput = uint.TryParse(volumesReadText, out uint newVolumesRead);
-            if (isValidVolumesReadInput && Series.VolumesRead != newVolumesRead)
+            if (isValidVolumesReadInput && ViewModel.Series.VolumesRead != newVolumesRead)
             {
-                Series.VolumesRead = newVolumesRead;
-                VolumesReadTextBlock.Text = $"{newVolumesRead} Vol{(Series.VolumesRead > 1 ? "s" : string.Empty)} Read";
+                ViewModel.Series.VolumesRead = newVolumesRead;
+                VolumesReadTextBlock.Text = $"{newVolumesRead} Vol{(ViewModel.Series.VolumesRead > 1 ? "s" : string.Empty)} Read";
                 VolumesReadMaskedTextBox.Clear();
 
-                MainWindowViewModel.collectionStatsWindow.ViewModel.UpdateCollectionVolumesRead();
+                _collectionStatsViewModel.UpdateCollectionVolumesRead();
 
-                LOGGER.Info($"Updated # of Volumes Read for \"{Series.Titles["Romaji"]}\" from {Series.VolumesRead} to {newVolumesRead}");
+                LOGGER.Info($"Updated # of Volumes Read for \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\" from {ViewModel.Series.VolumesRead} to {newVolumesRead}");
             }
             else
             {
@@ -106,18 +109,19 @@ public partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfoViewMod
         if (!RatingMaskedTextBox.Text.StartsWith("__._"))
         {
             bool isValidRatingVal = decimal.TryParse(RatingMaskedTextBox.Text[..4].Trim().Replace("_", "0"), out decimal ratingVal);
-            if (isValidRatingVal && decimal.Compare(Series.Rating, ratingVal) != 0 && decimal.Compare(ratingVal, new decimal(10.0)) <= 0)
+            if (isValidRatingVal && decimal.Compare(ViewModel.Series.Rating, ratingVal) != 0 && decimal.Compare(ratingVal, new decimal(10.0)) <= 0)
             {
-                Series.Rating = ratingVal;
+                ViewModel.Series.Rating = ratingVal;
                 RatingTextBlock.Text = $"Rating {ratingVal}/10.0";
                 RatingMaskedTextBox.Clear();
-                
-                // Update rating Distribution Chart
-                MainWindowViewModel.UserCollection.First(series => series == Series).Rating = ratingVal;
-                MainWindowViewModel.collectionStatsWindow.ViewModel.UpdateRatingChartValues();
-                MainWindowViewModel.collectionStatsWindow.ViewModel.UpdateCollectionRating();
 
-                LOGGER.Info($"Updating rating for \"{Series.Titles["Romaji"]}\" {(Series.Rating == -1 ? string.Empty : $"from \"{Series.Rating}/10.0\"")} to \"{decimal.Round(ratingVal, 1)}/10.0\"");
+                // Update rating Distribution Chart
+                // TODO - Need to actually update the rating of the series object here
+                //ViewModel.UserCollection.First(series => series == Series).Rating = ratingVal;
+                _collectionStatsViewModel.UpdateRatingChartValues();
+                _collectionStatsViewModel.UpdateCollectionRating();
+
+                LOGGER.Info($"Updating rating for \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\" {(ViewModel.Series.Rating == -1 ? string.Empty : $"from \"{ViewModel.Series.Rating}/10.0\"")} to \"{decimal.Round(ratingVal, 1)}/10.0\"");
             }
             else
             {
@@ -127,94 +131,80 @@ public partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfoViewMod
 
         string valueText = ValueMaskedTextBox.Text[1..];
         decimal valueVal = Convert.ToDecimal(valueText.Trim().Replace("_", "0"));
-        if (!valueText.Equals("__________________.__") && decimal.Compare(Series.Value, valueVal) != 0)
+        if (!valueText.Equals("__________________.__") && decimal.Compare(ViewModel.Series.Value, valueVal) != 0)
         {
-            string logMsg = $"value for \"{Series.Titles["Romaji"]}\" from {ViewModel.CurCurrencyInstance}{Series.Value} to {ViewModel.CurCurrencyInstance}{valueVal}";
+            string logMsg = $"value for \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\" from {ViewModel.CurCurrencyInstance}{ViewModel.Series.Value} to {ViewModel.CurCurrencyInstance}{valueVal}";
             LOGGER.Info($"Updating {logMsg}");
 
-            Series.Value = valueVal;
+            ViewModel.Series.Value = valueVal;
             // ValueTextBlock.Text = $"{ViewModel.CurCurrency}{valueVal}";
             ValueMaskedTextBox.Clear();
 
-            MainWindowViewModel.collectionStatsWindow.ViewModel.UpdateCollectionPrice();
+            _collectionStatsViewModel.UpdateCollectionPrice();
             LOGGER.Info($"Updated {logMsg}");
         }
         
         string publisherText = PublisherTextBox.Text.Trim();
-        if (!string.IsNullOrWhiteSpace(publisherText) && !publisherText.Equals(Series.Publisher))
+        if (!string.IsNullOrWhiteSpace(publisherText) && !publisherText.Equals(ViewModel.Series.Publisher))
         {
-            Series.Publisher = publisherText;
-            MainWindowViewModel.UpdateSeriesCard(Series);
+            ViewModel.Series.Publisher = publisherText;
+            _mainWindowViewModel.UpdateSeriesCard(ViewModel.Series);
             PublisherTextBox.Clear();
 
-            LOGGER.Info($"Updated Publisher for \"{Series.Titles["Romaji"]}\" from \"{Series.Publisher}\" to \"{publisherText}\"");
+            LOGGER.Info($"Updated Publisher for \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\" from \"{ViewModel.Series.Publisher}\" to \"{publisherText}\"");
 
         }
         
         HashSet<Genre> curGenres = EditSeriesInfoViewModel.GetCurrentGenresSelected();
-        if (curGenres.Count > 0 && (Series.Genres == null || !curGenres.SetEquals(Series.Genres)))
+        if (curGenres.Count > 0 && (ViewModel.Series.Genres == null || !curGenres.SetEquals(ViewModel.Series.Genres)))
         {
-            LOGGER.Info($"Updating Genres for \"{Series.Titles["Romaji"]}\" from [{string.Join(", ", Series.Genres)}] to [{string.Join(", ", curGenres)}]");
-            if (Series.Genres != null)
+            LOGGER.Info($"Updating Genres for \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\" from [{string.Join(", ", ViewModel.Series.Genres)}] to [{string.Join(", ", curGenres)}]");
+            if (ViewModel.Series.Genres != null)
             {
-                MainWindowViewModel.collectionStatsWindow.ViewModel.UpdateGenreChart(curGenres.Except(Series.Genres), Series.Genres.Except(curGenres)); 
+                _collectionStatsViewModel.UpdateGenreChart(curGenres.Except(ViewModel.Series.Genres), ViewModel.Series.Genres.Except(curGenres)); 
             }
             else
             {
-                MainWindowViewModel.collectionStatsWindow.ViewModel.UpdateGenreChart(curGenres, []); 
+                _collectionStatsViewModel.UpdateGenreChart(curGenres, []); 
             }
-            Series.Genres = curGenres;
+            ViewModel.Series.Genres = curGenres;
         }
     }
 
     private async void ChangeSeriesCoverFromFileAsync(object sender, RoutedEventArgs args)
     {
         ViewModelBase.newCoverCheck = true;
-        IReadOnlyList<IStorageFile> file = await this.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions 
+        IReadOnlyList<IStorageFile> file = await this.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {
             AllowMultiple = false,
-            FileTypeFilter = [ new FilePickerFileType("Images") { Patterns = ["*.png", "*.jpg", "*.jpeg"] } ]
+            FileTypeFilter = [new FilePickerFileType("Images") { Patterns = ["*.png", "*.jpg", "*.jpeg"] }]
         });
 
-        if (file.Count > 0)
+        if (file.Count == 1)
         {
-            for (int x = 0; x < MainWindowViewModel.UserCollection.Count; x++)
-            {
-                if (MainWindowViewModel.UserCollection[x] == Series)
-                {
-                    Series Series = MainWindowViewModel.UserCollection[x];
-
-                    string filePath = file[0].Path.LocalPath;
-                    string fileExtension = filePath[^3..];
-                    if (!Series.Cover.EndsWith(fileExtension))
-                    {
-                        Series.DeleteCover();
-                        Series.Cover = Series.Cover.Remove(Series.Cover.Length - 3, 3) + fileExtension;
-                    };
-
-                    MainWindowViewModel.ChangeCover(Series, filePath);
-                    break;
-                }
-            }
+            string fullCoverPath = AppFileHelper.GetFullCoverPath(ViewModel.Series.Cover);
+            Bitmap newCover = await _bitmapHelper.GenerateAvaloniaBitmapAsync(fullCoverPath, file[0].Path.LocalPath);
+            GenerateNewBitmap(newCover, fullCoverPath);
+        }
+        else
+        {
+            LOGGER.Warn("User selected multiple files for user icon.");
         }
     }
 
     private async void RefreshSeriesAsync(object sender, RoutedEventArgs args)
     {
-        await ((MainWindow)((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).MainWindow).ViewModel.RefreshSeries(Series);
+        await _mainWindowViewModel.RefreshSeries(ViewModel.Series);
         GenreSelector.SelectedItems.Clear();
         UpdateSelectedGenres();
-        MainWindowViewModel.collectionStatsWindow.ViewModel.UpdateGenreChart();
+        _collectionStatsViewModel.UpdateGenreChart();
         
     }
 
-    private async void RemoveSeriesAsync(object sender, RoutedEventArgs args)
+    private void RemoveSeries(object sender, RoutedEventArgs args)
     {
         ViewModelBase.newCoverCheck = true;
-        _ = await Observable.Start(() => 
-        {
-            MainWindowViewModel.DeleteSeries(Series);
-        }, RxApp.MainThreadScheduler);
+        _mainWindowViewModel.DeleteSeries(ViewModel.Series);
         this.Close();
     }
 
@@ -230,15 +220,15 @@ public partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfoViewMod
                 {
                     if (newMaxVols >= newCurVols)
                     {
-                        LOGGER.Info($"Changing Series Volume Counts For \"{Series.Titles["Romaji"]}\" From {Series.CurVolumeCount}/{Series.MaxVolumeCount} -> {newCurVols}/{newMaxVols}");
+                        LOGGER.Info($"Changing Series Volume Counts For \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\" From {ViewModel.Series.CurVolumeCount}/{ViewModel.Series.MaxVolumeCount} -> {newCurVols}/{newMaxVols}");
                         
-                        MainWindowViewModel.collectionStatsWindow.ViewModel.UpdateVolumeCounts(Series, newCurVols, newMaxVols);
+                        _collectionStatsViewModel.UpdateVolumeCounts(ViewModel.Series, newCurVols, newMaxVols);
 
-                        Series.CurVolumeCount = newCurVols;
-                        Series.MaxVolumeCount = newMaxVols;
-                        MainWindowViewModel.UpdateSeriesCard(Series);
+                        ViewModel.Series.CurVolumeCount = newCurVols;
+                        ViewModel.Series.MaxVolumeCount = newMaxVols;
+                        _mainWindowViewModel.UpdateSeriesCard(ViewModel.Series);
 
-                        MainWindowViewModel.collectionStatsWindow.ViewModel.UpdateVolumeCountChartValues();
+                        _collectionStatsViewModel.UpdateVolumeCountChartValues();
                         
                         CurVolumeMaskedTextBox.Clear();
                         MaxVolumeMaskedTextBox.Clear();
@@ -258,9 +248,9 @@ public partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfoViewMod
 
     public void UpdateSelectedGenres()
     {
-        if (Series.Genres != null)
+        if (ViewModel.Series.Genres != null)
         {
-            foreach (Genre genre in Series.Genres)
+            foreach (Genre genre in ViewModel.Series.Genres)
             {
                 switch (genre)
                 {

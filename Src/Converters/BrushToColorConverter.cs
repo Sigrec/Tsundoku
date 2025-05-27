@@ -2,7 +2,7 @@ using System.Globalization;
 using Avalonia.Data.Converters;
 using Avalonia.Media;
 
-namespace Tsundoku.Helpers
+namespace Tsundoku.Converters
 {
     public class BrushToColorConverter : IValueConverter
     {

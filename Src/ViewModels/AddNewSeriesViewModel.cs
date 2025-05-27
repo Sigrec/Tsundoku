@@ -3,25 +3,36 @@ using ReactiveUI.Fody.Helpers;
 using System.Collections.ObjectModel;
 using Avalonia.Controls;
 using System.Collections.Specialized;
-using ReactiveUI;
 using System.Reactive.Linq;
+using Tsundoku.Helpers;
+using static Tsundoku.Models.TsundokuLanguageModel;
+using Avalonia.Collections;
 
 namespace Tsundoku.ViewModels
 {
     public class AddNewSeriesViewModel : ViewModelBase
     {
+        private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
+        private readonly BitmapHelper _bitmapHelper;
+        private readonly MangaDex _mangaDex;
+        private readonly AniList _aniList;
         [Reactive] public string TitleText { get; set; }
         [Reactive] public string PublisherText { get; set; }
         [Reactive] public string CoverImageUrl { get; set; }
         [Reactive] public string MaxVolumeCount { get; set; }
         [Reactive] public string CurVolumeCount { get; set; }
-        [Reactive] public bool AllowDuplicate { get; set; } = false;
+        [Reactive] public bool AllowDuplicate { get; set; }
         [Reactive] public string AdditionalLanguagesToolTipText { get; set; }
         [Reactive] public bool IsAddSeriesButtonEnabled { get; set; } = false;
-        public static ObservableCollection<ListBoxItem> SelectedAdditionalLanguages { get; set; } = new ObservableCollection<ListBoxItem>();
+        [Reactive] public AvaloniaList<ListBoxItem> SelectedAdditionalLanguages { get; set; } = [];
         private static readonly StringBuilder CurLanguages = new StringBuilder();
-        public AddNewSeriesViewModel()
-        {   
+
+        public AddNewSeriesViewModel(IUserService userService, BitmapHelper bitmapHelper, MangaDex mangaDex, AniList aniList) : base(userService)
+        {
+            _bitmapHelper = bitmapHelper;
+            _mangaDex = mangaDex;
+            _aniList = aniList;
+
             SelectedAdditionalLanguages.CollectionChanged += AdditionalLanguagesCollectionChanged;
         }
 
@@ -59,91 +70,37 @@ namespace Tsundoku.ViewModels
         /// <param name="maxVolCount">The max # of volumes this series currently has</param>
         /// <param name="additionalLanguages">Additional languages to get more info for from Mangadex</param>
         /// <returns>Whether the series can be added to the users collection or not</returns>
-        public static async Task<KeyValuePair<bool, string>> GetSeriesDataAsync(string title, Format bookType, ushort curVolCount, ushort maxVolCount, ObservableCollection<string> additionalLanguages, string customImageUrl = "", string publisher = "Unknown", Demographic demographic = Demographic.Unknown, uint volumesRead = 0, decimal rating = -1, decimal value = 0, bool alllowDuplicate = false)
+        public async Task<KeyValuePair<bool, string>> GetSeriesDataAsync(string title, Format bookType, ushort curVolCount, ushort maxVolCount, List<TsundokuLanguage> additionalLanguages, string customImageUrl = "", string publisher = "Unknown", Demographic demographic = Demographic.Unknown, uint volumesRead = 0, decimal rating = -1, decimal value = 0, bool alllowDuplicate = false)
         {
             string returnMsg = string.Empty;
-            Series? newSeries = await Series.CreateNewSeriesCardAsync(title, bookType, maxVolCount, curVolCount, additionalLanguages, publisher, demographic, volumesRead, rating, value, customImageUrl);
-            bool duplicateSeriesCheck = true;
+            Series? newSeries = await Series.CreateNewSeriesCardAsync(_bitmapHelper, _mangaDex, _aniList, title, bookType, maxVolCount, curVolCount, additionalLanguages, publisher, demographic, volumesRead, rating, value, customImageUrl);
+
+            bool successfulAdd = false;
             if (newSeries != null)
             {
-                duplicateSeriesCheck = !alllowDuplicate && MainWindowViewModel.UserCollection.AsParallel().Any(series => series.Equals(newSeries));
-
-                if (alllowDuplicate || !duplicateSeriesCheck)
+                try
                 {
-                    try
+                    // TODO - Need to ensure that if user is searching or filtering that adding a series that matches it shows up and if it doesn't does not show up but is still in the list
+                    LOGGER.Debug($"\nAdding New Series (Allow Dupe ?= {alllowDuplicate}) -> \"{title}\" | \"{bookType}\" | {curVolCount} | {maxVolCount}\n{newSeries}");
+                    successfulAdd = _userService.AddSeries(newSeries, alllowDuplicate);
+                    if (!successfulAdd)
                     {
-                        LOGGER.Info($"\nAdding New Series (Is Dupe ?= {duplicateSeriesCheck}) -> \"{title}\" | \"{bookType}\" | {curVolCount} | {maxVolCount}\n{newSeries}");
-                        int index = MainWindowViewModel.UserCollection.BinarySearch(newSeries, new SeriesComparer(MainUser.CurLanguage));
-                        index = index < 0 ? ~index : index;
-                        if (MainWindowViewModel.UserCollection.Count == MainWindowViewModel.SearchedCollection.Count)
-                        {
-                            LOGGER.Debug("No Filter Insert");
-                            MainWindowViewModel.SearchedCollection.Insert(index, newSeries);
-                        }
-                        else if (
-                            DetermineFilter(newSeries, (((Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).MainWindow as Views.MainWindow).ViewModel.CurFilter)
-                            ||
-                            (MainWindowViewModel.SearchIsBusy && (newSeries.Titles.Values.AsParallel().Any(title => title.Contains(MainWindowViewModel.CurSearchText, StringComparison.OrdinalIgnoreCase)) || newSeries.Staff.Values.AsParallel().Any(staff => staff.Contains(MainWindowViewModel.CurSearchText, StringComparison.OrdinalIgnoreCase))))
-                        )
-                        {
-                            int searchedIndex = MainWindowViewModel.SearchedCollection.ToList().BinarySearch(newSeries, new SeriesComparer(MainUser.CurLanguage));
-                            searchedIndex = searchedIndex < 0 ? ~searchedIndex : searchedIndex;
-                            if (MainWindowViewModel.SearchedCollection.Count == 0 || searchedIndex == MainWindowViewModel.SearchedCollection.Count)
-                            {
-                                MainWindowViewModel.SearchedCollection.Add(newSeries);
-                            }
-                            else
-                            {
-                                MainWindowViewModel.SearchedCollection.Insert(searchedIndex, newSeries);
-                            }
-                        }
-                        LOGGER.Debug("{} | {}", newSeries.VolumesRead, newSeries.Value);
-                        MainWindowViewModel.UserCollection.Insert(index, newSeries);
-                    }
-                    catch (Exception ex)
-                    {
-                        LOGGER.Error("Error adding new Series to Collection\n{msg}", ex.Message);
-                        newSeries?.Dispose();
+                        returnMsg = "Duplicate Series";
                     }
                 }
-                else
+                catch (Exception ex)
                 {
-                    returnMsg = "Duplicate Series";
-                    LOGGER.Info("{} Already Exists Not Adding", newSeries.Titles["Romaji"]);
+                    LOGGER.Error("Error adding new Series to Collection\n{msg}", ex.Message);
+                    newSeries?.Dispose();
+                    returnMsg = "Unknown Reason";
                 }
             }
-
-            if (duplicateSeriesCheck)
-            {
-                LOGGER.Debug("Disposing {series}", newSeries?.Titles["Romaji"]);
-                newSeries?.Dispose();
-            }
-            return new KeyValuePair<bool, string>(duplicateSeriesCheck, returnMsg);
+            return new KeyValuePair<bool, string>(successfulAdd, returnMsg);
         }
 
-        public static ObservableCollection<string> ConvertSelectedLangList(ObservableCollection<ListBoxItem> SelectedLangs)
+        public List<TsundokuLanguage> ConvertSelectedLangList()
         {
-            return new ObservableCollection<string>(SelectedLangs.Select(lang => lang.Content.ToString()).OfType<string>());
-        }
-
-        public static bool DetermineFilter(Series newSeries, TsundokuFilter filter)
-        {
-            return filter switch
-            {
-                TsundokuFilter.Ongoing => newSeries.Status == Status.Ongoing,
-                TsundokuFilter.Finished => newSeries.Status == Status.Finished,
-                TsundokuFilter.Hiatus => newSeries.Status == Status.Hiatus,
-                TsundokuFilter.Cancelled => newSeries.Status == Status.Cancelled,
-                TsundokuFilter.Complete => newSeries.MaxVolumeCount == newSeries.CurVolumeCount,
-                TsundokuFilter.Incomplete => newSeries.MaxVolumeCount != newSeries.CurVolumeCount,
-                TsundokuFilter.Manga => newSeries.Format != Format.Novel,
-                TsundokuFilter.Novel => newSeries.Format == Format.Novel,
-                TsundokuFilter.Shounen => newSeries.Demographic == Demographic.Shounen,
-                TsundokuFilter.Shoujo => newSeries.Demographic == Demographic.Shoujo,
-                TsundokuFilter.Seinen => newSeries.Demographic == Demographic.Seinen,
-                TsundokuFilter.Josei => newSeries.Demographic == Demographic.Josei,
-                _ => false,
-            };
+            return [.. SelectedAdditionalLanguages.Select(lang => lang.Content.ToString().GetEnumValueFromMemberValue<TsundokuLanguage>())];
         }
     }
 }

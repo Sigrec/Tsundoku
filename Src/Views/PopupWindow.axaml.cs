@@ -7,9 +7,12 @@ namespace Tsundoku.Views;
 
 public partial class PopupWindow : ReactiveWindow<PopupWindowViewModel>
 {
-    public PopupWindow()
+    private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
+    public PopupWindow(PopupWindowViewModel viewModel)
     {
+        ViewModel = viewModel;
         InitializeComponent();
+
         Closing += (s, e) => { ViewModel.ResetPopupInfo(); };
     }
 

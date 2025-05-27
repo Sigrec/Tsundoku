@@ -12,7 +12,7 @@
         FontFamily="Segoe UI"
         MaxWidth="491"
         MinWidth="491"
-        MaxHeight="865"
+        MaxHeight="870"
         WindowStartupLocation="2"
         KeyboardNavigation.TabNavigation="None">
     
@@ -24,7 +24,7 @@
 		</ResourceDictionary>
 	</Window.Resources>
 
-    <Border Classes="menu" BorderThickness="3" CornerRadius="0,0,8,8" ClipToBounds="True">
+    <Border Classes="Menu" BorderThickness="3" CornerRadius="0,0,8,8" ClipToBounds="True">
         <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Theme="{StaticResource ReverseCollectionScroll}"> 
             <StackPanel Margin="20,10,20,20" Spacing="10">
                 <StackPanel Spacing="5">
@@ -33,12 +33,12 @@
                                FontSize="20" 
                                FontWeight="Bold"
                                ToolTip.Tip="{CompiledBinding UsernameText}"
-                               Classes="menu"/>
+                               Classes="Menu"/>
                     <StackPanel Orientation="Horizontal" Spacing="5">
                         <TextBox Name="UsernameChange"
                                 Width="400"
                                 FontWeight="Bold"
-                                Classes="menu"
+                                Classes="Menu"
                                 FontSize="15"
                                 MaxLength="20"
                                 Height="35"
@@ -54,7 +54,7 @@
                     </StackPanel>
                 </StackPanel>
                 <StackPanel Spacing="5">
-                    <TextBlock Text="Currency" TextDecorations="Underline" FontSize="20" FontWeight="Bold" Classes="menu"/>
+                    <TextBlock Text="Currency" TextDecorations="Underline" FontSize="20" FontWeight="Bold" Classes="Menu"/>
                     <ComboBox Name="CurrencySelector"
                               SelectionChanged="CurrencyChanged"
                               SelectedIndex="{CompiledBinding CurrencyIndex}"
@@ -93,7 +93,7 @@
 					</ComboBox>
                 </StackPanel>
                 <StackPanel Spacing="5">
-                    <TextBlock Text="Memberships" TextDecorations="Underline" FontSize="20" FontWeight="Bold" Classes="menu"/>
+                    <TextBlock Text="Memberships" TextDecorations="Underline" FontSize="20" FontWeight="Bold" Classes="Menu"/>
                     <WrapPanel Width="450" Margin="-5,0,0,0">
 						<WrapPanel.Styles>
                             <Style Selector="ToggleButton">
@@ -115,18 +115,18 @@
 					</WrapPanel>
                 </StackPanel>
 				<StackPanel Spacing="5">
-                    <TextBlock Text="Controls" TextDecorations="Underline" FontSize="20" FontWeight="Bold" Classes="menu"/>
-                    <TextBlock Text="Copy Title → Click Title on Series Card" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
-                    <TextBlock Text="Open Series Page → Click Series Image" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
-                    <TextBlock Text="Toggle Fullscreen → F11" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
-                    <TextBlock Text="Advanced Search → CTRL+F" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
-                    <TextBlock Text="Screenshot Collection → CTRL+P" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
-                    <TextBlock Text="Reload Filter/Sort on Collection → SHIFT+R" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
-                    <TextBlock Text="Save Collection (Auto Saves on Close) → CTRL+S" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
-                    <TextBlock Text="Reload Covers → CTRL+R" FontSize="15" FontWeight="DemiBold" Classes="menu"/>
+                    <TextBlock Text="Controls" TextDecorations="Underline" FontSize="20" FontWeight="Bold" Classes="Menu"/>
+                    <TextBlock Text="Copy Title → Click Title on Series Card" FontSize="15" FontWeight="DemiBold" Classes="Menu"/>
+                    <TextBlock Text="Open Series Page → Click Series Image" FontSize="15" FontWeight="DemiBold" Classes="Menu"/>
+                    <TextBlock Text="Toggle Fullscreen → F11" FontSize="15" FontWeight="DemiBold" Classes="Menu"/>
+                    <TextBlock Text="Advanced Search → CTRL+F" FontSize="15" FontWeight="DemiBold" Classes="Menu"/>
+                    <TextBlock Text="Screenshot Collection → CTRL+P" FontSize="15" FontWeight="DemiBold" Classes="Menu"/>
+                    <TextBlock Text="Reload Filter/Sort on Collection → SHIFT+R" FontSize="15" FontWeight="DemiBold" Classes="Menu"/>
+                    <TextBlock Text="Save Collection (Auto Saves on Close) → CTRL+S" FontSize="15" FontWeight="DemiBold" Classes="Menu"/>
+                    <TextBlock Text="Reload Covers → CTRL+R" FontSize="15" FontWeight="DemiBold" Classes="Menu"/>
                 </StackPanel>
                 <StackPanel Spacing="5">
-                    <TextBlock Text="Settings" TextDecorations="Underline" FontSize="20" FontWeight="Bold" Classes="menu"/>
+                    <TextBlock Text="Settings" TextDecorations="Underline" FontSize="20" FontWeight="Bold" Classes="Menu"/>
                     <WrapPanel Width="450" Margin="-5,0,0,0">
                         <WrapPanel.Styles>
                             <Style Selector="Button">
@@ -172,7 +172,7 @@
                     </WrapPanel>
                 </StackPanel>
                 <StackPanel Spacing="5">
-                    <TextBlock Text="Youtubers" TextDecorations="Underline" FontSize="20" FontWeight="Bold" Classes="menu"/>
+                    <TextBlock Text="Youtubers" TextDecorations="Underline" FontSize="20" FontWeight="Bold" Classes="Menu"/>
                     <WrapPanel Width="450" Margin="-5,0,0,0">
                         <Button Theme="{StaticResource UserSettingsButton}"
                                 Click="OpenYoutuberSite"
@@ -219,7 +219,7 @@
                                TextDecorations="Underline"
                                FontSize="20"
                                FontWeight="Bold"
-                               Classes="menu"/>
+                               Classes="Menu"/>
                     <StackPanel Orientation="Horizontal" Width="450" Margin="-5,0,0,0">
                         <Button Theme="{StaticResource UserSettingsButton}"
                                 Click="OpenAniListLink"

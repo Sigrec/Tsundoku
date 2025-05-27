@@ -14,12 +14,12 @@
 		<!-- <Setter Property="Padding" Value="{DynamicResource ButtonPadding}"/> -->
 
 		<Style Selector="TextBlock.mouseover">
-            <Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.StatusAndBookTypeBGHoverColor}"/>
-            <Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.StatusAndBookTypeTextHoverColor}"/>
+            <Setter Property="Background" Value="{CompiledBinding CurrentTheme.StatusAndBookTypeBGHoverColor}"/>
+            <Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.StatusAndBookTypeTextHoverColor}"/>
         </Style>
         <Style Selector="TextBlock.nomouseover">
-            <Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.StatusAndBookTypeBGColor}"/>
-            <Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.StatusAndBookTypeTextColor}"/>
+            <Setter Property="Background" Value="{CompiledBinding CurrentTheme.StatusAndBookTypeBGColor}"/>
+            <Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.StatusAndBookTypeTextColor}"/>
         </Style>
 	</ControlTheme>
 </ResourceDictionary>

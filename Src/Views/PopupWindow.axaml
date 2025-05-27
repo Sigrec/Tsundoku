@@ -7,7 +7,7 @@
         x:Class="Tsundoku.Views.PopupWindow"
         Icon="\Assets\Icons\Tsundoku-Logo.ico"
         FontFamily="Segoe UI"
-        Classes="menu"
+        Classes="Menu"
         WindowStartupLocation="CenterScreen"
         SizeToContent="Height"
         Width="300"
@@ -16,14 +16,10 @@
         Title="{CompiledBinding Title}"
         CanResize="false">
 
-    <Window.DataContext>
-		<vm:PopupWindowViewModel/>
-	</Window.DataContext>
-
-    <Border Classes="menu" BorderThickness="3" CornerRadius="0,0,8,8" ClipToBounds="True">
+    <Border Classes="Menu" BorderThickness="3" CornerRadius="0,0,8,8" ClipToBounds="True">
         <StackPanel Orientation="Vertical" Margin="10" Spacing="5">
-            <i:Icon Value="{CompiledBinding Icon}" FontSize="25" FontWeight="Bold" Foreground="{CompiledBinding CurrentThemeInstance.DividerColor}" Classes="menu"/>
-            <TextBlock Text="{CompiledBinding InfoText}" FontSize="20" TextAlignment="Center" FontWeight="Bold" TextWrapping="Wrap" Classes="menu"/>
+            <i:Icon Value="{CompiledBinding Icon}" FontSize="25" FontWeight="Bold" Foreground="{CompiledBinding CurrentTheme.DividerColor}" Classes="Menu"/>
+            <TextBlock Text="{CompiledBinding InfoText}" FontSize="20" TextAlignment="Center" FontWeight="Bold" TextWrapping="Wrap" Classes="Menu"/>
         </StackPanel>
     </Border>
 </Window>

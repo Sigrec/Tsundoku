@@ -1,23 +1,79 @@
-using ReactiveUI.Fody.Helpers;
-using ReactiveUI;
-using System.Reactive.Linq;
 using System.Collections.ObjectModel;
+using System.Reactive.Linq;
+using ReactiveUI.Fody.Helpers;
+using Tsundoku.Models;
 
 namespace Tsundoku.ViewModels
 {
     public class ThemeSettingsViewModel : ViewModelBase
     {
-        public static ObservableCollection<string> UserThemesDisplay { get; set; }
-        [Reactive] public string ThemeName { get; set; }
+        private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
         [Reactive] public bool IsSaveThemeButtonEnabled { get; set; }
         [Reactive] public bool IsGenerateThemeButtonEnabled { get; set; } = false;
-        [Reactive] public int CurThemeIndex { get; set; }
+        [Reactive] public int SelectedThemeIndex { get; set; }
 
-        public ThemeSettingsViewModel()
+        public ReadOnlyObservableCollection<TsundokuTheme> SavedThemes => _userService.SavedThemes;
+
+        public ThemeSettingsViewModel(IUserService userService) : base(userService)
         {
-            this.WhenAnyValue(x => x.ThemeName, x => !string.IsNullOrWhiteSpace(x) && !x.Equals("Default", StringComparison.OrdinalIgnoreCase)).Subscribe(x => IsSaveThemeButtonEnabled = x);
-            this.WhenAnyValue(x => x.CurrentThemeInstance).Subscribe(x => CurThemeIndex = MainUser.SavedThemes.IndexOf(x));
-            UserThemesDisplay = new ObservableCollection<string>(MainUser.SavedThemes.OrderBy(theme => theme.ThemeName).Select(theme => theme.ThemeName));
+            UpdateSelectedThemeIndex();
+        }
+
+        public void UpdateSelectedThemeIndex()
+        {
+            int initialIndex = SavedThemes.ToList().FindIndex(t => t.ThemeName == CurrentTheme.ThemeName);
+            LOGGER.Debug("Updating Selected Theme Index to {val}", initialIndex);
+            SelectedThemeIndex = initialIndex != -1 ? initialIndex : 0;
+        }
+
+        public TsundokuTheme GetMainTheme()
+        {
+            return _userService.GetMainTheme()!;
+        }
+
+        public TsundokuTheme GetCurrentTheme()
+        {
+            return _userService.GetCurrentThemeSnapshot()!;
+        }
+
+        public void OverrideCurrentTheme(TsundokuTheme theme)
+        {
+            _userService.OverrideCurrentTheme(theme);
+        }
+
+        public void SetTheme(TsundokuTheme theme)
+        {
+            _userService.SetCurrentTheme(theme);
+        }
+
+        public void SetTheme(string themeName)
+        {
+            _userService.SetCurrentTheme(themeName);
+        }
+
+        public void RemoveTheme(string themeName)
+        {
+            _userService.RemoveTheme(themeName);
+            UpdateSelectedThemeIndex();
+        }
+
+        public void ExportTheme(string fileName)
+        {
+            _userService.ExportTheme(fileName);
+        }
+
+        public async Task ImportThemeAsync(string filePath)
+        {
+            await _userService.ImportThemeAsync(filePath);
+            UpdateSelectedThemeIndex();
+            _userService.SaveUserData();
+        }
+
+        public void SaveTheme(TsundokuTheme theme)
+        {
+            _userService.AddTheme(theme);
+            UpdateSelectedThemeIndex();
+            _userService.SaveUserData();
         }
     }
 }

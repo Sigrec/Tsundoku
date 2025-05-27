@@ -7,13 +7,13 @@
         xmlns:local="clr-namespace:Tsundoku.Models"
         x:Class="Tsundoku.Views.EditSeriesInfoWindow"
         x:DataType="vm:EditSeriesInfoViewModel"
-        Classes="menu"
+        Classes="Menu"
         FontFamily="Segoe UI"
         WindowStartupLocation="CenterScreen"
         SizeToContent="WidthAndHeight"
         CanResize="false">
 
-    <Border Classes="menu" BorderThickness="3" CornerRadius="0,0,8,8" ClipToBounds="True">
+    <Border Classes="Menu" BorderThickness="3" CornerRadius="0,0,8,8" ClipToBounds="True">
         <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Theme="{StaticResource ReverseCollectionScroll}"> 
             <Grid
                 RowDefinitions="Auto,20,Auto,Auto,20,Auto,Auto,2,Auto,7,Auto"
@@ -41,7 +41,7 @@
                         ScrollViewer.IsScrollChainingEnabled="false"
                         FontWeight="Bold"
                         FontSize="16"
-                        Classes="menu"/>
+                        Classes="Menu"/>
                     <StackPanel
                         Spacing="10"
                         Height="200"
@@ -57,7 +57,7 @@
                             Height="45"
                             Padding="0,0,1,0"
                             Theme="{StaticResource MenuButton}"
-                            Click="RemoveSeriesAsync"/>
+                            Click="RemoveSeries"/>
                         <MaskedTextBox
                             Name="CurVolumeMaskedTextBox"
                             HorizontalContentAlignment="Center"
@@ -71,7 +71,7 @@
                             TextAlignment="Center"
                             MaxLength="3"
                             ToolTip.Tip="Cur"
-                            Classes="menu"
+                            Classes="Menu"
                             Mask="###"/>
                         <MaskedTextBox 
                             Name="MaxVolumeMaskedTextBox"
@@ -86,7 +86,7 @@
                             TextAlignment="Center"
                             MaxLength="3"
                             ToolTip.Tip="Max"
-                            Classes="menu"
+                            Classes="Menu"
                             Mask="###"/>
                         <Button
                             Name="ChangeSeriesVolumeCountButton"
@@ -100,7 +100,7 @@
                             Click="ChangeSeriesVolumeCountsAsync"/>
                     </StackPanel>
                 </StackPanel>
-                <Line Grid.ColumnSpan="3" Grid.Column="0" Grid.Row="1" StartPoint="0,10" EndPoint="550,10" VerticalAlignment="Center" HorizontalAlignment="Center" Stroke="{CompiledBinding CurrentThemeInstance.DividerColor}" StrokeThickness="3"/>
+                <Line Grid.ColumnSpan="3" Grid.Column="0" Grid.Row="1" StartPoint="0,10" EndPoint="550,10" VerticalAlignment="Center" HorizontalAlignment="Center" Stroke="{CompiledBinding CurrentTheme.DividerColor}" StrokeThickness="3"/>
                 <TextBlock
                     Name="CoverImageTextBlock"
                     Text="Cover Image"
@@ -109,7 +109,7 @@
                     Grid.ColumnSpan="3"
                     FontSize="20"
                     FontWeight="Bold"
-                    Classes="menu"
+                    Classes="Menu"
                     TextDecorations="Underline"
                     Margin="2,0,0,3"
                     HorizontalAlignment="Left"
@@ -122,7 +122,7 @@
                         FontWeight="Bold"
                         Height="38"
                         Text="{CompiledBinding CoverImageUrl}"
-                        Classes="menu"
+                        Classes="Menu"
                         BorderThickness="2"
                         ToolTip.Tip="Optional"
                         Watermark="Image Url (Hover Title to see Full Text)"/>
@@ -145,12 +145,12 @@
                         ToolTip.Tip="Change Cover From File"
                         Theme="{StaticResource MenuButton}"/>
                 </StackPanel>
-                <Line Grid.ColumnSpan="3" Grid.Column="0" Grid.Row="4" StartPoint="0,10" EndPoint="550,10" VerticalAlignment="Center" HorizontalAlignment="Center" Stroke="{CompiledBinding CurrentThemeInstance.DividerColor}" StrokeThickness="3"/>
+                <Line Grid.ColumnSpan="3" Grid.Column="0" Grid.Row="4" StartPoint="0,10" EndPoint="550,10" VerticalAlignment="Center" HorizontalAlignment="Center" Stroke="{CompiledBinding CurrentTheme.DividerColor}" StrokeThickness="3"/>
                 <TextBlock
                     Name="PublisherTextBlock"
                     Grid.Row="5"
                     Grid.Column="0"
-                    Classes="menu"
+                    Classes="Menu"
                     FontWeight="Bold"
                     Text="Publisher"
                     TextDecorations="Underline" 
@@ -164,7 +164,7 @@
                     Grid.Column="0"
                     Height="38"
                     Width="262"
-                    Classes="menu"
+                    Classes="Menu"
                     BorderThickness="2"
                     FontWeight="Bold"
                     FontSize="17"
@@ -176,7 +176,7 @@
                     Name="ValueTextBlock"
                     Grid.Row="5"
                     Grid.Column="2"
-                    Classes="menu"
+                    Classes="Menu"
                     FontWeight="Bold"
                     TextDecorations="Underline" 
                     HorizontalAlignment="Center"
@@ -203,7 +203,7 @@
                     HorizontalContentAlignment="Center"
                     Mask="{Binding CurCurrencyInstance, StringFormat='{}{0}000000000000000000.00'}"
                     VerticalContentAlignment="Center"
-                    Classes="menu"/>
+                    Classes="Menu"/>
                 <Grid 
                     Grid.RowDefinitions="Auto,Auto"
                     Grid.ColumnDefinitions="*,15,*,15,*"
@@ -217,7 +217,7 @@
                         Text="{CompiledBinding Series.Rating, StringFormat='{}Rating {0}/10.0'}"
                         TextDecorations="Underline" 
                         FontWeight="Bold"
-                        Classes="menu"
+                        Classes="Menu"
                         HorizontalAlignment="Center"
                         Margin="0,0,0,3"
                         FontSize="20"/>
@@ -232,7 +232,7 @@
                         FontWeight="Bold"
                         FontSize="17"
                         TextAlignment="Left"
-                        Classes="menu"
+                        Classes="Menu"
                         HorizontalContentAlignment="Center"
                         HidePromptOnLeave="True"
                         Mask="90.0/1\0.\0"/>
@@ -241,7 +241,7 @@
                         Grid.Column="2"
                         Text="Demographic"
                         TextDecorations="Underline"
-						Classes="menu"
+						Classes="Menu"
                         FontWeight="Bold"
                         HorizontalAlignment="Center"
                         Margin="0,0,0,3"
@@ -276,7 +276,7 @@
                         ToolTip.Tip="Volumes Read"
                         HorizontalAlignment="Center"
                         TextDecorations="Underline"
-                        Classes="menu"
+                        Classes="Menu"
                         Margin="0,0,0,3"
                         FontSize="20"/>
                     <MaskedTextBox
@@ -294,7 +294,7 @@
                         FontSize="17"
                         TextAlignment="Left"
                         HorizontalContentAlignment="Center"
-                        Classes="menu"
+                        Classes="Menu"
                         Mask="000"/>
                 </Grid>
                 <StackPanel
@@ -340,7 +340,6 @@
                         FontSize="17"
                         VerticalContentAlignment="Center"
                         HorizontalContentAlignment="Center"
-                        Click="ToggleSeriesFavoriteAsync"
                         Theme="{StaticResource MenuToggleButton}">
                         <Button.Content>
                             <StackPanel Orientation="Horizontal" Spacing="3">
@@ -363,7 +362,7 @@
                         Text="Genres" 
                         FontSize="20" 
                         FontWeight="Bold" 
-                        Classes="menu" 
+                        Classes="Menu" 
                         Margin="2,0,0,0"
                         TextDecorations="Underline"
                         ToolTip.Tip="{CompiledBinding GenresToolTipText}" 

@@ -1,7 +1,7 @@
 using Avalonia.Controls;
-using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Interactivity;
 using Avalonia.ReactiveUI;
+using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
 using Tsundoku.Models;
 using Tsundoku.ViewModels;
@@ -10,26 +10,28 @@ namespace Tsundoku.Views
 {
     public partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesViewModel>
     {
+        private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
         private ushort MaxVolNum;
         private ushort CurVolNum;
         public bool IsOpen = false;
-        private MainWindow CollectionWindow;
+        private readonly CollectionStatsViewModel _collectionStatsViewModel;
 
-        public AddNewSeriesWindow()
+        public AddNewSeriesWindow(AddNewSeriesViewModel viewModel, CollectionStatsViewModel collectionStatsViewModel)
         {
+            ViewModel = viewModel;
+            _collectionStatsViewModel = collectionStatsViewModel;
             InitializeComponent();
+
             Opened += (s, e) =>
             {
                 IsOpen ^= true;
-                CollectionWindow = (MainWindow)((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).MainWindow;
             };
 
             Closing += (s, e) =>
             {
                 if (IsOpen)
                 {
-                    MainWindow.ResetMenuButton(CollectionWindow.AddNewSeriesButton);
-                    ((AddNewSeriesWindow)s).Hide();
+                    this.Hide();
                     IsOpen ^= true;
                     Topmost = false;
                 }
@@ -44,7 +46,7 @@ namespace Tsundoku.Views
 
         private async Task ShowErrorDialog(string info = "Unable to Add Series")
         {
-            PopupWindow errorDialog = new PopupWindow();
+            PopupWindow errorDialog = App.ServiceProvider.GetRequiredService<PopupWindow>();
             errorDialog.SetWindowText("Error", "fa-solid fa-circle-exclamation", info);
             await errorDialog.ShowDialog(this);
         }
@@ -79,7 +81,6 @@ namespace Tsundoku.Views
             return (ushort)(string.IsNullOrWhiteSpace(value) ? 0 : ushort.Parse(value));
         }
 
-        // TODO - Remove cover if series doesn't get added due to error or something
         public async void OnAddSeriesButtonClicked(object sender, RoutedEventArgs args)
         {
             AddSeriesButton.IsEnabled = false;
@@ -89,12 +90,12 @@ namespace Tsundoku.Views
             _ = decimal.TryParse(Rating.Text[..4].Replace("_", "0"), out decimal rating);
             _ = decimal.TryParse(ValueMaskedTextBox.Text[1..].Replace("_", "0"), out decimal seriesValue);
             
-            KeyValuePair<bool, string> validSeries = await AddNewSeriesViewModel.GetSeriesDataAsync(
+            KeyValuePair<bool, string> validSeries = await ViewModel!.GetSeriesDataAsync(
                 TitleBox.Text.Trim(), 
                 (MangaButton.IsChecked == true) ? Format.Manga : Format.Novel, 
                 CurVolNum, 
                 MaxVolNum, 
-                AddNewSeriesViewModel.SelectedAdditionalLanguages.Count != 0 ? AddNewSeriesViewModel.ConvertSelectedLangList(AddNewSeriesViewModel.SelectedAdditionalLanguages) : [],
+                ViewModel.SelectedAdditionalLanguages.Count != 0 ? ViewModel.ConvertSelectedLangList() : [],
                 !string.IsNullOrWhiteSpace(customImageUrl) ? customImageUrl.Trim() : string.Empty, 
                 !string.IsNullOrWhiteSpace(PublisherTextBox.Text) ? PublisherTextBox.Text.Trim() : "Unknown", //Publisher
                 Series.GetSeriesDemographic((DemographicCombobox.SelectedItem as ComboBoxItem).Content.ToString()), 
@@ -104,12 +105,9 @@ namespace Tsundoku.Views
                 ViewModel.AllowDuplicate
             );
             
-            if (!validSeries.Key) // Boolean returns whether the series added is a duplicate
+            if (validSeries.Key) // Boolean returns whether the series added succeeded
             {
-                // Update User Stats
-                MainWindowViewModel.collectionStatsWindow.ViewModel.UpdateAllStats(CurVolNum, (uint)(MaxVolNum - CurVolNum));
-
-                // Clear the fields in this window
+                _collectionStatsViewModel.UpdateAllStats(CurVolNum, (uint)(MaxVolNum - CurVolNum));
                 ClearFields();
             }
             else
@@ -118,70 +116,5 @@ namespace Tsundoku.Views
             }
             AddSeriesButton.IsEnabled = ViewModel.IsAddSeriesButtonEnabled;
         }
-
-         // public void AddLangListBoxItem(string lang)
-        // {
-        //     AddNewSeriesViewModel.SelectedAdditionalLanguages.Remove(GetLangListBoxItem(PreviousLanguage));
-
-        //     ListBoxItem? newItem = GetLangListBoxItem(lang);
-        //     if (newItem != null)
-        //     {
-        //         LOGGER.Debug("Adding To Selected Lang List");
-        //         AddNewSeriesViewModel.SelectedAdditionalLanguages.Add(newItem);
-        //     }
-        // }
-
-        // public ListBoxItem? GetLangListBoxItem(string lang)
-        // {
-        //     return lang switch
-        //     {
-        //         "Arabic" => Arabic,
-        //         "Azerbaijan" => Azerbaijan,
-        //         "Bengali" => Bengali,
-        //         "Bulgarian" => Bulgarian,
-        //         "Burmese" => Burmese,
-        //         "Catalan" => Catalan,
-        //         "Chinese" => Chinese,
-        //         "Croatian" => Croatian,
-        //         "Czech" => Czech,
-        //         "Danish" => Danish,
-        //         "Dutch" => Dutch,
-        //         "Esperanto" => Esperanto,
-        //         "Estonian" => Estonian,
-        //         "Filipino" => Filipino,
-        //         "Finnish" => Finnish,
-        //         "French" => French,
-        //         "German" => German,
-        //         "Greek" => Greek,
-        //         "Hebrew" => Hebrew,
-        //         "Hindi" => Hindi,
-        //         "Hungarian" => Hungarian,
-        //         "Indonesian" => Indonesian,
-        //         "Italian" => Italian,
-        //         "Kazakh" => Kazakh,
-        //         "Korean" => Korean,
-        //         "Latin" => Latin,
-        //         "Lithuanian" => Lithuanian,
-        //         "Malay" => Malay,
-        //         "Mongolian" => Mongolian,
-        //         "Nepali" => Nepali,
-        //         "Norwegian" => Norwegian,
-        //         "Persian" => Persian,
-        //         "Polish" => Polish,
-        //         "Portuguese" => Portuguese,
-        //         "Romanian" => Romanian,
-        //         "Russian" => Russian,
-        //         "Serbian" => Serbian,
-        //         "Slovak" => Slovak,
-        //         "Spanish" => Spanish,
-        //         "Swedish" => Swedish,
-        //         "Tamil" => Tamil,
-        //         "Thai" => Thai,
-        //         "Turkish" => Turkish,
-        //         "Ukrainian" => Ukrainian,
-        //         "Vietnamese" => Vietnamese,
-        //         _ => null,
-        //     };
-        // }
     }
 }

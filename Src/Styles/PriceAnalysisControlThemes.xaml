@@ -86,8 +86,8 @@
 	</ControlTheme>
 
 	<ControlTheme x:Key="{x:Type DataGridColumnHeader}" TargetType="DataGridColumnHeader">
-		<Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBGHoverColor}"/>
-		<Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuButtonTextAndIconHoverColor}"/>
+		<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}"/>
+		<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor}"/>
 		<Setter Property="HorizontalContentAlignment" Value="Stretch" />
 		<Setter Property="VerticalContentAlignment" Value="Center" />
 		<Setter Property="SeparatorBrush" Value="{DynamicResource DataGridGridLinesBrush}" />
@@ -264,24 +264,24 @@
 		</Style>
 
 		<Style Selector="^:pointerover /template/ Rectangle">
-			<Setter Property="Fill" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBGHoverColor}" />
+			<Setter Property="Fill" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}" />
 		</Style>
 
 		<Style Selector="^:selected">
 			<Style Selector="^ /template/ Rectangle#BackgroundRectangle">
-				<Setter Property="Fill" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBGHoverColor}" />
+				<Setter Property="Fill" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}" />
 				<Setter Property="Opacity" Value="{DynamicResource DataGridRowSelectedUnfocusedBackgroundOpacity}" />
 			</Style>
 			<Style Selector="^:pointerover /template/ Rectangle#BackgroundRectangle">
-				<Setter Property="Fill" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBGHoverColor}" />
+				<Setter Property="Fill" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}" />
 				<Setter Property="Opacity" Value="{DynamicResource DataGridRowSelectedHoveredUnfocusedBackgroundOpacity}" />
 			</Style>
 			<Style Selector="^:focus /template/ Rectangle#BackgroundRectangle">
-				<Setter Property="Fill" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBGHoverColor}" />
+				<Setter Property="Fill" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}" />
 				<Setter Property="Opacity" Value="{DynamicResource DataGridRowSelectedBackgroundOpacity}" />
 			</Style>
 			<Style Selector="^:pointerover:focus /template/ Rectangle#BackgroundRectangle">
-				<Setter Property="Fill" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBGHoverColor}" />
+				<Setter Property="Fill" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}" />
 				<Setter Property="Opacity" Value="{DynamicResource DataGridRowSelectedHoveredBackgroundOpacity}" />
 			</Style>
 		</Style>
@@ -310,9 +310,9 @@
 
 	<ControlTheme x:Key="{x:Type DataGrid}" TargetType="DataGrid">
 		<Setter Property="RowBackground" Value="Transparent" />
-		<Setter Property="BorderBrush" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBorderColor}"/>
-		<Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBGColor}"/>
-		<Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuButtonTextAndIconColor}"/>
+		<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor}"/>
+		<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGColor}"/>
+		<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor}"/>
 		<Setter Property="HeadersVisibility" Value="Column" />
 		<Setter Property="HorizontalScrollBarVisibility" Value="Disabled" />
 		<Setter Property="VerticalScrollBarVisibility" Value="Auto" />

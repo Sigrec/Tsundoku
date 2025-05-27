@@ -53,4 +53,14 @@ namespace Tsundoku.Models
             };
         }
     }
+
+    public sealed class GenreEntry
+    {
+        public Genre Genre { get; }
+
+        public GenreEntry(Genre genre)
+        {
+            Genre = genre;
+        }
+    }
 }

@@ -4,39 +4,28 @@ using Tsundoku.Models;
 
 namespace Tsundoku.Helpers
 {
-    public partial class MangaDex
+    public partial class MangaDex(IHttpClientFactory httpClientFactory)
     {
-        private static readonly HttpClient MangadexClient;
+        private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
+        private readonly HttpClient _mangadexClient = httpClientFactory.CreateClient("MangaDexClient");
         [GeneratedRegex(@"(?:\n\n---\n\*\*Links:\*\*|\n\n\n---|\n\n\*\*|\[(?:Official|Wikipedia).*?\]|\n___\n|\r\n\s+\r\n)[\S\s]*|- Winner.*$")] private static partial Regex MangaDexDescRegex();
         [GeneratedRegex(@"[a-z\d]{8}-[a-z\d]{4}-[a-z\d]{4}-[a-z\d]{4}-[a-z\d]{11,}")] public static partial Regex MangaDexIDRegex();
         [GeneratedRegex(@" \((.*)\)")] public static partial Regex NativeStaffRegex();
         [GeneratedRegex(@"^.*(?= \(.*\))")] public static partial Regex FullStaffRegex();
 
-        static MangaDex()
-        {
-            MangadexClient = new HttpClient(new SocketsHttpHandler
-            {
-                PooledConnectionLifetime = TimeSpan.FromMinutes(1)
-            })
-            {
-                BaseAddress = new Uri("https://api.mangadex.org/"),
-                DefaultVersionPolicy = HttpVersionPolicy.RequestVersionExact
-            };
-            MangadexClient.DefaultRequestHeaders.Add("User-Agent", ViewModels.ViewModelBase.USER_AGENT);
-        }
-
-        /// <summary>
+        // <summary>
         /// REST request to get series data for a MangaDex series by title
         /// </summary>
         /// <param name="title">A string used for getting series data from MangaDex</param>
         /// <returns></returns>
-        public static async Task<JsonDocument?> GetSeriesByTitleAsync(string title)
+        // Make the method non-static
+        public async Task<JsonDocument?> GetSeriesByTitleAsync(string title)
         {
             try
             {
                 title = HttpUtility.UrlEncode(title);
-                LOGGER.Debug($"MangaDex Getting Series By Title Async \"{MangadexClient.BaseAddress}manga?title={title}\"");
-                var response = await MangadexClient.GetStringAsync($"manga?title={title}");
+                LOGGER.Debug($"MangaDex Getting Series By Title Async \"{_mangadexClient.BaseAddress}manga?title={title}\"");
+                var response = await _mangadexClient.GetStringAsync($"manga?title={title}");
                 return JsonDocument.Parse(response);
             }
             catch (HttpRequestException e)
@@ -51,12 +40,13 @@ namespace Tsundoku.Helpers
         /// </summary>
         /// <param name="id">A unique string ID used for getting series data from MangaDex</param>
         /// <returns></returns>
-        public static async Task<JsonDocument?> GetSeriesByIdAsync(string id)
+        // Make the method non-static
+        public async Task<JsonDocument?> GetSeriesByIdAsync(string id)
         {
             try
             {
-                LOGGER.Debug($"MangaDex Getting Series Async \"{MangadexClient.BaseAddress}manga/{id}\"");
-                var response = await MangadexClient.GetStringAsync($"manga/{id}");
+                LOGGER.Debug($"MangaDex Getting Series Async \"{_mangadexClient.BaseAddress}manga/{id}\"");
+                var response = await _mangadexClient.GetStringAsync($"manga/{id}");
                 return JsonDocument.Parse(response);
             }
             catch (Exception e)
@@ -71,12 +61,13 @@ namespace Tsundoku.Helpers
         /// </summary>
         /// <param name="id">The string id used to query the author data for a MangaDex series</param>
         /// <returns></returns>
-        public static async Task<string?> GetAuthorAsync(string id)
+        // Make the method non-static
+        public async Task<string?> GetAuthorAsync(string id)
         {
             try
             {
-                LOGGER.Debug($"MangaDex Getting Author Async \"{MangadexClient.BaseAddress}author/{id}\"");
-                var response = await MangadexClient.GetStringAsync($"author/{id}");
+                LOGGER.Debug($"MangaDex Getting Author Async \"{_mangadexClient.BaseAddress}author/{id}\"");
+                var response = await _mangadexClient.GetStringAsync($"author/{id}");
                 return JsonDocument.Parse(response).RootElement.GetProperty("data").GetProperty("attributes").GetProperty("name").GetString();
             }
             catch (Exception e)
@@ -91,17 +82,19 @@ namespace Tsundoku.Helpers
         /// </summary>
         /// <param name="id">The id used to query the cover</param>
         /// <returns></returns>
-        public static async Task<string?> GetCoverAsync(string id)
+        // Make the method non-static
+        public async Task<string?> GetCoverAsync(string id)
         {
             try
             {
-                LOGGER.Debug($"MangaDex Getting Cover Async \"{MangadexClient.BaseAddress}cover/{id}\"");
-                var response = await MangadexClient.GetStringAsync($"cover/{id}");
+                LOGGER.Debug($"MangaDex Getting Cover Async \"{_mangadexClient.BaseAddress}cover/{id}\"");
+                var response = await _mangadexClient.GetStringAsync($"cover/{id}");
                 JsonElement data = JsonDocument.Parse(response).RootElement.GetProperty("data");
-                if (data.ValueKind == JsonValueKind.Array)
+                if (data.ValueKind == JsonValueKind.Array) // Collection
                 {
                     return data.EnumerateArray().ElementAt(0).GetProperty("attributes").GetProperty("fileName").GetString();
                 }
+                else
                 {
                     return data.GetProperty("attributes").GetProperty("fileName").GetString();
                 }
@@ -113,9 +106,12 @@ namespace Tsundoku.Helpers
             return null;
         }
 
+        // These methods don't use HttpClient, so they can remain static if you prefer,
+        // or become instance methods if MangaDex is meant to be entirely an instance class.
+        // For now, I'll leave them static if they truly have no instance dependency.
         public static bool IsSeriesInvalid(string title, string englishTitle, string englishAltTitle)
         {
-            return 
+            return
             (
                 !(
                     title.Contains("Digital", StringComparison.OrdinalIgnoreCase)
@@ -126,13 +122,8 @@ namespace Tsundoku.Helpers
                 )
                 && englishTitle.Contains("Digital", StringComparison.OrdinalIgnoreCase)
             );
-        }  
+        }
 
-        /// <summary>
-        /// Gets the additional/alternative titles for a MangaDex series
-        /// </summary>
-        /// <param name="data">The JSON data of the series from MangaDex</param>
-        /// <returns></returns>
         public static JsonElement.ArrayEnumerator GetAdditionalMangaDexTitleList(JsonElement data)
         {
             if (data.ValueKind == JsonValueKind.Array) // Collection
@@ -178,15 +169,9 @@ namespace Tsundoku.Helpers
             }
         }
 
-        /// <summary>
-        /// Parses MangaDex series descriptions to remove all of the fluff
-        /// </summary>
-        /// <param name="seriesDescription">The string containing the description of the series</param>
-        /// <returns></returns>
         public static string ParseMangadexDescription(string seriesDescription)
-		{
-
-			return MangaDexDescRegex().Replace(seriesDescription, "").TrimEnd('\n').Trim();
-		}
+        {
+            return MangaDexDescRegex().Replace(seriesDescription, "").TrimEnd('\n').Trim();
+        }
     }
 }

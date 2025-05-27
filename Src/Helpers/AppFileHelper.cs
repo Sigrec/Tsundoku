@@ -1,11 +1,6 @@
 using Tsundoku.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using Tsundoku.Models; // Assuming Tsundoku.Models contains User, Format, etc.
+using Tsundoku.Models;
+using System.Text.Json.Nodes; // Assuming Tsundoku.Models contains User, Format, etc.
 
 namespace Tsundoku.Helpers
 {
@@ -15,9 +10,10 @@ namespace Tsundoku.Helpers
     /// </summary>
     public static class AppFileHelper
     {
-        private static readonly HashSet<string> ValidImageExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
+        public static readonly HashSet<string> ValidImageExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
-            ".jpg", ".jpeg", ".png"
+            ".png", ".jpg", ".jpeg"
         };
 
         /// <summary>
@@ -57,10 +53,8 @@ namespace Tsundoku.Helpers
         /// <param name="bookType">The format/type of the book (e.g., "Manga", "Novel").</param>
         /// <param name="dupeIndex">A reference parameter that will hold the duplicate index if a duplicate was found (e.g., 2 for _2).</param>
         /// <returns>A unique, full file path for the cover image.</returns>
-        public static string CreateUniqueCoverFilePath(string coverLink, string title, Format bookType, ref uint dupeIndex)
+        public static (string, bool) CreateUniqueCoverFileName(string coverLink, string title, Format bookType, bool allowDuplicate, ref uint dupeIndex)
         {
-            string coversFolderPath = GetCoversFolderPath();
-
             string safeTitle = ExtensionMethods.RemoveInPlaceCharArray(string.Concat(title.Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries))).Replace(",", string.Empty);
 
             string extension = Path.GetExtension(coverLink).ToLowerInvariant();
@@ -76,30 +70,29 @@ namespace Tsundoku.Helpers
                 extension = ".png";
             }
 
-            string format = bookType.ToString().ToUpper();
-            string baseFileName = $"{safeTitle}_{format}";
-            string newPath = Path.Combine(coversFolderPath, $"{baseFileName}{extension}");
-
-            if (File.Exists(newPath))
+            string baseFileName = $"{safeTitle}_{bookType.ToString().ToUpper()}";
+            bool isDuplicate = false;
+            if (CheckCoverFileExists(baseFileName + extension) && allowDuplicate)
             {
+                isDuplicate = true;
                 uint count = (dupeIndex == 0) ? 2 : dupeIndex;
-
-                string potentialPath;
                 while (true)
                 {
-                    potentialPath = Path.Combine(coversFolderPath, $"{baseFileName}_{count}{extension}");
-                    if (!File.Exists(potentialPath))
+                    string newFileName = $"{baseFileName}_{count}{extension}";
+                    if (!CheckCoverFileExists(newFileName))
                     {
-                        newPath = potentialPath;
+                        baseFileName = newFileName;
                         dupeIndex = count;
-                        LOGGER.Info("Duplicate detected. New cover path created: {NewPath}", newPath);
                         break;
                     }
-                    LOGGER.Info("Path {PotentialPath} already exists. Trying next index.", potentialPath);
                     count++;
                 }
             }
-            return newPath;
+            else
+            {
+                baseFileName += extension;
+            }
+            return (baseFileName, isDuplicate);
         }
 
         /// <summary>
@@ -188,7 +181,7 @@ namespace Tsundoku.Helpers
                 string.Concat(baseFileNameWithoutExtension.Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries)))
                 .Replace(",", string.Empty);
 
-            if (!extension.StartsWith("."))
+            if (!extension.StartsWith('.'))
             {
                 extension = "." + extension;
             }
@@ -204,6 +197,172 @@ namespace Tsundoku.Helpers
             }
 
             return newPath;
+        }
+
+        /// <summary>
+        /// Serializes the provided User object to the UserData.json file using source-generated JSON.
+        /// </summary>
+        /// <param name="userData">The User object to serialize.</param>
+        public static void WriteUserDataToFile(User userData)
+        {
+            string filePath = GetUserDataJsonPath();
+            try
+            {
+                // Use the Default instance of your UserModelContext.
+                string jsonString = userData.Serialize();
+                File.WriteAllText(filePath, jsonString);
+                LOGGER.Info("User data successfully written to {FilePath}", filePath);
+            }
+            catch (Exception ex)
+            {
+                LOGGER.Error(ex, "Failed to write user data to {FilePath}\n{ErrorMsg}", filePath, ex.Message);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Serializes the provided JsonNode to the UserData.json file.
+        /// This method uses the default JsonSerializerOptions from UserModelContext.
+        /// </summary>
+        /// <param name="jsonDataNode">The JsonNode object to serialize.</param>
+        public static void WriteUserDataToFile(JsonNode jsonDataNode)
+        {
+            string filePath = GetUserDataJsonPath();
+            try
+            {
+                string jsonString = jsonDataNode.ToJsonString(UserModelContext.Default.Options);
+                File.WriteAllText(filePath, jsonString);
+                LOGGER.Info("JsonNode data successfully written to {FilePath}", filePath);
+            }
+            catch (Exception ex)
+            {
+                LOGGER.Error(ex, "Failed to write json user data to {FilePath}\n{ErrorMsg}", filePath, ex.Message);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Deserializes User data from the UserData.json file using source-generated JSON.
+        /// </summary>
+        /// <returns>The deserialized User object, or null if the file does not exist or deserialization fails.</returns>
+        public static User? ReadUserDataFromFile()
+        {
+            string filePath = GetUserDataJsonPath();
+            if (!File.Exists(filePath))
+            {
+                LOGGER.Error("User data file not found at {FilePath}.", filePath);
+                return null;
+            }
+
+            try
+            {
+                string jsonString = File.ReadAllText(filePath);
+                User? user = JsonSerializer.Deserialize(jsonString, UserModelContext.Default.User);
+
+                if (user != null)
+                {
+                    LOGGER.Info("User data successfully deserialized from {FilePath} for user: {Username}", filePath, user.UserName);
+                }
+                else
+                {
+                    // This scenario might occur if the JSON content is literally "null" or an empty object that maps to null User.
+                    LOGGER.Warn("Deserialization from {FilePath} completed, but resulted in a null User object. JSON content: {JsonContent}", filePath, jsonString);
+                }
+
+                return user;
+            }
+            catch (Exception ex)
+            {
+                LOGGER.Error(ex, "Failed to read or deserialize user data from {FilePath}", filePath);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Checks if a file with the given name exists in the "Covers" folder.
+        /// </summary>
+        /// <param name="fileName">The specific file name to check (e.g., "MySeries_MANGA.png").</param>
+        /// <returns>True if the file exists, false otherwise.</returns>
+        public static bool CheckCoverFileExists(string fileName)
+        {
+            string coversFolderPath = GetCoversFolderPath();
+            string fullPath = Path.Combine(coversFolderPath, fileName);
+            bool exists = File.Exists(fullPath);
+            if (exists)
+            {
+                LOGGER.Debug("Cover file {FileName} found at {FullPath}", fileName, fullPath);
+            }
+            else
+            {
+                LOGGER.Debug("Cover file {FileName} not found at {FullPath}", fileName, fullPath);
+            }
+            return exists;
+        }
+
+        /// <summary>
+        /// Gets the full path to an existing cover file if it has a valid image extension
+        /// and exists in the "Covers" folder.
+        /// </summary>am>
+        /// <returns>The full path to the existing cover file if found, otherwise null.</returns>
+        public static string GetFullCoverPath(string coverFileName)
+        {
+            string fullPath = Path.Combine(GetCoversFolderPath(), coverFileName);
+            string extension = Path.GetExtension(coverFileName).ToLowerInvariant();
+
+            if (ValidImageExtensions.Contains(extension))
+            {
+                LOGGER.Debug("Found existing cover file with valid extension: {FullPath}", fullPath);
+                return fullPath;
+            }
+
+            if (!ValidImageExtensions.Contains(extension))
+            {
+                LOGGER.Warn("Provided file name {FileName} has an invalid or unrecognized extension '{Extension}'", coverFileName, extension);
+            }
+            else
+            {
+                LOGGER.Warn("Cover file {FileName} with valid extension '{Extension}' not found at {FullPath}", coverFileName, extension, fullPath);
+            }
+            return fullPath;
+        }
+
+        /// <summary>
+        /// Removes the extension from a given file name.
+        /// </summary>
+        /// <param name="fileNameWithExtension">The file name including its extension (e.g., "MyImage.png").</param>
+        /// <returns>The file name without its extension (e.g., "MyImage"). Returns an empty string if the input is null or empty.</returns>
+        public static string GetFileNameWithoutExtension(string fileNameWithExtension)
+        {
+            if (string.IsNullOrEmpty(fileNameWithExtension))
+            {
+                return string.Empty; // Return an empty string for null or empty input
+            }
+            return Path.GetFileNameWithoutExtension(fileNameWithExtension);
+        }
+        
+        /// <summary>
+        /// Finds the full path to an existing cover file in the "Covers" folder
+        /// by iterating through known valid image extensions, given only the base filename.
+        /// </summary>
+        /// <param name="baseFileNameWithoutExtension">The base name of the cover file without any extension (e.g., "MySeries_MANGA").</param>
+        /// <returns>The full path to the first found existing cover file with a valid extension, or null if no such file is found.</returns>
+        public static string? FindExistingCoverByBaseName(string baseFileNameWithExtension)
+        {
+            string coversFolderPath = GetCoversFolderPath();
+            string baseFileNameWithoutExtension = GetFileNameWithoutExtension(baseFileNameWithExtension);
+
+            foreach (string ext in ValidImageExtensions)
+            {
+                string potentialPath = Path.Combine(coversFolderPath, baseFileNameWithoutExtension + ext);
+                if (File.Exists(potentialPath))
+                {
+                    LOGGER.Info("Found existing cover file by base name: {FullPath}", potentialPath);
+                    return potentialPath;
+                }
+            }
+
+            LOGGER.Warn("No existing cover file found for base name {BaseName} with any valid extensions.", baseFileNameWithoutExtension);
+            return null; // No valid cover found with any known extension
         }
     }
 }

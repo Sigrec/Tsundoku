@@ -39,12 +39,12 @@
 		<ApplicationIcon>Assets\Icons\Tsundoku-Logo.ico</ApplicationIcon>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
 	  <DebugType>embedded</DebugType>
 	</PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-        <AssemblyInformationalVersion>7.1.0</AssemblyInformationalVersion>
+        <AssemblyInformationalVersion>1.0.0</AssemblyInformationalVersion>
     </PropertyGroup>
 
 	<ItemGroup>
@@ -61,13 +61,18 @@
 		<None Remove="Assets\Example.jpg" />
 		<None Remove="Assets\Icons\Tsundoku-Logo.ico" />
 		<AvaloniaResource Include="Assets\Icons\Tsundoku-Logo.ico" />
-		<EmbeddedResource Include="NLog.config" />
 		<AvaloniaResource Include="Styles/**" />
 		<Content Update="lib*.dll">
 			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 			<ExcludeFromSingleFile>false</ExcludeFromSingleFile>
 		</Content>
 	</ItemGroup>
+
+    <ItemGroup>
+        <Content Include="NLog.config">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
 	
 	<ItemGroup>
 		<!--This helps with theme dll-s trimming.
@@ -85,10 +90,11 @@
 		<PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.0" />
 		<PackageReference Include="Avalonia.Controls.DataGrid" Version="11.3.0" />
 		<PackageReference Include="DiscordRichPresence" Version="1.2.1.24" />
+        <PackageReference Include="DynamicData" Version="9.3.2" />
 		<PackageReference Include="GraphQL.Client" Version="6.1.0" />
 		<PackageReference Include="GraphQL.Client.Serializer.SystemTextJson" Version="6.1.0" />
-		<PackageReference Include="GraphQL.Client.Serializer.Newtonsoft" Version="6.1.0" />
 		<PackageReference Include="MangaAndLightNovelWebScrape" Version="4.0.2" />
+		<PackageReference Include="Microsoft.Extensions.Http" Version="9.0.5" />
 		<PackageReference Include="NLog" Version="5.4.0" />
 		<PackageReference Include="FileWatcherEx" Version="2.6.0" />
 		<PackageReference Include="Projektanker.Icons.Avalonia.FontAwesome" Version="9.6.1" />

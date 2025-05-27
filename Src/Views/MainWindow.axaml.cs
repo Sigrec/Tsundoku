@@ -1,5 +1,5 @@
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
+using Microsoft.Extensions.DependencyInjection;
 using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
 using Avalonia.Media.Imaging;
@@ -14,13 +14,16 @@ using System.Reactive.Linq;
 using Tsundoku.Helpers;
 using Tsundoku.Models;
 using Tsundoku.ViewModels;
+using static Tsundoku.Models.TsundokuFilterModel;
+using System.Reactive.Disposables;
+using static Tsundoku.Models.TsundokuLanguageModel;
 
 namespace Tsundoku.Views
 {
     public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
     {
+        private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
         WindowState previousWindowState;
-        private static readonly List<Series> CoverChangedSeriesList = [];
         private static readonly FileSystemWatcherEx CoverFolderWatcher = new FileSystemWatcherEx(@"Covers")
         {
             IncludeSubdirectories = false,
@@ -30,47 +33,27 @@ namespace Tsundoku.Views
         private static string itemString;
         private static readonly TimeSpan AdvancedSearchPopulateDelay = new TimeSpan(TimeSpan.TicksPerSecond / 4);
 
-        public MainWindow()
+        public MainWindow(MainWindowViewModel viewModel)
         {
             InitializeComponent();
-            this.WhenActivated(action => 
-                action(ViewModel!.EditSeriesInfoDialog.RegisterHandler(DoShowEditSeriesInfoDialogAsync)));
+            ViewModel = viewModel;
+#if DEBUG
+            this.AttachDevTools();
+#endif
+
+            //this.WhenActivated(action => action(ViewModel!.EditSeriesInfoDialog.RegisterHandler(DoShowEditSeriesInfoDialogAsync)));
+            this.WhenActivated(disposables =>
+            {
+                ViewModel!.EditSeriesInfoDialog
+                    .RegisterHandler(DoShowEditSeriesInfoDialogAsync)
+                    .DisposeWith(disposables);
+            });
 
             SetupAdvancedSearchBar(" & ");
 
             CoverFolderWatcher.OnCreated += (s, e) =>
             {
-                string path = e.FullPath.Replace(".crdownload", "");
-                LOGGER.Debug("{} | {} | {} | {}", path, !ViewModelBase.newCoverCheck, path.EndsWith("jpg", StringComparison.OrdinalIgnoreCase), path.EndsWith("png", StringComparison.OrdinalIgnoreCase));
-                if (!ViewModelBase.newCoverCheck && (path.EndsWith("jpg", StringComparison.OrdinalIgnoreCase) || path.EndsWith("png", StringComparison.OrdinalIgnoreCase)))
-                {
-                    string pathFileExtension = path[^3..];
-                    Series series = MainWindowViewModel.SearchedCollection.AsParallel().SingleOrDefault(series => series.Cover.Equals(path)) ?? MainWindowViewModel.UserCollection.AsParallel().SingleOrDefault(series => series.Cover.Equals(path));
-                    
-                    if (series == null)
-                    { 
-                        string newPath = path[..^3] + (pathFileExtension.Equals("jpg") ? "png" : "jpg");
-                        series = MainWindowViewModel.SearchedCollection.AsParallel().SingleOrDefault(series => series.Cover.Equals(newPath)) ?? MainWindowViewModel.UserCollection.AsParallel().SingleOrDefault(series => series.Cover.Equals(newPath));
-                    }
-
-                    if (!series.Cover[^3..].Equals(pathFileExtension))
-                    {
-                        series.Cover = series.Cover[..^3] + pathFileExtension;
-                        File.Delete(series.Cover[..^3] + (pathFileExtension.Equals("jpg") ? "png" : "jpg"));
-                        LOGGER.Info("Changed File Extention for {} to {}", series.Titles["Romaji"], pathFileExtension);
-                    }
-
-                    if (!CoverChangedSeriesList.Contains(series))
-                    {
-                        CoverChangedSeriesList.Add(series);
-                        LOGGER.Info($"Added \"{series.Titles["Romaji"]}\" to Cover Change List");
-                    }
-                    else
-                    {
-                        LOGGER.Info($"\"{series.Titles["Romaji"]}\" Cover Changed Again");
-                    }
-                }
-                ViewModelBase.newCoverCheck = false;
+                ViewModel.CoverFolderWatcherLogic(e.FullPath.Replace(".crdownload", ""));
             };
             CoverFolderWatcher.Start();
 
@@ -91,33 +74,19 @@ namespace Tsundoku.Views
                 }
                 else if (e.KeyModifiers == KeyModifiers.Control && e.Key == Key.P)
                 {
-                    LOGGER.Info($"Saving Screenshot of Collection for \"{ViewModelBase.CurrentTheme.ThemeName} Theme\"");
+                    LOGGER.Info($"Saving Screenshot of Collection for \"{ViewModel.CurrentTheme.ThemeName} Theme\"");
                     await ScreenCaptureWindows();
                 }
                 else if (e.KeyModifiers == KeyModifiers.Control && e.Key == Key.S)
                 {
-                    ViewModel.SearchText = "";
-                    ViewModelBase.MainUser.SaveUserData();
-                    await ToggleNotificationPopup($"Saved \"{ViewModel.UserName}'s\" Data");
+                    ViewModel.SaveUserData();
+                    await ToggleNotificationPopup($"Saved \"{ViewModel.CurrentUser.UserName}'s\" Data");
                 }
                 else if (e.KeyModifiers == KeyModifiers.Control && e.Key == Key.R)
                 {
                     LOGGER.Info("Reloading Covers");
-                    if (CoverChangedSeriesList.Count != 0)
-                    {
-                        ReloadCoverBitmaps();
-                    }
-                    else
-                    {
-                        LOGGER.Debug("No Covers Reloaded");
-                    }
+                    ReloadCoverBitmaps();
                     await ToggleNotificationPopup($"Reloaded Covers");
-                }
-                else if (e.KeyModifiers == KeyModifiers.Shift && e.Key == Key.R)
-                {
-                    LOGGER.Info("Reloading Filter/Sort on Collection");
-                    ViewModel.FilterCollection(ViewModel.CurFilter);
-                    await ToggleNotificationPopup($"Reloaded \"{ViewModel.CurFilter}\" Filter/Sort on Collection");
                 }
                 else if (e.KeyModifiers == KeyModifiers.Control && e.Key == Key.F)
                 {
@@ -135,7 +104,11 @@ namespace Tsundoku.Views
                 }
             };
 
-            Closing += (s, e) => { SaveOnClose(ViewModelBase.isReloading); };
+            Closing += (s, e) =>
+            {
+                CoverFolderWatcher.Dispose();
+                ViewModel.SaveOnClose();
+            };
         }
 
         private async Task ScreenCaptureWindows()
@@ -144,12 +117,12 @@ namespace Tsundoku.Views
             string screenshotsFolderPath = AppFileHelper.GetScreenshotsFolderPath();
 
             // 2. Construct the base filename parts
-            string userName = ViewModel.UserName;
-            string themeName = ViewModelBase.CurrentTheme.ThemeName;
-            string language = ViewModel.CurLanguage;
-            string filterSegment = (ViewModel.CurFilter != TsundokuFilter.None && ViewModel.CurFilter != TsundokuFilter.Query)
-                                   ? $"-{ViewModel.CurFilter.GetStringValue()}" // Assumes GetStringValue() exists for TsundokuFilter
-                                   : string.Empty;
+            string userName = ViewModel.CurrentUser.UserName;
+            string themeName = ViewModel.CurrentTheme.ThemeName;
+            TsundokuLanguage language = ViewModel.CurrentUser.Language;
+            string filterSegment = (ViewModel.SelectedFilter != TsundokuFilter.None && ViewModel.SelectedFilter != TsundokuFilter.Query)
+                ? $"-{ViewModel.SelectedFilter.GetStringValue()}" // Assumes GetStringValue() exists for TsundokuFilter
+                : string.Empty;
 
             // 3. Create the full base filename without extension
             string baseFileNameWithoutExtension = $"{userName}-Collection-Screenshot-{themeName}-{language}{filterSegment}";
@@ -182,11 +155,21 @@ namespace Tsundoku.Views
 
         private async Task DoShowEditSeriesInfoDialogAsync(IInteractionContext<EditSeriesInfoViewModel, MainWindowViewModel?> interaction)
         {
-            var dialog = new EditSeriesInfoWindow();
+            EditSeriesInfoWindow dialog = App.ServiceProvider.GetRequiredService<EditSeriesInfoWindow>();
             dialog.DataContext = interaction.Input;
+            MainWindowViewModel? resultFromDialog = await this.OpenManagedDialogWithResultAsync<EditSeriesInfoWindow, EditSeriesInfoViewModel, MainWindowViewModel?>(
+                dialog,
+                "Edit Series Info Dialog"
+            );
+            interaction.SetOutput(resultFromDialog);
+        }
 
-            var result = await dialog.ShowDialog<MainWindowViewModel?>(this);
-            interaction.SetOutput(result);
+        private async void OpenEditSeriesInfoWindow(object sender, RoutedEventArgs args)
+        {
+            Button seriesButton = (Button)sender;
+            seriesButton.Foreground = ViewModel.CurrentTheme.SeriesButtonIconHoverColor;
+            await ViewModel!.CreateEditSeriesDialog(seriesButton.DataContext as Series);
+            seriesButton.Foreground = ViewModel.CurrentTheme.SeriesButtonIconColor;
         }
 
         private async Task ToggleNotificationPopup(string notiText)
@@ -197,104 +180,111 @@ namespace Tsundoku.Views
             NotificationPopup.IsVisible = false;
         }
 
-        private void ToggleSeriesFavorite(object sender, RoutedEventArgs args)
-        {
-            if (ViewModel.CurFilter == TsundokuFilter.Favorites && !((Series)((Button)sender).DataContext).IsFavorite)
-            {
-                ViewModel.FilterCollection(TsundokuFilter.Favorites);
-            }
-        }
-
-        public static void ResetMenuButton(ToggleButton menuButton)
-        {
-            menuButton.IsChecked = false;
-        }
-
         private void CloseNotificationPopup(object sender, RoutedEventArgs args) => NotificationPopup.IsVisible = false;
 
         private void OpenAddSeriesDialog(object sender, RoutedEventArgs args)
         {
-            AddNewSeriesButton.IsChecked = true;
-            if (!MainWindowViewModel.newSeriesWindow.IsOpen)
+            if (this.DataContext is MainWindowViewModel viewModel)
             {
-                MainWindowViewModel.newSeriesWindow.Show();
+                AddNewSeriesWindow? window = this.OpenManagedWindow<AddNewSeriesWindow, AddNewSeriesViewModel>(viewModel.NewSeriesWindow, "Add New Series Window");
+
+                if (window != null)
+                {
+                    AddNewSeriesButton.IsChecked = true;
+                    window.Closing += (s, e) => AddNewSeriesButton.IsChecked = false;
+                }
             }
             else
             {
-                MainWindowViewModel.newSeriesWindow.WindowState = WindowState.Normal;
-                MainWindowViewModel.newSeriesWindow.Activate();
+                LOGGER.Error("MainWindow DataContext is null or not MainWindowViewModel. Cannot open Add New Series window.");
             }
         }
 
         private void OpenSettingsDialog(object sender, RoutedEventArgs args)
         {
-            SettingsButton.IsChecked = true;
-            if (!MainWindowViewModel.settingsWindow.IsOpen)
+            if (this.DataContext is MainWindowViewModel viewModel)
             {
-                MainWindowViewModel.settingsWindow.Show();
+                SettingsWindow? window = this.OpenManagedWindow<SettingsWindow, UserSettingsViewModel>(viewModel.SettingsWindow, "Settings Window");
+                if (window != null)
+                {
+                    SettingsButton.IsChecked = true;
+                    window.Closing += (s, e) => SettingsButton.IsChecked = false;
+                }
             }
             else
             {
-                MainWindowViewModel.settingsWindow.WindowState = WindowState.Normal;
-                MainWindowViewModel.settingsWindow.Activate();
+                LOGGER.Error("MainWindow DataContext is null or not MainWindowViewModel. Cannot open Settings window.");
             }
         }
 
         private void OpenCollectionStatsDialog(object sender, RoutedEventArgs args)
         {
-            StatsButton.IsChecked = true;
-            if (!MainWindowViewModel.collectionStatsWindow.IsOpen)
+            if (this.DataContext is MainWindowViewModel viewModel)
             {
-                MainWindowViewModel.collectionStatsWindow.Show();
+                CollectionStatsWindow? window = this.OpenManagedWindow<CollectionStatsWindow, CollectionStatsViewModel>(viewModel.CollectionStatsWindow, "Collection Stats Window");
+                if (window != null)
+                {
+                    StatsButton.IsChecked = true;
+                    window.Closing += (s, e) => StatsButton.IsChecked = false;
+                }
             }
             else
             {
-                MainWindowViewModel.collectionStatsWindow.WindowState = WindowState.Normal;
-                MainWindowViewModel.collectionStatsWindow.Activate();
+                LOGGER.Error("MainWindow DataContext is null or not MainWindowViewModel. Cannot open Collection Stats window.");
             }
         }
 
         private void OpenPriceAnalysisDialog(object sender, RoutedEventArgs args)
         {
-            AnalysisButton.IsChecked = true;
-            if (!MainWindowViewModel.priceAnalysisWindow.IsOpen)
+            if (this.DataContext is MainWindowViewModel viewModel)
             {
-                MainWindowViewModel.priceAnalysisWindow.Show();
+                PriceAnalysisWindow? window = this.OpenManagedWindow<PriceAnalysisWindow, PriceAnalysisViewModel>(viewModel.PriceAnalysisWindow, "Price Analysis Window");
+                if (window != null)
+                {
+                    AnalysisButton.IsChecked = true;
+                    window.Closing += (s, e) => AnalysisButton.IsChecked = false;
+                }
             }
             else
             {
-                MainWindowViewModel.priceAnalysisWindow.WindowState = WindowState.Normal;
-                MainWindowViewModel.priceAnalysisWindow.Activate();
+                LOGGER.Error("MainWindow DataContext is null or not MainWindowViewModel. Cannot open Price Analysis window.");
             }
         }
 
         private void OpenThemeSettingsDialog(object sender, RoutedEventArgs args)
         {
-            ThemeButton.IsChecked = true;
-            MainWindowViewModel.themeSettingsWindow.WindowState = WindowState.Normal;
-            if (!MainWindowViewModel.themeSettingsWindow.IsOpen)
+            if (this.DataContext is MainWindowViewModel viewModel)
             {
-                MainWindowViewModel.themeSettingsWindow.Show();
+                CollectionThemeWindow? window = this.OpenManagedWindow<CollectionThemeWindow, ThemeSettingsViewModel>(viewModel.ThemeSettingsWindow, "Theme Settings Window");
+                if (window != null)
+                {
+                    ThemeButton.IsChecked = true;
+                    window.Closing += (s, e) => ThemeButton.IsChecked = false;
+                }
             }
             else
             {
-                MainWindowViewModel.themeSettingsWindow.Activate();
+                LOGGER.Error("MainWindow DataContext is null or not MainWindowViewModel. Cannot open Theme Settings window.");
             }
         }
 
         private void OpenUserNotesDialog(object sender, RoutedEventArgs args)
         {
-            UserNotesButton.IsChecked = true;
-            if (!MainWindowViewModel.userNotesWindow.IsOpen)
+            if (this.DataContext is MainWindowViewModel viewModel)
             {
-                MainWindowViewModel.userNotesWindow.Show();
+                UserNotesWindow? window = this.OpenManagedWindow<UserNotesWindow, UserNotesWindowViewModel>(viewModel.UserNotesWindow, "User Notes Window");
+                if (window != null)
+                {
+                    UserNotesButton.IsChecked = true;
+                    window.Closing += (s, e) => UserNotesButton.IsChecked = false;
+                }
             }
             else
             {
-                MainWindowViewModel.userNotesWindow.WindowState = WindowState.Normal;
-                MainWindowViewModel.userNotesWindow.Activate();
+                LOGGER.Error("MainWindow DataContext is null or not MainWindowViewModel. Cannot open User Notes window.");
             }
         }
+
 
         public void SetupAdvancedSearchBar(string delimiter)
         {
@@ -350,31 +340,25 @@ namespace Tsundoku.Views
         /// <summary>
         /// Reloads Covers for Series where the cover was changed
         /// </summary>
-        private static void ReloadCoverBitmaps()
+        private void ReloadCoverBitmaps()
         {
             LOGGER.Debug("Reloading Cover Bitmaps");
-            uint cache = 0;
-            for (int x = 0; x < MainWindowViewModel.UserCollection.Count; x++)
-            {
-                // If the image does not exist in the covers folder then don't create a bitmap for it
-                if (CoverChangedSeriesList.Contains(MainWindowViewModel.UserCollection[x]))
-                {
-                    MainWindowViewModel.ChangeCover(MainWindowViewModel.UserCollection[x], MainWindowViewModel.UserCollection[x].Cover);
-                    cache++;
-                }
-                else if (cache == CoverChangedSeriesList.Count)
-                {
-                    break;
-                }
-            }
-            CoverChangedSeriesList.Clear();
-        }
-
-        private void SearchCollection(object sender, KeyEventArgs args) => MainWindowViewModel.UserIsSearching(true);
-
-        private async void OpenEditSeriesInfoWindow(object sender, RoutedEventArgs args)
-        {
-            _ = await ViewModel!.EditSeriesInfoDialog.Handle(new EditSeriesInfoViewModel((Series)(sender as Button).DataContext, (Button)sender));
+            // uint cache = 0;
+            // TODO - Need to create a method that will reload coverBitmaps for all series when a cover is changed
+            // for (int x = 0; x < ViewModel.UserCollection.Count; x++)
+            // {
+            //     // If the image does not exist in the covers folder then don't create a bitmap for it
+            //     if (CoverChangedSeriesList.Contains(ViewModel.UserCollection[x]))
+            //     {
+            //         MainWindowViewModel.ChangeCover(ViewModel.UserCollection[x], ViewModel.UserCollection[x].Cover);
+            //         cache++;
+            //     }
+            //     else if (cache == CoverChangedSeriesList.Count)
+            //     {
+            //         break;
+            //     }
+            // }
+            // CoverChangedSeriesList.Clear();
         }
 
         /// <summary>
@@ -382,23 +366,11 @@ namespace Tsundoku.Views
         /// </summary>
         private void LanguageChanged(object sender, SelectionChangedEventArgs e)
         {
-            if ((sender as ComboBox).IsDropDownOpen)
+            if (LanguageSelector.SelectedItem is ComboBoxItem selectedItem)
             {
-                if (!string.IsNullOrWhiteSpace(ViewModel.SearchText)) // Checks if the user is searching, filtering, or sorting
-                {
-                    // ViewModel.SearchIsBusy = false;
-                    ViewModel.SearchText = string.Empty;
-                }
-                
-                if (ViewModel.CurFilter != TsundokuFilter.None)
-                {
-                    ViewModel.CurFilter = TsundokuFilter.None;
-                }
-                
-                // AddNewSeriesWindow.PreviousLanguage = ViewModel.CurLanguage;
-                ViewModel.CurLanguage = (LanguageSelector.SelectedItem as ComboBoxItem).Content.ToString();
-                LOGGER.Info($"Changed Langauge to \"{ViewModel.CurLanguage}\"");
-                MainWindowViewModel.SortCollection();
+                string newLang = selectedItem.Content.ToString() ?? string.Empty;
+                ViewModel.UpdateUserLanguage(newLang);
+                LOGGER.Info("Changed Langauge to {Lang}", newLang);
             }
         }
 
@@ -407,58 +379,12 @@ namespace Tsundoku.Views
         /// </summary>
         private void CollectionFilterChanged(object sender, SelectionChangedEventArgs e)
         {
-            if ((sender as ComboBox).IsDropDownOpen)
+            if (CollectionFilterSelector.SelectedItem is ComboBoxItem selectedItem)
             {
-                ViewModel.UpdateCurFilter(CollectionFilterSelector.SelectedItem as ComboBoxItem);
+                string newFilter = selectedItem.Content?.ToString() ?? string.Empty;
+                LOGGER.Debug("Changing Filter to {filter}", newFilter);
+                ViewModel.SelectedFilter = newFilter.GetEnumValueFromMemberValue(TsundokuFilter.None);
             }
-        }
-
-        public void SaveOnClose(bool isReloading)
-        {
-            LOGGER.Info("Closing Tsundoku");
-            ViewModel.SearchText = "";
-            if (!isReloading) { ViewModelBase.MainUser.SaveUserData(); }
-            Helpers.DiscordRP.Deinitialize();
-            CoverFolderWatcher.Dispose();
-
-            if (MainWindowViewModel.newSeriesWindow != null)
-            {
-                MainWindowViewModel.newSeriesWindow.Closing += (s, e) => { e.Cancel = false; };
-                MainWindowViewModel.newSeriesWindow.Close();
-            }
-
-            if (MainWindowViewModel.settingsWindow != null)
-            {
-                MainWindowViewModel.settingsWindow.Closing += (s, e) => { e.Cancel = false; };
-                MainWindowViewModel.settingsWindow.Close();
-            }
-
-            if (MainWindowViewModel.themeSettingsWindow != null)
-            {
-                MainWindowViewModel.themeSettingsWindow.Closing += (s, e) => { e.Cancel = false; };
-                MainWindowViewModel.themeSettingsWindow.Close();
-            }
-
-            if (MainWindowViewModel.priceAnalysisWindow != null)
-            {
-                MainWindowViewModel.priceAnalysisWindow.Closing += (s, e) => { e.Cancel = false; };
-                MainWindowViewModel.priceAnalysisWindow.Close();
-            }
-
-            if (MainWindowViewModel.collectionStatsWindow != null)
-            {
-                MainWindowViewModel.collectionStatsWindow.Closing += (s, e) => { e.Cancel = false; };
-                MainWindowViewModel.collectionStatsWindow.Close();
-            }
-
-            if (MainWindowViewModel.userNotesWindow != null)
-            {
-                MainWindowViewModel.userNotesWindow.Closing += (s, e) => { e.Cancel = false; };
-                MainWindowViewModel.userNotesWindow.Close();
-            }
-
-            NLog.LogManager.Shutdown();
-            App.DisposeMutex();
         }
 
         /// <summary>
@@ -468,17 +394,26 @@ namespace Tsundoku.Views
         {
             await ViewModelBase.OpenSiteLink(((sender as Canvas).DataContext as Series).Link.ToString());
         }
-        
+
         private async void ChangeUserIcon(object sender, PointerPressedEventArgs args)
         {
-            var file = await this.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions {
-                AllowMultiple = false,
-                FileTypeFilter = new List<FilePickerFileType>() { new FilePickerFileType("Images") { Patterns = ["*.png", "*.jpg", "*.jpeg", "*.crdownload"] } }
-            });
-            if (file.Count > 0)
+            IReadOnlyList<IStorageFile> file = await this.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
             {
-                ViewModel.UserIcon = new Avalonia.Media.Imaging.Bitmap(file[0].Path.LocalPath).CreateScaledBitmap(new PixelSize(USER_ICON_WIDTH, USER_ICON_HEIGHT), BitmapInterpolationMode.HighQuality);
-                LOGGER.Info($"Changed Users Icon to {file[0].Path.LocalPath}");
+                AllowMultiple = false,
+                FileTypeFilter = new List<FilePickerFileType>() { new FilePickerFileType("Images") { Patterns = ["*.png", "*.jpg", "*.jpeg"] } }
+            });
+            if (file.Count == 1)
+            {
+                string path = file[0].Path.LocalPath;
+                if (Path.GetExtension(path).Equals(".png"))
+                {
+                    Path.ChangeExtension(path, ".png");
+                }
+                ViewModel.UpdateUserIcon(Path.ChangeExtension(file[0].Path.LocalPath, ".png"));
+            }
+            else
+            {
+                LOGGER.Warn("User selected multiple files for user icon.");
             }
         }
 
@@ -520,11 +455,10 @@ namespace Tsundoku.Views
             Series curSeries = (Series)((Button)sender).DataContext;
             if (curSeries.CurVolumeCount < curSeries.MaxVolumeCount)
             {
-                MainWindowViewModel.collectionStatsWindow.ViewModel.UsersNumVolumesCollected++;
-                MainWindowViewModel.collectionStatsWindow.ViewModel.UsersNumVolumesToBeCollected--;
+                ViewModel.AddUserVolumeCount();
                 curSeries.CurVolumeCount += 1;
                 TextBlock volumeDisplay = (TextBlock)((Button)sender).GetLogicalSiblings().ElementAt(1);
-                string log = $"Adding 1 Volume To \"{curSeries.Titles["Romaji"]}\" : {volumeDisplay.Text} -> ";
+                string log = $"Adding 1 Volume To \"{curSeries.Titles[TsundokuLanguage.Romaji]}\" : {volumeDisplay.Text} -> ";
                 volumeDisplay.Text = curSeries.CurVolumeCount + "/" + curSeries.MaxVolumeCount;
                 LOGGER.Info(log + volumeDisplay.Text);
 
@@ -540,11 +474,10 @@ namespace Tsundoku.Views
             Series curSeries = (Series)((Button)sender).DataContext; //Get the current series data
             if (curSeries.CurVolumeCount >= 1) //Only decrement if the user currently has 1 or more volumes
             {
-                MainWindowViewModel.collectionStatsWindow.ViewModel.UsersNumVolumesCollected--;
-                MainWindowViewModel.collectionStatsWindow.ViewModel.UsersNumVolumesToBeCollected++;
+                ViewModel.SubstractUserVolumeCount();
                 curSeries.CurVolumeCount -= 1;
                 TextBlock volumeDisplay = (TextBlock)((Button)sender).GetLogicalSiblings().ElementAt(1);
-                string log = $"Removing 1 Volume From \"{curSeries.Titles["Romaji"]}\" : {volumeDisplay.Text} -> ";
+                string log = $"Removing 1 Volume From \"{curSeries.Titles[TsundokuLanguage.Romaji]}\" : {volumeDisplay.Text} -> ";
                 volumeDisplay.Text = curSeries.CurVolumeCount + "/" + curSeries.MaxVolumeCount;
                 LOGGER.Info(log + volumeDisplay.Text);
 

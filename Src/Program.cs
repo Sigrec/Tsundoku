@@ -1,18 +1,22 @@
-using System.Runtime.CompilerServices;
 using Avalonia.ReactiveUI;
-using Projektanker.Icons.Avalonia.FontAwesome;
 using Projektanker.Icons.Avalonia;
+using Projektanker.Icons.Avalonia.FontAwesome;
+using System.Runtime.CompilerServices;
 
 namespace Tsundoku
 {
     internal class Program
     {
-        // Initialization code. Don't use any Avalonia, third-party APIs or any
-        // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
-        // yet and stuff might break.
+        // Add a static property to hold the ServiceProvider for dependency injection
+
+        // This is your main entry point
         [STAThread]
-        public static void Main(string[] args){
+        public static void Main(string[] args)
+        {
             BuildAvaloniaApp().StartWithClassicDesktopLifetime(args, Avalonia.Controls.ShutdownMode.OnMainWindowClose);
+
+            // Optional: When the app shuts down, dispose of the service provider
+            //(ServiceProvider as IDisposable)?.Dispose();
         }
 
         // Avalonia configuration, don't remove; also used by visual designer.
@@ -23,9 +27,9 @@ namespace Tsundoku
 
             return AppBuilder.Configure<App>()
                 .UsePlatformDetect()
-                .LogToTrace()
+                .LogToTrace() // This often logs basic Avalonia events, can be useful
                 .UseReactiveUI()
-                .With(LoaderOptimization.MultiDomainHost)
+                .With(LoaderOptimization.MultiDomainHost) // Using LoaderOptimization with explicit type
                 .With(LoadHint.Always);
         }
     }

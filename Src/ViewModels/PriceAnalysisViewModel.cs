@@ -5,11 +5,13 @@ using Avalonia.Controls;
 using MangaAndLightNovelWebScrape;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+using Tsundoku.Models;
 
 namespace Tsundoku.ViewModels
 {
     public class PriceAnalysisViewModel : ViewModelBase
     {
+        private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
         public AvaloniaList<EntryModel> AnalyzedList { get; set; } = new AvaloniaList<EntryModel>();
         [Reactive] public int BrowserIndex { get; set; }
         [Reactive] public bool IsAnalyzeButtonEnabled { get; set; } = false;
@@ -18,9 +20,10 @@ namespace Tsundoku.ViewModels
         [Reactive] public int CurRegionIndex { get; set; }
         public AvaloniaList<ListBoxItem> SelectedWebsites { get; } = [];
         private static readonly StringBuilder CurWebsites = new StringBuilder();
-        public PriceAnalysisViewModel()
+
+        public PriceAnalysisViewModel(IUserService userService) : base(userService)
         {
-            
+
             SelectedWebsites.CollectionChanged += WebsiteCollectionChanged;
             this.WhenAnyValue(x => x.CurRegion).Subscribe(x => CurRegionIndex = Array.IndexOf(Enum.GetValues<Region>(), x));
         }

@@ -3,6 +3,7 @@
 					xmlns:vm="clr-namespace:Tsundoku.ViewModels"
                     xmlns:sys="using:System"
 					x:DataType="vm:ViewModelBase">
+                    
 	<ControlTheme x:Key="MenuComboBox" TargetType="ComboBox">
 		<Setter Property="Padding" Value="{DynamicResource ComboBoxPadding}" />
 		<Setter Property="FocusAdorner" Value="{x:Null}" />
@@ -20,9 +21,9 @@
 		<Setter Property="AutoScrollToSelectedItem" Value="True"/>
         <Setter Property="Cursor" Value="Hand"/>
 		<!-- <Setter Property="PlaceholderForeground" Value="Aqua" /> -->
-		<Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBGColor}"/>
-		<Setter Property="BorderBrush" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBorderColor}"/>
-		<Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuButtonTextAndIconColor}"/>
+		<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGColor}"/>
+		<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor}"/>
+		<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor}"/>
 
 		<Setter Property="Template">
 			<ControlTemplate>
@@ -77,7 +78,7 @@
 								Margin="0,0,10,0"
 								HorizontalAlignment="Right"
 								VerticalAlignment="Center"
-								Foreground="{CompiledBinding CurrentThemeInstance.MenuButtonBorderColor}"
+								Foreground="{CompiledBinding CurrentTheme.MenuButtonBorderColor}"
 								Data="M1939 486L2029 576L1024 1581L19 576L109 486L1024 1401L1939 486Z"/>
 
 						<Popup Name="PART_Popup"
@@ -89,8 +90,8 @@
 							IsLightDismissEnabled="True"
 							InheritsTransform="True">
                             <Border x:Name="PopupBorder"
-                                    Background="{CompiledBinding CurrentThemeInstance.MenuButtonBGColor}"
-                                    BorderBrush="{CompiledBinding CurrentThemeInstance.MenuButtonBorderColor}"
+                                    Background="{CompiledBinding CurrentTheme.MenuButtonBGColor}"
+                                    BorderBrush="{CompiledBinding CurrentTheme.MenuButtonBorderColor}"
                                     BorderThickness="2"
                                     CornerRadius="2">
                                 <ScrollViewer HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
@@ -108,17 +109,17 @@
 		</Setter>
 
 		<Style Selector="^:pointerover /template/ Border#Background">
-			<Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBGHoverColor}"/>
-			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBorderHoverColor}"/>
+			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}"/>
+			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor}"/>
 		</Style>
 
 		<Style Selector="^:pressed /template/ Border#Background">
-			<Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBGHoverColor}"/>
-			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBorderHoverColor}"/>
+			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}"/>
+			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor}"/>
 		</Style>
 
 		<Style Selector="^:pointerover /template/ PathIcon#DropDownGlyph">
-			<Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuButtonTextAndIconHoverColor}"/>
+			<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor}"/>
 		</Style>
 	</ControlTheme>
 
@@ -126,7 +127,7 @@
 		<Setter Property="Padding" Value="{DynamicResource ComboBoxItemThemePadding}" />
 		<Setter Property="HorizontalContentAlignment" Value="Stretch" />
 		<Setter Property="Background" Value="Transparent"/>
-		<Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuButtonTextAndIconColor}"/>
+		<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor}"/>
 
 		<Setter Property="Template">
 			<ControlTemplate>
@@ -145,19 +146,19 @@
 		</Setter>
 
 		<Style Selector="^:pressed">
-			<Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBGHoverColor}"/>
-			<Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuButtonTextAndIconHoverColor}"/>
+			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}"/>
+			<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor}"/>
 		</Style>
 
 		<Style Selector="^:pointerover">
-			<Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBGHoverColor}"/>
-			<Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuButtonTextAndIconHoverColor}"/>
+			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}"/>
+			<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor}"/>
 		</Style>
 
 		<Style Selector="^:selected">
 			<Style Selector="^">
-				<Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBGHoverColor}"/>
-				<Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuButtonTextAndIconHoverColor}"/>
+				<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}"/>
+				<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor}"/>
 			</Style>
 		</Style>
 	</ControlTheme>
@@ -177,9 +178,9 @@
 				<TransformOperationsTransition Property="RenderTransform" Duration="0:0:.075" />
 			</Transitions>
 		</Setter>
-		<Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBGColor}"/>
-		<Setter Property="BorderBrush" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBorderColor}"/>
-		<Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuButtonTextAndIconColor}"/>
+		<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGColor}"/>
+		<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor}"/>
+		<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor}"/>
 
 		<Setter Property="Template">
 			<ControlTemplate>
@@ -198,29 +199,29 @@
 		</Setter>
 
 		<Style Selector="^:pointerover">
-			<Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBGHoverColor}"/>
-			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBorderHoverColor}"/>
-			<Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuButtonTextAndIconHoverColor}"/>
+			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}"/>
+			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor}"/>
+			<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor}"/>
 		</Style>
 	
 		<Style Selector="^:pressed">
-			<Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBGHoverColor}"/>
-			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBorderHoverColor}"/>
-			<Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuButtonTextAndIconHoverColor}"/>
+			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}"/>
+			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor}"/>
+			<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor}"/>
 			<Setter Property="RenderTransform" Value="scale(0.98)" />
 		</Style>
 
 		<Style Selector="^:disabled">
-			<Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBGHoverColor}"/>
-			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBorderHoverColor}"/>
-			<Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuButtonTextAndIconHoverColor}"/>
+			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}"/>
+			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor}"/>
+			<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor}"/>
 		</Style>
 	</ControlTheme>
 
 	<ControlTheme x:Key="MenuToggleButton" TargetType="ToggleButton">
-        <Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBGColor}"/>
-		<Setter Property="BorderBrush" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBorderColor}"/>
-		<Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuButtonTextAndIconColor}"/>
+        <Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGColor}"/>
+		<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor}"/>
+		<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor}"/>
         <Setter Property="BorderThickness" Value="2" />
         <Setter Property="CornerRadius" Value="2" />
         <Setter Property="Padding" Value="{DynamicResource ButtonPadding}" />
@@ -256,30 +257,30 @@
         </Setter>
 	
 		<Style Selector="^:pointerover">
-			<Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBGHoverColor}"/>
-			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBorderHoverColor}"/>
-			<Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuButtonTextAndIconHoverColor}"/>
+			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}"/>
+			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor}"/>
+			<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor}"/>
 		</Style>
 
 		<Style Selector="^:pressed">
-			<Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBGHoverColor}"/>
-			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBorderHoverColor}"/>
-			<Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuButtonTextAndIconHoverColor}"/>
+			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}"/>
+			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor}"/>
+			<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor}"/>
 		</Style>
 
 		<Style Selector="^:checked">
 			<Style Selector="^">
-				<Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBGHoverColor}"/>
-				<Setter Property="BorderBrush" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBorderHoverColor}"/>
-				<Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuButtonTextAndIconHoverColor}"/>
+				<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}"/>
+				<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor}"/>
+				<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor}"/>
 			</Style>
 		</Style>
     </ControlTheme>
     
     <ControlTheme x:Key="QueryListBox" TargetType="ListBox">
-		<Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBGColor}"/>
-		<Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuButtonTextAndIconHoverColor}"/>
-        <Setter Property="BorderBrush" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBorderColor}"/>
+		<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGColor}"/>
+		<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor}"/>
+        <Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor}"/>
         <Setter Property="BorderThickness" Value="2" />
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
         <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
@@ -323,8 +324,8 @@
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Padding" Value="12,9,12,12" />
         <Setter Property="BorderThickness" Value="0,1,0,1" />
-        <Setter Property="BorderBrush" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBorderColor}"/>
-        <Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuButtonTextAndIconColor}"/>
+        <Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor}"/>
+        <Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor}"/>
         <Setter Property="VerticalContentAlignment" Value="Stretch"/>
         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
         
@@ -347,34 +348,34 @@
         </Setter>
 
         <Style Selector="^:pointerover">
-			<Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBGHoverColor}"/>
-			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBorderHoverColor}"/>
+			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}"/>
+			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor}"/>
 		</Style>
 
         <Style Selector="^:pressed">
-			<Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBGHoverColor}"/>
-			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBorderHoverColor}"/>
+			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}"/>
+			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor}"/>
 		</Style>
 
 		<Style Selector="^:selected">
 			<Style Selector="^">
-				<Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBGHoverColor}"/>
-				<Setter Property="BorderBrush" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBorderHoverColor}"/>
+				<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}"/>
+				<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor}"/>
 			</Style>
 
             <Style Selector="^:not(:focus)">
-				<Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBGHoverColor}"/>
-				<Setter Property="BorderBrush" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBorderHoverColor}"/>
+				<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}"/>
+				<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor}"/>
 			</Style>
 
 			<!-- <Style Selector="^:pointerover">
-				<Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBGColor}"/>
-				<Setter Property="BorderBrush" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBorderColor}"/>
+				<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGColor}"/>
+				<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor}"/>
 			</Style> -->
 
             <Style Selector="^:pressed">
-				<Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBGColor}"/>
-				<Setter Property="BorderBrush" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBorderColor}"/>
+				<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGColor}"/>
+				<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor}"/>
 			</Style>
 		</Style>
     </ControlTheme>
@@ -382,9 +383,9 @@
     <sys:Double x:Key="ToolTipContentMaxWidth">320</sys:Double>
     <ControlTheme x:Key="{x:Type ToolTip}" TargetType="ToolTip">
         <Setter Property="FontWeight" Value="Bold" />
-        <Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.MenuBGColor}"/>
-		<Setter Property="BorderBrush" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBorderColor}"/>
-		<Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuButtonTextAndIconColor}"/>
+        <Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuBGColor}"/>
+		<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor}"/>
+		<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor}"/>
         <Setter Property="BorderThickness" Value="2" />
         <Setter Property="FontSize" Value="{DynamicResource ToolTipContentThemeFontSize}" />
         <Setter Property="Padding" Value="{DynamicResource ToolTipBorderThemePadding}" />
@@ -419,7 +420,7 @@
     </ControlTheme>
 
     <ControlTheme x:Key="FluentScrollBarThumb" TargetType="Thumb">
-        <Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.DividerColor}"/>
+        <Setter Property="Background" Value="{CompiledBinding CurrentTheme.DividerColor}"/>
         <Setter Property="Template">
             <Setter.Value>
             <ControlTemplate>
@@ -436,19 +437,19 @@
         </Setter>
 
         <Style Selector="^:pointerover /template/ Border">
-            <Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.DividerColor}" />
+            <Setter Property="Background" Value="{CompiledBinding CurrentTheme.DividerColor}" />
         </Style>
         <Style Selector="^:pressed  /template/ Border">
-            <Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.DividerColor}" />
+            <Setter Property="Background" Value="{CompiledBinding CurrentTheme.DividerColor}" />
         </Style>
     </ControlTheme>
 
     <ControlTheme x:Key="ReverseFluentScrollBarLineButton" TargetType="RepeatButton">
         <Setter Property="Opacity" Value="0" />
-        <Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentThemeInstance.DividerColor}"/>
+        <Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentTheme.DividerColor}"/>
         <Setter Property="Template">
             <ControlTemplate>
-            <ContentPresenter Background="{CompiledBinding CurrentThemeInstance.CollectionBGColor}"
+            <ContentPresenter Background="{CompiledBinding CurrentTheme.CollectionBGColor}"
                             BorderBrush="{DynamicResource ScrollBarButtonBorderBrush}"
                             Content="{TemplateBinding Content}"/>
             </ControlTemplate>
@@ -460,26 +461,26 @@
         </Setter>
 
         <Style Selector="^:pointerover">
-            <Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuButtonTextAndIconHoverColor}"/>
+            <Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor}"/>
 
             <Style Selector="^ /template/ ContentPresenter" >
-                <Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBGHoverColor}"/>
-                <Setter Property="BorderBrush" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBorderHoverColor}"/>
+                <Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}"/>
+                <Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor}"/>
             </Style>
         </Style>
 
         <!-- <Style Selector="^:pressed">
-            <Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuBGColor}"/>
+            <Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentTheme.MenuBGColor}"/>
             <Style Selector="^ /template/ ContentPresenter" >
-            <Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.DividerColor}" />
-            <Setter Property="BorderBrush" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBorderColor}" />
+            <Setter Property="Background" Value="{CompiledBinding CurrentTheme.DividerColor}" />
+            <Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor}" />
             </Style>
         </Style>
 
         <Style Selector="^:pointerover">
-            <Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuButtonTextAndIconHoverColor}"/>
-            <Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBGHoverColor}"/>
-            <Setter Property="BorderBrush" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBorderHoverColor}"/>
+            <Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor}"/>
+            <Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}"/>
+            <Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor}"/>
         </Style> -->
     </ControlTheme>
 
@@ -496,7 +497,7 @@
                             BorderBrush="{TemplateBinding BorderBrush}">
                         <Grid RowDefinitions="Auto,*,Auto">
                         <Rectangle x:Name="TrackRect"
-                                    Fill="{CompiledBinding CurrentThemeInstance.CollectionBGColor}"
+                                    Fill="{CompiledBinding CurrentTheme.CollectionBGColor}"
                                     Stroke="{DynamicResource ScrollBarTrackStroke}"
                                     StrokeThickness="{DynamicResource ScrollBarTrackBorderThemeThickness}"
                                     Opacity="0"
@@ -569,7 +570,7 @@
                 <Setter Property="Background" Value="{DynamicResource ScrollBarBackgroundPointerOver}" />
             </Style>
             <Style Selector="^ /template/ Rectangle#TrackRect">
-                <Setter Property="Fill" Value="{CompiledBinding CurrentThemeInstance.MenuBGColor}" />
+                <Setter Property="Fill" Value="{CompiledBinding CurrentTheme.MenuBGColor}" />
                 <Setter Property="Stroke" Value="{DynamicResource ScrollBarTrackStrokePointerOver}" />
                 <Setter Property="Opacity" Value="1" />
             </Style>
@@ -580,30 +581,30 @@
                 <Setter Property="Opacity" Value="1" />
             </Style>
             <Style Selector="^ /template/ PathIcon">
-                <Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.DividerColor}" />
+                <Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.DividerColor}" />
             </Style>
         </Style>
 
         <Style Selector="^ /template/ RepeatButton#PART_LineUpButton, ^ /template/ RepeatButton#PART_LineDownButton">
-            <Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentThemeInstance.DividerColor}"/>
+            <Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentTheme.DividerColor}"/>
             <Style Selector="^:pointerover">
-                <Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentThemeInstance.CollectionBGColor}"/>
+                <Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentTheme.CollectionBGColor}"/>
 
                 <Style Selector="^ /template/ ContentPresenter" >
-                    <Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.DividerColor}"/>
+                    <Setter Property="Background" Value="{CompiledBinding CurrentTheme.DividerColor}"/>
                 </Style>
                 <Style Selector="^ PathIcon">
-                    <Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.CollectionBGColor}" />
+                    <Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.CollectionBGColor}" />
                 </Style>
             </Style>
 
             <Style Selector="^:pressed">
-                <Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuBGColor}"/>
+                <Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentTheme.MenuBGColor}"/>
                 <Style Selector="^ /template/ ContentPresenter" >
-                    <Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.DividerColor}" />
+                    <Setter Property="Background" Value="{CompiledBinding CurrentTheme.DividerColor}" />
                 </Style>
                 <Style Selector="^ PathIcon">
-                    <Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.CollectionBGColor}" />
+                    <Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.CollectionBGColor}" />
                 </Style>
             </Style>
         </Style>

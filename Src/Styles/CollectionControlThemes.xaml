@@ -5,9 +5,9 @@
 					x:DataType="vm:ViewModelBase">
 
     <ControlTheme x:Key="QueryListBox" TargetType="ListBox">
-		<Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBGColor}"/>
-		<Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuButtonTextAndIconHoverColor}"/>
-        <Setter Property="BorderBrush" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBorderColor}"/>
+		<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGColor}"/>
+		<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor}"/>
+        <Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor}"/>
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
         <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
@@ -20,13 +20,13 @@
 
         <Setter Property="Template">
             <ControlTemplate>
-                <Border Name="border"
+                <Border x:Name="border"
                         ClipToBounds="{TemplateBinding ClipToBounds}"
                         Background="{TemplateBinding Background}"
                         BorderBrush="{TemplateBinding BorderBrush}"
                         BorderThickness="{TemplateBinding BorderThickness}"
                         CornerRadius="{TemplateBinding CornerRadius}">
-                    <ScrollViewer Name="PART_ScrollViewer"
+                    <ScrollViewer x:Name="PART_ScrollViewer"
                                     VerticalSnapPointsType="{TemplateBinding (ScrollViewer.VerticalSnapPointsType)}"
                                     HorizontalSnapPointsType="{TemplateBinding (ScrollViewer.HorizontalSnapPointsType)}"
                                     HorizontalScrollBarVisibility="{TemplateBinding (ScrollViewer.HorizontalScrollBarVisibility)}"
@@ -37,7 +37,7 @@
                                     BringIntoViewOnFocusChange="{TemplateBinding (ScrollViewer.BringIntoViewOnFocusChange)}"
                                     Background="Transparent"
                                     Theme="{StaticResource ReverseCollectionScroll}">
-                        <ItemsPresenter Name="PART_ItemsPresenter"
+                        <ItemsPresenter x:Name="PART_ItemsPresenter"
                                         ItemsPanel="{TemplateBinding ItemsPanel}"
                                         Margin="{TemplateBinding Padding}"/>
                     </ScrollViewer>
@@ -48,9 +48,9 @@
 
     <ControlTheme x:Key="QuerySearchBox" TargetType="AutoCompleteBox">
         <Setter Property="VerticalAlignment" Value="Center" />
-        <Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBGColor}"/>
-		<Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuButtonTextAndIconColor}"/>
-        <Setter Property="BorderBrush" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBorderColor}"/>
+        <Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGColor}"/>
+		<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor}"/>
+        <Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor}"/>
         <Setter Property="BorderThickness" Value="2" />
         <Setter Property="Width" Value="500" />
         <Setter Property="FontWeight" Value="Bold" />
@@ -60,10 +60,10 @@
         <Setter Property="MaxDropDownHeight" Value="{DynamicResource AutoCompleteListMaxHeight}" />
         <Setter Property="Template">
             <ControlTemplate>
-                <Grid Name="PART_LayoutRoot">
-                    <TextBox Name="PART_TextBox"
+                <Grid x:Name="PART_LayoutRoot">
+                    <TextBox x:Name="PART_TextBox"
                             Watermark="{TemplateBinding Watermark}"
-                            Classes="menu"
+                            Classes="Menu"
                             Width="{TemplateBinding Width}"
                             Foreground="{TemplateBinding Foreground}"
                             Background="{TemplateBinding Background}"
@@ -78,20 +78,20 @@
                             Padding="{TemplateBinding Padding}"
                             Margin="0"
                             DataValidationErrors.Errors="{TemplateBinding (DataValidationErrors.Errors)}" />
-                    <Popup Name="PART_Popup" 
+                    <Popup x:Name="PART_Popup" 
                             WindowManagerAddShadowHint="False"
                             MinWidth="{Binding Bounds.Width, RelativeSource={RelativeSource TemplatedParent}}"
                             MaxHeight="{TemplateBinding MaxDropDownHeight}"
                             IsLightDismissEnabled="True"
                             PlacementTarget="{TemplateBinding}">
-                            <Border Name="PART_SuggestionsContainer"
+                            <Border x:Name="PART_SuggestionsContainer"
                                     Padding="{DynamicResource AutoCompleteListMargin}"
                                     BorderThickness="2"
-                                    BorderBrush="{CompiledBinding CurrentThemeInstance.MenuButtonBorderColor}"
-                                    Background="{CompiledBinding CurrentThemeInstance.MenuButtonBGColor}"
+                                    BorderBrush="{CompiledBinding CurrentTheme.MenuButtonBorderColor}"
+                                    Background="{CompiledBinding CurrentTheme.MenuButtonBGColor}"
                                     Margin="0,5,0,0"
                                     CornerRadius="{DynamicResource OverlayCornerRadius}">
-                                <ListBox Name="PART_SelectingItemsControl"
+                                <ListBox x:Name="PART_SelectingItemsControl"
                                         Classes="query"
                                         Background="Transparent"
                                         Foreground="{TemplateBinding Foreground}"
@@ -128,10 +128,10 @@
 
 	<ControlTheme x:Key="FluentScrollBarLineButton" TargetType="RepeatButton">
 		<Setter Property="Opacity" Value="0" />
-		<Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentThemeInstance.DividerColor}"/>
+		<Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentTheme.DividerColor}"/>
 		<Setter Property="Template">
 			<ControlTemplate>
-			<ContentPresenter Background="{CompiledBinding CurrentThemeInstance.MenuBGColor}"
+			<ContentPresenter Background="{CompiledBinding CurrentTheme.MenuBGColor}"
 							  BorderBrush="{DynamicResource ScrollBarButtonBorderBrush}"
 							  Content="{TemplateBinding Content}"/>
 			</ControlTemplate>
@@ -143,19 +143,19 @@
 		</Setter>
 
 		<Style Selector="^:pointerover">
-			<Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuButtonTextAndIconHoverColor}"/>
+			<Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor}"/>
 
 			<Style Selector="^ /template/ ContentPresenter" >
-				<Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBGHoverColor}"/>
-				<Setter Property="BorderBrush" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBorderHoverColor}"/>
+				<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}"/>
+				<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor}"/>
 			</Style>
 		</Style>
 
 		<Style Selector="^:pressed">
-			<Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuBGColor}"/>
+			<Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentTheme.MenuBGColor}"/>
 			<Style Selector="^ /template/ ContentPresenter" >
-			<Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.DividerColor}" />
-			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBorderColor}" />
+			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.DividerColor}" />
+			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor}" />
 			</Style>
 		</Style>
 	</ControlTheme>
@@ -176,7 +176,7 @@
 						BorderBrush="{TemplateBinding BorderBrush}">
 					<Grid RowDefinitions="Auto,*,Auto">
 					<Rectangle x:Name="TrackRect"
-								Fill="{CompiledBinding CurrentThemeInstance.MenuBGColor}"
+								Fill="{CompiledBinding CurrentTheme.MenuBGColor}"
 								Stroke="{DynamicResource ScrollBarTrackStroke}"
 								StrokeThickness="{DynamicResource ScrollBarTrackBorderThemeThickness}"
 								Opacity="0"
@@ -188,7 +188,7 @@
 						</Rectangle.Transitions>
 					</Rectangle>
 
-					<RepeatButton Name="PART_LineUpButton"
+					<RepeatButton x:Name="PART_LineUpButton"
 									HorizontalAlignment="Center"
 									Theme="{StaticResource FluentScrollBarLineButton}"
 									Grid.Row="0"
@@ -208,13 +208,13 @@
 							Orientation="{TemplateBinding Orientation}"
 							IsDirectionReversed="True">
 						<Track.DecreaseButton>
-						<RepeatButton Name="PART_PageUpButton"
+						<RepeatButton x:Name="PART_PageUpButton"
 										Classes="largeIncrease"
 										Theme="{StaticResource FluentScrollBarPageButton}"
 										Focusable="False" />
 						</Track.DecreaseButton>
 						<Track.IncreaseButton>
-						<RepeatButton Name="PART_PageDownButton"
+						<RepeatButton x:Name="PART_PageDownButton"
 										Classes="largeIncrease"
 										Theme="{StaticResource FluentScrollBarPageButton}"
 										Focusable="False" />
@@ -226,7 +226,7 @@
 								RenderTransformOrigin="100%,50%" />
 					</Track>
 
-					<RepeatButton Name="PART_LineDownButton"
+					<RepeatButton x:Name="PART_LineDownButton"
 									HorizontalAlignment="Center"
 									Theme="{StaticResource FluentScrollBarLineButton}"
 									Grid.Row="2"
@@ -249,12 +249,12 @@
 				<Setter Property="Background" Value="{DynamicResource ScrollBarBackgroundPointerOver}" />
 			</Style>
 			<Style Selector="^ /template/ Rectangle#TrackRect">
-				<Setter Property="Fill" Value="{CompiledBinding CurrentThemeInstance.MenuBGColor}" />
+				<Setter Property="Fill" Value="{CompiledBinding CurrentTheme.MenuBGColor}" />
 				<Setter Property="Stroke" Value="{DynamicResource ScrollBarTrackStrokePointerOver}" />
 				<Setter Property="Opacity" Value="1" />
 			</Style>
 			<Style Selector="^ /template/ Thumb">
-				<Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.DividerColor}" />
+				<Setter Property="Background" Value="{CompiledBinding CurrentTheme.DividerColor}" />
 				<Setter Property="RenderTransform" Value="none" />
 			</Style>
 			<Style Selector="^ /template/ RepeatButton">
@@ -264,11 +264,11 @@
 	</ControlTheme>
 
     <ControlTheme x:Key="CollectionScroll" TargetType="ScrollViewer">
-        <Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.CollectionBGColor}" />
+        <Setter Property="Background" Value="{CompiledBinding CurrentTheme.CollectionBGColor}" />
             <Setter Property="Template">
                 <ControlTemplate>
                     <Grid ColumnDefinitions="*,Auto" RowDefinitions="*,Auto">
-                        <ScrollContentPresenter Name="PART_ContentPresenter"
+                        <ScrollContentPresenter x:Name="PART_ContentPresenter"
                                                 Grid.Row="0"
                                                 Grid.Column="0"
                                                 Grid.RowSpan="2"
@@ -286,10 +286,10 @@
                                                     IsScrollInertiaEnabled="{Binding (ScrollViewer.IsScrollInertiaEnabled), ElementName=PART_ContentPresenter}"/>
                             </ScrollContentPresenter.GestureRecognizers>
                         </ScrollContentPresenter>
-                        <ScrollBar Name="PART_HorizontalScrollBar"
+                        <ScrollBar x:Name="PART_HorizontalScrollBar"
                                     Orientation="Horizontal"
                                     Grid.Row="1" />
-                        <ScrollBar Name="PART_VerticalScrollBar"
+                        <ScrollBar x:Name="PART_VerticalScrollBar"
                                     Orientation="Vertical"
                                     Theme="{StaticResource CollectionScrollBar}"
                                     Grid.Column="1" />

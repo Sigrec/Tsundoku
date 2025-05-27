@@ -10,68 +10,64 @@
         Title="Add New Series"
 		FontFamily="Segoe UI"
 		SizeToContent="WidthAndHeight"
-        Classes="menu"
+        Classes="Menu"
 		WindowStartupLocation="2"
 		KeyboardNavigation.TabNavigation="Cycle"
 		x:DataType="vm:AddNewSeriesViewModel"
 		CanResize="false">
 
-	<Window.DataContext>
-		<vm:AddNewSeriesViewModel/>
-	</Window.DataContext>
-
-	<Border Classes="menu" BorderThickness="3" CornerRadius="0,0,8,8" ClipToBounds="True">
+	<Border Classes="Menu" BorderThickness="3" CornerRadius="0,0,8,8" ClipToBounds="True">
 		<Grid ColumnDefinitions="*,15,*,15,*" RowDefinitions="Auto,Auto,5,Auto,Auto,5,Auto,Auto,5,Auto,Auto,5,Auto,Auto,5,Auto,Auto,5,Auto,Auto" Margin="20,20,20,30" ShowGridLines="false">
             <Grid.Styles>
                 <Style Selector="ScrollBar:vertical">
                     <Style Selector="^ /template/ Rectangle#TrackRect">
-                        <Setter Property="Fill" Value="{CompiledBinding CurrentThemeInstance.CollectionBGColor}" />
+                        <Setter Property="Fill" Value="{CompiledBinding CurrentTheme.CollectionBGColor}" />
                     </Style>
 
                     <Style Selector="^ /template/ Thumb">
-                        <Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.DividerColor}" />
+                        <Setter Property="Background" Value="{CompiledBinding CurrentTheme.DividerColor}" />
                         <Style Selector="^:pointerover /template/ Border">
-                            <Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.DividerColor}" />
+                            <Setter Property="Background" Value="{CompiledBinding CurrentTheme.DividerColor}" />
                         </Style>
                         <Style Selector="^:pressed /template/ Border">
-                            <Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.DividerColor}" />
+                            <Setter Property="Background" Value="{CompiledBinding CurrentTheme.DividerColor}" />
                         </Style>
                     </Style>
 
                     <Style Selector="^[IsExpanded=true]">
                         <Style Selector="^ /template/ Thumb">
-                            <Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.DividerColor}" />
+                            <Setter Property="Background" Value="{CompiledBinding CurrentTheme.DividerColor}" />
                         </Style>
 
                         <Style Selector="^ /template/ PathIcon">
-                            <Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.DividerColor}" />
+                            <Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.DividerColor}" />
                         </Style>
 
                         <Style Selector="^ /template/ Rectangle#TrackRect">
-                            <Setter Property="Fill" Value="{CompiledBinding CurrentThemeInstance.MenuBGColor}" />
+                            <Setter Property="Fill" Value="{CompiledBinding CurrentTheme.MenuBGColor}" />
                         </Style>
                     </Style>
 
                     <Style Selector="^ /template/ RepeatButton#PART_LineUpButton, ^ /template/ RepeatButton#PART_LineDownButton">
-                        <Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentThemeInstance.DividerColor}"/>
+                        <Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentTheme.DividerColor}"/>
                         <Style Selector="^:pointerover">
-                            <Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuButtonTextAndIconHoverColor}"/>
+                            <Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor}"/>
 
                             <Style Selector="^ /template/ ContentPresenter" >
-                                <Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.DividerColor}"/>
+                                <Setter Property="Background" Value="{CompiledBinding CurrentTheme.DividerColor}"/>
                             </Style>
                             <Style Selector="^ PathIcon">
-                                <Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.CollectionBGColor}" />
+                                <Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.CollectionBGColor}" />
                             </Style>
                         </Style>
 
                         <Style Selector="^:pressed">
-                            <Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuBGColor}"/>
+                            <Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentTheme.MenuBGColor}"/>
                             <Style Selector="^ /template/ ContentPresenter" >
-                                <Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.DividerColor}" />
+                                <Setter Property="Background" Value="{CompiledBinding CurrentTheme.DividerColor}" />
                             </Style>
                             <Style Selector="^ PathIcon">
-                                <Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.CollectionBGColor}" />
+                                <Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.CollectionBGColor}" />
                             </Style>
                         </Style>
                     </Style>
@@ -84,7 +80,7 @@
                        Text="Additional Languages" 
                        FontSize="20" 
                        FontWeight="Bold" 
-                       Classes="menu" 
+                       Classes="Menu" 
                        Margin="2,0,0,3" 
                        ToolTip.Tip="{CompiledBinding AdditionalLanguagesToolTipText}" 
                        ToolTip.IsEnabled="{CompiledBinding AdditionalLanguagesToolTipText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
@@ -144,7 +140,7 @@
 						<ListBoxItem Name="Ukrainian" Theme="{StaticResource QueryListBoxItem}">Ukrainian</ListBoxItem>
 						<ListBoxItem Name="Vietnamese" Theme="{StaticResource QueryListBoxItem}">Vietnamese</ListBoxItem>
 			</ListBox>
-			<TextBlock Text="Enter Title or ID" Grid.Row="0" Grid.Column="0" FontSize="20" FontWeight="Bold" Classes="menu" Margin="2,0,0,1" ToolTip.Tip="{CompiledBinding TitleText}"/>
+			<TextBlock Text="Enter Title or ID" Grid.Row="0" Grid.Column="0" FontSize="20" FontWeight="Bold" Classes="Menu" Margin="2,0,0,1" ToolTip.Tip="{CompiledBinding TitleText}"/>
 			<TextBox Name="TitleBox"
 					 FontSize="18"
 					 Grid.Row="1"
@@ -154,11 +150,11 @@
 					 FontWeight="Bold"
                      Height="74"
 					 Text="{CompiledBinding TitleText}"
-					 Classes="menu"
+					 Classes="Menu"
 					 BorderThickness="2"
 					 TextWrapping="Wrap"
 					 Watermark="Title or AniList/MangaDex ID..."/>
-            <TextBlock Text="Publisher" Grid.Row="3" Grid.Column="0" FontSize="20" FontWeight="Bold" Classes="menu" Margin="2,0,0,1" ToolTip.Tip="{CompiledBinding PublisherText}"/>
+            <TextBlock Text="Publisher" Grid.Row="3" Grid.Column="0" FontSize="20" FontWeight="Bold" Classes="Menu" Margin="2,0,0,1" ToolTip.Tip="{CompiledBinding PublisherText}"/>
 			<TextBox Name="PublisherTextBox"
 					 FontSize="18"
 					 Grid.Row="4"
@@ -168,14 +164,14 @@
 					 FontWeight="Bold"
                      Height="37"
 					 Text="{CompiledBinding PublisherText}"
-					 Classes="menu"
+					 Classes="Menu"
                      ToolTip.Tip="Optional"
 					 BorderThickness="2"
                      MaxLength="24"/>
-			<TextBlock Text="Cur Volumes" Grid.Row="6" Grid.Column="0" FontSize="20" FontWeight="Bold" Classes="menu" Margin="2,0,0,1"/>
+			<TextBlock Text="Cur Volumes" Grid.Row="6" Grid.Column="0" FontSize="20" FontWeight="Bold" Classes="Menu" Margin="2,0,0,1"/>
 			<MaskedTextBox Name="CurVolCount"
 						   Width="247"
-						   Classes="menu"
+						   Classes="Menu"
 						   Grid.Row="7"
 						   Grid.Column="0"
 						   BorderThickness="2"
@@ -184,12 +180,12 @@
 						   FontSize="18"
 						   Mask="000"
 						   MaxLength="3"/>
-			<TextBlock Text="Max Volumes" Grid.Row="6" Grid.Column="2" FontSize="20" FontWeight="Bold" Classes="menu" Margin="2,0,0,1"/>
+			<TextBlock Text="Max Volumes" Grid.Row="6" Grid.Column="2" FontSize="20" FontWeight="Bold" Classes="Menu" Margin="2,0,0,1"/>
 			<MaskedTextBox Name="MaxVolCount"
 						   Width="247"
 						   Grid.Row="7"
 						   Grid.Column="2"
-						   Classes="menu"
+						   Classes="Menu"
 						   BorderThickness="2"
 						   FontWeight="Bold"
 						   FontSize="18"
@@ -202,7 +198,7 @@
 					   FontSize="20"
 					   FontWeight="Bold"
 					   Margin="2,0,0,3"
-					   Classes="menu"/>
+					   Classes="Menu"/>
 			<StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Width="180" Grid.Row="10" Grid.Column="0" Spacing="5" Margin="0,0,10,0">
 				<ToggleButton Name="MangaButton"
 						 	  Width="121"
@@ -221,7 +217,7 @@
                        Grid.Row="9"
 					   Grid.Column="2"
                        Margin="2,0,0,3"
-                       Classes="menu"/>
+                       Classes="Menu"/>
             <ComboBox Name="DemographicCombobox"
                       Theme="{StaticResource MenuComboBox}"
                       SelectedIndex="4"
@@ -242,14 +238,14 @@
                        Grid.Row="12"
 					   Grid.Column="0"
                        Margin="2,0,0,3"
-                       Classes="menu"/>
+                       Classes="Menu"/>
             <MaskedTextBox Name="VolumesRead"
                            HorizontalAlignment="Left"
                            ToolTip.Tip="Optional"
 						   Width="247"
 						   Grid.Row="13"
 						   Grid.Column="0"
-						   Classes="menu"
+						   Classes="Menu"
 						   BorderThickness="2"
 						   FontWeight="Bold"
 						   FontSize="18"
@@ -261,13 +257,13 @@
                        Grid.Row="12"
 					   Grid.Column="2"
                        Margin="2,0,0,3"
-                       Classes="menu"/>
+                       Classes="Menu"/>
             <MaskedTextBox Name="Rating"
 						   Width="247"
 						   Grid.Row="13"
 						   Grid.Column="2"
                            ToolTip.Tip="Optional"
-						   Classes="menu"
+						   Classes="Menu"
 						   BorderThickness="2"
 						   FontWeight="Bold"
 						   FontSize="18"
@@ -279,7 +275,7 @@
 					   FontSize="20"
 					   FontWeight="Bold"
 					   Margin="2,0,0,3"
-					   Classes="menu"/>
+					   Classes="Menu"/>
             <MaskedTextBox Name="ValueMaskedTextBox"
                            HorizontalAlignment="Left"
                            ToolTip.Tip="Optional"
@@ -287,7 +283,7 @@
 						   Width="247"
 						   Grid.Row="16"
 						   Grid.Column="0"
-						   Classes="menu"
+						   Classes="Menu"
 						   BorderThickness="2"
                            HorizontalContentAlignment="Center"
 						   FontWeight="Bold"
@@ -299,7 +295,7 @@
 					   FontSize="20"
 					   FontWeight="Bold"
 					   Margin="2,0,0,3"
-					   Classes="menu"/>
+					   Classes="Menu"/>
 			<Button Name="AddSeriesButton"
 					Content="Add New Series"
 					Click="OnAddSeriesButtonClicked"
@@ -311,7 +307,7 @@
 					Grid.Row="16"
 					Grid.Column="2">
 			</Button>
-            <TextBlock Text="Cover Image" Grid.Row="18" Grid.Column="0" Grid.ColumnSpan="3" FontSize="20" FontWeight="Bold" Classes="menu" Margin="2,0,0,3" ToolTip.Tip="{CompiledBinding CoverImageUrl}"/>
+            <TextBlock Text="Cover Image" Grid.Row="18" Grid.Column="0" Grid.ColumnSpan="3" FontSize="20" FontWeight="Bold" Classes="Menu" Margin="2,0,0,3" ToolTip.Tip="{CompiledBinding CoverImageUrl}"/>
 			<StackPanel Orientation="Horizontal" Spacing="5" Grid.Row="19" Grid.Column="0" Grid.ColumnSpan="4">
                 <TextBox Name="CoverImageUrlTextBox"
 					 FontSize="18"
@@ -319,7 +315,7 @@
 					 FontWeight="Bold"
                      Height="37"
 					 Text="{CompiledBinding CoverImageUrl}"
-					 Classes="menu"
+					 Classes="Menu"
 					 BorderThickness="2"
                      ToolTip.Tip="Optional"
 					 Watermark="Optional Image Url (Hover Title to see Full Text)"/>

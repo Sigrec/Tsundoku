@@ -1,12 +1,11 @@
+using System.Reactive.Linq;
 using Avalonia.Controls;
-using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using Avalonia.ReactiveUI;
-using DynamicData;
+using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
-using System.Collections.ObjectModel;
 using Tsundoku.Helpers;
 using Tsundoku.Models;
 using Tsundoku.ViewModels;
@@ -15,53 +14,53 @@ namespace Tsundoku.Views
 {
     public partial class CollectionThemeWindow : ReactiveWindow<ThemeSettingsViewModel>
     {
-        private TsundokuTheme? NewTheme { get; set; }
-        private string SelectedTheme;
-        public bool IsOpen, ThemeChanged = false;
-        private MainWindow CollectionWindow;
+        private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
+        private TsundokuTheme? BackupCurrentTheme { get; set; }
+        public bool IsOpen = false;
+        private bool _isInitialized = false;
+        private string CurThemeName;
 
-        public CollectionThemeWindow()
+        public CollectionThemeWindow(ThemeSettingsViewModel viewModel)
         {
+            ViewModel = viewModel;
             InitializeComponent();
-
-            DataContext = new ThemeSettingsViewModel();
 
             Opened += (s, e) =>
             {
-
-                CollectionWindow = (MainWindow)((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).MainWindow;
-                NewTheme = ViewModelBase.CurrentTheme.Cloning();
-                SelectedTheme = ViewModelBase.CurrentTheme.ThemeName;
-                ViewModelBase.CurrentTheme = NewTheme;
-                IsOpen ^= true;
-                ThemeChanged = false;
-
-                int index = ThemeSettingsViewModel.UserThemesDisplay.IndexOf(ViewModelBase.CurrentTheme.ThemeName);
-                ViewModel.CurThemeIndex = index != -1 ? index : ThemeSettingsViewModel.UserThemesDisplay.IndexOf("Default");
+                TsundokuTheme curTheme = ViewModel.GetCurrentTheme();
+                BackupCurrentTheme = curTheme.Cloning();
+                CurThemeName = curTheme.ThemeName;
+                BackupCurrentTheme.ThemeName = "Backup";
+                ViewModel.OverrideCurrentTheme(BackupCurrentTheme);
+                IsOpen = true;
             };
 
             Closing += (s, e) =>
             {
                 if (IsOpen)
                 {
-                    MainWindow.ResetMenuButton(CollectionWindow.ThemeButton);
-                    ((CollectionThemeWindow)s).Hide();
+                    this.Hide();
                     NewThemeName.Text = "";
                     Topmost = false;
-                    IsOpen ^= true;
+                    IsOpen = false;
 
-                    TsundokuTheme curSelectedTheme = ViewModelBase.MainUser.SavedThemes.Single(theme => theme.ThemeName.Equals(SelectedTheme));
-                    if (!NewTheme.Equals(curSelectedTheme))
+                    TsundokuTheme? curSelectedTheme = ViewModel.GetMainTheme();
+                    if (!BackupCurrentTheme.Equals(curSelectedTheme!))
                     {
-                        LOGGER.Info("Resetting theme to {0}", curSelectedTheme.ThemeName);
-                        ViewModelBase.CurrentTheme = curSelectedTheme;
+                        ViewModel.SetTheme(curSelectedTheme);
                     }
-                    NewTheme = null;
+                    BackupCurrentTheme = null;
                 }
                 e.Cancel = true;
             };
 
-            this.WhenAnyValue(x => x.NewThemeName.Text, x => x.MainColor1.Text, x => x.MainColor2.Text, x => x.TextColor1.Text, x => x.TextColor2.Text, x => x.AccentColor1.Text, x => x.AccentColor2.Text, (name, mc1, mc2, tc1, tc2, ac1, ac2) => !string.IsNullOrWhiteSpace(name) && !name.Equals("Default", StringComparison.OrdinalIgnoreCase) && !mc1.Contains('_') && !mc2.Contains('_') && !tc1.Contains('_') && !tc2.Contains('_') && !ac1.Contains('_') && !ac2.Contains('_')).Subscribe(x => ViewModel.IsGenerateThemeButtonEnabled = x);
+            this.WhenAnyValue(x => x.NewThemeName.Text, x => x.MainColor1.Text, x => x.MainColor2.Text, x => x.TextColor1.Text, x => x.TextColor2.Text, x => x.AccentColor1.Text, x => x.AccentColor2.Text, (name, mc1, mc2, tc1, tc2, ac1, ac2) => _isInitialized && !string.IsNullOrWhiteSpace(name) && !name.Equals("Default", StringComparison.OrdinalIgnoreCase) && !mc1.Contains('_') && !mc2.Contains('_') && !tc1.Contains('_') && !tc2.Contains('_') && !ac1.Contains('_') && !ac2.Contains('_')).Subscribe(x => ViewModel.IsGenerateThemeButtonEnabled = x);
+
+            this.WhenAnyValue(x => x.NewThemeName.Text, (newName) => _isInitialized && !string.IsNullOrWhiteSpace(newName) && !newName.Equals("Default", StringComparison.OrdinalIgnoreCase))
+                .DistinctUntilChanged()
+                .Subscribe(x => ViewModel.IsSaveThemeButtonEnabled = x);
+
+            _isInitialized = true;
         }
 
         /// <summary>
@@ -85,56 +84,56 @@ namespace Tsundoku.Views
         {
             LOGGER.Info("Generating New Theme1");
 
-            NewTheme.ThemeName = NewThemeName.Text;
+            BackupCurrentTheme.ThemeName = NewThemeName.Text;
 
             // Apply menu colors
-            NewTheme.MenuBGColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
-            NewTheme.UsernameColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
-            NewTheme.UserIconBorderColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
-            NewTheme.MenuTextColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
-            NewTheme.SearchBarBGColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
-            NewTheme.SearchBarBorderColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
-            NewTheme.SearchBarTextColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
-            NewTheme.DividerColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
-            NewTheme.MenuButtonBGColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
-            NewTheme.MenuButtonBGHoverColor = new SolidColorBrush(Color.Parse(MainColor2.Text));
-            NewTheme.MenuButtonBorderColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
-            NewTheme.MenuButtonBorderHoverColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
-            NewTheme.MenuButtonTextAndIconColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
-            NewTheme.MenuButtonTextAndIconHoverColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
+            BackupCurrentTheme.MenuBGColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
+            BackupCurrentTheme.UsernameColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
+            BackupCurrentTheme.UserIconBorderColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
+            BackupCurrentTheme.MenuTextColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
+            BackupCurrentTheme.SearchBarBGColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
+            BackupCurrentTheme.SearchBarBorderColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
+            BackupCurrentTheme.SearchBarTextColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
+            BackupCurrentTheme.DividerColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
+            BackupCurrentTheme.MenuButtonBGColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
+            BackupCurrentTheme.MenuButtonBGHoverColor = new SolidColorBrush(Color.Parse(MainColor2.Text));
+            BackupCurrentTheme.MenuButtonBorderColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
+            BackupCurrentTheme.MenuButtonBorderHoverColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
+            BackupCurrentTheme.MenuButtonTextAndIconColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
+            BackupCurrentTheme.MenuButtonTextAndIconHoverColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
 
             // Apply Colleciton Colors
-            NewTheme.CollectionBGColor = new SolidColorBrush(Color.Parse(MainColor2.Text));
-            NewTheme.StatusAndBookTypeBGColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
-            NewTheme.StatusAndBookTypeBGHoverColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
-            NewTheme.StatusAndBookTypeTextColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
-            NewTheme.StatusAndBookTypeTextHoverColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
-            NewTheme.SeriesCardBGColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
-            NewTheme.SeriesCardTitleColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
-            NewTheme.SeriesCardPublisherColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
-            NewTheme.SeriesCardStaffColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
-            NewTheme.SeriesCardDescColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
-            NewTheme.SeriesProgressBGColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
-            NewTheme.SeriesProgressBarColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
-            NewTheme.SeriesProgressBarBGColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
-            NewTheme.SeriesProgressBarBorderColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
-            NewTheme.SeriesProgressTextColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
-            NewTheme.SeriesProgressButtonsHoverColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
-            NewTheme.SeriesButtonIconColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
-            NewTheme.SeriesButtonIconHoverColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
-            NewTheme.SeriesEditPaneBGColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
-            NewTheme.SeriesNotesBGColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
-            NewTheme.SeriesNotesBorderColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
-            NewTheme.SeriesNotesTextColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
-            NewTheme.SeriesEditPaneButtonsBGColor = new SolidColorBrush(Color.Parse(MainColor2.Text));
-            NewTheme.SeriesEditPaneButtonsBGHoverColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
-            NewTheme.SeriesEditPaneButtonsBorderColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
-            NewTheme.SeriesEditPaneButtonsBorderHoverColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
-            NewTheme.SeriesEditPaneButtonsIconColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
-            NewTheme.SeriesEditPaneButtonsIconHoverColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
+            BackupCurrentTheme.CollectionBGColor = new SolidColorBrush(Color.Parse(MainColor2.Text));
+            BackupCurrentTheme.StatusAndBookTypeBGColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
+            BackupCurrentTheme.StatusAndBookTypeBGHoverColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
+            BackupCurrentTheme.StatusAndBookTypeTextColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
+            BackupCurrentTheme.StatusAndBookTypeTextHoverColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
+            BackupCurrentTheme.SeriesCardBGColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
+            BackupCurrentTheme.SeriesCardTitleColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
+            BackupCurrentTheme.SeriesCardPublisherColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
+            BackupCurrentTheme.SeriesCardStaffColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
+            BackupCurrentTheme.SeriesCardDescColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
+            BackupCurrentTheme.SeriesProgressBGColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
+            BackupCurrentTheme.SeriesProgressBarColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
+            BackupCurrentTheme.SeriesProgressBarBGColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
+            BackupCurrentTheme.SeriesProgressBarBorderColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
+            BackupCurrentTheme.SeriesProgressTextColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
+            BackupCurrentTheme.SeriesProgressButtonsHoverColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
+            BackupCurrentTheme.SeriesButtonIconColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
+            BackupCurrentTheme.SeriesButtonIconHoverColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
+            BackupCurrentTheme.SeriesEditPaneBGColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
+            BackupCurrentTheme.SeriesNotesBGColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
+            BackupCurrentTheme.SeriesNotesBorderColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
+            BackupCurrentTheme.SeriesNotesTextColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
+            BackupCurrentTheme.SeriesEditPaneButtonsBGColor = new SolidColorBrush(Color.Parse(MainColor2.Text));
+            BackupCurrentTheme.SeriesEditPaneButtonsBGHoverColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
+            BackupCurrentTheme.SeriesEditPaneButtonsBorderColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
+            BackupCurrentTheme.SeriesEditPaneButtonsBorderHoverColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
+            BackupCurrentTheme.SeriesEditPaneButtonsIconColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
+            BackupCurrentTheme.SeriesEditPaneButtonsIconHoverColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
 
             // Generate Theme
-            AddTheme(NewTheme);  
+            ViewModel.SaveTheme(BackupCurrentTheme);  
         }
 
         /// <summary>
@@ -144,151 +143,90 @@ namespace Tsundoku.Views
         {
            LOGGER.Info("Generating New Theme2");
 
-            NewTheme.ThemeName = NewThemeName.Text;
+            BackupCurrentTheme.ThemeName = NewThemeName.Text;
 
             // Apply menu colors
-            NewTheme.MenuBGColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
-            NewTheme.UsernameColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
-            NewTheme.UserIconBorderColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
-            NewTheme.MenuTextColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
-            NewTheme.SearchBarBGColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
-            NewTheme.SearchBarBorderColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
-            NewTheme.SearchBarTextColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
-            NewTheme.DividerColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
-            NewTheme.MenuButtonBGColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
-            NewTheme.MenuButtonBGHoverColor = new SolidColorBrush(Color.Parse(MainColor2.Text));
-            NewTheme.MenuButtonBorderColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
-            NewTheme.MenuButtonBorderHoverColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
-            NewTheme.MenuButtonTextAndIconColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
-            NewTheme.MenuButtonTextAndIconHoverColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
+            BackupCurrentTheme.MenuBGColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
+            BackupCurrentTheme.UsernameColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
+            BackupCurrentTheme.UserIconBorderColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
+            BackupCurrentTheme.MenuTextColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
+            BackupCurrentTheme.SearchBarBGColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
+            BackupCurrentTheme.SearchBarBorderColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
+            BackupCurrentTheme.SearchBarTextColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
+            BackupCurrentTheme.DividerColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
+            BackupCurrentTheme.MenuButtonBGColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
+            BackupCurrentTheme.MenuButtonBGHoverColor = new SolidColorBrush(Color.Parse(MainColor2.Text));
+            BackupCurrentTheme.MenuButtonBorderColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
+            BackupCurrentTheme.MenuButtonBorderHoverColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
+            BackupCurrentTheme.MenuButtonTextAndIconColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
+            BackupCurrentTheme.MenuButtonTextAndIconHoverColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
 
             // Apply Colleciton Colors
-            NewTheme.CollectionBGColor = new SolidColorBrush(Color.Parse(MainColor2.Text));
-            NewTheme.StatusAndBookTypeBGColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
-            NewTheme.StatusAndBookTypeBGHoverColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
-            NewTheme.StatusAndBookTypeTextColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
-            NewTheme.StatusAndBookTypeTextHoverColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
-            NewTheme.SeriesCardBGColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
-            NewTheme.SeriesCardTitleColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
-            NewTheme.SeriesCardPublisherColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
-            NewTheme.SeriesCardStaffColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
-            NewTheme.SeriesCardDescColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
-            NewTheme.SeriesProgressBGColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
-            NewTheme.SeriesProgressBarColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
-            NewTheme.SeriesProgressBarBGColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
-            NewTheme.SeriesProgressBarBorderColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
-            NewTheme.SeriesProgressTextColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
-            NewTheme.SeriesProgressButtonsHoverColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
-            NewTheme.SeriesButtonIconColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
-            NewTheme.SeriesButtonIconHoverColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
-            NewTheme.SeriesEditPaneBGColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
-            NewTheme.SeriesNotesBGColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
-            NewTheme.SeriesNotesBorderColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
-            NewTheme.SeriesNotesTextColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
-            NewTheme.SeriesEditPaneButtonsBGColor = new SolidColorBrush(Color.Parse(MainColor2.Text));
-            NewTheme.SeriesEditPaneButtonsBGHoverColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
-            NewTheme.SeriesEditPaneButtonsBorderColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
-            NewTheme.SeriesEditPaneButtonsBorderHoverColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
-            NewTheme.SeriesEditPaneButtonsIconColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
-            NewTheme.SeriesEditPaneButtonsIconHoverColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
+            BackupCurrentTheme.CollectionBGColor = new SolidColorBrush(Color.Parse(MainColor2.Text));
+            BackupCurrentTheme.StatusAndBookTypeBGColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
+            BackupCurrentTheme.StatusAndBookTypeBGHoverColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
+            BackupCurrentTheme.StatusAndBookTypeTextColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
+            BackupCurrentTheme.StatusAndBookTypeTextHoverColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
+            BackupCurrentTheme.SeriesCardBGColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
+            BackupCurrentTheme.SeriesCardTitleColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
+            BackupCurrentTheme.SeriesCardPublisherColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
+            BackupCurrentTheme.SeriesCardStaffColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
+            BackupCurrentTheme.SeriesCardDescColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
+            BackupCurrentTheme.SeriesProgressBGColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
+            BackupCurrentTheme.SeriesProgressBarColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
+            BackupCurrentTheme.SeriesProgressBarBGColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
+            BackupCurrentTheme.SeriesProgressBarBorderColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
+            BackupCurrentTheme.SeriesProgressTextColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
+            BackupCurrentTheme.SeriesProgressButtonsHoverColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
+            BackupCurrentTheme.SeriesButtonIconColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
+            BackupCurrentTheme.SeriesButtonIconHoverColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
+            BackupCurrentTheme.SeriesEditPaneBGColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
+            BackupCurrentTheme.SeriesNotesBGColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
+            BackupCurrentTheme.SeriesNotesBorderColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
+            BackupCurrentTheme.SeriesNotesTextColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
+            BackupCurrentTheme.SeriesEditPaneButtonsBGColor = new SolidColorBrush(Color.Parse(MainColor2.Text));
+            BackupCurrentTheme.SeriesEditPaneButtonsBGHoverColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
+            BackupCurrentTheme.SeriesEditPaneButtonsBorderColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
+            BackupCurrentTheme.SeriesEditPaneButtonsBorderHoverColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
+            BackupCurrentTheme.SeriesEditPaneButtonsIconColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
+            BackupCurrentTheme.SeriesEditPaneButtonsIconHoverColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
 
             // Generate Theme
-            AddTheme(NewTheme);    
+            ViewModel.SaveTheme(BackupCurrentTheme);    
         }
 
         private async Task ShowDialog(string title, string info = "Unable to Add Theme")
         {
-            PopupWindow dialog = new PopupWindow();
+            PopupWindow dialog = App.ServiceProvider.GetRequiredService<PopupWindow>();
             dialog.SetWindowText(title, "fa-solid fa-circle-exclamation", info);
             await dialog.ShowDialog(this);
         }
-
-        /// <summary>
-        /// Adds a new theme to the users themes
-        /// </summary>
-        private async void AddTheme(TsundokuTheme newTheme)
+        private async void SaveNewTheme(object sender, RoutedEventArgs args)
         {
-            NewThemeName.Text = string.IsNullOrWhiteSpace(NewThemeName.Text) ? newTheme.ThemeName.Trim() : NewThemeName.Text.Trim();
-            if (!string.IsNullOrWhiteSpace(NewThemeName.Text) && !NewThemeName.Text.Equals("Default", StringComparison.OrdinalIgnoreCase) && NewThemeName.Text.Length <= 60)
+            try
             {
-                newTheme.ThemeName = NewThemeName.Text;
-                bool duplicateCheck = false;
-                TsundokuTheme replaceTheme = newTheme.Cloning(); 
-                // Checks if the new theme already exists (some other theme has the same name as what the theme the user is currently trying to save)
-                for (int x = 0; x < ViewModelBase.MainUser.SavedThemes.Count; x++)
-                {
-                    if (newTheme.ThemeName.Equals(ViewModelBase.MainUser.SavedThemes[x].ThemeName))
-                    {
-                        LOGGER.Debug($"{newTheme.ThemeName} Already Exists Replacing Theme");
-                        duplicateCheck = true;
-
-                        for (int y = 0; y < ViewModelBase.MainUser.SavedThemes.Count; y++)
-                        {
-                            if (y != x)
-                            {
-                                ViewModelBase.MainUser.SavedThemes[x] = replaceTheme;
-                                ThemeSettingsViewModel.UserThemesDisplay.Replace(ViewModelBase.MainUser.SavedThemes[x].ThemeName, newTheme.ThemeName);
-                                LOGGER.Info($"Replaced Theme \"{newTheme.ThemeName}\"");
-                                ThemeChanged = true;
-                                ThemeSelector.SelectedIndex = x;
-                                return;
-                            }
-                        }
-                    }
-                }
-
-                if (!duplicateCheck)
-                {
-                    int index = ViewModelBase.MainUser.SavedThemes.BinarySearch(replaceTheme);
-                    index = index < 0 ? ~index : index;
-                    ViewModelBase.MainUser.SavedThemes.Insert(index, replaceTheme);
-                    ThemeSettingsViewModel.UserThemesDisplay.Insert(index, replaceTheme.ThemeName);
-                    LOGGER.Info($"Added New Theme \"{newTheme.ThemeName}\"");
-                    ThemeChanged = true;
-                    ThemeSelector.SelectedIndex = index;
-                }
+                BackupCurrentTheme.ThemeName = NewThemeName.Text.Trim();
+                ViewModel.SaveTheme(BackupCurrentTheme);
             }
-            else
+            catch (Exception ex)
             {
-                await ShowDialog("Error", $"Unable to Add Theme \"{NewThemeName.Text}\"");
-                LOGGER.Warn($"Empty, Invalid, or Theme Name > 60 Chars for \"{NewThemeName.Text}\"");
+                await ShowDialog("Error", $"Unable to Save New Theme \"{BackupCurrentTheme.ThemeName}\"");
+                LOGGER.Warn(ex.Message);
             }
-        }
-
-        private void SaveNewTheme(object sender, RoutedEventArgs args)
-        {
-            SaveTheme(NewTheme);
-        }
-
-        private void SaveTheme(TsundokuTheme newTheme)
-        {
-            AddTheme(newTheme);
-            // ViewModelBase.MainUser.SavedThemes.Add(TsundokuTheme.DEFAULT_THEME);
-            // ViewModelBase.MainUser.SavedThemes = new ObservableCollection<TsundokuTheme>(ViewModelBase.MainUser.SavedThemes.OrderBy(theme => theme.ThemeName));
-            ViewModelBase.MainUser.SaveUserData();
         }
 
         private async void ExportThemeAsync(object sender, RoutedEventArgs args)
         {
-            string themesFolderPath = AppFileHelper.GetThemesFolderPath();
-
-            // Construct the full file path for the theme
-            string themeFileName = $"{ViewModelBase.CurrentTheme.ThemeName.Replace(" ", "_")}.json";
-            string themeFullPath = Path.Combine(themesFolderPath, themeFileName);
-
             try
             {
-                // Serialize the theme and write it to the file
-                string jsonContent = JsonSerializer.Serialize(ViewModelBase.CurrentTheme, typeof(TsundokuTheme), User.UserJsonModel);
-                File.WriteAllText(themeFullPath, jsonContent);
-
-                await ShowDialog("Info", $"Exported \"{ViewModelBase.CurrentTheme.ThemeName}\" Theme");
-                LOGGER.Info("Exported \"{ThemeName}\" Theme to {Path}", ViewModelBase.CurrentTheme.ThemeName, themeFullPath);
+                ViewModel.ExportTheme(CurThemeName);
+                await ShowDialog("Info", $"Exported \"{CurThemeName}\" Theme");
+                LOGGER.Info("Exported \"{ThemeName}\"", CurThemeName);
             }
             catch (Exception ex)
             {
-                await ShowDialog("Error", $"Failed to export \"{ViewModelBase.CurrentTheme.ThemeName}\" Theme.");
-                LOGGER.Error(ex, "Failed to export \"{ThemeName}\" Theme to {Path}", ViewModelBase.CurrentTheme.ThemeName, themeFullPath);
+                await ShowDialog("Error", $"Failed to export \"{CurThemeName}\" Theme.");
+                LOGGER.Error(ex, "Failed to export \"{ThemeName}\"", CurThemeName);
             }
         }
 
@@ -315,67 +253,31 @@ namespace Tsundoku.Views
             {
                 // Get the local path from the selected file
                 string newThemeFileLocalPath = file[0].Path.LocalPath;
-
-                if (newThemeFileLocalPath.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+                try
                 {
-                    try
-                    {
-                        // Use async version of File.ReadAllText
-                        string jsonContent = await File.ReadAllTextAsync(newThemeFileLocalPath);
-                        TsundokuTheme? importedTheme = JsonSerializer.Deserialize(jsonContent, typeof(TsundokuTheme), User.UserJsonModel) as TsundokuTheme;
-
-                        if (importedTheme != null)
-                        {
-                            SaveTheme(importedTheme);
-                            await ShowDialog("Info", $"Imported \"{importedTheme.ThemeName}\" Theme");
-                            LOGGER.Info("Imported Theme \"{ThemeName}\" from {Path}", importedTheme.ThemeName, newThemeFileLocalPath);
-                        }
-                        else
-                        {
-                            await ShowDialog("Error", $"Unable to Import \"{newThemeFileLocalPath}\", Deserialization failed.");
-                            LOGGER.Error("Deserialization failed for theme file {File}", newThemeFileLocalPath);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        await ShowDialog("Error", $"Unable to Import \"{newThemeFileLocalPath}\", Invalid Data or Access Error.");
-                        LOGGER.Error(ex, "Unable to Import {File}, Invalid Data or Access Error", newThemeFileLocalPath);
-                    }
+                    await ViewModel.ImportThemeAsync(newThemeFileLocalPath);
                 }
-                else
+                catch
                 {
-                    await ShowDialog("Error", $"Unable to Import \"{newThemeFileLocalPath}\", Not a JSON file.");
-                    LOGGER.Error("Unable to Import {File} - Not a JSON file", newThemeFileLocalPath);
+                    await ShowDialog("Error", $"Unable to Import Theme @ \"{newThemeFileLocalPath}\"");
                 }
             }
             NewThemeName.Text = "";
         }
 
-        private void RemoveSavedTheme(object sender, RoutedEventArgs args)
+        private async void RemoveSavedTheme(object sender, RoutedEventArgs args)
         {
-            if (!ThemeSelector.SelectedItem.ToString().Equals("Default"))
+            if (ThemeSelector.SelectedItem is TsundokuTheme selectedTheme)
             {
-                LOGGER.Info($"Removed Theme \"{ThemeSelector.SelectedItem}\"");
-                int curIndex = ViewModelBase.MainUser.SavedThemes.IndexOf(ViewModelBase.CurrentTheme);
-                ViewModelBase.MainUser.SavedThemes.RemoveAt(curIndex);
-                ThemeSettingsViewModel.UserThemesDisplay.RemoveAt(curIndex);
-                ThemeChanged = true;
-                ThemeSelector.SelectedIndex = curIndex == 0 ? curIndex : --curIndex;
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
+                try
+                {
+                    ViewModel.RemoveTheme(selectedTheme.ThemeName);
+                }
+                catch
+                {
+                    await ShowDialog("Error", $"Unable to Remove Theme \"{selectedTheme.ThemeName}\"");
+                }
             }
-        }
-
-        private void ChangeTheme()
-        {
-            ThemeChanged = true;
-            SelectedTheme = ThemeSelector.SelectedItem == null ? SelectedTheme : ThemeSelector.SelectedItem.ToString();
-
-            NewTheme = ViewModelBase.MainUser.SavedThemes.Single(theme => theme.ThemeName.Equals(SelectedTheme)).Cloning();
-            ViewModelBase.CurrentTheme = NewTheme;
-
-            LOGGER.Info("Theme Changed To {}", SelectedTheme);
-            ThemeChanged = false;
         }
 
         /// <summary>
@@ -383,9 +285,16 @@ namespace Tsundoku.Views
         /// </summary>
         private void ChangeMainTheme(object sender, SelectionChangedEventArgs e)
         {
-            if (ThemeSelector.IsDropDownOpen || ThemeChanged)
+            if (_isInitialized && ThemeSelector.IsDropDownOpen)
             {
-                ChangeTheme();
+                if (ThemeSelector.SelectedItem is TsundokuTheme selectedTheme)
+                {
+                    CurThemeName = selectedTheme.ThemeName;
+                    ViewModel.SetTheme(selectedTheme);
+                    BackupCurrentTheme = selectedTheme.Cloning();
+                    BackupCurrentTheme.ThemeName = "Backup";
+                    ViewModel.OverrideCurrentTheme(BackupCurrentTheme);
+                }
             }
         }
     }

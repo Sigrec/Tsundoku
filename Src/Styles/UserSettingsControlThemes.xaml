@@ -20,9 +20,9 @@
 				<TransformOperationsTransition Property="RenderTransform" Duration="0:0:.075" />
 			</Transitions>
 		</Setter>
-        <Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBGColor}"/>
-        <Setter Property="BorderBrush" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBorderColor}"/>
-        <Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuButtonTextAndIconColor}"/>
+        <Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGColor}"/>
+        <Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor}"/>
+        <Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor}"/>
 
         <Setter Property="Template">
 			<ControlTemplate>
@@ -41,22 +41,22 @@
 		</Setter>
 
         <Style Selector="^:pointerover">
-			<Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBGHoverColor}"/>
-			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBorderHoverColor}"/>
-			<Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuButtonTextAndIconHoverColor}"/>
+			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}"/>
+			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor}"/>
+			<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor}"/>
 		</Style>
 	
 		<Style Selector="^:pressed">
-			<Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBGHoverColor}"/>
-			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBorderHoverColor}"/>
-			<Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuButtonTextAndIconHoverColor}"/>
+			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}"/>
+			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor}"/>
+			<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor}"/>
             <Setter Property="RenderTransform" Value="scale(0.98)" />
 		</Style>
 
         <Style Selector="^:disabled /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Background" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBGHoverColor}"/>
-            <Setter Property="BorderBrush" Value="{CompiledBinding CurrentThemeInstance.MenuButtonBorderHoverColor}"/>
-            <Setter Property="Foreground" Value="{CompiledBinding CurrentThemeInstance.MenuButtonTextAndIconHoverColor}"/>
+            <Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}"/>
+            <Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor}"/>
+            <Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor}"/>
         </Style>
 	</ControlTheme>
 </ResourceDictionary>

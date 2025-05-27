@@ -1,29 +1,32 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Reactive.Linq;
+using Avalonia.Collections;
 using Avalonia.Controls;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Tsundoku.Models;
+using static Tsundoku.Models.TsundokuLanguageModel;
 
 namespace Tsundoku.ViewModels
 {
     public class EditSeriesInfoViewModel : ViewModelBase
     {
+        private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
         public Series Series { get; set; }
-        public Button Button { get; set; }
         [Reactive] public int DemographicIndex { get; set; }
         [Reactive] public string CoverImageUrl { get; set; }
         [Reactive] public string GenresToolTipText { get; set; }
-        public static ObservableCollection<ListBoxItem> SelectedGenres { get; set; } = new ObservableCollection<ListBoxItem>();
+        public static AvaloniaList<ListBoxItem> SelectedGenres { get; set; } = new AvaloniaList<ListBoxItem>();
         private static StringBuilder CurGenres = new StringBuilder();
 
-        public EditSeriesInfoViewModel(Series Series, Button Button)
+        public EditSeriesInfoViewModel(Series Series, IUserService userService) : base(userService)
         {
             this.Series = Series;
-            this.Button = Button;
 
-            this.WhenAnyValue(x => x.Series.Demographic).ObserveOn(RxApp.TaskpoolScheduler).Subscribe(x => DemographicIndex = Array.IndexOf(DEMOGRAPHICS, x));
+            this.WhenAnyValue(x => x.Series.Demographic)
+                .ObserveOn(RxApp.TaskpoolScheduler)
+                .Subscribe(x => DemographicIndex = Array.IndexOf(DEMOGRAPHICS, x));
 
             SelectedGenres.CollectionChanged += SeriesGenresChanged;
         }

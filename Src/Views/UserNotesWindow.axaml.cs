@@ -1,4 +1,3 @@
-using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.ReactiveUI;
 using Tsundoku.ViewModels;
 
@@ -6,25 +5,24 @@ namespace Tsundoku.Views;
 
 public partial class UserNotesWindow : ReactiveWindow<UserNotesWindowViewModel>
 {
+    private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
     public bool IsOpen = false;
-    private MainWindow CollectionWindow;
 
-    public UserNotesWindow()
+    public UserNotesWindow(UserNotesWindowViewModel viewModel)
     {
+        ViewModel = viewModel;
         InitializeComponent();
         
         Opened += (s, e) =>
         {
-            CollectionWindow = (MainWindow)((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).MainWindow;
             IsOpen ^= true;
         };
 
         Closing += (s, e) =>
         {
             if (IsOpen) 
-            { 
-                MainWindow.ResetMenuButton(CollectionWindow.UserNotesButton);
-                ((UserNotesWindow)s).Hide();
+            {
+                this.Hide();
                 IsOpen ^= true;
             }
             e.Cancel = true;
