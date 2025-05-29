@@ -23,7 +23,6 @@ namespace Tsundoku.ViewModels
         public EditSeriesInfoViewModel(Series Series, IUserService userService) : base(userService)
         {
             this.Series = Series;
-
             this.WhenAnyValue(x => x.Series.Demographic)
                 .ObserveOn(RxApp.TaskpoolScheduler)
                 .Subscribe(x => DemographicIndex = Array.IndexOf(DEMOGRAPHICS, x));

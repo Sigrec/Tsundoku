@@ -11,9 +11,11 @@ using Tsundoku.ViewModels;
 using Tsundoku.Converters;
 using System.Text.Json.Nodes;
 using static Tsundoku.Models.TsundokuLanguageModel;
-using System.Reactive.Concurrency;
 using System.Diagnostics.CodeAnalysis;
 using DynamicData.Kernel;
+using static Tsundoku.Models.TsundokuFilterModel;
+using ReactiveUI.Fody.Helpers;
+using Avalonia.Threading;
 
 namespace Tsundoku.Models
 {
@@ -31,8 +33,8 @@ namespace Tsundoku.Models
         Series? GetSeriesByCoverPath(string coverPath);
         TsundokuLanguage GetLanguage();
         bool DoesDuplicateExist(Series series);
+        IReadOnlyList<Series> GetUserCollection();
 
-        ReadOnlyObservableCollection<Series> UserCollection { get; }
         ReadOnlyObservableCollection<TsundokuTheme> SavedThemes { get; }
 
         IObservable<TsundokuTheme?> CurrentTheme { get; } // Expose as an observable
@@ -54,7 +56,7 @@ namespace Tsundoku.Models
         void ClearUserCollection();
     }
 
-    public class UserService : IUserService
+    public class UserService : IUserService, IDisposable
     {
         private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
         private readonly BehaviorSubject<User?> _userSubject = new BehaviorSubject<User?>(null);
@@ -70,6 +72,9 @@ namespace Tsundoku.Models
 
         private readonly ReadOnlyObservableCollection<Series> _userCollection;
         private readonly ReadOnlyObservableCollection<TsundokuTheme> _savedThemes;
+
+        [Reactive] public string SeriesFilterText { get; set; } = string.Empty;
+        [Reactive] public TsundokuFilter SelectedFilter { get; set; } = TsundokuFilter.None;
 
         private readonly CompositeDisposable _disposables = new CompositeDisposable();
         private bool _disposed = false;
@@ -121,14 +126,12 @@ namespace Tsundoku.Models
                     {
                         theme = lookupTheme.Value;
                     }
-                    
+
                     _currentThemeSubject.OnNext(theme);
                     LOGGER.Info($"Set Theme to '{theme?.ThemeName ?? "null"}'");
                 })
                 .DisposeWith(_disposables);
         }
-
-        public ReadOnlyObservableCollection<Series> UserCollection => _userCollection;
         public ReadOnlyObservableCollection<TsundokuTheme> SavedThemes => _savedThemes;
 
         public void LoadUserData()
@@ -154,6 +157,7 @@ namespace Tsundoku.Models
                 JsonNode? userData = JsonNode.Parse(userFileData);
                 if (userData != null)
                 {
+                    User.UpdateSchemaVersion(userData, false);
                     loadedUser = userData.Deserialize(UserModelContext.Default.User);
                 }
                 else
@@ -163,74 +167,97 @@ namespace Tsundoku.Models
                 }
             }
 
-            if (loadedUser.SavedThemes != null)
-            {
-                _savedThemesSourceCache.Clear();
-                _savedThemesSourceCache.AddOrUpdate(loadedUser.SavedThemes);
-            }
-
-            if (loadedUser.UserCollection != null)
-            {
-                _userCollectionSourceCache.Clear();
-                _userCollectionSourceCache.AddOrUpdate(loadedUser.UserCollection);
-            }
-
-            PreallocateSeriesImageBitmaps(loadedUser.UserCollection);
+            RefreshSourceCache(loadedUser);
             _userSubject.OnNext(loadedUser);
             LOGGER.Info($"Finished Loading \"{loadedUser.UserName}'s\" Data!");
         }
 
-        private static void PreallocateSeriesImageBitmaps(List<Series> userCollection)
+        private static void PreallocateSeriesImageBitmaps(SourceCache<Series, Guid> userCollection)
         {
-            // Operate on the underlying list of the SourceList for iteration
-            // Using `Items` is safe for iteration when not modifying the collection.
-            // If you were modifying the collection, you'd want to use `Edit` block.
-            foreach (Series x in userCollection)
+            Dictionary<string, string> coverFiles = Directory
+                .EnumerateFiles(AppFileHelper.GetCoversFolderPath(), "*.*", SearchOption.TopDirectoryOnly)
+                .Where(file => AppFileHelper.ValidImageExtensions.Contains(Path.GetExtension(file)))
+                .ToDictionary(
+                    f => Path.GetFileNameWithoutExtension(f),
+                    f => f,
+                    StringComparer.OrdinalIgnoreCase
+                );
+
+            userCollection.Edit(innerCache =>
             {
-                string fullCoverPath = AppFileHelper.GetFullCoverPath(x.Cover);
-                string extension = Path.GetExtension(fullCoverPath);
-                Bitmap? loadedBitmap = null;
-
-                if (extension.Equals(".png"))
+                foreach (Series curSeries in innerCache.Items)
                 {
-                    if (File.Exists(fullCoverPath))
-                    {
-                        loadedBitmap = GenerateCoverBitmap(x, fullCoverPath);
-                    }
-                }
-                else
-                {
-                    fullCoverPath = AppFileHelper.FindExistingCoverByBaseName(x.Cover);
-                    if (File.Exists(fullCoverPath))
-                    {
-                        loadedBitmap = GenerateCoverBitmap(x, fullCoverPath);
-                        x.DeleteCover();
-                        x.Cover = Path.ChangeExtension(x.Cover, ".png");
-                    }
-                }
-                x.CoverBitMap = loadedBitmap;
-            }
+                    string? fullCoverPath = AppFileHelper.GetFullCoverPath(curSeries.Cover);
+                    if (string.IsNullOrEmpty(fullCoverPath))
+                        return;
 
-            // After all images are processed, potentially update a reactive property
-            // to indicate that covers are now fully loaded/updated.
-            // This should be on the main thread.
-            // RxApp.MainThreadScheduler.Schedule(() => UpdatedCovers = true);
+                    bool hasPngExtension = Path.GetExtension(curSeries.Cover).Equals(".png", StringComparison.OrdinalIgnoreCase);
+                    string baseName = Path.GetFileNameWithoutExtension(curSeries.Cover);
+                    Bitmap? loadedBitmap = null;
+                    string? newCover = null;
+
+                    if (hasPngExtension && File.Exists(fullCoverPath))
+                    {
+                        loadedBitmap = GenerateCoverBitmap(curSeries, fullCoverPath, true);
+                    }
+                    else
+                    {
+                        LOGGER.Debug("'.png' Extension file not found for {title} or File Does Not Exist, Searching for Another Valid File...", curSeries.Titles[TsundokuLanguage.Romaji]);
+                        if (coverFiles.TryGetValue(baseName, out string fallbackPath))
+                        {
+                            loadedBitmap = GenerateCoverBitmap(curSeries, fallbackPath, false);
+
+                            if (hasPngExtension)
+                            {
+                                AppFileHelper.DeleteCoverFile(Path.GetFileName(fallbackPath));
+                            }
+                            else
+                            {
+                                AppFileHelper.DeleteCoverFile(curSeries.Cover);
+                                newCover = Path.ChangeExtension(curSeries.Cover, ".png");
+                            }
+                        }
+                        else
+                        {
+                            LOGGER.Warn("{name} {format} Series cover image {image} does not exist", curSeries.Titles[TsundokuLanguage.Romaji], curSeries.Format, curSeries.Cover);
+                        }
+                    }
+
+                    curSeries.CoverBitMap = loadedBitmap;
+                }
+            });
+
             LOGGER.Info("Cover Images fully Loaded");
+            coverFiles.Clear();
+            coverFiles = null;
         }
 
-        private static Bitmap GenerateCoverBitmap(Series series, string fullCoverPath)
+        private static Bitmap GenerateCoverBitmap(Series series, string fullCoverPath, bool isPngExtension)
         {
             Bitmap loadedBitmap = new Bitmap(fullCoverPath);
+            if (!isPngExtension)
+            {
+                fullCoverPath = Path.ChangeExtension(fullCoverPath, ".png");
+            }
+
             if (loadedBitmap.Size.Width != LEFT_SIDE_CARD_WIDTH || loadedBitmap.Size.Height != IMAGE_HEIGHT)
             {
                 Bitmap scaledBitmap = loadedBitmap.CreateScaledBitmap(new PixelSize(LEFT_SIDE_CARD_WIDTH, IMAGE_HEIGHT), BitmapInterpolationMode.HighQuality);
+                LOGGER.Debug("Scaled {} Cover Image", series.Titles[TsundokuLanguage.Romaji]);
                 loadedBitmap.Dispose();
 
                 scaledBitmap.Save(fullCoverPath, 100);
-                LOGGER.Debug("Scaling {} Cover Image", series.Titles[TsundokuLanguage.Romaji]);
+                LOGGER.Info("Saved Scaled Cover {path}", fullCoverPath);
 
                 return scaledBitmap;
             }
+
+            if (!isPngExtension)
+            {
+                loadedBitmap.Save(fullCoverPath, 100);
+                LOGGER.Info("Saved Cover {path}", fullCoverPath);
+            }
+            
             return loadedBitmap;
         }
 
@@ -242,22 +269,20 @@ namespace Tsundoku.Models
             return _userCollectionSourceCache.Items
                 .FirstOrDefault(series => string.Equals(series.Cover, coverPath));
         }
-        private void ResfreshSourceCache()
-        {
-            User user = GetCurrentUserSnapshot();
-            _userCollectionSourceCache.Edit(updater =>
-            {
-                updater.Clear();
-                foreach (var series in user.UserCollection)
-                    updater.AddOrUpdate(series);
-            });
 
-            _savedThemesSourceCache.Edit(updater =>
+        private void RefreshSourceCache(User? user)
+        {
+            if (user!.SavedThemes != null)
             {
-                updater.Clear();
-                foreach (var theme in user.SavedThemes)
-                    updater.AddOrUpdate(theme);
-            });
+                _savedThemesSourceCache.Clear();
+                _savedThemesSourceCache.AddOrUpdate(user!.SavedThemes);
+            }
+            if (user!.UserCollection != null)
+            {
+                _userCollectionSourceCache.Clear();
+                _userCollectionSourceCache.AddOrUpdate(user!.UserCollection);
+                PreallocateSeriesImageBitmaps(_userCollectionSourceCache);
+            }
         }
 
         private static User CreateDefaultUser()
@@ -290,8 +315,7 @@ namespace Tsundoku.Models
         {
             try
             {
-                string jsonContent = File.ReadAllText(filePath);
-                JsonNode? uploadedUserData = JsonNode.Parse(jsonContent);
+                JsonNode? uploadedUserData = JsonNode.Parse(File.ReadAllText(filePath));
 
                 if (uploadedUserData is null)
                 {
@@ -300,7 +324,7 @@ namespace Tsundoku.Models
                 }
 
                 // Ensure schema is updated (optional flag depending on your implementation)
-                User.UpdateSchemaVersion(uploadedUserData);
+                User.UpdateSchemaVersion(uploadedUserData, true);
 
                 User? newUser = uploadedUserData.Deserialize(UserModelContext.Default.User);
                 if (newUser is null)
@@ -314,15 +338,15 @@ namespace Tsundoku.Models
                 string backupFileName;
                 do
                 {
-                    backupFileName = $"UserData_Backup{count}.json";
+                    backupFileName = $"UserData_Backup_{count}.json";
                     count++;
                 } while (File.Exists(backupFileName));
 
-                File.Replace(filePath, AppFileHelper.GetUserDataJsonPath(), backupFileName);
+                File.Replace(filePath, AppFileHelper.GetUserDataJsonPath(), AppFileHelper.GetFilePath(backupFileName));
 
                 // Push to reactive stream
+                RefreshSourceCache(newUser);
                 _userSubject.OnNext(newUser);
-                ResfreshSourceCache();
 
                 LOGGER.Info("Successfully imported user data from '{}'. Backup created as '{}'.", filePath, backupFileName);
             }
@@ -334,6 +358,11 @@ namespace Tsundoku.Models
             {
                 LOGGER.Error(ex, "Unexpected error during ImportUserData from '{}'.", filePath);
             }
+        }
+
+        public IReadOnlyList<Series> GetUserCollection()
+        {
+            return GetCurrentUserSnapshot().UserCollection;
         }
 
         public void UpdateSeriesCoverBitmap(Guid seriesId, Bitmap bitmap)
@@ -438,7 +467,7 @@ namespace Tsundoku.Models
 
         public bool DoesDuplicateExist(Series series)
         {
-            return _userCollectionSourceCache.Items.Any(series.Equals);
+            return _userCollectionSourceCache.Items.Contains(series, new SeriesValueComparer());
         }
 
         public bool AddSeries(Series? series, bool allowDuplicate = false)
@@ -461,18 +490,10 @@ namespace Tsundoku.Models
 
             UpdateUser(user =>
             {
-                SeriesComparer comparer = new SeriesComparer(user.Language);
-                int index = user.UserCollection.BinarySearch(series, comparer);
-
-                if (index < 0)
-                {
-                    index = ~index;
-                }
-
-                user.UserCollection.Insert(index, series);
+                user.UserCollection.Add(series);
             });
 
-            LOGGER.Info("Added {series} to Collection", series.Titles[TsundokuLanguage.Romaji]);
+            LOGGER.Info("Added {series} ({id}) to Collection", series.Titles[TsundokuLanguage.Romaji] + (series.DuplicateIndex == 0 ? string.Empty : $" ({series.DuplicateIndex})"), series.Id);
             return true;
         }
 
@@ -487,7 +508,8 @@ namespace Tsundoku.Models
             {
                 user.UserCollection.Remove(series);
             });
-            LOGGER.Info("Removed {series} from Collection", series.Titles[TsundokuLanguage.Romaji]);
+            series?.Dispose();
+            LOGGER.Info("Removed {series} ({id}) from Collection", series.Titles[TsundokuLanguage.Romaji] + (series.DuplicateIndex == 0 ? string.Empty : $" ({series.DuplicateIndex})"), series.Id);
         }
 
         public void AddTheme(TsundokuTheme theme)

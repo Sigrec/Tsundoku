@@ -20,8 +20,8 @@ namespace Tsundoku.Views
 
         public PriceAnalysisWindow(PriceAnalysisViewModel viewModel)
         {
-            ViewModel = viewModel;
             InitializeComponent();
+            ViewModel = viewModel;
 
             Opened += (s, e) =>
             {
@@ -40,7 +40,8 @@ namespace Tsundoku.Views
                 e.Cancel = true;
             };
 
-            this.WhenAnyValue(x => x.TitleBox.Text, x => x.MangaButton.IsChecked, x => x.NovelButton.IsChecked, x => x.BrowserSelector.SelectedItem, x => x.RegionSelector.SelectedItem, x => x.ViewModel.WebsitesSelected, (title, manga, novel, browser, region, websiteCheck) => !string.IsNullOrWhiteSpace(title) && !(manga == false && novel == false && websiteCheck) && browser != null && region != null && websiteCheck).Subscribe(x => ViewModel.IsAnalyzeButtonEnabled = x);
+            this.WhenAnyValue(x => x.TitleBox.Text, x => x.MangaButton.IsChecked, x => x.NovelButton.IsChecked, x => x.BrowserSelector.SelectedItem, x => x.RegionComboBox.SelectedItem, x => x.ViewModel.WebsitesSelected, (title, manga, novel, browser, region, websiteCheck) => !string.IsNullOrWhiteSpace(title) && !(manga == false && novel == false && websiteCheck) && browser != null && region != null && websiteCheck)
+                .Subscribe(x => ViewModel.IsAnalyzeButtonEnabled = x);
         }
 
         private void IsMangaButtonClicked(object sender, RoutedEventArgs args)
@@ -55,7 +56,7 @@ namespace Tsundoku.Views
 
         private bool IsWebsiteListValid(IList input)
         {
-            Region region = ViewModelBase.MainUser.Region;
+            Region region = ViewModel.CurrentUser.Region;
             foreach (ListBoxItem website in input)
             {
                 bool isValid = website.Content.ToString() switch
@@ -89,13 +90,13 @@ namespace Tsundoku.Views
                 StartScrapeButton.IsEnabled = false;
                 StartScrapeButton.Content = "Analyzing..."; 
                 Scrape.Browser = MangaAndLightNovelWebScrape.Helpers.GetBrowserFromString((BrowserSelector.SelectedItem as ComboBoxItem).Content.ToString());
-                Scrape.Region = MangaAndLightNovelWebScrape.Helpers.GetRegionFromString((RegionSelector.SelectedItem as ComboBoxItem).Content.ToString());
+                Scrape.Region = ViewModel.CurrentUser.Region;
                 Scrape.Filter = MangaAndLightNovelWebScrape.Helpers.GetStockStatusFilterFromString((StockFilterSelector.SelectedItem as ComboBoxItem).Content.ToString());
-                Scrape.IsBooksAMillionMember = ViewModelBase.MainUser.Memberships[BooksAMillion.WEBSITE_TITLE];
-                Scrape.IsKinokuniyaUSAMember = ViewModelBase.MainUser.Memberships[KinokuniyaUSA.WEBSITE_TITLE];
-                Scrape.IsIndigoMember = ViewModelBase.MainUser.Memberships[Indigo.WEBSITE_TITLE];
+                Scrape.IsBooksAMillionMember = ViewModel.CurrentUser.Memberships[BooksAMillion.WEBSITE_TITLE];
+                Scrape.IsKinokuniyaUSAMember = ViewModel.CurrentUser.Memberships[KinokuniyaUSA.WEBSITE_TITLE];
+                Scrape.IsIndigoMember = ViewModel.CurrentUser.Memberships[Indigo.WEBSITE_TITLE];
 
-                LOGGER.Info($"Started Scrape For \"{TitleBox.Text}\" on {Scrape.Browser} Browser w/ Region = \"{Scrape.Region}\" & \"{(StockFilterSelector.SelectedItem as ComboBoxItem).Content} Filter\" & Websites = [{string.Join(", ", ViewModel.SelectedWebsites.Select(site => site.Content.ToString()))}] & Memberships = ({string.Join(" & ", ViewModelBase.MainUser.Memberships)})");
+                LOGGER.Info($"Started Scrape For \"{TitleBox.Text}\" on {Scrape.Browser} Browser w/ Region = \"{Scrape.Region}\" & \"{(StockFilterSelector.SelectedItem as ComboBoxItem).Content} Filter\" & Websites = [{string.Join(", ", ViewModel.SelectedWebsites.Select(site => site.Content.ToString()))}] & Memberships = ({string.Join(" & ", ViewModel.CurrentUser.Memberships)})");
                 
                 await Scrape.InitializeScrapeAsync(
                     title: TitleBox.Text, 
@@ -119,12 +120,15 @@ namespace Tsundoku.Views
 
         private void RegionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (RegionSelector.IsDropDownOpen)
+            if (RegionComboBox.SelectedItem is ComboBoxItem selectedItem)
             {
-                Region newRegion = MangaAndLightNovelWebScrape.Helpers.GetRegionFromString((RegionSelector.SelectedItem as ComboBoxItem).Content.ToString());
-                LOGGER.Info("Region Changed to {}", newRegion.ToString());
-                ViewModelBase.MainUser.Region = newRegion;
-                ViewModelBase.MainUser.Region = newRegion;
+                string? newRegionItem = selectedItem.Content?.ToString();
+                if (newRegionItem != null)
+                {
+                    Region newRegion = MangaAndLightNovelWebScrape.Helpers.GetRegionFromString(newRegionItem);
+                    ViewModel.UpdateUserRegion(newRegion);
+                    LOGGER.Info("Region Changed to {}", newRegionItem);
+                }
             }
         }
 

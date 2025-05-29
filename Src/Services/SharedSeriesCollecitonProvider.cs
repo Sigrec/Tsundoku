@@ -1,6 +1,9 @@
 using System.Collections.ObjectModel;
+using System.Linq.Dynamic.Core;
+using System.Linq.Expressions;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Text.RegularExpressions;
 using DynamicData;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -24,14 +27,17 @@ namespace Tsundoku.Services
         // provider's public contract, allowing ViewModels to control the global filter criteria.
         string SeriesFilterText { get; set; }
         TsundokuFilter SelectedFilter { get; set; }
+        string AdvancedSearchQuery { get; set; }
+        string AdvancedSearchQueryErrorMessage { get; set; }
     }
 
     /// <summary>
     /// Provides a globally filtered and sorted ReadOnlyObservableCollection of Series
     /// that can be consumed by multiple ViewModels.
     /// </summary>
-    public class SharedSeriesCollectionProvider : ReactiveObject, ISharedSeriesCollectionProvider, IDisposable
+    public partial class SharedSeriesCollectionProvider : ReactiveObject, ISharedSeriesCollectionProvider, IDisposable
     {
+        private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
         private readonly CompositeDisposable _disposables = new CompositeDisposable();
         private ReadOnlyObservableCollection<Series> _dynamicUserCollection;
 
@@ -44,6 +50,10 @@ namespace Tsundoku.Services
         // ViewModels that want to control the global filter will bind to these properties.
         [Reactive] public string SeriesFilterText { get; set; } = string.Empty;
         [Reactive] public TsundokuFilter SelectedFilter { get; set; } = TsundokuFilter.None;
+        [Reactive] public string AdvancedSearchQueryErrorMessage { get; set; }
+        [Reactive] public string AdvancedSearchQuery { get; set; }
+
+        [GeneratedRegex(@"(?<FilterName>\w+)(?<Operator>==|>=|<=|>|<)(?<FilterValue>\"".*?\""|\w+)?", RegexOptions.ExplicitCapture | RegexOptions.Compiled)] public static partial Regex AdvancedQueryRegex();
 
         private readonly IUserService _userService; // Injected to get raw data and user language
 
@@ -52,6 +62,7 @@ namespace Tsundoku.Services
         /// Sets up the reactive pipeline to filter and sort the Series collection.
         /// </summary>
         /// <param name="userService">The service providing raw Series data and user information.</param>
+        // TODO - Add a "loading" icon/screen when changing language or format
         public SharedSeriesCollectionProvider(IUserService userService)
         {
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
@@ -77,6 +88,7 @@ namespace Tsundoku.Services
 
             // 2. Define the TsundokuFilter (enum-based status) filter predicate
             IObservable<Func<Series, bool>> tsundokuFilter = this.WhenAnyValue(x => x.SelectedFilter)
+                .Where(filter => filter != TsundokuFilter.Query)
                 .DistinctUntilChanged()
                 .Select(filterEnum =>
                 {
@@ -142,16 +154,58 @@ namespace Tsundoku.Services
                     });
                 });
 
+            IObservable<Func<Series, bool>> advancedFilter = this.WhenAnyValue(x => x.AdvancedSearchQuery)
+                .DistinctUntilChanged()
+                .SelectMany(async query =>
+                {
+                    // Clear previous error message
+                    AdvancedSearchQueryErrorMessage = string.Empty;
+
+                    if (string.IsNullOrWhiteSpace(query))
+                    {
+                        return series => true; // No advanced filter
+                    }
+
+                    // Attempt to parse the query string and build the Dynamic LINQ expression
+                    string dynamicLinqString = await GenerateDynamicLinqExpression(query);
+
+                    if (string.IsNullOrWhiteSpace(dynamicLinqString))
+                    {
+                        AdvancedSearchQueryErrorMessage = "Incorrectly formatted advanced search query.";
+                        LOGGER.Warn("Advanced search query parsing resulted in an empty/invalid LINQ expression for: {Query}", query);
+                        return series => true;
+                    }
+
+                    try
+                    {
+                        LambdaExpression predicate = DynamicExpressionParser.ParseLambda<Series, bool>(ParsingConfig.Default, true, dynamicLinqString);
+                        Func<Series, bool> compiledPredicate = (Func<Series, bool>)predicate.Compile();
+
+                        LOGGER.Info("Advanced Search Query => {query}", dynamicLinqString.Replace("it.", "series."));
+                        return compiledPredicate;
+                    }
+                    catch (Exception ex)
+                    {
+                        AdvancedSearchQueryErrorMessage = "Invalid advanced search syntax.";
+                        LOGGER.Error(ex, "Error compiling dynamic LINQ expression for query: {Query}, Expression: {Expression}", query, dynamicLinqString);
+                        return series => true;
+                    }
+                })
+                .StartWith(s => true); // Start with no filter
+
             // 3. Combine filter predicates into a single observable predicate
-            var combinedFilter = Observable.CombineLatest(
+            IObservable<Func<Series, bool>> combinedFilter = Observable.CombineLatest(
                 textFilter,
                 tsundokuFilter,
-                (textPredicate, tsundokuPredicate) =>
-                    (Func<Series, bool>)(series => textPredicate(series) && tsundokuPredicate(series))
+                advancedFilter,
+                (textPred, tsundokuPred, advancedPred) =>
+                    (Func<Series, bool>)(series =>
+                        textPred(series) && tsundokuPred(series) && advancedPred(series)
+                    )
             );
 
             // 4. Define the series comparer (for sorting) based on the current user's language
-            var seriesComparerChanged = _userService.CurrentUser
+            IObservable<IComparer<Series>> seriesComparerChanged = _userService.CurrentUser
                 .Where(user => user != null)
                 .Select(user => user!.Language)
                 .DistinctUntilChanged()
@@ -162,10 +216,118 @@ namespace Tsundoku.Services
             // 5. Build the DynamicData pipeline
             _userService.UserCollectionChanges
                 .Filter(combinedFilter)
-                .SortAndBind(out _dynamicUserCollection, seriesComparerChanged)
                 .ObserveOn(RxApp.MainThreadScheduler)
+                .SortAndBind(out _dynamicUserCollection, seriesComparerChanged)
                 .Subscribe()
                 .DisposeWith(_disposables);
+        }
+
+        private static async Task<string> GenerateDynamicLinqExpression(string advancedSearchQuery)
+        {
+            // This method needs to be called from a context where it's safe to run parsing logic.
+            // Wrapping it in Task.Run to ensure it doesn't block the UI thread during parsing.
+            return await Task.Run(() =>
+            {
+                advancedSearchQuery = advancedSearchQuery.Trim();
+                var advancedSearchMatches = AdvancedQueryRegex().Matches(advancedSearchQuery);
+
+                if (advancedSearchMatches.Count == 0)
+                {
+                    return string.Empty; // No valid filter parts
+                }
+
+                StringBuilder advancedFilterExpression = new StringBuilder();
+
+                bool firstFilter = true;
+                foreach (Match searchFilter in advancedSearchMatches)
+                {
+                    string filterName = searchFilter.Groups["FilterName"].Value;
+                    string operatorType = searchFilter.Groups["Operator"].Value;
+                    string filterValue = searchFilter.Groups["FilterValue"].Success ? searchFilter.Groups["FilterValue"].Value : string.Empty;
+
+                    if (!firstFilter)
+                    {
+                        advancedFilterExpression.Append(" && ");
+                    }
+                    firstFilter = false;
+
+                    string parsedFilter = ParseAdvancedFilter(filterName, operatorType, filterValue);
+
+                    if (string.IsNullOrWhiteSpace(parsedFilter))
+                    {
+                        // If parsing failed for any part, return empty string to signal an error
+                        return string.Empty;
+                    }
+
+                    advancedFilterExpression.Append($"({parsedFilter})");
+                }
+
+                return advancedFilterExpression.ToString();
+            });
+        }
+
+
+        // --- Your existing ParseAdvancedFilter method ---
+        private static string ParseAdvancedFilter(string filterName, string operatorType, string filterValue)
+        {
+            operatorType = operatorType.Equals("=") ? "==" : operatorType;
+
+            static string BuildStringContainsExpression(string propertyName, string val)
+            {
+                // Extract the actual search value, removing outer quotes if present.
+                // This logic correctly handles user input like "Notes=="My note""
+                string searchValue = val.StartsWith('"') && val.EndsWith('"') && val.Length > 1
+                                     ? val[1..^1]
+                                     : val;
+
+                // Escape the search value for safe inclusion in the C# string literal.
+                string escapedSearchValue = EscapeForCSharpStringLiteral(searchValue);
+
+                // Construct the dynamic LINQ expression.
+                // Use ToLowerInvariant() on both sides for case-insensitive comparison,
+                // as Dynamic LINQ does not directly support StringComparison.OrdinalIgnoreCase.
+                // The !string.IsNullOrWhiteSpace check ensures the property is not null/empty before ToLowerInvariant().
+                return $"!string.IsNullOrWhiteSpace(it.{propertyName}) && it.{propertyName}.ToLowerInvariant().Contains(\"{escapedSearchValue.ToLowerInvariant()}\")";
+            }
+
+            return filterName.ToLowerInvariant() switch
+            {
+                "rating" or "value" or "read" or "curvolumes" or "maxvolumes" =>
+                    int.TryParse(filterValue, out _) ? $"it.{filterName} {operatorType} {filterValue}" : string.Empty,
+
+                "format" =>
+                    $"(it.Format {operatorType} Format.{filterValue})",
+
+                "status" =>
+                    $"(it.Status {operatorType} Status.{filterValue})",
+
+                "demographic" =>
+                    $"(it.Demographic {operatorType} Demographic.{filterValue})",
+
+                "series" =>
+                    filterValue.Equals("Complete", StringComparison.OrdinalIgnoreCase) ? $"it.CurVolumeCount > 0 && it.CurVolumeCount == it.MaxVolumeCount" :
+                    filterValue.Equals("InComplete", StringComparison.OrdinalIgnoreCase) ? $"it.MaxVolumeCount > 0 && it.CurVolumeCount < it.MaxVolumeCount || it.MaxVolumeCount == 0" : 
+                    string.Empty,
+
+                "favorite" => $"{(filterValue.Equals("True") ? '!' : "")}it.IsFavorite",
+
+                "notes" => BuildStringContainsExpression("SeriesNotes", filterValue),
+                "publisher" => BuildStringContainsExpression("Publisher", filterValue),
+
+                "genre" =>
+                    // Assuming Series.Genres is List<string> and filterValue is the actual genre string (e.g., "Action")
+                    // If Genre is an enum in your project, change this to:
+                    // `it.Genres != null && it.Genres.Contains(YourProject.Models.GenreEnum.{filterValue})`
+                    $"it.Genres != null && it.Genres.Contains(Genre.{EscapeForCSharpStringLiteral(filterValue)}\")",
+
+                _ => string.Empty,
+            };
+        }
+        
+        private static string EscapeForCSharpStringLiteral(string value)
+        {
+            // Replace backslashes first, then quotes
+            return value.Replace("\\", "\\\\").Replace("\"", "\\\"");
         }
 
         /// <summary>

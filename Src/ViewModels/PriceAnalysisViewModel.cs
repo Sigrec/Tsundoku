@@ -25,7 +25,12 @@ namespace Tsundoku.ViewModels
         {
 
             SelectedWebsites.CollectionChanged += WebsiteCollectionChanged;
-            this.WhenAnyValue(x => x.CurRegion).Subscribe(x => CurRegionIndex = Array.IndexOf(Enum.GetValues<Region>(), x));
+            this.WhenAnyValue(x => x.CurrentUser.Region).Subscribe(x => CurRegionIndex = Array.IndexOf(Enum.GetValues<Region>(), x));
+        }
+
+        public void UpdateUserRegion(Region newRegion)
+        {
+            _userService.UpdateUser(user => user.Region = newRegion);
         }
 
         private void WebsiteCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)

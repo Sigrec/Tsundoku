@@ -1,0 +1,17 @@
+Add New Series Window:
+- Allow for getting a series via a title, AniList ID, or MangaDex ID
+- Publisher is a optional field by default it will be "Unknown"
+- Cur Volumes & Max Volumes are mandatory fields and the max values are 999 for each
+- Select Book Type is mandatory Field
+- Demographic is optional by default it is "Unknown"
+- Volumes Read is optional and max is 999
+- Rating is optional and by default it is -1, and if it's -1 it is not used in your rating data calculation
+- Value is optional and max is "999999999999999999.99" of any currency
+- Cover Image is optional, by default it will just use the image of the series from the site it gets series data from
+- Allow Duplicate button is disabled by default, but it allows you to add the same series multiple times
+- "Additional Languages" allows you to select additional languages to add for a series, if you hover over the title name it will show you a list of all the additional languages you have selected. By default "Romaji", "English", & "Japanese" are selected.
+
+User Settings Window:
+- You can change your Username to anything as long as it's 1-20 characters long including emoji's, emoji's are maxed out at 10 though as 1 eomji takes up 2 characters
+- "Memberships" are used in the "Price Analysis Window" to add membership discounts to calculations, currently supported site with memberships are "Kinokuniya USA", "Indigo", & "Books-A-Million"
+- Under "Settings" if you hover over the buttons they will tell you what they all do.

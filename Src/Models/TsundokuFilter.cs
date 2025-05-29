@@ -12,6 +12,7 @@ namespace Tsundoku.Models
         public enum TsundokuFilter
         {
             [EnumMember(Value = "None")] None,
+            [EnumMember(Value = "Query")] Query,
             [EnumMember(Value = "Favorites")] Favorites,
             [EnumMember(Value = "Complete")] Complete,
             [EnumMember(Value = "Incomplete")] Incomplete,
@@ -49,7 +50,6 @@ namespace Tsundoku.Models
             [EnumMember(Value = "Thriller")] Thriller,
             [EnumMember(Value = "Read")] Read,
             [EnumMember(Value = "Unread")] Unread,
-            [EnumMember(Value = "Query")] Query,
         }
     }
 }

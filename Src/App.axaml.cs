@@ -7,10 +7,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using Tsundoku.Helpers;
 using Tsundoku.Models;
-using Avalonia.Media;
 using System.Reactive.Disposables;
-using System.Reactive.Linq;
-using ReactiveUI;
 using Tsundoku.Services;
 
 namespace Tsundoku
@@ -21,7 +18,6 @@ namespace Tsundoku
         private static Mutex _mutex;
         public static Mutex Mutex { get => _mutex; set => _mutex = value; }
         public static IServiceProvider? ServiceProvider { get; private set; }
-        private readonly CompositeDisposable _disposables = new CompositeDisposable(); // Add this line
 
         public App()
         {

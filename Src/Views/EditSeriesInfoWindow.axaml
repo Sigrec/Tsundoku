@@ -184,7 +184,7 @@
                     FontSize="20">
                     <TextBlock.Text>
                         <MultiBinding StringFormat="{}{0}{1}">
-                            <Binding Path="CurCurrencyInstance"/>
+                            <Binding Path="CurrentUser.Currency"/>
                             <Binding Path="Series.Value"/>
                         </MultiBinding>
                     </TextBlock.Text>
@@ -201,7 +201,7 @@
                     FontSize="17"
                     TextAlignment="Center"
                     HorizontalContentAlignment="Center"
-                    Mask="{Binding CurCurrencyInstance, StringFormat='{}{0}000000000000000000.00'}"
+                    Mask="{CompiledBinding CurrentUser.Currency, StringFormat='{}{0}000000000000000000.00'}"
                     VerticalContentAlignment="Center"
                     Classes="Menu"/>
                 <Grid 

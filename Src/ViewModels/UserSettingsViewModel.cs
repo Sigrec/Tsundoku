@@ -5,38 +5,62 @@ using Tsundoku.Models;
 using System.Windows.Input;
 using MangaAndLightNovelWebScrape.Websites;
 using static Tsundoku.Models.TsundokuLanguageModel;
-using Tsundoku.Services;
-using System.Collections.ObjectModel;
+using Tsundoku.Helpers;
+using System.Globalization;
 namespace Tsundoku.ViewModels
 {
     public class UserSettingsViewModel : ViewModelBase
     {
         private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
-        [Reactive] public string UsernameText { get; set; }
         [Reactive] public bool IsChangeUsernameButtonEnabled { get; set; }
-        [Reactive] public int CurrencyIndex { get; set; }
         [Reactive] public bool IndigoMember { get; set; }
         [Reactive] public bool BooksAMillionMember { get; set; }
         [Reactive] public bool KinokuniyaUSAMember { get; set; }
+        [Reactive] public string SelectedCurrency { get; set; }
         public ICommand ExportToSpreadSheetAsyncCommand { get; }
-        private readonly ISharedSeriesCollectionProvider _sharedSeriesProvider;
-        public ReadOnlyObservableCollection<Series> UserCollection { get; }
-
-        public UserSettingsViewModel(IUserService userService, ISharedSeriesCollectionProvider sharedSeriesProvider) : base(userService)
+        public UserSettingsViewModel(IUserService userService) : base(userService)
         {
-            _sharedSeriesProvider = sharedSeriesProvider ?? throw new ArgumentNullException(nameof(sharedSeriesProvider));
-            UserCollection = _sharedSeriesProvider.DynamicUserCollection;
-            IndigoMember = CurrentUser.Memberships[Indigo.WEBSITE_TITLE];
+            this.WhenAnyValue(x => x.CurrentUser)
+                .Where(user => user != null)
+                .Select(user => user!.Currency)
+                .DistinctUntilChanged()
+                .Subscribe(currency =>
+                {
+                    SelectedCurrency = currency;
+                });
+
             BooksAMillionMember = CurrentUser.Memberships[BooksAMillion.WEBSITE_TITLE];
+            this.WhenAnyValue(x => x.BooksAMillionMember)
+                .Skip(1)
+                .Subscribe(isMember => UpdateMembership(BooksAMillion.WEBSITE_TITLE, isMember));
+
+            IndigoMember = CurrentUser.Memberships[Indigo.WEBSITE_TITLE];
+            this.WhenAnyValue(x => x.IndigoMember)
+                .Skip(1)
+                .Subscribe(isMember => UpdateMembership(Indigo.WEBSITE_TITLE, isMember));
+
             KinokuniyaUSAMember = CurrentUser.Memberships[KinokuniyaUSA.WEBSITE_TITLE];
+            this.WhenAnyValue(x => x.KinokuniyaUSAMember)
+                .Skip(1)
+                .Subscribe(isMember => UpdateMembership(KinokuniyaUSA.WEBSITE_TITLE, isMember));
 
             ExportToSpreadSheetAsyncCommand = ReactiveCommand.CreateFromTask(ExportToSpreadSheetAsync);
-            // this.WhenAnyValue(x => x.CurCurrencyInstance).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => CurrencyIndex = Array.IndexOf(AVAILABLE_CURRENCY, Uri.UnescapeDataString(x)));
-            // this.WhenAnyValue(x => x.CurCurrencyInstance).ObserveOn(RxApp.MainThreadScheduler).Subscribe(x => CurrentUser.Currency = CurCurrencyInstance);
-            // this.WhenAnyValue(x => x.UsernameText, x => !string.IsNullOrWhiteSpace(x)).Subscribe(x => IsChangeUsernameButtonEnabled = x);
-            this.WhenAnyValue(x => x.IndigoMember).Subscribe(x => CurrentUser.Memberships[Indigo.WEBSITE_TITLE] = x);
-            this.WhenAnyValue(x => x.BooksAMillionMember).Subscribe(x => CurrentUser.Memberships[BooksAMillion.WEBSITE_TITLE] = x);
-            this.WhenAnyValue(x => x.KinokuniyaUSAMember).Subscribe(x => CurrentUser.Memberships[KinokuniyaUSA.WEBSITE_TITLE] = x);
+        }
+
+        private void UpdateMembership(string websiteTitle, bool isMember)
+        {
+            _userService.UpdateUser(user => user.Memberships[websiteTitle] = isMember);
+            LOGGER.Debug("Updated {site} Membership to {isMember}", websiteTitle, isMember);
+        }
+
+        public void UpdateUserCurrency(string newCurrency)
+        {
+            _userService.UpdateUser(user => user.Currency = newCurrency);
+        }
+
+        public void UpdateUserName(string newUsername)
+        {
+            _userService.UpdateUser(user => user.UserName = newUsername);
         }
 
         public void ImportUserData(string filePath)
@@ -46,47 +70,61 @@ namespace Tsundoku.ViewModels
 
         private async Task ExportToSpreadSheetAsync()
         {
+            LOGGER.Info("Exporting User Collection to CSV Spreadhseet");
+            string filePath = AppFileHelper.GetFilePath("TsundokuCollection.csv");
+            string userNotes = CurrentUser.Notes;
+            TsundokuLanguage userLanguage = CurrentUser.Language;
+            string userCurrency = CurrentUser.Currency;
+
+            IReadOnlyList<Series> seriesToExport = _userService.GetUserCollection();
+
             await Task.Run(async () =>
             {
-                string COLLECTION_FILE = @"TsundokuCollection.csv";
                 StringBuilder output = new();
-                if (!string.IsNullOrWhiteSpace(CurrentUser.Notes))
+
+                if (!string.IsNullOrWhiteSpace(userNotes))
                 {
-                    output.AppendFormat("\"{0}\"", CurrentUser.Notes).AppendLine();
+                    output.Append($"\"{userNotes.Replace("\"", "\"\"")}\"").AppendLine().AppendLine();
                 }
+
                 string[] headers = ["Title", "Staff", "Format", "Status", "Cur Volumes", "Max Volumes", "Demographic", "Value", "Rating", "Volumes Read", "Genres", "Notes"];
                 output.AppendLine(string.Join(",", headers));
 
-                foreach (Series curSeries in UserCollection)
+                foreach (Series curSeries in seriesToExport)
                 {
-                    TsundokuLanguage titleLang = curSeries.Titles.ContainsKey(CurrentUser.Language) ? CurrentUser.Language : TsundokuLanguage.Romaji;
-                    TsundokuLanguage staffLang = curSeries.Staff.ContainsKey(CurrentUser.Language) ? CurrentUser.Language : TsundokuLanguage.Romaji;
+                    string title = curSeries.Titles.TryGetValue(userLanguage, out string? preferredTitle) ? preferredTitle : title = curSeries.Titles[TsundokuLanguage.Romaji];
+                    string romajiTitle = curSeries.Titles[TsundokuLanguage.Romaji]; // Get Romaji title regardless
 
-                    output.AppendFormat("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11}\n",
-                        $"\"{curSeries.Titles[titleLang]}{(!titleLang.Equals(TsundokuLanguage.Romaji) && !curSeries.Titles[titleLang].Equals(curSeries.Titles[TsundokuLanguage.Romaji], StringComparison.OrdinalIgnoreCase) ? $" ({curSeries.Titles[TsundokuLanguage.Romaji]})\"" : "\"")}",
-                        $"\"{curSeries.Staff[staffLang]}{(!staffLang.Equals(TsundokuLanguage.Romaji) && !curSeries.Staff[staffLang].Equals(curSeries.Staff[TsundokuLanguage.Romaji], StringComparison.OrdinalIgnoreCase) ? $" ({curSeries.Staff[TsundokuLanguage.Romaji]})\"" : "\"")}",
-                        curSeries.Format.ToString(),
-                        curSeries.Status.ToString(),
-                        curSeries.CurVolumeCount,
-                        curSeries.MaxVolumeCount,
-                        curSeries.Demographic.ToString(),
-                        $"{CurrentUser.Currency}{curSeries.Value}",
-                        curSeries.Rating != -1 ? curSeries.Rating : string.Empty,
-                        curSeries.VolumesRead,
-                        curSeries.Genres != null ? $"\"{string.Join("\n", curSeries.Genres)}\"" : string.Empty,
-                        $"\"{curSeries.SeriesNotes}\""
-                    );
+                    string staff = curSeries.Staff.TryGetValue(userLanguage, out string? preferredStaff) ? preferredStaff : curSeries.Staff[TsundokuLanguage.Romaji];
+                    string romajiStaff = curSeries.Staff[TsundokuLanguage.Romaji]; // Get Romaji staff regardless
+
+                    string formattedTitle = !userLanguage.Equals(TsundokuLanguage.Romaji) && !title.Equals(romajiTitle, StringComparison.OrdinalIgnoreCase) ? title : $"{title} ({romajiTitle})";
+
+                    string formattedStaff = !userLanguage.Equals(TsundokuLanguage.Romaji) && !staff.Equals(romajiStaff, StringComparison.OrdinalIgnoreCase) ? staff : $"{staff} ({romajiStaff})";
+
+                    output.Append($"\"{formattedTitle.Replace("\"", "\"\"")}\",");
+                    output.Append($"\"{formattedStaff.Replace("\"", "\"\"")}\",");
+                    output.Append($"{curSeries.Format},");
+                    output.Append($"{curSeries.Status},");
+                    output.Append($"{curSeries.CurVolumeCount},");
+                    output.Append($"{curSeries.MaxVolumeCount},");
+                    output.Append($"{curSeries.Demographic},");
+                    output.Append($"{userCurrency}{curSeries.Value.ToString(CultureInfo.InvariantCulture)},");
+                    output.Append($"{(curSeries.Rating != -1 ? curSeries.Rating.ToString(CultureInfo.InvariantCulture) : string.Empty)},");
+                    output.Append($"{curSeries.VolumesRead},");
+                    output.Append($"{(curSeries.Genres.Count != 0 ? $"\"{string.Join(" | ", curSeries.Genres)}\"" : string.Empty)},");
+                    output.Append($"\"{(!string.IsNullOrWhiteSpace(curSeries.SeriesNotes) ? curSeries.SeriesNotes.Replace("\"", "\"\"") : string.Empty)}\"\n");
                 }
 
                 try
                 {
-                    await File.WriteAllTextAsync(COLLECTION_FILE, output.ToString(), Encoding.UTF8);
-                    LOGGER.Info($"Exported {CurrentUser.UserName}'s Data To -> TsundokuCollection.csv");
-                    await OpenSiteLink(@"TsundokuCollection.csv");
+                    await File.WriteAllTextAsync(filePath, output.ToString(), Encoding.UTF8);
+                    LOGGER.Info("Exported Spreadsheet Data to -> {filePath}", filePath);
+                    await OpenSiteLink(filePath);
                 }
                 catch (Exception ex)
                 {
-                    LOGGER.Warn($"Could not Export {CurrentUser.UserName}'s Data To -> TsundokuCollection.csv \n{ex}");
+                    LOGGER.Warn("Could not Export Collection Spreadsheet Data to -> {filePath}\n{ex.Message}", filePath, ex.Message);
                 }
             });
         }

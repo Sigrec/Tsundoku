@@ -32,10 +32,9 @@
                                TextDecorations="Underline" 
                                FontSize="20" 
                                FontWeight="Bold"
-                               ToolTip.Tip="{CompiledBinding UsernameText}"
                                Classes="Menu"/>
                     <StackPanel Orientation="Horizontal" Spacing="5">
-                        <TextBox Name="UsernameChange"
+                        <TextBox x:Name="UsernameChangeTextBox"
                                 Width="400"
                                 FontWeight="Bold"
                                 Classes="Menu"
@@ -43,21 +42,20 @@
                                 MaxLength="20"
                                 Height="35"
                                 Watermark="Enter New Username..."
-                                Text="{CompiledBinding UsernameText}"
                                 BorderThickness="2"/>
-                        <Button FontSize="18"
+                        <Button x:Name="ChangeUsernameButton"
+                                FontSize="18"
                                 BorderThickness="2"
                                 Theme="{StaticResource UserSettingsButton}"
                                 i:Attached.Icon="fa-check" 
                                 Click="ChangeUsername"
-                                IsEnabled="{Binding IsChangeUsernameButtonEnabled}"/>
+                                IsEnabled="{CompiledBinding IsChangeUsernameButtonEnabled}"/>
                     </StackPanel>
                 </StackPanel>
                 <StackPanel Spacing="5">
                     <TextBlock Text="Currency" TextDecorations="Underline" FontSize="20" FontWeight="Bold" Classes="Menu"/>
-                    <ComboBox Name="CurrencySelector"
+                    <ComboBox x:Name="CurrencyComboBox"
                               SelectionChanged="CurrencyChanged"
-                              SelectedIndex="{CompiledBinding CurrencyIndex}"
                               Theme="{StaticResource MenuComboBox}"
                               HorizontalAlignment="Left"
 							  Width="80"
@@ -100,30 +98,19 @@
                                 <Setter Property="Margin" Value="3"/>
                             </Style>
                         </WrapPanel.Styles>
-					<ToggleButton Name="BooksAMillionButton"
-								  IsChecked="{Binding BooksAMillionMember}"
+					<ToggleButton x:Name="BooksAMillionButton"
+								  IsChecked="{CompiledBinding BooksAMillionMember}"
 							      Theme="{StaticResource MenuToggleButton}"
 							      Content="Books-A-Million"/>
-					<ToggleButton Name="KinokuniyaUSAButton"
-								  IsChecked="{Binding KinokuniyaUSAMember}"
+					<ToggleButton x:Name="KinokuniyaUSAButton"
+								  IsChecked="{CompiledBinding KinokuniyaUSAMember}"
 							      Theme="{StaticResource MenuToggleButton}"
 							      Content="Kinokuniya USA"/>
-                    <ToggleButton Name="IndigoButton"
-								  IsChecked="{Binding IndigoMember}"
+                    <ToggleButton x:Name="IndigoButton"
+								  IsChecked="{CompiledBinding IndigoMember}"
 							      Theme="{StaticResource MenuToggleButton}"
 							      Content="Indigo"/>
 					</WrapPanel>
-                </StackPanel>
-				<StackPanel Spacing="5">
-                    <TextBlock Text="Controls" TextDecorations="Underline" FontSize="20" FontWeight="Bold" Classes="Menu"/>
-                    <TextBlock Text="Copy Title → Click Title on Series Card" FontSize="15" FontWeight="DemiBold" Classes="Menu"/>
-                    <TextBlock Text="Open Series Page → Click Series Image" FontSize="15" FontWeight="DemiBold" Classes="Menu"/>
-                    <TextBlock Text="Toggle Fullscreen → F11" FontSize="15" FontWeight="DemiBold" Classes="Menu"/>
-                    <TextBlock Text="Advanced Search → CTRL+F" FontSize="15" FontWeight="DemiBold" Classes="Menu"/>
-                    <TextBlock Text="Screenshot Collection → CTRL+P" FontSize="15" FontWeight="DemiBold" Classes="Menu"/>
-                    <TextBlock Text="Reload Filter/Sort on Collection → SHIFT+R" FontSize="15" FontWeight="DemiBold" Classes="Menu"/>
-                    <TextBlock Text="Save Collection (Auto Saves on Close) → CTRL+S" FontSize="15" FontWeight="DemiBold" Classes="Menu"/>
-                    <TextBlock Text="Reload Covers → CTRL+R" FontSize="15" FontWeight="DemiBold" Classes="Menu"/>
                 </StackPanel>
                 <StackPanel Spacing="5">
                     <TextBlock Text="Settings" TextDecorations="Underline" FontSize="20" FontWeight="Bold" Classes="Menu"/>
@@ -153,14 +140,10 @@
                                 ToolTip.Tip="Open Themes Folder"
                                 i:Attached.Icon="fa-solid fa-swatchbook"/>
                         <Button Theme="{StaticResource UserSettingsButton}"
-                                Click="JoinDiscord"
-                                ToolTip.Tip="JoinDiscord"
-                                i:Attached.Icon="fa-brands fa-discord"/>
-                        <Button Theme="{StaticResource UserSettingsButton}"
                                 Click="ReportBug"
                                 ToolTip.Tip="Report Bug/Issue"
                                 i:Attached.Icon="fa-solid fa-bug"/>
-                        <Button Name="ExportToSpreadSheetButton"
+                        <Button x:Name="ExportToSpreadSheetButton"
                                 Theme="{StaticResource UserSettingsButton}"
                                 Command="{Binding ExportToSpreadSheetAsyncCommand}"
                                 ToolTip.Tip="Export to CSV"
@@ -169,46 +152,81 @@
                                 Click="OpenCoolorsSite"
                                 ToolTip.Tip="Open Coolors Website"
                                 i:Attached.Icon="fa-solid fa-palette"/>
+                        <Button Theme="{StaticResource UserSettingsButton}"
+                                Click="JoinDiscord"
+                                ToolTip.Tip="Join Discord"
+                                i:Attached.Icon="fa-brands fa-discord"/>
                     </WrapPanel>
+                </StackPanel>
+				<StackPanel Spacing="5">
+                    <TextBlock Text="Controls" TextDecorations="Underline" FontSize="20" FontWeight="Bold" Classes="Menu"/>
+                    <TextBlock FontSize="15" FontWeight="DemiBold" Classes="Menu">
+                        <Run Text="Copy Title →"/>
+                        <Run Text="Click Title on Series Card" FontWeight="Bold"/>
+                    </TextBlock>
+                    <TextBlock FontSize="15" FontWeight="DemiBold" Classes="Menu">
+                        <Run Text="Open Series Page →"/>
+                        <Run Text="Click Series Image" FontWeight="Bold"/>
+                    </TextBlock>
+                    <TextBlock FontSize="15" FontWeight="DemiBold" Classes="Menu">
+                        <Run Text="Toggle Fullscreen →"/>
+                        <Run Text="F11" FontWeight="Bold"/>
+                    </TextBlock>
+                    <TextBlock FontSize="15" FontWeight="DemiBold" Classes="Menu">
+                        <Run Text="Advanced Search →"/>
+                        <Run Text="CTRL+F" FontWeight="Bold"/>
+                    </TextBlock>
+                    <TextBlock FontSize="15" FontWeight="DemiBold" Classes="Menu">
+                        <Run Text="Screenshot Collection →"/>
+                        <Run Text="CTRL+P" FontWeight="Bold"/>
+                    </TextBlock>
+                    <TextBlock FontSize="15" FontWeight="DemiBold" Classes="Menu">
+                        <Run Text="Reload Filter/Sort on Collection →"/>
+                        <Run Text="SHIFT+R" FontWeight="Bold"/>
+                    </TextBlock>
+                    <TextBlock FontSize="15" FontWeight="DemiBold" Classes="Menu">
+                        <Run Text="Save Collection (Auto Saves on Close) →"/>
+                        <Run Text="CTRL+S" FontWeight="Bold"/>
+                    </TextBlock>
                 </StackPanel>
                 <StackPanel Spacing="5">
                     <TextBlock Text="Youtubers" TextDecorations="Underline" FontSize="20" FontWeight="Bold" Classes="Menu"/>
                     <WrapPanel Width="450" Margin="-5,0,0,0">
                         <Button Theme="{StaticResource UserSettingsButton}"
                                 Click="OpenYoutuberSite"
-                                Name="EastCoastManga"
+                                x:Name="EastCoastManga"
                                 Content="EastCoastManga"/>
                         <Button Theme="{StaticResource UserSettingsButton}"
                                 Click="OpenYoutuberSite" 
-                                Name="PlasmsManga"
+                                x:Name="PlasmsManga"
                                 Content="Plasm's Manga"/>
                         <Button Theme="{StaticResource UserSettingsButton}"
                                 Click="OpenYoutuberSite" 
-                                Name="hvlmanga"
+                                x:Name="hvlmanga"
                                 Content="hvlmanga"/>
                         <Button Theme="{StaticResource UserSettingsButton}"
                                 Click="OpenYoutuberSite" 
-                                Name="JakeThePog"
+                                x:Name="JakeThePog"
                                 Content="Jake The Pog"/>
                         <Button Theme="{StaticResource UserSettingsButton}"
                                 Click="OpenYoutuberSite" 
-                                Name="DanielPeppers"
+                                x:Name="DanielPeppers"
                                 Content="Daniel Peppers"/>
                         <Button Theme="{StaticResource UserSettingsButton}"
                                 Click="OpenYoutuberSite" 
-                                Name="Ararawgi"
+                                x:Name="Ararawgi"
                                 Content="Ararawgi"/>
                         <Button Theme="{StaticResource UserSettingsButton}"
                                 Click="OpenYoutuberSite" 
-                                Name="TheMangaSloth"
+                                x:Name="TheMangaSloth"
                                 Content="TheMangaSloth"/>
                         <Button Theme="{StaticResource UserSettingsButton}"
                                 Click="OpenYoutuberSite" 
-                                Name="mangageekdom"
+                                x:Name="mangageekdom"
                                 Content="MANGA GEEKDOM"/>
                         <Button Theme="{StaticResource UserSettingsButton}"
                                 Click="OpenYoutuberSite" 
-                                Name="meettheweebfamily"
+                                x:Name="meettheweebfamily"
                                 Content="Meet the Weeb Family"/>
                     </WrapPanel>
                 </StackPanel>
@@ -224,17 +242,17 @@
                         <Button Theme="{StaticResource UserSettingsButton}"
                                 Click="OpenAniListLink"
                                 HorizontalAlignment="Center"
-                                Name="AniListCredit"
+                                x:Name="AniListCredit"
                                 Content="AniList"/>
                         <Button Theme="{StaticResource UserSettingsButton}"
                                 Click="OpenMangadexLink" 
                                 HorizontalAlignment="Center"
-                                Name="MangadexCredit"
+                                x:Name="MangadexCredit"
                                 Content="Mangadex"/>
                         <Button Theme="{StaticResource UserSettingsButton}"
-                                Click="UploadUserData" 
+                                Click="ImportUserDataAsync" 
                                 HorizontalAlignment="Center"
-                                Name="ImportUserData"
+                                x:Name="ImportUserData"
                                 Content="Import"/>
                     </StackPanel>
                 </StackPanel>

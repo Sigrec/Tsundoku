@@ -97,17 +97,17 @@ namespace Tsundoku.Views
                 MaxVolNum, 
                 ViewModel.SelectedAdditionalLanguages.Count != 0 ? ViewModel.ConvertSelectedLangList() : [],
                 !string.IsNullOrWhiteSpace(customImageUrl) ? customImageUrl.Trim() : string.Empty, 
-                !string.IsNullOrWhiteSpace(PublisherTextBox.Text) ? PublisherTextBox.Text.Trim() : "Unknown", //Publisher
+                !string.IsNullOrWhiteSpace(PublisherTextBox.Text) ? PublisherTextBox.Text.Trim() : "Unknown",
                 Series.GetSeriesDemographic((DemographicCombobox.SelectedItem as ComboBoxItem).Content.ToString()), 
                 volumesRead, 
                 !Rating.Text[..4].StartsWith("__._") ? rating : -1, 
                 seriesValue,
-                ViewModel.AllowDuplicate
+                AllowDuplicateButton.IsChecked.GetValueOrDefault(false)
             );
             
             if (validSeries.Key) // Boolean returns whether the series added succeeded
             {
-                _collectionStatsViewModel.UpdateAllStats(CurVolNum, (uint)(MaxVolNum - CurVolNum));
+                // _collectionStatsViewModel.UpdateAllStats(CurVolNum, (uint)(MaxVolNum - CurVolNum));
                 ClearFields();
             }
             else

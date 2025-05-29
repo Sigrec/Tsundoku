@@ -2,7 +2,6 @@ using Avalonia.Controls;
 using Microsoft.Extensions.DependencyInjection;
 using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
-using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
 using Avalonia.ReactiveUI;
 using FileWatcherEx;
@@ -17,6 +16,7 @@ using Tsundoku.ViewModels;
 using static Tsundoku.Models.TsundokuFilterModel;
 using System.Reactive.Disposables;
 using static Tsundoku.Models.TsundokuLanguageModel;
+using Tsundoku.Services;
 
 namespace Tsundoku.Views
 {
@@ -24,11 +24,6 @@ namespace Tsundoku.Views
     {
         private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
         WindowState previousWindowState;
-        private static readonly FileSystemWatcherEx CoverFolderWatcher = new FileSystemWatcherEx(@"Covers")
-        {
-            IncludeSubdirectories = false,
-            NotifyFilter = NotifyFilters.FileName,
-        };
         private static StringBuilder newSearchText = new StringBuilder();
         private static string itemString;
         private static readonly TimeSpan AdvancedSearchPopulateDelay = new TimeSpan(TimeSpan.TicksPerSecond / 4);
@@ -37,11 +32,11 @@ namespace Tsundoku.Views
         {
             InitializeComponent();
             ViewModel = viewModel;
+            DataContext = viewModel;
 #if DEBUG
             this.AttachDevTools();
 #endif
 
-            //this.WhenActivated(action => action(ViewModel!.EditSeriesInfoDialog.RegisterHandler(DoShowEditSeriesInfoDialogAsync)));
             this.WhenActivated(disposables =>
             {
                 ViewModel!.EditSeriesInfoDialog
@@ -51,15 +46,9 @@ namespace Tsundoku.Views
 
             SetupAdvancedSearchBar(" & ");
 
-            CoverFolderWatcher.OnCreated += (s, e) =>
-            {
-                ViewModel.CoverFolderWatcherLogic(e.FullPath.Replace(".crdownload", ""));
-            };
-            CoverFolderWatcher.Start();
-
             KeyDown += async (s, e) => 
             {
-                if (e.Key == Key.F11) 
+                if (e.Key == Key.F11) // Fullscreen
                 {
                     if (WindowState != WindowState.FullScreen)
                     {
@@ -72,21 +61,15 @@ namespace Tsundoku.Views
                         WindowState = previousWindowState;
                     }
                 }
-                else if (e.KeyModifiers == KeyModifiers.Control && e.Key == Key.P)
+                else if (e.KeyModifiers == KeyModifiers.Control && e.Key == Key.P) // Take Screenshot
                 {
                     LOGGER.Info($"Saving Screenshot of Collection for \"{ViewModel.CurrentTheme.ThemeName} Theme\"");
                     await ScreenCaptureWindows();
                 }
-                else if (e.KeyModifiers == KeyModifiers.Control && e.Key == Key.S)
+                else if (e.KeyModifiers == KeyModifiers.Control && e.Key == Key.S) // Save User Data
                 {
                     ViewModel.SaveUserData();
                     await ToggleNotificationPopup($"Saved \"{ViewModel.CurrentUser.UserName}'s\" Data");
-                }
-                else if (e.KeyModifiers == KeyModifiers.Control && e.Key == Key.R)
-                {
-                    LOGGER.Info("Reloading Covers");
-                    ReloadCoverBitmaps();
-                    await ToggleNotificationPopup($"Reloaded Covers");
                 }
                 else if (e.KeyModifiers == KeyModifiers.Control && e.Key == Key.F)
                 {
@@ -99,24 +82,20 @@ namespace Tsundoku.Views
                     else
                     {
                         AdvancedSearchPopup.IsVisible ^= true;
-                        await ToggleNotificationPopup($"To Exit Advanced Search Press CTRL+F");
+                        await ToggleNotificationPopup($"To Exit Advanced Search Press CTRL+F or Click Anywhere");
                     }
                 }
             };
 
             Closing += (s, e) =>
             {
-                CoverFolderWatcher.Dispose();
                 ViewModel.SaveOnClose();
             };
         }
 
         private async Task ScreenCaptureWindows()
         {
-            // 1. Get the path for the screenshots folder. This also ensures the directory exists.
-            string screenshotsFolderPath = AppFileHelper.GetScreenshotsFolderPath();
-
-            // 2. Construct the base filename parts
+            // Construct the base filename parts
             string userName = ViewModel.CurrentUser.UserName;
             string themeName = ViewModel.CurrentTheme.ThemeName;
             TsundokuLanguage language = ViewModel.CurrentUser.Language;
@@ -124,10 +103,10 @@ namespace Tsundoku.Views
                 ? $"-{ViewModel.SelectedFilter.GetStringValue()}" // Assumes GetStringValue() exists for TsundokuFilter
                 : string.Empty;
 
-            // 3. Create the full base filename without extension
+            // Create the full base filename without extension
             string baseFileNameWithoutExtension = $"{userName}-Collection-Screenshot-{themeName}-{language}{filterSegment}";
 
-            // 4. Get a unique path for the screenshot
+            // Get a unique path for the screenshot
             string finalScreenshotPath = AppFileHelper.CreateUniqueScreenshotPath(baseFileNameWithoutExtension, ".png");
 
             try
@@ -179,8 +158,6 @@ namespace Tsundoku.Views
             await Task.Delay(TimeSpan.FromSeconds(3));
             NotificationPopup.IsVisible = false;
         }
-
-        private void CloseNotificationPopup(object sender, RoutedEventArgs args) => NotificationPopup.IsVisible = false;
 
         private void OpenAddSeriesDialog(object sender, RoutedEventArgs args)
         {
@@ -285,14 +262,26 @@ namespace Tsundoku.Views
             }
         }
 
+        private void StartAdvancedQuery(object sender, RoutedEventArgs args)
+        {
+            ViewModel.AdvancedSearchQuery = AdvancedSearchBar.Text;
+        }
 
         public void SetupAdvancedSearchBar(string delimiter)
         {
             AdvancedSearchBar.MinimumPopulateDelay = AdvancedSearchPopulateDelay; // Might just remove this delay in the end
+            AdvancedSearchBar.AddHandler(PointerPressedEvent, (_, _) =>
+            {
+                if (string.IsNullOrWhiteSpace(AdvancedSearchBar.Text))
+                {
+                    AdvancedSearchBar.IsDropDownOpen = true;
+                }
+            }, RoutingStrategies.Tunnel);
+            
             AdvancedSearchBar.ItemSelector = (query, item) =>
             {
                 newSearchText.Clear();
-                if (MainWindowViewModel.AdvancedQueryRegex().IsMatch(query))
+                if (SharedSeriesCollectionProvider.AdvancedQueryRegex().IsMatch(query))
                 {
                     newSearchText.Append(query[..query.LastIndexOf(delimiter)]).Append(delimiter);
                 }
@@ -301,7 +290,12 @@ namespace Tsundoku.Views
             AdvancedSearchBar.ItemFilter = (query, item) =>
             {
                 itemString = item as string;
-                if (!MainWindowViewModel.AdvancedQueryRegex().IsMatch(query))
+
+                // Show all available filters when the query is empty
+                if (string.IsNullOrWhiteSpace(query))
+                    return true;
+
+                if (!SharedSeriesCollectionProvider.AdvancedQueryRegex().IsMatch(query))
                 {
                     return itemString.StartsWith(query, StringComparison.OrdinalIgnoreCase);
                 }
@@ -309,7 +303,7 @@ namespace Tsundoku.Views
                 {
                     return false;
                 }
-                
+
                 string filterName = itemString[..^2];
                 if (itemString.Contains("==") && (query.Contains($"{filterName}<=") || query.Contains($"{filterName}>=")))
                 {
@@ -319,8 +313,9 @@ namespace Tsundoku.Views
                 {
                     return false;
                 }
- 
-                return AdvancedSearchBar.IsVisible && itemString.StartsWith(query[(query.LastIndexOf(delimiter) + delimiter.Length)..], StringComparison.OrdinalIgnoreCase);
+
+                return AdvancedSearchBar.IsVisible &&
+                    itemString.StartsWith(query[(query.LastIndexOf(delimiter) + delimiter.Length)..], StringComparison.OrdinalIgnoreCase);
             };
         }
         
@@ -335,30 +330,6 @@ namespace Tsundoku.Views
             {
                 ViewModel.AdvancedSearchQueryErrorMessage = string.Empty;
             }
-        }   
-
-        /// <summary>
-        /// Reloads Covers for Series where the cover was changed
-        /// </summary>
-        private void ReloadCoverBitmaps()
-        {
-            LOGGER.Debug("Reloading Cover Bitmaps");
-            // uint cache = 0;
-            // TODO - Need to create a method that will reload coverBitmaps for all series when a cover is changed
-            // for (int x = 0; x < ViewModel.UserCollection.Count; x++)
-            // {
-            //     // If the image does not exist in the covers folder then don't create a bitmap for it
-            //     if (CoverChangedSeriesList.Contains(ViewModel.UserCollection[x]))
-            //     {
-            //         MainWindowViewModel.ChangeCover(ViewModel.UserCollection[x], ViewModel.UserCollection[x].Cover);
-            //         cache++;
-            //     }
-            //     else if (cache == CoverChangedSeriesList.Count)
-            //     {
-            //         break;
-            //     }
-            // }
-            // CoverChangedSeriesList.Clear();
         }
 
         /// <summary>
@@ -368,9 +339,12 @@ namespace Tsundoku.Views
         {
             if (LanguageSelector.SelectedItem is ComboBoxItem selectedItem)
             {
-                string newLang = selectedItem.Content.ToString() ?? string.Empty;
-                ViewModel.UpdateUserLanguage(newLang);
-                LOGGER.Info("Changed Langauge to {Lang}", newLang);
+                string? newLang = selectedItem.Content?.ToString();
+                if (newLang != null)
+                {
+                    ViewModel.UpdateUserLanguage(newLang);
+                    LOGGER.Info("Changed Langauge to {Lang}", newLang);
+                }
             }
         }
 

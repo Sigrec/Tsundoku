@@ -36,6 +36,8 @@ namespace Tsundoku.ViewModels
             SelectedAdditionalLanguages.CollectionChanged += AdditionalLanguagesCollectionChanged;
         }
 
+        // TODO - Additional Languages selected should persist across app startups? I can traverse the list and and check what additional langs are used or store it in json
+        // TODO - When user is looking for a additional lang but MangaDex doesn't have it show a popup that lets them enter the title in?
         private void AdditionalLanguagesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             switch (e.Action)
@@ -70,19 +72,34 @@ namespace Tsundoku.ViewModels
         /// <param name="maxVolCount">The max # of volumes this series currently has</param>
         /// <param name="additionalLanguages">Additional languages to get more info for from Mangadex</param>
         /// <returns>Whether the series can be added to the users collection or not</returns>
-        public async Task<KeyValuePair<bool, string>> GetSeriesDataAsync(string title, Format bookType, ushort curVolCount, ushort maxVolCount, List<TsundokuLanguage> additionalLanguages, string customImageUrl = "", string publisher = "Unknown", Demographic demographic = Demographic.Unknown, uint volumesRead = 0, decimal rating = -1, decimal value = 0, bool alllowDuplicate = false)
+        public async Task<KeyValuePair<bool, string>> GetSeriesDataAsync(string title, Format bookType, ushort curVolCount, ushort maxVolCount, List<TsundokuLanguage> additionalLanguages, string customImageUrl = "", string publisher = "Unknown", Demographic demographic = Demographic.Unknown, uint volumesRead = 0, decimal rating = -1, decimal value = 0, bool allowDuplicate = false)
         {
             string returnMsg = string.Empty;
-            Series? newSeries = await Series.CreateNewSeriesCardAsync(_bitmapHelper, _mangaDex, _aniList, title, bookType, maxVolCount, curVolCount, additionalLanguages, publisher, demographic, volumesRead, rating, value, customImageUrl);
+            Series? newSeries = await Series.CreateNewSeriesCardAsync(
+                bitmapHelper: _bitmapHelper,
+                mangaDex: _mangaDex,
+                aniList: _aniList,
+                title: title,
+                bookType: bookType,
+                maxVolCount: maxVolCount,
+                minVolCount: curVolCount, // Assuming curVolCount maps to minVolCount
+                additionalLanguages: additionalLanguages,
+                publisher: publisher,
+                demographic: demographic,
+                volumesRead: volumesRead,
+                rating: rating,
+                value: value,
+                customImageUrl: customImageUrl,
+                allowDuplicate: allowDuplicate
+            );
 
             bool successfulAdd = false;
             if (newSeries != null)
             {
                 try
                 {
-                    // TODO - Need to ensure that if user is searching or filtering that adding a series that matches it shows up and if it doesn't does not show up but is still in the list
-                    LOGGER.Debug($"\nAdding New Series (Allow Dupe ?= {alllowDuplicate}) -> \"{title}\" | \"{bookType}\" | {curVolCount} | {maxVolCount}\n{newSeries}");
-                    successfulAdd = _userService.AddSeries(newSeries, alllowDuplicate);
+                    LOGGER.Debug($"\nAdding New Series (Allow Dupe ?= {allowDuplicate}) -> \"{title}\" | \"{bookType}\" | {curVolCount} | {maxVolCount}\n{newSeries}");
+                    successfulAdd = _userService.AddSeries(newSeries, allowDuplicate);
                     if (!successfulAdd)
                     {
                         returnMsg = "Duplicate Series";

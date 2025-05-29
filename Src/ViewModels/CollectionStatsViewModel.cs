@@ -93,6 +93,8 @@ namespace Tsundoku.ViewModels
 
         public ObservableCollection<ISeries<KeyValuePair<string, int>>> GenreDistribution { get; set; }
         private Dictionary<string, int> GenreData; // No longer initialized here
+        private bool disposedValue;
+
         public Axis[] GenreXAxes { get; set; }
         public Axis[] GenreYAxes { get; set; }
 
@@ -212,7 +214,7 @@ namespace Tsundoku.ViewModels
             CollectionPrice = string.Empty;
             SeriesCount = (uint)UserCollection.Count;
             FavoriteCount = (uint)UserCollection.Count(series => series.IsFavorite);
-            GenerateStats();
+            // GenerateStats();
 
             // this.WhenAnyValue(x => x.MeanRating).Subscribe(x => MainUser.MeanRating = x);
             // this.WhenAnyValue(x => x.VolumesRead).Subscribe(x => MainUser.VolumesRead = x);
@@ -638,7 +640,7 @@ namespace Tsundoku.ViewModels
             {
                 valueVal = decimal.Add(valueVal, x.Value);
             }
-            CollectionPrice = $"{CurCurrencyInstance}{decimal.Round(valueVal, 2)}";
+            CollectionPrice = $"{CurrentUser.Currency}{decimal.Round(valueVal, 2)}";
         }
 
         public void UpdateCollectionVolumesRead()
@@ -750,7 +752,7 @@ namespace Tsundoku.ViewModels
             }
             
             testMeanRating = countMeanRating == 0 ? 0 : decimal.Round(testMeanRating / countMeanRating, 1);
-            string testCollectionPriceString = $"{CurCurrencyInstance}{decimal.Round(testCollectionPrice, 2)}";
+            string testCollectionPriceString = $"{CurrentUser.Currency}{decimal.Round(testCollectionPrice, 2)}";
 
             // Crash protection for aggregate values
             // if (MainUser.VolumesRead == testVolumesRead && MainUser.MeanRating == testMeanRating && MainUser.CollectionPrice.Equals(testCollectionPriceString) && testUsersNumVolumesCollected == MainUser.NumVolumesCollected && testUsersNumVolumesToBeCollected == MainUser.NumVolumesToBeCollected)
@@ -771,6 +773,25 @@ namespace Tsundoku.ViewModels
             // }
 
             GenerateCharts();
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    _disposables.Dispose();
+                }
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }

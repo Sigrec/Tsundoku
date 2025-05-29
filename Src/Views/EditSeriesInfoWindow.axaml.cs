@@ -64,23 +64,27 @@ public partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfoViewMod
         CoverImageUrlTextBox.Clear();
     }
 
-    /// <summary>
-    /// Changes the chosen demographic for a particular series
-    /// </summary>
-    private void DemographicChanged(object sender, SelectionChangedEventArgs e)
+    private async void ChangeSeriesCoverFromFileAsync(object sender, RoutedEventArgs args)
     {
-        if (DemographicComboBox.IsDropDownOpen)
+        ViewModelBase.newCoverCheck = true;
+        IReadOnlyList<IStorageFile> file = await this.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {
-            Demographic demographic = Series.GetSeriesDemographic((DemographicComboBox.SelectedItem as ComboBoxItem).Content.ToString());
-            ViewModel.Series.Demographic = demographic;
+            AllowMultiple = false,
+            FileTypeFilter = [new FilePickerFileType("Images") { Patterns = ["*.png", "*.jpg", "*.jpeg"] }]
+        });
 
-            _collectionStatsViewModel.UpdateDemographicChartValues();
-            _collectionStatsViewModel.UpdateDemographicPercentages();
-
-            LOGGER.Info($"Changed Demographic for \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\" to {demographic}");
+        if (file.Count == 1)
+        {
+            string fullCoverPath = AppFileHelper.GetFullCoverPath(ViewModel.Series.Cover);
+            Bitmap newCover = await _bitmapHelper.GenerateAvaloniaBitmapAsync(fullCoverPath, file[0].Path.LocalPath);
+            GenerateNewBitmap(newCover, fullCoverPath);
+        }
+        else
+        {
+            LOGGER.Warn("User selected multiple files for user icon");
         }
     }
-
+    
     /// <summary>
     /// Saves the stats for the series when the button is clicked
     /// </summary>
@@ -133,7 +137,7 @@ public partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfoViewMod
         decimal valueVal = Convert.ToDecimal(valueText.Trim().Replace("_", "0"));
         if (!valueText.Equals("__________________.__") && decimal.Compare(ViewModel.Series.Value, valueVal) != 0)
         {
-            string logMsg = $"value for \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\" from {ViewModel.CurCurrencyInstance}{ViewModel.Series.Value} to {ViewModel.CurCurrencyInstance}{valueVal}";
+            string logMsg = $"value for \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\" from {ViewModel.CurrentUser.Currency}{ViewModel.Series.Value} to {ViewModel.CurrentUser.Currency}{valueVal}";
             LOGGER.Info($"Updating {logMsg}");
 
             ViewModel.Series.Value = valueVal;
@@ -143,7 +147,7 @@ public partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfoViewMod
             _collectionStatsViewModel.UpdateCollectionPrice();
             LOGGER.Info($"Updated {logMsg}");
         }
-        
+
         string publisherText = PublisherTextBox.Text.Trim();
         if (!string.IsNullOrWhiteSpace(publisherText) && !publisherText.Equals(ViewModel.Series.Publisher))
         {
@@ -154,63 +158,61 @@ public partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfoViewMod
             LOGGER.Info($"Updated Publisher for \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\" from \"{ViewModel.Series.Publisher}\" to \"{publisherText}\"");
 
         }
-        
+
         HashSet<Genre> curGenres = EditSeriesInfoViewModel.GetCurrentGenresSelected();
         if (curGenres.Count > 0 && (ViewModel.Series.Genres == null || !curGenres.SetEquals(ViewModel.Series.Genres)))
         {
             LOGGER.Info($"Updating Genres for \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\" from [{string.Join(", ", ViewModel.Series.Genres)}] to [{string.Join(", ", curGenres)}]");
             if (ViewModel.Series.Genres != null)
             {
-                _collectionStatsViewModel.UpdateGenreChart(curGenres.Except(ViewModel.Series.Genres), ViewModel.Series.Genres.Except(curGenres)); 
+                // _collectionStatsViewModel.UpdateGenreChart(curGenres.Except(ViewModel.Series.Genres), ViewModel.Series.Genres.Except(curGenres));
             }
             else
             {
-                _collectionStatsViewModel.UpdateGenreChart(curGenres, []); 
+                // _collectionStatsViewModel.UpdateGenreChart(curGenres, []);
             }
             ViewModel.Series.Genres = curGenres;
         }
     }
 
-    private async void ChangeSeriesCoverFromFileAsync(object sender, RoutedEventArgs args)
+    /// <summary>
+    /// Changes the chosen demographic for a particular series
+    /// </summary>
+    /// // TODO - Fix this when doing collection stats
+    private void DemographicChanged(object sender, SelectionChangedEventArgs e)
     {
-        ViewModelBase.newCoverCheck = true;
-        IReadOnlyList<IStorageFile> file = await this.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+        if (DemographicComboBox.IsDropDownOpen)
         {
-            AllowMultiple = false,
-            FileTypeFilter = [new FilePickerFileType("Images") { Patterns = ["*.png", "*.jpg", "*.jpeg"] }]
-        });
+            Demographic demographic = Series.GetSeriesDemographic((DemographicComboBox.SelectedItem as ComboBoxItem).Content.ToString());
+            ViewModel.Series.Demographic = demographic;
 
-        if (file.Count == 1)
-        {
-            string fullCoverPath = AppFileHelper.GetFullCoverPath(ViewModel.Series.Cover);
-            Bitmap newCover = await _bitmapHelper.GenerateAvaloniaBitmapAsync(fullCoverPath, file[0].Path.LocalPath);
-            GenerateNewBitmap(newCover, fullCoverPath);
-        }
-        else
-        {
-            LOGGER.Warn("User selected multiple files for user icon.");
+            _collectionStatsViewModel.UpdateDemographicChartValues();
+            _collectionStatsViewModel.UpdateDemographicPercentages();
+
+            LOGGER.Info($"Changed Demographic for \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\" to {demographic}");
         }
     }
+
 
     private async void RefreshSeriesAsync(object sender, RoutedEventArgs args)
     {
         await _mainWindowViewModel.RefreshSeries(ViewModel.Series);
-        GenreSelector.SelectedItems.Clear();
-        UpdateSelectedGenres();
-        _collectionStatsViewModel.UpdateGenreChart();
-        
+        // GenreSelector.SelectedItems.Clear();
+        // UpdateSelectedGenres();
+        // _collectionStatsViewModel.UpdateGenreChart();
+
     }
 
     private void RemoveSeries(object sender, RoutedEventArgs args)
     {
-        ViewModelBase.newCoverCheck = true;
         _mainWindowViewModel.DeleteSeries(ViewModel.Series);
         this.Close();
     }
 
+    // TODO - Fix this when doing collection stats
     private async void ChangeSeriesVolumeCountsAsync(object sender, RoutedEventArgs args)
     {
-        _ = await Observable.Start(() => 
+        _ = await Observable.Start(() =>
         {
             string curVolumeString = CurVolumeMaskedTextBox.Text.Replace("_", string.Empty);
             string maxVolumeString = MaxVolumeMaskedTextBox.Text.Replace("_", string.Empty);
@@ -221,7 +223,7 @@ public partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfoViewMod
                     if (newMaxVols >= newCurVols)
                     {
                         LOGGER.Info($"Changing Series Volume Counts For \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\" From {ViewModel.Series.CurVolumeCount}/{ViewModel.Series.MaxVolumeCount} -> {newCurVols}/{newMaxVols}");
-                        
+
                         _collectionStatsViewModel.UpdateVolumeCounts(ViewModel.Series, newCurVols, newMaxVols);
 
                         ViewModel.Series.CurVolumeCount = newCurVols;
@@ -229,7 +231,7 @@ public partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfoViewMod
                         _mainWindowViewModel.UpdateSeriesCard(ViewModel.Series);
 
                         _collectionStatsViewModel.UpdateVolumeCountChartValues();
-                        
+
                         CurVolumeMaskedTextBox.Clear();
                         MaxVolumeMaskedTextBox.Clear();
                     }

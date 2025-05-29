@@ -12,15 +12,7 @@ namespace Tsundoku.ViewModels
 
         public UserNotesWindowViewModel(IUserService userService) : base(userService)
         {
-            this.WhenAnyValue(x => x.CurrentUser)
-                .DistinctUntilChanged()
-                .Where(user => user != null)
-                .Subscribe(user =>
-                {
-                    Notes = user!.Notes;
-                    LOGGER.Info($"Notes initialized from user: '{Notes}'");
-                });
-
+            Notes = CurrentUser.Notes;
             this.WhenAnyValue(x => x.Notes)
                 .DistinctUntilChanged()
                 .Throttle(TimeSpan.FromMilliseconds(1000))
@@ -28,7 +20,7 @@ namespace Tsundoku.ViewModels
                 .Subscribe(notes =>
                 {
                     _userService.UpdateUser(user => user.Notes = notes);
-                    LOGGER.Debug($"User notes updated to service: '{notes}'");
+                    LOGGER.Trace($"User notes updated to '{notes}'");
                 });
         }
     }

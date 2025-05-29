@@ -23,7 +23,7 @@ namespace Tsundoku.Models
         });
 
         [JsonIgnore] private bool disposedValue;
-        [JsonIgnore] [Reactive] public Bitmap CoverBitMap { get; set; }
+        [JsonIgnore][Reactive] public Bitmap CoverBitMap { get; set; }
         public Guid Id { get; set; } = Guid.NewGuid();
         [Reactive] public string Publisher { get; set; }
         [Reactive] public Dictionary<TsundokuLanguage, string> Titles { get; set; }
@@ -43,7 +43,6 @@ namespace Tsundoku.Models
         [Reactive] public decimal Rating { get; set; }
         [Reactive] public Demographic Demographic { get; set; }
         [Reactive] public bool IsFavorite { get; set; } = false;
-        [JsonIgnore] public bool IsEditPaneOpen { get; set; } = false;
 
         [JsonConstructor]
         public Series(
@@ -67,8 +66,8 @@ namespace Tsundoku.Models
         {
             this.Publisher = Publisher;
             this.Titles = Titles;
-			this.Staff = Staff;
-			this.Description = Description;
+            this.Staff = Staff;
+            this.Description = Description;
             this.Format = Format;
             this.Status = Status;
             this.Cover = Cover;
@@ -76,11 +75,11 @@ namespace Tsundoku.Models
             this.Genres = Genres;
             this.MaxVolumeCount = MaxVolumeCount;
             this.CurVolumeCount = CurVolumeCount;
-			this.Rating = Rating;
+            this.Rating = Rating;
             this.VolumesRead = VolumesRead;
             this.Value = Value;
-			this.Demographic = Demographic;
-			this.CoverBitMap = CoverBitMap;
+            this.Demographic = Demographic;
+            this.CoverBitMap = CoverBitMap;
             this.DuplicateIndex = DuplicateIndex;
         }
 
@@ -96,7 +95,6 @@ namespace Tsundoku.Models
         /// <param name="additionalLanguages">List of additional languages to query for</param>
         /// <returns></returns>
         /// TODO - Make it so it doesn't download the image until it's confirmed that the series is not a dupe
-        /// TODO - Allow duplicating series adds the duplicate but does not set the dupe index and does not indent cover path with the dupe index
         public static async Task<Series?> CreateNewSeriesCardAsync(
             BitmapHelper bitmapHelper,
             MangaDex mangaDex,
@@ -123,7 +121,7 @@ namespace Tsundoku.Models
                 bool isAniListID = false, isMangaDexId = false;
                 string curMangaDexId = string.Empty;
                 uint dupeIndex = 0;
-    ;
+                ;
                 if (int.TryParse(title, out int seriesId))
                 {
                     LOGGER.Debug("Getting AniList ID Data");
@@ -153,8 +151,8 @@ namespace Tsundoku.Models
                 JsonElement.ArrayEnumerator mangaDexAltTitles = [];
                 Dictionary<TsundokuLanguage, string> newTitles = [];
 
-                // AniList Query Check
-                Restart:
+            // AniList Query Check
+            Restart:
                 if ((!isMangaDexId || isAniListID) && seriesDataDoc != null)
                 {
                     LOGGER.Debug("Valid AniList Query");
@@ -163,10 +161,10 @@ namespace Tsundoku.Models
                     nativeTitle = seriesData.GetProperty("title").GetProperty("native").GetString();
                     romajiTitle = seriesData.GetProperty("title").GetProperty("romaji").GetString();
                     englishTitle = seriesData.GetProperty("title").GetProperty("english").GetString();
-                    if (!isAniListID 
+                    if (!isAniListID
                             && !(
-                                    EntryModel.Similar(title, englishTitle, !string.IsNullOrWhiteSpace(englishTitle) && title.Length > englishTitle.Length ? englishTitle.Length / 6 : title.Length / 6) != -1 
-                                    || EntryModel.Similar(title, romajiTitle, !string.IsNullOrWhiteSpace(romajiTitle) && title.Length > romajiTitle.Length ? romajiTitle.Length / 6 : title.Length / 6) != -1 
+                                    EntryModel.Similar(title, englishTitle, !string.IsNullOrWhiteSpace(englishTitle) && title.Length > englishTitle.Length ? englishTitle.Length / 6 : title.Length / 6) != -1
+                                    || EntryModel.Similar(title, romajiTitle, !string.IsNullOrWhiteSpace(romajiTitle) && title.Length > romajiTitle.Length ? romajiTitle.Length / 6 : title.Length / 6) != -1
                                     || EntryModel.Similar(title, nativeTitle, !string.IsNullOrWhiteSpace(nativeTitle) && title.Length > nativeTitle.Length ? nativeTitle.Length / 6 : title.Length / 6) != -1
                                 )
                         )
@@ -199,7 +197,7 @@ namespace Tsundoku.Models
                     }
 
                     // Loop while there are still staff to check
-                    while(hasNextPage)
+                    while (hasNextPage)
                     {
                         JsonDocument? moreStaffQuery;
                         if (int.TryParse(title, out seriesId))
@@ -242,7 +240,7 @@ namespace Tsundoku.Models
                         }
                         else
                         {
-                            LOGGER.Debug("Alt Titles Empty so Making Call to Mangadex");
+                            LOGGER.Info("Alt Titles Empty so Making Call to Mangadex");
                             JsonDocument? altTitlesAgain = await mangaDex.GetSeriesByTitleAsync(romajiTitle);
                             if (altTitlesAgain == null)
                             {
@@ -320,8 +318,8 @@ namespace Tsundoku.Models
                                     && (
                                         data.GetArrayLength() == 1
                                         || (
-                                                EntryModel.Similar(title, englishTitle, !string.IsNullOrWhiteSpace(englishTitle) && title.Length > englishTitle.Length ? englishTitle.Length / 6 : title.Length / 6) != -1 
-                                                || EntryModel.Similar(title, englishAltTitle, !string.IsNullOrWhiteSpace(englishAltTitle) && title.Length > englishAltTitle.Length ? englishAltTitle.Length / 6 : title.Length / 6) != -1 
+                                                EntryModel.Similar(title, englishTitle, !string.IsNullOrWhiteSpace(englishTitle) && title.Length > englishTitle.Length ? englishTitle.Length / 6 : title.Length / 6) != -1
+                                                || EntryModel.Similar(title, englishAltTitle, !string.IsNullOrWhiteSpace(englishAltTitle) && title.Length > englishAltTitle.Length ? englishAltTitle.Length / 6 : title.Length / 6) != -1
                                                 || EntryModel.Similar(title, japaneseAltTitle, !string.IsNullOrWhiteSpace(japaneseAltTitle) && title.Length > japaneseAltTitle.Length ? japaneseAltTitle.Length / 6 : title.Length / 6) != -1
                                         )
                                     )
@@ -333,7 +331,7 @@ namespace Tsundoku.Models
                                 }
                             }
 
-                            if(notFoundCondition)
+                            if (notFoundCondition)
                             {
                                 LOGGER.Warn($"User Input Invalid Series Title or ID \"{title}\" or Can't Determine Series Needs to be more Specific");
                                 return null;
@@ -397,7 +395,7 @@ namespace Tsundoku.Models
                         // Get the staff for a series
                         string? staffName = string.Empty;
                         StringBuilder nativeStaffBuilder = new StringBuilder(), fullStaffBuilder = new StringBuilder();
-                        foreach(string staff in relationships.Where(staff => staff.GetProperty("type").GetString().Equals("author") || staff.GetProperty("type").GetString().Equals("artist")).Select(staff => staff.GetProperty("id").GetString()).Distinct())
+                        foreach (string staff in relationships.Where(staff => staff.GetProperty("type").GetString().Equals("author") || staff.GetProperty("type").GetString().Equals("artist")).Select(staff => staff.GetProperty("id").GetString()).Distinct())
                         {
                             staffName = await mangaDex.GetAuthorAsync(staff);
                             if (!string.IsNullOrWhiteSpace(staffName))
@@ -490,7 +488,7 @@ namespace Tsundoku.Models
             }
 
             LOGGER.Warn($"User Input Invalid Series Title or ID \"{title}\" or Can't Determine Series Needs to be more Specific");
-			return null;
+            return null;
         }
 
         public static void AddAdditionalLanguages(ref Dictionary<TsundokuLanguage, string> newTitles, List<TsundokuLanguage> additionalLanguages, List<JsonElement> altTitles)
@@ -523,17 +521,17 @@ namespace Tsundoku.Models
             };
         }
 
-		public static Status GetSeriesStatus(string jsonStatus)
-		{
-			return jsonStatus switch
-			{
-				"RELEASING" or "NOT_YET_RELEASED" or "ongoing" => Status.Ongoing,
-				"FINISHED"  or "completed" => Status.Finished,
-				"CANCELLED" or "cancelled" => Status.Cancelled,
-				"HIATUS" or "hiatus" => Status.Hiatus,
-				_  => Status.Error
-			};
-		}
+        public static Status GetSeriesStatus(string jsonStatus)
+        {
+            return jsonStatus switch
+            {
+                "RELEASING" or "NOT_YET_RELEASED" or "ongoing" => Status.Ongoing,
+                "FINISHED" or "completed" => Status.Finished,
+                "CANCELLED" or "cancelled" => Status.Cancelled,
+                "HIATUS" or "hiatus" => Status.Hiatus,
+                _ => Status.Error
+            };
+        }
 
         public static Demographic GetSeriesDemographic(string demographic)
         {
@@ -541,7 +539,7 @@ namespace Tsundoku.Models
             {
                 "shounen" or "Shounen" => Demographic.Shounen,
                 "shoujo" or "Shoujo" => Demographic.Shoujo,
-                "josei" or "Josei"=> Demographic.Josei,
+                "josei" or "Josei" => Demographic.Josei,
                 "seinen" or "Seinen" => Demographic.Seinen,
                 _ => Demographic.Unknown
             };
@@ -561,13 +559,7 @@ namespace Tsundoku.Models
 
         public void DeleteCover()
         {
-            string fullCoverPath = AppFileHelper.GetFullCoverPath(this.Cover); 
-            LOGGER.Info("Deleting Cover {cover}", fullCoverPath);
-            if (File.Exists(fullCoverPath))
-            {
-                File.SetAttributes(fullCoverPath, FileAttributes.Normal);
-                File.Delete(fullCoverPath);
-            }
+            AppFileHelper.DeleteCoverFile(this.Cover);
         }
 
         public void UpdateCover(Bitmap newCover)
@@ -595,55 +587,51 @@ namespace Tsundoku.Models
         public override string ToString()
         {
             if (this != null)
-			{
-				return JsonSerializer.Serialize(this, typeof(Series), SeriesJsonModel);
-			}
-			return "Null Series";
+            {
+                return JsonSerializer.Serialize(this, typeof(Series), SeriesJsonModel);
+            }
+            return "Null Series";
         }
 
         protected virtual void Dispose(bool disposing)
-		{
-			if (!this.disposedValue)
-			{
+        {
+            if (!this.disposedValue)
+            {
                 if (disposing)
                 {
                     // dispose managed state (managed objects)
                     this.CoverBitMap?.Dispose();
                     DeleteCover();
-				}
+                }
 
-				// free unmanaged resources (unmanaged objects) and override finalizer
-				// set large fields to null
-				this.disposedValue = true;
-			}
-		}
+                // free unmanaged resources (unmanaged objects) and override finalizer
+                // set large fields to null
+                this.disposedValue = true;
+            }
+        }
 
-		// Override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
-		// ~Series()
-		// {
-		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-		//     Dispose(disposing: false);
-		// }
+        // Override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
+        // ~Series()
+        // {
+        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        //     Dispose(disposing: false);
+        // }
 
-		public void Dispose()
-		{
-			// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-			Dispose(disposing: true);
-			GC.SuppressFinalize(this);
-		}
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
 
         public bool Equals(Series? other)
         {
-            return other is not null &&
-                   Titles[TsundokuLanguage.Romaji].Equals(other.Titles[TsundokuLanguage.Romaji]) &&
-                   Titles[TsundokuLanguage.Japanese].Equals(other.Titles[TsundokuLanguage.Japanese]) &&
-                   Format.Equals(other.Format) &&
-                   Format == other.Format;
+            return other is not null && this.Id.Equals(other.Id);
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Titles, Staff, Description, Format, Status, Cover, Link);
+            return Id.GetHashCode();
         }
 
         public static bool operator ==(Series? left, Series? right)
@@ -687,7 +675,34 @@ namespace Tsundoku.Models
             string xTitle = x.Titles.TryGetValue(_curLang, out string? xValue) ? xValue : x.Titles[TsundokuLanguage.Romaji];
             string yTitle = y.Titles.TryGetValue(_curLang, out string? yValue) ? yValue : y.Titles[TsundokuLanguage.Romaji];
 
-            return _seriesTitleComparer.Compare(xTitle, yTitle);
+            int titleComparison = _seriesTitleComparer.Compare(xTitle, yTitle);
+
+            // If titles are the same, compare by DuplicateIndex
+            return titleComparison != 0 ? titleComparison : x.DuplicateIndex.CompareTo(y.DuplicateIndex);
+        }
+    }
+    
+    public class SeriesValueComparer : IEqualityComparer<Series>
+    {
+        public bool Equals(Series? x, Series? y)
+        {
+            if (x == null || y == null)
+                return false;
+
+            return x.Format == y.Format
+                && x.Titles.SequenceEqual(y.Titles)
+                && x.Staff.SequenceEqual(y.Staff);
+        }
+
+        public int GetHashCode(Series obj)
+        {
+            HashCode hash = new HashCode();
+            hash.Add(obj.Format);
+            foreach (var title in obj.Titles)
+                hash.Add(title);
+            foreach (var staff in obj.Staff)
+                hash.Add(staff);
+            return hash.ToHashCode();
         }
     }
 }

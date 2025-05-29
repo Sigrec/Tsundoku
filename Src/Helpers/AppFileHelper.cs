@@ -24,7 +24,7 @@ namespace Tsundoku.Helpers
         /// <param name="appSpecificSubfolder">A subfolder name *within* Tsundoku (e.g., "Logs", "Covers").
         /// Pass an empty string for files directly under the "Tsundoku" folder (like UserData.json).</param>
         /// <returns>The full path to the specified file in a writable location.</returns>
-        public static string GetFilePath(string fileName, string appSpecificSubfolder)
+        public static string GetFilePath(string fileName, string appSpecificSubfolder = "")
         {
             // This now calls GetFolderPath directly to ensure "Tsundoku" is always in the path,
             // and passes the specific subfolder name (which can be empty).
@@ -41,7 +41,7 @@ namespace Tsundoku.Helpers
         {
             // Assuming ViewModelBase.USER_DATA_FILEPATH holds "UserData.json"
             // Pass an EMPTY string for the subfolder to place it directly under Tsundoku\
-            return GetFilePath(ViewModelBase.USER_DATA_FILEPATH, "");
+            return GetFilePath(ViewModelBase.USER_DATA_FILEPATH);
         }
 
         /// <summary>
@@ -59,16 +59,11 @@ namespace Tsundoku.Helpers
 
             string extension = Path.GetExtension(coverLink).ToLowerInvariant();
 
-            if (!extension.StartsWith('.'))
-            {
-                extension = "." + extension.TrimStart('.');
-            }
-
             if (!ValidImageExtensions.Contains(extension))
             {
                 LOGGER.Warn("Derived extension '{DerivedExtension}' from cover link '{CoverLink}' is not a recognized image format. Defaulting to '.png'.", extension, coverLink);
-                extension = ".png";
             }
+            extension = ".png";
 
             string baseFileName = $"{safeTitle}_{bookType.ToString().ToUpper()}";
             bool isDuplicate = false;
@@ -87,6 +82,7 @@ namespace Tsundoku.Helpers
                     }
                     count++;
                 }
+                LOGGER.Debug("{name} DupeIndex is Now {count}", title, dupeIndex);
             }
             else
             {
@@ -230,9 +226,9 @@ namespace Tsundoku.Helpers
             string filePath = GetUserDataJsonPath();
             try
             {
-                string jsonString = jsonDataNode.ToJsonString(UserModelContext.Default.Options);
+                string jsonString = jsonDataNode.ToJsonString(User.JSON_SERIALIZATION_OPTIONS);
                 File.WriteAllText(filePath, jsonString);
-                LOGGER.Info("JsonNode data successfully written to {FilePath}", filePath);
+                LOGGER.Debug("JsonNode data successfully written to {FilePath}", filePath);
             }
             catch (Exception ex)
             {
@@ -311,7 +307,7 @@ namespace Tsundoku.Helpers
 
             if (ValidImageExtensions.Contains(extension))
             {
-                LOGGER.Debug("Found existing cover file with valid extension: {FullPath}", fullPath);
+                LOGGER.Trace("Cover file {FileName} has valid extension {extension}: {FullPath}", coverFileName, extension, fullPath);
                 return fullPath;
             }
 
@@ -339,7 +335,7 @@ namespace Tsundoku.Helpers
             }
             return Path.GetFileNameWithoutExtension(fileNameWithExtension);
         }
-        
+
         /// <summary>
         /// Finds the full path to an existing cover file in the "Covers" folder
         /// by iterating through known valid image extensions, given only the base filename.
@@ -356,13 +352,52 @@ namespace Tsundoku.Helpers
                 string potentialPath = Path.Combine(coversFolderPath, baseFileNameWithoutExtension + ext);
                 if (File.Exists(potentialPath))
                 {
-                    LOGGER.Info("Found existing cover file by base name: {FullPath}", potentialPath);
+                    LOGGER.Debug("Found existing cover file by base name: {FullPath}", potentialPath);
                     return potentialPath;
                 }
             }
 
             LOGGER.Warn("No existing cover file found for base name {BaseName} with any valid extensions.", baseFileNameWithoutExtension);
             return null; // No valid cover found with any known extension
+        }
+
+        public static void DeleteCoverFile(string coverName)
+        {
+            string filePath = GetFullCoverPath(coverName);
+            if (File.Exists(filePath))
+            {
+                try
+                {
+                    FileAttributes attributes = File.GetAttributes(filePath);
+                    if ((attributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
+                    {
+                        // Remove ONLY the ReadOnly attribute, leave others (Hidden, Archive, etc.) intact
+                        File.SetAttributes(filePath, attributes & ~FileAttributes.ReadOnly);
+                        LOGGER.Trace("Removed ReadOnly attribute from: {filePath}", filePath);
+                    }
+
+                    File.Delete(filePath);
+                    LOGGER.Info("Successfully deleted: {filePath}", filePath);
+                }
+                catch (UnauthorizedAccessException ex)
+                {
+                    LOGGER.Error("Error deleting {filePath}: Access denied. (Details: {ex.Message})", filePath, ex.Message);
+                    // This could still happen if permissions are truly insufficient beyond ReadOnly
+                    // or if the file is in use by another process despite the error message.
+                }
+                catch (IOException ex)
+                {
+                    LOGGER.Info("Error deleting {filePath}: I/O error (e.g., file in use). (Details: {ex.Message})", filePath, ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    LOGGER.Info("An unexpected error occurred while deleting {filePath}: {ex.Message}", filePath, ex.Message);
+                }
+            }
+            else
+            {
+                LOGGER.Warn("File not found, skipping deletion: {filePath}", filePath);
+            }
         }
     }
 }

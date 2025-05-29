@@ -15,11 +15,11 @@ namespace Tsundoku.Views
         private readonly CollectionStatsViewModel _collectionStatsViewModel;
         public bool IsOpen = false;
         public int currencyLength = 0;
-        
+
         public SettingsWindow(UserSettingsViewModel viewModel, CollectionStatsViewModel collectionStatsViewModel)
         {
-            ViewModel = viewModel;
             InitializeComponent();
+            ViewModel = viewModel;
             _collectionStatsViewModel = collectionStatsViewModel;
 
             Opened += (s, e) =>
@@ -45,25 +45,31 @@ namespace Tsundoku.Views
             this.WhenAnyValue(x => x.IndigoButton.IsChecked, (member) => member != null && member == true).Subscribe(x => ViewModel.IndigoMember = x);
             this.WhenAnyValue(x => x.BooksAMillionButton.IsChecked, (member) => member != null && member == true).Subscribe(x => ViewModel.BooksAMillionMember = x);
             this.WhenAnyValue(x => x.KinokuniyaUSAButton.IsChecked, (member) => member != null && member == true).Subscribe(x => ViewModel.KinokuniyaUSAMember = x);
+
+            this.WhenAnyValue(x => x.UsernameChangeTextBox.Text, (newUsername) => !string.IsNullOrWhiteSpace(newUsername) && !newUsername.Equals(ViewModel.CurrentUser.UserName))
+                .Subscribe(x => ViewModel.IsChangeUsernameButtonEnabled = x);
         }
 
-        public void CurrencyChanged(object sender, SelectionChangedEventArgs e)
+        private void CurrencyChanged(object sender, SelectionChangedEventArgs e)
         {
-            if ((sender as ComboBox).IsDropDownOpen)
+            if (CurrencyComboBox.SelectedItem is ComboBoxItem selectedItem)
             {
-                string newCurrency = (CurrencySelector.SelectedItem as ComboBoxItem).Content.ToString();
-                currencyLength = ViewModelBase.CurCurrency.Length;
-                ViewModelBase.CurCurrency = newCurrency;
-                _collectionStatsViewModel.CollectionPrice = $"{newCurrency}{ _collectionStatsViewModel.CollectionPrice[currencyLength..]}";
-                LOGGER.Info($"Currency Changed To {newCurrency}");
+                string? newCurrency = selectedItem.Content?.ToString();
+                if (newCurrency != null)
+                {
+                    ViewModel.UpdateUserCurrency(newCurrency);
+                    // currencyLength = ViewModelBase.CurCurrency.Length;
+                    // _collectionStatsViewModel.CollectionPrice = $"{newCurrency}{ _collectionStatsViewModel.CollectionPrice[currencyLength..]}";
+                    LOGGER.Info($"Currency Changed To {newCurrency}");
+                }
             }
         }
 
 
         /// <summary>
-        /// Allows user to upload a new Json file to be used as their new data, it additionall creates a backup file of the users last save
+        /// Allows user to import a new Json file to be used as their new data, it additionall creates a backup file of the users last save
         /// </summary>
-        private async void UploadUserData(object sender, RoutedEventArgs args)
+        private async void ImportUserDataAsync(object sender, RoutedEventArgs args)
         {
             IReadOnlyList<IStorageFile> files = await this.StorageProvider.OpenFilePickerAsync(
                 new FilePickerOpenOptions
@@ -234,14 +240,11 @@ namespace Tsundoku.Views
 
         public void ChangeUsername(object sender, RoutedEventArgs args)
         {
-            if (!string.IsNullOrWhiteSpace(UsernameChange.Text))
+            string newUsername = UsernameChangeTextBox.Text;
+            if (!string.IsNullOrWhiteSpace(newUsername))
             {
-                ViewModelBase.MainUser.UserName = UsernameChange.Text;
-                LOGGER.Info($"Username Changed To -> {UsernameChange.Text}");
-            }
-            else
-            {
-                LOGGER.Warn("Change Username Field is Missing Input");
+                ViewModel.UpdateUserName(newUsername);
+                LOGGER.Info("Username Changed to {Username");
             }
         }
 

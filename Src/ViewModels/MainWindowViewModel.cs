@@ -16,6 +16,7 @@ using Microsoft.Extensions.DependencyInjection;
 using DynamicData;
 using Tsundoku.Services;
 using System.Collections.ObjectModel;
+using Avalonia.Threading;
 
 namespace Tsundoku.ViewModels
 {
@@ -37,6 +38,7 @@ namespace Tsundoku.ViewModels
         private PriceAnalysisWindow _priceAnalysisWindow;
         private CollectionStatsWindow _collectionStatsWindow;
         private UserNotesWindow _userNotesWindow;
+        private bool disposedValue;
 
         public AddNewSeriesWindow NewSeriesWindow => _newSeriesWindow;
         public SettingsWindow SettingsWindow => _settingsWindow;
@@ -46,7 +48,7 @@ namespace Tsundoku.ViewModels
         public UserNotesWindow UserNotesWindow => _userNotesWindow;
 
         // --- Reactive Properties (Public) ---
-        [Reactive] public string AdvancedSeriesFilterText { get; set; } = string.Empty;
+        [Reactive] public string AdvancedSearchQuery { get; set; } = string.Empty;
         [Reactive] public string SeriesFilterText { get; set; }
         [Reactive] public TsundokuFilter SelectedFilter { get; set; } = TsundokuFilter.None;
         [Reactive] public ushort SelectedFilterIndex { get; set; } = 0;
@@ -59,7 +61,6 @@ namespace Tsundoku.ViewModels
         public static readonly List<Series> CoverChangedSeriesList = [];
 
         // --- Commands and Interactions (Public Readonly) ---
-        public ICommand StartAdvancedSearch { get; }
         public Interaction<EditSeriesInfoViewModel, MainWindowViewModel?> EditSeriesInfoDialog { get; } = new Interaction<EditSeriesInfoViewModel, MainWindowViewModel?>();
 
         // --- Helper Properties / Methods (Regex, etc.) ---
@@ -86,6 +87,14 @@ namespace Tsundoku.ViewModels
                 .Subscribe(filter => sharedSeriesProvider.SelectedFilter = filter)
                 .DisposeWith(_disposables);
 
+            this.WhenAnyValue(x => x.AdvancedSearchQuery)
+                .Subscribe(query => sharedSeriesProvider.AdvancedSearchQuery = query)
+                .DisposeWith(_disposables);
+
+            this.WhenAnyValue(x => x.AdvancedSearchQueryErrorMessage)
+                .Subscribe(queryErrMsg => sharedSeriesProvider.AdvancedSearchQueryErrorMessage = queryErrMsg)
+                .DisposeWith(_disposables);
+
             ConfigureWindows();
 
             this.WhenAnyValue(x => x.CurrentUser.Language)
@@ -94,13 +103,14 @@ namespace Tsundoku.ViewModels
                 .Subscribe(lang => SelectedLangIndex = (ushort)INDEXED_LANGUAGES[lang])
                 .DisposeWith(_disposables);
 
-            this.WhenAnyValue(x => x.SelectedFilter)
-                .DistinctUntilChanged()
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(filter => SelectedFilterIndex = (ushort)FILTERS[filter])
-                .DisposeWith(_disposables);
-
-            StartAdvancedSearch = ReactiveCommand.Create(() => AdvancedSearchCollection(AdvancedSeriesFilterText));
+            Observable.Merge(
+                this.WhenAnyValue(x => x.SelectedFilter),
+                this.WhenAnyValue(x => x._sharedSeriesProvider.SelectedFilter)
+            )
+            .DistinctUntilChanged()
+            .ObserveOn(RxApp.MainThreadScheduler)
+            .Subscribe(filter => SelectedFilterIndex = (ushort)FILTERS[filter])
+            .DisposeWith(_disposables);
         }
 
         public void SaveUserData()
@@ -150,94 +160,6 @@ namespace Tsundoku.ViewModels
             _userService.UpdateUser(user => user.Language = newLang.GetEnumValueFromMemberValue(TsundokuLanguage.Romaji));
         }
 
-        // Basic Test Query Demographic==Seinen Format==Manga Series==Complete Favorite==True
-        // TODO - Fix the Advanced Search since others are done
-        public async Task AdvancedSearchCollection(string AdvancedSearchQuery)
-        {
-            if (!string.IsNullOrWhiteSpace(AdvancedSearchQuery) && AdvancedQueryRegex().IsMatch(AdvancedSearchQuery))
-            {
-                AdvancedSearchQuery = AdvancedSearchQuery.Trim();
-                if (!string.IsNullOrWhiteSpace(SeriesFilterText)) // Checks if the user searching and remove the text
-                {
-                    // SearchIsBusy = false;
-                    SeriesFilterText = string.Empty;
-                }
-                if (SelectedFilter != TsundokuFilter.None)
-                {
-                    SelectedFilter = TsundokuFilter.None;
-                }
-
-                await Task.Run(() =>
-                {
-                    var AdvancedSearchMatches = AdvancedQueryRegex().Matches(AdvancedSearchQuery.Trim()).OrderBy(x => x.Value);
-                    GroupCollection advFilter;
-
-                    StringBuilder AdvancedFilterExpression = new StringBuilder();
-                    AdvancedFilterExpression.Append("series => ");
-                    foreach (Match SearchFilter in AdvancedSearchMatches)
-                    {
-                        advFilter = SearchFilter.Groups;
-                        AdvancedFilterExpression.AppendFormat("({0}) && ", ParseAdvancedFilter(advFilter[1].Value, advFilter[2].Value, advFilter[3].Value));
-                    }
-                    AdvancedFilterExpression.Remove(AdvancedFilterExpression.Length - 4, 4);
-                    LOGGER.Info($"Initial Query = \"{AdvancedSearchQuery}\" -> \"{AdvancedFilterExpression}\"");
-                    try
-                    {
-                        // FilteredCollection = UserCollection.AsQueryable().Where(AdvancedFilterExpression.ToString());
-                    }
-                    catch (Exception ex)
-                    {
-                        AdvancedSearchQueryErrorMessage = "Incorrectly Formatted Advanced Search Query!";
-                        LOGGER.Warn($"User Inputted Incorrectly Formatted Advanced Search Query => \"{ex.Message}\"");
-                    }
-                    finally
-                    {
-                        AdvancedFilterExpression.Clear();
-                    }
-                });
-
-                // if (FilteredCollection.Any())
-                // {
-                //     if (SelectedFilter != TsundokuFilter.Query)
-                //     {
-                //         SelectedFilter = TsundokuFilter.Query;
-                //     }
-                //     SearchedCollection.Clear();
-                //     SearchedCollection.AddRange(FilteredCollection);
-                //     LOGGER.Info($"Valid Advanced Search Query");
-                // }
-                // else
-                // {
-                //     AdvancedSearchQueryErrorMessage = "Advanced Search Query Returned No Series!";
-                //     LOGGER.Info("Advanced Search Query Returned No Series");
-                // }
-            }
-            else
-            {
-                AdvancedSearchQueryErrorMessage = "Inputted Incorrectly Formatted Advanced Search Query!";
-                LOGGER.Warn("User Inputted Incorrectly Formatted Advanced Search Query");
-            }
-        }
-
-        private static string ParseAdvancedFilter(string filterName, string logicType, string filterValue)
-        {
-            logicType = logicType.Equals("=") ? "==" : logicType;
-            return filterName switch
-            {
-                "Rating" or "Value" => $"series.{filterName} {logicType} {filterValue}M",
-                "Read" => $"series.VolumesRead {logicType} {filterValue}",
-                "CurVolumes" => $"series.CurVolumeCount {logicType} {filterValue}",
-                "MaxVolumes" => $"series.MaxVolumeCount {logicType} {filterValue}",
-                "Format" or "Status" or "Demographic" => $"series.{filterName} == {filterName}.{filterValue}",
-                "Series" => $"series.MaxVolumeCount {(filterValue.Equals("Complete") ? "==" : "<")} series.CurVolumeCount",
-                "Favorite" => $"{(filterValue.Equals("True") ? '!' : "")}series.IsFavorite",
-                "Notes" => $"!string.IsNullOrWhiteSpace(series.SeriesNotes) && series.SeriesNotes.Contains(\"{filterValue[1..^1]}\")",
-                "Publisher" => $"series.Publisher.Contains({(!filterValue.StartsWith('"') ? "\"" : string.Empty)}{filterValue}{(!filterValue.EndsWith('"') ? "\"" : string.Empty)}, StringComparison.OrdinalIgnoreCase)",
-                "Genre" => $"series.Genres != null && series.Genres.Contains(Tsundoku.Models.Genre.{filterValue})",
-                _ => string.Empty,
-            };
-        }
-
         /// <summary>
         /// Changes the cover for series
         /// </summary>
@@ -251,9 +173,9 @@ namespace Tsundoku.ViewModels
 
         public void DeleteSeries(Series series)
         {
+            newCoverCheck = false;
             _userService.RemoveSeries(series);
-            CollectionStatsWindow.ViewModel.UpdateAllStats(series.CurVolumeCount, (uint)(series.MaxVolumeCount - series.CurVolumeCount), true);
-            LOGGER.Info("Removed {} From Collection", series.Titles[TsundokuLanguage.Romaji]);
+            // CollectionStatsWindow.ViewModel.UpdateAllStats(series.CurVolumeCount, (uint)(series.MaxVolumeCount - series.CurVolumeCount), true);
         }
 
         public void UpdateSeriesCard(Series series)
@@ -261,37 +183,10 @@ namespace Tsundoku.ViewModels
             _userService.AddSeries(series);
         }
 
-        // TODO - Ensure that if people change files directly in the Covers folder it updates properly
-        public void CoverFolderWatcherLogic(string path)
-        {
-            LOGGER.Debug("{} | {} | {} | {}", path, !newCoverCheck, path.EndsWith("jpg", StringComparison.OrdinalIgnoreCase), path.EndsWith("png", StringComparison.OrdinalIgnoreCase));
-            if (!newCoverCheck && (path.EndsWith("jpg", StringComparison.OrdinalIgnoreCase) || path.EndsWith("png", StringComparison.OrdinalIgnoreCase)))
-            {
-                string pathFileExtension = path[^3..];
-                Series series = _userService.GetSeriesByCoverPath(path) ?? _userService.GetSeriesByCoverPath(path[..^3] + (pathFileExtension.Equals("jpg") ? "png" : "jpg"));
-
-                if (!series.Cover[^3..].Equals(pathFileExtension))
-                {
-                    series.Cover = series.Cover[..^3] + pathFileExtension;
-                    File.Delete(series.Cover[..^3] + (pathFileExtension.Equals("jpg") ? "png" : "jpg"));
-                    LOGGER.Info("Changed File Extention for {} to {}", series.Titles[TsundokuLanguage.Romaji], pathFileExtension);
-                }
-
-                if (!CoverChangedSeriesList.Contains(series))
-                {
-                    CoverChangedSeriesList.Add(series);
-                    LOGGER.Debug($"Added \"{series.Titles[TsundokuLanguage.Romaji]}\" to Cover Change List");
-                }
-                else
-                {
-                    LOGGER.Info($"\"{series.Titles[TsundokuLanguage.Romaji]}\" Cover Changed Again");
-                }
-            }
-            newCoverCheck = false;
-        }
-
         public async Task RefreshSeries(Series series)
         {
+            LOGGER.Info("Refreshing {series} ({id})", series.Titles[TsundokuLanguage.Romaji] + (series.DuplicateIndex == 0 ? string.Empty : $" ({series.DuplicateIndex})"), series.Id);
+
             newCoverCheck = true;
             Series? refreshedSeries = await Series.CreateNewSeriesCardAsync(
                 _bitmapHelper,
@@ -359,13 +254,24 @@ namespace Tsundoku.ViewModels
             LogManager.Shutdown();
             App.DisposeMutex();
         }
-        
-        /// <summary>
-        /// Disposes of all managed resources, particularly Rx subscriptions.
-        /// </summary>
-        public override void Dispose()
+
+        protected virtual void Dispose(bool disposing)
         {
-            _disposables.Dispose();
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    _disposables.Dispose();
+                }
+                disposedValue = true;
+            }
+        }
+        
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }
