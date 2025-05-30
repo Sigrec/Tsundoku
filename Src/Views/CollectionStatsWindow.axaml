@@ -42,6 +42,7 @@
                 <!-- Pie Charts -->
                 <Border Name="DistBGOne" Grid.Row="4" Grid.Column="0" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" HorizontalAlignment="Center">
                     <WrapPanel Margin="10">
+                        <!-- Demographic Pie chart -->
                         <Border Background="{CompiledBinding CurrentTheme.CollectionBGColor}" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" Width="570" Height="300" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10">
                             <Border CornerRadius="8" ClipToBounds="True">
                                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="3">
@@ -119,6 +120,8 @@
                                 </StackPanel>
                             </Border>
                         </Border>
+
+                        <!-- Status Pie Chart -->
                         <Border Background="{CompiledBinding CurrentTheme.CollectionBGColor}" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" Width="570" Height="300"  HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10">
                             <Border CornerRadius="8" ClipToBounds="True">
                                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="3">
@@ -183,6 +186,8 @@
                                 </StackPanel>
                             </Border>
                         </Border>
+
+                        <!-- Format Pie Chart -->
                         <Border Background="{CompiledBinding CurrentTheme.CollectionBGColor}" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" Width="570" Height="300"  HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10">
                             <Border CornerRadius="8" ClipToBounds="True">
                                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="3">
@@ -278,27 +283,32 @@
                 <!-- Bar Charts -->
                 <Border Name="DistBGTwo" Grid.Row="6" Grid.Column="0" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" HorizontalAlignment="Center">
                     <WrapPanel Margin="10">
+                        <!-- Rating Bar Chart -->
                         <Border Background="{CompiledBinding CurrentTheme.CollectionBGColor}" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" Width="570" Height="550" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10">
                             <Border CornerRadius="8" ClipToBounds="True">
                                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                                     <TextBlock Text="Ratings" FontSize="21" FontWeight="Bold" Classes="Menu" HorizontalAlignment="Center" Margin="0,0,0,0"/>
-                                    <lvc:CartesianChart Series="{CompiledBinding RatingDistribution}" XAxes="{CompiledBinding RatingXAxes}" YAxes="{Binding RatingYAxes}" Width="570" Height="510"/>
+                                    <lvc:CartesianChart Series="{CompiledBinding RatingDistribution}" XAxes="{CompiledBinding RatingXAxes}" YAxes="{CompiledBinding RatingYAxes}" Width="570" Height="510"/>
                                 </StackPanel>
                             </Border>
                         </Border>
+
+                        <!-- Volume Count Bar Chart -->
                         <Border Background="{CompiledBinding CurrentTheme.CollectionBGColor}" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" Width="570" Height="550" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10">
                             <Border CornerRadius="8" ClipToBounds="True">
                                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                                     <TextBlock Text="Volume Counts" FontSize="21" FontWeight="Bold" Classes="Menu" HorizontalAlignment="Center" Margin="0,0,0,0"/>
-                                    <lvc:CartesianChart Series="{CompiledBinding VolumeCountDistribution}" XAxes="{CompiledBinding VolumeCountXAxes}" YAxes="{Binding VolumeCountYAxes}" Width="570" Height="510"/>
+                                    <lvc:CartesianChart Series="{CompiledBinding VolumeCountDistribution}" XAxes="{CompiledBinding VolumeCountXAxes}" YAxes="{CompiledBinding VolumeCountYAxes}" Width="570" Height="510"/>
                                 </StackPanel>
                             </Border>
                         </Border>
+
+                        <!-- Genre Distribution Bar Chart -->
                         <Border Background="{CompiledBinding CurrentTheme.CollectionBGColor}" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" Width="570" Height="550" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10">
                             <Border CornerRadius="8" ClipToBounds="True">
                                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                                     <TextBlock Text="Genres" FontSize="21" FontWeight="Bold" Classes="Menu" HorizontalAlignment="Center" Margin="0,0,0,0"/>
-                                    <lvc:CartesianChart VerticalAlignment="Center" HorizontalAlignment="Center" Series="{CompiledBinding GenreDistribution}" XAxes="{CompiledBinding GenreXAxes}" YAxes="{Binding GenreYAxes}" Width="570" Height="510"/>
+                                    <lvc:CartesianChart VerticalAlignment="Center" HorizontalAlignment="Center" Series="{CompiledBinding GenreDistribution}" XAxes="{CompiledBinding GenreXAxes}" YAxes="{CompiledBinding GenreYAxes}" Width="570" Height="510"/>
                                 </StackPanel>
                             </Border>
                         </Border>

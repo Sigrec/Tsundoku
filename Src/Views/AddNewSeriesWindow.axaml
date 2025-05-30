@@ -276,7 +276,7 @@
 					   FontWeight="Bold"
 					   Margin="2,0,0,3"
 					   Classes="Menu"/>
-            <MaskedTextBox Name="ValueMaskedTextBox"
+            <MaskedTextBox Name="CostMaskedTextBox"
                            HorizontalAlignment="Left"
                            ToolTip.Tip="Optional"
                            PromptChar=" "

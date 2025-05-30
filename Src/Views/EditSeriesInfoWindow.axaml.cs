@@ -1,10 +1,8 @@
-using System.Reactive.Linq;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
 using Avalonia.ReactiveUI;
-using ReactiveUI;
 using Tsundoku.Helpers;
 using Tsundoku.Models;
 using Tsundoku.ViewModels;
@@ -18,6 +16,8 @@ public partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfoViewMod
     private readonly BitmapHelper _bitmapHelper;
     private readonly MainWindowViewModel _mainWindowViewModel;
     private readonly CollectionStatsViewModel _collectionStatsViewModel;
+    private bool _IsInitialized = false;
+
     public EditSeriesInfoWindow(MainWindowViewModel mainWindowViewModel, CollectionStatsViewModel collectionStatsViewModel, BitmapHelper bitmapHelper)
     {
         _bitmapHelper = bitmapHelper;
@@ -26,11 +26,12 @@ public partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfoViewMod
         InitializeComponent();
 
         Opened += (s, e) =>
-        {;
+        {
+            ;
             this.Title = $"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]} Info";
             VolumesReadTextBlock.Text = $"{ViewModel.Series.VolumesRead} Vol{(ViewModel.Series.VolumesRead > 1 ? "s" : string.Empty)} Read";
             UpdateSelectedGenres();
-            LOGGER.Debug("{} | {}", this.Height, this.Width);
+            _IsInitialized = true;
         };
     }
 
@@ -91,104 +92,99 @@ public partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfoViewMod
     private void SaveStats(object sender, RoutedEventArgs args)
     {
         string volumesReadText = VolumesReadMaskedTextBox.Text.Replace("_", string.Empty);
-        if (!string.IsNullOrWhiteSpace(volumesReadText))
+        if (!string.IsNullOrWhiteSpace(volumesReadText) &&
+            uint.TryParse(volumesReadText, out uint newVolumesRead) &&
+            ViewModel.Series.VolumesRead != newVolumesRead)
         {
-            bool isValidVolumesReadInput = uint.TryParse(volumesReadText, out uint newVolumesRead);
-            if (isValidVolumesReadInput && ViewModel.Series.VolumesRead != newVolumesRead)
-            {
-                ViewModel.Series.VolumesRead = newVolumesRead;
-                VolumesReadTextBlock.Text = $"{newVolumesRead} Vol{(ViewModel.Series.VolumesRead > 1 ? "s" : string.Empty)} Read";
-                VolumesReadMaskedTextBox.Clear();
+            uint oldVolumesRead = ViewModel.Series.VolumesRead;
 
-                _collectionStatsViewModel.UpdateCollectionVolumesRead();
+            ViewModel.Series.VolumesRead = newVolumesRead;
+            VolumesReadTextBlock.Text = $"{newVolumesRead} Vol{(newVolumesRead == 1 ? string.Empty : "s")} Read";
+            VolumesReadMaskedTextBox.Clear();
 
-                LOGGER.Info($"Updated # of Volumes Read for \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\" from {ViewModel.Series.VolumesRead} to {newVolumesRead}");
-            }
-            else
-            {
-                LOGGER.Warn($"Volumes Read Input {VolumesReadMaskedTextBox.Text} is Invalid");
-            }
+            LOGGER.Info($"Updated # of Volumes Read for \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\" from {oldVolumesRead} to {newVolumesRead}");
+        }
+        else if (!string.IsNullOrWhiteSpace(volumesReadText))
+        {
+            LOGGER.Warn($"Volumes Read Input \"{volumesReadText}\" is invalid or unchanged.");
         }
 
         if (!RatingMaskedTextBox.Text.StartsWith("__._"))
         {
-            bool isValidRatingVal = decimal.TryParse(RatingMaskedTextBox.Text[..4].Trim().Replace("_", "0"), out decimal ratingVal);
-            if (isValidRatingVal && decimal.Compare(ViewModel.Series.Rating, ratingVal) != 0 && decimal.Compare(ratingVal, new decimal(10.0)) <= 0)
+            string rawInput = RatingMaskedTextBox.Text[..4].Trim().Replace("_", "0");
+            if (decimal.TryParse(rawInput, out decimal ratingVal))
             {
-                ViewModel.Series.Rating = ratingVal;
-                RatingTextBlock.Text = $"Rating {ratingVal}/10.0";
-                RatingMaskedTextBox.Clear();
+                // Clamp to max value and avoid unnecessary assignment
+                if (ratingVal <= 10.0m && ratingVal != ViewModel.Series.Rating)
+                {
+                    ViewModel.Series.Rating = ratingVal;
+                    RatingTextBlock.Text = $"Rating {decimal.Round(ratingVal, 1)}/10.0";
+                    RatingMaskedTextBox.Clear();
 
-                // Update rating Distribution Chart
-                // TODO - Need to actually update the rating of the series object here
-                //ViewModel.UserCollection.First(series => series == Series).Rating = ratingVal;
-                _collectionStatsViewModel.UpdateRatingChartValues();
-                _collectionStatsViewModel.UpdateCollectionRating();
-
-                LOGGER.Info($"Updating rating for \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\" {(ViewModel.Series.Rating == -1 ? string.Empty : $"from \"{ViewModel.Series.Rating}/10.0\"")} to \"{decimal.Round(ratingVal, 1)}/10.0\"");
+                    LOGGER.Info($"Updating rating for \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\" {(ViewModel.Series.Rating == -1 ? string.Empty : $"from \"{ViewModel.Series.Rating}/10.0\" ")} to \"{decimal.Round(ratingVal, 1)}/10.0\"");
+                }
+                else
+                {
+                    LOGGER.Warn($"Rating Value {ratingVal} is larger than 10.0");
+                }
             }
             else
             {
-                LOGGER.Warn($"Rating Value {ratingVal} is larger than 10.0 or was Invalid");
+                LOGGER.Warn($"Invalid Rating Input: {rawInput}");
             }
         }
 
-        string valueText = ValueMaskedTextBox.Text[1..];
-        decimal valueVal = Convert.ToDecimal(valueText.Trim().Replace("_", "0"));
-        if (!valueText.Equals("__________________.__") && decimal.Compare(ViewModel.Series.Value, valueVal) != 0)
+        string costTextRaw = CostMaskedTextBox.Text;
+        if (RatingMaskedTextBox.Text.EndsWith("__________________.__") && !string.IsNullOrWhiteSpace(costTextRaw))
         {
-            string logMsg = $"value for \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\" from {ViewModel.CurrentUser.Currency}{ViewModel.Series.Value} to {ViewModel.CurrentUser.Currency}{valueVal}";
-            LOGGER.Info($"Updating {logMsg}");
+            string costText = costTextRaw[1..].Replace("_", "0");
+            if (!costText.Contains('_') && decimal.TryParse(costText, out decimal newValue) &&
+                decimal.Compare(ViewModel.Series.Value, newValue) != 0)
+            {
+                string currency = ViewModel.CurrentUser.Currency;
+                decimal oldValue = ViewModel.Series.Value;
 
-            ViewModel.Series.Value = valueVal;
-            // ValueTextBlock.Text = $"{ViewModel.CurCurrency}{valueVal}";
-            ValueMaskedTextBox.Clear();
+                ViewModel.Series.Value = newValue;
+                CostMaskedTextBox.Clear();
 
-            _collectionStatsViewModel.UpdateCollectionPrice();
-            LOGGER.Info($"Updated {logMsg}");
+                LOGGER.Info($"Updated Cost for \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\" from {currency}{oldValue} to {currency}{newValue}");
+            }
+            else
+            {
+                LOGGER.Warn($"Invalid or unchanged cost input: \"{costTextRaw}\"");
+            }
         }
 
         string publisherText = PublisherTextBox.Text.Trim();
-        if (!string.IsNullOrWhiteSpace(publisherText) && !publisherText.Equals(ViewModel.Series.Publisher))
+        if (!string.IsNullOrEmpty(publisherText) && !publisherText.Equals(ViewModel.Series.Publisher, StringComparison.Ordinal))
         {
+            string oldPublisher = ViewModel.Series.Publisher;
             ViewModel.Series.Publisher = publisherText;
-            _mainWindowViewModel.UpdateSeriesCard(ViewModel.Series);
             PublisherTextBox.Clear();
 
-            LOGGER.Info($"Updated Publisher for \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\" from \"{ViewModel.Series.Publisher}\" to \"{publisherText}\"");
-
+            LOGGER.Info($"Updated Publisher for \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\" from \"{oldPublisher}\" to \"{publisherText}\"");
         }
+    }
 
-        HashSet<Genre> curGenres = EditSeriesInfoViewModel.GetCurrentGenresSelected();
-        if (curGenres.Count > 0 && (ViewModel.Series.Genres == null || !curGenres.SetEquals(ViewModel.Series.Genres)))
-        {
-            LOGGER.Info($"Updating Genres for \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\" from [{string.Join(", ", ViewModel.Series.Genres)}] to [{string.Join(", ", curGenres)}]");
-            if (ViewModel.Series.Genres != null)
-            {
-                // _collectionStatsViewModel.UpdateGenreChart(curGenres.Except(ViewModel.Series.Genres), ViewModel.Series.Genres.Except(curGenres));
-            }
-            else
-            {
-                // _collectionStatsViewModel.UpdateGenreChart(curGenres, []);
-            }
-            ViewModel.Series.Genres = curGenres;
-        }
+    private void GenreSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (!_IsInitialized || (e.AddedItems.Count == 0 && e.RemovedItems.Count == 0))
+            return;
+
+        HashSet<Genre> curGenres = ViewModel!.GetCurrentGenresSelected();
+        LOGGER.Info($"Updating Genres for \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\" from [{string.Join(", ", ViewModel.Series.Genres)}] to [{string.Join(", ", curGenres)}]");
+        ViewModel.Series.Genres = curGenres;
     }
 
     /// <summary>
     /// Changes the chosen demographic for a particular series
     /// </summary>
-    /// // TODO - Fix this when doing collection stats
     private void DemographicChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (DemographicComboBox.IsDropDownOpen)
+        if (_IsInitialized && DemographicComboBox.IsDropDownOpen)
         {
             Demographic demographic = Series.GetSeriesDemographic((DemographicComboBox.SelectedItem as ComboBoxItem).Content.ToString());
             ViewModel.Series.Demographic = demographic;
-
-            _collectionStatsViewModel.UpdateDemographicChartValues();
-            _collectionStatsViewModel.UpdateDemographicPercentages();
-
             LOGGER.Info($"Changed Demographic for \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\" to {demographic}");
         }
     }
@@ -197,10 +193,6 @@ public partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfoViewMod
     private async void RefreshSeriesAsync(object sender, RoutedEventArgs args)
     {
         await _mainWindowViewModel.RefreshSeries(ViewModel.Series);
-        // GenreSelector.SelectedItems.Clear();
-        // UpdateSelectedGenres();
-        // _collectionStatsViewModel.UpdateGenreChart();
-
     }
 
     private void RemoveSeries(object sender, RoutedEventArgs args)
@@ -209,43 +201,34 @@ public partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfoViewMod
         this.Close();
     }
 
-    // TODO - Fix this when doing collection stats
-    private async void ChangeSeriesVolumeCountsAsync(object sender, RoutedEventArgs args)
+    private void ChangeSeriesVolumeCounts(object sender, RoutedEventArgs args)
     {
-        _ = await Observable.Start(() =>
+        string curVolumeString = CurVolumeMaskedTextBox.Text.Replace("_", string.Empty);
+        string maxVolumeString = MaxVolumeMaskedTextBox.Text.Replace("_", string.Empty);
+        if (!string.IsNullOrWhiteSpace(curVolumeString) && !string.IsNullOrWhiteSpace(maxVolumeString))
         {
-            string curVolumeString = CurVolumeMaskedTextBox.Text.Replace("_", string.Empty);
-            string maxVolumeString = MaxVolumeMaskedTextBox.Text.Replace("_", string.Empty);
-            if (!string.IsNullOrWhiteSpace(curVolumeString) && !string.IsNullOrWhiteSpace(maxVolumeString))
+            if (ushort.TryParse(curVolumeString, out ushort newCurVols) && ushort.TryParse(maxVolumeString, out ushort newMaxVols))
             {
-                if (ushort.TryParse(curVolumeString, out ushort newCurVols) && ushort.TryParse(maxVolumeString, out ushort newMaxVols))
+                if (newMaxVols >= newCurVols)
                 {
-                    if (newMaxVols >= newCurVols)
-                    {
-                        LOGGER.Info($"Changing Series Volume Counts For \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\" From {ViewModel.Series.CurVolumeCount}/{ViewModel.Series.MaxVolumeCount} -> {newCurVols}/{newMaxVols}");
+                    ViewModel.Series.CurVolumeCount = newCurVols;
+                    ViewModel.Series.MaxVolumeCount = newMaxVols;
 
-                        _collectionStatsViewModel.UpdateVolumeCounts(ViewModel.Series, newCurVols, newMaxVols);
+                    LOGGER.Info($"Changed Series Volume Counts For \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\" From {ViewModel.Series.CurVolumeCount}/{ViewModel.Series.MaxVolumeCount} -> {newCurVols}/{newMaxVols}");
 
-                        ViewModel.Series.CurVolumeCount = newCurVols;
-                        ViewModel.Series.MaxVolumeCount = newMaxVols;
-                        _mainWindowViewModel.UpdateSeriesCard(ViewModel.Series);
-
-                        _collectionStatsViewModel.UpdateVolumeCountChartValues();
-
-                        CurVolumeMaskedTextBox.Clear();
-                        MaxVolumeMaskedTextBox.Clear();
-                    }
-                    else
-                    {
-                        LOGGER.Warn($"{newCurVols} Is Not Less Than or Equal To {newMaxVols}");
-                    }
+                    CurVolumeMaskedTextBox.Clear();
+                    MaxVolumeMaskedTextBox.Clear();
                 }
                 else
                 {
-                    LOGGER.Warn($"\"{curVolumeString}\" and \"{maxVolumeString}\" are not Valid ushort Inputs");
+                    LOGGER.Warn($"{newCurVols} Is Not Less Than or Equal To {newMaxVols}");
                 }
             }
-        }, RxApp.MainThreadScheduler);
+            else
+            {
+                LOGGER.Warn($"\"{curVolumeString}\" and \"{maxVolumeString}\" are not Valid ushort Inputs");
+            }
+        }
     }
 
     public void UpdateSelectedGenres()

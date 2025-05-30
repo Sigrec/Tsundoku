@@ -1,4 +1,3 @@
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Reactive.Linq;
 using Avalonia.Collections;
@@ -6,7 +5,6 @@ using Avalonia.Controls;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Tsundoku.Models;
-using static Tsundoku.Models.TsundokuLanguageModel;
 
 namespace Tsundoku.ViewModels
 {
@@ -17,7 +15,7 @@ namespace Tsundoku.ViewModels
         [Reactive] public int DemographicIndex { get; set; }
         [Reactive] public string CoverImageUrl { get; set; }
         [Reactive] public string GenresToolTipText { get; set; }
-        public static AvaloniaList<ListBoxItem> SelectedGenres { get; set; } = new AvaloniaList<ListBoxItem>();
+        public AvaloniaList<ListBoxItem> SelectedGenres { get; set; } = [];
         private static StringBuilder CurGenres = new StringBuilder();
 
         public EditSeriesInfoViewModel(Series Series, IUserService userService) : base(userService)
@@ -57,7 +55,7 @@ namespace Tsundoku.ViewModels
             }
         }
 
-        public static HashSet<Genre> GetCurrentGenresSelected()
+        public HashSet<Genre> GetCurrentGenresSelected()
         {
             HashSet<Genre> newGenres = [];
             foreach (ListBoxItem genreItem in SelectedGenres)

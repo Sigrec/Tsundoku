@@ -128,18 +128,6 @@ namespace Tsundoku.ViewModels
             _userService.UpdateUserIcon(filePath);
         }
 
-        public void AddUserVolumeCount()
-        {
-            CollectionStatsWindow.ViewModel.UsersNumVolumesCollected++;
-            CollectionStatsWindow.ViewModel.UsersNumVolumesToBeCollected--;
-        }
-
-        public void SubstractUserVolumeCount()
-        {
-            CollectionStatsWindow.ViewModel.UsersNumVolumesCollected--;
-            CollectionStatsWindow.ViewModel.UsersNumVolumesToBeCollected++;
-        }
-
         private void ConfigureWindows()
         {
             LOGGER.Info("Configuring Windows...");
@@ -148,7 +136,6 @@ namespace Tsundoku.ViewModels
             _settingsWindow = _serviceProvider.GetRequiredService<SettingsWindow>();
             _themeSettingsWindow = _serviceProvider.GetRequiredService<CollectionThemeWindow>();
             _priceAnalysisWindow = _serviceProvider.GetRequiredService<PriceAnalysisWindow>();
-            // _priceAnalysisWindow.ViewModel.CurRegion = CurrentUser.Region;
             _collectionStatsWindow = _serviceProvider.GetRequiredService<CollectionStatsWindow>();
             _userNotesWindow = _serviceProvider.GetRequiredService<UserNotesWindow>();
 
@@ -175,7 +162,6 @@ namespace Tsundoku.ViewModels
         {
             newCoverCheck = false;
             _userService.RemoveSeries(series);
-            // CollectionStatsWindow.ViewModel.UpdateAllStats(series.CurVolumeCount, (uint)(series.MaxVolumeCount - series.CurVolumeCount), true);
         }
 
         public void UpdateSeriesCard(Series series)
@@ -206,7 +192,6 @@ namespace Tsundoku.ViewModels
                 true);
 
             _userService.AddSeries(refreshedSeries);
-            CollectionStatsWindow.ViewModel.UpdateChartStats();
         }
 
         public void SaveOnClose()

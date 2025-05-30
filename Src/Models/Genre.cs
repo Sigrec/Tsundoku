@@ -1,28 +1,28 @@
-using Tsundoku.Helpers;
+using System.Runtime.Serialization;
 
 namespace Tsundoku.Models
 {
     public enum Genre
     {
-        [StringValue("Action")] Action,
-        [StringValue("Adventure")] Adventure,
-        [StringValue("Comedy")] Comedy,
-        [StringValue("Drama")] Drama,
-        [StringValue("Ecchi")] Ecchi,
-        [StringValue("Fantasy")] Fantasy,
-        [StringValue("Horror")] Horror,
-        [StringValue("Mahou Shoujo")] MahouShoujo,
-        [StringValue("Mecha")] Mecha,
-        [StringValue("Music")] Music,
-        [StringValue("Mystery")] Mystery,
-        [StringValue("Psychological")] Psychological,
-        [StringValue("Romance")] Romance,
-        [StringValue("Sci-Fi")] SciFi,
-        [StringValue("Slice of Life")] SliceOfLife,
-        [StringValue("Sports")] Sports,
-        [StringValue("Supernatural")] Supernatural,
-        [StringValue("Thriller")] Thriller,
-        None
+        [EnumMember(Value = "Action")] Action,
+        [EnumMember(Value = "Adventure")] Adventure,
+        [EnumMember(Value = "Comedy")] Comedy,
+        [EnumMember(Value = "Drama")] Drama,
+        [EnumMember(Value = "Ecchi")] Ecchi,
+        [EnumMember(Value = "Fantasy")] Fantasy,
+        [EnumMember(Value = "Horror")] Horror,
+        [EnumMember(Value = "Mahou Shoujo")] MahouShoujo,
+        [EnumMember(Value = "Mecha")] Mecha,
+        [EnumMember(Value = "Music")] Music,
+        [EnumMember(Value = "Mystery")] Mystery,
+        [EnumMember(Value = "Psychological")] Psychological,
+        [EnumMember(Value = "Romance")] Romance,
+        [EnumMember(Value = "Sci-Fi")] SciFi,
+        [EnumMember(Value = "Slice of Life")] SliceOfLife,
+        [EnumMember(Value = "Sports")] Sports,
+        [EnumMember(Value = "Supernatural")] Supernatural,
+        [EnumMember(Value = "Thriller")] Thriller,
+        [EnumMember(Value = "None")] None
     }
 
     public class GenreExtensions

@@ -34,6 +34,7 @@ namespace Tsundoku.Models
         TsundokuLanguage GetLanguage();
         bool DoesDuplicateExist(Series series);
         IReadOnlyList<Series> GetUserCollection();
+        int GetCurCollectionCount();
 
         ReadOnlyObservableCollection<TsundokuTheme> SavedThemes { get; }
 
@@ -170,6 +171,11 @@ namespace Tsundoku.Models
             RefreshSourceCache(loadedUser);
             _userSubject.OnNext(loadedUser);
             LOGGER.Info($"Finished Loading \"{loadedUser.UserName}'s\" Data!");
+        }
+
+        public int GetCurCollectionCount()
+        {
+            return _userCollectionSourceCache.Count;
         }
 
         private static void PreallocateSeriesImageBitmaps(SourceCache<Series, Guid> userCollection)

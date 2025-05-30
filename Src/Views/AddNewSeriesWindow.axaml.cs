@@ -72,7 +72,7 @@ namespace Tsundoku.Views
             DemographicCombobox.SelectedIndex = 4;
             VolumesRead.Text = string.Empty;
             Rating.Text = string.Empty;
-            ValueMaskedTextBox.Text = string.Empty;
+            CostMaskedTextBox.Text = string.Empty;
             CoverImageUrlTextBox.Text = string.Empty;
         }
 
@@ -88,7 +88,7 @@ namespace Tsundoku.Views
             string customImageUrl = CoverImageUrlTextBox.Text;
             _ = uint.TryParse(VolumesRead.Text.Replace("_", ""), out uint volumesRead);
             _ = decimal.TryParse(Rating.Text[..4].Replace("_", "0"), out decimal rating);
-            _ = decimal.TryParse(ValueMaskedTextBox.Text[1..].Replace("_", "0"), out decimal seriesValue);
+            _ = decimal.TryParse(CostMaskedTextBox.Text[1..].Replace("_", "0"), out decimal seriesValue);
             
             KeyValuePair<bool, string> validSeries = await ViewModel!.GetSeriesDataAsync(
                 TitleBox.Text.Trim(), 

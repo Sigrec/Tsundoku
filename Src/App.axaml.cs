@@ -85,7 +85,6 @@ namespace Tsundoku
         }
 
         // Configure your application's services for Dependency Injection
-        // TODO - If I change something about a series while filtering the filter doesn't reset basically after
         private static void ConfigureServices(IServiceCollection services)
         {
             // You can configure a specific named HttpClient if needed
