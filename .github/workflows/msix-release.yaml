@@ -48,57 +48,56 @@ jobs:
       # This step will always run, but the PowerShell logic inside will check for secrets.
       # If secrets are not found, it will stop the workflow.
       run: |
-        # Define a valid temp path for the .pfx file
-        $env:PFX_TEMP_PATH = "$env:TEMP\TsundokuPackage_TemporaryKey.pfx"
+        # Define the path to store the .pfx file
+        $env:PFX_TEMP_PATH = "$env:TEMP\code-signing-cert.pfx"
 
         if ("${{ secrets.PFX_BASE64 }}" -ne "" -and "${{ secrets.PFX_PASSWORD }}" -ne "") {
-            Write-Host "PFX secrets found. Restoring certificate."
-            
+            Write-Host "✅ PFX secrets found. Restoring certificate..."
+
             # Decode and write the certificate file
             [System.IO.File]::WriteAllBytes($env:PFX_TEMP_PATH, [System.Convert]::FromBase64String("${{ secrets.PFX_BASE64 }}"))
 
-            Write-Host "Certificate restored to $env:PFX_TEMP_PATH"
+            Write-Host "📄 Certificate restored to: $env:PFX_TEMP_PATH"
 
-            # Export environment variables for later steps
-            "PACKAGE_CERT_KEY_FILE=$env:PFX_TEMP_PATH" | Out-File -FilePath $env:GITHUB_ENV -Append
-            "PACKAGE_CERT_PASSWORD=${{ secrets.PFX_PASSWORD }}" | Out-File -FilePath $env:GITHUB_ENV -Append
+            # Set environment variables for future steps
+            "PACKAGE_CERT_KEY_FILE=$env:PFX_TEMP_PATH" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+            "PACKAGE_CERT_PASSWORD=${{ secrets.PFX_PASSWORD }}" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
         } else {
-            Write-Error "ERROR: PFX_BASE64 or PFX_PASSWORD secrets are missing or empty."
-            Write-Error "Signing certificate is mandatory for this workflow. Aborting."
+            Write-Error "❌ ERROR: PFX_BASE64 or PFX_PASSWORD secrets are missing or empty."
             exit 1
         }
       shell: pwsh
 
     - name: ✅ Verify Csproj Version Matches Tag
       run: |
-        $TAG_VERSION = "${{ github.event.inputs.tag }}"
-        Write-Host "Checking versions in $env:AVALONIA_PROJECT_PATH against tag version $TAG_VERSION"
+          $TAG_VERSION = "${{ github.event.inputs.tag }}".TrimStart("v")
+          Write-Host "Checking versions in $env:AVALONIA_PROJECT_PATH against tag version $TAG_VERSION"
 
-        $CSPROJ_CONTENT = Get-Content $env:AVALONIA_PROJECT_PATH -Raw
-        $CSPROJ_VERSION = [regex]::Match($CSPROJ_CONTENT, '(?<=<Version>)[^<]+').Value
-        $CSPROJ_FILE_VERSION = [regex]::Match($CSPROJ_CONTENT, '(?<=<FileVersion>)[^<]+').Value
-        $CSPROJ_ASSEMBLY_VERSION = [regex]::Match($CSPROJ_CONTENT, '(?<=<AssemblyVersion>)[^<]+').Value
+          $CSPROJ_CONTENT = Get-Content $env:AVALONIA_PROJECT_PATH -Raw
+          $CSPROJ_VERSION = [regex]::Match($CSPROJ_CONTENT, '(?<=<Version>)[^<]+').Value
+          $CSPROJ_FILE_VERSION = [regex]::Match($CSPROJ_CONTENT, '(?<=<FileVersion>)[^<]+').Value
+          $CSPROJ_ASSEMBLY_VERSION = [regex]::Match($CSPROJ_CONTENT, '(?<=<AssemblyVersion>)[^<]+').Value
 
-        Write-Host "Csproj versions: Version=$CSPROJ_VERSION, FileVersion=$CSPROJ_FILE_VERSION, AssemblyVersion=$CSPROJ_ASSEMBLY_VERSION"
+          Write-Host "Csproj versions: Version=$CSPROJ_VERSION, FileVersion=$CSPROJ_FILE_VERSION, AssemblyVersion=$CSPROJ_ASSEMBLY_VERSION"
 
-        $EXPECTED_ASSEMBLY_VERSION = "$TAG_VERSION.0"
+          $EXPECTED_ASSEMBLY_VERSION = "$TAG_VERSION.0"
 
-        if ($CSPROJ_VERSION -ne $TAG_VERSION) {
-          Write-Host "Error: Version tag ($TAG_VERSION) does NOT match <Version> ($CSPROJ_VERSION)"
+          if ($CSPROJ_VERSION -ne $TAG_VERSION) {
+          Write-Host "Error: Version tag (v$TAG_VERSION) does NOT match <Version> ($CSPROJ_VERSION)"
           exit 1
-        }
+          }
 
-        if ($CSPROJ_FILE_VERSION -ne $TAG_VERSION) {
-          Write-Host "Error: Version tag ($TAG_VERSION) does NOT match <FileVersion> ($CSPROJ_FILE_VERSION)"
+          if ($CSPROJ_FILE_VERSION -ne $TAG_VERSION) {
+          Write-Host "Error: Version tag (v$TAG_VERSION) does NOT match <FileVersion> ($CSPROJ_FILE_VERSION)"
           exit 1
-        }
+          }
 
-        if ($CSPROJ_ASSEMBLY_VERSION -ne $EXPECTED_ASSEMBLY_VERSION) {
-          Write-Host "Error: Version tag ($TAG_VERSION) does NOT match <AssemblyVersion> ($CSPROJ_ASSEMBLY_VERSION)"
+          if ($CSPROJ_ASSEMBLY_VERSION -ne $EXPECTED_ASSEMBLY_VERSION) {
+          Write-Host "Error: Version tag (v$TAG_VERSION) does NOT match <AssemblyVersion> ($CSPROJ_ASSEMBLY_VERSION)"
           exit 1
-        }
+          }
 
-        Write-Host "Version check passed."
+          Write-Host "✅ Version check passed."
       shell: pwsh
 
     - name: 🔧 Build and Package MSIX Bundle
