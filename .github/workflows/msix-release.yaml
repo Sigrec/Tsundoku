@@ -11,7 +11,7 @@ on:
 jobs:
   Build-And-Release:
     # MSIX packaging requires Windows tools
-    runs-on: windows-latest
+    runs-on: windows-2022
 
     env:
       # Define the path to your main Avalonia project for consistency
