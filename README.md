@@ -25,7 +25,7 @@ To report a issue please go to the issues link [Tsundoku Issues](https://github.
 Of course I understand if you do not trust me but I promise there is nothing malicious in the executable. The windows defender should turn off after the first time you run it but in case it does not here is a link to add an exclusion [Windows Security Exclusion](https://support.microsoft.com/en-us/windows/add-an-exclusion-to-windows-security-811816c0-4dfd-af4a-47e4-c301afe13b26)
 ***
 ### Here is one of my own custom themes, showcasing what the app looks like when run in Fullscreen (F11)
-![Tsundoku Example App](https://github.com/Sigrec/TsundokuApp/blob/main/Src/Assets/ThemeExample.jpg)
+![Tsundoku Example App](https://github.com/Sigrec/TsundokuApp/blob/main/Src/Assets/ThemeExample.png)
 ***
 
 ## Useful Links
