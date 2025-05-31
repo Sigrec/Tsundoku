@@ -48,17 +48,24 @@ jobs:
       # This step will always run, but the PowerShell logic inside will check for secrets.
       # If secrets are not found, it will stop the workflow.
       run: |
+        # Define a valid temp path for the .pfx file
+        $env:PFX_TEMP_PATH = "$env:TEMP\TsundokuPackage_TemporaryKey.pfx"
+
         if ("${{ secrets.PFX_BASE64 }}" -ne "" -and "${{ secrets.PFX_PASSWORD }}" -ne "") {
-          Write-Host "PFX secrets found. Restoring certificate."
-          [System.IO.File]::WriteAllBytes($env:PFX_TEMP_PATH, [System.Convert]::FromBase64String("${{ secrets.PFX_BASE64 }}"))
-          Write-Host "Certificate restored to $env:PFX_TEMP_PATH"
-          # Set environment variables that the next build step can use
-          echo "PACKAGE_CERT_KEY_FILE=$env:PFX_TEMP_PATH" | Out-File -FilePath $env:GITHUB_ENV -Append
-          echo "PACKAGE_CERT_PASSWORD=${{ secrets.PFX_PASSWORD }}" | Out-File -FilePath $env:GITHUB_ENV -Append
+            Write-Host "PFX secrets found. Restoring certificate."
+            
+            # Decode and write the certificate file
+            [System.IO.File]::WriteAllBytes($env:PFX_TEMP_PATH, [System.Convert]::FromBase64String("${{ secrets.PFX_BASE64 }}"))
+
+            Write-Host "Certificate restored to $env:PFX_TEMP_PATH"
+
+            # Export environment variables for later steps
+            "PACKAGE_CERT_KEY_FILE=$env:PFX_TEMP_PATH" | Out-File -FilePath $env:GITHUB_ENV -Append
+            "PACKAGE_CERT_PASSWORD=${{ secrets.PFX_PASSWORD }}" | Out-File -FilePath $env:GITHUB_ENV -Append
         } else {
-          Write-Error "ERROR: PFX_BASE64 or PFX_PASSWORD secrets are missing or empty."
-          Write-Error "Signing certificate is mandatory for this workflow. Aborting."
-          exit 1 # This command will stop the workflow immediately
+            Write-Error "ERROR: PFX_BASE64 or PFX_PASSWORD secrets are missing or empty."
+            Write-Error "Signing certificate is mandatory for this workflow. Aborting."
+            exit 1
         }
       shell: pwsh
 
