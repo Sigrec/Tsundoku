@@ -100,7 +100,7 @@ namespace Tsundoku.Views
             string themeName = ViewModel.CurrentTheme.ThemeName;
             TsundokuLanguage language = ViewModel.CurrentUser.Language;
             string filterSegment = (ViewModel.SelectedFilter != TsundokuFilter.None && ViewModel.SelectedFilter != TsundokuFilter.Query)
-                ? $"-{ViewModel.SelectedFilter.GetStringValue()}" // Assumes GetStringValue() exists for TsundokuFilter
+                ? $"-{ViewModel.SelectedFilter.GetEnumMemberValue()}"
                 : string.Empty;
 
             // Create the full base filename without extension
@@ -430,11 +430,7 @@ namespace Tsundoku.Views
             if (curSeries.CurVolumeCount < curSeries.MaxVolumeCount)
             {
                 curSeries.CurVolumeCount += 1;
-                // TextBlock volumeDisplay = (TextBlock)((Button)sender).GetLogicalSiblings().ElementAt(1);
-                // volumeDisplay.Text = curSeries.CurVolumeCount + "/" + curSeries.MaxVolumeCount;
                 LOGGER.Info("Added 1 Volume to {title}", curSeries.Titles[TsundokuLanguage.Romaji]);
-
-                (sender as Button).FindLogicalAncestorOfType<Grid>(false).FindLogicalDescendantOfType<ProgressBar>(false).Value = curSeries.CurVolumeCount;
             }
         }
 
@@ -447,12 +443,7 @@ namespace Tsundoku.Views
             if (curSeries.CurVolumeCount >= 1) //Only decrement if the user currently has 1 or more volumes
             {
                 curSeries.CurVolumeCount -= 1;
-                // TextBlock volumeDisplay = (TextBlock)((Button)sender).GetLogicalSiblings().ElementAt(1);
-                // string log = $"Removing 1 Volume From \"{curSeries.Titles[TsundokuLanguage.Romaji]}\" : {volumeDisplay.Text} -> ";
-                // volumeDisplay.Text = curSeries.CurVolumeCount + "/" + curSeries.MaxVolumeCount;
                 LOGGER.Info("Removed 1 Volume from {title}", curSeries.Titles[TsundokuLanguage.Romaji]);
-
-                (sender as Button).FindLogicalAncestorOfType<Grid>(false).FindLogicalDescendantOfType<ProgressBar>(false).Value = curSeries.CurVolumeCount;
             }
         }
     }

@@ -7,6 +7,7 @@ using MangaAndLightNovelWebScrape.Websites;
 using static Tsundoku.Models.TsundokuLanguageModel;
 using Tsundoku.Helpers;
 using System.Globalization;
+using DynamicData;
 namespace Tsundoku.ViewModels
 {
     public class UserSettingsViewModel : ViewModelBase
@@ -16,7 +17,7 @@ namespace Tsundoku.ViewModels
         [Reactive] public bool IndigoMember { get; set; }
         [Reactive] public bool BooksAMillionMember { get; set; }
         [Reactive] public bool KinokuniyaUSAMember { get; set; }
-        [Reactive] public string SelectedCurrency { get; set; }
+        [Reactive] public int SelectedCurrencyIndex { get; set; } = 0;
         public ICommand ExportToSpreadSheetAsyncCommand { get; }
         public UserSettingsViewModel(IUserService userService) : base(userService)
         {
@@ -26,7 +27,7 @@ namespace Tsundoku.ViewModels
                 .DistinctUntilChanged()
                 .Subscribe(currency =>
                 {
-                    SelectedCurrency = currency;
+                    SelectedCurrencyIndex = AVAILABLE_CURRENCY.IndexOf(currency);
                 });
 
             BooksAMillionMember = CurrentUser.Memberships[BooksAMillion.WEBSITE_TITLE];

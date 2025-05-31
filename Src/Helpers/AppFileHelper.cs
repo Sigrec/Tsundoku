@@ -1,6 +1,9 @@
 using Tsundoku.ViewModels;
 using Tsundoku.Models;
 using System.Text.Json.Nodes; // Assuming Tsundoku.Models contains User, Format, etc.
+#if RELEASE
+using Windows.Storage;
+#endif
 
 namespace Tsundoku.Helpers
 {
@@ -368,11 +371,11 @@ namespace Tsundoku.Helpers
             {
                 try
                 {
-                    FileAttributes attributes = File.GetAttributes(filePath);
-                    if ((attributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
+                    System.IO.FileAttributes attributes = File.GetAttributes(filePath);
+                    if ((attributes & System.IO.FileAttributes.ReadOnly) == System.IO.FileAttributes.ReadOnly)
                     {
                         // Remove ONLY the ReadOnly attribute, leave others (Hidden, Archive, etc.) intact
-                        File.SetAttributes(filePath, attributes & ~FileAttributes.ReadOnly);
+                        File.SetAttributes(filePath, attributes & ~System.IO.FileAttributes.ReadOnly);
                         LOGGER.Trace("Removed ReadOnly attribute from: {filePath}", filePath);
                     }
 

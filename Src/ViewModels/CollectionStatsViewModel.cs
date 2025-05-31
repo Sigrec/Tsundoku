@@ -1,4 +1,4 @@
-﻿﻿using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using LiveChartsCore;
 using System.Reactive.Linq;
 using ReactiveUI.Fody.Helpers;
@@ -113,13 +113,13 @@ namespace Tsundoku.ViewModels
         public Axis[] GenreXAxes { get; set; } = [];
         public Axis[] GenreYAxes { get; set; } = [];
 
-        [Reactive] public decimal MeanRating { get; set; }
-        [Reactive] public uint VolumesRead { get; set; }
-        [Reactive] public string CollectionPrice { get; set; }
         [Reactive] public uint SeriesCount { get; set; }
         [Reactive] public uint FavoriteCount { get; set; }
-        [Reactive] public uint UsersNumVolumesCollected { get; set; }
-        [Reactive] public uint UsersNumVolumesToBeCollected { get; set; }
+
+        [Reactive] public SolidColorBrush PaneBackgroundColor { get; set; }
+        [Reactive] public SolidColorBrush UnknownRectangleColor { get; set; }
+        [Reactive] public SolidColorBrush ManhuaRectangleColor { get; set; }
+        [Reactive] public SolidColorBrush ManfraRectangleColor { get; set; }
 
         public ReadOnlyObservableCollection<Series> UserCollection { get; }
         private readonly ISharedSeriesCollectionProvider _sharedSeriesProvider;
@@ -130,11 +130,111 @@ namespace Tsundoku.ViewModels
             _sharedSeriesProvider = sharedSeriesProvider ?? throw new ArgumentNullException(nameof(sharedSeriesProvider));
             UserCollection = _sharedSeriesProvider.DynamicUserCollection;
 
+            SetupStats();
             SetupPieCharts();
             SetupBarCharts();
+            UpdateStatsTheme();
+        }
 
+        private void UpdateStatsTheme()
+        {
+            this.WhenAnyValue(
+                x => x.CurrentTheme.MenuBGColor,
+                x => x.CurrentTheme.MenuButtonBGColor,
+                x => x.CurrentTheme.MenuTextColor,
+                x => x.CurrentTheme.DividerColor)
+            .DistinctUntilChanged()
+            .Subscribe(_ =>
+            {
+                UpdateRatingBarChartColors();
+                UpdateVolumeDistributionBarChartColors();
+                UpdateGenreBarChartColors();
+                UpdatePieChartColors();
+                UpdateBackgroundColors();
+                UpdateUnknownRectangleColor();
+                UpdateManhuaRectangleColor();
+            })
+            .DisposeWith(_disposables);
+
+            this.WhenAnyValue(
+                x => x.CurrentTheme.SeriesCardDescColor,
+                x => x.CurrentTheme.SeriesCardTitleColor)
+            .DistinctUntilChanged()
+            .Subscribe(_ =>
+            {
+                UpdatePieChartColors();
+                UpdateManhuaRectangleColor();
+                UpdateManfraRectangleColor();
+            })
+            .DisposeWith(_disposables);
+
+            this.WhenAnyValue(
+                x => x.CurrentTheme.SeriesCardBGColor)
+            .DistinctUntilChanged()
+            .Subscribe(_ =>
+            {
+                UpdateBackgroundColors();
+                UpdateUnknownRectangleColor();
+            })
+            .DisposeWith(_disposables);
+            
+            this.WhenAnyValue(
+                x => x.CurrentTheme.SeriesCardStaffColor,
+                x => x.CurrentTheme.SeriesEditPaneButtonsIconColor)
+            .DistinctUntilChanged()
+            .Subscribe(_ =>
+            {
+                UpdateManfraRectangleColor();
+            })
+            .DisposeWith(_disposables);
+        }
+
+        private void UpdateBackgroundColors()
+        {
+            PaneBackgroundColor = CurrentTheme.SeriesCardBGColor.Equals(CurrentTheme.MenuBGColor)
+                ? CurrentTheme.MenuButtonBGColor
+                : CurrentTheme.SeriesCardBGColor;
+        }
+
+        private SolidColorBrush GetUnknownColor()
+        {
+            return  CurrentTheme.SeriesCardDescColor.Color == CurrentTheme.MenuTextColor.Color
+                ? CurrentTheme.SeriesCardTitleColor
+                : CurrentTheme.SeriesCardDescColor;
+        }
+        private void UpdateUnknownRectangleColor()
+        {
+            UnknownRectangleColor = GetUnknownColor();
+        }
+
+        private SolidColorBrush GetManhwaColor()
+        {
+            return CurrentTheme.SeriesCardDescColor.Color == CurrentTheme.MenuTextColor.Color
+                ? CurrentTheme.SeriesCardTitleColor
+                : CurrentTheme.SeriesCardDescColor;
+        }
+        private void UpdateManhuaRectangleColor()
+        {
+            ManhuaRectangleColor = GetManhwaColor();
+        }
+
+        private SolidColorBrush GetManfraColor()
+        {
+            return CurrentTheme.SeriesCardStaffColor.Color == CurrentTheme.SeriesCardTitleColor.Color
+                ? CurrentTheme.SeriesEditPaneButtonsIconColor
+                : CurrentTheme.SeriesCardStaffColor;
+        }
+        private void UpdateManfraRectangleColor()
+        {
+            ManfraRectangleColor = GetManfraColor();
+        }
+
+#region Stats
+        private void SetupStats()
+        {
             _userService.UserCollectionChanges
-                .AutoRefresh(x => x.Rating) // react to Rating changes
+                .AutoRefresh(x => x.Rating)
+                .DistinctUntilChanged()
                 .ToCollection()
                 .Subscribe(seriesList =>
                 {
@@ -150,27 +250,36 @@ namespace Tsundoku.ViewModels
                         }
                     }
 
-                    MeanRating = count > 0 ? Math.Round(total / count, 1) : 0;
+                    _userService.UpdateUser(user => user.MeanRating = count > 0 ? Math.Round(total / count, 1) : 0);
                 });
 
             _userService.UserCollectionChanges
                 .AutoRefresh(x => x.VolumesRead)
+                .DistinctUntilChanged()
                 .ToCollection()
                 .Subscribe(seriesList =>
                 {
-                    VolumesRead = (uint)seriesList.Sum(x => x.VolumesRead);
+                    _userService.UpdateUser(user => user.VolumesRead = (uint)seriesList.Sum(x => x.VolumesRead));
                 });
 
-            _userService.UserCollectionChanges
-                .AutoRefresh(x => x.Value)
-                .ToCollection()
-                .Subscribe(seriesList =>
-                {
-                    decimal totalValue = seriesList.Sum(x => x.Value);
-                    CollectionPrice = $"{CurrentUser.Currency}{Math.Round(totalValue, 2)}";
-                });
+            Observable.CombineLatest(
+                _userService.UserCollectionChanges
+                    .AutoRefresh(x => x.Value)
+                    .AutoRefresh()
+                    .DistinctUntilChanged()
+                    .ToCollection(),
+                this.WhenAnyValue(x => x.CurrentUser.Currency),
+                (seriesList, currency) => new { seriesList, currency }
+            )
+            .Subscribe(result =>
+            {
+                decimal totalValue = result.seriesList.Sum(x => x.Value);
+                _userService.UpdateUser(user =>
+                    user.CollectionPrice = $"{result.currency}{Math.Round(totalValue, 2)}");
+            });
 
             _userService.UserCollectionChanges
+                .DistinctUntilChanged()
                 .ToCollection()
                 .Subscribe(seriesList =>
                 {
@@ -179,6 +288,7 @@ namespace Tsundoku.ViewModels
 
             _userService.UserCollectionChanges
                 .AutoRefresh(x => x.IsFavorite)
+                .DistinctUntilChanged()
                 .ToCollection()
                 .Subscribe(seriesList =>
                 {
@@ -188,6 +298,7 @@ namespace Tsundoku.ViewModels
             _userService.UserCollectionChanges
                 .AutoRefresh(x => x.CurVolumeCount)
                 .AutoRefresh(x => x.MaxVolumeCount)
+                .DistinctUntilChanged()
                 .ToCollection()
                 .Subscribe(seriesList =>
                 {
@@ -200,10 +311,14 @@ namespace Tsundoku.ViewModels
                         totalVolumesToBeCollected += (uint)(series.MaxVolumeCount - series.CurVolumeCount);
                     }
 
-                    UsersNumVolumesCollected = totalCurVolumes;
-                    UsersNumVolumesToBeCollected = totalVolumesToBeCollected;
+                    _userService.UpdateUser(user =>
+                    {
+                        user.NumVolumesCollected = totalCurVolumes;
+                        user.NumVolumesToBeCollected = totalVolumesToBeCollected;
+                    });
                 });
         }
+#endregion
 
 #region BarCharts
         private void SetupBarCharts()
@@ -213,19 +328,6 @@ namespace Tsundoku.ViewModels
             SetupRatingBarChart(behindBarPaint);
             SetupVolumeDistributionBarChart(behindBarPaint);
             SetupGenreBarChart();
-
-            this.WhenAnyValue(
-                x => x.CurrentTheme.MenuBGColor,
-                x => x.CurrentTheme.MenuButtonBGColor,
-                x => x.CurrentTheme.MenuTextColor,
-                x => x.CurrentTheme.DividerColor)
-            .Subscribe(_ =>
-            {
-                UpdateRatingBarChartColors();
-                UpdateVolumeDistributionBarChartColors();
-                UpdateGenreBarChartColors();
-            })
-            .DisposeWith(_disposables);
         }
 
         private static ColumnSeries<ObservableValue> CreateColumnSeries( ObservableCollection<ObservableValue> values, bool isHoverable = false, double dataLabelsSize = 0, bool ignoresBarPosition = true)
@@ -748,56 +850,24 @@ namespace Tsundoku.ViewModels
             SetupDemographicPieChart(initialUserCollectionCount);
             SetupStatusPieChart(initialUserCollectionCount);
             SetupFormatPieChart(initialUserCollectionCount);
-
-            this.WhenAnyValue(
-                x => x.CurrentTheme.MenuBGColor,
-                x => x.CurrentTheme.MenuButtonBGColor,
-                x => x.CurrentTheme.MenuTextColor,
-                x => x.CurrentTheme.DividerColor,
-                x => x.CurrentTheme.SeriesCardDescColor,
-                x => x.CurrentTheme.SeriesCardTitleColor)
-            .Subscribe(_ => UpdatePieChartColors())
-            .DisposeWith(_disposables);
         }
 
-        private static PieSeries<ObservableValue> CreatePieSeries(ObservableValue countValue, string name, SolidColorBrush fillBrush, SolidColorBrush strokeBrush)
+        private static PieSeries<ObservableValue> CreatePieSeries(ObservableValue countValue, string name)
         {
-            // Convert Avalonia.Media.Color to SkiaSharp.SKColor for Fill
-            SKColor skFillColor = new SKColor(
-                fillBrush.Color.R,
-                fillBrush.Color.G,
-                fillBrush.Color.B,
-                fillBrush.Color.A);
-
-            SKColor skStrokeColor = new SKColor(
-                strokeBrush.Color.R,
-                strokeBrush.Color.G,
-                strokeBrush.Color.B,
-                strokeBrush.Color.A);
-
             return new PieSeries<ObservableValue>
             {
                 Values = new ObservableCollection<ObservableValue> { countValue },
                 Name = name,
-                Fill = new SolidColorPaint(skFillColor),   // Uses SkiaSharp.SKColor
-                Stroke = new SolidColorPaint(skStrokeColor) // Uses SkiaSharp.SKColor
             };
-        }
-
-        private SolidColorBrush GetConditionalFillBrush()
-        {
-            return CurrentTheme.SeriesCardDescColor.Color == CurrentTheme.MenuTextColor.Color ?
-                CurrentTheme.SeriesCardTitleColor :
-                CurrentTheme.SeriesCardDescColor;
         }
 
         private void SetupDemographicPieChart(int initialUserCollectionCount)
         {
-            Demographics.Add(CreatePieSeries(ShounenCount, "Shounen", CurrentTheme.MenuBGColor, CurrentTheme.DividerColor));
-            Demographics.Add(CreatePieSeries(SeinenCount, "Seinen", CurrentTheme.MenuButtonBGColor, CurrentTheme.DividerColor));
-            Demographics.Add(CreatePieSeries(ShoujoCount, "Shoujo", CurrentTheme.MenuTextColor, CurrentTheme.DividerColor));
-            Demographics.Add(CreatePieSeries(JoseiCount, "Josei", CurrentTheme.DividerColor, CurrentTheme.DividerColor));
-            Demographics.Add(CreatePieSeries(UnknownCount, "Unknown", GetConditionalFillBrush(), CurrentTheme.DividerColor));
+            Demographics.Add(CreatePieSeries(ShounenCount, "Shounen"));
+            Demographics.Add(CreatePieSeries(SeinenCount, "Seinen"));
+            Demographics.Add(CreatePieSeries(ShoujoCount, "Shoujo"));
+            Demographics.Add(CreatePieSeries(JoseiCount, "Josei"));
+            Demographics.Add(CreatePieSeries(UnknownCount, "Unknown"));
 
             _userService.UserCollectionChanges
                 .AutoRefresh(x => x.Demographic) // detect property changes
@@ -854,26 +924,10 @@ namespace Tsundoku.ViewModels
 
         private void SetupStatusPieChart(int initialUserCollectionCount)
         {
-            StatusDistribution.Add(new PieSeries<ObservableValue>
-            {
-                Values = new ObservableCollection<ObservableValue> { OngoingCount },
-                Name = "Ongoing"
-            });
-            StatusDistribution.Add(new PieSeries<ObservableValue>
-            {
-                Values = new ObservableCollection<ObservableValue> { FinishedCount },
-                Name = "Finished"
-            });
-            StatusDistribution.Add(new PieSeries<ObservableValue>
-            {
-                Values = new ObservableCollection<ObservableValue> { CancelledCount },
-                Name = "Cancelled"
-            });
-            StatusDistribution.Add(new PieSeries<ObservableValue>
-            {
-                Values = new ObservableCollection<ObservableValue> { HiatusCount },
-                Name = "Hiatus"
-            });
+            StatusDistribution.Add(CreatePieSeries(OngoingCount, "Ongoing"));
+            StatusDistribution.Add(CreatePieSeries(FinishedCount, "Finished"));
+            StatusDistribution.Add(CreatePieSeries(CancelledCount, "Cancelled"));
+            StatusDistribution.Add(CreatePieSeries(HiatusCount, "Josei"));
 
             _userService.UserCollectionChanges
                 .AutoRefresh(x => x.Status) // detect property changes
@@ -925,37 +979,13 @@ namespace Tsundoku.ViewModels
 
         private void SetupFormatPieChart(int initialUserCollectionCount)
         {
-            Formats.Add(new PieSeries<ObservableValue>
-            {
-                Values = new ObservableCollection<ObservableValue> { MangaCount },
-                Name = "Manga"
-            });
-            Formats.Add(new PieSeries<ObservableValue>
-            {
-                Values = new ObservableCollection<ObservableValue> { ManhwaCount },
-                Name = "Manhwa"
-            });
-            Formats.Add(new PieSeries<ObservableValue>
-            {
-                Values = new ObservableCollection<ObservableValue> { ManhuaCount },
-                Name = "Manhua"
-            });
-            Formats.Add(new PieSeries<ObservableValue>
-            {
-                Values = new ObservableCollection<ObservableValue> { ManfraCount },
-                Name = "Manfra"
-            });
-            Formats.Add(new PieSeries<ObservableValue>
-            {
-                Values = new ObservableCollection<ObservableValue> { ComicCount },
-                Name = "Comic"
-            });
-            Formats.Add(new PieSeries<ObservableValue>
-            {
-                Values = new ObservableCollection<ObservableValue> { NovelCount },
-                Name = "Novel"
-            });
-
+            Formats.Add(CreatePieSeries(MangaCount, "Manga"));
+            Formats.Add(CreatePieSeries(ManhwaCount, "Manhwa"));
+            Formats.Add(CreatePieSeries(NovelCount, "Novel"));
+            Formats.Add(CreatePieSeries(ComicCount, "Comic"));
+            Formats.Add(CreatePieSeries(ManhuaCount, "Manhua"));
+            Formats.Add(CreatePieSeries(ManfraCount, "Manfra"));
+            
             _userService.UserCollectionChanges
                 .AutoRefresh(x => x.Format) // detect property changes
                 .Group(user => user.Format)
@@ -1039,7 +1069,7 @@ namespace Tsundoku.ViewModels
             }
             if (Demographics.Count > 4 && Demographics[4] is PieSeries<ObservableValue> unknown)
             {
-                unknown.Fill = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(GetConditionalFillBrush())); // Use helper
+                unknown.Fill = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(GetUnknownColor())); // Use helper
                 unknown.Stroke = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
             }
 
@@ -1068,32 +1098,32 @@ namespace Tsundoku.ViewModels
             // --- Update Format Pie Chart Series ---
             if (Formats.Count > 0 && Formats[0] is PieSeries<ObservableValue> manga)
             {
-                manga.Fill = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.MenuBGColor));
+                manga.Fill = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.MenuButtonBGColor));
                 manga.Stroke = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
             }
             if (Formats.Count > 1 && Formats[1] is PieSeries<ObservableValue> manhwa)
             {
-                manhwa.Fill = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.MenuButtonBGColor));
+                manhwa.Fill = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.MenuBGColor));
                 manhwa.Stroke = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
             }
-            if (Formats.Count > 2 && Formats[2] is PieSeries<ObservableValue> manhua)
+            if (Formats.Count > 2 && Formats[2] is PieSeries<ObservableValue> novel)
             {
-                manhua.Fill = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.MenuTextColor));
-                manhua.Stroke = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
-            }
-            if (Formats.Count > 3 && Formats[3] is PieSeries<ObservableValue> novel)
-            {
-                novel.Fill = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
+                novel.Fill = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.MenuTextColor));
                 novel.Stroke = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
             }
-            if (Formats.Count > 4 && Formats[4] is PieSeries<ObservableValue> comic)
+            if (Formats.Count > 3 && Formats[3] is PieSeries<ObservableValue> comic)
             {
-                comic.Fill = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(GetConditionalFillBrush()));
+                comic.Fill = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
                 comic.Stroke = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
+            }
+            if (Formats.Count > 4 && Formats[4] is PieSeries<ObservableValue> manhua)
+            {
+                manhua.Fill = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(GetManhwaColor()));
+                manhua.Stroke = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
             }
             if (Formats.Count > 5 && Formats[5] is PieSeries<ObservableValue> manfra)
             {
-                manfra.Fill = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(GetConditionalFillBrush()));
+                manfra.Fill = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(GetManfraColor()));
                 manfra.Stroke = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
             }
         }

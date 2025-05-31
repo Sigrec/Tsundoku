@@ -58,6 +58,7 @@
                               SelectionChanged="CurrencyChanged"
                               Theme="{StaticResource MenuComboBox}"
                               HorizontalAlignment="Left"
+                              SelectedIndex="{CompiledBinding SelectedCurrencyIndex}"
 							  Width="80"
                               AutoScrollToSelectedItem="True">
 						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="$"/>

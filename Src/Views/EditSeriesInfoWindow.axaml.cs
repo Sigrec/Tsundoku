@@ -15,14 +15,12 @@ public partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfoViewMod
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
     private readonly BitmapHelper _bitmapHelper;
     private readonly MainWindowViewModel _mainWindowViewModel;
-    private readonly CollectionStatsViewModel _collectionStatsViewModel;
     private bool _IsInitialized = false;
 
     public EditSeriesInfoWindow(MainWindowViewModel mainWindowViewModel, CollectionStatsViewModel collectionStatsViewModel, BitmapHelper bitmapHelper)
     {
         _bitmapHelper = bitmapHelper;
         _mainWindowViewModel = mainWindowViewModel;
-        _collectionStatsViewModel = collectionStatsViewModel;
         InitializeComponent();
 
         Opened += (s, e) =>
@@ -58,11 +56,13 @@ public partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfoViewMod
     {
         string customImageUrl = CoverImageUrlTextBox.Text.Trim();
         string fullCoverPath = AppFileHelper.GetFullCoverPath(ViewModel.Series.Cover);
-        Bitmap newCover = await _bitmapHelper.GenerateAvaloniaBitmapAsync(fullCoverPath, string.Empty, customImageUrl, true);
+        Bitmap? newCover = await _bitmapHelper.UpdateCoverFromUrlAsync(customImageUrl, fullCoverPath);
 
-        GenerateNewBitmap(newCover, customImageUrl);
-
-        CoverImageUrlTextBox.Clear();
+        if (newCover != null)
+        {
+            GenerateNewBitmap(newCover, customImageUrl);
+            CoverImageUrlTextBox.Clear();
+        }
     }
 
     private async void ChangeSeriesCoverFromFileAsync(object sender, RoutedEventArgs args)
@@ -77,8 +77,11 @@ public partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfoViewMod
         if (file.Count == 1)
         {
             string fullCoverPath = AppFileHelper.GetFullCoverPath(ViewModel.Series.Cover);
-            Bitmap newCover = await _bitmapHelper.GenerateAvaloniaBitmapAsync(fullCoverPath, file[0].Path.LocalPath);
-            GenerateNewBitmap(newCover, fullCoverPath);
+            Bitmap? newCover = await BitmapHelper.UpdateCoverFromFilePathAsync(file[0].Path.LocalPath, fullCoverPath);
+            if (newCover != null)
+            {
+                GenerateNewBitmap(newCover, fullCoverPath);
+            }
         }
         else
         {

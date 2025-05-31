@@ -13,125 +13,171 @@ namespace Tsundoku.Helpers
             _httpClientFactory = httpClientFactory;
         }
 
-        // TODO - Split this function into multiple so one to update cover from a new path, another to update cover from a url
         /// <summary>
-        /// Downloads an image from a URL if it's a customImage or the new path does not exist,
-        /// and saves it as a PNG Avalonia Bitmap to a local path.
+        /// Updates the cover image from a local file path. It loads the existing image,
+        /// scales it if necessary, and saves it to the specified destination path.
         /// </summary>
-        /// <param name="newPath">The path to save the image file in the "Covers" directory on the user's machine.</param>
-        /// <param name="httpClient">The HttpClient instance to use for downloading images.</param>
-        /// <param name="coverLink">Original image URL from an API call (fallback).</param>
-        /// <param name="isCustomImage">Web image URL provided by the user (takes precedence).</param>
+        /// <param name="sourceFilePath">The existing local path to the image file.</param>
+        /// <param name="destinationCoverPath">The path where the (potentially scaled) image should be saved (e.g., in the "Covers" directory).</param>
         /// <returns>The generated and scaled Avalonia Bitmap, or null if any operation fails.</returns>
-        public async Task<Bitmap?> GenerateAvaloniaBitmapAsync(
-            string coverPath,
-            string newPath = "",
-            string coverLink = "",
-            bool isCustomImageUrl = false)
+        public static async Task<Bitmap?> UpdateCoverFromFilePathAsync(string sourceFilePath, string destinationCoverPath)
         {
-            if ((isCustomImageUrl && !string.IsNullOrWhiteSpace(coverLink)) || !File.Exists(coverPath))
+            if (string.IsNullOrWhiteSpace(sourceFilePath) || !File.Exists(sourceFilePath))
             {
-                Uri? imageUri = null;
+                LOGGER.Error("Provided source file path is null/empty or does not exist: {SourceFilePath}", sourceFilePath);
+                return null;
+            }
 
-                // Only try coverLink if custom failed or was not provided
-                if (imageUri == null && !string.IsNullOrWhiteSpace(coverLink))
+            try
+            {
+                LOGGER.Debug("Attempting to load image from local path: {SourceFilePath}", sourceFilePath);
+                // Avalonia Bitmap constructor can load directly from a file path
+                return await Task.Run(() =>
                 {
-                    if (Uri.TryCreate(coverLink, UriKind.Absolute, out Uri coverUri) &&
-                        (coverUri.Scheme == Uri.UriSchemeHttp || coverUri.Scheme == Uri.UriSchemeHttps))
+                    using (var loadedBitmap = new Bitmap(sourceFilePath))
                     {
-                        imageUri = coverUri;
-                        LOGGER.Debug("Using Image Link for Cover {CoverLink}", coverLink);
+                        LOGGER.Debug("Image loaded from local path. Dimensions: {Width}x{Height}", loadedBitmap.PixelSize.Width, loadedBitmap.PixelSize.Height);
+                        // ProcessAndSaveBitmap is synchronous, so it runs within this Task.Run context
+                        return ProcessAndSaveBitmap(loadedBitmap, destinationCoverPath, sourceFilePath);
                     }
-                    else
-                    {
-                        LOGGER.Warn("Cover link '{CoverLink}' is not a valid absolute URI or has an unsupported scheme. Cannot download image.", coverLink);
-                    }
-                }
+                });
+            }
+            catch (ArgumentException argEx)
+            {
+                LOGGER.Error(argEx, "Invalid image format detected when loading from local path: {SourceFilePath}.", sourceFilePath);
+                return null;
+            }
+            catch (Exception ex)
+            {
+                LOGGER.Error(ex, "Failed to load or process image from local path: {SourceFilePath}.", sourceFilePath);
+                return null;
+            }
+        }
 
-                if (imageUri == null)
-                {
-                    LOGGER.Error("No valid image URL could be resolved from coverLink ('{CoverLink}').", coverLink);
-                    return null; // No valid URL to download from
-                }
-                else
-                {
-                    LOGGER.Debug("Attempting to download image from: {ResolvedImageUrl}", imageUri.OriginalString);
-                }
+        /// <summary>
+        /// Downloads an image from a URL, processes it, and saves it as a PNG Avalonia Bitmap
+        /// to a local path.
+        /// </summary>
+        /// <param name="imageUrl">The URL of the image to download.</param>
+        /// <param name="destinationCoverPath">The path to save the image file in the "Covers" directory on the user's machine.</param>
+        /// <returns>The generated and scaled Avalonia Bitmap, or null if any operation fails.</returns>
+        public async Task<Bitmap?> UpdateCoverFromUrlAsync(string imageUrl, string destinationCoverPath)
+        {
+            if (string.IsNullOrWhiteSpace(imageUrl))
+            {
+                LOGGER.Error("Provided image URL is null or empty.");
+                return null;
+            }
 
-                byte[] imageByteArray;
-                try
-                {
-                    // Create HttpClient instance internally using the injected factory
-                    // Using the named client 'AddCoverClient' as configured in Program.cs
-                    using (HttpClient httpClient = _httpClientFactory.CreateClient("AddCoverClient"))
-                    {
-                        imageByteArray = await httpClient.GetByteArrayAsync(imageUri);
-                    }
-                    LOGGER.Info("Successfully downloaded image from {ResolvedImageUrl}. Size: {Size} bytes.", imageUri.OriginalString, imageByteArray.Length);
-                }
-                catch (HttpRequestException httpEx)
-                {
-                    LOGGER.Error(httpEx, "HTTP error downloading image from {ResolvedImageUrl}. Status: {HttpStatus}", imageUri.OriginalString, httpEx.StatusCode);
-                    return null;
-                }
-                catch (Exception ex)
-                {
-                    LOGGER.Error(ex, "Failed to download image from {ResolvedImageUrl}.", imageUri.OriginalString);
-                    return null;
-                }
+            if (!Uri.TryCreate(imageUrl, UriKind.Absolute, out Uri? imageUri) ||
+                (imageUri.Scheme != Uri.UriSchemeHttp && imageUri.Scheme != Uri.UriSchemeHttps))
+            {
+                LOGGER.Warn("Cover URL '{ImageUrl}' is not a valid absolute URI or has an unsupported scheme. Cannot download image.", imageUrl);
+                return null;
+            }
 
-                Bitmap? originalBitmap = null;
-                try
+            LOGGER.Debug("Attempting to download image from: {ResolvedImageUrl}", imageUri.OriginalString);
+            byte[] imageByteArray;
+            try
+            {
+                // Use the named HttpClient client from the factory for specific configurations
+                using (HttpClient httpClient = _httpClientFactory.CreateClient("AddCoverClient"))
                 {
-                    // 3. Create Bitmap from bytes and scale
+                    imageByteArray = await httpClient.GetByteArrayAsync(imageUri);
+                }
+                LOGGER.Info("Successfully downloaded image from {ResolvedImageUrl}. Size: {Size} bytes.", imageUri.OriginalString, imageByteArray.Length);
+            }
+            catch (HttpRequestException httpEx)
+            {
+                LOGGER.Error(httpEx, "HTTP error downloading image from {ResolvedImageUrl}. Status: {HttpStatus}", imageUri.OriginalString, httpEx.StatusCode);
+                return null;
+            }
+            catch (Exception ex)
+            {
+                LOGGER.Error(ex, "Failed to download image from {ResolvedImageUrl}.", imageUri.OriginalString);
+                return null;
+            }
+
+            Bitmap? originalBitmap = null;
+            try
+            {
+                return await Task.Run(() =>
+                {
                     using (var imageStream = new MemoryStream(imageByteArray))
                     {
                         originalBitmap = new Bitmap(imageStream);
                     }
                     LOGGER.Debug("Original bitmap created from downloaded data. Dimensions: {Width}x{Height}", originalBitmap.PixelSize.Width, originalBitmap.PixelSize.Height);
+                    return ProcessAndSaveBitmap(originalBitmap, destinationCoverPath, imageUri.OriginalString);
+                });
+            }
+            catch (ArgumentException argEx)
+            {
+                LOGGER.Error(argEx, "Invalid image format detected when creating bitmap from downloaded data from {ResolvedImageUrl}.", imageUri.OriginalString);
+                return null;
+            }
+            catch (Exception ex)
+            {
+                LOGGER.Error(ex, "Error processing or saving image downloaded from {ResolvedImageUrl} to {NewPath}.", imageUri.OriginalString, destinationCoverPath);
+                return null;
+            }
+            finally
+            {
+                // Ensure originalBitmap is disposed if it was created here
+                originalBitmap?.Dispose();
+                LOGGER.Debug("Original bitmap (if created) disposed.");
+            }
+        }
 
-                    Bitmap newCover = originalBitmap.CreateScaledBitmap(
+        /// <summary>
+        /// Private helper method to scale an Avalonia Bitmap to a standard size and save it as a PNG.
+        /// </summary>
+        /// <param name="originalBitmap">The bitmap to process and save.</param>
+        /// <param name="savePath">The path where the scaled image should be saved.</param>
+        /// <param name="sourceIdentifier">A string identifying the source (e.g., file path or URL) for logging purposes.</param>
+        /// <returns>The generated and scaled Avalonia Bitmap, or null if scaling or saving fails.</returns>
+        private static Bitmap? ProcessAndSaveBitmap(Bitmap originalBitmap, string savePath, string sourceIdentifier)
+        {
+            Bitmap? scaledBitmap = null;
+            try
+            {
+                if (originalBitmap.PixelSize.Width != LEFT_SIDE_CARD_WIDTH || originalBitmap.PixelSize.Height != IMAGE_HEIGHT)
+                {
+                    LOGGER.Debug("Scaling bitmap from {Width}x{Height} to {TargetWidth}x{TargetHeight} for {Source}.",
+                        originalBitmap.PixelSize.Width, originalBitmap.PixelSize.Height,
+                        LEFT_SIDE_CARD_WIDTH, IMAGE_HEIGHT,
+                        sourceIdentifier);
+
+                    scaledBitmap = originalBitmap.CreateScaledBitmap(
                         new PixelSize(LEFT_SIDE_CARD_WIDTH, IMAGE_HEIGHT),
                         BitmapInterpolationMode.HighQuality);
+                }
+                else
+                {
+                    LOGGER.Debug("Bitmap already at target size for {Source}. No scaling needed.", sourceIdentifier);
+                    scaledBitmap = originalBitmap; // Use original if no scaling needed
+                }
 
-                    // 4. Save the scaled bitmap to file
-                    newCover.Save(coverPath, 100);
-                    LOGGER.Debug("Saved Image File from Url to {file}", coverPath);
+                // Ensure the directory exists
+                string? directory = Path.GetDirectoryName(savePath);
+                if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                    LOGGER.Debug("Created directory: {DirectoryPath}", directory);
+                }
 
-                    // 5. Return the newly created Bitmap
-                    return newCover;
-                }
-                catch (ArgumentException argEx)
-                {
-                    LOGGER.Error(argEx, "Invalid image format detected when creating bitmap from downloaded data from {ResolvedImageUrl}.", imageUri.OriginalString);
-                    return null;
-                }
-                catch (Exception ex)
-                {
-                    LOGGER.Error(ex, "Error processing or saving image downloaded from {ResolvedImageUrl} to {NewPath}.", imageUri.OriginalString, coverPath);
-                    return null;
-                }
-                finally
-                {
-                    // Ensure originalBitmap is disposed to free unmanaged resources
-                    originalBitmap?.Dispose();
-                    LOGGER.Debug("Original bitmap (if created) disposed.");
-                }
+                // Save the bitmap (whether scaled or original)
+                // Avalonia Bitmap.Save handles various image formats; 100 usually means best quality for PNG.
+                scaledBitmap.Save(savePath, 100);
+                LOGGER.Info("Successfully saved cover image to: {SavePath} from {Source}.", savePath, sourceIdentifier);
+
+                return scaledBitmap;
             }
-            else
+            catch (Exception ex)
             {
-                LOGGER.Debug("Saving Image File from Path {file}", newPath);
-                Bitmap loadedBitmap = new Bitmap(string.IsNullOrWhiteSpace(newPath) ? coverPath : newPath);
-                if (loadedBitmap.Size.Width != LEFT_SIDE_CARD_WIDTH || loadedBitmap.Size.Height != IMAGE_HEIGHT)
-                {
-                    Bitmap scaledBitmap = loadedBitmap.CreateScaledBitmap(new PixelSize(LEFT_SIDE_CARD_WIDTH, IMAGE_HEIGHT), BitmapInterpolationMode.HighQuality);
-                    scaledBitmap.Save(coverPath, 100);
-                    loadedBitmap.Dispose();
-                    return scaledBitmap;
-                }
-
-                loadedBitmap.Save(coverPath, 100);
-                return loadedBitmap;
+                LOGGER.Error(ex, "Failed to scale or save bitmap from {SourceIdentifier} to {SavePath}.", sourceIdentifier, savePath);
+                scaledBitmap?.Dispose(); // Dispose if creation or save failed
+                return null;
             }
         }
 

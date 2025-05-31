@@ -25,29 +25,30 @@
 	<Border Classes="Menu" BorderThickness="3" CornerRadius="0,0,8,8" ClipToBounds="True">
 		<ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Theme="{StaticResource ReverseCollectionScroll}"> 
 			<Grid RowDefinitions="Auto,Auto,Auto,20,Auto,20,Auto" ColumnDefinitions="*" Margin="20" VerticalAlignment="Center" HorizontalAlignment="Center">
-				<Border Name="StatsBG" Grid.Row="0" Grid.RowSpan="3" Grid.Column="0" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" Height="230" BoxShadow="0 0 10 3 #B3000000" HorizontalAlignment="Center">
+				<Border Name="StatsBG" Grid.Row="0" Grid.RowSpan="3" Grid.Column="0" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" Height="230" BoxShadow="0 0 10 3 #B3000000" HorizontalAlignment="Center" Background="{CompiledBinding PaneBackgroundColor}">
                     <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="Auto" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10">
                         <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0" Margin="0,0,0,0" MaxWidth="626" HorizontalAlignment="Center">
-                            <controls:ValueStat Text="{CompiledBinding MeanRating}" Title="Mean Score" Icon="fa-solid fa-gauge-simple" PointerPressed="CopyTextAsync"/>
-                            <controls:ValueStat Text="{CompiledBinding VolumesRead}" Title="Volumes Read" Icon="fa-solid fa-book-open-reader" PointerPressed="CopyTextAsync"/>
+                            <controls:ValueStat Text="{CompiledBinding CurrentUser.MeanRating}" Title="Mean Score" Icon="fa-solid fa-gauge-simple" PointerPressed="CopyTextAsync"/>
+                            <controls:ValueStat Text="{CompiledBinding CurrentUser.VolumesRead}" Title="Volumes Read" Icon="fa-solid fa-book-open-reader" PointerPressed="CopyTextAsync"/>
                             <controls:ValueStat Text="{CompiledBinding SeriesCount}" Title="Series Count" Icon="fa-solid fa-globe" PointerPressed="CopyTextAsync"/>
                         </StackPanel>
                         <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Center">
-                            <controls:ValueStat Text="{CompiledBinding UsersNumVolumesCollected}" Width="240" Title="Volumes Collected" Icon="fa-solid fa-bookmark" PointerPressed="CopyTextAsync"/>
-                            <controls:ValueStat Width="240" Text="{CompiledBinding UsersNumVolumesToBeCollected}" Title="Volumes To Be Collected" Icon="fa-regular fa-bookmark" PointerPressed="CopyTextAsync"/>
+                            <controls:ValueStat Text="{CompiledBinding CurrentUser.NumVolumesCollected}" Width="240" Title="Volumes Collected" Icon="fa-solid fa-bookmark" PointerPressed="CopyTextAsync"/>
+                            <controls:ValueStat Width="240" Text="{CompiledBinding CurrentUser.NumVolumesToBeCollected}" Title="Volumes To Be Collected" Icon="fa-regular fa-bookmark" PointerPressed="CopyTextAsync"/>
                         </StackPanel>
-                        <controls:ValueStat Grid.Row="2" Grid.Column="0" HorizontalAlignment="Center" Text="{CompiledBinding CollectionPrice}" Title="Collection Value" Icon="fa-solid fa-sack-dollar" PointerPressed="CopyTextAsync"/>
+                        <controls:ValueStat Grid.Row="2" Grid.Column="0" HorizontalAlignment="Center" Text="{CompiledBinding CurrentUser.CollectionPrice}" Title="Collection Value" Icon="fa-solid fa-sack-dollar" PointerPressed="CopyTextAsync"/>
                     </Grid>
                 </Border>
+
                 <!-- Pie Charts -->
-                <Border Name="DistBGOne" Grid.Row="4" Grid.Column="0" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" HorizontalAlignment="Center">
+                <Border Name="DistBGOne" Grid.Row="4" Grid.Column="0" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" HorizontalAlignment="Center" Background="{CompiledBinding PaneBackgroundColor}">
                     <WrapPanel Margin="10">
                         <!-- Demographic Pie chart -->
                         <Border Background="{CompiledBinding CurrentTheme.CollectionBGColor}" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" Width="570" Height="300" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10">
                             <Border CornerRadius="8" ClipToBounds="True">
                                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="3">
                                     <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="10" Margin="0,0,20,0">
-                                        <TextBlock  Grid.Row="0" Grid.Column="0" Text="Demographic" FontSize="22" FontWeight="Bold" Classes="Menu" HorizontalAlignment="Center" Margin="0"/>
+                                        <TextBlock  Grid.Row="0" Grid.Column="0" Text="Demographic" FontSize="23" FontWeight="Bold" Classes="Menu" HorizontalAlignment="Center" Margin="0,0,0,2"/>
                                         <Grid RowDefinitions="*,3,*,3,*,3,*,3,*" ColumnDefinitions="Auto,3,Auto" HorizontalAlignment="Center" VerticalAlignment="Center" ShowGridLines="false">
                                             <Border Grid.Row="0" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="24" Height="24">
                                                 <Rectangle Fill="{CompiledBinding CurrentTheme.MenuBGColor}" ClipToBounds="True" Width="18" Height="18"/>
@@ -102,7 +103,7 @@
                                                 </TextBlock>
                                             </Border>
                                             <Border Grid.Row="8" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="24" Height="24">
-                                                <Rectangle Name="UnknownRectangle" ClipToBounds="True" Width="18" Height="18"/>
+                                                <Rectangle Name="UnknownRectangle" ClipToBounds="True" Width="18" Height="18" Fill="{CompiledBinding UnknownRectangleColor}"/>
                                             </Border>
                                             <Border Grid.Row="8" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="165" Height="24">
                                                 <TextBlock Background="{CompiledBinding CurrentTheme.MenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
@@ -126,7 +127,7 @@
                             <Border CornerRadius="8" ClipToBounds="True">
                                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="3">
                                     <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="10" Margin="0,0,20,0">
-                                        <TextBlock Text="Status" FontSize="22" FontWeight="Bold" Classes="Menu" HorizontalAlignment="Center" Margin="0"/>
+                                        <TextBlock Text="Status" FontSize="23" FontWeight="Bold" Classes="Menu" HorizontalAlignment="Center" Margin="0,0,0,2"/>
                                         <Grid RowDefinitions="*,3,*,3,*,3,*" ColumnDefinitions="Auto,3,Auto" HorizontalAlignment="Center" VerticalAlignment="Center" ShowGridLines="false">
                                             <Border Grid.Row="0" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="24" Height="24">
                                                 <Rectangle Fill="{CompiledBinding CurrentTheme.MenuButtonBGColor}" ClipToBounds="True" Width="18" Height="18"/>
@@ -192,10 +193,10 @@
                             <Border CornerRadius="8" ClipToBounds="True">
                                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="3">
                                     <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="10" Margin="0,0,20,0">
-                                        <TextBlock Text="Format" FontSize="22" FontWeight="Bold" Classes="Menu" HorizontalAlignment="Center" Margin="0"/>
+                                        <TextBlock Text="Format" FontSize="23" FontWeight="Bold" Classes="Menu" HorizontalAlignment="Center" Margin="0,0,0,2"/>
                                         <Grid RowDefinitions="*,3,*,3,*,3,*,3,*,3,*" ColumnDefinitions="Auto,3,Auto" HorizontalAlignment="Center" VerticalAlignment="Center" ShowGridLines="false">
                                             <Border Grid.Row="0" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="24" Height="24">
-                                                <Rectangle Fill="{CompiledBinding CurrentTheme.MenuBGColor}" ClipToBounds="True" Width="18" Height="18"/>
+                                                <Rectangle Fill="{CompiledBinding CurrentTheme.MenuButtonBGColor}" ClipToBounds="True" Width="18" Height="18"/>
                                             </Border>
                                             <Border Grid.Row="0" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="165" Height="24" OpacityMask="White">
                                                 <TextBlock Background="{CompiledBinding CurrentTheme.MenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
@@ -208,7 +209,7 @@
                                                 </TextBlock>
                                             </Border>
                                             <Border Grid.Row="2" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="24" Height="24">
-                                                <Rectangle Fill="{CompiledBinding CurrentTheme.MenuButtonBGColor}" ClipToBounds="True" Width="18" Height="18"/>
+                                                <Rectangle Fill="{CompiledBinding CurrentTheme.MenuBGColor}" ClipToBounds="True" Width="18" Height="18"/>
                                             </Border>
                                             <Border Grid.Row="2" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="165" Height="24">
                                                 <TextBlock Background="{CompiledBinding CurrentTheme.MenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
@@ -225,31 +226,18 @@
                                             </Border>
                                             <Border Grid.Row="4" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="165" Height="24">
                                                 <TextBlock Background="{CompiledBinding CurrentTheme.MenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
-                                                    <TextBlock.Text>
-                                                        <MultiBinding StringFormat="Manhua {0}% ({1})" Mode="OneWay">
-                                                            <Binding Path="ManhuaPercentage"/>
-                                                            <Binding Path="ManhuaCount.Value"/>
+                                                <TextBlock.Text>
+                                                        <MultiBinding StringFormat="Novel {0}% ({1})" Mode="OneWay">
+                                                            <Binding Path="NovelPercentage"/>
+                                                            <Binding Path="NovelCount.Value"/>
                                                         </MultiBinding>
                                                     </TextBlock.Text>
                                                 </TextBlock>
                                             </Border>
                                             <Border Grid.Row="6" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="24" Height="24">
-                                                <Rectangle Name="ManfraRectangle" ClipToBounds="True" Width="18" Height="18"/>
+                                                <Rectangle Name="ComicRectangle" ClipToBounds="True" Width="18" Height="18" Fill="{CompiledBinding CurrentTheme.DividerColor}"/>
                                             </Border>
                                             <Border Grid.Row="6" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="165" Height="24">
-                                                <TextBlock Background="{CompiledBinding CurrentTheme.MenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
-                                                <TextBlock.Text>
-                                                        <MultiBinding StringFormat="Manfra {0}% ({1})" Mode="OneWay">
-                                                            <Binding Path="ManfraPercentage"/>
-                                                            <Binding Path="ManfraCount.Value"/>
-                                                        </MultiBinding>
-                                                    </TextBlock.Text>
-                                                </TextBlock>
-                                            </Border>
-                                            <Border Grid.Row="8" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="24" Height="24">
-                                                <Rectangle Name="ComicRectangle" ClipToBounds="True" Width="18" Height="18"/>
-                                            </Border>
-                                            <Border Grid.Row="8" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="165" Height="24">
                                                 <TextBlock Background="{CompiledBinding CurrentTheme.MenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
                                                 <TextBlock.Text>
                                                         <MultiBinding StringFormat="Comic {0}% ({1})" Mode="OneWay">
@@ -259,15 +247,28 @@
                                                     </TextBlock.Text>
                                                 </TextBlock>
                                             </Border>
+                                            <Border Grid.Row="8" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="24" Height="24">
+                                                <Rectangle Fill="{CompiledBinding ManhuaRectangleColor}" ClipToBounds="True" Width="18" Height="18"/>
+                                            </Border>
+                                            <Border Grid.Row="8" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="165" Height="24">
+                                                <TextBlock Background="{CompiledBinding CurrentTheme.MenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
+                                                    <TextBlock.Text>
+                                                        <MultiBinding StringFormat="Manhua {0}% ({1})" Mode="OneWay">
+                                                            <Binding Path="ManhuaPercentage"/>
+                                                            <Binding Path="ManhuaCount.Value"/>
+                                                        </MultiBinding>
+                                                    </TextBlock.Text>
+                                                </TextBlock>
+                                            </Border>
                                             <Border Grid.Row="10" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="24" Height="24">
-                                                <Rectangle Fill="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="18" Height="18"/>
+                                                <Rectangle Name="ManfraRectangle" ClipToBounds="True" Width="18" Height="18" Fill="{CompiledBinding ManfraRectangleColor}"/>
                                             </Border>
                                             <Border Grid.Row="10" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="165" Height="24">
                                                 <TextBlock Background="{CompiledBinding CurrentTheme.MenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
                                                 <TextBlock.Text>
-                                                        <MultiBinding StringFormat="Novel {0}% ({1})" Mode="OneWay">
-                                                            <Binding Path="NovelPercentage"/>
-                                                            <Binding Path="NovelCount.Value"/>
+                                                        <MultiBinding StringFormat="Manfra {0}% ({1})" Mode="OneWay">
+                                                            <Binding Path="ManfraPercentage"/>
+                                                            <Binding Path="ManfraCount.Value"/>
                                                         </MultiBinding>
                                                     </TextBlock.Text>
                                                 </TextBlock>
@@ -280,36 +281,102 @@
                         </Border> 
                     </WrapPanel>
                 </Border>
+
                 <!-- Bar Charts -->
-                <Border Name="DistBGTwo" Grid.Row="6" Grid.Column="0" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" HorizontalAlignment="Center">
+                <Border Name="DistBGTwo" Grid.Row="6" Grid.Column="0" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" HorizontalAlignment="Center" Background="{CompiledBinding PaneBackgroundColor}">
                     <WrapPanel Margin="10">
                         <!-- Rating Bar Chart -->
                         <Border Background="{CompiledBinding CurrentTheme.CollectionBGColor}" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" Width="570" Height="550" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10">
                             <Border CornerRadius="8" ClipToBounds="True">
-                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                                    <TextBlock Text="Ratings" FontSize="21" FontWeight="Bold" Classes="Menu" HorizontalAlignment="Center" Margin="0,0,0,0"/>
-                                    <lvc:CartesianChart Series="{CompiledBinding RatingDistribution}" XAxes="{CompiledBinding RatingXAxes}" YAxes="{CompiledBinding RatingYAxes}" Width="570" Height="510"/>
-                                </StackPanel>
+                                <Grid Width="570" Height="510" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/> <!-- Chart Row -->
+                                    </Grid.RowDefinitions>
+
+                                    <!-- Chart aligned to bottom -->
+                                    <lvc:CartesianChart
+                                        Grid.Row="0"
+                                        Series="{CompiledBinding RatingDistribution}"
+                                        XAxes="{CompiledBinding RatingXAxes}"
+                                        YAxes="{CompiledBinding RatingYAxes}"
+                                        Width="570"
+                                        Height="510" 
+                                        Margin="0,20,0,0"/>
+
+                                    <!-- Title floating on top -->
+                                    <TextBlock
+                                        Text="Ratings"
+                                        FontSize="23"
+                                        FontWeight="Bold"
+                                        Classes="Menu"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Top"
+                                        Margin="0,-5,0,0" />
+                                </Grid>
                             </Border>
                         </Border>
 
                         <!-- Volume Count Bar Chart -->
                         <Border Background="{CompiledBinding CurrentTheme.CollectionBGColor}" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" Width="570" Height="550" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10">
                             <Border CornerRadius="8" ClipToBounds="True">
-                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                                    <TextBlock Text="Volume Counts" FontSize="21" FontWeight="Bold" Classes="Menu" HorizontalAlignment="Center" Margin="0,0,0,0"/>
-                                    <lvc:CartesianChart Series="{CompiledBinding VolumeCountDistribution}" XAxes="{CompiledBinding VolumeCountXAxes}" YAxes="{CompiledBinding VolumeCountYAxes}" Width="570" Height="510"/>
-                                </StackPanel>
+                                <Grid Width="570" Height="510">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/> <!-- Chart -->
+                                    </Grid.RowDefinitions>
+
+                                    <!-- Chart in background -->
+                                    <lvc:CartesianChart
+                                        Grid.Row="0"
+                                        Series="{CompiledBinding VolumeCountDistribution}"
+                                        XAxes="{CompiledBinding VolumeCountXAxes}"
+                                        YAxes="{CompiledBinding VolumeCountYAxes}"
+                                        VerticalAlignment="Bottom"
+                                        Width="570"
+                                        Height="510"
+                                        Margin="0,20,0,0"/>
+
+                                    <!-- TextBlock on top, positioned with margin -->
+                                    <TextBlock
+                                        Text="Volume Counts"
+                                        FontSize="23"
+                                        FontWeight="Bold"
+                                        Classes="Menu"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Top"
+                                        Margin="0,-5,0,0" />
+                                </Grid>
                             </Border>
                         </Border>
 
                         <!-- Genre Distribution Bar Chart -->
                         <Border Background="{CompiledBinding CurrentTheme.CollectionBGColor}" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" Width="570" Height="550" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10">
                             <Border CornerRadius="8" ClipToBounds="True">
-                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                                    <TextBlock Text="Genres" FontSize="21" FontWeight="Bold" Classes="Menu" HorizontalAlignment="Center" Margin="0,0,0,0"/>
-                                    <lvc:CartesianChart VerticalAlignment="Center" HorizontalAlignment="Center" Series="{CompiledBinding GenreDistribution}" XAxes="{CompiledBinding GenreXAxes}" YAxes="{CompiledBinding GenreYAxes}" Width="570" Height="510"/>
-                                </StackPanel>
+                                <Grid Width="570" Height="510" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/> <!-- Chart Row -->
+                                    </Grid.RowDefinitions>
+
+                                    <!-- Chart aligned to bottom -->
+                                    <lvc:CartesianChart
+                                        Grid.Row="0"
+                                        Series="{CompiledBinding GenreDistribution}"
+                                        XAxes="{CompiledBinding GenreXAxes}"
+                                        YAxes="{CompiledBinding GenreYAxes}"
+                                        VerticalAlignment="Bottom"
+                                        Width="570"
+                                        Height="510"
+                                        Margin="0,20,0,0"/>
+
+                                    <!-- Title floating on top -->
+                                    <TextBlock
+                                        Text="Genres"
+                                        FontSize="23"
+                                        FontWeight="Bold"
+                                        Classes="Menu"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Top"
+                                        Margin="0,-5,0,0" />
+                                </Grid>
                             </Border>
                         </Border>
                     </WrapPanel>

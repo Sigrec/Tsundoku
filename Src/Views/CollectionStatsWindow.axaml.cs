@@ -14,10 +14,6 @@ namespace Tsundoku.Views
         private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
         public bool IsOpen = false;
         public bool CanUpdate = true; // On First Update
-        Subject<SolidColorBrush> UnknownRectangleColorSource = new Subject<SolidColorBrush>();
-        Subject<SolidColorBrush> ManfraRectangleColorSource = new Subject<SolidColorBrush>();
-        Subject<SolidColorBrush> ComicRectangleColorSource = new Subject<SolidColorBrush>();
-        Subject<SolidColorBrush> DataBGColorSource = new Subject<SolidColorBrush>();
 
         public CollectionStatsWindow(CollectionStatsViewModel viewModel)
         {
@@ -26,24 +22,6 @@ namespace Tsundoku.Views
 
             Opened += (s, e) =>
             {
-                // _ = UnknownRectangle.Bind(Avalonia.Controls.Shapes.Shape.FillProperty, UnknownRectangleColorSource);
-                // UnknownRectangleColorSource.OnNext(SolidColorBrush.Parse(ViewModel.CurrentTheme.SeriesCardDescColor == ViewModel.CurrentTheme.MenuTextColor ? ViewModel.CurrentTheme.SeriesCardTitleColor.ToString() : ViewModel.CurrentTheme.SeriesCardDescColor.ToString()));
-
-                // _ = ComicRectangle.Bind(Avalonia.Controls.Shapes.Shape.FillProperty, ComicRectangleColorSource);
-                // ComicRectangleColorSource.OnNext(SolidColorBrush.Parse(ViewModel.CurrentTheme.SeriesCardDescColor == ViewModel.CurrentTheme.MenuTextColor  ? ViewModel.CurrentTheme.SeriesCardTitleColor.ToString() : ViewModel.CurrentTheme.SeriesCardDescColor.ToString()));
-
-                // _ = ManfraRectangle.Bind(Avalonia.Controls.Shapes.Shape.FillProperty, ManfraRectangleColorSource);
-                // ManfraRectangleColorSource.OnNext(SolidColorBrush.Parse(ViewModel.CurrentTheme.SeriesCardStaffColor == ViewModel.CurrentTheme.SeriesCardTitleColor  ? ViewModel.CurrentTheme.SeriesEditPaneButtonsIconColor.ToString() : ViewModel.CurrentTheme.SeriesCardStaffColor.ToString()));
-
-                // _ = StatsBG.Bind(Avalonia.Controls.Border.BackgroundProperty, DataBGColorSource);
-                // DataBGColorSource.OnNext(SolidColorBrush.Parse(ViewModel.CurrentTheme.SeriesCardBGColor == ViewModel.CurrentTheme.MenuBGColor ? ViewModel.CurrentTheme.MenuButtonBGColor.ToString() : ViewModel.CurrentTheme.SeriesCardBGColor.ToString()));
-
-                // _ = DistBGOne.Bind(Avalonia.Controls.Border.BackgroundProperty, DataBGColorSource);
-                // DataBGColorSource.OnNext(SolidColorBrush.Parse(ViewModel.CurrentTheme.SeriesCardBGColor == ViewModel.CurrentTheme.MenuBGColor ? ViewModel.CurrentTheme.MenuButtonBGColor.ToString() : ViewModel.CurrentTheme.SeriesCardBGColor.ToString()));
-
-                // _ = DistBGTwo.Bind(Avalonia.Controls.Border.BackgroundProperty, DataBGColorSource);
-                // DataBGColorSource.OnNext(SolidColorBrush.Parse(ViewModel.CurrentTheme.SeriesCardBGColor == ViewModel.CurrentTheme.MenuBGColor ? ViewModel.CurrentTheme.MenuButtonBGColor.ToString() : ViewModel.CurrentTheme.SeriesCardBGColor.ToString()));
-
                 CanUpdate = false;
                 IsOpen ^= true;
 

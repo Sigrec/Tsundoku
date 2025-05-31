@@ -94,7 +94,7 @@ namespace Tsundoku.Models
         /// <param name="MD_Query">MangaDex object for the MangaDex HTTP client</param>
         /// <param name="additionalLanguages">List of additional languages to query for</param>
         /// <returns></returns>
-        /// TODO - Make it so it doesn't download the image until it's confirmed that the series is not a dupe
+        // TODO - Make it so it doesn't download the image until it's confirmed that the series is not a dupe
         public static async Task<Series?> CreateNewSeriesCardAsync(
             BitmapHelper bitmapHelper,
             MangaDex mangaDex,
@@ -261,7 +261,8 @@ namespace Tsundoku.Models
                         newStaff.Add(ANILIST_LANG_CODES[countryOfOrigin], nativeStaff);
                     }
 
-                    Bitmap? coverImage = !isRefresh && (!isDuplicateCover || allowDuplicate) ? await bitmapHelper.GenerateAvaloniaBitmapAsync(AppFileHelper.GetFullCoverPath(coverPath), string.Empty, string.IsNullOrWhiteSpace(customImageUrl) ? seriesData.GetProperty("coverImage").GetProperty("extraLarge").GetString() : customImageUrl) : null;
+                    string imageUrl = string.IsNullOrWhiteSpace(customImageUrl) ? seriesData.GetProperty("coverImage").GetProperty("extraLarge").GetString() : customImageUrl;
+                    Bitmap? coverImage = !isRefresh && (!isDuplicateCover || allowDuplicate) ? await bitmapHelper.UpdateCoverFromUrlAsync(imageUrl, AppFileHelper.GetFullCoverPath(coverPath)) : null;
 
                     if (!isRefresh && coverImage is null)
                     {
@@ -453,7 +454,7 @@ namespace Tsundoku.Models
                             }
                         }
 
-                        Bitmap? coverImage = !isRefresh && (!isDuplicateCover || allowDuplicate) ? await bitmapHelper.GenerateAvaloniaBitmapAsync(AppFileHelper.GetFullCoverPath(coverPath), string.Empty, coverLink) : null;
+                        Bitmap? coverImage = !isRefresh && (!isDuplicateCover || allowDuplicate) ? await bitmapHelper.UpdateCoverFromUrlAsync(coverLink, AppFileHelper.GetFullCoverPath(coverPath)) : null;
 
                         if (!isRefresh && coverImage is null)
                         {

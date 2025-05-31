@@ -62,7 +62,6 @@ namespace Tsundoku.Services
         /// Sets up the reactive pipeline to filter and sort the Series collection.
         /// </summary>
         /// <param name="userService">The service providing raw Series data and user information.</param>
-        // TODO - Add a "loading" icon/screen when changing language or format
         public SharedSeriesCollectionProvider(IUserService userService)
         {
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));

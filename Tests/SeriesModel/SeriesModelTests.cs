@@ -1,7 +1,8 @@
+using Microsoft.Extensions.DependencyInjection;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text.Json;
-using Microsoft.Extensions.DependencyInjection;
+using static Tsundoku.Models.TsundokuLanguageModel;
 
 [assembly: Description("Testing Series Model from Tsundoku")]
 namespace Tsundoku.Tests
@@ -113,7 +114,7 @@ namespace Tsundoku.Tests
         [AvaloniaTest]
         public async Task MultipleAdditionalLangTitle_AniListLink_Test()
         {
-            _series = await Series.CreateNewSeriesCardAsync(_bitmapHelper, _mangaDex, _aniList, "Rent-A-Girlfriend", Constants.Format.Manga, 18, 0, ["Arabic", "Chinese", "French", "Korean", "Russian", "Spanish"]);
+            _series = await Series.CreateNewSeriesCardAsync(_bitmapHelper, _mangaDex, _aniList, "Rent-A-Girlfriend", Constants.Format.Manga, 18, 0, [TsundokuLanguage.Arabic, TsundokuLanguage.Chinese, TsundokuLanguage.French, TsundokuLanguage.Korean, TsundokuLanguage.Russian, TsundokuLanguage.Spanish]);
             Assert.That(_series.ToString(), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesModel\SeriesModelTestData\Rent-A-Girlfriend.json")));
         }
 
@@ -373,7 +374,7 @@ namespace Tsundoku.Tests
         public async Task GetSeriesStaff_Anthology_Test()
         {
             //Lycoris Recoil Koushiki Comic Anthology: Repeat
-            Assert.That((await Series.CreateNewSeriesCardAsync(_bitmapHelper, _mangaDex, _aniList, "リコリス・リコイル 公式コミックアンソロジー リピート", Constants.Format.Manga, 5, 0, [])).Staff["Romaji"], Is.EqualTo("Takeshi Kojima | Mekimeki | Nyoijizai | GUNP | Itsuki Takano | Ren Sakuragi | sometime | Ryou Niina | Ginmoku | Mikaduchi | Nikomi Wakadori | Miki Morinaga | Raika Suzumi | Ree | Itsuki Tsutsui | Utashima | Shirou Urayama | Bonryuu | Yasuka Manuma | Yuichi | Marco Nii | Nana Komado | Yuu Kimura | Sugar.Kirikanoko | Atto | Kasumi Fukagawa | Tiv | Sou Hamayumiba | Kanari Abe | Nachi Aono | Koruse"));
+            Assert.That((await Series.CreateNewSeriesCardAsync(_bitmapHelper, _mangaDex, _aniList, "リコリス・リコイル 公式コミックアンソロジー リピート", Constants.Format.Manga, 5, 0, [])).Staff[TsundokuLanguage.Romaji], Is.EqualTo("Takeshi Kojima | Mekimeki | Nyoijizai | GUNP | Itsuki Takano | Ren Sakuragi | sometime | Ryou Niina | Ginmoku | Mikaduchi | Nikomi Wakadori | Miki Morinaga | Raika Suzumi | Ree | Itsuki Tsutsui | Utashima | Shirou Urayama | Bonryuu | Yasuka Manuma | Yuichi | Marco Nii | Nana Komado | Yuu Kimura | Sugar.Kirikanoko | Atto | Kasumi Fukagawa | Tiv | Sou Hamayumiba | Kanari Abe | Nachi Aono | Koruse"));
         }
 
         [Test] // Tests if only native = null, onyl full = null, and both native and full are null

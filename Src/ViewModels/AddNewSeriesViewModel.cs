@@ -24,7 +24,7 @@ namespace Tsundoku.ViewModels
         [Reactive] public bool AllowDuplicate { get; set; }
         [Reactive] public string AdditionalLanguagesToolTipText { get; set; }
         [Reactive] public bool IsAddSeriesButtonEnabled { get; set; } = false;
-        [Reactive] public AvaloniaList<ListBoxItem> SelectedAdditionalLanguages { get; set; } = [];
+        public AvaloniaList<ListBoxItem> SelectedAdditionalLanguages { get; set; } = [];
         private static readonly StringBuilder CurLanguages = new StringBuilder();
 
         public AddNewSeriesViewModel(IUserService userService, BitmapHelper bitmapHelper, MangaDex mangaDex, AniList aniList) : base(userService)
