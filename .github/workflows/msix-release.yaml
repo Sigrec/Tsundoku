@@ -99,6 +99,11 @@ jobs:
 
           Write-Host "✅ Version check passed."
       shell: pwsh
+    
+    - name: 🧰 Install MSIX/WAP workload
+      run: |
+        dotnet workload install windowsapp
+      shell: pwsh
 
     - name: 🔧 Build and Package MSIX Bundle
       id: build_msix # Add an ID to this step to reference its outputs
