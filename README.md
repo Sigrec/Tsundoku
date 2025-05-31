@@ -76,3 +76,51 @@ Of course I understand if you do not trust me but I promise there is nothing mal
 - https://twitter.com/MangaPlusENG (English News)
 - https://twitter.com/WSJ_manga (English & Japanese News)
 ***
+
+## Privacy Policy for Tsundoku
+
+_Last updated: 2025-05-30_
+
+Tsundoku ("we", "our", or "us") respects your privacy and is committed to protecting it through this Privacy Policy.
+
+### Information We Collect
+
+Tsundoku is a desktop application designed to help you track your manga and light novel collections. We want to be transparent about what data we collect:
+
+- **Personal Data**: We do **not** collect any personal information such as your name, email, or contact details.
+- **Usage Data**: Tsundoku runs locally on your device and does not send any usage data or analytics to external servers.
+- **Local Data**: All your collection data is stored locally on your device and is not shared unless you choose to back it up or export it manually.
+
+### How We Use Your Data
+
+Since all your data stays on your device, we do not use or share your data with third parties.
+
+### Third-Party Services
+
+Tsundoku interacts with the following third-party APIs:
+
+- **AniList API**: To fetch manga and light novel metadata.
+- **MangaDex API**: To access manga information and updates.
+
+Please refer to their privacy policies for information on how they handle data:
+
+- [AniList Privacy Policy](https://anilist.co/privacy/)
+- [MangaDex Privacy Policy](https://mangadex.org/privacy)
+
+### Data Security
+
+We recommend you keep your device secure and back up your data regularly. The app does save whenever you open and close the app but you can save yourself by pressing `CTRL+S`. Tsundoku does not have access to your data and cannot recover it if lost.
+
+### Children’s Privacy
+
+Tsundoku is not directed to children under 13, and we do not knowingly collect data from children.
+
+### Changes to This Privacy Policy
+
+We may update this Privacy Policy occasionally. If so, we will update the “Last updated” date at the top of this page.
+
+### Contact Us
+
+If you have any questions or concerns about this Privacy Policy, please contact us via the GitHub repository:
+
+[https://github.com/Sigrec/Tsundoku](https://github.com/Sigrec/Tsundoku)
