@@ -77,7 +77,7 @@ Of course I understand if you do not trust me but I promise there is nothing mal
 - https://twitter.com/WSJ_manga (English & Japanese News)
 ***
 
-## Privacy Policy for Tsundoku
+## Privacy Policy
 
 _Last updated: 2025-05-30_
 
