@@ -6,7 +6,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
         x:Class="Tsundoku.Views.AddNewSeriesWindow"
-		Icon="\Assets\Icons\Tsundoku-Logo.ico"
+		Icon="\Assets\Icons\TsundokuLogo.ico"
         Title="Add New Series"
 		FontFamily="Segoe UI"
 		SizeToContent="WidthAndHeight"

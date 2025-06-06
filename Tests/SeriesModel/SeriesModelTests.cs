@@ -5,7 +5,7 @@ using System.Text.Json;
 using static Tsundoku.Models.TsundokuLanguageModel;
 
 [assembly: Description("Testing Series Model from Tsundoku")]
-namespace Tsundoku.Tests
+namespace Tsundoku.Tests.SeriesModel
 {
     [Author("Sean (Alias -> Prem or Sigrec)")]
     [TestOf(typeof(Series))]
@@ -29,7 +29,7 @@ namespace Tsundoku.Tests
         public void Setup()
         {
             // 1. Build a minimal DI container that mirrors your app's setup
-            var services = new ServiceCollection();
+            ServiceCollection services = new ServiceCollection();
 
             // Register IHttpClientFactory for default clients (e.g., if BitmapHelper uses an unnamed client)
             services.AddHttpClient("AddCoverClient", client =>

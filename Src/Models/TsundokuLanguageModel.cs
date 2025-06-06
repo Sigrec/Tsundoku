@@ -10,8 +10,8 @@ namespace Tsundoku.Models
 
         static TsundokuLanguageModel()
         {
-            var stringToLangBuilder = new Dictionary<string, TsundokuLanguage>(StringComparer.OrdinalIgnoreCase);
-            var langToStringBuilder = new Dictionary<TsundokuLanguage, string>();
+            Dictionary<string, TsundokuLanguage> stringToLangBuilder = new(StringComparer.OrdinalIgnoreCase);
+            Dictionary<TsundokuLanguage, string> langToStringBuilder = [];
 
             foreach (TsundokuLanguage langEnum in Enum.GetValues<TsundokuLanguage>())
             {

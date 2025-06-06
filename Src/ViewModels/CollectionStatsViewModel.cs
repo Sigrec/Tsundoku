@@ -236,12 +236,12 @@ namespace Tsundoku.ViewModels
                 .AutoRefresh(x => x.Rating)
                 .DistinctUntilChanged()
                 .ToCollection()
-                .Subscribe(seriesList =>
+                .Select(list =>
                 {
                     decimal total = 0;
                     int count = 0;
 
-                    foreach (var series in seriesList)
+                    foreach (Series series in list)
                     {
                         if (series.Rating >= 0)
                         {
@@ -249,38 +249,42 @@ namespace Tsundoku.ViewModels
                             count++;
                         }
                     }
-
-                    _userService.UpdateUser(user => user.MeanRating = count > 0 ? Math.Round(total / count, 1) : 0);
-                });
+                    return decimal.Round(decimal.Divide(total, count), 2);
+                })
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(rating => _userService.UpdateUser(user => user.MeanRating = rating));
 
             _userService.UserCollectionChanges
                 .AutoRefresh(x => x.VolumesRead)
                 .DistinctUntilChanged()
                 .ToCollection()
-                .Subscribe(seriesList =>
+                .Select(seriesCollection => (uint)seriesCollection.Sum(item => item.VolumesRead))
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(volumesRead =>
                 {
-                    _userService.UpdateUser(user => user.VolumesRead = (uint)seriesList.Sum(x => x.VolumesRead));
+                    _userService.UpdateUser(user => user.VolumesRead = volumesRead);
                 });
 
             Observable.CombineLatest(
                 _userService.UserCollectionChanges
                     .AutoRefresh(x => x.Value)
-                    .AutoRefresh()
                     .DistinctUntilChanged()
-                    .ToCollection(),
+                    .ToCollection()
+                    .Select(seriesCollection => Math.Round((double)seriesCollection.Sum(item => item.Value), 2))
+                    .ObserveOn(RxApp.MainThreadScheduler),
                 this.WhenAnyValue(x => x.CurrentUser.Currency),
-                (seriesList, currency) => new { seriesList, currency }
+                (value, currency) => new { value, currency }
             )
             .Subscribe(result =>
             {
-                decimal totalValue = result.seriesList.Sum(x => x.Value);
                 _userService.UpdateUser(user =>
-                    user.CollectionPrice = $"{result.currency}{Math.Round(totalValue, 2)}");
+                    user.CollectionPrice = $"{result.currency}{result.value}");
             });
 
             _userService.UserCollectionChanges
                 .DistinctUntilChanged()
                 .ToCollection()
+                .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(seriesList =>
                 {
                     SeriesCount = (uint)seriesList.Count;
@@ -290,9 +294,11 @@ namespace Tsundoku.ViewModels
                 .AutoRefresh(x => x.IsFavorite)
                 .DistinctUntilChanged()
                 .ToCollection()
-                .Subscribe(seriesList =>
+                .Select(seriesList => (uint)seriesList.Count(x => x.IsFavorite))
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(count =>
                 {
-                    FavoriteCount = (uint)seriesList.Count(x => x.IsFavorite);
+                    FavoriteCount = count;
                 });
 
             _userService.UserCollectionChanges
@@ -300,21 +306,25 @@ namespace Tsundoku.ViewModels
                 .AutoRefresh(x => x.MaxVolumeCount)
                 .DistinctUntilChanged()
                 .ToCollection()
-                .Subscribe(seriesList =>
+                .Select(seriesList =>
                 {
                     uint totalCurVolumes = 0;
                     uint totalVolumesToBeCollected = 0;
 
-                    foreach (var series in seriesList)
+                    foreach (Series series in seriesList)
                     {
                         totalCurVolumes += series.CurVolumeCount;
                         totalVolumesToBeCollected += (uint)(series.MaxVolumeCount - series.CurVolumeCount);
                     }
-
+                    return (totalCurVolumes, totalVolumesToBeCollected);
+                })
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(tuple =>
+                {
                     _userService.UpdateUser(user =>
                     {
-                        user.NumVolumesCollected = totalCurVolumes;
-                        user.NumVolumesToBeCollected = totalVolumesToBeCollected;
+                        user.NumVolumesCollected = tuple.totalCurVolumes;
+                        user.NumVolumesToBeCollected = tuple.totalVolumesToBeCollected;
                     });
                 });
         }
@@ -400,7 +410,7 @@ namespace Tsundoku.ViewModels
                     .Select(seriesList => // Perform all your counting logic on this snapshot
                     {
                         int[] counts = new int[11]; // For ratings 0-10
-                        foreach (var series in seriesList)
+                        foreach (Series series in seriesList)
                         {
                             int bucketIndex = (int)Math.Floor(series.Rating);
                             if (series.Rating == 10)
@@ -562,9 +572,9 @@ namespace Tsundoku.ViewModels
                 {
                     int[] volumeCounts = new int[11];
 
-                    foreach (var series in seriesList)
+                    foreach (Series series in seriesList)
                     {
-                        var volume = series.MaxVolumeCount;
+                        uint volume = series.MaxVolumeCount;
 
                         if (volume >= 1 && volume < 10)
                         {
@@ -771,12 +781,12 @@ namespace Tsundoku.ViewModels
                 .Select(seriesList => // Perform the genre counting logic
                 {
                     GenreData.Clear();
-                    foreach (var series in seriesList)
+                    foreach (Series series in seriesList)
                     {
                         if (series.Genres is not { Count: > 0 })
                             continue;
 
-                        foreach (var genre in series.Genres)
+                        foreach (Genre genre in series.Genres)
                         {
                             string genreKey = genre.GetEnumMemberValue();
 

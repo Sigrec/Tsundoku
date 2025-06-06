@@ -174,7 +174,7 @@ namespace Tsundoku.Helpers
         private static short RateLimitCheck(HttpResponseHeaders responseHeaders)
         {
             responseHeaders.TryGetValues("X-RateLimit-Remaining", out var rateRemainingValues);
-            _ = short.TryParse(rateRemainingValues?.FirstOrDefault(), out var rateRemaining);
+            _ = short.TryParse(rateRemainingValues?.FirstOrDefault(), out short rateRemaining);
             LOGGER.Info($"AniList Rate Remaining = {rateRemaining}");
             if (rateRemaining > 0)
             {
@@ -183,7 +183,7 @@ namespace Tsundoku.Helpers
             else
             {
                 responseHeaders.TryGetValues("Retry-After", out var retryAfter);
-                _ = short.TryParse(retryAfter?.FirstOrDefault(), out var retryAfterInSeconds);
+                _ = short.TryParse(retryAfter?.FirstOrDefault(), out short retryAfterInSeconds);
                 return retryAfterInSeconds;
             }
         }

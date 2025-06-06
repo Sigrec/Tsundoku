@@ -1,0 +1,450 @@
+<!-- File: Controls/SeriesCardDisplay.axaml -->
+<UserControl
+    x:Class="Tsundoku.Controls.SeriesCardDisplay"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:m="clr-namespace:Tsundoku.Models;assembly=Tsundoku"
+    xmlns:cv="clr-namespace:Tsundoku.Converters;assembly=Tsundoku"
+    xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+    xmlns:vm="clr-namespace:Tsundoku.ViewModels;assembly=Tsundoku"
+    xmlns:controls="clr-namespace:Tsundoku.Controls"
+    x:DataType="controls:SeriesCardDisplay">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+			<cv:TitleLangConverter x:Key="ConvertTitle"/>
+			<cv:StaffLangConverter x:Key="ConvertStaff"/>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+  <!-- 
+    IMPORTANT:
+    1) x:DataType="vm:MainViewModel" so that 
+       {Binding CardTheme.…, RelativeSource={RelativeSource AncestorType=UserControl}} and {CompiledBinding CurrentUser.…} still resolve.
+    2) We expose a “Series” StyledProperty in the code‐behind, so everywhere
+       you do “Series.Whatever” below, that refers to that property.
+  -->
+
+  <Border
+      Background="Transparent"
+      Margin="20"
+      BorderBrush="Transparent"
+      BorderThickness="0"
+      CornerRadius="8"
+      BoxShadow="0 0 15 6 #B3000000"
+      Width="{CompiledBinding Source={x:Static m:Constants.CARD_WIDTH}}">
+
+    <Border
+        CornerRadius="8"
+        ClipToBounds="True"
+        Width="{CompiledBinding Source={x:Static m:Constants.CARD_WIDTH}}">
+
+      <Grid
+          Width="{CompiledBinding Source={x:Static m:Constants.CARD_WIDTH}}"
+          Grid.ColumnDefinitions="Auto,Auto"
+          ShowGridLines="False">
+
+        <!-- ── ToolTip Styles (theme from MainViewModel) ── -->
+        <Grid.Styles>
+          <Style Selector="ToolTip">
+            <Setter
+                Property="Background"
+                Value="{Binding CardTheme.StatusAndBookTypeBGColor, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+            <Setter
+                Property="BorderBrush"
+                Value="{Binding CardTheme.MenuButtonBorderColor, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+            <Setter
+                Property="Foreground"
+                Value="{Binding CardTheme.MenuButtonTextAndIconColor, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+          </Style>
+        </Grid.Styles>
+
+        <!-- ── Left Side Card ─────────────────────────────────────────────────── -->
+        <Canvas
+            Grid.Column="0"
+            PointerPressed="OpenSiteLink"
+            OpacityMask="White"
+            Cursor="Hand"
+            Width="{CompiledBinding Source={x:Static m:Constants.LEFT_SIDE_CARD_WIDTH}}">
+
+          <Canvas.Styles>
+            <Style Selector="TextBlock.mouseover">
+              <Setter
+                  Property="Background"
+                  Value="{Binding CardTheme.StatusAndBookTypeBGHoverColor, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+              <Setter
+                  Property="Foreground"
+                  Value="{Binding CardTheme.StatusAndBookTypeTextHoverColor, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+            </Style>
+            <Style Selector="TextBlock.nomouseover">
+              <Setter
+                  Property="Background"
+                  Value="{Binding CardTheme.StatusAndBookTypeBGColor, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+              <Setter
+                  Property="Foreground"
+                  Value="{Binding CardTheme.StatusAndBookTypeTextColor, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+            </Style>
+          </Canvas.Styles>
+
+          <!-- Top Left: Cover Image -->
+          <Image
+              Height="{CompiledBinding Source={x:Static m:Constants.IMAGE_HEIGHT}}"
+              Width="{CompiledBinding Source={x:Static m:Constants.LEFT_SIDE_CARD_WIDTH}}"
+              Source="{Binding Series.CoverBitMap, RelativeSource={RelativeSource AncestorType=UserControl}}"
+              ClipToBounds="True" />
+
+          <!-- Bottom Left: Status | Format -->
+          <TextBlock
+              Canvas.Bottom="0"
+              Classes.mouseover="{CompiledBinding $parent.IsPointerOver}"
+              Classes.nomouseover="{CompiledBinding !$parent.IsPointerOver}"
+              Width="{CompiledBinding Source={x:Static m:Constants.LEFT_SIDE_CARD_WIDTH}}"
+              Height="{CompiledBinding Source={x:Static m:Constants.BOTTOM_SECTION_CARD_HEIGHT}}"
+              FontWeight="Bold"
+              FontSize="17"
+              TextAlignment="Center"
+              Padding="0,8,0,0">
+            <TextBlock.Text>
+              <MultiBinding StringFormat="{}{0} | {1}" Mode="OneWay">
+                <Binding Path="Series.Status" RelativeSource="{RelativeSource AncestorType=UserControl}" />
+                <Binding Path="Series.Format" RelativeSource="{RelativeSource AncestorType=UserControl}" />
+              </MultiBinding>
+            </TextBlock.Text>
+          </TextBlock>
+        </Canvas>
+
+        <!-- ── Right Side Series Card ─────────────────────────────────────────── -->
+        <Grid
+            Grid.Row="0"
+            Grid.Column="1"
+            Width="{CompiledBinding Source={x:Static m:Constants.RIGHT_SIDE_CARD_WIDTH}}"
+            RowDefinitions="Auto,40"
+            ShowGridLines="False">
+
+          <Grid.Styles>
+            <Style Selector="ScrollViewer">
+              <Setter Property="IsScrollChainingEnabled" Value="False" />
+            </Style>
+            <Style Selector="ScrollBar:vertical">
+              <Style Selector="^ /template/ Rectangle#TrackRect">
+                <Setter
+                    Property="Fill"
+                    Value="{Binding CardTheme.CollectionBGColor, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+              </Style>
+              <Style Selector="^ /template/ Thumb">
+                <Setter
+                    Property="Background"
+                    Value="{Binding CardTheme.DividerColor, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                <Style Selector="^:pointerover /template/ Border">
+                  <Setter
+                      Property="Background"
+                      Value="{Binding CardTheme.DividerColor, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                </Style>
+                <Style Selector="^:pressed /template/ Border">
+                  <Setter
+                      Property="Background"
+                      Value="{Binding CardTheme.DividerColor, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                </Style>
+              </Style>
+              <Style Selector="^[IsExpanded=true]">
+                <Style Selector="^ /template/ Thumb">
+                  <Setter
+                      Property="Background"
+                      Value="{Binding CardTheme.DividerColor, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                </Style>
+                <Style Selector="^ /template/ PathIcon">
+                  <Setter
+                      Property="Foreground"
+                      Value="{Binding CardTheme.DividerColor, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                </Style>
+                <Style Selector="^ /template/ Rectangle#TrackRect">
+                  <Setter
+                      Property="Fill"
+                      Value="{Binding CardTheme.MenuBGColor, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                </Style>
+              </Style>
+              <Style Selector="^ /template/ RepeatButton#PART_LineUpButton, ^ /template/ RepeatButton#PART_LineDownButton">
+                <Setter
+                    Property="TextElement.Foreground"
+                    Value="{Binding CardTheme.DividerColor, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                <Style Selector="^:pointerover">
+                  <Setter
+                      Property="TextElement.Foreground"
+                      Value="{Binding CardTheme.MenuButtonTextAndIconHoverColor, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                  <Style Selector="^ /template/ ContentPresenter">
+                    <Setter
+                        Property="Background"
+                        Value="{Binding CardTheme.DividerColor, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                  </Style>
+                  <Style Selector="^ PathIcon">
+                    <Setter
+                        Property="Foreground"
+                        Value="{Binding CardTheme.CollectionBGColor, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                  </Style>
+                </Style>
+                <Style Selector="^:pressed">
+                  <Setter
+                      Property="TextElement.Foreground"
+                      Value="{Binding CardTheme.MenuBGColor, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                  <Style Selector="^ /template/ ContentPresenter">
+                    <Setter
+                        Property="Background"
+                        Value="{Binding CardTheme.DividerColor, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                  </Style>
+                  <Style Selector="^ PathIcon">
+                    <Setter
+                        Property="Foreground"
+                        Value="{Binding CardTheme.CollectionBGColor, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                  </Style>
+                </Style>
+              </Style>
+            </Style>
+          </Grid.Styles>
+
+          <!-- Level 5: Top Right Side Card ────────────────────────────────────── -->
+          <Grid
+              Height="{CompiledBinding Source={x:Static m:Constants.TOP_SECTION_CARD_HEIGHT}}"
+              Grid.Row="0"
+              Width="{CompiledBinding Source={x:Static m:Constants.RIGHT_SIDE_CARD_WIDTH}}"
+              Grid.RowDefinitions="Auto,Auto,Auto,*"
+              Background="{Binding CardTheme.SeriesCardBGColor, RelativeSource={RelativeSource AncestorType=UserControl}}"
+              ShowGridLines="False">
+
+            <Grid.Styles>
+              <Style Selector="ScrollBar:vertical">
+                <Style Selector="^[IsExpanded=true]">
+                  <Style Selector="^ /template/ Rectangle#TrackRect">
+                    <Setter
+                        Property="Fill"
+                        Value="{Binding CardTheme.CollectionBGColor, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                  </Style>
+                </Style>
+              </Style>
+            </Grid.Styles>
+
+            <!-- Publisher -->
+            <TextBlock
+                Grid.Row="0"
+                Foreground="{Binding CardTheme.SeriesCardPublisherColor, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                MaxLines="1"
+                FontSize="15"
+                Text="{Binding Series.Publisher, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                Padding="9,2,4,-1" />
+
+            <!-- Series Title -->
+            <TextBlock
+                Grid.Row="1"
+                x:Name="SeriesTitleTextBlock"
+                TextWrapping="Wrap"
+                Foreground="{Binding CardTheme.SeriesCardTitleColor, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                FontWeight="Bold"
+                FontSize="23"
+                MaxHeight="{CompiledBinding Source={x:Static m:Constants.TOP_SECTION_CARD_HEIGHT}}"
+                PointerPressed="CopySeriesTitleAsync"
+                Padding="8,0,7,2"
+                Cursor="Hand"
+                TextAlignment="Left"
+                TextTrimming="WordEllipsis"
+                MaxLines="3"
+                Width="{CompiledBinding Source={x:Static m:Constants.RIGHT_SIDE_CARD_WIDTH}}"
+                LineHeight="25">
+              <TextBlock.Text>
+                <MultiBinding Converter="{StaticResource ConvertTitle}">
+                  <Binding Path="Series.Titles" RelativeSource="{RelativeSource AncestorType=UserControl}" />
+                  <Binding Path="Language" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
+                </MultiBinding>
+              </TextBlock.Text>
+              <ToolTip.Tip>
+                <TextBlock
+                    TextWrapping="Wrap"
+                    FontWeight="Bold"
+                    FontSize="18"
+                    TextTrimming="None"
+                    MaxLines="100"
+                    LineHeight="25">
+                  <TextBlock.Text>
+                    <MultiBinding Converter="{StaticResource ConvertTitle}">
+                      <Binding Path="Series.Titles" RelativeSource="{RelativeSource AncestorType=UserControl}" />
+                      <Binding Path="Language" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
+                      <Binding Path="Series.DuplicateIndex" RelativeSource="{RelativeSource AncestorType=UserControl}" />
+                    </MultiBinding>
+                  </TextBlock.Text>
+                </TextBlock>
+              </ToolTip.Tip>
+            </TextBlock>
+
+            <!-- Staff -->
+            <TextBlock
+                TextWrapping="Wrap"
+                Grid.Row="2"
+                Foreground="{Binding CardTheme.SeriesCardStaffColor, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                MaxLines="2"
+                TextTrimming="WordEllipsis"
+                FontSize="15"
+                Padding="9,0,4,3">
+              <TextBlock.Text>
+                <MultiBinding Converter="{StaticResource ConvertStaff}" Mode="OneWay">
+                  <Binding Path="Series.Staff" RelativeSource="{RelativeSource AncestorType=UserControl}" />
+                  <Binding Path="Language" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
+                </MultiBinding>
+              </TextBlock.Text>
+              <ToolTip.Tip>
+                <TextBlock
+                    TextWrapping="Wrap"
+                    FontWeight="Bold"
+                    TextTrimming="None"
+                    MaxLines="100">
+                  <TextBlock.Text>
+                    <MultiBinding Converter="{StaticResource ConvertStaff}" Mode="OneWay">
+                      <Binding Path="Series.Staff" RelativeSource="{RelativeSource AncestorType=UserControl}" />
+                      <Binding Path="Language" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
+                    </MultiBinding>
+                  </TextBlock.Text>
+                </TextBlock>
+              </ToolTip.Tip>
+            </TextBlock>
+
+            <!-- Description ScrollViewer -->
+            <ScrollViewer
+                VerticalScrollBarVisibility="Auto"
+                HorizontalScrollBarVisibility="Disabled"
+                Grid.Row="3">
+              <TextBlock
+                  TextWrapping="Wrap"
+                  Foreground="{Binding CardTheme.SeriesCardDescColor, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                  Opacity="0.9"
+                  Text="{Binding Series.Description, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                  Padding="10,-2,20,10" />
+            </ScrollViewer>
+          </Grid>
+
+          <!-- Bottom Right Side Card (Progress + Buttons) -->
+          <Grid
+              Height="{CompiledBinding Source={x:Static m:Constants.BOTTOM_SECTION_CARD_HEIGHT}}"
+              Background="{Binding CardTheme.SeriesProgressBGColor, RelativeSource={RelativeSource AncestorType=UserControl}}"
+              Width="{CompiledBinding Source={x:Static m:Constants.RIGHT_SIDE_CARD_WIDTH}}"
+              Grid.Row="1"
+              ColumnDefinitions="Auto,Auto">
+            <Grid.Styles>
+              <Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter
+                    Property="TextBlock.Foreground"
+                    Value="{Binding CardTheme.SeriesButtonIconHoverColor, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+              </Style>
+            </Grid.Styles>
+
+            <Grid
+                ColumnDefinitions="Auto"
+                RowDefinitions="40"
+                HorizontalAlignment="Center"
+                Grid.Column="0"
+                Grid.ColumnSpan="1">
+              <Grid.Styles>
+                <Style Selector="Button">
+                  <Style Selector="^:pointerover /template/ ContentPresenter">
+                    <Setter
+                        Property="TextBlock.Foreground"
+                        Value="{Binding CardTheme.SeriesProgressButtonsHoverColor, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                    <Setter Property="Background" Value="Transparent"/>
+                  </Style>
+                </Style>
+              </Grid.Styles>
+
+              <!-- ProgressBar -->
+              <ProgressBar
+                  Height="30"
+                  Width="298"
+                  Margin="10,0,0,0"
+                  Grid.Row="0"
+                  Grid.Column="0"
+                  Value="{Binding Series.CurVolumeCount, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                  Background="{Binding CardTheme.SeriesProgressBarBGColor, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                  Foreground="{Binding CardTheme.SeriesProgressBarColor, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                  BorderBrush="{Binding CardTheme.SeriesProgressBarBorderColor, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                  BorderThickness="1.5"
+                  Orientation="Horizontal"
+                  Padding="2"
+                  FontWeight="Bold"
+                  VerticalAlignment="Center"
+                  HorizontalAlignment="Center"
+                  FontSize="15"
+                  Minimum="0"
+                  Maximum="{Binding Series.MaxVolumeCount, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+
+              <!-- “–” Button, Count Text, “+” Button -->
+              <StackPanel
+                  Orientation="Horizontal"
+                  Grid.Column="0"
+                  Grid.Row="0"
+                  HorizontalAlignment="Center"
+                  Margin="10,0,0,0">
+                <Button
+                    Background="Transparent"
+                    Foreground="{Binding CardTheme.SeriesProgressTextColor, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                    FontWeight="Bold"
+                    Height="15"
+                    Width="32"
+                    FontSize="31"
+                    Margin="0,0,-17,0"
+                    Padding="-2,-17,0,0"
+                    Cursor="Hand"
+                    Click="SubtractVolume"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    Content="-" />
+
+                <TextBlock
+                    TextAlignment="Center"
+                    FontSize="16"
+                    FontWeight="Bold"
+                    Foreground="{Binding CardTheme.SeriesProgressTextColor, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                    Margin="0,7.5,0,0">
+                  <TextBlock.Text>
+                    <MultiBinding StringFormat="{}{0}/{1}">
+                      <Binding Path="Series.CurVolumeCount" RelativeSource="{RelativeSource AncestorType=UserControl}" />
+                      <Binding Path="Series.MaxVolumeCount" RelativeSource="{RelativeSource AncestorType=UserControl}" />
+                    </MultiBinding>
+                  </TextBlock.Text>
+                </TextBlock>
+
+                <Button
+                    Background="Transparent"
+                    Foreground="{Binding CardTheme.SeriesProgressTextColor, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                    FontWeight="Bold"
+                    Height="20"
+                    Width="21"
+                    FontSize="24"
+                    Cursor="Hand"
+                    Click="AddVolume"
+                    Padding="-6,-9.5,0,0"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    HorizontalContentAlignment="Center"
+                    Content="+" />
+              </StackPanel>
+            </Grid>
+
+            <!-- Edit Series Info Button (icon) -->
+            <Button
+                Grid.Column="1"
+                Background="{Binding CardTheme.SeriesProgressBGColor, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                FontSize="30"
+                Margin="0,0,3,0"
+                BorderThickness="0"
+                HorizontalAlignment="Left"
+                HorizontalContentAlignment="Center"
+                BorderBrush="{Binding CardTheme.SeriesButtonIconColor, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                Height="{CompiledBinding Source={x:Static m:Constants.BOTTOM_SECTION_CARD_HEIGHT}}"
+                Foreground="{Binding CardTheme.SeriesButtonIconColor, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                i:Attached.Icon="fa-solid fa-square-pen"
+                Cursor="Hand"
+                Click="OpenEditSeriesInfoWindow">
+            </Button>
+          </Grid>
+        </Grid>
+      </Grid>
+    </Border>
+  </Border>
+</UserControl>

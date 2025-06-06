@@ -16,7 +16,7 @@
   <PropertyGroup>
     <ProjectGuid>8dc9a078-90fc-499f-a851-861d7e684ff1</ProjectGuid>
     <TargetPlatformVersion>10.0.26100.0</TargetPlatformVersion>
-    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <TargetPlatformMinVersion>10.0.18362.0</TargetPlatformMinVersion>
     <DefaultLanguage>en-US</DefaultLanguage>
     <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
     <NoWarn>$(NoWarn);NU1702</NoWarn>
@@ -44,9 +44,8 @@
     <Content Include="Images\BadgeLogo.scale-150.png" />
     <Content Include="Images\BadgeLogo.scale-200.png" />
     <Content Include="Images\BadgeLogo.scale-400.png" />
-    <Content Include="Images\SplashScreen.scale-200.png" />
     <Content Include="Images\LockScreenLogo.scale-200.png" />
-    <Content Include="Images\Square150x150Logo.scale-200.png" />
+    <Content Include="Images\SplashScreen.png" />
     <Content Include="Images\Square44x44Logo.altform-lightunplated_targetsize-16.png" />
     <Content Include="Images\Square44x44Logo.altform-lightunplated_targetsize-24.png" />
     <Content Include="Images\Square44x44Logo.altform-lightunplated_targetsize-256.png" />
@@ -67,13 +66,17 @@
     <Content Include="Images\Square44x44Logo.targetsize-256.png" />
     <Content Include="Images\Square44x44Logo.targetsize-32.png" />
     <Content Include="Images\Square44x44Logo.targetsize-48.png" />
+    <Content Include="Images\Square150x150Logo.scale-100.png" />
+    <Content Include="Images\Square150x150Logo.scale-200.png" />
+    <Content Include="Images\Square150x150Logo.scale-400.png" />
     <Content Include="Images\StoreLogo.scale-100.png" />
     <Content Include="Images\StoreLogo.scale-125.png" />
     <Content Include="Images\StoreLogo.scale-150.png" />
     <Content Include="Images\StoreLogo.scale-200.png" />
     <Content Include="Images\StoreLogo.scale-400.png" />
-    <Content Include="Images\Tsundoku-Logo.png" />
-    <Content Include="Images\Wide310x150Logo.scale-200.png" />
+    <Content Include="Images\Wide310x150Logo.png" />
+    <Content Include="Images\Square310x310Logo.png" />
+    <Content Include="Images\Square71x71Logo.png" />
     <None Include="TsundokuPackage_TemporaryKey.pfx" />
   </ItemGroup>
   <Import Project="$(WapProjPath)\Microsoft.DesktopBridge.targets" />

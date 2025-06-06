@@ -5,7 +5,7 @@
 		xmlns:vm="using:Tsundoku.ViewModels"
 		xmlns:models="using:MangaAndLightNovelWebScrape.EntryModel"
         x:Class="Tsundoku.Views.PriceAnalysisWindow"
-        Icon="\Assets\Icons\Tsundoku-Logo.ico"
+        Icon="\Assets\Icons\TsundokuLogo.ico"
         Title="Price Analysis"
 		FontFamily="Segoe UI"
         SizeToContent="Height"

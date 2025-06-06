@@ -1,6 +1,6 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-		xmlns:local="clr-namespace:Tsundoku.Models"
+		xmlns:m="clr-namespace:Tsundoku.Models"
         xmlns:vm="clr-namespace:Tsundoku.ViewModels"
 		xmlns:help="clr-namespace:Tsundoku.Helpers"
 		xmlns:cv="clr-namespace:Tsundoku.Converters"
@@ -9,7 +9,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
         x:Class="Tsundoku.Views.MainWindow"
-        Icon="\Assets\Icons\Tsundoku-Logo.ico"
+        Icon="\Assets\Icons\TsundokuLogo.ico"
         Title="Tsundoku"
 		Name="TsundokuWindow"
 		FontFamily="Segoe UI" 
@@ -78,7 +78,7 @@
                 <StackPanel Orientation="Horizontal" Spacing="5">
                     <AutoCompleteBox 
                         Name="AdvancedSearchBar"
-                        ItemsSource="{x:Static local:Constants.ADVANCED_SEARCH_FILTERS}" 
+                        ItemsSource="{x:Static m:Constants.ADVANCED_SEARCH_FILTERS}" 
                         Text="{CompiledBinding AdvancedSearchQuery, Mode=OneWay}"
                         Classes="query"
                         KeyUp="RemoveErrorMessage"
@@ -116,10 +116,10 @@
                     BorderThickness="0,0,0,3"
                     Height="150">
                 <Grid Margin="0,15,0,15" ColumnDefinitions="*,Auto,10,*" RowDefinitions="Auto,Auto" HorizontalAlignment="Center" VerticalAlignment="Center" ShowGridLines="false">
-                    <StackPanel Margin="0,0,0,1" Orientation="Horizontal" Spacing="0,0,1,1" Grid.Column="1" Grid.Row="0" Height="{CompiledBinding Source={x:Static local:Constants.USER_ICON_HEIGHT}}" HorizontalAlignment="Left" VerticalAlignment="Center">
+                    <StackPanel Margin="0,0,0,1" Orientation="Horizontal" Spacing="0,0,1,1" Grid.Column="1" Grid.Row="0" Height="{CompiledBinding Source={x:Static m:Constants.USER_ICON_HEIGHT}}" HorizontalAlignment="Left" VerticalAlignment="Center">
                         <Border BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.UserIconBorderColor}" CornerRadius="2" ClipToBounds="True" Height="75">
-                            <Image Height="{CompiledBinding Source={x:Static local:Constants.USER_ICON_HEIGHT}}"
-                                   Width="{CompiledBinding Source={x:Static local:Constants.USER_ICON_WIDTH}}"
+                            <Image Height="{CompiledBinding Source={x:Static m:Constants.USER_ICON_HEIGHT}}"
+                                   Width="{CompiledBinding Source={x:Static m:Constants.USER_ICON_WIDTH}}"
                                    Source="{CompiledBinding CurrentUser.UserIcon}"
                                    Cursor="Hand"
                                    PointerPressed="ChangeUserIcon"
@@ -355,333 +355,11 @@
                     </ItemsRepeater.Layout>
                     
                     <ItemsRepeater.ItemTemplate>
-                        <!-- Full Card Display -->
-                        <DataTemplate>
-                            <Border Background="Transparent" Margin="20" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 15 6 #B3000000" Width="{CompiledBinding Source={x:Static local:Constants.CARD_WIDTH}}">
-                                <Border CornerRadius="8" ClipToBounds="True" Width="{CompiledBinding Source={x:Static local:Constants.CARD_WIDTH}}">
-                                    <Grid Width="{CompiledBinding Source={x:Static local:Constants.CARD_WIDTH}}"
-                                          Grid.ColumnDefinitions="Auto,Auto"
-                                          ShowGridLines="false">
-                                        <Grid.Styles>
-                                            <Style Selector="ToolTip">
-                                                <Setter Property="Background" Value="{CompiledBinding #CollectionPane.DataContext.CurrentTheme.StatusAndBookTypeBGColor}"/>
-                                                <Setter Property="BorderBrush" Value="{CompiledBinding #CollectionPane.DataContext.CurrentTheme.MenuButtonBorderColor}"/>
-                                                <Setter Property="Foreground" Value="{CompiledBinding #CollectionPane.DataContext.CurrentTheme.MenuButtonTextAndIconColor}"/>
-                                            </Style>
-                                        </Grid.Styles>
-
-                                        <!-- Left Side Card -->
-                                        <Canvas Grid.Column="0"
-                                                Grid.Row="0"
-                                                PointerPressed="OpenSiteLink"
-                                                OpacityMask="White"
-                                                Cursor="Hand"
-                                                Width="{CompiledBinding Source={x:Static local:Constants.LEFT_SIDE_CARD_WIDTH}}">
-                                            <Canvas.Styles>
-                                                <Style Selector="TextBlock.mouseover">
-                                                    <Setter Property="Background" Value="{CompiledBinding #CollectionPane.DataContext.CurrentTheme.StatusAndBookTypeBGHoverColor}"/>
-                                                    <Setter Property="Foreground" Value="{CompiledBinding #CollectionPane.DataContext.CurrentTheme.StatusAndBookTypeTextHoverColor}"/>
-                                                </Style>
-                                                <Style Selector="TextBlock.nomouseover">
-                                                    <Setter Property="Background" Value="{CompiledBinding #CollectionPane.DataContext.CurrentTheme.StatusAndBookTypeBGColor}"/>
-                                                    <Setter Property="Foreground" Value="{CompiledBinding #CollectionPane.DataContext.CurrentTheme.StatusAndBookTypeTextColor}"/>
-                                                </Style>
-                                            </Canvas.Styles>
-
-                                            <!-- Top Left Side Card -->
-                                            <Image Height="{CompiledBinding Source={x:Static local:Constants.IMAGE_HEIGHT}}"
-                                                    Width="{CompiledBinding Source={x:Static local:Constants.LEFT_SIDE_CARD_WIDTH}}"
-                                                    Source="{CompiledBinding CoverBitMap}"
-                                                    ClipToBounds="True">
-                                            </Image>
-
-                                            <!-- Bottom Left Side Card -->
-                                            <TextBlock 
-                                                Canvas.Bottom="0" 
-                                                Classes.mouseover="{CompiledBinding $parent.IsPointerOver}"
-                                                Classes.nomouseover="{Binding !$parent.IsPointerOver}"
-                                                Width="{CompiledBinding Source={x:Static local:Constants.LEFT_SIDE_CARD_WIDTH}}"
-                                                Height="{CompiledBinding Source={x:Static local:Constants.BOTTOM_SECTION_CARD_HEIGHT}}"
-                                                FontWeight="Bold"
-                                                FontSize="17"
-                                                TextAlignment="Center"
-                                                Padding="0,8,0,0">
-                                                <TextBlock.Text>
-                                                    <MultiBinding StringFormat="{}{0} | {1}" Mode="OneWay">
-                                                        <Binding Path="Status"/>
-                                                        <Binding Path="Format"/>
-                                                    </MultiBinding>
-                                                </TextBlock.Text>
-                                            </TextBlock>
-                                        </Canvas>
-
-                                        <!-- Right Side Series Card -->
-                                        <Grid Grid.Row="0"
-                                              Grid.Column="1"
-                                              Width="{CompiledBinding Source={x:Static local:Constants.RIGHT_SIDE_CARD_WIDTH}}"
-                                              DockPanel.Dock="Right" 
-                                              RowDefinitions="Auto, 40"
-                                              ShowGridLines="false">
-                                            <Grid.Styles>
-                                                <Style Selector="ScrollViewer">
-                                                    <Setter Property="IsScrollChainingEnabled" Value="false"/>
-                                                </Style>
-                                                <Style Selector="ScrollBar:vertical">
-                                                    <Style Selector="^ /template/ Rectangle#TrackRect">
-                                                        <Setter Property="Fill" Value="{CompiledBinding #CollectionPane.DataContext.CurrentTheme.CollectionBGColor}" />
-                                                    </Style>
-
-                                                    <Style Selector="^ /template/ Thumb">
-                                                        <Setter Property="Background" Value="{CompiledBinding #CollectionPane.DataContext.CurrentTheme.DividerColor}" />
-                                                        <Style Selector="^:pointerover /template/ Border">
-                                                            <Setter Property="Background" Value="{CompiledBinding #CollectionPane.DataContext.CurrentTheme.DividerColor}" />
-                                                        </Style>
-                                                        <Style Selector="^:pressed /template/ Border">
-                                                            <Setter Property="Background" Value="{CompiledBinding #CollectionPane.DataContext.CurrentTheme.DividerColor}" />
-                                                        </Style>
-                                                    </Style>
-
-                                                    <Style Selector="^[IsExpanded=true]">
-                                                        <Style Selector="^ /template/ Thumb">
-                                                            <Setter Property="Background" Value="{CompiledBinding #CollectionPane.DataContext.CurrentTheme.DividerColor}" />
-                                                        </Style>
-
-                                                        <Style Selector="^ /template/ PathIcon">
-                                                            <Setter Property="Foreground" Value="{CompiledBinding #CollectionPane.DataContext.CurrentTheme.DividerColor}" />
-                                                        </Style>
-
-                                                        <Style Selector="^ /template/ Rectangle#TrackRect">
-                                                            <Setter Property="Fill" Value="{CompiledBinding #CollectionPane.DataContext.CurrentTheme.MenuBGColor}" />
-                                                        </Style>
-                                                    </Style>
-
-                                                    <Style Selector="^ /template/ RepeatButton#PART_LineUpButton, ^ /template/ RepeatButton#PART_LineDownButton">
-                                                        <Setter Property="TextElement.Foreground" Value="{CompiledBinding #CollectionPane.DataContext.CurrentTheme.DividerColor}"/>
-                                                        <Style Selector="^:pointerover">
-                                                            <Setter Property="TextElement.Foreground" Value="{CompiledBinding #CollectionPane.DataContext.CurrentTheme.MenuButtonTextAndIconHoverColor}"/>
-
-                                                            <Style Selector="^ /template/ ContentPresenter" >
-                                                                <Setter Property="Background" Value="{CompiledBinding #CollectionPane.DataContext.CurrentTheme.DividerColor}"/>
-                                                            </Style>
-                                                            <Style Selector="^ PathIcon">
-                                                                <Setter Property="Foreground" Value="{CompiledBinding #CollectionPane.DataContext.CurrentTheme.CollectionBGColor}" />
-                                                            </Style>
-                                                        </Style>
-
-                                                        <Style Selector="^:pressed">
-                                                            <Setter Property="TextElement.Foreground" Value="{CompiledBinding #CollectionPane.DataContext.CurrentTheme.MenuBGColor}"/>
-                                                            <Style Selector="^ /template/ ContentPresenter" >
-                                                                <Setter Property="Background" Value="{CompiledBinding #CollectionPane.DataContext.CurrentTheme.DividerColor}" />
-                                                            </Style>
-                                                            <Style Selector="^ PathIcon">
-                                                                <Setter Property="Foreground" Value="{CompiledBinding #CollectionPane.DataContext.CurrentTheme.CollectionBGColor}" />
-                                                            </Style>
-                                                        </Style>
-                                                    </Style>
-                                                </Style>
-                                            </Grid.Styles>
-
-                                            <!-- Top Right Side Card Series Data Pane -->
-                                            <Grid Height="{CompiledBinding Source={x:Static local:Constants.TOP_SECTION_CARD_HEIGHT}}" 
-                                                    Grid.Row="0"
-                                                    Width="{CompiledBinding Source={x:Static local:Constants.RIGHT_SIDE_CARD_WIDTH}}"
-                                                    Grid.RowDefinitions="Auto,Auto,Auto,*"
-                                                    Background="{CompiledBinding #CollectionPane.DataContext.CurrentTheme.SeriesCardBGColor}"
-                                                    ShowGridLines="false">
-                                                <Grid.Styles>
-                                                    <Style Selector="ScrollBar:vertical">
-                                                        <Style Selector="^[IsExpanded=true]">
-                                                            <Style Selector="^ /template/ Rectangle#TrackRect">
-                                                                <Setter Property="Fill" Value="{CompiledBinding #CollectionPane.DataContext.CurrentTheme.CollectionBGColor}" />
-                                                            </Style>
-                                                        </Style>
-                                                    </Style>
-                                                </Grid.Styles>
-                                                <!-- <Border Grid.Row="0" BorderBrush="Red" BorderThickness="1"> -->
-                                                <!-- MaxLength="24" -->
-                                                <TextBlock Grid.Row="0"
-                                                           Foreground="{CompiledBinding #CollectionPane.DataContext.CurrentTheme.SeriesCardPublisherColor}"
-                                                           MaxLines="1"
-                                                           FontSize="15"
-                                                           Text="{CompiledBinding Publisher}"
-                                                           Padding="9,2,4,-1"/>
-                                                <TextBlock Grid.Row="1"
-                                                    x:Name="SeriesTitleTextBlock"
-                                                    TextWrapping="Wrap"
-                                                    Foreground="{CompiledBinding #CollectionPane.DataContext.CurrentTheme.SeriesCardTitleColor}"
-                                                    FontWeight="Bold"
-                                                    FontSize="23"
-                                                    MaxHeight="{CompiledBinding Source={x:Static local:Constants.TOP_SECTION_CARD_HEIGHT}}"
-                                                    PointerPressed="CopySeriesTitleAsync"
-                                                    Padding="8,0,7,2"
-                                                    Cursor="Hand"
-                                                    TextAlignment="Left"
-                                                    TextTrimming="WordEllipsis"
-                                                    MaxLines="3"
-                                                    Width="{CompiledBinding Source={x:Static local:Constants.RIGHT_SIDE_CARD_WIDTH}}"
-                                                    LineHeight="25">
-                                                    <TextBlock.Text>
-                                                        <MultiBinding Converter="{StaticResource ConvertTitle}">
-                                                            <Binding Path="Titles"/>
-                                                            <Binding Path="#CollectionPane.DataContext.CurrentUser.Language"/>
-                                                        </MultiBinding>
-                                                    </TextBlock.Text>
-                                                    <ToolTip.Tip>
-                                                        <TextBlock TextWrapping="Wrap"
-                                                                FontWeight="Bold"
-                                                                FontSize="18"
-                                                                TextTrimming="None"
-                                                                MaxLines="100"
-                                                                LineHeight="25">
-                                                        <TextBlock.Text>
-                                                            <MultiBinding Converter="{StaticResource ConvertTitle}">
-                                                                <Binding Path="Titles"/>
-                                                                <Binding Path="#CollectionPane.DataContext.CurLanguage"/>
-                                                                <Binding Path="DuplicateIndex"/>
-                                                            </MultiBinding>
-                                                            </TextBlock.Text>
-                                                        </TextBlock>
-                                                    </ToolTip.Tip>
-                                                </TextBlock>
-                                                <!-- </Border> -->
-                                                <TextBlock TextWrapping="Wrap"
-                                                           Grid.Row="2"
-                                                           Foreground="{CompiledBinding #CollectionPane.DataContext.CurrentTheme.SeriesCardStaffColor}"
-                                                           MaxLines="2"
-                                                           TextTrimming="WordEllipsis"
-                                                           FontSize="15"
-                                                           Padding="9,0,4,3">
-                                                    <TextBlock.Text>
-                                                        <MultiBinding Converter="{StaticResource ConvertStaff}" Mode="OneWay">
-                                                            <Binding Path="Staff"/>
-                                                            <Binding Path="#CollectionPane.DataContext.CurrentUser.Language"/>
-                                                        </MultiBinding>
-                                                    </TextBlock.Text>
-                                                    <ToolTip.Tip>
-                                                        <TextBlock TextWrapping="Wrap"
-                                                                FontWeight="Bold"
-                                                                TextTrimming="None"
-                                                                MaxLines="100">
-                                                            <TextBlock.Text>
-                                                                <MultiBinding Converter="{StaticResource ConvertStaff}" Mode="OneWay">
-                                                                    <Binding Path="Staff"/>
-                                                                    <Binding Path="#CollectionPane.DataContext.CurrentUser.Language"/>
-                                                                </MultiBinding>
-                                                            </TextBlock.Text>
-                                                        </TextBlock>
-                                                    </ToolTip.Tip>
-                                                </TextBlock>
-                                                <ScrollViewer VerticalScrollBarVisibility="Auto"
-                                                              HorizontalScrollBarVisibility="Disabled"
-                                                              Grid.Row="3">
-                                                    <TextBlock TextWrapping="Wrap"
-                                                                Foreground="{CompiledBinding #CollectionPane.DataContext.CurrentTheme.SeriesCardDescColor}"
-                                                                Opacity="0.9"
-                                                                Text="{CompiledBinding Description}"
-                                                                Padding="10,-2,20,10"/>
-                                                </ScrollViewer>
-                                            </Grid>
-
-										    <!-- Bottom Right Side Card -->
-                                            <Grid Height="{CompiledBinding Source={x:Static local:Constants.BOTTOM_SECTION_CARD_HEIGHT}}"
-                                                  Background="{CompiledBinding #CollectionPane.DataContext.CurrentTheme.SeriesProgressBGColor}"
-                                                  Width="{CompiledBinding Source={x:Static local:Constants.RIGHT_SIDE_CARD_WIDTH}}"
-                                                  Grid.Row="1"
-                                                  ColumnDefinitions="Auto,Auto">
-                                                <Grid.Styles>
-                                                    <Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-                                                        <Setter Property="Background" Value="Transparent"/>
-                                                        <Setter Property="TextBlock.Foreground" Value="{CompiledBinding #CollectionPane.DataContext.CurrentTheme.SeriesButtonIconHoverColor}"/>
-                                                    </Style>
-                                                </Grid.Styles>
-                                                <Grid ColumnDefinitions="Auto" RowDefinitions="40" HorizontalAlignment="Center" Grid.Column="0" Grid.ColumnSpan="1">
-                                                    <Grid.Styles>
-                                                        <Style Selector="Button">
-                                                            <Style Selector="^:pointerover /template/ ContentPresenter">
-                                                                <Setter Property="TextBlock.Foreground" Value="{CompiledBinding #CollectionPane.DataContext.CurrentTheme.SeriesProgressButtonsHoverColor}"/>
-                                                                <Setter Property="Background" Value="Transparent"/>
-                                                            </Style>
-                                                        </Style>
-                                                    </Grid.Styles>
-                                                    <ProgressBar Height="30"
-                                                                Width="298"
-                                                                Margin="10,0,0,0"
-                                                                Grid.Row="0"
-                                                                Grid.Column="0"
-                                                                Value="{CompiledBinding CurVolumeCount}"
-                                                                Background="{CompiledBinding #CollectionPane.DataContext.CurrentTheme.SeriesProgressBarBGColor}"
-                                                                Foreground="{CompiledBinding #CollectionPane.DataContext.CurrentTheme.SeriesProgressBarColor}"
-                                                                BorderBrush="{CompiledBinding #CollectionPane.DataContext.CurrentTheme.SeriesProgressBarBorderColor}"
-                                                                BorderThickness="1.5"
-                                                                Orientation="Horizontal"
-                                                                Padding="2"
-                                                                FontWeight="Bold"
-                                                                VerticalAlignment="Center"
-                                                                HorizontalAlignment="Center"
-                                                                FontSize="15"
-                                                                Minimum="0"
-                                                                Maximum="{CompiledBinding MaxVolumeCount}"/>
-                                                    <StackPanel Orientation="Horizontal" Grid.Column="0" Grid.Row="0" HorizontalAlignment="Center" Margin="10,0,0,0">
-                                                        <Button Background="Transparent"
-                                                            Foreground="{CompiledBinding #CollectionPane.DataContext.CurrentTheme.SeriesProgressTextColor}"
-                                                            FontWeight="Bold"
-                                                            Height="15"
-                                                            Width="32"
-                                                            FontSize="31"
-                                                            Margin="0,0,-17,0"
-                                                            Padding="-2,-17,0,0"
-                                                            Cursor="Hand"
-                                                            Click="SubtractVolume"
-                                                            VerticalAlignment="Center"
-                                                            HorizontalAlignment="Center"
-                                                            Content="-"/>
-                                                        <TextBlock TextAlignment="Center" 
-                                                                    FontSize="16" 
-                                                                    FontWeight="Bold" 
-                                                                    Foreground="{CompiledBinding #CollectionPane.DataContext.CurrentTheme.SeriesProgressTextColor}"
-                                                                    Margin="0,7.5,0,0">
-                                                            <TextBlock.Text>
-                                                                <MultiBinding StringFormat="{}{0}/{1}">
-                                                                    <Binding Path="CurVolumeCount"/>
-                                                                    <Binding Path="MaxVolumeCount"/>
-                                                                </MultiBinding>
-                                                            </TextBlock.Text>
-                                                        </TextBlock>
-                                                        <Button Background="Transparent"
-                                                                Foreground="{CompiledBinding #CollectionPane.DataContext.CurrentTheme.SeriesProgressTextColor}"
-                                                                FontWeight="Bold"
-                                                                Height="20"
-                                                                Width="21"
-                                                                FontSize="24"
-                                                                Cursor="Hand"
-                                                                Click="AddVolume"
-                                                                Padding="-6,-9.5,0,0"
-                                                                VerticalAlignment="Center"
-                                                                HorizontalAlignment="Center"
-                                                                VerticalContentAlignment="Center"
-                                                                HorizontalContentAlignment="Center"
-                                                                Content="+"/>
-                                                    </StackPanel>
-                                                </Grid>
-                                                <Button Grid.Column="1"
-                                                        Background="{CompiledBinding #CollectionPane.DataContext.CurrentTheme.SeriesProgressBGColor}"
-                                                        FontSize="30"
-                                                        Margin="0,0,3,0"
-                                                        BorderThickness="0"
-                                                        HorizontalAlignment="Left"
-                                                        HorizontalContentAlignment="Center"
-                                                        BorderBrush="{CompiledBinding #CollectionPane.DataContext.CurrentTheme.SeriesButtonIconColor}"
-                                                        Height="{CompiledBinding Source={x:Static local:Constants.BOTTOM_SECTION_CARD_HEIGHT}}"
-                                                        Foreground="{CompiledBinding #CollectionPane.DataContext.CurrentTheme.SeriesButtonIconColor}"
-                                                        i:Attached.Icon="fa-solid fa-square-pen"
-                                                        Cursor="Hand"
-                                                        Click="OpenEditSeriesInfoWindow">
-                                                </Button>
-                                            </Grid>
-                                        </Grid>
-                                    </Grid>
-                                </Border>
-                            </Border>
+                         <DataTemplate DataType="m:Series">
+                            <controls:SeriesCardDisplay
+                                Series="{CompiledBinding}"
+                                CardTheme="{CompiledBinding #CollectionPane.DataContext.CurrentTheme}"
+                                Language="{CompiledBinding #CollectionPane.DataContext.CurrentUser.Language}" />
                         </DataTemplate>
                     </ItemsRepeater.ItemTemplate>
                 </ItemsRepeater>

@@ -20,7 +20,7 @@ namespace Tsundoku.Converters
             // Use the pre-built, optimized dictionary for lookup
             if (languageString != null && TsundokuLanguageStringValueToLanguageMap.TryGetValue(languageString, out TsundokuLanguage langEnum))
             {
-                if (staff.TryGetValue(langEnum, out var result))
+                if (staff.TryGetValue(langEnum, out string? result))
                 {
                     return result;
                 }

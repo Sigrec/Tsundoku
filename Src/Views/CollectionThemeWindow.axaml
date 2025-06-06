@@ -9,8 +9,8 @@
         xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
         xmlns:controls="clr-namespace:Tsundoku.Controls"
         x:Class="Tsundoku.Views.CollectionThemeWindow"
-        Icon="\Assets\Icons\Tsundoku-Logo.ico"
-        Title="Theme Settings"
+        Icon="\Assets\Icons\TsundokuLogo.ico"
+        Title="Theme"
         FontFamily="Segoe UI"
         WindowState="2"
         Classes="Menu"
@@ -677,8 +677,8 @@
                             <ComboBox x:Name="ThemeSelector"
                                     SelectionChanged="ChangeMainTheme"
                                     Height="35"
-                                    ItemsSource="{CompiledBinding SavedThemes}"
-                                    SelectedIndex="{CompiledBinding SelectedThemeIndex, Mode=TwoWay}"
+                                    ItemsSource="{CompiledBinding SavedThemes, Mode=OneWay}"
+                                    SelectedIndex="{CompiledBinding SelectedThemeIndex, Mode=OneWay}"
                                     BorderThickness="2"
                                     Theme="{StaticResource MenuComboBox}">
                                 <ComboBox.ItemTemplate>

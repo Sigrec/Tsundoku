@@ -5,7 +5,7 @@
         xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
         xmlns:vm="using:Tsundoku.ViewModels"
         x:Class="Tsundoku.Views.PopupWindow"
-        Icon="\Assets\Icons\Tsundoku-Logo.ico"
+        Icon="\Assets\Icons\TsundokuLogo.ico"
         FontFamily="Segoe UI"
         Classes="Menu"
         WindowStartupLocation="CenterScreen"

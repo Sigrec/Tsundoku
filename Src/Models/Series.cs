@@ -23,7 +23,7 @@ namespace Tsundoku.Models
         });
 
         [JsonIgnore] private bool disposedValue;
-        [JsonIgnore][Reactive] public Bitmap CoverBitMap { get; set; }
+        [JsonIgnore][Reactive] public Bitmap? CoverBitMap { get; set; }
         public Guid Id { get; set; } = Guid.NewGuid();
         [Reactive] public string Publisher { get; set; }
         [Reactive] public Dictionary<TsundokuLanguage, string> Titles { get; set; }
@@ -34,7 +34,7 @@ namespace Tsundoku.Models
         [Reactive] public Status Status { get; set; }
         [Reactive] public string Cover { get; set; }
         public Uri Link { get; set; }
-        [Reactive] public HashSet<Genre> Genres { get; set; }
+        [Reactive] public HashSet<Genre>? Genres { get; set; }
         [Reactive] public string SeriesNotes { get; set; }
         [Reactive] public ushort MaxVolumeCount { get; set; }
         [Reactive] public ushort CurVolumeCount { get; set; }
@@ -437,7 +437,7 @@ namespace Tsundoku.Models
                         }
 
                         // Remove empty titles
-                        foreach (var x in newTitles)
+                        foreach (KeyValuePair<TsundokuLanguage, string> x in newTitles)
                         {
                             if (string.IsNullOrWhiteSpace(x.Value))
                             {
@@ -446,7 +446,7 @@ namespace Tsundoku.Models
                         }
 
                         // Remove empty titles
-                        foreach (var x in newStaff)
+                        foreach (KeyValuePair<TsundokuLanguage, string> x in newStaff)
                         {
                             if (string.IsNullOrWhiteSpace(x.Value))
                             {
@@ -594,6 +594,105 @@ namespace Tsundoku.Models
             return "Null Series";
         }
 
+        public void UpdateFrom(Series other)
+        {
+            // 1. Titles (Dictionary<TsundokuLanguage, string>) – deep‐compare by count + per‐key/value
+            if (!ExtensionMethods.DictionariesEqual(Titles, other.Titles))
+            {
+                Titles = new Dictionary<TsundokuLanguage, string>(other.Titles);
+            }
+
+            // 2. Staff (Dictionary<TsundokuLanguage, string>) – deep‐compare
+            if (!ExtensionMethods.DictionariesEqual(Staff, other.Staff))
+            {
+                Staff = new Dictionary<TsundokuLanguage, string>(other.Staff);
+            }
+
+            // 3. Description (string)
+            if (Description != other.Description)
+            {
+                Description = other.Description;
+            }
+
+            // 4. Format (enum or struct)
+            if (Format != other.Format)
+            {
+                Format = other.Format;
+            }
+
+            // 5. Status (enum or struct)
+            if (Status != other.Status)
+            {
+                Status = other.Status;
+            }
+
+            // 6. Cover (string)
+            if (Cover != other.Cover)
+            {
+                Cover = other.Cover;
+            }
+
+            // 7. Link (Uri)
+            if (!Equals(Link, other.Link))
+            {
+                Link = other.Link;
+            }
+
+            // 8. Genres (HashSet<Genre>) – deep‐compare via SetEquals
+            if (!ExtensionMethods.HashSetsEqual(Genres, other.Genres))
+            {
+                Genres = [.. other.Genres];
+            }
+
+            // 9. MaxVolumeCount (ushort)
+            if (MaxVolumeCount != other.MaxVolumeCount)
+            {
+                MaxVolumeCount = other.MaxVolumeCount;
+            }
+
+            // 10. CurVolumeCount (ushort)
+            if (CurVolumeCount != other.CurVolumeCount)
+            {
+                CurVolumeCount = other.CurVolumeCount;
+            }
+
+            // 11. Rating (decimal)
+            if (Rating != other.Rating)
+            {
+                Rating = other.Rating;
+            }
+
+            // 12. VolumesRead (uint)
+            if (VolumesRead != other.VolumesRead)
+            {
+                VolumesRead = other.VolumesRead;
+            }
+
+            // 13. Value (decimal)
+            if (Value != other.Value)
+            {
+                Value = other.Value;
+            }
+
+            // 14. Demographic (enum or struct)
+            if (Demographic != other.Demographic)
+            {
+                Demographic = other.Demographic;
+            }
+
+            // 15. Publisher (string)
+            if (Publisher != other.Publisher)
+            {
+                Publisher = other.Publisher;
+            }
+
+            // 16. DuplicateIndex (uint)
+            if (DuplicateIndex != other.DuplicateIndex)
+            {
+                DuplicateIndex = other.DuplicateIndex;
+            }
+        }
+
         protected virtual void Dispose(bool disposing)
         {
             if (!this.disposedValue)
@@ -607,6 +706,7 @@ namespace Tsundoku.Models
 
                 // free unmanaged resources (unmanaged objects) and override finalizer
                 // set large fields to null
+                this.CoverBitMap = null;
                 this.disposedValue = true;
             }
         }
@@ -699,9 +799,9 @@ namespace Tsundoku.Models
         {
             HashCode hash = new HashCode();
             hash.Add(obj.Format);
-            foreach (var title in obj.Titles)
+            foreach (KeyValuePair<TsundokuLanguage, string> title in obj.Titles)
                 hash.Add(title);
-            foreach (var staff in obj.Staff)
+            foreach (KeyValuePair<TsundokuLanguage, string> staff in obj.Staff)
                 hash.Add(staff);
             return hash.ToHashCode();
         }

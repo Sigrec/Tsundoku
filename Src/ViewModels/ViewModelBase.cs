@@ -15,12 +15,12 @@ namespace Tsundoku.ViewModels
         public static bool updatedVersion = false;
         public static bool newCoverCheck = false;
         public bool isReloading = false;
-        public const string CUR_TSUNDOKU_VERSION = "1.0.0";
+        public const string CUR_TSUNDOKU_VERSION = "1.1.0";
         public const double SCHEMA_VERSION = 6.0;
         public const string USER_DATA_FILEPATH = @"UserData.json";
         
-        [Reactive] public TsundokuTheme CurrentTheme { get; private set; }
-        [Reactive] public User CurrentUser { get; private set; }
+        [Reactive] public TsundokuTheme CurrentTheme { get; protected set; }
+        [Reactive] public User CurrentUser { get; protected set; }
         
         protected readonly IUserService _userService;
         protected readonly CompositeDisposable _disposables = new CompositeDisposable();

@@ -4,7 +4,7 @@
         xmlns:vm="using:Tsundoku.ViewModels"
         x:Class="Tsundoku.Views.UserNotesWindow"
         Title="Notes"
-        Icon="\Assets\Icons\Tsundoku-Logo.ico"
+        Icon="\Assets\Icons\TsundokuLogo.ico"
         FontFamily="Segoe UI"
         Classes="Menu"
         MinWidth="600"

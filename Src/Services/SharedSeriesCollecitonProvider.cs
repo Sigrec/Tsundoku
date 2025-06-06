@@ -228,7 +228,7 @@ namespace Tsundoku.Services
             return await Task.Run(() =>
             {
                 advancedSearchQuery = advancedSearchQuery.Trim();
-                var advancedSearchMatches = AdvancedQueryRegex().Matches(advancedSearchQuery);
+                MatchCollection advancedSearchMatches = AdvancedQueryRegex().Matches(advancedSearchQuery);
 
                 if (advancedSearchMatches.Count == 0)
                 {

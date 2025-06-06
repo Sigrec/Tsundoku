@@ -100,7 +100,10 @@ namespace Tsundoku.ViewModels
             this.WhenAnyValue(x => x.CurrentUser.Language)
                 .DistinctUntilChanged()
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(lang => SelectedLangIndex = (ushort)INDEXED_LANGUAGES[lang])
+                .Subscribe(lang =>
+                {
+                    SelectedLangIndex = (ushort)INDEXED_LANGUAGES[lang];
+                })
                 .DisposeWith(_disposables);
 
             Observable.Merge(
@@ -127,7 +130,6 @@ namespace Tsundoku.ViewModels
         {
             _userService.UpdateUserIcon(filePath);
         }
-
         private void ConfigureWindows()
         {
             LOGGER.Info("Configuring Windows...");
@@ -169,29 +171,30 @@ namespace Tsundoku.ViewModels
             _userService.AddSeries(series);
         }
 
-        public async Task RefreshSeries(Series series)
+        public async Task RefreshSeries(Series originalSeries)
         {
-            LOGGER.Info("Refreshing {series} ({id})", series.Titles[TsundokuLanguage.Romaji] + (series.DuplicateIndex == 0 ? string.Empty : $" ({series.DuplicateIndex})"), series.Id);
+            LOGGER.Info("Refreshing {series} ({id})", originalSeries.Titles[TsundokuLanguage.Romaji] + (originalSeries.DuplicateIndex == 0 ? string.Empty : $" ({originalSeries.DuplicateIndex})"), originalSeries.Id);
 
             newCoverCheck = true;
             Series? refreshedSeries = await Series.CreateNewSeriesCardAsync(
                 _bitmapHelper,
                 _mangaDex,
                 _aniList,
-                series.Link.Segments.Last(),
-                series.Format,
-                series.MaxVolumeCount,
-                series.CurVolumeCount,
-                series.SeriesContainsAdditionalLanagues(),
-                series.Publisher,
-                series.Demographic,
-                series.VolumesRead,
-                series.Rating,
-                series.Value,
+                originalSeries.Link.Segments.Last(),
+                originalSeries.Format,
+                originalSeries.MaxVolumeCount,
+                originalSeries.CurVolumeCount,
+                originalSeries.SeriesContainsAdditionalLanagues(),
+                originalSeries.Publisher,
+                originalSeries.Demographic,
+                originalSeries.VolumesRead,
+                originalSeries.Rating,
+                originalSeries.Value,
                 string.Empty,
-                true);
+                allowDuplicate: false,
+                isRefresh: true);
 
-            _userService.AddSeries(refreshedSeries);
+            _userService.UpdateSeries(originalSeries, refreshedSeries);
         }
 
         public void SaveOnClose()

@@ -25,7 +25,7 @@ namespace Tsundoku.Helpers
             {
                 title = HttpUtility.UrlEncode(title);
                 LOGGER.Debug($"MangaDex Getting Series By Title Async \"{_mangadexClient.BaseAddress}manga?title={title}\"");
-                var response = await _mangadexClient.GetStringAsync($"manga?title={title}");
+                string response = await _mangadexClient.GetStringAsync($"manga?title={title}");
                 return JsonDocument.Parse(response);
             }
             catch (HttpRequestException e)
@@ -46,7 +46,7 @@ namespace Tsundoku.Helpers
             try
             {
                 LOGGER.Debug($"MangaDex Getting Series Async \"{_mangadexClient.BaseAddress}manga/{id}\"");
-                var response = await _mangadexClient.GetStringAsync($"manga/{id}");
+                string response = await _mangadexClient.GetStringAsync($"manga/{id}");
                 return JsonDocument.Parse(response);
             }
             catch (Exception e)
@@ -67,7 +67,7 @@ namespace Tsundoku.Helpers
             try
             {
                 LOGGER.Debug($"MangaDex Getting Author Async \"{_mangadexClient.BaseAddress}author/{id}\"");
-                var response = await _mangadexClient.GetStringAsync($"author/{id}");
+                string response = await _mangadexClient.GetStringAsync($"author/{id}");
                 return JsonDocument.Parse(response).RootElement.GetProperty("data").GetProperty("attributes").GetProperty("name").GetString();
             }
             catch (Exception e)
@@ -88,7 +88,7 @@ namespace Tsundoku.Helpers
             try
             {
                 LOGGER.Debug($"MangaDex Getting Cover Async \"{_mangadexClient.BaseAddress}cover/{id}\"");
-                var response = await _mangadexClient.GetStringAsync($"cover/{id}");
+                string response = await _mangadexClient.GetStringAsync($"cover/{id}");
                 JsonElement data = JsonDocument.Parse(response).RootElement.GetProperty("data");
                 if (data.ValueKind == JsonValueKind.Array) // Collection
                 {

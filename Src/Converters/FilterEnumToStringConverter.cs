@@ -12,7 +12,7 @@ namespace Tsundoku.Converters
         {
             if (value is TsundokuFilter filter)
             {
-                var enumMember = typeof(TsundokuFilter)
+                string? enumMember = typeof(TsundokuFilter)
                     .GetField(filter.ToString())
                     ?.GetCustomAttribute<EnumMemberAttribute>()?.Value;
 
@@ -27,7 +27,7 @@ namespace Tsundoku.Converters
             {
                 foreach (TsundokuFilter val in Enum.GetValues(typeof(TsundokuFilter)))
                 {
-                    var enumMember = typeof(TsundokuFilter)
+                    string? enumMember = typeof(TsundokuFilter)
                         .GetField(val.ToString())
                         ?.GetCustomAttribute<EnumMemberAttribute>()?.Value;
 

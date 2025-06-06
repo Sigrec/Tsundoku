@@ -8,6 +8,7 @@
 		<AvaloniaNameGeneratorIsEnabled>true</AvaloniaNameGeneratorIsEnabled>
 		<AvaloniaNameGeneratorFilterByPath>*</AvaloniaNameGeneratorFilterByPath>
 		<AvaloniaNameGeneratorFilterByNamespace>*</AvaloniaNameGeneratorFilterByNamespace>
+        <AvaloniaUseCompiledBindings>true</AvaloniaUseCompiledBindings>
 
 		<!-- Targeting -->
 		<RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
@@ -31,12 +32,12 @@
 		<JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
 
 		<!-- Metadata -->
-		<Version>1.0.0</Version>
-		<FileVersion>1.0.0</FileVersion>
-		<AssemblyVersion>1.0.0.0</AssemblyVersion>
+		<Version>1.1.0</Version>
+		<FileVersion>1.1.0</FileVersion>
+		<AssemblyVersion>1.1.0.0</AssemblyVersion>
 		<RepositoryUrl>https://github.com/Sigrec/Tsundoku</RepositoryUrl>
 		<Description>Desktop Manga and Light Novel Collection App</Description>
-		<ApplicationIcon>Assets\Icons\Tsundoku-Logo.ico</ApplicationIcon>
+		<ApplicationIcon>Assets\Icons\TsundokuLogo.ico</ApplicationIcon>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
@@ -59,20 +60,14 @@
 		<AvaloniaResource Remove="Assets\Example.jpg" />
 		<None Remove="Assets\DiscordRPImage.png" />
 		<None Remove="Assets\Example.jpg" />
-		<None Remove="Assets\Icons\Tsundoku-Logo.ico" />
-		<AvaloniaResource Include="Assets\Icons\Tsundoku-Logo.ico" />
+		<None Remove="Assets\Icons\TsundokuLogo.ico" />
+		<AvaloniaResource Include="Assets\Icons\TsundokuLogo.ico" />
 		<AvaloniaResource Include="Styles/**" />
 		<Content Update="lib*.dll">
 			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 			<ExcludeFromSingleFile>false</ExcludeFromSingleFile>
 		</Content>
 	</ItemGroup>
-
-    <ItemGroup>
-        <Content Include="NLog.config">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Content>
-    </ItemGroup>
 	
 	<ItemGroup>
 		<!--This helps with theme dll-s trimming.

@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using System.Reactive.Linq;
 using ReactiveUI.Fody.Helpers;
 using Tsundoku.Models;
 
@@ -10,7 +9,7 @@ namespace Tsundoku.ViewModels
         private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
         [Reactive] public bool IsSaveThemeButtonEnabled { get; set; }
         [Reactive] public bool IsGenerateThemeButtonEnabled { get; set; } = false;
-        [Reactive] public int SelectedThemeIndex { get; set; }
+        [Reactive] public uint SelectedThemeIndex { get; set; }
 
         public ReadOnlyObservableCollection<TsundokuTheme> SavedThemes => _userService.SavedThemes;
 
@@ -21,9 +20,8 @@ namespace Tsundoku.ViewModels
 
         public void UpdateSelectedThemeIndex()
         {
-            int initialIndex = SavedThemes.ToList().FindIndex(t => t.ThemeName == CurrentTheme.ThemeName);
-            LOGGER.Debug("Updating Selected Theme Index to {val}", initialIndex);
-            SelectedThemeIndex = initialIndex != -1 ? initialIndex : 0;
+            SelectedThemeIndex = _userService.GetCurrentThemeIndex();
+            LOGGER.Debug("Updated Selected Theme Index to {val}", SelectedThemeIndex);
         }
 
         public TsundokuTheme GetMainTheme()

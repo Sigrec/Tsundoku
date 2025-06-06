@@ -8,7 +8,7 @@
 		xmlns:lvc="using:LiveChartsCore.SkiaSharpView.Avalonia"
         x:Class="Tsundoku.Views.CollectionStatsWindow"
 		x:DataType="vm:CollectionStatsViewModel"
-		Icon="\Assets\Icons\Tsundoku-Logo.ico"
+		Icon="\Assets\Icons\TsundokuLogo.ico"
         Title="Stats"
 		FontFamily="Segoe UI"
         Classes="Menu"
@@ -28,7 +28,7 @@
 				<Border Name="StatsBG" Grid.Row="0" Grid.RowSpan="3" Grid.Column="0" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" Height="230" BoxShadow="0 0 10 3 #B3000000" HorizontalAlignment="Center" Background="{CompiledBinding PaneBackgroundColor}">
                     <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="Auto" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10">
                         <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0" Margin="0,0,0,0" MaxWidth="626" HorizontalAlignment="Center">
-                            <controls:ValueStat Text="{CompiledBinding CurrentUser.MeanRating}" Title="Mean Score" Icon="fa-solid fa-gauge-simple" PointerPressed="CopyTextAsync"/>
+                            <controls:ValueStat Text="{CompiledBinding CurrentUser.MeanRating}" Title="Mean Rating" Icon="fa-solid fa-gauge-simple" PointerPressed="CopyTextAsync"/>
                             <controls:ValueStat Text="{CompiledBinding CurrentUser.VolumesRead}" Title="Volumes Read" Icon="fa-solid fa-book-open-reader" PointerPressed="CopyTextAsync"/>
                             <controls:ValueStat Text="{CompiledBinding SeriesCount}" Title="Series Count" Icon="fa-solid fa-globe" PointerPressed="CopyTextAsync"/>
                         </StackPanel>

@@ -134,7 +134,7 @@ namespace Tsundoku.Views
 
         private void WebsiteSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var list = (sender as ListBox).SelectedItems;
+            IList? list = (sender as ListBox).SelectedItems;
             ViewModel.WebsitesSelected = list.Count != 0 && IsWebsiteListValid(list);
         }
 

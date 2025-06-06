@@ -21,7 +21,7 @@
 
     <TrayIcon.Icons>
 		<TrayIcons>
-			<TrayIcon Icon="\Assets\Icons\Tsundoku-Logo.ico" ToolTipText="Tsundoku"/>
+			<TrayIcon Icon="\Assets\Icons\TsundokuLogo.ico" ToolTipText="Tsundoku"/>
 		</TrayIcons>
   	</TrayIcon.Icons>
 </Application>

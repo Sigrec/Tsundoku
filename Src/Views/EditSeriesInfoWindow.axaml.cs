@@ -138,7 +138,7 @@ public partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfoViewMod
         }
 
         string costTextRaw = CostMaskedTextBox.Text;
-        if (RatingMaskedTextBox.Text.EndsWith("__________________.__") && !string.IsNullOrWhiteSpace(costTextRaw))
+        if (!costTextRaw.EndsWith("__________________.__") && !string.IsNullOrWhiteSpace(costTextRaw))
         {
             string costText = costTextRaw[1..].Replace("_", "0");
             if (!costText.Contains('_') && decimal.TryParse(costText, out decimal newValue) &&
@@ -206,30 +206,87 @@ public partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfoViewMod
 
     private void ChangeSeriesVolumeCounts(object sender, RoutedEventArgs args)
     {
-        string curVolumeString = CurVolumeMaskedTextBox.Text.Replace("_", string.Empty);
-        string maxVolumeString = MaxVolumeMaskedTextBox.Text.Replace("_", string.Empty);
-        if (!string.IsNullOrWhiteSpace(curVolumeString) && !string.IsNullOrWhiteSpace(maxVolumeString))
+        string curText = CurVolumeMaskedTextBox.Text.Replace("_", string.Empty).Trim();
+        string maxText = MaxVolumeMaskedTextBox.Text.Replace("_", string.Empty).Trim();
+
+        // Try parsing each non‐empty field:
+        ushort newCur = 0, newMax = 0;
+        bool hasCur = !string.IsNullOrWhiteSpace(curText) && ushort.TryParse(curText, out newCur);
+        bool hasMax = !string.IsNullOrWhiteSpace(maxText) && ushort.TryParse(maxText, out newMax);
+
+        // If either field was non‐empty but failed to parse, log a warning and stop:
+        if (!string.IsNullOrWhiteSpace(curText) && !hasCur)
         {
-            if (ushort.TryParse(curVolumeString, out ushort newCurVols) && ushort.TryParse(maxVolumeString, out ushort newMaxVols))
+            LOGGER.Warn($"\"{curText}\" is not a valid ushort input for current volume");
+            return;
+        }
+        if (!string.IsNullOrWhiteSpace(maxText) && !hasMax)
+        {
+            LOGGER.Warn($"\"{maxText}\" is not a valid ushort input for max volume");
+            return;
+        }
+
+        // Both were provided:
+        if (hasCur && hasMax)
+        {
+            if (newMax >= newCur)
             {
-                if (newMaxVols >= newCurVols)
-                {
-                    ViewModel.Series.CurVolumeCount = newCurVols;
-                    ViewModel.Series.MaxVolumeCount = newMaxVols;
+                ushort oldCur = ViewModel.Series.CurVolumeCount;
+                ushort oldMax = ViewModel.Series.MaxVolumeCount;
+                ViewModel.Series.CurVolumeCount = newCur;
+                ViewModel.Series.MaxVolumeCount = newMax;
 
-                    LOGGER.Info($"Changed Series Volume Counts For \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\" From {ViewModel.Series.CurVolumeCount}/{ViewModel.Series.MaxVolumeCount} -> {newCurVols}/{newMaxVols}");
+                LOGGER.Info(
+                    $"Changed Series Volume Counts For \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\" " +
+                    $"From {oldCur}/{oldMax} -> {newCur}/{newMax}"
+                );
 
-                    CurVolumeMaskedTextBox.Clear();
-                    MaxVolumeMaskedTextBox.Clear();
-                }
-                else
-                {
-                    LOGGER.Warn($"{newCurVols} Is Not Less Than or Equal To {newMaxVols}");
-                }
+                CurVolumeMaskedTextBox.Clear();
+                MaxVolumeMaskedTextBox.Clear();
             }
             else
             {
-                LOGGER.Warn($"\"{curVolumeString}\" and \"{maxVolumeString}\" are not Valid ushort Inputs");
+                LOGGER.Warn($"{newCur} cannot be greater than {newMax}");
+            }
+        }
+        // Only “current” was provided:
+        else if (hasCur)
+        {
+            if (newCur <= ViewModel.Series.MaxVolumeCount)
+            {
+                ushort oldCur = ViewModel.Series.CurVolumeCount;
+                ViewModel.Series.CurVolumeCount = newCur;
+
+                LOGGER.Info(
+                    $"Updated Series Current Volume Count For \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\" " +
+                    $"From {oldCur} to {newCur}"
+                );
+
+                CurVolumeMaskedTextBox.Clear();
+            }
+            else
+            {
+                LOGGER.Warn($"{newCur} cannot be greater than {ViewModel.Series.MaxVolumeCount}");
+            }
+        }
+        // Only “max” was provided:
+        else if (hasMax)
+        {
+            if (newMax >= ViewModel.Series.CurVolumeCount)
+            {
+                ushort oldMax = ViewModel.Series.MaxVolumeCount;
+                ViewModel.Series.MaxVolumeCount = newMax;
+
+                LOGGER.Info(
+                    $"Updated Series Max Volume Count For \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\" " +
+                    $"From {oldMax} to {newMax}"
+                );
+
+                MaxVolumeMaskedTextBox.Clear();
+            }
+            else
+            {
+                LOGGER.Warn($"{newMax} cannot be less than {ViewModel.Series.CurVolumeCount}");
             }
         }
     }

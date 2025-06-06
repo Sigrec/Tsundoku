@@ -1,10 +1,8 @@
 using Avalonia.Controls;
 using Microsoft.Extensions.DependencyInjection;
 using Avalonia.Interactivity;
-using Avalonia.LogicalTree;
 using Avalonia.Platform.Storage;
 using Avalonia.ReactiveUI;
-using FileWatcherEx;
 using ReactiveUI;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -16,7 +14,6 @@ using Tsundoku.ViewModels;
 using static Tsundoku.Models.TsundokuFilterModel;
 using System.Reactive.Disposables;
 using static Tsundoku.Models.TsundokuLanguageModel;
-using Tsundoku.Services;
 
 namespace Tsundoku.Views
 {
@@ -141,14 +138,6 @@ namespace Tsundoku.Views
                 "Edit Series Info Dialog"
             );
             interaction.SetOutput(resultFromDialog);
-        }
-
-        private async void OpenEditSeriesInfoWindow(object sender, RoutedEventArgs args)
-        {
-            Button seriesButton = (Button)sender;
-            seriesButton.Foreground = ViewModel.CurrentTheme.SeriesButtonIconHoverColor;
-            await ViewModel!.CreateEditSeriesDialog(seriesButton.DataContext as Series);
-            seriesButton.Foreground = ViewModel.CurrentTheme.SeriesButtonIconColor;
         }
 
         private async Task ToggleNotificationPopup(string notiText)

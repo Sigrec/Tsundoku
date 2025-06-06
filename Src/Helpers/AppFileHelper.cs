@@ -115,7 +115,6 @@ namespace Tsundoku.Helpers
             baseWritablePath = ApplicationData.Current.LocalCacheFolder.Path;
             fullFolderPath = Path.Combine(baseWritablePath, "Local", "Tsundoku", subfolderName);
 #endif
-
             try
             {
                 Directory.CreateDirectory(fullFolderPath);

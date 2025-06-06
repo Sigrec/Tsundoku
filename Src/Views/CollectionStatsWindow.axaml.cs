@@ -47,7 +47,7 @@ namespace Tsundoku.Views
         {
             string curText = $"{(sender as Controls.ValueStat).Text} {(sender as Controls.ValueStat).Title}";
             LOGGER.Info($"Copying {curText} to Clipboard");
-            await TextCopy.ClipboardService.SetTextAsync($"{curText}");
+            await TextCopy.ClipboardService.SetTextAsync(curText);
         }
     }
 }

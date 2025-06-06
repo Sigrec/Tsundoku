@@ -34,7 +34,7 @@ namespace Tsundoku.Helpers
                 // Avalonia Bitmap constructor can load directly from a file path
                 return await Task.Run(() =>
                 {
-                    using (var loadedBitmap = new Bitmap(sourceFilePath))
+                    using (Bitmap loadedBitmap = new Bitmap(sourceFilePath))
                     {
                         LOGGER.Debug("Image loaded from local path. Dimensions: {Width}x{Height}", loadedBitmap.PixelSize.Width, loadedBitmap.PixelSize.Height);
                         // ProcessAndSaveBitmap is synchronous, so it runs within this Task.Run context
@@ -103,7 +103,7 @@ namespace Tsundoku.Helpers
             {
                 return await Task.Run(() =>
                 {
-                    using (var imageStream = new MemoryStream(imageByteArray))
+                    using (MemoryStream imageStream = new MemoryStream(imageByteArray))
                     {
                         originalBitmap = new Bitmap(imageStream);
                     }

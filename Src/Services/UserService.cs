@@ -15,14 +15,16 @@ using System.Diagnostics.CodeAnalysis;
 using DynamicData.Kernel;
 using static Tsundoku.Models.TsundokuFilterModel;
 using ReactiveUI.Fody.Helpers;
-using Avalonia.Threading;
+using Tsundoku.Models;
+using System.Collections.Specialized;
 
-namespace Tsundoku.Models
+namespace Tsundoku.Services
 {
     public interface IUserService : IDisposable
     {
         IObservable<User?> CurrentUser { get; }
         IObservable<IChangeSet<Series, Guid>> UserCollectionChanges { get; }
+        IObservable<IChangeSet<TsundokuTheme, string>> SavedThemeChanges { get; }
         void UpdateUser(Action<User> updateAction);
         void LoadUserData();
         void SaveUserData(User user);
@@ -30,11 +32,13 @@ namespace Tsundoku.Models
         void ImportUserData(string filePath);
         void UpdateUserIcon(string filePath);
         User? GetCurrentUserSnapshot();
+        uint GetCurrentThemeIndex();
         Series? GetSeriesByCoverPath(string coverPath);
         TsundokuLanguage GetLanguage();
         bool DoesDuplicateExist(Series series);
         IReadOnlyList<Series> GetUserCollection();
         int GetCurCollectionCount();
+        uint SelectedThemeIndex { get; set; }
 
         ReadOnlyObservableCollection<TsundokuTheme> SavedThemes { get; }
 
@@ -45,6 +49,7 @@ namespace Tsundoku.Models
         TsundokuTheme? GetCurrentThemeSnapshot();
         TsundokuTheme? GetMainTheme();
         bool AddSeries(Series? series, bool allowDuplicate = false);
+        bool UpdateSeries(Series originalSeries, Series? refreshdSeries);
         void UpdateSeriesCoverBitmap(Guid seriesId, Bitmap bitmap);
         void RemoveSeries(Series series);
 
@@ -59,6 +64,7 @@ namespace Tsundoku.Models
 
     public class UserService : IUserService, IDisposable
     {
+        public static string USER_AGENT = "Tsundoku/1.0";
         private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
         private readonly BehaviorSubject<User?> _userSubject = new BehaviorSubject<User?>(null);
         public IObservable<User?> CurrentUser => _userSubject.AsObservable();
@@ -70,26 +76,28 @@ namespace Tsundoku.Models
         private readonly SourceCache<Series, Guid> _userCollectionSourceCache = new SourceCache<Series, Guid>(s => s.Id);
         public IObservable<IChangeSet<Series, Guid>> UserCollectionChanges => _userCollectionSourceCache.Connect();
         private readonly SourceCache<TsundokuTheme, string> _savedThemesSourceCache = new SourceCache<TsundokuTheme, string>(t => t.ThemeName);
+        public IObservable<IChangeSet<TsundokuTheme, string>> SavedThemeChanges => _savedThemesSourceCache.Connect();
 
         private readonly ReadOnlyObservableCollection<Series> _userCollection;
         private readonly ReadOnlyObservableCollection<TsundokuTheme> _savedThemes;
 
         [Reactive] public string SeriesFilterText { get; set; } = string.Empty;
         [Reactive] public TsundokuFilter SelectedFilter { get; set; } = TsundokuFilter.None;
+        [Reactive] public uint SelectedThemeIndex { get; set; }
 
         private readonly CompositeDisposable _disposables = new CompositeDisposable();
         private bool _disposed = false;
 
         public UserService()
         {
-            var themeComparerChanged = _userSubject
-                .Where(user => user != null)
-                .Select(user => user!.Language)
-                .DistinctUntilChanged()
-                .Select(curLang => (IComparer<TsundokuTheme>)new TsundokuThemeComparer(curLang));
+            // IObservable<IComparer<TsundokuTheme>> themeComparerChanged = _userSubject
+            //     .Where(user => user != null)
+            //     .Select(user => user!.Language)
+            //     .DistinctUntilChanged()
+            //     .Select(curLang => (IComparer<TsundokuTheme>)new TsundokuThemeComparer(curLang));
 
-            _savedThemesSourceCache.Connect()
-                .SortAndBind(out _savedThemes, themeComparerChanged)
+            SavedThemeChanges
+                .SortAndBind(out _savedThemes, new TsundokuThemeComparer(TsundokuLanguage.English))
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe()
                 .DisposeWith(_disposables);
@@ -101,7 +109,7 @@ namespace Tsundoku.Models
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(mainThemeName =>
                 {
-                    var lookupTheme = _savedThemesSourceCache.Lookup(mainThemeName);
+                    Optional<TsundokuTheme> lookupTheme = _savedThemesSourceCache.Lookup(mainThemeName);
                     TsundokuTheme theme;
 
                     if (lookupTheme == null)
@@ -173,6 +181,22 @@ namespace Tsundoku.Models
             SaveUserData();
             LOGGER.Info($"Finished Loading \"{loadedUser.UserName}'s\" Data!");
         }
+
+        public uint GetCurrentThemeIndex()
+        {
+            string currentName = GetCurrentThemeSnapshot().ThemeName;
+
+            // This only loops until it finds the first match (or until the end).
+            var match = _savedThemes
+                .Select((theme, idx) => new { theme, idx })
+                .FirstOrDefault(x => x.theme.ThemeName.Equals(currentName));
+
+            // If no match, FirstOrDefault returns null, so idx = 0 by default.
+            int foundIndex = (match is null) ? -1 : match.idx;
+
+            return (uint)(foundIndex >= 0 ? foundIndex : 0);
+        }
+
 
         public int GetCurCollectionCount()
         {
@@ -450,7 +474,7 @@ namespace Tsundoku.Models
             User user = _userSubject.Value;
             updateAction(user);
             _userSubject.OnNext(user);
-            LOGGER.Debug($"User properties updated for: {user.UserName}");
+            LOGGER.Trace($"User properties updated for: {user.UserName}");
         }
 
         public User? GetCurrentUserSnapshot()
@@ -572,6 +596,30 @@ namespace Tsundoku.Models
             return true;
         }
 
+        public bool UpdateSeries(Series originalSeries, Series? refreshedSeries)
+        {
+            if (refreshedSeries == null)
+            {
+                LOGGER.Warn("{title} returned a null series entry on refresh", originalSeries.Titles[TsundokuLanguage.Romaji]);
+            }
+            else if (_userCollectionSourceCache.Lookup(originalSeries.Id).HasValue)
+            {
+                originalSeries.UpdateFrom(refreshedSeries);
+                UpdateUser(user =>
+                {
+                    int index = user.UserCollection.BinarySearch(originalSeries, new SeriesComparer(user.Language));
+                    index = index < 0 ? ~index : index;
+                    user.UserCollection.RemoveAt(index);
+                    user.UserCollection.Insert(index, originalSeries);
+                });
+
+                LOGGER.Info("Refreshed {series} ({id}) in Collection", originalSeries.Titles[TsundokuLanguage.Romaji] + (originalSeries.DuplicateIndex == 0 ? string.Empty : $" ({originalSeries.DuplicateIndex})"), originalSeries.Id);
+                return true;
+            }
+            refreshedSeries?.Dispose();
+            return false;
+        }
+
         public void RemoveSeries(Series series)
         {
             if (series == null)
@@ -622,7 +670,7 @@ namespace Tsundoku.Models
                 {
                     // Remove the existing theme from its current position.
                     user.SavedThemes.RemoveAt(insertionIndex);
-                    LOGGER.Debug($"Removed existing theme '{theme.ThemeName}' at index {insertionIndex} for update.");
+                    LOGGER.Debug($"Removed existing theme '{theme.ThemeName}' at index {insertionIndex} for update");
                 }
                 else
                 {
@@ -632,11 +680,11 @@ namespace Tsundoku.Models
                 // Insert the new/updated theme at the determined sorted position.
                 user.SavedThemes.Insert(insertionIndex, theme);
                 user.MainTheme = theme.ThemeName;
-                LOGGER.Debug($"Inserted theme '{theme.ThemeName}' at index {insertionIndex} into User.SavedThemes.");
+                LOGGER.Debug($"Inserted theme '{theme.ThemeName}' at index {insertionIndex}");
             });
             
             // _currentThemeSubject.OnNext(theme);
-            LOGGER.Info("Added {theme} theme", theme.ThemeName);
+            LOGGER.Info("Added or Updated {theme} theme", theme.ThemeName);
         }
 
         public void RemoveTheme(TsundokuTheme theme)

@@ -6,3 +6,4 @@ global using System.Text;
 global using Avalonia.Input;
 global using MangaAndLightNovelWebScrape.Enums;
 global using NLog;
+global using Tsundoku.Services;
