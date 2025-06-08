@@ -12,7 +12,7 @@
         FontFamily="Segoe UI"
         MaxWidth="491"
         MinWidth="491"
-        MaxHeight="870"
+        MaxHeight="845"
         WindowStartupLocation="2"
         KeyboardNavigation.TabNavigation="None">
     

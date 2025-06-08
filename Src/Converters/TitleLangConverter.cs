@@ -6,6 +6,7 @@ namespace Tsundoku.Converters
 {
     public class TitleLangConverter : IMultiValueConverter
     {
+        private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
         public static readonly TitleLangConverter Instance = new();
 
         public object? Convert(IList<object?> values, Type type, object? parameter, CultureInfo culture)
@@ -16,16 +17,15 @@ namespace Tsundoku.Converters
                 return "ERROR";
             }
 
-            string langStringValue = values[1].ToString();
+            TsundokuLanguage? lang = (TsundokuLanguage)values[1]!;
             
             // Determine the language to use for title lookup.
             // Prioritize the language from the string value, falling back to Romaji.
             TsundokuLanguage effectiveLanguage = TsundokuLanguage.Romaji; // Default fallback
 
-            if (TsundokuLanguageStringValueToLanguageMap.TryGetValue(langStringValue, out TsundokuLanguage mappedLanguage) &&
-                titles.ContainsKey(mappedLanguage))
+            if (lang != null && titles.ContainsKey(lang.Value))
             {
-                effectiveLanguage = mappedLanguage;
+                effectiveLanguage = lang.Value;
             }
 
             // Get the title using the determined effective language

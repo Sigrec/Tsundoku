@@ -16,7 +16,7 @@
     <Border Classes="Menu" BorderThickness="3" CornerRadius="0,0,8,8" ClipToBounds="True">
         <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Theme="{StaticResource ReverseCollectionScroll}"> 
             <Grid
-                RowDefinitions="Auto,20,Auto,Auto,20,Auto,Auto,2,Auto,7,Auto"
+                RowDefinitions="Auto,20,Auto,Auto,20,Auto,Auto,2,Auto,20,Auto"
                 ColumnDefinitions="*,15,*,15,*"
                 Margin="20,20,20,20"
                 ShowGridLines="false">
@@ -304,7 +304,7 @@
                     Orientation="Horizontal"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
-                    Margin="0,8,0,0"
+                    Margin="0,0,0,0"
                     Spacing="10">
                     <Button 
                         FontSize="17"
@@ -358,7 +358,7 @@
                     Grid.Column="4">
                     <TextBlock
                         x:Name="GenresTextBlock"
-                        HorizontalAlignment="Left"  
+                        HorizontalAlignment="Center"  
                         Text="Genres" 
                         FontSize="20" 
                         FontWeight="Bold" 

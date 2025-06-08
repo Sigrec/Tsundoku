@@ -77,23 +77,23 @@
 	</ItemGroup>
 	
 	<ItemGroup>
-		<PackageReference Include="Avalonia.Controls.ColorPicker" Version="11.3.0" />
+		<PackageReference Include="Avalonia.Controls.ColorPicker" Version="11.3.1" />
 		<PackageReference Include="Avalonia.Controls.ItemsRepeater" Version="11.1.5" />
-		<PackageReference Include="Avalonia.Desktop" Version="11.3.0" />
-		<PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.3.0" />
-		<PackageReference Include="Avalonia.ReactiveUI" Version="11.3.0" />
-		<PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.0" />
-		<PackageReference Include="Avalonia.Controls.DataGrid" Version="11.3.0" />
-		<PackageReference Include="DiscordRichPresence" Version="1.2.1.24" />
-        <PackageReference Include="DynamicData" Version="9.3.2" />
+		<PackageReference Include="Avalonia.Desktop" Version="11.3.1" />
+		<PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.3.1" />
+		<PackageReference Include="Avalonia.ReactiveUI" Version="11.3.1" />
+		<PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.1" />
+		<PackageReference Include="Avalonia.Controls.DataGrid" Version="11.3.1" />
+		<PackageReference Include="DiscordRichPresence" Version="1.3.0.28" />
+        <PackageReference Include="DynamicData" Version="9.4.1" />
 		<PackageReference Include="GraphQL.Client" Version="6.1.0" />
 		<PackageReference Include="GraphQL.Client.Serializer.SystemTextJson" Version="6.1.0" />
 		<PackageReference Include="MangaAndLightNovelWebScrape" Version="4.0.2" />
 		<PackageReference Include="Microsoft.Extensions.Http" Version="9.0.5" />
-		<PackageReference Include="NLog" Version="5.4.0" />
+		<PackageReference Include="NLog" Version="5.5.0" />
 		<PackageReference Include="FileWatcherEx" Version="2.6.0" />
-		<PackageReference Include="Projektanker.Icons.Avalonia.FontAwesome" Version="9.6.1" />
-		<PackageReference Include="System.Linq.Dynamic.Core" Version="1.6.3" />
+		<PackageReference Include="Projektanker.Icons.Avalonia.FontAwesome" Version="9.6.2" />
+		<PackageReference Include="System.Linq.Dynamic.Core" Version="1.6.5" />
 		<PackageReference Include="System.Drawing.Common" Version="9.0.5" />
 		<PackageReference Include="TextCopy" Version="6.2.1" />
 		<PackageReference Include="ReactiveUI.Fody" Version="19.5.41" />

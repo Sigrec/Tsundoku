@@ -2,11 +2,13 @@ using Avalonia.Controls;
 using Microsoft.Extensions.DependencyInjection;
 using Tsundoku.Models;
 using Tsundoku.ViewModels;
+using static Tsundoku.Models.TsundokuLanguageModel;
 
 namespace Tsundoku.Controls
 {
     public partial class SeriesCardDisplay : UserControl
     {
+        private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
         public static readonly StyledProperty<Series?> SeriesProperty =
                 AvaloniaProperty.Register<SeriesCardDisplay, Series?>(nameof(Series));
 
@@ -26,10 +28,10 @@ namespace Tsundoku.Controls
         }
 
         // ‣ 3) (Optional) If you also need CurrentUser.Language, expose that here too:
-        public static readonly StyledProperty<string?> LanguageProperty =
-            AvaloniaProperty.Register<SeriesCardDisplay, string?>(nameof(Language));
+        public static readonly StyledProperty<TsundokuLanguage?> LanguageProperty =
+            AvaloniaProperty.Register<SeriesCardDisplay, TsundokuLanguage?>(nameof(Language));
 
-        public string? Language
+        public TsundokuLanguage? Language
         {
             get => GetValue(LanguageProperty);
             set => SetValue(LanguageProperty, value);
@@ -50,7 +52,7 @@ namespace Tsundoku.Controls
         // 2) The “real” DI‐based ctor:
         public SeriesCardDisplay(MainWindowViewModel mainWindowViewModel)
         {
-            _mainWindowViewModel = mainWindowViewModel 
+            _mainWindowViewModel = mainWindowViewModel
                 ?? throw new ArgumentNullException(nameof(mainWindowViewModel));
             InitializeComponent();
         }
@@ -65,8 +67,12 @@ namespace Tsundoku.Controls
 
         private async void CopySeriesTitleAsync(object? sender, PointerPressedEventArgs e)
         {
-            if (sender is TextBlock tb)
-                await TextCopy.ClipboardService.SetTextAsync(tb.Text);
+            if (Language != null)
+            {
+                string title = Series.Titles[Language.Value];
+                LOGGER.Debug("Copying {title} to Clipboard", title);
+                await TextCopy.ClipboardService.SetTextAsync(title);
+            }
         }
 
         private void SubtractVolume(object? sender, Avalonia.Interactivity.RoutedEventArgs e)

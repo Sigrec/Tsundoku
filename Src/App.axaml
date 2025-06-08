@@ -7,7 +7,7 @@
 	<Application.Resources>
 		 <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceInclude Source="/Styles/UniversalNavControlThemes.xaml"/>
+                <ResourceInclude Source="avares://Tsundoku/Styles/UniversalNavControlThemes.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
 	</Application.Resources>
@@ -16,7 +16,7 @@
 		<FluentTheme/>
 		<StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
 		<StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml" />
-		<StyleInclude Source="/Styles/MenuTheme.xaml" />
+		<StyleInclude Source="avares://Tsundoku/Styles/MenuTheme.xaml" />
     </Application.Styles>
 
     <TrayIcon.Icons>

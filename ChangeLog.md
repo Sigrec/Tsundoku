@@ -9,6 +9,15 @@ This project adheres to [Semantic Versioning](https://semver.org/) and follows t
 ### 1.1.0 – 2025-06-08
 
 #### Changed
+- Updated Avalonia to **v11.3.1**  
+- Updated DiscordRichPresence to **v1.3.0.28**  
+- Updated DynamicData to **v9.4.1**  
+- Updated NLog to **v5.5.0**  
+- Updated System.Linq.Dynamic.Core to **v1.6.5**  
+- Updated Projektanker.Icons.Avalonia.FontAwesome to **v9.6.2**  
+- Centered **Genres** title in the Series Edit Window  
+- Added padding to the top of the Series Edit Window buttons  
+- Reduced Settings Window max height to **845**  
 - Renamed **Mean Score** to **Mean Rating** in the Statistics window.
 
 #### Fixed
@@ -18,6 +27,8 @@ This project adheres to [Semantic Versioning](https://semver.org/) and follows t
 - Enable the Series Edit button to fire properly.  
 - Prevent “refresh” from duplicating series cards.  
 - Display the app icon at its intended size.  
+- Hover title now displays correctly  
+- Full series title is copied on click if the series card title text overflows
 
 </details>
 
