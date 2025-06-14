@@ -12,6 +12,7 @@ This project adheres to [Semantic Versioning](https://semver.org/) and follows t
 - Updated **System.Linq.Dynamic.Core** to `v1.6.6`  
 - Updated **Microsoft.Extensions.Http** to `v9.0.6`  
 - Renamed **Value** to **Total Value** in the *Add New Series* window
+- Updated **Publisher, Staff, & Description** series card text to be bold
 
 #### Fixed
 - Resolved issue where refreshing a series with a changed status would break the UI layout until hovered  

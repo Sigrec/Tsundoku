@@ -20,8 +20,12 @@ namespace Tsundoku.ViewModels
 
         public void UpdateSelectedThemeIndex()
         {
-            SelectedThemeIndex = _userService.GetCurrentThemeIndex();
-            LOGGER.Debug("Updated Selected Theme Index to {val}", SelectedThemeIndex);
+            uint index = _userService.GetCurrentThemeIndex();
+            if (SelectedThemeIndex != index)
+            {
+                SelectedThemeIndex = _userService.GetCurrentThemeIndex();
+                LOGGER.Debug("Updated Selected Theme Index to {val}", SelectedThemeIndex);
+            }
         }
 
         public TsundokuTheme GetMainTheme()
@@ -63,8 +67,8 @@ namespace Tsundoku.ViewModels
         public async Task ImportThemeAsync(string filePath)
         {
             await _userService.ImportThemeAsync(filePath);
-            UpdateSelectedThemeIndex();
             _userService.SaveUserData();
+            UpdateSelectedThemeIndex();
         }
 
         public void SaveTheme(TsundokuTheme theme)

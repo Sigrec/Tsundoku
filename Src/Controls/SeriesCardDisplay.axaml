@@ -229,6 +229,7 @@
                 Grid.Row="0"
                 Foreground="{Binding CardTheme.SeriesCardPublisherColor, ElementName=Root}"
                 MaxLines="1"
+                FontWeight="Bold"
                 FontSize="15"
                 Text="{Binding Series.Publisher, ElementName=Root}"
                 Padding="9,2,4,-1" />
@@ -279,6 +280,7 @@
             <TextBlock
                 TextWrapping="Wrap"
                 Grid.Row="2"
+                FontWeight="Bold"
                 Foreground="{Binding CardTheme.SeriesCardStaffColor, ElementName=Root}"
                 MaxLines="2"
                 TextTrimming="WordEllipsis"
@@ -313,10 +315,11 @@
                 Grid.Row="3">
               <TextBlock
                   TextWrapping="Wrap"
+                  FontWeight="Bold"
                   Foreground="{Binding CardTheme.SeriesCardDescColor, ElementName=Root}"
                   Opacity="0.9"
                   Text="{Binding Series.Description, ElementName=Root}"
-                  Padding="10,-2,20,10" />
+                  Padding="10,-2,20,5" />
             </ScrollViewer>
           </Grid>
 
