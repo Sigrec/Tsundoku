@@ -86,7 +86,7 @@ namespace Tsundoku.Views
             );
             if (files.Count == 1)
             {
-                ViewModel.ImportUserData(files[0].Path.LocalPath);
+                ViewModel.ImportUserDataFromJson(files[0].Path.LocalPath);
                 // ((IClassicDesktopStyleApplicationLifetime)Application.Current.ApplicationLifetime).TryShutdown();
                 // Process.Start(@$"{AppDomain.CurrentDomain.BaseDirectory}\Tsundoku.exe");
             }

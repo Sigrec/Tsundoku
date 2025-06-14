@@ -20,7 +20,7 @@ namespace Tsundoku.Helpers
         /// <param name="sourceFilePath">The existing local path to the image file.</param>
         /// <param name="destinationCoverPath">The path where the (potentially scaled) image should be saved (e.g., in the "Covers" directory).</param>
         /// <returns>The generated and scaled Avalonia Bitmap, or null if any operation fails.</returns>
-        public static async Task<Bitmap?> UpdateCoverFromFilePathAsync(string sourceFilePath, string destinationCoverPath)
+        public static Bitmap? UpdateCoverFromFilePath(string sourceFilePath, string destinationCoverPath)
         {
             if (string.IsNullOrWhiteSpace(sourceFilePath) || !File.Exists(sourceFilePath))
             {
@@ -32,15 +32,12 @@ namespace Tsundoku.Helpers
             {
                 LOGGER.Debug("Attempting to load image from local path: {SourceFilePath}", sourceFilePath);
                 // Avalonia Bitmap constructor can load directly from a file path
-                return await Task.Run(() =>
+                using (Bitmap loadedBitmap = new Bitmap(sourceFilePath))
                 {
-                    using (Bitmap loadedBitmap = new Bitmap(sourceFilePath))
-                    {
-                        LOGGER.Debug("Image loaded from local path. Dimensions: {Width}x{Height}", loadedBitmap.PixelSize.Width, loadedBitmap.PixelSize.Height);
-                        // ProcessAndSaveBitmap is synchronous, so it runs within this Task.Run context
-                        return ProcessAndSaveBitmap(loadedBitmap, destinationCoverPath, sourceFilePath);
-                    }
-                });
+                    LOGGER.Debug("Image loaded from local path. Dimensions: {Width}x{Height}", loadedBitmap.PixelSize.Width, loadedBitmap.PixelSize.Height);
+                    // ProcessAndSaveBitmap is synchronous, so it runs within this Task.Run context
+                    return ProcessAndSaveBitmap(loadedBitmap, destinationCoverPath, sourceFilePath);
+                }
             }
             catch (ArgumentException argEx)
             {
@@ -101,15 +98,12 @@ namespace Tsundoku.Helpers
             Bitmap? originalBitmap = null;
             try
             {
-                return await Task.Run(() =>
+                using (MemoryStream imageStream = new MemoryStream(imageByteArray))
                 {
-                    using (MemoryStream imageStream = new MemoryStream(imageByteArray))
-                    {
-                        originalBitmap = new Bitmap(imageStream);
-                    }
-                    LOGGER.Debug("Original bitmap created from downloaded data. Dimensions: {Width}x{Height}", originalBitmap.PixelSize.Width, originalBitmap.PixelSize.Height);
-                    return ProcessAndSaveBitmap(originalBitmap, destinationCoverPath, imageUri.OriginalString);
-                });
+                    originalBitmap = new Bitmap(imageStream);
+                }
+                LOGGER.Debug("Original bitmap created from downloaded data. Dimensions: {Width}x{Height}", originalBitmap.PixelSize.Width, originalBitmap.PixelSize.Height);
+                return ProcessAndSaveBitmap(originalBitmap, destinationCoverPath, imageUri.OriginalString);
             }
             catch (ArgumentException argEx)
             {
@@ -160,7 +154,7 @@ namespace Tsundoku.Helpers
 
                 // Ensure the directory exists
                 string? directory = Path.GetDirectoryName(savePath);
-                if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+                if (!string.IsNullOrWhiteSpace(directory) && !Directory.Exists(directory))
                 {
                     Directory.CreateDirectory(directory);
                     LOGGER.Debug("Created directory: {DirectoryPath}", directory);

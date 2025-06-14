@@ -77,7 +77,7 @@ public partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfoViewMod
         if (file.Count == 1)
         {
             string fullCoverPath = AppFileHelper.GetFullCoverPath(ViewModel.Series.Cover);
-            Bitmap? newCover = await BitmapHelper.UpdateCoverFromFilePathAsync(file[0].Path.LocalPath, fullCoverPath);
+            Bitmap? newCover = BitmapHelper.UpdateCoverFromFilePath(file[0].Path.LocalPath, fullCoverPath);
             if (newCover != null)
             {
                 GenerateNewBitmap(newCover, fullCoverPath);

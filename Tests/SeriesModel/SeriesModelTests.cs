@@ -1,7 +1,11 @@
+using Avalonia;
+using Avalonia.Headless;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net;
 using System.Net.Http.Headers;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
+using Tsundoku.ViewModels;
 using static Tsundoku.Models.TsundokuLanguageModel;
 
 [assembly: Description("Testing Series Model from Tsundoku")]
@@ -10,6 +14,7 @@ namespace Tsundoku.Tests.SeriesModel
     [Author("Sean (Alias -> Prem or Sigrec)")]
     [TestOf(typeof(Series))]
     [Description("Testing Series Model")]
+    [TestFixture]
     public class SeriesModelTests
     {
         public static readonly JsonSerializerOptions options = new()
@@ -28,15 +33,19 @@ namespace Tsundoku.Tests.SeriesModel
         [OneTimeSetUp]
         public void Setup()
         {
+            App.ConfigureNLogToUseLocalCacheFolder();
+
             // 1. Build a minimal DI container that mirrors your app's setup
             ServiceCollection services = new ServiceCollection();
 
             // Register IHttpClientFactory for default clients (e.g., if BitmapHelper uses an unnamed client)
             services.AddHttpClient("AddCoverClient", client =>
             {
-                client.DefaultRequestVersion = HttpVersion.Version30;
+                client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("Tsundoku", ViewModelBase.CUR_TSUNDOKU_VERSION));
+                client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("(https://github.com/Sigrec/Tsundoku)"));
+                client.DefaultRequestVersion = HttpVersion.Version20;
                 client.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionExact;
-                client.DefaultRequestHeaders.Add("User-Agent", "Tsundoku-Test/1.0");
+                client.Timeout = TimeSpan.FromSeconds(30);
             }).SetHandlerLifetime(TimeSpan.FromMinutes(5));
 
             // Register the named HttpClient for MangaDexApi as configured in your Program.cs
@@ -45,16 +54,23 @@ namespace Tsundoku.Tests.SeriesModel
                 client.BaseAddress = new Uri("https://api.mangadex.org/");
                 client.DefaultRequestVersion = HttpVersion.Version30;
                 client.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionExact;
-                client.DefaultRequestHeaders.Add("User-Agent", "Tsundoku-Test/1.0");
-            }).SetHandlerLifetime(TimeSpan.FromMinutes(5)); // Manage handler lifetime
+                client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("Tsundoku", ViewModelBase.CUR_TSUNDOKU_VERSION));
+                client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("(https://github.com/Sigrec/Tsundoku)"));
+                client.Timeout = TimeSpan.FromSeconds(30);
+            }).SetHandlerLifetime(TimeSpan.FromMinutes(5));
 
+            // --- AniList GraphQL Client Setup ---
             services.AddHttpClient("AniListHttpClient", client =>
             {
                 client.BaseAddress = new Uri("https://graphql.anilist.co");
+                client.Timeout = TimeSpan.FromSeconds(30);
                 client.DefaultRequestVersion = HttpVersion.Version30;
                 client.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrHigher;
-                client.DefaultRequestHeaders.Add("User-Agent", "Tsundoku-Test/1.0");
+                client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("Tsundoku", ViewModelBase.CUR_TSUNDOKU_VERSION));
+                client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("(https://github.com/Sigrec/Tsundoku)"));
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                client.DefaultRequestHeaders.Add("RequestType", "POST");
+                client.DefaultRequestHeaders.Add("ContentType", "application/json");
             }).SetHandlerLifetime(TimeSpan.FromMinutes(5))
               .AddTypedClient<AniListGraphQLClient>();
 
@@ -88,55 +104,82 @@ namespace Tsundoku.Tests.SeriesModel
         public async Task NotOnMangaDex_AniList_Test()
         {
             _series = await Series.CreateNewSeriesCardAsync(_bitmapHelper, _mangaDex, _aniList, "-0.5˚C", Constants.Format.Manga, 5, 0, []);
-            Assert.That(_series.ToString(), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesModel\SeriesModelTestData\0.5C.json")));
+            Assert.That(_series.ToString(), Is.EqualTo(await File.ReadAllTextAsync(@"\Tests\\SeriesModel\SeriesModelTestData\0.5C.json")));
         }
 
         [AvaloniaTest]
         public async Task Novel_AniList_Test()
         {
-            Assert.That((await Series.CreateNewSeriesCardAsync(_bitmapHelper, _mangaDex, _aniList, "Classroom of the Elite", Constants.Format.Novel, 14, 0, [], "Unknown", Constants.Demographic.Seinen, 4, (decimal)5.6, (decimal)5000.65)).ToString(), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesModel\SeriesModelTestData\CoTE.json")));
+            try
+            {
+                string actual = (await Series.CreateNewSeriesCardAsync(
+                    bitmapHelper: _bitmapHelper,
+                    mangaDex: _mangaDex,
+                    aniList: _aniList,
+                    title: "ようこそ実力至上主義の教室へ",
+                    bookType: Constants.Format.Novel,
+                    maxVolCount: 14,
+                    minVolCount: 0,
+                    additionalLanguages: [],
+                    publisher: "Unknown",
+                    demographic: Constants.Demographic.Seinen,
+                    volumesRead: 4,
+                    rating: (decimal)5.6,
+                    value: (decimal)5000.65
+                ))?.ToString();
+
+                string expected = await File.ReadAllTextAsync(GetTestFilePath(@"SeriesModelTestData\CoTE.json"));
+
+                Assert.That(actual, Is.EqualTo(expected));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Test failed: {ex}");
+                throw;
+            }
         }
+
 
         [AvaloniaTest]
         public async Task MangaDexID_HasNativeStaff_Test()
         {
             _series = await Series.CreateNewSeriesCardAsync(_bitmapHelper, _mangaDex, _aniList, "32d76d19-8a05-4db0-9fc2-e0b0648fe9d0", Constants.Format.Manga, 2, 0, []);
-            Assert.That(_series.ToString(), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesModel\SeriesModelTestData\SoloLeveling.json")));
+            Assert.That(_series.ToString(), Is.EqualTo(await File.ReadAllTextAsync(@"\Tests\\SeriesModel\SeriesModelTestData\SoloLeveling.json")));
         }
 
         [AvaloniaTest]
         public async Task MangaDexID_NoNativeStaff_Test()
         {
             _series = await Series.CreateNewSeriesCardAsync(_bitmapHelper, _mangaDex, _aniList, "c0189f4a-dee6-48f4-abbe-53a4359cbcfb", Constants.Format.Manga, 2, 0, []);
-            Assert.That(_series.ToString(), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesModel\SeriesModelTestData\AtTheNorthernFort.json")));
+            Assert.That(_series.ToString(), Is.EqualTo(await File.ReadAllTextAsync(@"\Tests\\SeriesModel\SeriesModelTestData\AtTheNorthernFort.json")));
         }
 
         [AvaloniaTest]
         public async Task MultipleAdditionalLangTitle_AniListLink_Test()
         {
             _series = await Series.CreateNewSeriesCardAsync(_bitmapHelper, _mangaDex, _aniList, "Rent-A-Girlfriend", Constants.Format.Manga, 18, 0, [TsundokuLanguage.Arabic, TsundokuLanguage.Chinese, TsundokuLanguage.French, TsundokuLanguage.Korean, TsundokuLanguage.Russian, TsundokuLanguage.Spanish]);
-            Assert.That(_series.ToString(), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesModel\SeriesModelTestData\Rent-A-Girlfriend.json")));
+            Assert.That(_series.ToString(), Is.EqualTo(await File.ReadAllTextAsync(@"\Tests\\SeriesModel\SeriesModelTestData\Rent-A-Girlfriend.json")));
         }
 
         [AvaloniaTest]
         public async Task SimilarNotEquals_AniList_Test()
         {
             _series = await Series.CreateNewSeriesCardAsync(_bitmapHelper, _mangaDex, _aniList, "dont toy with me miss nagatoro", Constants.Format.Manga, 5, 0, []);
-            Assert.That(_series.ToString(), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesModel\SeriesModelTestData\IjiranaideNagatoro-san.json")));
+            Assert.That(_series.ToString(), Is.EqualTo(await File.ReadAllTextAsync(@"\Tests\\SeriesModel\SeriesModelTestData\IjiranaideNagatoro-san.json")));
         }
 
         [AvaloniaTest]
         public async Task Radiant_MangaDexTitle_Test()
         {
             _series = await Series.CreateNewSeriesCardAsync(_bitmapHelper, _mangaDex, _aniList, "Radiant", Constants.Format.Manga, 18, 0, []);
-            Assert.That(_series.ToString(), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesModel\SeriesModelTestData\Radiant.json")));
+            Assert.That(_series.ToString(), Is.EqualTo(await File.ReadAllTextAsync(@"\Tests\\SeriesModel\SeriesModelTestData\Radiant.json")));
         }
 
         [AvaloniaTest]
         public async Task TheBeginningAfterTheEnd_NoDemographic_MangaDexTitle_Test()
         {
             _series = await Series.CreateNewSeriesCardAsync(_bitmapHelper, _mangaDex, _aniList, "The Beginning After The End", Constants.Format.Manga, 5, 0, []);
-            Assert.That(_series.ToString(), Is.EqualTo(await File.ReadAllTextAsync(@"\Tsundoku\Tests\SeriesModel\SeriesModelTestData\TBATE.json")));
+            Assert.That(_series.ToString(), Is.EqualTo(await File.ReadAllTextAsync(@"\Tests\\SeriesModel\SeriesModelTestData\TBATE.json")));
         }
 
         [Test]
@@ -154,13 +197,13 @@ namespace Tsundoku.Tests.SeriesModel
         }
 
         [Test]
-        public void IdenticalSeriesNames_GetSeriesByID_Test()
+        public async System.Threading.Tasks.Task IdenticalSeriesNames_GetSeriesByID_Test()
         {
-            Assert.Multiple(async () =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That((await _aniList.GetSeriesByIDAsync(98282, Constants.Format.Manga, 1)).RootElement.GetProperty("Media").GetProperty("title").GetProperty("romaji").GetString(), Is.EqualTo("Getsuyoubi no Tawawa"));
                 Assert.That((await _aniList.GetSeriesByIDAsync(125854, Constants.Format.Manga, 1)).RootElement.GetProperty("Media").GetProperty("title").GetProperty("romaji").GetString(), Is.EqualTo("Getsuyoubi no Tawawa"));
-            });
+            }
         }
 
         [Test]
@@ -302,7 +345,7 @@ namespace Tsundoku.Tests.SeriesModel
         [Parallelizable(scope: ParallelScope.Self)]
         public void GetCorrectFormat_Test()
         {
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(Series.GetCorrectFormat("JP"), Is.EqualTo(Constants.Format.Manga));
                 Assert.That(Series.GetCorrectFormat("KR"), Is.EqualTo(Constants.Format.Manhwa));
@@ -310,14 +353,14 @@ namespace Tsundoku.Tests.SeriesModel
                 Assert.That(Series.GetCorrectFormat("TW"), Is.EqualTo(Constants.Format.Manhua));
                 Assert.That(Series.GetCorrectFormat("FR"), Is.EqualTo(Constants.Format.Manfra));
                 Assert.That(Series.GetCorrectFormat("EN"), Is.EqualTo(Constants.Format.Comic));
-            });
+            }
         }
 
         [Test]
         [Parallelizable(scope: ParallelScope.Self)]
         public void GetSeriesStatus_Test()
         {
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(Series.GetSeriesStatus("RELEASING"), Is.EqualTo(Constants.Status.Ongoing));
                 Assert.That(Series.GetSeriesStatus("NOT_YET_RELEASED"), Is.EqualTo(Constants.Status.Ongoing));
@@ -329,14 +372,14 @@ namespace Tsundoku.Tests.SeriesModel
                 Assert.That(Series.GetSeriesStatus("HIATUS"), Is.EqualTo(Constants.Status.Hiatus));
                 Assert.That(Series.GetSeriesStatus("hiatus"), Is.EqualTo(Constants.Status.Hiatus));
                 Assert.That(Series.GetSeriesStatus("UNICORN"), Is.EqualTo(Constants.Status.Error));
-            });
+            }
         }
 
         [Test]
         [Parallelizable(scope: ParallelScope.Self)]
         public void GetSeriesDemographics_Test()
         {
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(Series.GetSeriesDemographic("shounen"), Is.EqualTo(Constants.Demographic.Shounen));
                 Assert.That(Series.GetSeriesDemographic("Shounen"), Is.EqualTo(Constants.Demographic.Shounen));
@@ -346,7 +389,7 @@ namespace Tsundoku.Tests.SeriesModel
                 Assert.That(Series.GetSeriesDemographic("Josei"), Is.EqualTo(Constants.Demographic.Josei));
                 Assert.That(Series.GetSeriesDemographic("seinen"), Is.EqualTo(Constants.Demographic.Seinen));
                 Assert.That(Series.GetSeriesDemographic("Seinen"), Is.EqualTo(Constants.Demographic.Seinen));
-            });
+            }
         }
 
         [Test] // Testing with Bungou Stray Dogs
@@ -381,7 +424,18 @@ namespace Tsundoku.Tests.SeriesModel
         [Parallelizable(scope: ParallelScope.Self)]
         public void GetSeriesStaff_AllNullStaffScenarios_Name_Test()
         {
-            Assert.That(AniList.GetSeriesStaff(JsonDocument.Parse(File.ReadAllText(@"\Tsundoku\Tests\SeriesModel\SeriesModelTestData\staffNameTest.json")).RootElement.GetProperty("data").GetProperty("Media").GetProperty("staff").GetProperty("edges"), "full", Constants.Format.Novel, "86: Eighty Six", new System.Text.StringBuilder()), Is.EqualTo("Asato Asato | しらび | Ⅰ-Ⅳ"));
+            Assert.That(AniList.GetSeriesStaff(JsonDocument.Parse(File.ReadAllText(@"\Tests\\SeriesModel\SeriesModelTestData\staffNameTest.json")).RootElement.GetProperty("data").GetProperty("Media").GetProperty("staff").GetProperty("edges"), "full", Constants.Format.Novel, "86: Eighty Six", new System.Text.StringBuilder()), Is.EqualTo("Asato Asato | しらび | Ⅰ-Ⅳ"));
+        }
+
+        private static string GetTestFilePath(string relativePath, [CallerFilePath] string? callerFilePath = null)
+        {
+            if (callerFilePath is null)
+            {
+                throw new ArgumentNullException(nameof(callerFilePath));
+            }
+
+            string testDirectory = Path.GetDirectoryName(callerFilePath)!;
+            return Path.Combine(testDirectory, relativePath);
         }
     }
 }

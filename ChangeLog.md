@@ -6,8 +6,19 @@ This project adheres to [Semantic Versioning](https://semver.org/) and follows t
 <details>
 <summary>1.x Releases</summary>
 
-### 1.1.0 – 2025-06-08
+### 1.1.1 – 2025-06-14
+#### Changed
+- Updated **System.Drawing.Common** to `v9.0.6`  
+- Updated **System.Linq.Dynamic.Core** to `v1.6.6`  
+- Updated **Microsoft.Extensions.Http** to `v9.0.6`  
+- Renamed **Value** to **Total Value** in the *Add New Series* window
 
+#### Fixed
+- Resolved issue where refreshing a series with a changed status would break the UI layout until hovered  
+- Fixed bug where changing a cover via URL failed due to folder permission errors  
+- Fixed issue where a successful refresh would delete the cover filename  
+
+### 1.1.0 – 2025-06-08
 #### Changed
 - Updated Avalonia to **v11.3.1**  
 - Updated DiscordRichPresence to **v1.3.0.28**  

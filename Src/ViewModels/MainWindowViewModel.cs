@@ -194,6 +194,7 @@ namespace Tsundoku.ViewModels
                 allowDuplicate: false,
                 isRefresh: true);
 
+            refreshedSeries.Cover = originalSeries.Cover;
             _userService.UpdateSeries(originalSeries, refreshedSeries);
         }
 

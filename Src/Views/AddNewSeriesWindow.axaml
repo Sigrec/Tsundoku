@@ -269,7 +269,7 @@
 						   FontSize="18"
                            HorizontalContentAlignment="Center"
                            Mask="90.0/1\0.\0"/>
-            <TextBlock Text="Value"
+            <TextBlock Text="Total Value"
 					   Grid.Row="15"
 					   Grid.Column="0"
 					   FontSize="20"

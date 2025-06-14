@@ -1,14 +1,19 @@
+using System.Reactive.Linq;
 using Avalonia.Controls;
+using Avalonia.ReactiveUI;
 using Microsoft.Extensions.DependencyInjection;
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 using Tsundoku.Models;
 using Tsundoku.ViewModels;
 using static Tsundoku.Models.TsundokuLanguageModel;
 
 namespace Tsundoku.Controls
 {
-    public partial class SeriesCardDisplay : UserControl
+    public partial class SeriesCardDisplay : ReactiveUserControl<SeriesCardDisplay>
     {
         private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
+
         public static readonly StyledProperty<Series?> SeriesProperty =
                 AvaloniaProperty.Register<SeriesCardDisplay, Series?>(nameof(Series));
 

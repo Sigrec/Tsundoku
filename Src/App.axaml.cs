@@ -7,7 +7,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using Tsundoku.Helpers;
 using Tsundoku.Controls;
-using Windows.Storage;
+//using Windows.Storage;
 using NLog.Config;
 using NLog.Targets;
 using NLog.Targets.Wrappers;
@@ -161,7 +161,7 @@ namespace Tsundoku
             services.AddSingleton<MainWindowViewModel>();
         }
 
-        private static void ConfigureNLogToUseLocalCacheFolder()
+        public static void ConfigureNLogToUseLocalCacheFolder()
         {
             // 1. Get the LocalCacheFolder path
             string localCachePath = AppFileHelper.GetFolderPath("Logs");

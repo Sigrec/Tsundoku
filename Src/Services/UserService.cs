@@ -29,7 +29,8 @@ namespace Tsundoku.Services
         void LoadUserData();
         void SaveUserData(User user);
         void SaveUserData();
-        void ImportUserData(string filePath);
+        void ImportUserDataFromJson(string filePath);
+        void ImportUserDataFromGoodreads(string filePath);
         void UpdateUserIcon(string filePath);
         User? GetCurrentUserSnapshot();
         uint GetCurrentThemeIndex();
@@ -345,7 +346,121 @@ namespace Tsundoku.Services
             return user;
         }
 
-        public void ImportUserData(string filePath)
+        public void ImportUserDataFromJson(string filePath)
+        {
+            try
+            {
+                JsonNode? uploadedUserData = JsonNode.Parse(File.ReadAllText(filePath));
+
+                if (uploadedUserData is null)
+                {
+                    LOGGER.Warn("File '{}' could not be parsed it is Malformed", filePath);
+                    return;
+                }
+
+                // Ensure schema is updated (optional flag depending on your implementation)
+                User.UpdateSchemaVersion(uploadedUserData, true);
+
+                User? newUser = uploadedUserData.Deserialize(UserModelContext.Default.User);
+                if (newUser is null)
+                {
+                    LOGGER.Warn("Deserialization returned null User from file '{}'.", filePath);
+                    return;
+                }
+
+                // Backup current data before replacing
+                int count = 1;
+                string backupFileName;
+                do
+                {
+                    backupFileName = $"UserData_Backup_{count}.json";
+                    count++;
+                } while (File.Exists(backupFileName));
+
+                string originalUserDataPath = AppFileHelper.GetUserDataJsonPath(); // This is the user data file you want to modify
+                string backupOfOriginalPath = AppFileHelper.GetFilePath(backupFileName); // This is where the old data will be backed up
+
+                try
+                {
+                    // 1. Validate that the source of new content exists
+                    if (!File.Exists(filePath))
+                    {
+                        LOGGER.Error("ImportUserData failed: Temporary source file with new content not found. File path: {filePath}", filePath);
+                        return; // Or throw an exception, as you can't proceed without the new data
+                    }
+
+                    // 2. Make a backup of the original file (if it exists)
+                    if (File.Exists(originalUserDataPath))
+                    {
+                        try
+                        {
+                            // Copy the original file to the backup location. Overwrite if backup already exists.
+                            File.Copy(originalUserDataPath, backupOfOriginalPath, true);
+                            LOGGER.Info("Successfully backed up original user data. Original path: {originalPath}, Backup path: {backupPath}", originalUserDataPath, backupOfOriginalPath);
+                        }
+                        catch (Exception ex)
+                        {
+                            // Log as an Error because backup failure is now critical
+                            LOGGER.Error(ex, "CRITICAL: Failed to create backup of original user data. Import operation aborted. Original path: {originalPath}, Backup path: {backupPath}. Error: {errorMessage}", originalUserDataPath, backupOfOriginalPath, ex.Message);
+                            // Re-throw the exception to ensure the outer catch block handles it and stops the import.
+                            throw;
+                        }
+                    }
+                    else
+                    {
+                        // If original file doesn't exist, no backup is made, but it's not a failure condition for backup itself.
+                        LOGGER.Info("Original user data file not found. Path: {originalPath}. No backup created before importing new data.", originalUserDataPath);
+                    }
+
+                    // 3. Write the new content to the original destination path (this will overwrite the old file)
+                    File.Copy(filePath, originalUserDataPath, true); // 'true' means overwrite the destination file
+                    LOGGER.Info("Successfully imported new user data. Source path: {sourcePath}, Destination path: {destinationPath}", filePath, originalUserDataPath);
+
+                    // 4. Optionally, delete the temporary source file once it's no longer needed
+                    try
+                    {
+                        File.Delete(filePath);
+                        LOGGER.Debug("Deleted temporary user data file. Path: {filePath}", filePath);
+                    }
+                    catch (Exception ex)
+                    {
+                        LOGGER.Warn(ex, "Failed to delete temporary user data file. File path: {filePath}. Error: {errorMessage}", filePath, ex.Message);
+                    }
+                }
+                catch (IOException ex)
+                {
+                    // This catch block will handle if the File.Copy(new, original, true) fails due to locking,
+                    // or if the initial backup copy failed and was re-thrown.
+                    LOGGER.Error(ex, "IOException during user data import. The destination file might be locked by another process. Destination path: {destinationPath}. Error: {errorMessage}", originalUserDataPath, ex.Message);
+                    // You might want to attempt to restore from backup here if this copy failed and backup was successful
+                }
+                catch (UnauthorizedAccessException ex)
+                {
+                    LOGGER.Error(ex, "Permission error during user data import. Ensure the application has write access to the destination path. Destination path: {destinationPath}. Error: {errorMessage}", originalUserDataPath, ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    LOGGER.Error(ex, "An unexpected error occurred during user data import. Error: {errorMessage}", ex.Message);
+                }
+
+                // Push to reactive stream
+                RefreshSourceCache(newUser);
+                _userSubject.OnNext(newUser);
+                SaveUserData();
+
+                LOGGER.Info("Successfully imported user data from '{}'. Backup created as '{}'.", filePath, backupFileName);
+            }
+            catch (JsonException ex)
+            {
+                LOGGER.Error(ex, "File '{}' is not valid JSON.", filePath);
+            }
+            catch (Exception ex)
+            {
+                LOGGER.Error(ex, "Unexpected error during ImportUserData from '{}'.", filePath);
+            }
+        }
+
+        public void ImportUserDataFromGoodreads(string filePath)
         {
             try
             {

@@ -64,9 +64,9 @@ namespace Tsundoku.ViewModels
             _userService.UpdateUser(user => user.UserName = newUsername);
         }
 
-        public void ImportUserData(string filePath)
+        public void ImportUserDataFromJson(string filePath)
         {
-            _userService.ImportUserData(filePath);
+            _userService.ImportUserDataFromJson(filePath);
         }
 
         private async Task ExportToSpreadSheetAsync()

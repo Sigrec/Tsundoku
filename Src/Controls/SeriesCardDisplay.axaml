@@ -102,6 +102,7 @@
               Width="{CompiledBinding Source={x:Static m:Constants.LEFT_SIDE_CARD_WIDTH}}"
               Height="{CompiledBinding Source={x:Static m:Constants.BOTTOM_SECTION_CARD_HEIGHT}}"
               FontWeight="Bold"
+              HorizontalAlignment="Center"
               FontSize="17"
               TextAlignment="Center"
               Padding="0,8,0,0">
@@ -250,7 +251,7 @@
                 Width="{CompiledBinding Source={x:Static m:Constants.RIGHT_SIDE_CARD_WIDTH}}"
                 LineHeight="25">
               <TextBlock.Text>
-                <MultiBinding Converter="{StaticResource ConvertTitle}">
+                <MultiBinding Converter="{StaticResource ConvertTitle}" Mode="OneWay">
                   <Binding Path="Series.Titles" ElementName="Root" />
                   <Binding Path="Language" ElementName="Root"/>
                 </MultiBinding>
@@ -264,7 +265,7 @@
                     MaxLines="100"
                     LineHeight="25">
                   <TextBlock.Text>
-                    <MultiBinding Converter="{StaticResource ConvertTitle}">
+                    <MultiBinding Converter="{StaticResource ConvertTitle}" Mode="OneWay">
                       <Binding Path="Series.Titles" ElementName="Root" />
                       <Binding Path="Language" ElementName="Root"/>
                       <Binding Path="Series.DuplicateIndex" ElementName="Root"/>
@@ -402,7 +403,7 @@
                     Foreground="{Binding CardTheme.SeriesProgressTextColor, ElementName=Root}"
                     Margin="0,7.5,0,0">
                   <TextBlock.Text>
-                    <MultiBinding StringFormat="{}{0}/{1}">
+                    <MultiBinding StringFormat="{}{0}/{1}" Mode="OneWay">
                       <Binding Path="Series.CurVolumeCount" ElementName="Root" />
                       <Binding Path="Series.MaxVolumeCount" ElementName="Root" />
                     </MultiBinding>
