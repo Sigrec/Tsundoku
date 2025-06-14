@@ -101,9 +101,9 @@ namespace Tsundoku.Helpers
                 using (MemoryStream imageStream = new MemoryStream(imageByteArray))
                 {
                     originalBitmap = new Bitmap(imageStream);
+                    LOGGER.Debug("Original bitmap created from downloaded data. Dimensions: {Width}x{Height}", originalBitmap.PixelSize.Width, originalBitmap.PixelSize.Height);
+                    return ProcessAndSaveBitmap(originalBitmap, destinationCoverPath, imageUri.OriginalString);
                 }
-                LOGGER.Debug("Original bitmap created from downloaded data. Dimensions: {Width}x{Height}", originalBitmap.PixelSize.Width, originalBitmap.PixelSize.Height);
-                return ProcessAndSaveBitmap(originalBitmap, destinationCoverPath, imageUri.OriginalString);
             }
             catch (ArgumentException argEx)
             {

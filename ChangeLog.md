@@ -6,7 +6,7 @@ This project adheres to [Semantic Versioning](https://semver.org/) and follows t
 <details>
 <summary>1.x Releases</summary>
 
-### 1.1.1 – 2025-06-14
+### 1.2.0 – 2025-06-14
 #### Changed
 - Updated **System.Drawing.Common** to `v9.0.6`  
 - Updated **System.Linq.Dynamic.Core** to `v1.6.6`  
