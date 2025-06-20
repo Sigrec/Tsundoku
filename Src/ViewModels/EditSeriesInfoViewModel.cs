@@ -60,8 +60,7 @@ namespace Tsundoku.ViewModels
             HashSet<Genre> newGenres = [];
             foreach (ListBoxItem genreItem in SelectedGenres)
             {
-                Genre genre = GenreExtensions.GetGenreFromString(genreItem.Content.ToString());
-                if (genre != Genre.None)
+                if (GenreExtensions.TryGetGenre(genreItem.Content.ToString(), out Genre genre))
                 {
                     newGenres.Add(genre);
                 }

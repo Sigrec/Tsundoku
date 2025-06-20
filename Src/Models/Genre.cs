@@ -1,66 +1,77 @@
-using System.Runtime.Serialization;
+using System.Reflection;
 
-namespace Tsundoku.Models
+namespace Tsundoku.Models;
+
+/// <summary>
+/// Attribute for specifying one or more string aliases for a Genre enum value.
+/// </summary>
+[AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
+public sealed class GenreAliasesAttribute : Attribute
 {
-    public enum Genre
-    {
-        [EnumMember(Value = "Action")] Action,
-        [EnumMember(Value = "Adventure")] Adventure,
-        [EnumMember(Value = "Comedy")] Comedy,
-        [EnumMember(Value = "Drama")] Drama,
-        [EnumMember(Value = "Ecchi")] Ecchi,
-        [EnumMember(Value = "Fantasy")] Fantasy,
-        [EnumMember(Value = "Horror")] Horror,
-        [EnumMember(Value = "Mahou Shoujo")] MahouShoujo,
-        [EnumMember(Value = "Mecha")] Mecha,
-        [EnumMember(Value = "Music")] Music,
-        [EnumMember(Value = "Mystery")] Mystery,
-        [EnumMember(Value = "Psychological")] Psychological,
-        [EnumMember(Value = "Romance")] Romance,
-        [EnumMember(Value = "Sci-Fi")] SciFi,
-        [EnumMember(Value = "Slice of Life")] SliceOfLife,
-        [EnumMember(Value = "Sports")] Sports,
-        [EnumMember(Value = "Supernatural")] Supernatural,
-        [EnumMember(Value = "Thriller")] Thriller,
-        [EnumMember(Value = "None")] None
-    }
+    public string[] Aliases { get; }
 
-    public class GenreExtensions
+    public GenreAliasesAttribute(params string[] aliases)
     {
-        public static Genre GetGenreFromString(string genre)
+        Aliases = aliases;
+    }
+}
+
+/// <summary>
+/// Enum representing possible genres associated with anime/manga.
+/// </summary>
+public enum Genre
+{
+    [GenreAliases("Action")] Action,
+    [GenreAliases("Adventure")] Adventure,
+    [GenreAliases("Comedy")] Comedy,
+    [GenreAliases("Drama")] Drama,
+    [GenreAliases("Ecchi")] Ecchi,
+    [GenreAliases("Fantasy")] Fantasy,
+    [GenreAliases("Hentai")] Hentai,
+    [GenreAliases("Horror")] Horror,
+    [GenreAliases("Mahou Shoujo", "Magical Girls")] MahouShoujo,
+    [GenreAliases("Mecha")] Mecha,
+    [GenreAliases("Music")] Music,
+    [GenreAliases("Mystery")] Mystery,
+    [GenreAliases("Psychological")] Psychological,
+    [GenreAliases("Romance")] Romance,
+    [GenreAliases("Sci-Fi", "SciFi")] SciFi,
+    [GenreAliases("Slice of Life", "SliceOfLife")] SliceOfLife,
+    [GenreAliases("Sports")] Sports,
+    [GenreAliases("Supernatural")] Supernatural,
+    [GenreAliases("Thriller")] Thriller
+}
+
+/// <summary>
+/// Extension methods and utilities for working with Genre enum values and aliases.
+/// </summary>
+public static class GenreExtensions
+{
+    private static readonly Dictionary<string, Genre> GenreMap;
+
+    static GenreExtensions()
+    {
+        GenreMap = new Dictionary<string, Genre>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (Genre genre in Enum.GetValues<Genre>())
         {
-            return genre switch
+            MemberInfo member = typeof(Genre).GetMember(genre.ToString()).First();
+            GenreAliasesAttribute? attribute = member.GetCustomAttribute<GenreAliasesAttribute>();
+            if (attribute != null)
             {
-                "Action" => Genre.Action,
-                "Adventure" => Genre.Adventure,
-                "Comedy" => Genre.Comedy,
-                "Drama" => Genre.Drama,
-                "Ecchi" => Genre.Ecchi,
-                "Fantasy" => Genre.Fantasy,
-                "Horror" => Genre.Horror,
-                "Mahou Shoujo" or "Magical Girls" => Genre.MahouShoujo,
-                "Mecha" => Genre.Mecha,
-                "Music" => Genre.Music,
-                "Mystery" => Genre.Mystery,
-                "Psychological" => Genre.Psychological,
-                "Romance" => Genre.Romance,
-                "Sci-Fi" or "SciFi" => Genre.SciFi,
-                "Slice of Life" or "Slice Of Life" or "SliceOfLife" => Genre.SliceOfLife,
-                "Sports" => Genre.Sports,
-                "Supernatural" => Genre.Supernatural,
-                "Thriller" => Genre.Thriller,
-                _ => Genre.None,
-            };
+                foreach (string alias in attribute.Aliases)
+                {
+                    GenreMap[alias] = genre;
+                }
+            }
         }
     }
 
-    public sealed class GenreEntry
+    /// <summary>
+    /// Attempts to map a genre string to its corresponding enum value.
+    /// </summary>
+    public static bool TryGetGenre(string genre, out Genre result)
     {
-        public Genre Genre { get; }
-
-        public GenreEntry(Genre genre)
-        {
-            Genre = genre;
-        }
+        return GenreMap.TryGetValue(genre, out result);
     }
 }

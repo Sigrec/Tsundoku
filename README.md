@@ -1,7 +1,7 @@
 # [Tsundoku](https://en.wikipedia.org/wiki/Tsundoku) (Desktop Manga & Light Novel Collection App)
 ### [Join The Discord](https://discord.gg/QcZ5jcFPeU) | [Follow Me on AL](https://anilist.co/user/Preminence/)
 ***
->**[Windows Download (v1.2.0)](https://apps.microsoft.com/detail/9p85xxdqfhs2?hl=en-us&gl=US&ocid=pdpshare)**
+>**[Windows Download (v1.3.0)](https://apps.microsoft.com/detail/9p85xxdqfhs2?hl=en-us&gl=US&ocid=pdpshare)**
 
 If you lose or delete the UserData.json file you will lose your entire collection, so do not delete it, otherwise you  will have to start over again (you can create a backup if needed), the Covers folder is visible incase a user wants to change the image shown for a particular series, just make sure u copy the EXACT name and extension (either jpg or png) from the image file.
 

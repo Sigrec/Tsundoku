@@ -1,0 +1,198 @@
+﻿{
+  "result": "ok",
+  "response": "entity",
+  "data": {
+    "id": "f7b62193-bdfb-4953-a6c6-0bd1b9a872f9",
+    "type": "manga",
+    "attributes": {
+      "title": {
+        "en": "The Bugle Call: Song of War"
+      },
+      "altTitles": [
+        {
+          "ja": "戦奏教室"
+        },
+        {
+          "ja-ro": "Sensou Kyoushitsu"
+        },
+        {
+          "ru": "Зов горна"
+        },
+        {
+          "fr": "The Bugle Call"
+        },
+        {
+          "ja": "The Bugle Call"
+        },
+        {
+          "pt-br": "Uma Canção de Guerra"
+        }
+      ],
+      "description": {
+        "en": "In Arboral Year 1294, the world is dominated by nine massive towers known as the Spires, remnants of an ancient civilization. Filled with lost secrets and powerful knowledge, nations struggle to possess them. Luca is a bugler in a mercenary company who wants nothing more than to leave the battlefield behind and become a true musician, a maestro. But marked as one of the enigmatic Branch-hexed, and gifted with the strange ability to see the sound of his instrument, Luca finds himself drawn reluctantly into a war of epic proportions!\n\nLeft for dead after a battle, Luca is saved by the mysterious Pontiff and learns he is not the only person with unusual powers. The Pontiff has formed a special team of Branch-hexed individuals he plans to use to help him defeat rival empires, and Luca learns that his powers, rather than being an escape from the battlefield, now force him to be a muse of massacre.",
+        "fr": "Transcender le fracas des armes, décider du sort de la bataille !\nLuka, orphelin recueilli par le chef d'un groupe de mercenaires, n'est pas comme les autres : une branche pousse sur son crâne et il peut voir les sons, matérialisés par des traits de lumière... Le seul à lui parler sans crainte est son père adoptif, aussi fin stratège qu'impitoyable au combat. À 14 ans, Luka a déjà vu assez d'horreurs pour une vie. En tant que clairon, il est de tous les affrontements, transmettant les ordres via son instrument. En réalité, il n'a qu'une envie : échapper à ce quotidien fait de violence pour devenir musicien...\n\n\nSeulement, la bataille qui s'annonce pourrait être sa dernière : cette fois, il doit prendre les armes... et, surtout, parmi ses opposants se trouvent d'autres \"branchus' dotés de divers pouvoirs surnaturels ! Ils font un massacre dans les rangs de Luka, et ce dernier, blessé, se saisit d'un clairon pour sonner la retraite... C'est alors que son véritable pouvoir se dévoile : tous ses alliés visualisent le son de son instrument et ses indications résonnent comme des ordres dans la tête des soldats de son camp ! Le garçon les sauve grâce aux stratégies de son père adoptif.\n\n\nTémoins de son exploit, les énigmatiques adversaires s'emparent de lui. Luka s'éveille dans une ville entourant une tour immense, vestige des temps anciens et source de magie... Ses nouveaux compagnons sont les protecteurs du lieu, régi par un mystérieux pape. Celui-ci passe un accord avec Luka : si le garçon met son pouvoir et son don tactique à son service, il l'aidera à devenir musicien. Sans le savoir, le jeune prodige se retrouve embarqué dans une guerre dont les enjeux le dépassent !\n\n\nLa lumière du son, seul espoir dans l'horreur des batailles... D'un trait vif et nerveux, une nouvelle génération d'auteurs invente un monde de dark fantasy sans concession. Mais ici, pas de héros surdoué au combat, juste un garçon rêvant de musique... Et pourtant, de ses talents dépend l'issue du conflit !",
+        "ja": "樹木暦1294年。音が“見える”ラッパ手の少年・リュカは傭兵団に属しながらも戦争を嫌い、楽師になる事を夢見ていた。しかしある日、「枝憑き」と呼ばれる力が発現し、彼の運命は大きく動き出す――。"
+      },
+      "isLocked": false,
+      "links": {
+        "al": "153007",
+        "ap": "sensou-kyoushitsu",
+        "bw": "series/370266/list",
+        "kt": "66389",
+        "mu": "200217",
+        "amz": "https://www.amazon.co.jp/dp/B0BFJBBDPH",
+        "cdj": "https://www.cdjapan.co.jp/product/NEOBK-2766502",
+        "ebj": "https://ebookjapan.yahoo.co.jp/books/718239",
+        "mal": "147585",
+        "raw": "https://shonenjumpplus.com/episode/14079602755249272339",
+        "engtl": "https://www.viz.com/manga-books/manga/bugle-call-song-of-war-volume-1/product/8376"
+      },
+      "originalLanguage": "ja",
+      "lastVolume": null,
+      "lastChapter": null,
+      "publicationDemographic": "shounen",
+      "status": "ongoing",
+      "year": 2022,
+      "contentRating": "safe",
+      "tags": [
+        {
+          "id": "391b0423-d847-456f-aff0-8b0cfc03066b",
+          "type": "tag",
+          "attributes": {
+            "name": {
+              "en": "Action"
+            },
+            "description": {
+
+            },
+            "group": "genre",
+            "version": 1
+          },
+          "relationships": []
+        },
+        {
+          "id": "3b60b75c-a2d7-4860-ab56-05f391bb889c",
+          "type": "tag",
+          "attributes": {
+            "name": {
+              "en": "Psychological"
+            },
+            "description": {
+
+            },
+            "group": "genre",
+            "version": 1
+          },
+          "relationships": []
+        },
+        {
+          "id": "ac72833b-c4e9-4878-b9db-6c8a4a99444a",
+          "type": "tag",
+          "attributes": {
+            "name": {
+              "en": "Military"
+            },
+            "description": {
+
+            },
+            "group": "theme",
+            "version": 1
+          },
+          "relationships": []
+        },
+        {
+          "id": "cdc58593-87dd-415e-bbc0-2ec27bf404cc",
+          "type": "tag",
+          "attributes": {
+            "name": {
+              "en": "Fantasy"
+            },
+            "description": {
+
+            },
+            "group": "genre",
+            "version": 1
+          },
+          "relationships": []
+        },
+        {
+          "id": "ee968100-4191-4968-93d3-f82d72be7e46",
+          "type": "tag",
+          "attributes": {
+            "name": {
+              "en": "Mystery"
+            },
+            "description": {
+
+            },
+            "group": "genre",
+            "version": 1
+          },
+          "relationships": []
+        },
+        {
+          "id": "f42fbf9e-188a-447b-9fdc-f19dc1e4d685",
+          "type": "tag",
+          "attributes": {
+            "name": {
+              "en": "Music"
+            },
+            "description": {
+
+            },
+            "group": "theme",
+            "version": 1
+          },
+          "relationships": []
+        },
+        {
+          "id": "f8f62932-27da-4fe4-8ee1-6779a8c5edba",
+          "type": "tag",
+          "attributes": {
+            "name": {
+              "en": "Tragedy"
+            },
+            "description": {
+
+            },
+            "group": "genre",
+            "version": 1
+          },
+          "relationships": []
+        }
+      ],
+      "state": "published",
+      "chapterNumbersResetOnNewVolume": false,
+      "createdAt": "2022-05-11T14:59:52+00:00",
+      "updatedAt": "2025-06-12T18:00:36+00:00",
+      "version": 64,
+      "availableTranslatedLanguages": [
+        "ru",
+        "vi",
+        "en",
+        "pt-br",
+        "es-la",
+        "fr"
+      ],
+      "latestUploadedChapter": "b2f6c042-9501-4780-9061-3efe56479ba5"
+    },
+    "relationships": [
+      {
+        "id": "2d3fa977-7dd0-47da-9cae-d4404232fb4c",
+        "type": "author"
+      },
+      {
+        "id": "95dc4d7e-45a2-4514-be13-52202f02dc89",
+        "type": "artist"
+      },
+      {
+        "id": "75cb2097-0678-446e-ab08-459a1009bde8",
+        "type": "cover_art"
+      },
+      {
+        "id": "6640d5cb-18a0-4264-8c0a-9dcbe39be5ef",
+        "type": "creator"
+      }
+    ]
+  }
+}

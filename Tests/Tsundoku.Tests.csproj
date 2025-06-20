@@ -3,10 +3,14 @@
   <PropertyGroup>
     <TargetFramework>net9.0-windows10.0.26100.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>disable</Nullable>
+	  <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
     <LangVersion>preview</LangVersion>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="AniList\AniListTestData\ToManyStaffIlustrators.json" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
@@ -21,6 +25,32 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Src\Tsundoku.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<Using Include="NUnit.Framework" />
+	<Using Include="Tsundoku.Helpers" />
+	<Using Include="Tsundoku.Clients" />
+	<Using Include="Tsundoku.Models" />
+	<Using Include="Avalonia.Headless.NUnit" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<AvaloniaXaml Remove="bin\**" />
+	<AvaloniaXaml Remove="obj\**" />
+	<Compile Remove="**\*.json" />
+	<Compile Remove="bin\**" />
+	<Compile Remove="obj\**" />
+	<None Include="**\*.json">
+	  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	</None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove="bin\**" />
+    <EmbeddedResource Remove="obj\**" />
+    <None Remove="bin\**" />
+    <None Remove="obj\**" />
   </ItemGroup>
 
 </Project>

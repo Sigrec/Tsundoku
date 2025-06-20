@@ -1,12 +1,12 @@
 ﻿using Tsundoku.Models;
 using ReactiveUI.Fody.Helpers;
-using System.Collections.ObjectModel;
 using Avalonia.Controls;
 using System.Collections.Specialized;
 using System.Reactive.Linq;
 using Tsundoku.Helpers;
 using static Tsundoku.Models.TsundokuLanguageModel;
 using Avalonia.Collections;
+using Tsundoku.Clients;
 
 namespace Tsundoku.ViewModels
 {

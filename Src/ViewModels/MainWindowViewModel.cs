@@ -3,8 +3,6 @@ using Tsundoku.Models;
 using ReactiveUI.Fody.Helpers;
 using Avalonia.Media.Imaging;
 using System.Text.RegularExpressions;
-using System.Windows.Input;
-using Avalonia.Collections;
 using Tsundoku.Helpers;
 using Tsundoku.Views;
 using static Tsundoku.Models.TsundokuFilterModel;
@@ -13,10 +11,8 @@ using static Tsundoku.Models.TsundokuLanguageModel;
 using System.Reactive.Linq;
 using System.Linq.Dynamic.Core;
 using Microsoft.Extensions.DependencyInjection;
-using DynamicData;
-using Tsundoku.Services;
 using System.Collections.ObjectModel;
-using Avalonia.Threading;
+using Tsundoku.Clients;
 
 namespace Tsundoku.ViewModels
 {

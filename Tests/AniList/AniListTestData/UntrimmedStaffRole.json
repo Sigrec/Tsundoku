@@ -1,0 +1,87 @@
+﻿{
+  "staff": {
+    "pageInfo": {
+      "hasNextPage": false
+    },
+    "edges": [
+      {
+        "role": "Story ",
+        "node": {
+          "name": {
+            "full": "Kafka Asagiri",
+            "native": "朝霧カフカ",
+            "alternative": [
+              "朝雾卡夫卡"
+            ]
+          }
+        }
+      },
+      {
+        "role": "Art",
+        "node": {
+          "name": {
+            "full": "Harukawa35",
+            "native": "春河35",
+            "alternative": [
+              "Sango Harukawa"
+            ]
+          }
+        }
+      },
+      {
+        "role": "Translator (Vietnamese)",
+        "node": {
+          "name": {
+            "full": "Lục Mịnh",
+            "native": null,
+            "alternative": []
+          }
+        }
+      },
+      {
+        "role": "Translator (Polish)",
+        "node": {
+          "name": {
+            "full": "Karolina Dwornik",
+            "native": null,
+            "alternative": []
+          }
+        }
+      },
+      {
+        "role": "Translator (Spanish)",
+        "node": {
+          "name": {
+            "full": "Carlos Mingo",
+            "native": null,
+            "alternative": [
+              "Carlos Alberto Mingo Gómez de Celis"
+            ]
+          }
+        }
+      },
+      {
+        "role": "Translator (Spanish)",
+        "node": {
+          "name": {
+            "full": "Irene Telleria",
+            "native": null,
+            "alternative": [
+              "Irene Tellería Domínguez"
+            ]
+          }
+        }
+      },
+      {
+        "role": "Translator (English)",
+        "node": {
+          "name": {
+            "full": "Kevin Gifford",
+            "native": null,
+            "alternative": []
+          }
+        }
+      }
+    ]
+  }
+}

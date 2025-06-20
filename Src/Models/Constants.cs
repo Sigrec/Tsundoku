@@ -15,7 +15,6 @@ namespace Tsundoku.Models
         public const ushort IMAGE_HEIGHT = CARD_HEIGHT - BOTTOM_SECTION_CARD_HEIGHT;
         public static IReadOnlyList<string> ADVANCED_SEARCH_FILTERS { get; } = ["CurVolumes==", "CurVolumes>=", "CurVolumes<=", "Demographic==Josei", "Demographic==Seinen", "Demographic==Shoujo", "Demographic==Shounen", "Demographic==Unknown", "Favorite==False", "Favorite==True", "Format==Manga", "Format==Novel", "Genre==Action", "Genre==Adventure", "Genre==Comedy", "Genre==Drama", "Genre==Ecchi", "Genre==Fantasy", "Genre==Horror", "Genre==MahouShoujo", "Genre==Mecha", "Genre==Music", "Genre==Mystery", "Genre==Psychological", "Genre==Romance", "Genre==SciFi", "Genre==SliceOfLife", "Genre==Sports", "Genre==Supernatural", "Genre==Thriller", "MaxVolumes==", "MaxVolumes>=", "MaxVolumes<=", "Notes==", "Publisher==", "Read==", "Read>=", "Read<=", "Rating==", "Rating>=", "Rating<=", "Series==Complete", "Series==InComplete", "Status==Cancelled", "Status==Finished", "Status==Hiatus", "Status==Ongoing", "Value==", "Value>=", "Value<="];
         public const ushort MENU_LENGTH = 400;
-		public static readonly string[] VALID_STAFF_ROLES = ["Story & Art", "Story", "Art", "Original Creator", "Character Design", "Cover Illustration", "Illustration", "Mechanical Design", "Original Story", "Original Character Design", "Original Story"];
 		public static readonly string[] AVAILABLE_CURRENCY = ["$", "€", "£", "¥", "₣", "₹", "₱", "₩", "₽", "₺", "₫", "฿", "₸", "₼", "₾", "₻"]; // "Rp", "RM", "﷼", "د.إ", "د. ك"
 		public static readonly string[] AVAILABLE_COLLECTION_FILTERS = ["None", "Query", "Favorites", "Complete", "Incomplete", "Ongoing", "Finished", "Hiatus", "Cancelled", "Shounen", "Shoujo", "Seinen", "Josei", "Manga", "Novel", "Action", "Adventure", "Comedy", "Drama", "Ecchi", "Fantsay", "Horror", "Mahou Shoujo", "Mecha", "Music", "Mystery", "Psychological", "Romance", "Sci-Fi", "Slice of Life", "Sports", "Supernatural", "Thriller", "Publisher", "Read", "Unread", "Rating", "Value"];
 
@@ -32,16 +31,6 @@ namespace Tsundoku.Models
             Hiatus,
             Cancelled,
             Error
-        }
-
-        public enum Format
-        {
-            Manga,
-            Manhwa,
-            Manhua,
-            Manfra,
-            Comic,
-            Novel
         }
 
         public enum Demographic

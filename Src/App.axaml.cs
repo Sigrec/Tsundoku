@@ -1,16 +1,18 @@
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
-using Tsundoku.ViewModels;
-using Tsundoku.Views;
-using System.Net;
-using System.Net.Http.Headers;
-using Tsundoku.Helpers;
-using Tsundoku.Controls;
 //using Windows.Storage;
 using NLog.Config;
 using NLog.Targets;
 using NLog.Targets.Wrappers;
+using System.Net;
+using System.Net.Http.Headers;
+using Tsundoku.Clients;
+using Tsundoku.Controls;
+using Tsundoku.Helpers;
+using Tsundoku.ViewModels;
+using Tsundoku.Views;
+using static Tsundoku.Clients.AniList;
 
 namespace Tsundoku
 {
@@ -118,13 +120,14 @@ namespace Tsundoku
                 client.Timeout = TimeSpan.FromSeconds(30);
                 client.DefaultRequestVersion = HttpVersion.Version30;
                 client.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrHigher;
+
                 client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("Tsundoku", ViewModelBase.CUR_TSUNDOKU_VERSION));
                 client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("(https://github.com/Sigrec/Tsundoku)"));
+
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                client.DefaultRequestHeaders.Add("RequestType", "POST");
-                client.DefaultRequestHeaders.Add("ContentType", "application/json");
-            }).SetHandlerLifetime(TimeSpan.FromMinutes(5))
-              .AddTypedClient<AniListGraphQLClient>();
+            })
+            .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+            .AddTypedClient<AniListGraphQLClient>();
 
             services.AddSingleton<IUserService, UserService>();
             services.AddSingleton<ISharedSeriesCollectionProvider, SharedSeriesCollectionProvider>();

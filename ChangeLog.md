@@ -6,6 +6,18 @@ This project adheres to [Semantic Versioning](https://semver.org/) and follows t
 <details>
 <summary>1.x Releases</summary>
 
+###
+### Changed
+- Added **Hentai** genre
+- Added **Supervisor** as a valid staff role
+
+### Perf Improvments
+- AniList client
+- MangaDex client
+
+### Fixed
+- MangaDex description parsing
+
 ### 1.2.0 – 2025-06-14
 #### Changed
 - Updated **System.Drawing.Common** to `v9.0.6`  
