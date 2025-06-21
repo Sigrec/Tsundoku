@@ -1,800 +1,938 @@
 using Avalonia.Media.Imaging;
-using MangaAndLightNovelWebScrape;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using System.Globalization;
 using System.Reactive.Concurrency;
-using System.Runtime.InteropServices;
 using System.Text.Encodings.Web;
 using Tsundoku.Clients;
 using Tsundoku.Helpers;
+using Tsundoku.Models.Enums;
+using static Tsundoku.Models.Enums.SeriesDemographicEnum;
+using static Tsundoku.Models.Enums.SeriesFormatEnum;
+using static Tsundoku.Models.Enums.SeriesGenreEnum;
+using static Tsundoku.Models.Enums.SeriesStatusEnum;
 using static Tsundoku.Models.TsundokuLanguageModel;
 
-namespace Tsundoku.Models
+namespace Tsundoku.Models;
+
+public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Series?>
 {
-    public partial class Series : ReactiveObject, IDisposable, IEquatable<Series?>
+    private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
+    private static SeriesModelContext SeriesJsonModel = new SeriesModelContext(new JsonSerializerOptions()
     {
-        private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
-        private static SeriesModelContext SeriesJsonModel = new SeriesModelContext(new JsonSerializerOptions()
+        WriteIndented = true,
+        ReadCommentHandling = JsonCommentHandling.Disallow,
+        AllowTrailingCommas = true,
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+    });
+
+    [JsonIgnore] private bool disposedValue;
+    [JsonIgnore][Reactive] public Bitmap? CoverBitMap { get; set; }
+    public Guid Id { get; set; } = Guid.NewGuid();
+    [Reactive] public string Publisher { get; set; }
+    [Reactive] public Dictionary<TsundokuLanguage, string> Titles { get; set; }
+    [Reactive] public Dictionary<TsundokuLanguage, string> Staff { get; set; }
+    [Reactive] public uint DuplicateIndex { get; set; }
+    [Reactive] public string Description { get; set; }
+    [Reactive] public SeriesFormat Format { get; set; }
+    [Reactive] public SeriesStatus Status { get; set; }
+    [Reactive] public string Cover { get; set; }
+    public Uri Link { get; set; }
+    [Reactive] public HashSet<SeriesGenre>? Genres { get; set; }
+    [Reactive] public string SeriesNotes { get; set; }
+    [Reactive] public ushort MaxVolumeCount { get; set; }
+    [Reactive] public ushort CurVolumeCount { get; set; }
+    [Reactive] public uint VolumesRead { get; set; }
+    [Reactive] public decimal Value { get; set; }
+    [Reactive] public decimal Rating { get; set; }
+    [Reactive] public SeriesDemographic Demographic { get; set; }
+    [Reactive] public bool IsFavorite { get; set; } = false;
+
+    [JsonConstructor]
+    public Series(
+        Dictionary<TsundokuLanguage, string> Titles,
+        Dictionary<TsundokuLanguage, string> Staff,
+        string Description,
+        SeriesFormat Format,
+        SeriesStatus Status,
+        string Cover,
+        Uri Link,
+        HashSet<SeriesGenre> Genres,
+        ushort MaxVolumeCount,
+        ushort CurVolumeCount,
+        decimal Rating,
+        uint VolumesRead,
+        decimal Value,
+        SeriesDemographic Demographic,
+        Bitmap CoverBitMap,
+        string Publisher = "Unknown",
+        uint DuplicateIndex = 0)
+    {
+        this.Publisher = Publisher;
+        this.Titles = Titles;
+        this.Staff = Staff;
+        this.Description = Description;
+        this.Format = Format;
+        this.Status = Status;
+        this.Cover = Cover;
+        this.Link = Link;
+        this.Genres = Genres;
+        this.MaxVolumeCount = MaxVolumeCount;
+        this.CurVolumeCount = CurVolumeCount;
+        this.Rating = Rating;
+        this.VolumesRead = VolumesRead;
+        this.Value = Value;
+        this.Demographic = Demographic;
+        this.CoverBitMap = CoverBitMap;
+        this.DuplicateIndex = DuplicateIndex;
+    }
+
+    /// <summary>
+    /// All Chinese or Taiwanese series use "Chinese (Simplified)" and go to "Chinese"
+    /// </summary>
+    /// <param name="input">Title or ID of the series the user wants to add to their collection</param>
+    /// <param name="bookType">Booktype of the series the user wants to add, either Manga or Light Novel</param>
+    /// <param name="maxVolCount">Current max volume count of the series</param>
+    /// <param name="minVolCount">Current volume count the user has for the series</param>
+    /// <param name="ALQuery">AniList object for the AniList HTTP Client</param>
+    /// <param name="MD_Query">MangaDex object for the MangaDex HTTP client</param>
+    /// <param name="additionalLanguages">List of additional languages to query for</param>
+    /// <returns></returns>
+    // TODO - Make it so it doesn't download the image until it's confirmed that the series is not a dupe
+    public static async Task<Series?> CreateNewSeriesCardAsync(
+        BitmapHelper bitmapHelper,
+        MangaDex mangaDex,
+        AniList aniList,
+        string input,
+        SeriesFormat bookType,
+        ushort maxVolCount,
+        ushort minVolCount,
+        TsundokuLanguage[] additionalLanguages,
+        string publisher = "Unknown",
+        SeriesDemographic demographic = SeriesDemographic.Unknown,
+        uint volumesRead = 0,
+        decimal rating = -1,
+        decimal value = 0,
+        string customImageUrl = "",
+        bool allowDuplicate = false,
+        bool isRefresh = false
+    )
+    {
+        Series? newSeries = null;
+        JsonDocument? mediaDataDoc = null;
+
+        int pageNum = 1;
+        string curMangaDexId = string.Empty;
+
+        bool isAniList = false;
+        bool isMangaDex = false;
+        bool isTitleId = false;
+
+        try
         {
-            WriteIndented = true,
-            ReadCommentHandling = JsonCommentHandling.Disallow,
-            AllowTrailingCommas = true,
-            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-        });
-
-        [JsonIgnore] private bool disposedValue;
-        [JsonIgnore][Reactive] public Bitmap? CoverBitMap { get; set; }
-        public Guid Id { get; set; } = Guid.NewGuid();
-        [Reactive] public string Publisher { get; set; }
-        [Reactive] public Dictionary<TsundokuLanguage, string> Titles { get; set; }
-        [Reactive] public Dictionary<TsundokuLanguage, string> Staff { get; set; }
-        [Reactive] public uint DuplicateIndex { get; set; }
-        [Reactive] public string Description { get; set; }
-        [Reactive] public Format Format { get; set; }
-        [Reactive] public Status Status { get; set; }
-        [Reactive] public string Cover { get; set; }
-        public Uri Link { get; set; }
-        [Reactive] public HashSet<Genre>? Genres { get; set; }
-        [Reactive] public string SeriesNotes { get; set; }
-        [Reactive] public ushort MaxVolumeCount { get; set; }
-        [Reactive] public ushort CurVolumeCount { get; set; }
-        [Reactive] public uint VolumesRead { get; set; }
-        [Reactive] public decimal Value { get; set; }
-        [Reactive] public decimal Rating { get; set; }
-        [Reactive] public Demographic Demographic { get; set; }
-        [Reactive] public bool IsFavorite { get; set; } = false;
-
-        [JsonConstructor]
-        public Series(
-            Dictionary<TsundokuLanguage, string> Titles,
-            Dictionary<TsundokuLanguage, string> Staff,
-            string Description,
-            Format Format,
-            Status Status,
-            string Cover,
-            Uri Link,
-            HashSet<Genre> Genres,
-            ushort MaxVolumeCount,
-            ushort CurVolumeCount,
-            decimal Rating,
-            uint VolumesRead,
-            decimal Value,
-            Demographic Demographic,
-            Bitmap CoverBitMap,
-            string Publisher = "Unknown",
-            uint DuplicateIndex = 0)
-        {
-            this.Publisher = Publisher;
-            this.Titles = Titles;
-            this.Staff = Staff;
-            this.Description = Description;
-            this.Format = Format;
-            this.Status = Status;
-            this.Cover = Cover;
-            this.Link = Link;
-            this.Genres = Genres;
-            this.MaxVolumeCount = MaxVolumeCount;
-            this.CurVolumeCount = CurVolumeCount;
-            this.Rating = Rating;
-            this.VolumesRead = VolumesRead;
-            this.Value = Value;
-            this.Demographic = Demographic;
-            this.CoverBitMap = CoverBitMap;
-            this.DuplicateIndex = DuplicateIndex;
-        }
-
-        /// <summary>
-        /// All Chinese or Taiwanese series use "Chinese (Simplified)" and go to "Chinese"
-        /// </summary>
-        /// <param name="title">Title or ID of the series the user wants to add to their collection</param>
-        /// <param name="bookType">Booktype of the series the user wants to add, either Manga or Light Novel</param>
-        /// <param name="maxVolCount">Current max volume count of the series</param>
-        /// <param name="minVolCount">Current volume count the user has for the series</param>
-        /// <param name="ALQuery">AniList object for the AniList HTTP Client</param>
-        /// <param name="MD_Query">MangaDex object for the MangaDex HTTP client</param>
-        /// <param name="additionalLanguages">List of additional languages to query for</param>
-        /// <returns></returns>
-        // TODO - Make it so it doesn't download the image until it's confirmed that the series is not a dupe
-        public static async Task<Series?> CreateNewSeriesCardAsync(
-            BitmapHelper bitmapHelper,
-            MangaDex mangaDex,
-            AniList aniList,
-            string title,
-            Format bookType,
-            ushort maxVolCount,
-            ushort minVolCount,
-            List<TsundokuLanguage> additionalLanguages,
-            string publisher = "Unknown",
-            Demographic demographic = Demographic.Unknown,
-            uint volumesRead = 0,
-            decimal rating = -1,
-            decimal value = 0,
-            string customImageUrl = "",
-            bool allowDuplicate = false,
-            bool isRefresh = false
-        )
-        {
-            Series? newSeries = null;
-            JsonDocument? mediaDataDoc = null;
-
-            try
+            if (int.TryParse(input, out int seriesId)) // Check AniList ID
             {
-                int pageNum = 1;
-                bool isAniListID = false, isMangaDexId = false;
-                string curMangaDexId = string.Empty;
-                uint dupeIndex = 0;
-                ;
-                if (int.TryParse(title, out int seriesId))
+                // Numeric title is treated as AniList ID
+                mediaDataDoc = await aniList.GetSeriesByIDAsync(seriesId, bookType, pageNum);
+                isAniList = true;
+                isTitleId = true;
+            }
+            else if (MangaDex.IsMangaDexId(input)) // Check MangaDex Id
+            {
+                mediaDataDoc = await mangaDex.GetSeriesByIdAsync(input);
+                curMangaDexId = input;
+                isMangaDex = true;
+                isTitleId = true;
+            }
+            else
+            {
+                mediaDataDoc = await aniList.GetSeriesByTitleAsync(input, bookType, pageNum); // Check AniList Title
+                if (mediaDataDoc == null)
                 {
-                    mediaDataDoc = await aniList.GetSeriesByIDAsync(seriesId, bookType, pageNum);
-                    isAniListID = true;
-                }
-                else if (MangaDex.MangaDexIDRegex().IsMatch(title))
-                {
-                    LOGGER.Debug("Getting MangaDex ID Data");
-                    mediaDataDoc = await mangaDex.GetSeriesByIdAsync(title);
-                    curMangaDexId = title;
-                    isMangaDexId = true;
+                    mediaDataDoc = await mangaDex.GetSeriesByTitleAsync(input); // Check MangaDex Title
+                    isMangaDex = true;
                 }
                 else
                 {
-                    mediaDataDoc = await aniList.GetSeriesByTitleAsync(title, bookType, pageNum);
-                    if (mediaDataDoc == null)
-                    {
-                        LOGGER.Debug("Getting MangaDex Title Data since AniList is Null");
-                        mediaDataDoc = await mangaDex.GetSeriesByTitleAsync(title);
-                        isMangaDexId = true;
-                    }
+                    isAniList = true;
                 }
+            }
 
-                string countryOfOrigin = string.Empty, nativeTitle = string.Empty, japaneseTitle = string.Empty, romajiTitle = string.Empty, englishTitle = string.Empty, coverPath = string.Empty;
-                Format filteredBookType;
-                JsonElement[] mangaDexAltTitles = [];
-                Dictionary<TsundokuLanguage, string> newTitles = [];
+            // Predeclare variables for extraction later
+            string countryOfOrigin = string.Empty;
+            string nativeTitle = string.Empty;
+            string japaneseTitle = string.Empty;
+            string romajiTitle = string.Empty;
+            string englishTitle = string.Empty;
+            string coverPath = string.Empty;
+
+            JsonElement[] mangaDexAltTitles = [];
+            Dictionary<TsundokuLanguage, string> newTitles = [];
+
+            BuildContext context = new BuildContext();
 
             // AniList Query Check
-            Restart:
-                if ((!isMangaDexId || isAniListID) && mediaDataDoc != null)
+            if (isAniList)
+            {
+                newSeries = await TryCreateAniListSeriesAsync(
+                    aniList,
+                    mangaDex,
+                    input,
+                    customImageUrl,
+                    bookType,
+                    isTitleId,
+                    mediaDataDoc,
+                    additionalLanguages,
+                    allowDuplicate,
+                    isRefresh,
+                    maxVolCount,
+                    minVolCount,
+                    rating,
+                    volumesRead,
+                    value,
+                    demographic,
+                    publisher,
+                    bitmapHelper,
+                    context
+                );
+
+                if (!isTitleId && newSeries is null && bookType != SeriesFormat.Novel)
                 {
-                    LOGGER.Debug("Valid AniList Query");
-                    string nativeStaff = string.Empty, fullStaff = string.Empty;
-                    JsonElement mediaData = mediaDataDoc.RootElement.GetProperty("Media");
-                    nativeTitle = mediaData.GetProperty("title").GetProperty("native").GetString();
-                    romajiTitle = mediaData.GetProperty("title").GetProperty("romaji").GetString();
-                    englishTitle = mediaData.GetProperty("title").GetProperty("english").GetString();
-                    if (!isAniListID
-                            && !(
-                                    EntryModel.Similar(title, englishTitle, !string.IsNullOrWhiteSpace(englishTitle) && title.Length > englishTitle.Length ? englishTitle.Length / 6 : title.Length / 6) != -1
-                                    || EntryModel.Similar(title, romajiTitle, !string.IsNullOrWhiteSpace(romajiTitle) && title.Length > romajiTitle.Length ? romajiTitle.Length / 6 : title.Length / 6) != -1
-                                    || EntryModel.Similar(title, nativeTitle, !string.IsNullOrWhiteSpace(nativeTitle) && title.Length > nativeTitle.Length ? nativeTitle.Length / 6 : title.Length / 6) != -1
-                                )
-                        )
-                    {
-                        LOGGER.Info("Not on AniList or Incorrect Entry -> Trying Mangadex");
-                        mediaDataDoc = null;
-                        goto Restart;
-                    }
-
-                    bool hasNextPage = AniList.ExtractStaffFromAniList(mediaData, ref nativeStaff, ref fullStaff);
-                    countryOfOrigin = mediaData.GetProperty("countryOfOrigin").GetString();
-                    filteredBookType = bookType == Format.Manga ? GetCorrectFormat(countryOfOrigin) : Format.Novel;
-                    (coverPath, bool isDuplicateCover) = !isRefresh ? AppFileHelper.CreateUniqueCoverFileName(mediaData.GetProperty("coverImage").GetProperty("extraLarge").GetString(), romajiTitle, filteredBookType, allowDuplicate, ref dupeIndex) : (string.Empty, false);
-
-
-                    // If available on AniList and is not a Japanese series get the Japanese title from Mangadex
-                    if (!bookType.Equals("NOVEL") && (countryOfOrigin.Equals("KR") || countryOfOrigin.Equals("CW") || countryOfOrigin.Equals("TW")))
-                    {
-                        LOGGER.Info("Getting Japanese Title for Non-Japanese Series");
-                        JsonDocument? getJapnAltTitle = await mangaDex.GetSeriesByTitleAsync(romajiTitle);
-                        if (getJapnAltTitle == null)
-                        {
-                            LOGGER.Warn($"Unable to get MangaDex alt titles for \"{romajiTitle}\"");
-                            return null;
-                        }
-                        mangaDexAltTitles = MangaDex.GetAdditionalMangaDexTitleList(getJapnAltTitle.RootElement.GetProperty("data"));
-                        if (!MangaDex.TryGetAltTitle("ja", mangaDexAltTitles, out japaneseTitle))
-                        {
-                            LOGGER.Warn("{Title} at MangaDex has no japanese title", romajiTitle);
-                        }
-                    }
-
-                    // Loop while there are still staff to check
-                    while (hasNextPage)
-                    {
-                        JsonDocument? moreStaffQuery;
-                        if (int.TryParse(title, out seriesId))
-                        {
-                            moreStaffQuery = await aniList.GetSeriesByIDAsync(seriesId, bookType, ++pageNum);
-                        }
-                        else
-                        {
-                            moreStaffQuery = await aniList.GetSeriesByTitleAsync(title, bookType, ++pageNum);
-                        }
-                        JsonElement media = moreStaffQuery.RootElement.GetProperty("Media");
-                        hasNextPage = AniList.ExtractStaffFromAniList(media, ref nativeStaff, ref fullStaff);
-                    }
-
-                    newTitles = new Dictionary<TsundokuLanguage, string>();
-                    if (!string.IsNullOrWhiteSpace(romajiTitle))
-                    {
-                        newTitles.Add(TsundokuLanguage.Romaji, romajiTitle);
-                    }
-                    if (!string.IsNullOrWhiteSpace(englishTitle))
-                    {
-                        newTitles.Add(TsundokuLanguage.English, englishTitle);
-                    }
-                    if (!string.IsNullOrWhiteSpace(japaneseTitle))
-                    {
-                        newTitles.Add(TsundokuLanguage.Japanese, japaneseTitle);
-                    }
-                    if (!string.IsNullOrWhiteSpace(nativeTitle))
-                    {
-                        newTitles.Add(ANILIST_LANG_CODES[countryOfOrigin], nativeTitle);
-                    }
-
-                    if (additionalLanguages.Count != 0)
-                    {
-                        if (mangaDexAltTitles.Any())
-                        {
-                            AddAdditionalLanguages(ref newTitles, additionalLanguages, mangaDexAltTitles.ToList());
-                        }
-                        else
-                        {
-                            LOGGER.Info("Alt Titles Empty so Making Call to Mangadex");
-                            JsonDocument? altTitlesAgain = await mangaDex.GetSeriesByTitleAsync(romajiTitle);
-                            if (altTitlesAgain == null)
-                            {
-                                LOGGER.Warn($"Unable to get MangaDex info for \"{romajiTitle}\"");
-                                return null;
-                            }
-                            AddAdditionalLanguages(ref newTitles, additionalLanguages, MangaDex.GetAdditionalMangaDexTitleList(altTitlesAgain.RootElement.GetProperty("data")).ToList());
-                        }
-                    }
-
-                    Dictionary<TsundokuLanguage, string> newStaff = new Dictionary<TsundokuLanguage, string>();
-                    if (!string.IsNullOrWhiteSpace(fullStaff))
-                    {
-                        newStaff.Add(TsundokuLanguage.Romaji, fullStaff);
-                    }
-                    if (nativeStaff != " | " && !string.IsNullOrWhiteSpace(nativeStaff))
-                    {
-                        newStaff.Add(ANILIST_LANG_CODES[countryOfOrigin], nativeStaff);
-                    }
-
-                    string imageUrl = string.IsNullOrWhiteSpace(customImageUrl) ? mediaData.GetProperty("coverImage").GetProperty("extraLarge").GetString() : customImageUrl;
-                    Bitmap? coverImage = !isRefresh && (!isDuplicateCover || allowDuplicate) ? await bitmapHelper.UpdateCoverFromUrlAsync(imageUrl, AppFileHelper.GetFullCoverPath(coverPath)) : null;
-
-                    if (!isRefresh && coverImage is null)
-                    {
-                        throw new InvalidOperationException("Expected cover image generation to succeed, but it returned null");
-                    }
-
-                    newSeries = new Series(
-                        newTitles,
-                        newStaff,
-                        AniList.ParseSeriesDescription(mediaData.GetProperty("description").GetString()),
-                        filteredBookType,
-                        GetSeriesStatus(mediaData.GetProperty("status").GetString()),
-                        coverPath,
-                        new Uri(mediaData.GetProperty("siteUrl").GetString()),
-                        AniList.ParseGenreArray(romajiTitle, mediaData.GetProperty("genres")),
-                        maxVolCount,
-                        minVolCount,
-                        rating,
-                        volumesRead,
-                        value,
-                        demographic,
-                        coverImage,
-                        publisher,
-                        dupeIndex
+                    mediaDataDoc = await mangaDex.GetSeriesByTitleAsync(input);
+                    newSeries = await TryCreateMangaDexSeriesAsync(
+                        mediaDataDoc: mediaDataDoc,
+                        mangaDex: mangaDex,
+                        input: input,
+                        customImageUrl: customImageUrl,
+                        curMangaDexId: curMangaDexId,
+                        additionalLanguages: additionalLanguages,
+                        allowDuplicate: allowDuplicate,
+                        isRefresh: isRefresh,
+                        maxVolCount: maxVolCount,
+                        minVolCount: minVolCount,
+                        rating: rating,
+                        volumesRead: volumesRead,
+                        value: value,
+                        demographic: demographic,
+                        publisher: publisher,
+                        bitmapHelper: bitmapHelper,
+                        context: context
                     );
                 }
-                else if (isMangaDexId || bookType == Format.Manga) // MangaDex
-                {
-                    bool notFoundCondition = true;
-                    if (!isMangaDexId)
-                    {
-                        mediaDataDoc = await mangaDex.GetSeriesByTitleAsync(title);
-                    }
-
-                    if (mediaDataDoc != null)
-                    {
-                        LOGGER.Debug("Check -1");
-                        JsonElement data = mediaDataDoc.RootElement.GetProperty("data");
-                        JsonElement attributes = data;
-                        Status Status;
-                        string description = string.Empty, link = string.Empty;
-                        string? englishAltTitle = string.Empty, japaneseAltTitle = string.Empty;
-                        JsonElement[] altTitles = [], relationships = [];
-
-                        if (data.ValueKind == JsonValueKind.Array)
-                        {
-                            foreach (JsonElement series in data.EnumerateArray())
-                            {
-                                attributes = series.GetProperty("attributes");
-                                altTitles = [.. attributes.GetProperty("altTitles").EnumerateArray()];
-                                englishAltTitle = MangaDex.GetAltTitle("en", altTitles);
-                                japaneseAltTitle = MangaDex.GetAltTitle("ja", altTitles);
-                                englishTitle = attributes.GetProperty("title").TryGetProperty("en", out JsonElement englishElement) ? englishElement.GetString() : englishAltTitle;
-
-                                if (!MangaDex.IsSeriesDigital(title, englishTitle, englishAltTitle)
-                                    && (
-                                        data.GetArrayLength() == 1
-                                        || (
-                                                EntryModel.Similar(title, englishTitle, !string.IsNullOrWhiteSpace(englishTitle) && title.Length > englishTitle.Length ? englishTitle.Length / 6 : title.Length / 6) != -1
-                                                || (englishAltTitle != null && EntryModel.Similar(title, englishAltTitle, !string.IsNullOrWhiteSpace(englishAltTitle) && title.Length > englishAltTitle.Length ? englishAltTitle.Length / 6 : title.Length / 6) != -1)
-                                                || (japaneseAltTitle != null && EntryModel.Similar(title, japaneseAltTitle, !string.IsNullOrWhiteSpace(japaneseAltTitle) && title.Length > japaneseAltTitle.Length ? japaneseAltTitle.Length / 6 : title.Length / 6) != -1)
-                                        )
-                                    )
-                                )
-                                {
-                                    data = series;
-                                    notFoundCondition = false;
-                                    break;
-                                }
-                            }
-
-                            if (notFoundCondition)
-                            {
-                                LOGGER.Warn($"User Input Invalid Series Title or ID \"{title}\" or Can't Determine Series Needs to be more Specific");
-                                return null;
-                            }
-                        }
-                        else
-                        {
-                            attributes = data.GetProperty("attributes");
-                            altTitles = [.. attributes.GetProperty("altTitles").EnumerateArray()];
-                            englishTitle = attributes.GetProperty("title").GetProperty("en").GetString();
-                            if (!MangaDex.TryGetAltTitle("en", altTitles, out englishAltTitle) && MangaDex.IsSeriesDigital(title, englishTitle, englishAltTitle))
-                            {
-                                LOGGER.Warn("{} is a Invalid Series", title);
-                                return null;
-                            }
-                        }
-
-                        relationships = [.. data.GetProperty("relationships").EnumerateArray()];
-                        curMangaDexId = string.IsNullOrWhiteSpace(curMangaDexId) ? data.GetProperty("id").GetString() : curMangaDexId;
-                        romajiTitle = MangaDex.GetAltTitle("ja-ro", altTitles) ?? englishTitle;
-                        description = MangaDex.ParseDescription(attributes.GetProperty("description").GetProperty("en").GetString());
-                        Status = GetSeriesStatus(attributes.GetProperty("status").GetString());
-                        link = !attributes.GetProperty("links").TryGetProperty("al", out JsonElement aniListId) ? @$"https://mangadex.org/title/{curMangaDexId}" : @$"https://anilist.co/manga/{aniListId}";
-                        countryOfOrigin = attributes.GetProperty("originalLanguage").GetString();
-
-                        string? coverId = relationships.Single(x => x.GetProperty("type").GetString().Equals("cover_art")).GetProperty("id").GetString();
-                        string coverLink = string.IsNullOrWhiteSpace(customImageUrl) ? await mangaDex.GetCoverLinkAsync(coverId, curMangaDexId, romajiTitle) : customImageUrl;
-
-                        (coverPath, bool isDuplicateCover) = !isRefresh ? AppFileHelper.CreateUniqueCoverFileName(coverLink, romajiTitle, GetCorrectFormat(countryOfOrigin), allowDuplicate, ref dupeIndex) : (string.Empty, false);
-                        demographic = GetSeriesDemographic(attributes.GetProperty("publicationDemographic").GetString());
-
-                        if (altTitles.Length != 0)
-                        {
-                            LOGGER.Debug("Series has no Alternate Titles");
-                        }
-
-                        newTitles = new Dictionary<TsundokuLanguage, string>
-                        {
-                            { TsundokuLanguage.Romaji, romajiTitle },
-                            { TsundokuLanguage.English,  englishTitle.Equals(englishAltTitle) || string.IsNullOrWhiteSpace(englishAltTitle) || countryOfOrigin.Equals("en") ? englishTitle : englishAltTitle }
-                        };
-
-                        // Get the Japanese title if the series is not a Japanese Comic
-                        if (!countryOfOrigin.Equals("ja") && MangaDex.TryGetAltTitle("ja", altTitles, out japaneseAltTitle))
-                        {
-                            newTitles.Add(TsundokuLanguage.Japanese, japaneseAltTitle);
-                        }
-
-                        // Check to see if the user wants additional languages
-                        if (additionalLanguages != null && additionalLanguages.Count != 0)
-                        {
-                            AddAdditionalLanguages(ref newTitles, additionalLanguages, [.. altTitles]);
-                        }
-
-                        // Get the staff for a series
-                        string? staffName = string.Empty;
-                        StringBuilder nativeStaffBuilder = new StringBuilder(), fullStaffBuilder = new StringBuilder();
-                        foreach (string staff in relationships.Where(staff => staff.GetProperty("type").GetString().Equals("author") || staff.GetProperty("type").GetString().Equals("artist")).Select(staff => staff.GetProperty("id").GetString()).Distinct())
-                        {
-                            staffName = await mangaDex.GetAuthorAsync(staff);
-                            if (!string.IsNullOrWhiteSpace(staffName))
-                            {
-                                if (MangaDex.NativeStaffRegex().IsMatch(staffName))
-                                {
-                                    string native = MangaDex.NativeStaffRegex().Match(staffName).Groups[1].ToString();
-                                    string full = MangaDex.FullStaffRegex().Match(staffName).Value;
-                                    if (fullStaffBuilder.ToString().Contains(full, StringComparison.OrdinalIgnoreCase) || nativeStaffBuilder.ToString().Contains(native, StringComparison.OrdinalIgnoreCase))
-                                    {
-                                        continue;
-                                    }
-                                    nativeStaffBuilder.AppendFormat("{0} | ", native);
-                                    fullStaffBuilder.AppendFormat("{0} | ", full);
-                                }
-                                else if (!fullStaffBuilder.ToString().Contains(staffName))
-                                {
-                                    fullStaffBuilder.AppendFormat("{0} | ", staffName);
-                                }
-                            }
-                            else
-                            {
-                                LOGGER.Warn($"Unable to get MangaDex author info for \"{romajiTitle}\"");
-                                return null;
-                            }
-                        }
-
-                        Dictionary<TsundokuLanguage, string> newStaff = new Dictionary<TsundokuLanguage, string>()
-                        {
-                            { TsundokuLanguage.Romaji, fullStaffBuilder.Remove(fullStaffBuilder.Length - 3, 3).ToString() }
-                        };
-
-                        // If country of origin is not English based add the english title and staff
-                        if (!countryOfOrigin.Equals("en"))
-                        {
-                            if (MangaDex.TryGetAltTitle(countryOfOrigin, altTitles, out englishAltTitle))
-                            {
-                                newTitles.Add(MANGADEX_LANG_CODES[countryOfOrigin], englishAltTitle);
-                            }
-                            newStaff.Add(MANGADEX_LANG_CODES[countryOfOrigin], nativeStaffBuilder.Length != 0 ? nativeStaffBuilder.Remove(nativeStaffBuilder.Length - 3, 3).ToString() : string.Empty);
-                        }
-
-                        // Remove empty titles
-                        foreach (KeyValuePair<TsundokuLanguage, string> x in newTitles)
-                        {
-                            if (string.IsNullOrWhiteSpace(x.Value))
-                            {
-                                newTitles.Remove(x.Key);
-                            }
-                        }
-
-                        // Remove empty titles
-                        foreach (KeyValuePair<TsundokuLanguage, string> x in newStaff)
-                        {
-                            if (string.IsNullOrWhiteSpace(x.Value))
-                            {
-                                newStaff.Remove(x.Key);
-                            }
-                        }
-
-                        Bitmap? coverImage = !isRefresh && (!isDuplicateCover || allowDuplicate) ? await bitmapHelper.UpdateCoverFromUrlAsync(coverLink, AppFileHelper.GetFullCoverPath(coverPath)) : null;
-
-                        if (!isRefresh && coverImage is null)
-                        {
-                            throw new InvalidOperationException("Expected cover image generation to succeed, but it returned null");
-                        }
-
-                        newSeries = new Series(
-                            newTitles,
-                            newStaff,
-                            description,
-                            GetCorrectFormat(countryOfOrigin),
-                            Status,
-                            coverPath,
-                            new Uri(link),
-                            MangaDex.ParseGenreData(romajiTitle, attributes.GetProperty("tags")),
-                            maxVolCount,
-                            minVolCount,
-                            rating,
-                            volumesRead,
-                            value,
-                            demographic,
-                            coverImage,
-                            publisher,
-                            dupeIndex
-                        );
-                    }
-                }
             }
-            catch (Exception ex)
+            else if (isMangaDex && bookType != SeriesFormat.Novel) // MangaDex
             {
-                // TODO - Add some of the input variables here
-                LOGGER.Error(ex, "Error Creating new Series");
+                newSeries = await TryCreateMangaDexSeriesAsync(
+                    mediaDataDoc: mediaDataDoc,
+                    mangaDex: mangaDex,
+                    input: input,
+                    customImageUrl: customImageUrl,
+                    curMangaDexId: curMangaDexId,
+                    additionalLanguages: additionalLanguages,
+                    allowDuplicate: allowDuplicate,
+                    isRefresh: isRefresh,
+                    maxVolCount: maxVolCount,
+                    minVolCount: minVolCount,
+                    rating: rating,
+                    volumesRead: volumesRead,
+                    value: value,
+                    demographic: demographic,
+                    publisher: publisher,
+                    bitmapHelper: bitmapHelper,
+                    context: context
+                );
             }
-            finally
+        }
+        catch (Exception ex)
+        {
+            // TODO - Add some of the input variables here
+            LOGGER.Error(ex, "Error Creating new Series");
+        }
+        finally
+        {
+            mediaDataDoc?.Dispose();
+        }
+        return newSeries;
+    }
+
+    private static async Task<Series?> TryCreateAniListSeriesAsync(
+        AniList aniList,
+        MangaDex mangaDex,
+        string input,
+        string? customImageUrl,
+        SeriesFormat bookType,
+        bool isAniListId,
+        JsonDocument mediaDataDoc,
+        TsundokuLanguage[] additionalLanguages,
+        bool allowDuplicate,
+        bool isRefresh,
+        ushort maxVolCount,
+        ushort minVolCount,
+        decimal rating,
+        uint volumesRead,
+        decimal value,
+        SeriesDemographic demographic,
+        string? publisher,
+        BitmapHelper bitmapHelper,
+        BuildContext context)
+    {
+        void AddIfNotEmpty(string? title, TsundokuLanguage lang)
+        {
+            if (!string.IsNullOrWhiteSpace(title))
             {
-                mediaDataDoc?.Dispose();
+                context.NewTitles[lang] = title;
             }
-            return newSeries;
         }
 
-        public static void AddAdditionalLanguages(ref Dictionary<TsundokuLanguage, string> newTitles, List<TsundokuLanguage> additionalLanguages, List<JsonElement> altTitles)
+        void AddStaffIfValid(string? staff, TsundokuLanguage lang)
         {
-            Span<string> mangaDexLang = CollectionsMarshal.AsSpan(MANGADEX_LANG_CODES.Where(lang => additionalLanguages.Contains(lang.Value)).Select(lang => lang.Key).ToList());
-
-            foreach (string langKey in mangaDexLang)
+            if (!string.IsNullOrWhiteSpace(staff) && staff != " | ")
             {
-                foreach (JsonElement mdKey in altTitles)
+                context.NewStaff[lang] = staff;
+            }
+        }
+
+        int pageNum = 1;
+
+        string nativeStaff = string.Empty;
+        string fullStaff = string.Empty;
+
+        JsonElement mediaData = mediaDataDoc.RootElement.GetProperty("Media");
+        JsonElement titleElement = mediaData.GetProperty("title");
+
+        context.NativeTitle = titleElement.GetProperty("native").GetString();
+        context.RomajiTitle = titleElement.GetProperty("romaji").GetString();
+        context.EnglishTitle = titleElement.GetProperty("english").GetString();
+
+        bool isSimilar = false;
+        if (!string.IsNullOrWhiteSpace(context.EnglishTitle))
+        {
+            isSimilar |= ExtensionMethods.Similar(input, context.EnglishTitle, ExtensionMethods.SimilarThreshold(input, context.EnglishTitle)) != -1;
+        }
+        if (!string.IsNullOrWhiteSpace(context.RomajiTitle))
+        {
+            isSimilar |= ExtensionMethods.Similar(input, context.RomajiTitle, ExtensionMethods.SimilarThreshold(input, context.RomajiTitle)) != -1;
+        }
+        if (!string.IsNullOrWhiteSpace(context.NativeTitle))
+        {
+            isSimilar |= ExtensionMethods.Similar(input, context.NativeTitle, ExtensionMethods.SimilarThreshold(input, context.NativeTitle)) != -1;
+        }
+
+        if (!isAniListId && !isSimilar)
+        {
+            LOGGER.Info("Not on AniList or Incorrect Entry -> Trying MangaDex");
+            return null;
+        }
+
+        context.CountryOfOrigin = mediaData.GetProperty("countryOfOrigin").GetString();
+        context.FilteredBookType = bookType == SeriesFormat.Manga
+            ? SeriesFormatEnum.Parse(context.CountryOfOrigin)
+            : SeriesFormat.Novel;
+
+        if (!isRefresh)
+        {
+            string imageUrl = mediaData
+                .GetProperty("coverImage")
+                .GetProperty("extraLarge")
+                .GetString();
+
+            (context.CoverPath, _) = AppFileHelper.CreateUniqueCoverFileName(
+                imageUrl,
+                context.RomajiTitle,
+                context.FilteredBookType,
+                allowDuplicate,
+                ref context.DupeIndex
+            );
+        }
+
+        // Fallback to MangaDex to fetch Japanese title for KR/TW/CW origin
+        if (bookType != SeriesFormat.Novel && IsAsianNonJapanese(context.CountryOfOrigin))
+        {
+            LOGGER.Info("Getting Japanese Title for Non-Japanese Series");
+
+            JsonDocument? altTitleDoc = await mangaDex.GetSeriesByTitleAsync(context.RomajiTitle);
+            if (altTitleDoc is null)
+            {
+                LOGGER.Warn("Unable to get MangaDex alt titles for \"{RomajiTitle}\"", context.RomajiTitle);
+                return null;
+            }
+
+            context.MangaDexAltTitles = MangaDex.GetAdditionalMangaDexTitleList(altTitleDoc.RootElement.GetProperty("data"), context.EnglishTitle, context.NativeTitle);
+
+            if (!MangaDex.TryGetAltTitle("ja", context.MangaDexAltTitles, out context.JapaneseTitle))
+            {
+                LOGGER.Warn("{RomajiTitle} at MangaDex has no japanese title", context.RomajiTitle);
+            }
+        }
+
+        bool disallowIllustrationStaff = input.Contains("Anthology", StringComparison.OrdinalIgnoreCase);
+        bool hasNextPage = AniList.ExtractStaffFromAniList(mediaData, ref nativeStaff, ref fullStaff, disallowIllustrationStaff);
+        while (hasNextPage) // Continue fetching paged staff
+        {
+            pageNum++;
+            LOGGER.Debug("Getting staff for page {num}", pageNum);
+            using JsonDocument? moreStaffDoc = isAniListId
+                ? await aniList.GetSeriesByIDAsync(int.Parse(input), bookType, pageNum)
+                : await aniList.GetSeriesByTitleAsync(input, bookType, pageNum);
+
+            if (moreStaffDoc is null)
+            {
+                LOGGER.Warn("AniList returned null when fetching additional staff (page {Page}) for {Title}", pageNum, input);
+                break;
+            }
+
+            JsonElement moreMedia = moreStaffDoc.RootElement.GetProperty("Media");
+            hasNextPage = AniList.ExtractStaffFromAniList(moreMedia, ref nativeStaff, ref fullStaff, disallowIllustrationStaff);
+        }
+
+        // Populate titles
+        AddIfNotEmpty(context.RomajiTitle, TsundokuLanguage.Romaji);
+        AddIfNotEmpty(context.EnglishTitle, TsundokuLanguage.English);
+        AddIfNotEmpty(context.JapaneseTitle, TsundokuLanguage.Japanese);
+        AddIfNotEmpty(context.NativeTitle, ANILIST_LANG_CODES[context.CountryOfOrigin]);
+
+        // Add additional languages from MangaDex if requested
+        if (additionalLanguages.Length > 0)
+        {
+            JsonElement[] altTitles = context.MangaDexAltTitles;
+
+            if (altTitles.Length == 0)
+            {
+                JsonDocument? altTitlesDoc = await mangaDex.GetSeriesByTitleAsync(context.RomajiTitle);
+                if (altTitlesDoc == null)
                 {
-                    if (!newTitles.ContainsKey(MANGADEX_LANG_CODES[langKey]) && mdKey.TryGetProperty(langKey, out JsonElement foundTitle))
+                    LOGGER.Warn("Unable to get MangaDex info for {Title}", context.RomajiTitle);
+                    return null;
+                }
+
+                altTitles = MangaDex.GetAdditionalMangaDexTitleList(
+                    altTitlesDoc.RootElement.GetProperty("data"),
+                    context.EnglishTitle,
+                    context.NativeTitle
+                );
+            }
+
+            AddAdditionalLanguages(ref context.NewTitles, additionalLanguages, altTitles);
+        }
+
+        // Build staff dictionary
+        AddStaffIfValid(fullStaff, TsundokuLanguage.Romaji);
+        AddStaffIfValid(nativeStaff, ANILIST_LANG_CODES[context.CountryOfOrigin]);
+
+        // Download cover image if needed
+        string coverImageUrl = string.IsNullOrWhiteSpace(customImageUrl)
+            ? mediaData.GetProperty("coverImage").GetProperty("extraLarge").GetString()
+            : customImageUrl;
+
+        Bitmap? coverImage = null;
+
+        if (!isRefresh && (allowDuplicate || !string.IsNullOrWhiteSpace(context.CoverPath)))
+        {
+            coverImage = await bitmapHelper.UpdateCoverFromUrlAsync(
+                coverImageUrl,
+                AppFileHelper.GetFullCoverPath(context.CoverPath)
+            );
+
+            if (coverImage is null)
+            {
+                LOGGER.Warn("Expected cover image generation to succeed, but it returned null");
+            }
+        }
+
+        return new Series(
+            Titles: context.NewTitles,
+            Staff: context.NewStaff,
+            Description: AniList.ParseSeriesDescription(mediaData.GetProperty("description").GetString()),
+            Format: context.FilteredBookType,
+            Status: SeriesStatusEnum.Parse(mediaData.GetProperty("status").GetString()),
+            Cover: context.CoverPath,
+            Link: new Uri(mediaData.GetProperty("siteUrl").GetString()),
+            Genres: AniList.ParseGenreArray(context.RomajiTitle, mediaData.GetProperty("genres")),
+            MaxVolumeCount: maxVolCount,
+            CurVolumeCount: minVolCount,
+            Rating: rating,
+            VolumesRead: volumesRead,
+            Value: value,
+            Demographic: demographic,
+            CoverBitMap: coverImage,
+            Publisher: publisher ?? "Unknown",
+            DuplicateIndex: context.DupeIndex
+        );
+    }
+
+    private static async Task<Series?> TryCreateMangaDexSeriesAsync(
+        JsonDocument mediaDataDoc,
+        MangaDex mangaDex,
+        string input,
+        string? customImageUrl,
+        string? curMangaDexId,
+        TsundokuLanguage[] additionalLanguages,
+        bool allowDuplicate,
+        bool isRefresh,
+        ushort maxVolCount,
+        ushort minVolCount,
+        decimal rating,
+        uint volumesRead,
+        decimal value,
+        SeriesDemographic demographic,
+        string? publisher,
+        BitmapHelper bitmapHelper,
+        BuildContext context)
+    {
+        JsonElement data = mediaDataDoc.RootElement.GetProperty("data");
+        if (data.ValueKind == JsonValueKind.Array)
+        {
+            LOGGER.Debug("Multiple series entries returned");
+            data = MangaDex.TryFindValidMangaDexSeries(data, input);
+        }
+
+        if (data.ValueKind != JsonValueKind.Object)
+        {
+            LOGGER.Warn("Series {Input}, is not on MangaDex, returned {Type}", input, data.ValueKind);
+            return null;
+        }
+
+        if (string.IsNullOrEmpty(curMangaDexId) && data.TryGetProperty("id", out JsonElement idElement))
+        {
+            curMangaDexId = idElement.GetString();
+        }
+
+        // attributes
+        if (!data.TryGetProperty("attributes", out JsonElement attributes))
+        {
+            LOGGER.Warn("Series {Input} missing 'attributes' block", input);
+            return null;
+        }
+        else if (!attributes.TryGetProperty("title", out JsonElement titleBlock))
+        {
+            LOGGER.Warn("Series {Input} missing 'title' block", input);
+            return null;
+        }
+
+        curMangaDexId = string.IsNullOrEmpty(curMangaDexId) ? data.GetProperty("id").GetString() : curMangaDexId;
+
+        JsonElement attributesBlock = data.GetProperty("attributes");
+        JsonElement[] altTitleList = [.. attributesBlock.GetProperty("altTitles").EnumerateArray()];
+
+        context.EnglishTitle = attributesBlock.GetProperty("title").GetProperty("en").GetString();
+        context.CountryOfOrigin = attributesBlock.GetProperty("originalLanguage").GetString();
+        context.RomajiTitle = MangaDex.GetAltTitle("ja-ro", altTitleList) ?? context.EnglishTitle;
+        context.NativeTitle = MangaDex.GetAltTitle(context.CountryOfOrigin, altTitleList) ?? context.RomajiTitle;
+        context.FilteredBookType = SeriesFormatEnum.Parse(context.CountryOfOrigin);
+
+        if (!MangaDex.TryGetAltTitle("ja", altTitleList, out context.JapaneseTitle))
+        {
+            context.JapaneseTitle = string.Empty;
+        }
+
+        // Update cover path
+        JsonElement[] relationships = [.. data.GetProperty("relationships").EnumerateArray()];
+        string? coverId = relationships
+            .AsValueEnumerable()
+            .FirstOrDefault(static x =>
+                x.TryGetProperty("type", out var typeProp) &&
+                typeProp.ValueEquals("cover_art"))
+            .GetProperty("id")
+            .GetString();
+
+        // Resolve cover URL (prefer custom, fallback to generated)
+        string coverUrl = string.IsNullOrWhiteSpace(customImageUrl)
+            ? await mangaDex.GetCoverLinkAsync(
+                coverId,
+                curMangaDexId ?? data.GetProperty("id").GetString(),
+                context.RomajiTitle)
+            : customImageUrl;
+
+        // Conditionally generate cover file path
+        (context.CoverPath, bool isDupe) = !isRefresh
+            ? AppFileHelper.CreateUniqueCoverFileName(
+                coverUrl,
+                context.RomajiTitle,
+                context.FilteredBookType,
+                allowDuplicate,
+                ref context.DupeIndex)
+            : (string.Empty, false);
+
+        // Titles
+        Dictionary<TsundokuLanguage, string> titles = context.NewTitles;
+        titles[TsundokuLanguage.Romaji] = context.RomajiTitle;
+        titles[TsundokuLanguage.English] = context.EnglishTitle;
+
+        // Japanese title only for non-Japanese-origin works
+        if (!string.IsNullOrWhiteSpace(context.JapaneseTitle))
+        {
+            titles[TsundokuLanguage.Japanese] = context.JapaneseTitle;
+        }
+
+        // Native language title (e.g., "ko", "zh-hk") if not English
+        if (!"en".Equals(context.CountryOfOrigin, StringComparison.Ordinal) &&
+            MangaDex.TryGetAltTitle(context.CountryOfOrigin, altTitleList, out string nativeAlt))
+        {
+            titles[MANGADEX_LANG_CODES[context.CountryOfOrigin]] = nativeAlt;
+        }
+
+        // Additional languages (only if specified)
+        if (additionalLanguages.Length > 0)
+        {
+            AddAdditionalLanguages(ref titles, additionalLanguages, altTitleList);
+        }
+
+        // Staff
+        (StringBuilder fullStaff, StringBuilder nativeStaff) = await mangaDex.GetStaffAsync(relationships, context.RomajiTitle);
+        if (fullStaff.Length > 0)
+        {
+            context.NewStaff[TsundokuLanguage.Romaji] = fullStaff.ToString();
+        }
+
+        if (nativeStaff.Length > 0)
+        {
+            context.NewStaff[MANGADEX_LANG_CODES[context.CountryOfOrigin]] = nativeStaff.ToString();
+        }
+
+        // Download cover
+        Bitmap? coverImage = null;
+        if (!isRefresh && (!isDupe || allowDuplicate))
+        {
+            coverImage = await bitmapHelper.UpdateCoverFromUrlAsync(coverUrl, AppFileHelper.GetFullCoverPath(context.CoverPath));
+            if (coverImage is null)
+            {
+                LOGGER.Warn("Expected cover image generation to succeed, but it returned null");
+            }
+        }
+
+        return new Series(
+            Titles: context.NewTitles,
+            Staff: context.NewStaff,
+            Description: MangaDex.ParseDescription(attributesBlock.GetProperty("description").GetProperty("en").GetString()),
+            Format: context.FilteredBookType,
+            Status: SeriesStatusEnum.Parse(attributesBlock.GetProperty("status").GetString()),
+            Cover: context.CoverPath,
+            Link: new Uri(attributesBlock.GetProperty("links").TryGetProperty("al", out JsonElement alId)
+                ? $"https://anilist.co/manga/{alId.GetString()}"
+                : $"https://mangadex.org/title/{curMangaDexId ?? data.GetProperty("id").GetString()}"),
+            Genres: MangaDex.ParseGenreData(context.RomajiTitle, attributesBlock.GetProperty("tags")),
+            MaxVolumeCount: maxVolCount,
+            CurVolumeCount: minVolCount,
+            Rating: rating,
+            VolumesRead: volumesRead,
+            Value: value,
+            Demographic: demographic,
+            CoverBitMap: coverImage,
+            Publisher: publisher ?? "Unknown",
+            DuplicateIndex: context.DupeIndex
+        );
+    }
+
+    /// <summary>
+    /// Determines whether the country of origin is an Asian region other than Japan (e.g., Korea, Taiwan, China).
+    /// </summary>
+    /// <param name="origin">The country code (e.g., "JP", "KR", "TW", "CW").</param>
+    /// <returns>
+    /// <c>true</c> if the origin is Korean, Taiwanese, or Chinese (Simplified/Traditional); otherwise, <c>false</c>.
+    /// </returns>
+    private static bool IsAsianNonJapanese(string origin)
+    {
+        return origin == "KR" || origin == "CW" || origin == "TW";
+    }
+
+    /// <summary>
+    /// Adds additional titles to the provided dictionary based on the specified alternate languages
+    /// and available altTitles from MangaDex. Only languages not already present in the dictionary
+    /// will be added.
+    /// </summary>
+    /// <param name="newTitles">Reference to the dictionary of titles to update.</param>
+    /// <param name="additionalLanguages">Array of requested additional languages to consider.</param>
+    /// <param name="altTitles">Flat list of MangaDex altTitle JsonElements to search through.</param>
+    public static void AddAdditionalLanguages(
+        ref Dictionary<TsundokuLanguage, string> newTitles,
+        TsundokuLanguage[] additionalLanguages,
+        JsonElement[] altTitles)
+    {
+        // Create lookup for faster contains checks
+        HashSet<TsundokuLanguage> requestedLangs = [.. additionalLanguages];
+
+        foreach ((string mdLangCode, TsundokuLanguage tsuLang) in MANGADEX_LANG_CODES)
+        {
+            if (!requestedLangs.Contains(tsuLang) || newTitles.ContainsKey(tsuLang))
+            {
+                continue;
+            }
+
+            foreach (JsonElement entry in altTitles)
+            {
+                if (entry.TryGetProperty(mdLangCode, out JsonElement altValue) &&
+                    altValue.ValueKind == JsonValueKind.String)
+                {
+                    string? value = altValue.GetString();
+                    if (!string.IsNullOrWhiteSpace(value))
                     {
-                        LOGGER.Debug($"Added [{MANGADEX_LANG_CODES[langKey]} : {foundTitle.GetString()}]");
-                        newTitles.Add(MANGADEX_LANG_CODES[langKey], foundTitle.GetString());
+                        LOGGER.Debug("Added [{Lang} : {Value}]", tsuLang, value);
+                        newTitles[tsuLang] = value;
                         break;
                     }
                 }
             }
         }
+    }
 
-        public static Format GetCorrectFormat(string jsonCountryOfOrigin)
+    public void DeleteCover()
+    {
+        AppFileHelper.DeleteCoverFile(this.Cover);
+    }
+
+    public void UpdateCover(Bitmap newCover)
+    {
+        RxApp.MainThreadScheduler.Schedule(() =>
         {
-            return jsonCountryOfOrigin switch
-            {
-                "KR" or "ko" => Format.Manhwa,
-                "CN" or "TW" or "zh" or "zh-hk" => Format.Manhua,
-                "FR" or "fr" => Format.Manfra,
-                "EN" or "en" => Format.Comic,
-                _ or "JP" or "ja" => Format.Manga
-            };
+            this.CoverBitMap.Dispose();
+            this.CoverBitMap = newCover;
+        });
+    }
+
+    public TsundokuLanguage[] SeriesContainsAdditionalLanagues()
+    {
+        return LANGUAGES
+            .AsValueEnumerable()
+            .Skip(3)
+            .Where(Titles.ContainsKey)
+            .ToArray();
+    }
+
+    public override string ToString()
+    {
+        if (this != null)
+        {
+            return JsonSerializer.Serialize(this, typeof(Series), SeriesJsonModel);
+        }
+        return "Null Series";
+    }
+
+    public void UpdateFrom(Series other)
+    {
+        // 1. Titles (Dictionary<TsundokuLanguage, string>) – deep‐compare by count + per‐key/value
+        if (!ExtensionMethods.DictionariesEqual(Titles, other.Titles))
+        {
+            Titles = new Dictionary<TsundokuLanguage, string>(other.Titles);
         }
 
-        public static Status GetSeriesStatus(string jsonStatus)
+        // 2. Staff (Dictionary<TsundokuLanguage, string>) – deep‐compare
+        if (!ExtensionMethods.DictionariesEqual(Staff, other.Staff))
         {
-            return jsonStatus switch
-            {
-                "RELEASING" or "NOT_YET_RELEASED" or "ongoing" => Status.Ongoing,
-                "FINISHED" or "completed" => Status.Finished,
-                "CANCELLED" or "cancelled" => Status.Cancelled,
-                "HIATUS" or "hiatus" => Status.Hiatus,
-                _ => Status.Error
-            };
+            Staff = new Dictionary<TsundokuLanguage, string>(other.Staff);
         }
 
-        public static Demographic GetSeriesDemographic(string demographic)
+        // 3. Description (string)
+        if (Description != other.Description)
         {
-            return demographic switch
-            {
-                "shounen" or "Shounen" => Demographic.Shounen,
-                "shoujo" or "Shoujo" => Demographic.Shoujo,
-                "josei" or "Josei" => Demographic.Josei,
-                "seinen" or "Seinen" => Demographic.Seinen,
-                _ => Demographic.Unknown
-            };
+            Description = other.Description;
         }
 
-        public void DeleteCover()
+        // 4. Format (enum or struct)
+        if (Format != other.Format)
         {
-            AppFileHelper.DeleteCoverFile(this.Cover);
+            Format = other.Format;
         }
 
-        public void UpdateCover(Bitmap newCover)
+        // 5. Status (enum or struct)
+        if (Status != other.Status)
         {
-            RxApp.MainThreadScheduler.Schedule(() =>
-            {
-                this.CoverBitMap.Dispose();
-                this.CoverBitMap = newCover;
-            });
+            Status = other.Status;
         }
 
-        public List<TsundokuLanguage> SeriesContainsAdditionalLanagues()
+        // 6. Cover (string)
+        if (Cover != other.Cover)
         {
-            List<TsundokuLanguage> additionalLangs = [];
-            foreach (TsundokuLanguage lang in LANGUAGES.Skip(3))
-            {
-                if (this.Titles.ContainsKey(lang))
-                {
-                    additionalLangs.Add(lang);
-                }
-            }
-            return additionalLangs;
+            Cover = other.Cover;
         }
 
-        public override string ToString()
+        // 7. Link (Uri)
+        if (!Equals(Link, other.Link))
         {
-            if (this != null)
-            {
-                return JsonSerializer.Serialize(this, typeof(Series), SeriesJsonModel);
-            }
-            return "Null Series";
+            Link = other.Link;
         }
 
-        public void UpdateFrom(Series other)
+        // 8. Genres (HashSet<Genre>) – deep‐compare via SetEquals
+        if (!ExtensionMethods.HashSetsEqual(Genres, other.Genres))
         {
-            // 1. Titles (Dictionary<TsundokuLanguage, string>) – deep‐compare by count + per‐key/value
-            if (!ExtensionMethods.DictionariesEqual(Titles, other.Titles))
-            {
-                Titles = new Dictionary<TsundokuLanguage, string>(other.Titles);
-            }
-
-            // 2. Staff (Dictionary<TsundokuLanguage, string>) – deep‐compare
-            if (!ExtensionMethods.DictionariesEqual(Staff, other.Staff))
-            {
-                Staff = new Dictionary<TsundokuLanguage, string>(other.Staff);
-            }
-
-            // 3. Description (string)
-            if (Description != other.Description)
-            {
-                Description = other.Description;
-            }
-
-            // 4. Format (enum or struct)
-            if (Format != other.Format)
-            {
-                Format = other.Format;
-            }
-
-            // 5. Status (enum or struct)
-            if (Status != other.Status)
-            {
-                Status = other.Status;
-            }
-
-            // 6. Cover (string)
-            if (Cover != other.Cover)
-            {
-                Cover = other.Cover;
-            }
-
-            // 7. Link (Uri)
-            if (!Equals(Link, other.Link))
-            {
-                Link = other.Link;
-            }
-
-            // 8. Genres (HashSet<Genre>) – deep‐compare via SetEquals
-            if (!ExtensionMethods.HashSetsEqual(Genres, other.Genres))
-            {
-                Genres = [.. other.Genres];
-            }
-
-            // 9. MaxVolumeCount (ushort)
-            if (MaxVolumeCount != other.MaxVolumeCount)
-            {
-                MaxVolumeCount = other.MaxVolumeCount;
-            }
-
-            // 10. CurVolumeCount (ushort)
-            if (CurVolumeCount != other.CurVolumeCount)
-            {
-                CurVolumeCount = other.CurVolumeCount;
-            }
-
-            // 11. Rating (decimal)
-            if (Rating != other.Rating)
-            {
-                Rating = other.Rating;
-            }
-
-            // 12. VolumesRead (uint)
-            if (VolumesRead != other.VolumesRead)
-            {
-                VolumesRead = other.VolumesRead;
-            }
-
-            // 13. Value (decimal)
-            if (Value != other.Value)
-            {
-                Value = other.Value;
-            }
-
-            // 14. Demographic (enum or struct)
-            if (Demographic != other.Demographic)
-            {
-                Demographic = other.Demographic;
-            }
-
-            // 15. Publisher (string)
-            if (Publisher != other.Publisher)
-            {
-                Publisher = other.Publisher;
-            }
-
-            // 16. DuplicateIndex (uint)
-            if (DuplicateIndex != other.DuplicateIndex)
-            {
-                DuplicateIndex = other.DuplicateIndex;
-            }
+            Genres = [.. other.Genres];
         }
 
-        protected virtual void Dispose(bool disposing)
+        // 9. MaxVolumeCount (ushort)
+        if (MaxVolumeCount != other.MaxVolumeCount)
         {
-            if (!this.disposedValue)
-            {
-                if (disposing)
-                {
-                    // dispose managed state (managed objects)
-                    this.CoverBitMap?.Dispose();
-                    DeleteCover();
-                }
-
-                // free unmanaged resources (unmanaged objects) and override finalizer
-                // set large fields to null
-                this.CoverBitMap = null;
-                this.disposedValue = true;
-            }
+            MaxVolumeCount = other.MaxVolumeCount;
         }
 
-        // Override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
-        // ~Series()
-        // {
+        // 10. CurVolumeCount (ushort)
+        if (CurVolumeCount != other.CurVolumeCount)
+        {
+            CurVolumeCount = other.CurVolumeCount;
+        }
+
+        // 11. Rating (decimal)
+        if (Rating != other.Rating)
+        {
+            Rating = other.Rating;
+        }
+
+        // 12. VolumesRead (uint)
+        if (VolumesRead != other.VolumesRead)
+        {
+            VolumesRead = other.VolumesRead;
+        }
+
+        // 13. Value (decimal)
+        if (Value != other.Value)
+        {
+            Value = other.Value;
+        }
+
+        // 14. Demographic (enum or struct)
+        if (Demographic != other.Demographic)
+        {
+            Demographic = other.Demographic;
+        }
+
+        // 15. Publisher (string)
+        if (Publisher != other.Publisher)
+        {
+            Publisher = other.Publisher;
+        }
+
+        // 16. DuplicateIndex (uint)
+        if (DuplicateIndex != other.DuplicateIndex)
+        {
+            DuplicateIndex = other.DuplicateIndex;
+        }
+    }
+
+    private void Dispose(bool disposing)
+    {
+        if (!this.disposedValue)
+        {
+            if (disposing)
+            {
+                // dispose managed state (managed objects)
+                this.CoverBitMap?.Dispose();
+                DeleteCover();
+            }
+
+            // free unmanaged resources (unmanaged objects) and override finalizer
+            // set large fields to null
+            this.CoverBitMap = null;
+            this.disposedValue = true;
+        }
+    }
+
+    // Override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
+    // ~Series()
+    // {
+    // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+    //     Dispose(disposing: false);
+    // }
+
+    public void Dispose()
+    {
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        //     Dispose(disposing: false);
-        // }
-
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
-        }
-
-        public bool Equals(Series? other)
-        {
-            return other is not null && this.Id.Equals(other.Id);
-        }
-
-        public override int GetHashCode()
-        {
-            return Id.GetHashCode();
-        }
-
-        public static bool operator ==(Series? left, Series? right)
-        {
-            return EqualityComparer<Series>.Default.Equals(left, right);
-        }
-
-        public static bool operator !=(Series? left, Series? right)
-        {
-            return !(left == right);
-        }
-
-        public override bool Equals(object? obj) => Equals(obj as Series);
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
     }
 
-    [JsonSerializable(typeof(Series))]
-    [JsonSourceGenerationOptions(UseStringEnumConverter = true)]
-    internal partial class SeriesModelContext : JsonSerializerContext
+    public bool Equals(Series? other)
     {
+        return other is not null && this.Id.Equals(other.Id);
     }
 
-    public class SeriesComparer : IComparer<Series>
+    public override int GetHashCode()
     {
-        private readonly TsundokuLanguage _curLang; // Changed to match common C# naming convention
-        private readonly StringComparer _seriesTitleComparer; // Changed to match common C# naming convention
-
-        public SeriesComparer(TsundokuLanguage curLang)
-        {
-            _curLang = curLang;
-            _seriesTitleComparer = StringComparer.Create(new CultureInfo(CULTURE_LANG_CODES[curLang]), false);
-        }
-
-        public int Compare(Series? x, Series? y)
-        {
-            // Handle nulls gracefully, as IComparer expects
-            if (x == null && y == null) return 0;
-            if (x == null) return -1;
-            if (y == null) return 1;
-
-            // Safely get titles, falling back to "Romaji" if preferred language isn't available
-            string xTitle = x.Titles.TryGetValue(_curLang, out string? xValue) ? xValue : x.Titles[TsundokuLanguage.Romaji];
-            string yTitle = y.Titles.TryGetValue(_curLang, out string? yValue) ? yValue : y.Titles[TsundokuLanguage.Romaji];
-
-            int titleComparison = _seriesTitleComparer.Compare(xTitle, yTitle);
-
-            // If titles are the same, compare by DuplicateIndex
-            return titleComparison != 0 ? titleComparison : x.DuplicateIndex.CompareTo(y.DuplicateIndex);
-        }
+        return Id.GetHashCode();
     }
-    
-    public class SeriesValueComparer : IEqualityComparer<Series>
+
+    public static bool operator ==(Series? left, Series? right)
     {
-        public bool Equals(Series? x, Series? y)
-        {
-            if (x == null || y == null)
-                return false;
+        return EqualityComparer<Series>.Default.Equals(left, right);
+    }
 
-            return x.Format == y.Format
-                && x.Titles.SequenceEqual(y.Titles)
-                && x.Staff.SequenceEqual(y.Staff);
-        }
+    public static bool operator !=(Series? left, Series? right)
+    {
+        return !(left == right);
+    }
 
-        public int GetHashCode(Series obj)
-        {
-            HashCode hash = new HashCode();
-            hash.Add(obj.Format);
-            foreach (KeyValuePair<TsundokuLanguage, string> title in obj.Titles)
-                hash.Add(title);
-            foreach (KeyValuePair<TsundokuLanguage, string> staff in obj.Staff)
-                hash.Add(staff);
-            return hash.ToHashCode();
-        }
+    public override bool Equals(object? obj) => Equals(obj as Series);
+
+    private sealed class BuildContext
+    {
+        public string NativeTitle = string.Empty;
+        public string RomajiTitle = string.Empty;
+        public string EnglishTitle = string.Empty;
+        public string JapaneseTitle = string.Empty;
+        public string CountryOfOrigin = string.Empty;
+        public string CoverPath = string.Empty;
+
+        public SeriesFormat FilteredBookType;
+        public uint DupeIndex;
+
+        public JsonElement[] MangaDexAltTitles = [];
+        public Dictionary<TsundokuLanguage, string> NewTitles = [];
+        public Dictionary<TsundokuLanguage, string> NewStaff = [];
+    }
+}
+
+[JsonSerializable(typeof(Series))]
+[JsonSourceGenerationOptions(UseStringEnumConverter = true)]
+internal partial class SeriesModelContext : JsonSerializerContext
+{
+}
+
+public class SeriesComparer : IComparer<Series>
+{
+    private readonly TsundokuLanguage _curLang; // Changed to match common C# naming convention
+    private readonly StringComparer _seriesTitleComparer; // Changed to match common C# naming convention
+
+    public SeriesComparer(TsundokuLanguage curLang)
+    {
+        _curLang = curLang;
+        _seriesTitleComparer = StringComparer.Create(new CultureInfo(CULTURE_LANG_CODES[curLang]), false);
+    }
+
+    public int Compare(Series? x, Series? y)
+    {
+        // Handle nulls gracefully, as IComparer expects
+        if (x == null && y == null) return 0;
+        if (x == null) return -1;
+        if (y == null) return 1;
+
+        // Safely get titles, falling back to "Romaji" if preferred language isn't available
+        string xTitle = x.Titles.TryGetValue(_curLang, out string? xValue) ? xValue : x.Titles[TsundokuLanguage.Romaji];
+        string yTitle = y.Titles.TryGetValue(_curLang, out string? yValue) ? yValue : y.Titles[TsundokuLanguage.Romaji];
+
+        int titleComparison = _seriesTitleComparer.Compare(xTitle, yTitle);
+
+        // If titles are the same, compare by DuplicateIndex
+        return titleComparison != 0 ? titleComparison : x.DuplicateIndex.CompareTo(y.DuplicateIndex);
+    }
+}
+
+public class SeriesValueComparer : IEqualityComparer<Series>
+{
+    public bool Equals(Series? x, Series? y)
+    {
+        if (x == null || y == null)
+            return false;
+
+        return x.Format == y.Format
+            && x.Titles.SequenceEqual(y.Titles)
+            && x.Staff.SequenceEqual(y.Staff);
+    }
+
+    public int GetHashCode(Series obj)
+    {
+        HashCode hash = new HashCode();
+        hash.Add(obj.Format);
+        foreach (KeyValuePair<TsundokuLanguage, string> title in obj.Titles)
+            hash.Add(title);
+        foreach (KeyValuePair<TsundokuLanguage, string> staff in obj.Staff)
+            hash.Add(staff);
+        return hash.ToHashCode();
     }
 }

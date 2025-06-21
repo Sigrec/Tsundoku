@@ -1,4 +1,5 @@
 using System.Text.Json;
+using static Tsundoku.Models.Enums.SeriesGenreEnum;
 
 namespace Tsundoku.Tests.AniList;
 
@@ -12,7 +13,7 @@ public class AniListDescParseTests
         using JsonDocument doc = JsonDocument.Parse(@"{ ""notArray"": 123 }");
         JsonElement notArray = doc.RootElement.GetProperty("notArray");
 
-        HashSet<Genre> result = Clients.AniList.ParseGenreArray("Bad Kind", notArray);
+        HashSet<SeriesGenre> result = Clients.AniList.ParseGenreArray("Bad Kind", notArray);
 
         Assert.That(result, Is.Empty);
     }

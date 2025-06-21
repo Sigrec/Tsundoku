@@ -3,21 +3,24 @@ using Avalonia.Interactivity;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
 using Avalonia.ReactiveUI;
+using Projektanker.Icons.Avalonia;
 using Tsundoku.Helpers;
-using Tsundoku.Models;
+using Tsundoku.Models.Enums;
 using Tsundoku.ViewModels;
+using static Tsundoku.Models.Enums.SeriesDemographicEnum;
+using static Tsundoku.Models.Enums.SeriesGenreEnum;
 using static Tsundoku.Models.TsundokuLanguageModel;
 
 namespace Tsundoku.Views;
 
-public partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfoViewModel>
+public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfoViewModel>
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
     private readonly BitmapHelper _bitmapHelper;
     private readonly MainWindowViewModel _mainWindowViewModel;
     private bool _IsInitialized = false;
 
-    public EditSeriesInfoWindow(MainWindowViewModel mainWindowViewModel, CollectionStatsViewModel collectionStatsViewModel, BitmapHelper bitmapHelper)
+    public EditSeriesInfoWindow(MainWindowViewModel mainWindowViewModel, BitmapHelper bitmapHelper)
     {
         _bitmapHelper = bitmapHelper;
         _mainWindowViewModel = mainWindowViewModel;
@@ -54,6 +57,8 @@ public partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfoViewMod
 
     private async void ChangeCoverFromLinkAsync(object sender, RoutedEventArgs args)
     {
+        ChangeCoverButtonIcon.Value = "fa-solid fa-arrow-rotate-right";
+        ChangeCoverButtonIcon.Animation = IconAnimation.Spin;
         string customImageUrl = CoverImageUrlTextBox.Text.Trim();
         string fullCoverPath = AppFileHelper.GetFullCoverPath(ViewModel.Series.Cover);
         Bitmap? newCover = await _bitmapHelper.UpdateCoverFromUrlAsync(customImageUrl, fullCoverPath);
@@ -63,6 +68,9 @@ public partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfoViewMod
             GenerateNewBitmap(newCover, customImageUrl);
             CoverImageUrlTextBox.Clear();
         }
+
+        ChangeCoverButtonIcon.Animation = IconAnimation.None;
+        ChangeCoverButtonIcon.Value = "fa-solid fa-circle-down";
     }
 
     private async void ChangeSeriesCoverFromFileAsync(object sender, RoutedEventArgs args)
@@ -174,7 +182,7 @@ public partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfoViewMod
         if (!_IsInitialized || (e.AddedItems.Count == 0 && e.RemovedItems.Count == 0))
             return;
 
-        HashSet<Genre> curGenres = ViewModel!.GetCurrentGenresSelected();
+        HashSet<SeriesGenre> curGenres = ViewModel!.GetCurrentGenresSelected();
         LOGGER.Info($"Updating Genres for \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\" from [{string.Join(", ", ViewModel.Series.Genres)}] to [{string.Join(", ", curGenres)}]");
         ViewModel.Series.Genres = curGenres;
     }
@@ -186,7 +194,7 @@ public partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfoViewMod
     {
         if (_IsInitialized && DemographicComboBox.IsDropDownOpen)
         {
-            Demographic demographic = Series.GetSeriesDemographic((DemographicComboBox.SelectedItem as ComboBoxItem).Content.ToString());
+            SeriesDemographic demographic = SeriesDemographicEnum.Parse((DemographicComboBox.SelectedItem as ComboBoxItem).Content.ToString());
             ViewModel.Series.Demographic = demographic;
             LOGGER.Info($"Changed Demographic for \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\" to {demographic}");
         }
@@ -295,62 +303,62 @@ public partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfoViewMod
     {
         if (ViewModel.Series.Genres != null)
         {
-            foreach (Genre genre in ViewModel.Series.Genres)
+            foreach (SeriesGenre genre in ViewModel.Series.Genres)
             {
                 switch (genre)
                 {
-                    case Genre.Action:
+                    case SeriesGenre.Action:
                         GenreSelector.SelectedItems.Add(ActionListBoxItem);
                         break;
-                    case Genre.Adventure:
+                    case SeriesGenre.Adventure:
                         GenreSelector.SelectedItems.Add(AdventureListBoxItem);
                         break;
-                    case Genre.Comedy:
+                    case SeriesGenre.Comedy:
                         GenreSelector.SelectedItems.Add(ComedyListBoxItem);
                         break;
-                    case Genre.Drama:
+                    case SeriesGenre.Drama:
                         GenreSelector.SelectedItems.Add(DramaListBoxItem);
                         break;
-                    case Genre.Ecchi:
+                    case SeriesGenre.Ecchi:
                         GenreSelector.SelectedItems.Add(EcchiListBoxItem);
                         break;
-                    case Genre.Fantasy:
+                    case SeriesGenre.Fantasy:
                         GenreSelector.SelectedItems.Add(FantasyListBoxItem);
                         break;
-                    case Genre.Horror:
+                    case SeriesGenre.Horror:
                         GenreSelector.SelectedItems.Add(HorrorListBoxItem);
                         break;
-                    case Genre.MahouShoujo:
+                    case SeriesGenre.MahouShoujo:
                         GenreSelector.SelectedItems.Add(MahouShoujoListBoxItem);
                         break;
-                    case Genre.Mecha:
+                    case SeriesGenre.Mecha:
                         GenreSelector.SelectedItems.Add(MechaListBoxItem);
                         break;
-                    case Genre.Music:
+                    case SeriesGenre.Music:
                         GenreSelector.SelectedItems.Add(MusicListBoxItem);
                         break;
-                    case Genre.Mystery:
+                    case SeriesGenre.Mystery:
                         GenreSelector.SelectedItems.Add(MysteryListBoxItem);
                         break;
-                    case Genre.Psychological:
+                    case SeriesGenre.Psychological:
                         GenreSelector.SelectedItems.Add(PsychologicalListBoxItem);
                         break;
-                    case Genre.Romance:
+                    case SeriesGenre.Romance:
                         GenreSelector.SelectedItems.Add(RomanceListBoxItem);
                         break;
-                    case Genre.SciFi:
+                    case SeriesGenre.SciFi:
                         GenreSelector.SelectedItems.Add(SciFiListBoxItem);
                         break;
-                    case Genre.SliceOfLife:
+                    case SeriesGenre.SliceOfLife:
                         GenreSelector.SelectedItems.Add(SliceOfLifeListBoxItem);
                         break;
-                    case Genre.Sports:
+                    case SeriesGenre.Sports:
                         GenreSelector.SelectedItems.Add(SportsListBoxItem);
                         break;
-                    case Genre.Supernatural:
+                    case SeriesGenre.Supernatural:
                         GenreSelector.SelectedItems.Add(SupernaturalListBoxItem);
                         break;
-                    case Genre.Thriller:
+                    case SeriesGenre.Thriller:
                         GenreSelector.SelectedItems.Add(ThrillerListBoxItem);
                         break;
                     default:

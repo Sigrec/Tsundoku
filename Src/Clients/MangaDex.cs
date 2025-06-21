@@ -1,6 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using System.Web;
-using Tsundoku.Models;
+using Tsundoku.Models.Enums;
+using static Tsundoku.Models.Enums.SeriesGenreEnum;
 
 namespace Tsundoku.Clients;
 
@@ -8,12 +9,20 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
     private readonly HttpClient _mangadexClient = httpClientFactory.CreateClient("MangaDexClient");
-    [GeneratedRegex(@"(?:\n\n---\n\*\*Links:\*\*|\n\n\n---|\n\n\*\*|\[(?:Official|Wikipedia).*?\]|\n___\n|\r\n\s+\r\n)[\S\s]*|- Winner.*$")] private static partial Regex MangaDexDescCleanupRegex();
-    [GeneratedRegex(@"[a-z\d]{8}-[a-z\d]{4}-[a-z\d]{4}-[a-z\d]{4}-[a-z\d]{11,}")] public static partial Regex MangaDexIDRegex();
-    [GeneratedRegex(@" \((.*)\)")] public static partial Regex NativeStaffRegex();
-    [GeneratedRegex(@"^.*(?= \(.*\))")] public static partial Regex FullStaffRegex();
 
-    // TODO - Add unit tests for Async calls, also checkf or improvements on regex
+    [GeneratedRegex(@"(?:(?:\n\n---\n\*\*Links:\*\*)|\n{3,}---|\n\n\*\*|\[(?:Official|Wikipedia).*?\]|\n___\n|\r\n\s+\r\n|\*\*\*Won.*)[\s\S]*|- Winner.*$", RegexOptions.Multiline | RegexOptions.IgnoreCase)]
+    public static partial Regex MangaDexDescCleanupRegex();
+
+    [GeneratedRegex(@"(?<=\bNative\b[^:\n]*:\s*)(?:[\p{P}\s_]+)?(.+?)(?=[\p{P}\p{S}\s]|$)", RegexOptions.IgnoreCase | RegexOptions.Multiline)]
+    private static partial Regex NativeStaffRegex();
+
+    [GeneratedRegex(@"\(([^()\n]+)\)")]
+    private static partial Regex NativeStaffFallbackRegex();
+
+    [GeneratedRegex(@"\s*\([^)]*\)")]
+    private static partial Regex StaffNameRegex();
+
+    // TODO - Add unit tests for Async calls, also check for improvements on regex
 
     /// <summary>
     /// Asynchronously retrieves MangaDex series data by its title.
@@ -28,7 +37,15 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
         try
         {
             string encodedTitle = HttpUtility.UrlEncode(title);
-            string endpoint = $"manga?title={encodedTitle}";
+
+            Dictionary<string, string> query = new()
+            {
+                ["title"] = encodedTitle,
+                ["order[relevance]"] = "desc"
+            };
+
+            string queryString = string.Join("&", query.Select(kvp => $"{kvp.Key}={kvp.Value}"));
+            string endpoint = $"manga?{queryString}";
 
             LOGGER.Debug($"MangaDex: Getting series by title async \"{_mangadexClient.BaseAddress}{endpoint}\"");
 
@@ -40,15 +57,15 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
         }
         catch (HttpRequestException ex)
         {
-            LOGGER.Error(ex, $"MangaDex HTTP error while getting series for title: \"{title}\"");
+            LOGGER.Error(ex, $"HTTP error while getting series for title: \"{title}\"");
         }
         catch (JsonException ex)
         {
-            LOGGER.Error(ex, $"MangaDex JSON parsing error for series title: \"{title}\"");
+            LOGGER.Error(ex, $"JSON parsing error for series title: \"{title}\"");
         }
         catch (Exception ex)
         {
-            LOGGER.Error(ex, $"MangaDex unexpected error for series title: \"{title}\"");
+            LOGGER.Error(ex, $"Unexpected error for series title: \"{title}\"");
         }
 
         return null;
@@ -66,7 +83,7 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
         try
         {
             string endpoint = $"manga/{id}";
-            LOGGER.Debug($"MangaDex: Getting series by ID async \"{_mangadexClient.BaseAddress}{endpoint}\"");
+            LOGGER.Debug("Getting series by ID async {Uri}", _mangadexClient.BaseAddress + endpoint);
 
             using HttpResponseMessage response = await _mangadexClient.GetAsync(endpoint);
             response.EnsureSuccessStatusCode();
@@ -97,12 +114,12 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
     /// <returns>
     /// The author's name if found, or <c>null</c> if the request fails.
     /// </returns>
-    public async Task<string?> GetAuthorAsync(string id)
+    public async Task<(string name, string? bio)> GetRelationshipAsync(string id, string type)
     {
         try
         {
             string endpoint = $"author/{id}";
-            LOGGER.Debug($"MangaDex: Getting author async \"{_mangadexClient.BaseAddress}{endpoint}\"");
+            LOGGER.Debug("Getting {Type} relationship async via {Url}", type, _mangadexClient.BaseAddress + endpoint);
 
             using HttpResponseMessage response = await _mangadexClient.GetAsync(endpoint);
             response.EnsureSuccessStatusCode();
@@ -110,11 +127,31 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
             using Stream stream = await response.Content.ReadAsStreamAsync();
             using JsonDocument json = await JsonDocument.ParseAsync(stream);
 
-            return json.RootElement
-                       .GetProperty("data")
-                       .GetProperty("attributes")
-                       .GetProperty("name")
-                       .GetString();
+            JsonElement attributes = json.RootElement
+                                         .GetProperty("data")
+                                         .GetProperty("attributes");
+
+            string name = attributes.GetProperty("name").GetString()!;
+            string? bio = null;
+
+            if (attributes.TryGetProperty("biography", out JsonElement bioElem))
+            {
+                // Try to get an English or any available language entry from the object
+                if (bioElem.ValueKind == JsonValueKind.Object && bioElem.EnumerateObject().Any())
+                {
+                    // Prefer English ("en") biography if available
+                    if (bioElem.TryGetProperty("en", out JsonElement enBio))
+                    {
+                        bio = enBio.GetString();
+                    }
+                    else
+                    {
+                        bio = bioElem.EnumerateObject().First().Value.GetString();
+                    }
+                }
+            }
+
+            return (name, string.IsNullOrWhiteSpace(bio) ? null : bio);
         }
         catch (HttpRequestException ex)
         {
@@ -129,7 +166,103 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
             LOGGER.Error(ex, $"MangaDex unexpected error for author ID: {id}");
         }
 
-        return null;
+        return (string.Empty, null);
+    }
+
+    /// <summary>
+    /// Asynchronously builds lists of native and full author/artist names from a MangaDex relationship array.
+    /// Matches names using regex patterns to separate native and full names when available.
+    /// Skips duplicate names (case-insensitive).
+    /// </summary>
+    /// <param name="relationships">A <see cref="JsonElement"/> array from the MangaDex API, expected to contain relationship entries.</param>
+    /// <param name="title">The title of the series, used for logging if author info is missing.</param>
+    /// <returns>
+    /// A tuple of <see cref="StringBuilder"/>s representing native and full staff names,
+    /// or <c>null</c> if any author name could not be retrieved.
+    /// </returns>
+    public async Task<(StringBuilder FullStaff, StringBuilder NativeStaff)> GetStaffAsync(JsonElement[] relationships, string title)
+    {
+        StringBuilder nativeStaffBuilder = new StringBuilder();
+        StringBuilder fullStaffBuilder = new StringBuilder();
+
+        AuthorEntry[] authorEntries =
+        [
+        .. relationships.AsValueEnumerable()
+            .Where(static r =>
+                r.TryGetProperty("type", out JsonElement typeElem) &&
+                r.TryGetProperty("id", out JsonElement idElem) &&
+                (typeElem.ValueEquals("author") || typeElem.ValueEquals("artist")) &&
+                idElem.ValueKind == JsonValueKind.String)
+            .Select(static r => new AuthorEntry(
+                r.GetProperty("id").GetString()!,
+                r.GetProperty("type").GetString()!))
+            .GroupBy(static e => e.Id)
+            .Select(static g => new AuthorEntry(
+                g.Key,
+                string.Join(" & ", g.Select(static e => e.Type).Distinct(StringComparer.Ordinal))))
+        ];
+
+        SemaphoreSlim semaphore = new SemaphoreSlim(5);
+        Task<(AuthorEntry Entry, string StaffNameRaw, string? Bio)>[] fetchTasks = [.. authorEntries.Select(async entry =>
+        {
+            await semaphore.WaitAsync();
+            try
+            {
+                (string staffNameRaw, string? bio) = await GetRelationshipAsync(entry.Id, entry.Type);
+                return (entry, staffNameRaw, bio);
+            }
+            finally
+            {
+                semaphore.Release();
+            }
+        })];
+
+        (AuthorEntry Entry, string StaffNameRaw, string? Bio)[] results = await Task.WhenAll(fetchTasks);
+
+        foreach ((AuthorEntry entry, string staffNameRaw, string? bio) in results)
+        {
+            if (string.IsNullOrWhiteSpace(staffNameRaw))
+            {
+                LOGGER.Warn("Unable to get MangaDex staff {Id} type {Type} for series {Title}", entry.Id, entry.Type, title);
+                continue;
+            }
+
+            string staffName = StaffNameRegex().Replace(staffNameRaw, string.Empty).Trim();
+            string nativeName = string.Empty;
+
+            if (!string.IsNullOrWhiteSpace(bio))
+            {
+                Match match = NativeStaffRegex().Match(bio);
+                if (match.Success)
+                {
+                    nativeName = match.Groups[1].Value.Trim();
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(nativeName))
+            {
+                Match match = NativeStaffFallbackRegex().Match(staffNameRaw);
+                if (match.Success)
+                {
+                    nativeName = match.Groups[1].Value.Trim();
+                }
+            }
+
+            nativeStaffBuilder.Append(string.IsNullOrWhiteSpace(nativeName) ? staffName : nativeName).Append(" | ");
+            fullStaffBuilder.Append(staffName).Append(" | ");
+        }
+
+        if (fullStaffBuilder.Length > 3)
+        {
+            fullStaffBuilder.Length -= 3;
+        }
+
+        if (nativeStaffBuilder.Length > 3)
+        {
+            nativeStaffBuilder.Length -= 3;
+        }
+
+        return (fullStaffBuilder, nativeStaffBuilder);
     }
 
     /// <summary>
@@ -151,7 +284,7 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
         try
         {
             string endpoint = $"cover/{id}";
-            LOGGER.Debug($"MangaDex: Getting cover async from \"{_mangadexClient.BaseAddress}{endpoint}\"");
+            LOGGER.Debug("Getting cover async from {Uri}", _mangadexClient.BaseAddress + endpoint);
 
             using HttpResponseMessage response = await _mangadexClient.GetAsync(endpoint);
             response.EnsureSuccessStatusCode();
@@ -167,7 +300,7 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
                 return first?.GetProperty("attributes").GetProperty("fileName").GetString();
             }
 
-            mangaDexId = mangaDexId ?? data.GetProperty("id").GetString();
+            mangaDexId ??= data.GetProperty("id").GetString();
             string? coverImage = data.GetProperty("attributes").GetProperty("fileName").GetString();
 
             if (coverImage == null)
@@ -194,58 +327,197 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
         return null;
     }
 
+    public static bool IsMangaDexId(string input)
+    {
+        return Guid.TryParse(input, out _);
+    }
+
     /// <summary>
     /// Determines if a series is considered digital or "invalid" based on specific keyword criteria across its titles.
     /// A series is deemed invalid if its English title contains "Digital", AND
-    /// neither its primary title nor its alternative English title contain
+    /// neither the user input nor its alternative English title contain
     /// "Digital", "Fan Colored", or "Official Colored" (case-insensitive).
     /// </summary>
-    /// <param name="title">The primary title of the series.</param>
+    /// <param name="input">The user input used to search for the series.</param>
     /// <param name="englishTitle">The English title of the series.</param>
     /// <param name="englishAltTitle">An alternative English title for the series.</param>
     /// <returns>True if the series matches the invalid criteria; otherwise, false.</returns>
-    public static bool IsSeriesDigital(string title, string englishTitle, string englishAltTitle)
+    public static bool IsSeriesDigital(string input, string englishTitle, string? englishAltTitle)
     {
         if (string.IsNullOrEmpty(englishTitle) ||
-            !englishTitle.Contains("Digital", StringComparison.OrdinalIgnoreCase))
+            !englishTitle.AsSpan().Contains("Digital", StringComparison.OrdinalIgnoreCase))
         {
             return false;
         }
 
-        if (title.AsSpan().Contains("Digital", StringComparison.OrdinalIgnoreCase) ||
-            title.AsSpan().Contains("Fan Colored", StringComparison.OrdinalIgnoreCase) ||
-            title.AsSpan().Contains("Official Colored", StringComparison.OrdinalIgnoreCase) ||
-            englishAltTitle.AsSpan().Contains("Digital", StringComparison.OrdinalIgnoreCase) ||
-            englishAltTitle.AsSpan().Contains("Official Colored", StringComparison.OrdinalIgnoreCase))
+        ReadOnlySpan<char> userInput = input;
+
+        if (userInput.Contains("Digital", StringComparison.OrdinalIgnoreCase) ||
+            userInput.Contains("Fan Colored", StringComparison.OrdinalIgnoreCase) ||
+            userInput.Contains("Official Colored", StringComparison.OrdinalIgnoreCase))
         {
             return false;
+        }
+
+        if (!string.IsNullOrWhiteSpace(englishAltTitle))
+        {
+            ReadOnlySpan<char> alt = englishAltTitle;
+            if (alt.Contains("Digital", StringComparison.OrdinalIgnoreCase) ||
+                alt.Contains("Official Colored", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
         }
 
         return true;
     }
 
     /// <summary>
-    /// Locates the "altTitles" JSON array element within a given root JsonElement structure.
-    /// This method handles two common root structures: a direct object or an array containing objects
-    /// that have the "data.attributes.altTitles" path.
+    /// Scans a MangaDex data array for a series whose English title or alternate English title is not considered "digital".
+    /// Matches are checked against the provided user input <paramref name="input"/>.
     /// </summary>
-    /// <param name="root">The JsonElement representing the root of the JSON structure to search within.</param>
-    /// <returns>A nullable JsonElement representing the "altTitles" array if found; otherwise, null.</returns>
-    private static JsonElement? FindAltTitlesElement(JsonElement root)
+    /// <param name="dataArray">The root <c>JsonElement</c> expected to be an array of series entries.</param>
+    /// <param name="input">The user input title to evaluate for filtering.</param>
+    /// <returns>The matching <c>JsonElement</c> representing the series, or <c>null</c> if no match is found.</returns>
+    public static JsonElement TryFindValidMangaDexSeries(JsonElement dataArray, string input)
+    {
+        foreach (JsonElement series in dataArray.EnumerateArray())
+        {
+            if (!series.TryGetProperty("attributes", out JsonElement attributes))
+            {
+                continue;
+            }
+
+            string enTitle = attributes.TryGetProperty("title", out JsonElement titleObj) &&
+                titleObj.TryGetProperty("en", out JsonElement enTitleElem)
+                ? enTitleElem.GetString() ?? string.Empty
+                : string.Empty;
+
+            JsonElement altTitles = attributes.TryGetProperty("altTitles", out JsonElement altRaw) &&
+                altRaw.ValueKind == JsonValueKind.Array
+                ? altRaw
+                : default;
+
+            // Check if any alternate title matches the input
+            bool altMatch = false;
+            string? enAlt = null;
+            if (altTitles.ValueKind == JsonValueKind.Array)
+            {
+                foreach (JsonElement altEntry in altTitles.EnumerateArray())
+                {
+                    foreach (JsonProperty prop in altEntry.EnumerateObject())
+                    {
+                        string? altValue = prop.Value.GetString();
+                        if (string.IsNullOrWhiteSpace(altValue))
+                        {
+                            continue;
+                        }
+
+                        if (prop.Name == "en")
+                        {
+                            enAlt = altValue;
+                        }
+
+                        if (string.Equals(altValue, input, StringComparison.OrdinalIgnoreCase))
+                        {
+                            altMatch = true;
+                            break;
+                        }
+                    }
+
+                    if (altMatch)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            // Determine if this series is acceptable
+            if (!IsSeriesDigital(input, enTitle, enAlt) &&
+                (string.Equals(enTitle, input, StringComparison.OrdinalIgnoreCase) || altMatch))
+            {
+                return series;
+            }
+        }
+
+        return default;
+    }
+
+
+    /// <summary>
+    /// Attempts to locate the "altTitles" array from a MangaDex-style JSON structure.
+    /// Searches through either:
+    /// 1. A root array of objects with attributes.title["en"] or altTitles containing a match,
+    /// 2. A root object with data.attributes.altTitles directly present.
+    /// </summary>
+    /// <param name="root">The root <see cref="JsonElement"/> to search in.</param>
+    /// <param name="englishTitle">The English title to match against title["en"].</param>
+    /// <param name="nativeTitle">The native title to match against altTitles.</param>
+    /// <returns>The <c>altTitles</c> <see cref="JsonElement"/> if found; otherwise, <c>null</c>.</returns>
+    private static JsonElement? FindAltTitlesElement(JsonElement root, string englishTitle, string nativeTitle)
     {
         if (root.ValueKind == JsonValueKind.Array)
         {
             foreach (JsonElement item in root.EnumerateArray())
             {
-                if (item.TryGetProperty("data", out JsonElement data) &&
-                    data.TryGetProperty("attributes", out JsonElement attrs) &&
-                    attrs.TryGetProperty("altTitles", out JsonElement altTitles) &&
+                if (!item.TryGetProperty("attributes", out JsonElement attrs))
+                {
+                    LOGGER.Debug("Skipping item: missing 'attributes'.");
+                    continue;
+                }
+
+                // Check title["en"]
+                if (attrs.TryGetProperty("title", out JsonElement titleObj) &&
+                    titleObj.TryGetProperty("en", out JsonElement titleEn))
+                {
+                    string? titleValue = titleEn.GetString();
+                    if (!string.IsNullOrWhiteSpace(titleValue))
+                    {
+                        LOGGER.Debug($"Checking title[\"en\"] = \"{titleValue}\" against \"{englishTitle}\"");
+
+                        if (string.Equals(titleValue, englishTitle, StringComparison.OrdinalIgnoreCase))
+                        {
+                            LOGGER.Debug("Match found in title[\"en\"]");
+                            return attrs.TryGetProperty("altTitles", out JsonElement matchedAltTitles)
+                                ? matchedAltTitles
+                                : null;
+                        }
+                    }
+                }
+                else
+                {
+                    LOGGER.Debug("title[\"en\"] is missing or empty.");
+                }
+
+                // Check altTitles array
+                if (attrs.TryGetProperty("altTitles", out JsonElement altTitles) &&
                     altTitles.ValueKind == JsonValueKind.Array)
                 {
-                    return altTitles;
+                    foreach (JsonElement altEntry in altTitles.EnumerateArray())
+                    {
+                        foreach (JsonProperty altProp in altEntry.EnumerateObject())
+                        {
+                            string? altValue = altProp.Value.GetString();
+                            if (!string.IsNullOrWhiteSpace(altValue))
+                            {
+                                LOGGER.Debug($"Checking altTitles[{altProp.Name}] = \"{altValue}\" against \"{nativeTitle}\"");
+
+                                if (string.Equals(altValue, nativeTitle, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    LOGGER.Debug($"Match found in altTitles[{altProp.Name}]");
+                                    return altTitles;
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    LOGGER.Debug("altTitles is missing or not an array.");
                 }
             }
-            return null;
+
+            LOGGER.Debug("No matching title[\"en\"] or altTitles entry found in any array item.");
         }
         else if (root.ValueKind == JsonValueKind.Object &&
                  root.TryGetProperty("data", out JsonElement data) &&
@@ -253,8 +525,10 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
                  attrs.TryGetProperty("altTitles", out JsonElement altTitles) &&
                  altTitles.ValueKind == JsonValueKind.Array)
         {
+            LOGGER.Debug("Found direct data.attributes.altTitles path in root object.");
             return altTitles;
         }
+
         return null;
     }
 
@@ -266,9 +540,9 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
     /// <param name="root">The JsonElement representing the root of the MangaDex JSON data.</param>
     /// <returns>An array of JsonElement, where each element is a unique alternative title object (e.g., {"en": "Title"}).
     /// Returns an empty array if no alternative titles are found or the structure is invalid.</returns>
-    public static JsonElement[] GetAdditionalMangaDexTitleList(JsonElement root)
+    public static JsonElement[] GetAdditionalMangaDexTitleList(JsonElement root, string englishTitle, string nativeTitle)
     {
-        JsonElement? altTitlesToProcess = FindAltTitlesElement(root);
+        JsonElement? altTitlesToProcess = FindAltTitlesElement(root, englishTitle, nativeTitle);
 
         if (altTitlesToProcess == null || altTitlesToProcess.Value.ValueKind != JsonValueKind.Array)
         {
@@ -293,6 +567,7 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
                 }
             }
         }
+
         return [.. uniqueAltTitles];
     }
 
@@ -331,7 +606,7 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
     /// <param name="foundTitle">When this method returns, contains the alternative title string if found for the specified country;
     /// otherwise, contains null or string.Empty.</param>
     /// <returns>true if an alternative title was found for the specified country; otherwise, false.</returns>
-    public static bool TryGetAltTitle(string country, JsonElement[] altTitles, out string foundTitle)
+    public static bool TryGetAltTitle(string country, JsonElement[] altTitles, out string? foundTitle)
     {
         foundTitle = null; // Initialize the out parameter to null
 
@@ -352,12 +627,12 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
 
     /// <summary>
     /// Parses a set of genres from a MangaDex tag JSON array. Only tags with the group "genre"
-    /// and a valid English name that maps to a known <see cref="Genre"/> enum are included.
+    /// and a valid English name that maps to a known <see cref="SeriesGenre"/> enum are included.
     /// </summary>
     /// <param name="romajiTitle">The title of the series, used for logging when no genres are found.</param>
     /// <param name="tags">The JSON array of tag elements from MangaDex.</param>
-    /// <returns>A <see cref="HashSet{T}"/> of <see cref="Genre"/> values parsed from the input.</returns>
-    public static HashSet<Genre> ParseGenreData(string romajiTitle, JsonElement attributes)
+    /// <returns>A <see cref="HashSet{T}"/> of <see cref="SeriesGenre"/> values parsed from the input.</returns>
+    public static HashSet<SeriesGenre> ParseGenreData(string romajiTitle, JsonElement attributes)
     {
         if(attributes.ValueKind != JsonValueKind.Object || 
             !attributes.TryGetProperty("tags", out var tags) || 
@@ -367,7 +642,7 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
             return [];
         }
 
-        HashSet<Genre> genres = [];
+        HashSet<SeriesGenre> genres = [];
 
         foreach (JsonElement tag in tags.EnumerateArray())
         {
@@ -386,7 +661,7 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
                 continue;
             }
 
-            if (GenreExtensions.TryGetGenre(enName.GetString(), out Genre genre))
+            if (SeriesGenreEnum.TryParse(enName.GetString(), out SeriesGenre genre))
             {
                 genres.Add(genre);
             }
@@ -395,9 +670,29 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
         return genres;
     }
 
-    // TODO - Add berserk https://mangadex.org/title/801513ba-a712-498c-8f57-cae55b38cc92/berserk?tab=art desc as a test
     public static string ParseDescription(string seriesDescription)
     {
-        return MangaDexDescCleanupRegex().Replace(seriesDescription, string.Empty).TrimEnd('\n').Trim();
+        ReadOnlySpan<char> span = seriesDescription.AsSpan();
+
+        if (!span.Contains("***Won", StringComparison.OrdinalIgnoreCase) &&
+            !span.Contains("- Winner", StringComparison.OrdinalIgnoreCase) &&
+            !span.Contains("**Links:**", StringComparison.OrdinalIgnoreCase) &&
+            !span.Contains("Wikipedia", StringComparison.OrdinalIgnoreCase) &&
+            !span.Contains("Official", StringComparison.OrdinalIgnoreCase) &&
+            !span.Contains("MangaPlus:", StringComparison.OrdinalIgnoreCase) &&
+            !span.Contains("---", StringComparison.OrdinalIgnoreCase) &&
+            !span.Contains("___", StringComparison.OrdinalIgnoreCase) &&
+            !span.Contains("\r\n \r\n", StringComparison.OrdinalIgnoreCase))
+        {
+            return seriesDescription.TrimEnd('\n');
+        }
+        
+        return MangaDexDescCleanupRegex().Replace(seriesDescription, string.Empty).Trim();
+    }
+
+    private readonly struct AuthorEntry(string id, string type)
+    {
+        public readonly string Id = id;
+        public readonly string Type = type;
     }
 }

@@ -133,8 +133,12 @@
                         ToolTip.Tip="Change Cover From Link"
                         VerticalContentAlignment="Center"
                         HorizontalContentAlignment="Center"
-                        Click="ChangeCoverFromLinkAsync"
-                        i:Attached.Icon="fa-solid fa-circle-down"/>
+                        Click="ChangeCoverFromLinkAsync">
+                        <i:Icon 
+                            x:Name="ChangeCoverButtonIcon"
+                            Value="fa-solid fa-circle-down" 
+                            FontSize="20" />
+                    </Button>
                     <Button 
                         x:Name="ChangeCoverFileButton"
                         i:Attached.Icon="fa-solid fa-image"

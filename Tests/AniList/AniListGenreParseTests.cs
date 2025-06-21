@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using static Tsundoku.Models.Enums.SeriesGenreEnum;
 
 namespace Tsundoku.Tests.AniList;
 
@@ -22,7 +23,7 @@ public class AniListGenreParseTests
         using JsonDocument doc = JsonDocument.Parse(json);
         JsonElement genresArray = doc.RootElement;
 
-        HashSet<Genre> result = Clients.AniList.ParseGenreArray("Test Title", genresArray);
+        HashSet<SeriesGenre> result = Clients.AniList.ParseGenreArray("Test Title", genresArray);
 
         Assert.That(result, Has.Count.EqualTo(knownGenres.Length));
     }
@@ -33,7 +34,7 @@ public class AniListGenreParseTests
         using JsonDocument doc = JsonDocument.Parse("[]");
         JsonElement genresArray = doc.RootElement;
 
-        HashSet<Genre> result = Clients.AniList.ParseGenreArray("Empty Test", genresArray);
+        HashSet<SeriesGenre> result = Clients.AniList.ParseGenreArray("Empty Test", genresArray);
 
         Assert.That(result, Is.Empty);
     }
@@ -46,7 +47,7 @@ public class AniListGenreParseTests
         using JsonDocument doc = JsonDocument.Parse(json);
         JsonElement genresArray = doc.RootElement;
 
-        HashSet<Genre> result = Clients.AniList.ParseGenreArray("Invalid Test", genresArray);
+        HashSet<SeriesGenre> result = Clients.AniList.ParseGenreArray("Invalid Test", genresArray);
 
         Assert.That(result, Is.Empty);
     }
@@ -59,14 +60,14 @@ public class AniListGenreParseTests
         using JsonDocument doc = JsonDocument.Parse(json);
         JsonElement genresArray = doc.RootElement;
 
-        HashSet<Genre> result = Clients.AniList.ParseGenreArray("Mixed Test", genresArray);
+        HashSet<SeriesGenre> result = Clients.AniList.ParseGenreArray("Mixed Test", genresArray);
 
         Assert.That(result, Has.Count.EqualTo(3));
         using (Assert.EnterMultipleScope())
         {
-            Assert.That(result, Does.Contain(Genre.Action));
-            Assert.That(result, Does.Contain(Genre.Horror));
-            Assert.That(result, Does.Contain(Genre.Mecha));
+            Assert.That(result, Does.Contain(SeriesGenre.Action));
+            Assert.That(result, Does.Contain(SeriesGenre.Horror));
+            Assert.That(result, Does.Contain(SeriesGenre.Mecha));
         }
     }
 
@@ -76,7 +77,7 @@ public class AniListGenreParseTests
         using JsonDocument doc = JsonDocument.Parse(@"{ ""notArray"": 123 }");
         JsonElement notArray = doc.RootElement.GetProperty("notArray");
 
-        HashSet<Genre> result = Clients.AniList.ParseGenreArray("Bad Kind", notArray);
+        HashSet<SeriesGenre> result = Clients.AniList.ParseGenreArray("Bad Kind", notArray);
 
         Assert.That(result, Is.Empty);
     }

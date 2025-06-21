@@ -37,7 +37,7 @@ public class MangaDexAltTitleTests
     [Test]
     public void GetAdditionalMangaDexTitleList_FullDocument_ParsesAltTitlesFromAttributes()
     {
-        JsonElement[] results = Clients.MangaDex.GetAdditionalMangaDexTitleList(document.RootElement);
+        JsonElement[] results = Clients.MangaDex.GetAdditionalMangaDexTitleList(document.RootElement, "The Bugle Call", "戦奏教室");
 
         using (Assert.EnterMultipleScope())
         {

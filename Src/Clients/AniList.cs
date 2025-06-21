@@ -3,7 +3,8 @@ using GraphQL.Client.Http;
 using GraphQL.Client.Serializer.SystemTextJson;
 using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
-using Tsundoku.Models;
+using static Tsundoku.Models.Enums.SeriesFormatEnum;
+using static Tsundoku.Models.Enums.SeriesGenreEnum;
 
 namespace Tsundoku.Clients;
 
@@ -44,7 +45,7 @@ public sealed partial class AniList
     /// <param name="format">The media format (e.g., manga or light novel).</param>
     /// <param name="pageNum">The staff pagination page number.</param>
     /// <returns>A <see cref="JsonDocument"/> containing the series data, or null if the request fails.</returns>
-    public async Task<JsonDocument?> GetSeriesByTitleAsync(string title, Format format, int pageNum)
+    public async Task<JsonDocument?> GetSeriesByTitleAsync(string title, SeriesFormat format, int pageNum)
     {
         object variables = new
         {
@@ -63,7 +64,7 @@ public sealed partial class AniList
     /// <param name="format">The media format (e.g., manga or light novel).</param>
     /// <param name="pageNum">The staff pagination page number.</param>
     /// <returns>A <see cref="JsonDocument"/> containing the series data, or null if the request fails.</returns>
-    public async Task<JsonDocument?> GetSeriesByIDAsync(int seriesId, Format format, int pageNum)
+    public async Task<JsonDocument?> GetSeriesByIDAsync(int seriesId, SeriesFormat format, int pageNum)
     {
         object variables = new
         {
@@ -292,13 +293,13 @@ public sealed partial class AniList
     }
 
     /// <summary>
-    /// Parses a JSON array of genre strings into a set of strongly typed <see cref="Genre"/> values.
+    /// Parses a JSON array of genre strings into a set of strongly typed <see cref="SeriesGenre"/> values.
     /// If no genres are present or the value is null, logs a debug message and returns an empty set.
     /// </summary>
     /// <param name="romajiTitle">The Romaji title of the series, used for logging.</param>
     /// <param name="genres">The JSON element representing an array of genre strings.</param>
     /// <returns>A <see cref="HashSet{Genre}"/> containing all recognized genres, or an empty set if none are valid.</returns>
-    public static HashSet<Genre> ParseGenreArray(string romajiTitle, JsonElement genres)
+    public static HashSet<SeriesGenre> ParseGenreArray(string romajiTitle, JsonElement genres)
     {
         if (genres.ValueKind != JsonValueKind.Array || genres.GetArrayLength() == 0)
         {
@@ -307,11 +308,11 @@ public sealed partial class AniList
         }
 
         int estimatedCapacity = genres.GetArrayLength();
-        HashSet<Genre> newGenres = new(estimatedCapacity);
+        HashSet<SeriesGenre> newGenres = new(estimatedCapacity);
 
         foreach (JsonElement element in genres.EnumerateArray())
         {
-            if (element.ValueKind == JsonValueKind.String && GenreExtensions.TryGetGenre(element.GetString()!, out Genre genre))
+            if (element.ValueKind == JsonValueKind.String && TryParse(element.GetString()!, out SeriesGenre genre))
             {
                 newGenres.Add(genre);
             }
@@ -363,22 +364,21 @@ public sealed partial class AniList
         return staff.GetProperty("staff").GetProperty("pageInfo").GetProperty("hasNextPage").GetBoolean();
     }
 
-    public static bool ExtractStaffFromAniList(JsonElement seriesData, ref string nativeStaff, ref string fullStaff)
+    public static bool ExtractStaffFromAniList(JsonElement seriesData, ref string nativeStaff, ref string fullStaff, bool disallowIllustrationStaff = true)
     {
         if (!seriesData.TryGetProperty("staff", out JsonElement staffData) ||
             !staffData.TryGetProperty("edges", out JsonElement staffEdges) ||
             staffEdges.ValueKind != JsonValueKind.Array)
         {
             nativeStaff = fullStaff = string.Empty;
+            LOGGER.Debug("Input media data does not have staff property");
             return false;
         }
 
-        StringBuilder nativeBuilder = new StringBuilder();
-        StringBuilder fullBuilder = new StringBuilder();
+        StringBuilder nativeBuilder = new StringBuilder(nativeStaff);
+        StringBuilder fullBuilder = new StringBuilder(fullStaff);
         HashSet<string> nativeSeen = new HashSet<string>(StringComparer.Ordinal);
         HashSet<string> fullSeen = new HashSet<string>(StringComparer.Ordinal);
-
-        bool checkIllustrationFilter = true; // For Manga + not anthology (hardcoded)
 
         foreach (JsonElement edge in staffEdges.EnumerateArray())
         {
@@ -391,10 +391,11 @@ public sealed partial class AniList
             string role = StaffRegex().Replace(roleRaw, string.Empty).Trim();
             if (!VALID_STAFF_ROLES.Contains(role, StringComparer.OrdinalIgnoreCase))
             {
+                LOGGER.Debug("{Role} is not a valid role, skipping staff member", role);
                 continue;
             }
 
-            if (checkIllustrationFilter &&
+            if (disallowIllustrationStaff &&
                 (role.Equals("Illustration", StringComparison.OrdinalIgnoreCase) ||
                  role.Equals("Cover Illustration", StringComparison.OrdinalIgnoreCase)))
             {

@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Net.Http.Headers;
 using System.Text.Json;
-using static Tsundoku.Clients.AniList;
+using static Tsundoku.Models.Enums.SeriesFormatEnum;
 
 namespace Tsundoku.Tests.AniList;
 
@@ -14,7 +14,6 @@ public class AniListGraphQLClientTests
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
-        App.ConfigureNLogToUseLocalCacheFolder();
         _httpClient = new HttpClient
         {
             BaseAddress = new Uri("https://graphql.anilist.co"),
@@ -34,9 +33,12 @@ public class AniListGraphQLClientTests
         _httpClient.Dispose();
     }
 
-    [TestCase("ようこそ実力至上主義の教室へ", Format.Novel)]
-    [TestCase("リコリス・リコイル 公式コミックアンソロジー リピート", Format.Manga)]
-    public async Task GetSeriesByTitleAsync_ContainsExpectedFields(string title, Format format)
+    [TestCase("ようこそ実力至上主義の教室へ", SeriesFormat.Novel)]
+    [TestCase("-0.5˚C", SeriesFormat.Manga)]
+    [TestCase("!", SeriesFormat.Manga)]
+    [TestCase("오늘만 사는 기사", SeriesFormat.Manga)]
+    [TestCase("Tian Guan Ci Fu", SeriesFormat.Manga)]
+    public async Task GetSeriesByTitleAsync_ContainsExpectedFields(string title, SeriesFormat format)
     {
         JsonDocument? result = await _aniList.GetSeriesByTitleAsync(title, format, pageNum: 1);
         Assert.That(result, Is.Not.Null, "Expected non-null result from AniList query.");
@@ -80,7 +82,7 @@ public class AniListGraphQLClientTests
     [Test]
     public async Task GetSeriesByIDAsync_ContainsExpectedFields()
     {
-        JsonDocument? result = await _aniList.GetSeriesByIDAsync(128067, Format.Manga, pageNum: 1);
+        JsonDocument? result = await _aniList.GetSeriesByIDAsync(128067, SeriesFormat.Manga, pageNum: 1);
         Assert.That(result, Is.Not.Null, "Expected non-null result from AniList query.");
 
         JsonElement root = result!.RootElement;

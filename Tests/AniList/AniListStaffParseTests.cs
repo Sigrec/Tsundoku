@@ -1,4 +1,8 @@
-﻿using System.Text.Json;
+﻿using System.Net;
+using System.Net.Http.Headers;
+using System.Text.Json;
+using Tsundoku.Clients;
+using static Tsundoku.Models.Enums.SeriesFormatEnum;
 
 namespace Tsundoku.Tests.AniList;
 
@@ -7,6 +11,62 @@ namespace Tsundoku.Tests.AniList;
 public class AniListStaffParseTests
 {
     // TODO - Need a test for "リコリス・リコイル 公式コミックアンソロジー リピート" anthology
+    [TestCase("リコリス・リコイル 公式コミックアンソロジー リピート", SeriesFormat.Manga)]
+    public async Task ExtractStaffFromAniList_ShouldReturnCorrectStaffString_Anthology(string title, SeriesFormat format)
+    {
+        HttpClient httpClient = new HttpClient
+        {
+            BaseAddress = new Uri("https://graphql.anilist.co"),
+            Timeout = TimeSpan.FromSeconds(30),
+            DefaultRequestVersion = HttpVersion.Version30,
+            DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrHigher
+        };
+        httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("Tsundoku-Test", "1.0"));
+        httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+        Clients.AniList aniList = new Clients.AniList(new AniListGraphQLClient(httpClient));
+
+        JsonDocument? result = await aniList.GetSeriesByTitleAsync(title, format, pageNum: 1);
+        Assert.That(result, Is.Not.Null, "Expected non-null result from AniList query.");
+        JsonElement root = result!.RootElement;
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(root.TryGetProperty("Media", out JsonElement mediaElem), Is.True, "Missing 'Media' property.");
+            Assert.That(mediaElem.ValueKind, Is.Not.EqualTo(JsonValueKind.Null), "Media is null.");
+
+            Assert.That(mediaElem.TryGetProperty("id", out _));
+            Assert.That(mediaElem.TryGetProperty("countryOfOrigin", out _));
+
+            Assert.That(mediaElem.TryGetProperty("title", out JsonElement titleElem));
+            Assert.That(titleElem.TryGetProperty("romaji", out _));
+            Assert.That(titleElem.TryGetProperty("english", out _));
+            Assert.That(titleElem.TryGetProperty("native", out _));
+
+            Assert.That(mediaElem.TryGetProperty("staff", out JsonElement staffElem));
+            Assert.That(staffElem.TryGetProperty("edges", out JsonElement edgesElem));
+
+            foreach (JsonElement edge in edgesElem.EnumerateArray())
+            {
+                Assert.That(edge.TryGetProperty("role", out _));
+                Assert.That(edge.TryGetProperty("node", out JsonElement nodeElem));
+                Assert.That(nodeElem.TryGetProperty("name", out JsonElement nameElem));
+                Assert.That(nameElem.TryGetProperty("full", out _));
+                Assert.That(nameElem.TryGetProperty("native", out _));
+                Assert.That(nameElem.TryGetProperty("alternative", out _));
+            }
+
+            Assert.That(mediaElem.TryGetProperty("genres", out _));
+            Assert.That(mediaElem.TryGetProperty("description", out _));
+            Assert.That(mediaElem.TryGetProperty("status", out _));
+            Assert.That(mediaElem.TryGetProperty("siteUrl", out _));
+            Assert.That(mediaElem.TryGetProperty("coverImage", out JsonElement coverElem));
+            Assert.That(coverElem.TryGetProperty("extraLarge", out _));
+        }
+
+        httpClient.Dispose();
+    }
+
     [Test]
     public async Task ExtractStaffFromAniList_ShouldReturnCorrectStaffString_WhenNotAnthology()
     {
@@ -79,7 +139,6 @@ public class AniListStaffParseTests
     [Test]
     public async Task ExtractStaffFromAniList_ShouldUseFallbacks_WhenStaffNamesAreMissing()
     {
-        App.ConfigureNLogToUseLocalCacheFolder();
         string json = await File.ReadAllTextAsync(@"AniList\AniListTestData\NullStaffNames.json");
         using JsonDocument doc = JsonDocument.Parse(json);
         JsonElement root = doc.RootElement;

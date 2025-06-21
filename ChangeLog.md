@@ -10,13 +10,18 @@ This project adheres to [Semantic Versioning](https://semver.org/) and follows t
 ### Changed
 - Added **Hentai** genre
 - Added **Supervisor** as a valid staff role
+- Added support for the following new languages `Albanian, Belarusian, Bosnian, Galician, Gujarati, Icelandic, Kannada, Latvian, Macedonian, Malayalam, Marathi, Punjabi, Slovenian, Telugu, and Urdu` from MangaDex
+- Dicord rich presence now updates based on what window you have open, if you are editing a series it will show the cover image being used and the name of the series
 
 ### Perf Improvments
 - AniList client
 - MangaDex client
+- Cover image downloading via url
 
 ### Fixed
 - MangaDex description parsing
+- MangaDex correctly gets native and full (regular) staff names
+- MangaDex api calls when not using ID now are ordered by relevance to hopefully make it get the correct series when title is "ambigious"
 
 ### 1.2.0 – 2025-06-14
 #### Changed

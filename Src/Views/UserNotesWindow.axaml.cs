@@ -3,9 +3,8 @@ using Tsundoku.ViewModels;
 
 namespace Tsundoku.Views;
 
-public partial class UserNotesWindow : ReactiveWindow<UserNotesWindowViewModel>
+public sealed partial class UserNotesWindow : ReactiveWindow<UserNotesWindowViewModel>
 {
-    private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
     public bool IsOpen = false;
 
     public UserNotesWindow(UserNotesWindowViewModel viewModel)

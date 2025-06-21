@@ -1,13 +1,10 @@
-using Avalonia.Controls;
 using Avalonia.ReactiveUI;
-using ReactiveUI;
 using Tsundoku.ViewModels;
 
 namespace Tsundoku.Views;
 
-public partial class PopupWindow : ReactiveWindow<PopupWindowViewModel>
+public sealed partial class PopupWindow : ReactiveWindow<PopupWindowViewModel>
 {
-    private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
     public PopupWindow(PopupWindowViewModel viewModel)
     {
         ViewModel = viewModel;
