@@ -1,0 +1,37 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:Tsundoku.ViewModels"
+        CanResize="False"
+        Width="300"
+        Height="100"
+        ShowInTaskbar="False"
+        Classes="Menu"
+        WindowStartupLocation="CenterOwner"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHints="NoChrome"
+        x:DataType="vm:LoadingDialogViewModel"
+        Topmost="True"
+        x:Class="Tsundoku.Views.LoadingDialog">
+    <Border Classes="Menu" BorderThickness="5" CornerRadius="0,0,8,8" ClipToBounds="True">
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="10">
+            <TextBlock 
+                x:Name="StatusTextBlock"
+                Classes="Menu"
+                FontSize="20"
+                HorizontalAlignment="Center" 
+                FontWeight="Bold"/>
+            <ProgressBar
+                x:Name="LoadingProgressBar"
+                Value="{CompiledBinding ProgressValue}"
+                Maximum="{CompiledBinding ProgressMaximum}"
+                IsIndeterminate="{CompiledBinding IsLoadingIndeterminate}" 
+                Background="{CompiledBinding CurrentTheme.SeriesProgressBarBGColor}"
+                Foreground="{CompiledBinding CurrentTheme.SeriesProgressBarColor}"
+                BorderBrush="{CompiledBinding CurrentTheme.SeriesProgressBarBorderColor}"
+                Width="220" 
+                Height="20" />
+        </StackPanel>
+    </Border>
+</Window>

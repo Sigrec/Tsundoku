@@ -7,7 +7,6 @@ using NLog.Targets.Wrappers;
 using System.Net;
 using System.Net.Http.Headers;
 using Tsundoku.Clients;
-using Tsundoku.Controls;
 using Tsundoku.Helpers;
 using Tsundoku.ViewModels;
 using Tsundoku.Views;
@@ -90,10 +89,12 @@ public sealed partial class App : Application
         // You can configure a specific named HttpClient if needed
         services.AddHttpClient("AddCoverClient", client =>
         {
+            client.DefaultRequestVersion = HttpVersion.Version30;
+            client.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrLower;
+
             client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("Tsundoku", ViewModelBase.CUR_TSUNDOKU_VERSION));
             client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("(https://github.com/Sigrec/Tsundoku)"));
-            client.DefaultRequestVersion = HttpVersion.Version20;
-            client.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionExact;
+
             client.Timeout = TimeSpan.FromSeconds(60);
         }).SetHandlerLifetime(TimeSpan.FromMinutes(5));
 
@@ -101,19 +102,21 @@ public sealed partial class App : Application
         {
             client.BaseAddress = new Uri("https://api.mangadex.org/");
             client.DefaultRequestVersion = HttpVersion.Version30;
-            client.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionExact;
+            client.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrLower;
+
             client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("Tsundoku", ViewModelBase.CUR_TSUNDOKU_VERSION));
             client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("(https://github.com/Sigrec/Tsundoku)"));
-            client.Timeout = TimeSpan.FromSeconds(30);
+
+            client.Timeout = TimeSpan.FromSeconds(90);
         }).SetHandlerLifetime(TimeSpan.FromMinutes(5));
 
         // --- AniList GraphQL Client Setup ---
         services.AddHttpClient("AniListHttpClient", client =>
         {
             client.BaseAddress = new Uri("https://graphql.anilist.co");
-            client.Timeout = TimeSpan.FromSeconds(30);
+            client.Timeout = TimeSpan.FromMinutes(2);
             client.DefaultRequestVersion = HttpVersion.Version30;
-            client.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrHigher;
+            client.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrLower;
 
             client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("Tsundoku", ViewModelBase.CUR_TSUNDOKU_VERSION));
             client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("(https://github.com/Sigrec/Tsundoku)"));
@@ -125,6 +128,9 @@ public sealed partial class App : Application
 
         services.AddSingleton<IUserService, UserService>();
         services.AddSingleton<ISharedSeriesCollectionProvider, SharedSeriesCollectionProvider>();
+
+        services.AddTransient<LoadingDialogViewModel>();
+        services.AddTransient<ILoadingDialogService, LoadingDialogService>();
 
         services.AddSingleton<AddNewSeriesWindow>();
         services.AddSingleton<AddNewSeriesViewModel>();
@@ -145,8 +151,6 @@ public sealed partial class App : Application
         services.AddSingleton<UserNotesWindowViewModel>();
 
         services.AddTransient<EditSeriesInfoWindow>();
-        services.AddTransient<SeriesCardDisplay>();
-        // services.AddSingleton<EditSeriesInfoViewModel>();
 
         services.AddTransient<PopupWindow>();
         services.AddTransient<PopupWindowViewModel>();
@@ -173,7 +177,7 @@ public sealed partial class App : Application
         {
             fileTarget = new FileTarget("TsundokuLogs")
             {
-                Layout = "[${longdate} | ${level:uppercase=true:padding=5:fixedLength=true}] (${logger}) ${message} ${exception:format=ToString,StackTrace}",
+                Layout = "[${longdate} | ${level:uppercase=true}] (${logger}) ${message} ${exception:format=ToString,StackTrace}",
                 FileName = Path.Combine(localCachePath, "TsundokuLogs.log"),
                 ArchiveFileName = Path.Combine(localCachePath, "TsundokuLogs.{#}.log"),
                 ArchiveNumbering = ArchiveNumberingMode.Rolling,
@@ -207,27 +211,27 @@ public sealed partial class App : Application
 
         config.AddTarget(asyncWrapper);
 
-    #if DEBUG
+#if DEBUG
         // 4. Configure (or create) the console target (only in DEBUG)
         ColoredConsoleTarget consoleTarget = config.FindTargetByName<ColoredConsoleTarget>("TsundokuConsole");
         if (consoleTarget == null)
         {
             consoleTarget = new ColoredConsoleTarget("TsundokuConsole")
             {
-                Layout = "[${longdate} | ${level:uppercase=true:padding=5:fixedLength=true}] (${logger}) ${message} ${exception:format=ToString,StackTrace}"
+                Layout = "[${longdate} | ${level:uppercase=true}] (${logger}) ${message} ${exception:format=ToString,StackTrace}"
             };
             config.AddTarget(consoleTarget);
         }
-    #endif
+#endif
 
         // 5. Clear existing rules for these targets (to avoid duplicates)
         for (int i = config.LoggingRules.Count - 1; i >= 0; i--)
         {
             LoggingRule rule = config.LoggingRules[i];
             if (rule.Targets.Any(t => t == fileTarget
-    #if DEBUG
+#if DEBUG
                                         || t == consoleTarget
-    #endif
+#endif
                                         ))
             {
                 config.LoggingRules.RemoveAt(i);
@@ -238,11 +242,11 @@ public sealed partial class App : Application
         LoggingRule fileRule = new LoggingRule("*", LogLevel.Info, asyncWrapper);
         config.LoggingRules.Add(fileRule);
 
-    #if DEBUG
+#if DEBUG
         // 7. Create rule: Console = all levels (Debug+), only in DEBUG
         LoggingRule consoleRule = new LoggingRule("*", LogLevel.Debug, consoleTarget);
         config.LoggingRules.Add(consoleRule);
-    #endif
+#endif
 
         // 8. Apply the updated configuration
         LogManager.Configuration = config;

@@ -17,13 +17,13 @@ public class ViewModelBase : ReactiveObject
     public bool isReloading = false;
     public const string CUR_TSUNDOKU_VERSION = "1.3.0";
     public const double SCHEMA_VERSION = 6.0;
-    public const string USER_DATA_FILEPATH = @"UserData.json";
+    public const string USER_DATA_FILEPATH = @"UserDataTest.json";
     
     [Reactive] public TsundokuTheme CurrentTheme { get; protected set; }
     [Reactive] public User CurrentUser { get; protected set; }
     
     protected readonly IUserService _userService;
-    protected readonly CompositeDisposable _disposables = new CompositeDisposable();
+    protected readonly CompositeDisposable _disposables = new();
 
     protected ViewModelBase(IUserService userService)
     {

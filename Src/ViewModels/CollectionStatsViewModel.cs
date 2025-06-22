@@ -236,30 +236,28 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
     private void SetupStats()
     {
         _userService.UserCollectionChanges
+            .Filter(series => series.Rating >= 0)
             .AutoRefresh(x => x.Rating)
             .DistinctUntilChanged()
+            .Throttle(TimeSpan.FromMilliseconds(500))
             .ToCollection()
             .Select(list =>
             {
                 decimal total = 0;
-                int count = 0;
-
                 foreach (Series series in list)
                 {
-                    if (series.Rating >= 0)
-                    {
-                        total += series.Rating;
-                        count++;
-                    }
+                    total += series.Rating;
                 }
-                return decimal.Round(decimal.Divide(total, count), 2);
+                return SeriesCount != 0 ? decimal.Round(decimal.Divide(total, SeriesCount), 2) : 0.00m;
             })
             .ObserveOn(RxApp.MainThreadScheduler)
             .Subscribe(rating => _userService.UpdateUser(user => user.MeanRating = rating));
 
         _userService.UserCollectionChanges
+            .Filter(series => series.VolumesRead > 0)
             .AutoRefresh(x => x.VolumesRead)
             .DistinctUntilChanged()
+            .Throttle(TimeSpan.FromMilliseconds(500))
             .ToCollection()
             .Select(seriesCollection => (uint)seriesCollection.Sum(item => item.VolumesRead))
             .ObserveOn(RxApp.MainThreadScheduler)
@@ -270,14 +268,16 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
 
         Observable.CombineLatest(
             _userService.UserCollectionChanges
+                .Filter(series => series.Value > 0m)
                 .AutoRefresh(x => x.Value)
                 .DistinctUntilChanged()
                 .ToCollection()
-                .Select(seriesCollection => Math.Round((double)seriesCollection.Sum(item => item.Value), 2))
+                .Select(seriesCollection => decimal.Round(seriesCollection.Sum(item => item.Value), 2))
                 .ObserveOn(RxApp.MainThreadScheduler),
             this.WhenAnyValue(x => x.CurrentUser.Currency),
             (value, currency) => new { value, currency }
         )
+        .Throttle(TimeSpan.FromMilliseconds(500))
         .Subscribe(result =>
         {
             _userService.UpdateUser(user =>
@@ -294,6 +294,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
             });
 
         _userService.UserCollectionChanges
+            .Filter(series => series.IsFavorite)
             .AutoRefresh(x => x.IsFavorite)
             .DistinctUntilChanged()
             .ToCollection()
@@ -308,6 +309,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
             .AutoRefresh(x => x.CurVolumeCount)
             .AutoRefresh(x => x.MaxVolumeCount)
             .DistinctUntilChanged()
+            .Throttle(TimeSpan.FromMilliseconds(500))
             .ToCollection()
             .Select(seriesList =>
             {
@@ -317,7 +319,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
                 foreach (Series series in seriesList)
                 {
                     totalCurVolumes += series.CurVolumeCount;
-                    totalVolumesToBeCollected += (uint)(series.MaxVolumeCount - series.CurVolumeCount);
+                    totalVolumesToBeCollected += series.MaxVolumeCount - series.CurVolumeCount;
                 }
                 return (totalCurVolumes, totalVolumesToBeCollected);
             })
@@ -887,7 +889,6 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
             .Group(user => user.Demographic)
             .Subscribe(groupChangeSet =>
             {
-                int collectionCount = _userService.GetCurCollectionCount();
                 foreach (Change<IGroup<Series, Guid, SeriesDemographic>, SeriesDemographic> change in groupChangeSet)
                 {
                     IGroup<Series, Guid, SeriesDemographic> group = change.Current;
@@ -897,9 +898,9 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
                         .StartWith(group.Cache.Count)
                         .Subscribe(count =>
                         {
-                            decimal percentage = collectionCount != 0
-                                ? Math.Round((decimal)count / collectionCount * 100, 2)
-                                : 0;
+                            decimal percentage = SeriesCount != 0
+                                ? decimal.Round((decimal)(count / SeriesCount) * 100, 2)
+                                : 0m;
 
                             switch (group.Key)
                             {
@@ -947,7 +948,6 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
             .Group(user => user.Status)
             .Subscribe(groupChangeSet =>
             {
-                int collectionCount = _userService.GetCurCollectionCount();
                 foreach (Change<IGroup<Series, Guid, SeriesStatus>, SeriesStatus> change in groupChangeSet)
                 {
                     IGroup<Series, Guid, SeriesStatus> group = change.Current;
@@ -957,8 +957,8 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
                         .StartWith(group.Cache.Count)
                         .Subscribe(count =>
                         {
-                            decimal percentage = collectionCount != 0
-                                ? Math.Round((decimal)count / collectionCount * 100, 2)
+                            decimal percentage = SeriesCount != 0
+                                ? Math.Round((decimal)count / SeriesCount * 100, 2)
                                 : 0;
 
                             switch (group.Key)
@@ -989,7 +989,6 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
         CancelledPercentage = CalculatePercentage(CancelledCount.Value, initialUserCollectionCount);
         HiatusPercentage = CalculatePercentage(HiatusCount.Value, initialUserCollectionCount);
     }
-
     private void SetupFormatPieChart(int initialUserCollectionCount)
     {
         Formats.Add(CreatePieSeries(MangaCount, "Manga"));
@@ -998,13 +997,12 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
         Formats.Add(CreatePieSeries(ComicCount, "Comic"));
         Formats.Add(CreatePieSeries(ManhuaCount, "Manhua"));
         Formats.Add(CreatePieSeries(ManfraCount, "Manfra"));
-        
+
         _userService.UserCollectionChanges
-            .AutoRefresh(x => x.Format) // detect property changes
+            .AutoRefresh(x => x.Format)
             .Group(user => user.Format)
             .Subscribe(groupChangeSet =>
             {
-                int collectionCount = _userService.GetCurCollectionCount();
                 foreach (Change<IGroup<Series, Guid, SeriesFormat>, SeriesFormat> change in groupChangeSet)
                 {
                     IGroup<Series, Guid, SeriesFormat> group = change.Current;
@@ -1014,8 +1012,8 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
                         .StartWith(group.Cache.Count)
                         .Subscribe(count =>
                         {
-                            decimal percentage = collectionCount != 0
-                                ? Math.Round((decimal)count / collectionCount * 100, 2)
+                            decimal percentage = SeriesCount != 0
+                                ? Math.Round((decimal)count / SeriesCount * 100, 2)
                                 : 0;
 
                             switch (group.Key)
@@ -1048,7 +1046,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
                         });
                 }
             });
-        
+
         MangaPercentage = CalculatePercentage(MangaCount.Value, initialUserCollectionCount);
         ManhwaPercentage = CalculatePercentage(ManhwaCount.Value, initialUserCollectionCount);
         ManhuaPercentage = CalculatePercentage(ManhuaCount.Value, initialUserCollectionCount);

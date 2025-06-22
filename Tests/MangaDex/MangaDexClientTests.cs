@@ -22,7 +22,7 @@ public class MangaDexClientTests
         {
             client.BaseAddress = new Uri("https://api.mangadex.org/");
             client.DefaultRequestVersion = HttpVersion.Version30;
-            client.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionExact;
+            client.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrLower;
             client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("Tsundoku-Test", "1.0"));
             client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("(https://github.com/Sigrec/Tsundoku)"));
             client.Timeout = TimeSpan.FromSeconds(30);

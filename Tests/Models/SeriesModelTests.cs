@@ -32,9 +32,10 @@ public class SeriesModelTests
         // Register IHttpClientFactory for default clients (e.g., if BitmapHelper uses an unnamed client)
         services.AddHttpClient("AddCoverClient", client =>
         {
+            client.DefaultRequestVersion = HttpVersion.Version30;
+            client.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrLower;
+
             client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("Tsundoku-Test", ViewModelBase.CUR_TSUNDOKU_VERSION));
-            client.DefaultRequestVersion = HttpVersion.Version20;
-            client.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionExact;
             client.Timeout = TimeSpan.FromSeconds(30);
         }).SetHandlerLifetime(TimeSpan.FromMinutes(5));
 
@@ -43,7 +44,7 @@ public class SeriesModelTests
         {
             client.BaseAddress = new Uri("https://api.mangadex.org/");
             client.DefaultRequestVersion = HttpVersion.Version30;
-            client.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionExact;
+            client.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrLower;
             client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("Tsundoku-Test", ViewModelBase.CUR_TSUNDOKU_VERSION));
             client.Timeout = TimeSpan.FromSeconds(30);
         }).SetHandlerLifetime(TimeSpan.FromMinutes(5));
@@ -282,9 +283,6 @@ public class SeriesModelTests
             CoverBitMap: emptyBitmap,
             Publisher: "SamplePub",
             DuplicateIndex: 1
-        )
-        {
-            Id = id ?? Guid.NewGuid()
-        };
+        );
     }
 }

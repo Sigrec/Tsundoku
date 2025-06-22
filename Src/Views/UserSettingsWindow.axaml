@@ -146,10 +146,10 @@
                                 i:Attached.Icon="fa-solid fa-bug"/>
                         <Button x:Name="ExportToSpreadSheetButton"
                                 Theme="{StaticResource UserSettingsButton}"
-                                Command="{Binding ExportToSpreadSheetAsyncCommand}"
+                                Click="ExportToSpreadSheetAsync"
                                 ToolTip.Tip="Export to CSV"
                                 i:Attached.Icon="fa-solid fa-file-csv"/>
-                         <Button Theme="{StaticResource UserSettingsButton}"
+                        <Button Theme="{StaticResource UserSettingsButton}"
                                 Click="OpenCoolorsSite"
                                 ToolTip.Tip="Open Coolors Website"
                                 i:Attached.Icon="fa-solid fa-palette"/>
@@ -254,7 +254,12 @@
                                 Click="ImportUserDataAsync" 
                                 HorizontalAlignment="Center"
                                 x:Name="ImportUserData"
-                                Content="Import"/>
+                                Content="Json Import"/>
+						<Button Theme="{StaticResource UserSettingsButton}"
+                                Click="ImportLibibDataAsync"
+                                HorizontalAlignment="Center"
+                                x:Name="ImportLibibData"
+                                Content="Libib Import"/>
                     </StackPanel>
                 </StackPanel>
             </StackPanel>

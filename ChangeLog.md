@@ -12,6 +12,8 @@ This project adheres to [Semantic Versioning](https://semver.org/) and follows t
 - Added **Supervisor** as a valid staff role
 - Added support for the following new languages `Albanian, Belarusian, Bosnian, Galician, Gujarati, Icelandic, Kannada, Latvian, Macedonian, Malayalam, Marathi, Punjabi, Slovenian, Telugu, and Urdu` from MangaDex
 - Dicord rich presence now updates based on what window you have open, if you are editing a series it will show the cover image being used and the name of the series
+- There is now a loading dialog popup for things that take a while to load like importing or exporting data
+X Clicking on the edit button for a series where the window is already open brings it up to the front 
 
 ### Perf Improvments
 - AniList client
@@ -21,7 +23,9 @@ This project adheres to [Semantic Versioning](https://semver.org/) and follows t
 ### Fixed
 - MangaDex description parsing
 - MangaDex correctly gets native and full (regular) staff names
-- MangaDex api calls when not using ID now are ordered by relevance to hopefully make it get the correct series when title is "ambigious"
+- MangaDex & AniList api calls when not using ID now are ordered by relevance to hopefully make it get the correct series when title is "ambigious"
+- Editing series window now currectly shows the title in the language that is selected instead of always the Romaji title
+- Unused files in the cover folder are now deleted on startup
 
 ### 1.2.0 – 2025-06-14
 #### Changed

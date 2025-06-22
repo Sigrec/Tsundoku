@@ -18,6 +18,7 @@ public sealed partial class SettingsWindow : ReactiveWindow<UserSettingsViewMode
     public SettingsWindow(UserSettingsViewModel viewModel)
     {
         InitializeComponent();
+
         ViewModel = viewModel;
 
         Opened += (s, e) =>
@@ -48,6 +49,11 @@ public sealed partial class SettingsWindow : ReactiveWindow<UserSettingsViewMode
             .Subscribe(x => ViewModel.IsChangeUsernameButtonEnabled = x);
     }
 
+    private async void ExportToSpreadSheetAsync(object sender, RoutedEventArgs e)
+    {
+        await ViewModel.ExportToSpreadSheetAsync(this);
+    }
+
     private void CurrencyChanged(object sender, SelectionChangedEventArgs e)
     {
         if (CurrencyComboBox.SelectedItem is ComboBoxItem selectedItem)
@@ -73,18 +79,43 @@ public sealed partial class SettingsWindow : ReactiveWindow<UserSettingsViewMode
             new FilePickerOpenOptions
             {
                 AllowMultiple = false,
-                FileTypeFilter = new List<FilePickerFileType>
-                {
+                FileTypeFilter =
+                [
                     new FilePickerFileType("JSON File")
                     {
                         Patterns = [ "*.json" ]
                     }
-                }
+                ]
             }
         );
         if (files.Count == 1)
         {
-            ViewModel.ImportUserDataFromJson(files[0].Path.LocalPath);
+            ViewModel.ImportUserDataFromJson(files[0].Path.LocalPath, this);
+        }
+    }
+
+    private async void ImportLibibDataAsync(object sender, RoutedEventArgs args)
+    {
+        IReadOnlyList<IStorageFile> files = await this.StorageProvider.OpenFilePickerAsync(
+            new FilePickerOpenOptions
+            {
+                AllowMultiple = true,
+                FileTypeFilter =
+                [
+                    new FilePickerFileType("JSON File")
+                    {
+                        Patterns = [ "*.csv" ]
+                    }
+                ]
+            }
+        );
+        if (files.Count > 0)
+        {
+            await ViewModel.ImportLibibDataFromCsv([.. files.Select(f => f.Path.LocalPath)], this.Owner as Window);
+        }
+        else
+        {
+            LOGGER.Debug("User tried to import libib data but no files were selected");
         }
     }
 

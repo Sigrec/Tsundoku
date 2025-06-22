@@ -22,8 +22,6 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
     [GeneratedRegex(@"\s*\([^)]*\)")]
     private static partial Regex StaffNameRegex();
 
-    // TODO - Add unit tests for Async calls, also check for improvements on regex
-
     /// <summary>
     /// Asynchronously retrieves MangaDex series data by its title.
     /// Logs and handles HTTP and JSON errors, and URL-encodes the title.
@@ -362,7 +360,8 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
         if (!string.IsNullOrWhiteSpace(englishAltTitle))
         {
             ReadOnlySpan<char> alt = englishAltTitle;
-            if (alt.Contains("Digital", StringComparison.OrdinalIgnoreCase) ||
+            if (alt.Contains("Digital", StringComparison.OrdinalIgnoreCase) || 
+                alt.Contains("Fan Colored", StringComparison.OrdinalIgnoreCase) || 
                 alt.Contains("Official Colored", StringComparison.OrdinalIgnoreCase))
             {
                 return false;
@@ -370,6 +369,49 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
         }
 
         return true;
+    }
+
+    /// <summary>
+    /// Constructs a URI link for an anime/manga, prioritizing AniList if an 'al' ID is available,
+    /// otherwise falling back to MangaDex using a provided ID or one from a data element.
+    /// Handles missing JSON properties gracefully.
+    /// </summary>
+    /// <param name="attributesBlock">A JsonElement representing the attributes block, expected to contain 'links' property.</param>
+    /// <param name="data">A JsonElement representing a data block, expected to contain an 'id' property as a fallback for MangaDex.</param>
+    /// <param name="curMangaDexId">An optional existing MangaDex ID to prioritize as a fallback.</param>
+    /// <returns>A Uri object for the anime/manga.</returns>
+    /// <exception cref="ArgumentException">Thrown if no valid ID (AniList or MangaDex) can be determined.</exception>
+    public static Uri ConstructMangaLink(JsonElement attributesBlock, JsonElement data, string? curMangaDexId)
+    {
+        // Attempt to get the AniList ID from attributesBlock.links.al
+        if (attributesBlock.TryGetProperty("links", out JsonElement linksProp) &&
+            linksProp.ValueKind == JsonValueKind.Object) // Ensure 'links' is an object
+        {
+            if (linksProp.TryGetProperty("al", out JsonElement alIdProp) &&
+                alIdProp.ValueKind == JsonValueKind.String) // Ensure 'al' is a string
+            {
+                return new Uri($"https://anilist.co/manga/{alIdProp.GetString()}");
+            }
+        }
+
+        // If curMangaDexId is null or empty, try to get from data.id
+        if (string.IsNullOrWhiteSpace(curMangaDexId))
+        {
+            if (data.TryGetProperty("id", out JsonElement dataIdProp) &&
+                dataIdProp.ValueKind == JsonValueKind.String) // Ensure 'id' is a string
+            {
+                return new Uri($"https://mangadex.org/title/{dataIdProp.GetString()}");
+            }
+            else
+            {
+                // Neither AniList nor MangaDex ID could be determined. This is an error.
+                // Log and throw an exception, or return a default/null based on desired behavior.
+                // LOGGER?.LogError("Failed to construct manga link: No valid AniList 'al' ID, 'curMangaDexId', or 'data.id' found.");
+                throw new ArgumentException("Could not determine a valid Manga ID from provided data.");
+            }
+        }
+
+        return new Uri($"https://mangadex.org/title/{curMangaDexId}");
     }
 
     /// <summary>
@@ -433,9 +475,9 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
             }
 
             // Determine if this series is acceptable
-            if (!IsSeriesDigital(input, enTitle, enAlt) &&
-                (string.Equals(enTitle, input, StringComparison.OrdinalIgnoreCase) || altMatch))
+            if (!IsSeriesDigital(input, enTitle, enAlt) && altMatch)
             {
+                LOGGER.Debug("Series {Input} is digital only, skipping", input);
                 return series;
             }
         }
@@ -646,16 +688,16 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
 
         foreach (JsonElement tag in tags.EnumerateArray())
         {
-            if (!tag.TryGetProperty("attributes", out var attr) ||
-                !attr.TryGetProperty("group", out var group) ||
+            if (!tag.TryGetProperty("attributes", out JsonElement attr) ||
+                !attr.TryGetProperty("group", out JsonElement group) ||
                 group.ValueKind != JsonValueKind.String ||
                 !group.GetString().Equals("genre", StringComparison.OrdinalIgnoreCase))
             {
                 continue;
             }
 
-            if (!attr.TryGetProperty("name", out var nameObj) ||
-                !nameObj.TryGetProperty("en", out var enName) ||
+            if (!attr.TryGetProperty("name", out JsonElement nameObj) ||
+                !nameObj.TryGetProperty("en", out JsonElement enName) ||
                 enName.ValueKind != JsonValueKind.String)
             {
                 continue;

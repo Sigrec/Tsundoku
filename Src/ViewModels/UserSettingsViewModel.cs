@@ -8,6 +8,10 @@ using static Tsundoku.Models.TsundokuLanguageModel;
 using Tsundoku.Helpers;
 using System.Globalization;
 using DynamicData;
+using static Tsundoku.Models.Enums.SeriesFormatEnum;
+using System.Collections.Concurrent;
+using Avalonia.Controls;
+using Tsundoku.Views;
 
 namespace Tsundoku.ViewModels;
 
@@ -19,9 +23,15 @@ public sealed class UserSettingsViewModel : ViewModelBase
     [Reactive] public bool BooksAMillionMember { get; set; }
     [Reactive] public bool KinokuniyaUSAMember { get; set; }
     [Reactive] public int SelectedCurrencyIndex { get; set; } = 0;
-    public ICommand ExportToSpreadSheetAsyncCommand { get; }
-    public UserSettingsViewModel(IUserService userService) : base(userService)
+
+    private readonly AddNewSeriesViewModel _addNewSeriesViewModel;
+    private readonly ILoadingDialogService _loadingDialogService;
+
+    public UserSettingsViewModel(IUserService userService, AddNewSeriesViewModel addNewSeriesViewModel, ILoadingDialogService loadingDialogService) : base(userService)
     {
+        _addNewSeriesViewModel = addNewSeriesViewModel;
+        _loadingDialogService = loadingDialogService;
+
         this.WhenAnyValue(x => x.CurrentUser)
             .Where(user => user != null)
             .Select(user => user!.Currency)
@@ -45,8 +55,6 @@ public sealed class UserSettingsViewModel : ViewModelBase
         this.WhenAnyValue(x => x.KinokuniyaUSAMember)
             .Skip(1)
             .Subscribe(isMember => UpdateMembership(KinokuniyaUSA.WEBSITE_TITLE, isMember));
-
-        ExportToSpreadSheetAsyncCommand = ReactiveCommand.CreateFromTask(ExportToSpreadSheetAsync);
     }
 
     private void UpdateMembership(string websiteTitle, bool isMember)
@@ -65,69 +73,109 @@ public sealed class UserSettingsViewModel : ViewModelBase
         _userService.UpdateUser(user => user.UserName = newUsername);
     }
 
-    public void ImportUserDataFromJson(string filePath)
+    public void ImportUserDataFromJson(string filePath, Window owner)
     {
-        _userService.ImportUserDataFromJson(filePath);
+        _loadingDialogService.Show("Importing User Data from Json", vm =>
+        {
+            vm.IsLoadingIndeterminate = true;
+            _userService.ImportUserDataFromJson(filePath);
+        }, owner);
     }
 
-    private async Task ExportToSpreadSheetAsync()
+    public async Task ImportLibibDataFromCsv(string[] filePaths, Window owner)
     {
-        LOGGER.Info("Exporting User Collection to CSV Spreadhseet");
-        string filePath = AppFileHelper.GetFilePath("TsundokuCollection.csv");
-        string userNotes = CurrentUser.Notes;
-        TsundokuLanguage userLanguage = CurrentUser.Language;
-        string userCurrency = CurrentUser.Currency;
-
-        IReadOnlyList<Series> seriesToExport = _userService.GetUserCollection();
-
-        await Task.Run(async () =>
+        await _loadingDialogService.ShowAsync("Importing Libib Data", async vm =>
         {
-            StringBuilder output = new();
-
-            if (!string.IsNullOrWhiteSpace(userNotes))
+            Dictionary<(string Title, SeriesFormat Format, string Publisher), uint>? result = await LibibParser.ExtractUniqueTitles(filePaths);
+            if (result is not null)
             {
-                output.Append($"\"{userNotes.Replace("\"", "\"\"")}\"").AppendLine().AppendLine();
+                vm.ProgressMaximum = result.Count - 1;
+                foreach (KeyValuePair<(string Title, SeriesFormat Format, string Publisher), uint> entry in result)
+                {
+                    KeyValuePair<bool, string> addSeriesResult = await _addNewSeriesViewModel.GetSeriesDataAsync(
+                        input: entry.Key.Title,
+                        bookType: entry.Key.Format,
+                        publisher: entry.Key.Publisher,
+                        curVolCount: entry.Value,
+                        maxVolCount: entry.Value
+                    );
+                    vm.ProgressValue++;
+
+                    if (addSeriesResult.Key)
+                    {
+                        LOGGER.Info("Successfully added series {Series} | {Format} | {Publisher} | {Count}", entry.Key.Title, entry.Key.Format, entry.Key.Publisher, entry.Value);
+                    }
+                    else
+                    {
+                        LOGGER.Info("Unable to add series {Series} from Libib", entry.Key.Title);
+                    }
+                }
             }
+        }, owner);
+    }
 
-            string[] headers = ["Title", "Staff", "Format", "Status", "Cur Volumes", "Max Volumes", "Demographic", "Value", "Rating", "Volumes Read", "Genres", "Notes"];
-            output.AppendLine(string.Join(",", headers));
+    public async Task ExportToSpreadSheetAsync(Window owner)
+    {
+        await _loadingDialogService.ShowAsync("Exporting Data to CSV", async vm =>
+        {
+            vm.IsLoadingIndeterminate = true;
+            LOGGER.Info("Exporting User Collection to CSV Spreadhseet");
+            string filePath = AppFileHelper.GetFilePath("TsundokuCollection.csv");
+            string userNotes = CurrentUser.Notes;
+            TsundokuLanguage userLanguage = CurrentUser.Language;
+            string userCurrency = CurrentUser.Currency;
 
-            foreach (Series curSeries in seriesToExport)
+            IReadOnlyList<Series> seriesToExport = _userService.GetUserCollection();
+
+            await Task.Run(async () =>
             {
-                string title = curSeries.Titles.TryGetValue(userLanguage, out string? preferredTitle) ? preferredTitle : title = curSeries.Titles[TsundokuLanguage.Romaji];
-                string romajiTitle = curSeries.Titles[TsundokuLanguage.Romaji]; // Get Romaji title regardless
+                StringBuilder output = new();
 
-                string staff = curSeries.Staff.TryGetValue(userLanguage, out string? preferredStaff) ? preferredStaff : curSeries.Staff[TsundokuLanguage.Romaji];
-                string romajiStaff = curSeries.Staff[TsundokuLanguage.Romaji]; // Get Romaji staff regardless
+                if (!string.IsNullOrWhiteSpace(userNotes))
+                {
+                    output.Append($"\"{userNotes.Replace("\"", "\"\"")}\"").AppendLine().AppendLine();
+                }
 
-                string formattedTitle = !userLanguage.Equals(TsundokuLanguage.Romaji) && !title.Equals(romajiTitle, StringComparison.OrdinalIgnoreCase) ? title : $"{title} ({romajiTitle})";
+                string[] headers = ["Title", "Staff", "Format", "Status", "Cur Volumes", "Max Volumes", "Demographic", "Value", "Rating", "Volumes Read", "Genres", "Notes"];
+                output.AppendLine(string.Join(",", headers));
 
-                string formattedStaff = !userLanguage.Equals(TsundokuLanguage.Romaji) && !staff.Equals(romajiStaff, StringComparison.OrdinalIgnoreCase) ? staff : $"{staff} ({romajiStaff})";
+                foreach (Series curSeries in seriesToExport)
+                {
+                    string title = curSeries.Titles.TryGetValue(userLanguage, out string? preferredTitle) ? preferredTitle : title = curSeries.Titles[TsundokuLanguage.Romaji];
+                    string romajiTitle = curSeries.Titles[TsundokuLanguage.Romaji]; // Get Romaji title regardless
 
-                output.Append($"\"{formattedTitle.Replace("\"", "\"\"")}\",");
-                output.Append($"\"{formattedStaff.Replace("\"", "\"\"")}\",");
-                output.Append($"{curSeries.Format},");
-                output.Append($"{curSeries.Status},");
-                output.Append($"{curSeries.CurVolumeCount},");
-                output.Append($"{curSeries.MaxVolumeCount},");
-                output.Append($"{curSeries.Demographic},");
-                output.Append($"{userCurrency}{curSeries.Value.ToString(CultureInfo.InvariantCulture)},");
-                output.Append($"{(curSeries.Rating != -1 ? curSeries.Rating.ToString(CultureInfo.InvariantCulture) : string.Empty)},");
-                output.Append($"{curSeries.VolumesRead},");
-                output.Append($"{(curSeries.Genres.Count != 0 ? $"\"{string.Join(" | ", curSeries.Genres)}\"" : string.Empty)},");
-                output.Append($"\"{(!string.IsNullOrWhiteSpace(curSeries.SeriesNotes) ? curSeries.SeriesNotes.Replace("\"", "\"\"") : string.Empty)}\"\n");
-            }
+                    string staff = curSeries.Staff.TryGetValue(userLanguage, out string? preferredStaff) ? preferredStaff : curSeries.Staff[TsundokuLanguage.Romaji];
+                    string romajiStaff = curSeries.Staff[TsundokuLanguage.Romaji]; // Get Romaji staff regardless
 
-            try
-            {
-                await File.WriteAllTextAsync(filePath, output.ToString(), Encoding.UTF8);
-                LOGGER.Info("Exported Spreadsheet Data to -> {filePath}", filePath);
-                await OpenSiteLink(filePath);
-            }
-            catch (Exception ex)
-            {
-                LOGGER.Warn("Could not Export Collection Spreadsheet Data to -> {filePath}\n{ex.Message}", filePath, ex.Message);
-            }
-        });
+                    string formattedTitle = !userLanguage.Equals(TsundokuLanguage.Romaji) && !title.Equals(romajiTitle, StringComparison.OrdinalIgnoreCase) ? title : $"{title} ({romajiTitle})";
+
+                    string formattedStaff = !userLanguage.Equals(TsundokuLanguage.Romaji) && !staff.Equals(romajiStaff, StringComparison.OrdinalIgnoreCase) ? staff : $"{staff} ({romajiStaff})";
+
+                    output.Append($"\"{formattedTitle.Replace("\"", "\"\"")}\",");
+                    output.Append($"\"{formattedStaff.Replace("\"", "\"\"")}\",");
+                    output.Append($"{curSeries.Format},");
+                    output.Append($"{curSeries.Status},");
+                    output.Append($"{curSeries.CurVolumeCount},");
+                    output.Append($"{curSeries.MaxVolumeCount},");
+                    output.Append($"{curSeries.Demographic},");
+                    output.Append($"{userCurrency}{curSeries.Value.ToString(CultureInfo.InvariantCulture)},");
+                    output.Append($"{(curSeries.Rating != -1 ? curSeries.Rating.ToString(CultureInfo.InvariantCulture) : string.Empty)},");
+                    output.Append($"{curSeries.VolumesRead},");
+                    output.Append($"{(curSeries.Genres.Count != 0 ? $"\"{string.Join(" | ", curSeries.Genres)}\"" : string.Empty)},");
+                    output.Append($"\"{(!string.IsNullOrWhiteSpace(curSeries.SeriesNotes) ? curSeries.SeriesNotes.Replace("\"", "\"\"") : string.Empty)}\"\n");
+                }
+
+                try
+                {
+                    await File.WriteAllTextAsync(filePath, output.ToString(), Encoding.UTF8);
+                    LOGGER.Info("Exported Spreadsheet Data to -> {filePath}", filePath);
+                    await OpenSiteLink(filePath);
+                }
+                catch (Exception ex)
+                {
+                    LOGGER.Warn("Could not Export Collection Spreadsheet Data to -> {filePath}\n{ex.Message}", filePath, ex.Message);
+                }
+            });
+        }, owner);
     }
 }

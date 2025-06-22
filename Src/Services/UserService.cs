@@ -16,7 +16,6 @@ using DynamicData.Kernel;
 using static Tsundoku.Models.TsundokuFilterModel;
 using ReactiveUI.Fody.Helpers;
 using Tsundoku.Models;
-using System.Collections.Specialized;
 
 namespace Tsundoku.Services;
 
@@ -79,7 +78,7 @@ public sealed class UserService : IUserService, IDisposable
     private readonly SourceCache<TsundokuTheme, string> _savedThemesSourceCache = new SourceCache<TsundokuTheme, string>(t => t.ThemeName);
     public IObservable<IChangeSet<TsundokuTheme, string>> SavedThemeChanges => _savedThemesSourceCache.Connect();
 
-    private readonly ReadOnlyObservableCollection<Series> _userCollection;
+    // private readonly ReadOnlyObservableCollection<Series> _userCollection;
     private readonly ReadOnlyObservableCollection<TsundokuTheme> _savedThemes;
 
     [Reactive] public string SeriesFilterText { get; set; } = string.Empty;
@@ -189,6 +188,7 @@ public sealed class UserService : IUserService, IDisposable
 
         // This only loops until it finds the first match (or until the end).
         var match = _savedThemes
+            .AsValueEnumerable()
             .Select((theme, idx) => new { theme, idx })
             .FirstOrDefault(x => x.theme.ThemeName.Equals(currentName));
 
@@ -206,8 +206,11 @@ public sealed class UserService : IUserService, IDisposable
 
     private static void PreallocateSeriesImageBitmaps(SourceCache<Series, Guid> userCollection)
     {
-        Dictionary<string, string> coverFiles = Directory
-            .EnumerateFiles(AppFileHelper.GetCoversFolderPath(), "*.*", SearchOption.TopDirectoryOnly)
+        string[] coverFilesList = [ ..Directory
+            .EnumerateFiles(AppFileHelper.GetCoversFolderPath(), "*.*", SearchOption.TopDirectoryOnly)];
+
+        Dictionary<string, string> coverFiles = coverFilesList
+            .AsValueEnumerable()
             .Where(file => AppFileHelper.VALID_IMAGE_EXTENSIONS.Contains(Path.GetExtension(file)))
             .ToDictionary(
                 f => Path.GetFileNameWithoutExtension(f),
@@ -260,9 +263,34 @@ public sealed class UserService : IUserService, IDisposable
 
                 curSeries.CoverBitMap = loadedBitmap;
             }
+
+            HashSet<string> covers = [ ..innerCache.Items
+                .AsValueEnumerable()
+                .Select(series => series.Cover)
+                .Where(cover => !string.IsNullOrWhiteSpace(cover))];
+
+            // Traverse files and delete any not referenced in collection
+            foreach (string filePath in coverFilesList)
+            {
+                string fileName = Path.GetFileName(filePath);
+                if (!covers.Contains(fileName))
+                {
+                    try
+                    {
+                        File.Delete(filePath);
+                        LOGGER.Info("Deleted unused file {File}", filePath);
+                    }
+                    catch (Exception ex)
+                    {
+                        // Optional: log or handle the error
+                        LOGGER.Warn(ex, "Failed to delete {File}", fileName);
+                    }
+                }
+            }
         });
 
         LOGGER.Info("Cover Images fully Loaded");
+        coverFilesList = null;
         coverFiles.Clear();
         coverFiles = null;
     }
@@ -707,7 +735,7 @@ public sealed class UserService : IUserService, IDisposable
             user.UserCollection.Add(series);
         });
 
-        LOGGER.Info("Added {series} ({id}) to Collection", series.Titles[TsundokuLanguage.Romaji] + (series.DuplicateIndex == 0 ? string.Empty : $" ({series.DuplicateIndex})"), series.Id);
+        LOGGER.Debug("Added {series} ({id}) to Collection", series.Titles[TsundokuLanguage.Romaji] + (series.DuplicateIndex == 0 ? string.Empty : $" ({series.DuplicateIndex})"), series.Id);
         return true;
     }
 
@@ -738,14 +766,31 @@ public sealed class UserService : IUserService, IDisposable
     public void RemoveSeries(Series series)
     {
         if (series == null)
+        {
             return;
+        }
 
-        _userCollectionSourceCache.Remove(series.Id);
+        if (_userCollectionSourceCache.Lookup(series.Id).HasValue)
+        {
+            if (_userCollectionSourceCache.Count > 0)
+            {
+                _userCollectionSourceCache.Remove(series.Id);
+            }
+            else
+            {
+                _userCollectionSourceCache.Clear();
+            }
+        }
+        else
+        {
+            LOGGER.Warn($"Series with ID {series.Id} not found in cache before removal.");
+        }
 
         UpdateUser(user =>
         {
             user.UserCollection.Remove(series);
         });
+
         series?.Dispose();
         LOGGER.Info("Removed {series} ({id}) from Collection", series.Titles[TsundokuLanguage.Romaji] + (series.DuplicateIndex == 0 ? string.Empty : $" ({series.DuplicateIndex})"), series.Id);
     }

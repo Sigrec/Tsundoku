@@ -16,7 +16,7 @@
         Title="{CompiledBinding Title}"
         CanResize="false">
 
-    <Border Classes="Menu" BorderThickness="3" CornerRadius="0,0,8,8" ClipToBounds="True">
+    <Border Classes="Menu" BorderThickness="5" CornerRadius="0,0,8,8" ClipToBounds="True">
         <StackPanel Orientation="Vertical" Margin="10" Spacing="5">
             <i:Icon Value="{CompiledBinding Icon}" FontSize="25" FontWeight="Bold" Foreground="{CompiledBinding CurrentTheme.DividerColor}" Classes="Menu"/>
             <TextBlock Text="{CompiledBinding InfoText}" FontSize="20" TextAlignment="Center" FontWeight="Bold" TextWrapping="Wrap" Classes="Menu"/>

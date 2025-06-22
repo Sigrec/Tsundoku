@@ -1,6 +1,7 @@
 ﻿using GraphQL;
 using GraphQL.Client.Http;
 using GraphQL.Client.Serializer.SystemTextJson;
+using System.Net;
 using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
 using static Tsundoku.Models.Enums.SeriesFormatEnum;
@@ -100,12 +101,12 @@ public sealed partial class AniList
             string variableDeclarations;
             if (queryType.Equals("Title", StringComparison.OrdinalIgnoreCase))
             {
-                field = "Media(search: $title, format: $format)";
+                field = "Media(search: $title, format: $format, sort: POPULARITY_DESC)";
                 variableDeclarations = "($title: String, $format: MediaFormat, $pageNum: Int)";
             }
             else
             {
-                field = "Media(id: $seriesId, format: $format)";
+                field = "Media(id: $seriesId, format: $format, sort: POPULARITY_DESC)";
                 variableDeclarations = "($seriesId: Int, $format: MediaFormat, $pageNum: Int)";
             }
 
@@ -147,16 +148,17 @@ public sealed partial class AniList
                 }}",
                 Variables = variables
             };
-
+            
             GraphQLResponse<JsonDocument?>? response = await SendWithRateLimitRetryAsync<JsonDocument?>(
                 queryRequest,
+                contextLabel,
                 maxRetries,
                 cancellationToken
             );
 
             if (response == null)
             {
-                LOGGER.Warn("AniList query for {Context} returned null (rate-limited or canceled).", contextLabel);
+                LOGGER.Warn("AniList query for {Context} returned null", contextLabel);
                 return null;
             }
 
@@ -171,22 +173,24 @@ public sealed partial class AniList
         }
     }
 
-    private Task<GraphQLResponse<JsonDocument?>?> SendWithRateLimitRetryAsync<T>(
+    private async Task<GraphQLResponse<JsonDocument?>?> SendWithRateLimitRetryAsync<T>(
         GraphQLRequest request,
+        string context,
         ushort maxRetries = 5,
         CancellationToken cancellationToken = default)
     {
-        return Task.Run(async () =>
-        {
-            int attempts = 0;
-            while (attempts < maxRetries)
-            {
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    LOGGER.Info("Request canceled before sending GraphQL query.");
-                    return null;
-                }
+        int attempts = 0;
 
+        while (attempts < maxRetries)
+        {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                LOGGER.Info("Request canceled before sending GraphQL query.");
+                return null;
+            }
+
+            try
+            {
                 GraphQLResponse<JsonDocument?> response = await _aniListClient
                     .SendQueryAsync<JsonDocument?>(request, cancellationToken);
 
@@ -197,20 +201,60 @@ public sealed partial class AniList
                 }
 
                 attempts++;
-
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    LOGGER.Info("Request canceled during delay wait.");
-                    return null;
-                }
-
                 LOGGER.Warn("Rate limit hit (attempt {Attempt}/{Max}). Delaying {Delay}...", attempts, maxRetries, delay.Value);
                 await Task.Delay(delay.Value, cancellationToken);
             }
+            catch (GraphQLHttpRequestException ex) when (ex.StatusCode == HttpStatusCode.TooManyRequests)
+            {
+                attempts++;
+                TimeSpan delay;
+                const int paddingSeconds = 5; 
 
-            LOGGER.Error("Exceeded maximum retry attempts ({MaxRetries}) due to rate limiting. Skipping request.", maxRetries);
-            return null;
-        }, cancellationToken);
+                // Access headers directly from graphqlEx.ResponseHeaders
+                if (ex.ResponseHeaders != null)
+                {
+                    TimeSpan? headersDelay = GetRateLimitDelay(ex.ResponseHeaders, paddingSeconds);
+                    if (headersDelay.HasValue)
+                    {
+                        delay = headersDelay.Value;
+                        LOGGER.Warn("HTTP 429 Too Many Requests (attempt {Attempt}/{Max}). Delaying for {Delay} based on 'Retry-After'.", attempts, maxRetries, delay.TotalSeconds);
+                    }
+                    else
+                    {
+                        // Fallback if Retry-After is unexpectedly missing from GraphQLHttpRequestException's response headers
+                        delay = TimeSpan.FromSeconds(Math.Pow(2, attempts) * 5 + paddingSeconds);
+                        LOGGER.Warn("HTTP 429 Too Many Requests (attempt {Attempt}/{Max}). 'Retry-After' header not found in GraphQLHttpRequestException.ResponseHeaders Retrying after fallback delay of {FallbackDelay}.", attempts, maxRetries, delay.TotalSeconds);
+                    }
+                }
+                else
+                {
+                    // Fallback if GraphQLHttpRequestException's ResponseHeaders are null (very unlikely for a 429 response)
+                    delay = TimeSpan.FromSeconds(Math.Pow(2, attempts) * 10 + paddingSeconds); // Longer fallback
+                    LOGGER.Warn("HTTP 429 Too Many Requests (attempt {Attempt}/{Max}). GraphQLHttpRequestException did not contain ResponseHeaders. Retrying after fallback delay of {FallbackDelay}.", attempts, maxRetries, delay.TotalSeconds);
+                }
+
+                await Task.Delay(delay, cancellationToken);
+                continue;
+            }
+            catch (GraphQLHttpRequestException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+            {
+                LOGGER.Warn("{Series} not found", context);
+                return null;
+            }
+            catch (TaskCanceledException ex)
+            {
+                LOGGER.Info(ex, "Request canceled during send or delay.");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                LOGGER.Error(ex, "Unexpected error during GraphQL request -> ");
+                return null;
+            }
+        }
+
+        LOGGER.Error("Exceeded maximum retry attempts ({MaxRetries}) due to rate limiting.");
+        return null;
     }
 
     /// <summary>
@@ -221,7 +265,7 @@ public sealed partial class AniList
     /// A <see cref="TimeSpan"/> representing the delay until the rate limit resets,
     /// or <c>null</c> if no delay is needed.
     /// </returns>
-    private static TimeSpan? GetRateLimitDelay(HttpResponseHeaders headers)
+    private static TimeSpan? GetRateLimitDelay(HttpResponseHeaders headers, int paddingSeconds = 5)
     {
         if (headers.TryGetValues("X-RateLimit-Remaining", out var remainingValues) &&
             short.TryParse(remainingValues.FirstOrDefault(), out short remaining))
@@ -241,12 +285,12 @@ public sealed partial class AniList
         if (headers.TryGetValues("Retry-After", out var retryAfterValues) &&
             short.TryParse(retryAfterValues.FirstOrDefault(), out short delaySeconds))
         {
-            LOGGER.Warn("AniList rate limit reached. Delaying for {Seconds} seconds.", delaySeconds);
-            return TimeSpan.FromSeconds(delaySeconds);
+            LOGGER.Warn("AniList rate limit reached. Delaying for {Seconds} seconds.", delaySeconds + paddingSeconds);
+            return TimeSpan.FromSeconds(delaySeconds + paddingSeconds);
         }
 
-        LOGGER.Warn("AniList response missing or invalid 'Retry-After' header. Defaulting to 30s.");
-        return TimeSpan.FromSeconds(30); // fallback to prevent hammering the API
+        LOGGER.Warn("AniList response missing or invalid 'Retry-After' header. Defaulting to 90s.");
+        return TimeSpan.FromSeconds(90); // fallback to prevent hammering the API
     }
 
     /// <summary>

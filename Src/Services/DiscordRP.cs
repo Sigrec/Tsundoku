@@ -1,9 +1,8 @@
 ﻿using DiscordRPC;
 using DiscordRPC.Logging;
 
-namespace Tsundoku.Helpers;
+namespace Tsundoku.Services;
 
-// TODO - Now I can set the presence when people are looking at various windows, also possibly display the cover image of the series they are editing?
 internal static class DiscordRP
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
@@ -30,7 +29,7 @@ internal static class DiscordRP
 
         client.Initialize();
 
-        SetPresence("Manga & Light Novel Collection App", "Browsing Collection");
+        SetPresence();
     }
 
     public static void Deinitialize()
@@ -43,7 +42,7 @@ internal static class DiscordRP
         }
     }
 
-    public static void SetPresence(string? details = null, string? state = null, bool refreshTimestamp = false)
+    public static void SetPresence(string? details = "Manga & Light Novel Collection Tracking App", string? state = "Browsing Collection", bool refreshTimestamp = false)
     {
         if (client == null || !client.IsInitialized)
         {

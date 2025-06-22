@@ -28,7 +28,7 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
 
     [JsonIgnore] private bool disposedValue;
     [JsonIgnore][Reactive] public Bitmap? CoverBitMap { get; set; }
-    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid Id { get; } = Guid.NewGuid();
     [Reactive] public string Publisher { get; set; }
     [Reactive] public Dictionary<TsundokuLanguage, string> Titles { get; set; }
     [Reactive] public Dictionary<TsundokuLanguage, string> Staff { get; set; }
@@ -40,8 +40,8 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
     public Uri Link { get; set; }
     [Reactive] public HashSet<SeriesGenre>? Genres { get; set; }
     [Reactive] public string SeriesNotes { get; set; }
-    [Reactive] public ushort MaxVolumeCount { get; set; }
-    [Reactive] public ushort CurVolumeCount { get; set; }
+    [Reactive] public uint MaxVolumeCount { get; set; }
+    [Reactive] public uint CurVolumeCount { get; set; }
     [Reactive] public uint VolumesRead { get; set; }
     [Reactive] public decimal Value { get; set; }
     [Reactive] public decimal Rating { get; set; }
@@ -58,8 +58,8 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
         string Cover,
         Uri Link,
         HashSet<SeriesGenre> Genres,
-        ushort MaxVolumeCount,
-        ushort CurVolumeCount,
+        uint MaxVolumeCount,
+        uint CurVolumeCount,
         decimal Rating,
         uint VolumesRead,
         decimal Value,
@@ -105,9 +105,9 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
         AniList aniList,
         string input,
         SeriesFormat bookType,
-        ushort maxVolCount,
-        ushort minVolCount,
-        TsundokuLanguage[] additionalLanguages,
+        uint maxVolCount,
+        uint minVolCount,
+        TsundokuLanguage[]? additionalLanguages,
         string publisher = "Unknown",
         SeriesDemographic demographic = SeriesDemographic.Unknown,
         uint volumesRead = 0,
@@ -245,8 +245,7 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
         }
         catch (Exception ex)
         {
-            // TODO - Add some of the input variables here
-            LOGGER.Error(ex, "Error Creating new Series");
+            LOGGER.Error(ex, "Error Creating new Series for {Input}", input);
         }
         finally
         {
@@ -263,11 +262,11 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
         SeriesFormat bookType,
         bool isAniListId,
         JsonDocument mediaDataDoc,
-        TsundokuLanguage[] additionalLanguages,
+        TsundokuLanguage[]? additionalLanguages,
         bool allowDuplicate,
         bool isRefresh,
-        ushort maxVolCount,
-        ushort minVolCount,
+        uint maxVolCount,
+        uint minVolCount,
         decimal rating,
         uint volumesRead,
         decimal value,
@@ -307,15 +306,15 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
         bool isSimilar = false;
         if (!string.IsNullOrWhiteSpace(context.EnglishTitle))
         {
-            isSimilar |= ExtensionMethods.Similar(input, context.EnglishTitle, ExtensionMethods.SimilarThreshold(input, context.EnglishTitle)) != -1;
+            isSimilar |= ExtensionMethods.Similar(input, context.EnglishTitle.Replace("and", "&"), ExtensionMethods.SimilarThreshold(input, context.EnglishTitle)) != -1 || context.EnglishTitle.Contains(input);
         }
         if (!string.IsNullOrWhiteSpace(context.RomajiTitle))
         {
-            isSimilar |= ExtensionMethods.Similar(input, context.RomajiTitle, ExtensionMethods.SimilarThreshold(input, context.RomajiTitle)) != -1;
+            isSimilar |= ExtensionMethods.Similar(input, context.RomajiTitle.Replace("and", "&"), ExtensionMethods.SimilarThreshold(input, context.RomajiTitle)) != -1 || context.RomajiTitle.Contains(input);
         }
         if (!string.IsNullOrWhiteSpace(context.NativeTitle))
         {
-            isSimilar |= ExtensionMethods.Similar(input, context.NativeTitle, ExtensionMethods.SimilarThreshold(input, context.NativeTitle)) != -1;
+            isSimilar |= ExtensionMethods.Similar(input, context.NativeTitle.Replace("and", "&"), ExtensionMethods.SimilarThreshold(input, context.NativeTitle)) != -1 || context.NativeTitle.Contains(input);
         }
 
         if (!isAniListId && !isSimilar)
@@ -392,7 +391,7 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
         AddIfNotEmpty(context.NativeTitle, ANILIST_LANG_CODES[context.CountryOfOrigin]);
 
         // Add additional languages from MangaDex if requested
-        if (additionalLanguages.Length > 0)
+        if (additionalLanguages is not null && additionalLanguages.Length > 0)
         {
             JsonElement[] altTitles = context.MangaDexAltTitles;
 
@@ -424,6 +423,16 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
             ? mediaData.GetProperty("coverImage").GetProperty("extraLarge").GetString()
             : customImageUrl;
 
+        string desc = mediaData.TryGetProperty("description", out JsonElement descriptionProp)
+            ? AniList.ParseSeriesDescription(descriptionProp.GetString())
+            : string.Empty;
+
+        SeriesStatus status = SeriesStatusEnum.Parse(mediaData.GetProperty("status").GetString());
+
+        Uri link = new Uri(mediaData.GetProperty("siteUrl").GetString());
+
+        HashSet<SeriesGenre> genres = AniList.ParseGenreArray(context.RomajiTitle, mediaData.GetProperty("genres"));
+
         Bitmap? coverImage = null;
 
         if (!isRefresh && (allowDuplicate || !string.IsNullOrWhiteSpace(context.CoverPath)))
@@ -442,12 +451,12 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
         return new Series(
             Titles: context.NewTitles,
             Staff: context.NewStaff,
-            Description: AniList.ParseSeriesDescription(mediaData.GetProperty("description").GetString()),
+            Description: desc,
             Format: context.FilteredBookType,
-            Status: SeriesStatusEnum.Parse(mediaData.GetProperty("status").GetString()),
+            Status: status,
             Cover: context.CoverPath,
-            Link: new Uri(mediaData.GetProperty("siteUrl").GetString()),
-            Genres: AniList.ParseGenreArray(context.RomajiTitle, mediaData.GetProperty("genres")),
+            Link: link,
+            Genres: genres,
             MaxVolumeCount: maxVolCount,
             CurVolumeCount: minVolCount,
             Rating: rating,
@@ -466,11 +475,11 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
         string input,
         string? customImageUrl,
         string? curMangaDexId,
-        TsundokuLanguage[] additionalLanguages,
+        TsundokuLanguage[]? additionalLanguages,
         bool allowDuplicate,
         bool isRefresh,
-        ushort maxVolCount,
-        ushort minVolCount,
+        uint maxVolCount,
+        uint minVolCount,
         decimal rating,
         uint volumesRead,
         decimal value,
@@ -572,7 +581,7 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
         }
 
         // Additional languages (only if specified)
-        if (additionalLanguages.Length > 0)
+        if (additionalLanguages is not null && additionalLanguages.Length > 0)
         {
             AddAdditionalLanguages(ref titles, additionalLanguages, altTitleList);
         }
@@ -589,7 +598,17 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
             context.NewStaff[MANGADEX_LANG_CODES[context.CountryOfOrigin]] = nativeStaff.ToString();
         }
 
-        // Download cover
+        string desc = attributesBlock.TryGetProperty("description", out JsonElement descriptionProp) &&
+            descriptionProp.ValueKind == JsonValueKind.Object &&
+            descriptionProp.TryGetProperty("en", out JsonElement enProp)
+            ? MangaDex.ParseDescription(enProp.GetString())
+            : string.Empty;
+            
+        SeriesStatus status = SeriesStatusEnum.Parse(attributesBlock.GetProperty("status").GetString());
+
+        Uri link = MangaDex.ConstructMangaLink(attributesBlock, data, curMangaDexId);
+        HashSet<SeriesGenre> genres = MangaDex.ParseGenreData(context.RomajiTitle, attributesBlock.GetProperty("tags"));
+
         Bitmap? coverImage = null;
         if (!isRefresh && (!isDupe || allowDuplicate))
         {
@@ -603,14 +622,12 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
         return new Series(
             Titles: context.NewTitles,
             Staff: context.NewStaff,
-            Description: MangaDex.ParseDescription(attributesBlock.GetProperty("description").GetProperty("en").GetString()),
+            Description: desc,
             Format: context.FilteredBookType,
-            Status: SeriesStatusEnum.Parse(attributesBlock.GetProperty("status").GetString()),
+            Status: status,
             Cover: context.CoverPath,
-            Link: new Uri(attributesBlock.GetProperty("links").TryGetProperty("al", out JsonElement alId)
-                ? $"https://anilist.co/manga/{alId.GetString()}"
-                : $"https://mangadex.org/title/{curMangaDexId ?? data.GetProperty("id").GetString()}"),
-            Genres: MangaDex.ParseGenreData(context.RomajiTitle, attributesBlock.GetProperty("tags")),
+            Link: link,
+            Genres: genres,
             MaxVolumeCount: maxVolCount,
             CurVolumeCount: minVolCount,
             Rating: rating,
@@ -930,9 +947,13 @@ public class SeriesValueComparer : IEqualityComparer<Series>
         HashCode hash = new HashCode();
         hash.Add(obj.Format);
         foreach (KeyValuePair<TsundokuLanguage, string> title in obj.Titles)
+        {
             hash.Add(title);
+        }
         foreach (KeyValuePair<TsundokuLanguage, string> staff in obj.Staff)
+        {
             hash.Add(staff);
+        }
         return hash.ToHashCode();
     }
 }

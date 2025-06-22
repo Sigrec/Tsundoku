@@ -35,7 +35,7 @@ public static class WindowHelper
 
             if (!windowInstance.IsVisible)
             {
-                windowInstance.Show();
+                windowInstance.Show(parentWindow);
             }
             else
             {

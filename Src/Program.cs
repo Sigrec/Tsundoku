@@ -29,7 +29,6 @@ internal sealed class Program
             .UsePlatformDetect()
             .UseSkia()
             .With(LoaderOptimization.MultiDomainHost)
-            .With(LoaderOptimization.MultiDomainHost)
             .With(LoadHint.Always)
 #if DEBUG
             .LogToTrace()

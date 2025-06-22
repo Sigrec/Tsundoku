@@ -4,6 +4,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
 using Avalonia.ReactiveUI;
 using Projektanker.Icons.Avalonia;
+using System.Collections.Frozen;
 using Tsundoku.Helpers;
 using Tsundoku.Models.Enums;
 using Tsundoku.ViewModels;
@@ -19,6 +20,7 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
     private readonly BitmapHelper _bitmapHelper;
     private readonly MainWindowViewModel _mainWindowViewModel;
     private bool _IsInitialized = false;
+    private readonly FrozenDictionary<SeriesGenre, object> GenreItemMap;
 
     public EditSeriesInfoWindow(MainWindowViewModel mainWindowViewModel, BitmapHelper bitmapHelper)
     {
@@ -26,13 +28,41 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
         _mainWindowViewModel = mainWindowViewModel;
         InitializeComponent();
 
+        GenreItemMap = new Dictionary<SeriesGenre, object>
+        {
+            [SeriesGenre.Action] = ActionListBoxItem,
+            [SeriesGenre.Adventure] = AdventureListBoxItem,
+            [SeriesGenre.Comedy] = ComedyListBoxItem,
+            [SeriesGenre.Drama] = DramaListBoxItem,
+            [SeriesGenre.Ecchi] = EcchiListBoxItem,
+            [SeriesGenre.Fantasy] = FantasyListBoxItem,
+            [SeriesGenre.Horror] = HorrorListBoxItem,
+            [SeriesGenre.MahouShoujo] = MahouShoujoListBoxItem,
+            [SeriesGenre.Mecha] = MechaListBoxItem,
+            [SeriesGenre.Music] = MusicListBoxItem,
+            [SeriesGenre.Mystery] = MysteryListBoxItem,
+            [SeriesGenre.Psychological] = PsychologicalListBoxItem,
+            [SeriesGenre.Romance] = RomanceListBoxItem,
+            [SeriesGenre.SciFi] = SciFiListBoxItem,
+            [SeriesGenre.SliceOfLife] = SliceOfLifeListBoxItem,
+            [SeriesGenre.Sports] = SportsListBoxItem,
+            [SeriesGenre.Supernatural] = SupernaturalListBoxItem,
+            [SeriesGenre.Thriller] = ThrillerListBoxItem
+        }.ToFrozenDictionary();
+
         Opened += (s, e) =>
         {
-            ;
-            this.Title = $"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]} Info";
+            string curTitle = ViewModel.Series.Titles[ViewModel.CurrentUser.Language];
+            DiscordRP.SetPresence(state: $"Editing {curTitle} {ViewModel.Series.Format}", refreshTimestamp: true);
+            this.Title = $"{curTitle}";
             VolumesReadTextBlock.Text = $"{ViewModel.Series.VolumesRead} Vol{(ViewModel.Series.VolumesRead > 1 ? "s" : string.Empty)} Read";
             UpdateSelectedGenres();
             _IsInitialized = true;
+        };
+
+        Closed += (s, e) =>
+        {
+            DiscordRP.SetPresence(refreshTimestamp: true);
         };
     }
 
@@ -239,8 +269,8 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
         {
             if (newMax >= newCur)
             {
-                ushort oldCur = ViewModel.Series.CurVolumeCount;
-                ushort oldMax = ViewModel.Series.MaxVolumeCount;
+                uint oldCur = ViewModel.Series.CurVolumeCount;
+                uint oldMax = ViewModel.Series.MaxVolumeCount;
                 ViewModel.Series.CurVolumeCount = newCur;
                 ViewModel.Series.MaxVolumeCount = newMax;
 
@@ -262,7 +292,7 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
         {
             if (newCur <= ViewModel.Series.MaxVolumeCount)
             {
-                ushort oldCur = ViewModel.Series.CurVolumeCount;
+                uint oldCur = ViewModel.Series.CurVolumeCount;
                 ViewModel.Series.CurVolumeCount = newCur;
 
                 LOGGER.Info(
@@ -282,7 +312,7 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
         {
             if (newMax >= ViewModel.Series.CurVolumeCount)
             {
-                ushort oldMax = ViewModel.Series.MaxVolumeCount;
+                uint oldMax = ViewModel.Series.MaxVolumeCount;
                 ViewModel.Series.MaxVolumeCount = newMax;
 
                 LOGGER.Info(
@@ -299,71 +329,18 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
         }
     }
 
-    public void UpdateSelectedGenres()
+    private void UpdateSelectedGenres()
     {
-        if (ViewModel.Series.Genres != null)
+        if (ViewModel.Series.Genres == null)
         {
-            foreach (SeriesGenre genre in ViewModel.Series.Genres)
+            return;
+        }
+
+        foreach (SeriesGenre genre in ViewModel.Series.Genres)
+        {
+            if (GenreItemMap.TryGetValue(genre, out object? item))
             {
-                switch (genre)
-                {
-                    case SeriesGenre.Action:
-                        GenreSelector.SelectedItems.Add(ActionListBoxItem);
-                        break;
-                    case SeriesGenre.Adventure:
-                        GenreSelector.SelectedItems.Add(AdventureListBoxItem);
-                        break;
-                    case SeriesGenre.Comedy:
-                        GenreSelector.SelectedItems.Add(ComedyListBoxItem);
-                        break;
-                    case SeriesGenre.Drama:
-                        GenreSelector.SelectedItems.Add(DramaListBoxItem);
-                        break;
-                    case SeriesGenre.Ecchi:
-                        GenreSelector.SelectedItems.Add(EcchiListBoxItem);
-                        break;
-                    case SeriesGenre.Fantasy:
-                        GenreSelector.SelectedItems.Add(FantasyListBoxItem);
-                        break;
-                    case SeriesGenre.Horror:
-                        GenreSelector.SelectedItems.Add(HorrorListBoxItem);
-                        break;
-                    case SeriesGenre.MahouShoujo:
-                        GenreSelector.SelectedItems.Add(MahouShoujoListBoxItem);
-                        break;
-                    case SeriesGenre.Mecha:
-                        GenreSelector.SelectedItems.Add(MechaListBoxItem);
-                        break;
-                    case SeriesGenre.Music:
-                        GenreSelector.SelectedItems.Add(MusicListBoxItem);
-                        break;
-                    case SeriesGenre.Mystery:
-                        GenreSelector.SelectedItems.Add(MysteryListBoxItem);
-                        break;
-                    case SeriesGenre.Psychological:
-                        GenreSelector.SelectedItems.Add(PsychologicalListBoxItem);
-                        break;
-                    case SeriesGenre.Romance:
-                        GenreSelector.SelectedItems.Add(RomanceListBoxItem);
-                        break;
-                    case SeriesGenre.SciFi:
-                        GenreSelector.SelectedItems.Add(SciFiListBoxItem);
-                        break;
-                    case SeriesGenre.SliceOfLife:
-                        GenreSelector.SelectedItems.Add(SliceOfLifeListBoxItem);
-                        break;
-                    case SeriesGenre.Sports:
-                        GenreSelector.SelectedItems.Add(SportsListBoxItem);
-                        break;
-                    case SeriesGenre.Supernatural:
-                        GenreSelector.SelectedItems.Add(SupernaturalListBoxItem);
-                        break;
-                    case SeriesGenre.Thriller:
-                        GenreSelector.SelectedItems.Add(ThrillerListBoxItem);
-                        break;
-                    default:
-                        break;
-                }
+                GenreSelector.SelectedItems.Add(item);
             }
         }
     }

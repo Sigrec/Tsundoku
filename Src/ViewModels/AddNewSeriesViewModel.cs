@@ -74,7 +74,7 @@ public sealed class AddNewSeriesViewModel : ViewModelBase
     /// <param name="maxVolCount">The max # of volumes this series currently has</param>
     /// <param name="additionalLanguages">Additional languages to get more info for from Mangadex</param>
     /// <returns>Whether the series can be added to the users collection or not</returns>
-    public async Task<KeyValuePair<bool, string>> GetSeriesDataAsync(string input, SeriesFormat bookType, ushort curVolCount, ushort maxVolCount, TsundokuLanguage[] additionalLanguages, string customImageUrl = "", string publisher = "Unknown", SeriesDemographic demographic = SeriesDemographic.Unknown, uint volumesRead = 0, decimal rating = -1, decimal value = 0, bool allowDuplicate = false)
+    public async Task<KeyValuePair<bool, string>> GetSeriesDataAsync(string input, SeriesFormat bookType, uint curVolCount = 0, uint maxVolCount = 1, TsundokuLanguage[]? additionalLanguages = null, string customImageUrl = "", string publisher = "Unknown", SeriesDemographic demographic = SeriesDemographic.Unknown, uint volumesRead = 0, decimal rating = -1, decimal value = 0, bool allowDuplicate = false)
     {
         string returnMsg = string.Empty;
         Series? newSeries = await Series.CreateNewSeriesCardAsync(
@@ -109,9 +109,9 @@ public sealed class AddNewSeriesViewModel : ViewModelBase
             }
             catch (Exception ex)
             {
-                LOGGER.Error("Error adding new Series to Collection\n{msg}", ex.Message);
+                LOGGER.Error(ex, "Error adding new Series to Collection");
                 newSeries?.Dispose();
-                returnMsg = "Unknown Reason";
+                returnMsg = ex.Message;
             }
         }
         return new KeyValuePair<bool, string>(successfulAdd, returnMsg);
