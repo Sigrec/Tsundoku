@@ -12,7 +12,7 @@ using static Tsundoku.Models.Enums.SeriesDemographicEnum;
 using static Tsundoku.Models.Enums.SeriesFormatEnum;
 using static Tsundoku.Models.Enums.SeriesGenreEnum;
 using static Tsundoku.Models.Enums.SeriesStatusEnum;
-using static Tsundoku.Models.TsundokuFilterModel;
+using static Tsundoku.Models.Enums.TsundokuFilterEnums;
 
 namespace Tsundoku.Services;
 
@@ -209,7 +209,7 @@ public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISh
 
         // 4. Define the series comparer (for sorting) based on the current user's language
         IObservable<IComparer<Series>> seriesComparerChanged = _userService.CurrentUser
-            .Where(user => user != null)
+            .Where(user => user is not null)
             .Select(user => user!.Language)
             .DistinctUntilChanged()
             .Select(curLang => (IComparer<Series>)new SeriesComparer(curLang));
@@ -320,8 +320,8 @@ public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISh
             "genre" =>
                 // Assuming Series.Genres is List<string> and filterValue is the actual genre string (e.g., "Action")
                 // If Genre is an enum in your project, change this to:
-                // `it.Genres != null && it.Genres.Contains(YourProject.Models.GenreEnum.{filterValue})`
-                $"it.Genres != null && it.Genres.Contains(Genre.{EscapeForCSharpStringLiteral(filterValue)}\")",
+                // `it.Genres is not null && it.Genres.Contains(YourProject.Models.GenreEnum.{filterValue})`
+                $"it.Genres is not null && it.Genres.Contains(Genre.{EscapeForCSharpStringLiteral(filterValue)}\")",
 
             _ => string.Empty,
         };

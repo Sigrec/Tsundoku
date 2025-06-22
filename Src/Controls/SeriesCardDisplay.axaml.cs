@@ -3,7 +3,7 @@ using Avalonia.ReactiveUI;
 using Microsoft.Extensions.DependencyInjection;
 using Tsundoku.Models;
 using Tsundoku.ViewModels;
-using static Tsundoku.Models.TsundokuLanguageModel;
+using static Tsundoku.Models.Enums.TsundokuLanguageEnums;
 
 namespace Tsundoku.Controls;
 
@@ -62,14 +62,16 @@ public sealed partial class SeriesCardDisplay : ReactiveUserControl<SeriesCardDi
     private async void OpenSiteLink(object? sender, PointerPressedEventArgs e)
     {
         if (Series?.Link is null)
+        {
             return;
+        }
 
         await ViewModelBase.OpenSiteLink(Series.Link.ToString());
     }
 
     private async void CopySeriesTitleAsync(object? sender, PointerPressedEventArgs e)
     {
-        if (Language != null)
+        if (Language is not null)
         {
             string title = Series.Titles[Language.Value];
             LOGGER.Debug("Copying {title} to Clipboard", title);
@@ -79,24 +81,20 @@ public sealed partial class SeriesCardDisplay : ReactiveUserControl<SeriesCardDi
 
     private void SubtractVolume(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
-        if (Series?.CurVolumeCount > 0)
-        {
-            Series.CurVolumeCount--;
-        }
+        Series?.DecrementCurVolumeCount();
     }
 
     private void AddVolume(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
-        if (Series != null && (Series.CurVolumeCount < Series.MaxVolumeCount))
-        {
-            Series.CurVolumeCount++;
-        }
+        Series?.IncrementCurVolumeCount();
     }
 
     private async void OpenEditSeriesInfoWindow(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
-        if (_mainWindowViewModel == null || Series is null)
+        if (_mainWindowViewModel is null || Series is null)
+        {
             return;
+        }
 
         Button seriesButton = (Button)sender;
         seriesButton.Foreground = CardTheme.SeriesButtonIconHoverColor;

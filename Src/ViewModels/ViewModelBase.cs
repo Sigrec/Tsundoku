@@ -16,8 +16,8 @@ public class ViewModelBase : ReactiveObject
     public static bool newCoverCheck = false;
     public bool isReloading = false;
     public const string CUR_TSUNDOKU_VERSION = "1.3.0";
-    public const double SCHEMA_VERSION = 6.0;
-    public const string USER_DATA_FILEPATH = @"UserDataTest.json";
+    public const double SCHEMA_VERSION = 6.1;
+    public const string USER_DATA_FILEPATH = @"UserData.json";
     
     [Reactive] public TsundokuTheme CurrentTheme { get; protected set; }
     [Reactive] public User CurrentUser { get; protected set; }
@@ -29,13 +29,13 @@ public class ViewModelBase : ReactiveObject
     {
         _userService = userService;
         _userService.CurrentTheme
-            .Where(theme => theme != null)
+            .Where(theme => theme is not null)
             .ObserveOn(RxApp.MainThreadScheduler)
             .Subscribe(theme => CurrentTheme = theme!)
             .DisposeWith(_disposables);
 
         _userService.CurrentUser
-            .Where(user => user != null) // Filters out the initial null from BehaviorSubject
+            .Where(user => user is not null) // Filters out the initial null from BehaviorSubject
             .Subscribe(user => CurrentUser = user);
     }
 

@@ -6,26 +6,34 @@ This project adheres to [Semantic Versioning](https://semver.org/) and follows t
 <details>
 <summary>1.x Releases</summary>
 
-###
-### Changed
+### 1.3.0 – 2025-06-22
+#### Changed
+- Updated **NLog** to `6.0.0`
 - Added **Hentai** genre
 - Added **Supervisor** as a valid staff role
-- Added support for the following new languages `Albanian, Belarusian, Bosnian, Galician, Gujarati, Icelandic, Kannada, Latvian, Macedonian, Malayalam, Marathi, Punjabi, Slovenian, Telugu, and Urdu` from MangaDex
-- Dicord rich presence now updates based on what window you have open, if you are editing a series it will show the cover image being used and the name of the series
-- There is now a loading dialog popup for things that take a while to load like importing or exporting data
-X Clicking on the edit button for a series where the window is already open brings it up to the front 
+- Added support for new MangaDex languages: `Albanian, Belarusian, Bosnian, Galician, Gujarati, Icelandic, Kannada, Latvian, Macedonian, Malayalam, Marathi, Punjabi, Slovenian, Telugu, and Urdu`
+- Improved Discord rich presence to show the series the user is editing if clicked, shows the title and format
+- Added a loading dialog for long-running operations (e.g., importing or exporting data)
+- Removed support for the following currencies: `₣, ₻`
+- Added support for the following currencies: `Rp, RM, R$, ₪, ₴, zł, Ft, Kč, kr, lei, ৳, ₮, KM, Br, L, din, ден, ر.س, د.إ, د.ك, Rs`
+- Changed maximum value format to `0000000000000000.00`
+- App will automatically clean up unused cover images on startup
 
-### Perf Improvments
-- AniList client
-- MangaDex client
-- Cover image downloading via url
+#### Performance Improvements
+- Improved performance of the AniList client
+- Improved performance of the MangaDex client
+- Improved cover-image downloading
 
-### Fixed
-- MangaDex description parsing
-- MangaDex correctly gets native and full (regular) staff names
-- MangaDex & AniList api calls when not using ID now are ordered by relevance to hopefully make it get the correct series when title is "ambigious"
-- Editing series window now currectly shows the title in the language that is selected instead of always the Romaji title
-- Unused files in the cover folder are now deleted on startup
+#### Fixed
+- Series with missing cover images now automatically retrieve a new cover on refresh
+- Clicking a button for an already open window now sets the focus to that window
+- Fixed currency-symbol placement in collection and series value amounts based on locale
+- Extended MangaDex description parser to handle additional edge cases (refresh a series to apply)
+- Fixed MangaDex staff-name retrieval to correctly return both native and full names
+- When searching by title (without ID), MangaDex and AniList API calls are now ordered by relevance to improve matching for ambiguous titles
+- Editing Series window now correctly displays the title in the selected language (instead of always using Romaji)
+- Series description now defaults to the original language if an English description is not available in MangaDex
+
 
 ### 1.2.0 – 2025-06-14
 #### Changed

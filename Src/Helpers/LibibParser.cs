@@ -25,7 +25,7 @@ public static partial class LibibParser
     public static async Task<Dictionary<(string Title, SeriesFormat Format, string Publisher), uint>?> ExtractUniqueTitles(string[]? csvFilePaths = null)
     {
         LOGGER.Info("Attempting to parse Libib csv files...");
-        if (csvFilePaths == null)
+        if (csvFilePaths is null)
         {
             LOGGER.Warn("User tried to import non existent file paths");
             return null;

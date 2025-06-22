@@ -185,16 +185,11 @@
                     TextDecorations="Underline" 
                     HorizontalAlignment="Center"
                     Margin="0,0,0,3"
+                    Text="{CompiledBinding SeriesValueText}"
                     FontSize="20">
-                    <TextBlock.Text>
-                        <MultiBinding StringFormat="{}{0}{1}">
-                            <Binding Path="CurrentUser.Currency"/>
-                            <Binding Path="Series.Value"/>
-                        </MultiBinding>
-                    </TextBlock.Text>
                 </TextBlock>
                 <MaskedTextBox
-                    x:Name="CostMaskedTextBox"
+                    x:Name="ValueMaskedTextBox"
                     Grid.Row="6"
                     Grid.Column="2"
                     Height="38"
@@ -205,7 +200,7 @@
                     FontSize="17"
                     TextAlignment="Center"
                     HorizontalContentAlignment="Center"
-                    Mask="{CompiledBinding CurrentUser.Currency, StringFormat='{}{0}000000000000000000.00'}"
+                    Mask="{CompiledBinding SeriesValueMaskedText}"
                     VerticalContentAlignment="Center"
                     Classes="Menu"/>
                 <Grid 

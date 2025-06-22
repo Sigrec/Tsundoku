@@ -4,7 +4,6 @@ using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using Avalonia.ReactiveUI;
-using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
 using Tsundoku.Helpers;
 using Tsundoku.Models;
@@ -19,10 +18,12 @@ public sealed partial class CollectionThemeWindow : ReactiveWindow<ThemeSettings
     public bool IsOpen = false;
     private bool _isInitialized = false;
     private string CurThemeName;
+    private readonly IPopupDialogService _popupDialogService;
 
-    public CollectionThemeWindow(ThemeSettingsViewModel viewModel)
+    public CollectionThemeWindow(ThemeSettingsViewModel viewModel, IPopupDialogService popupDialogService)
     {
         ViewModel = viewModel;
+        _popupDialogService = popupDialogService;
         InitializeComponent();
 
         Opened += (s, e) =>
@@ -197,9 +198,7 @@ public sealed partial class CollectionThemeWindow : ReactiveWindow<ThemeSettings
 
     private async Task ShowDialog(string title, string info = "Unable to Add Theme")
     {
-        PopupWindow dialog = App.ServiceProvider.GetRequiredService<PopupWindow>();
-        dialog.SetWindowText(title, "fa-solid fa-circle-exclamation", info);
-        await dialog.ShowDialog(this);
+        await _popupDialogService.ShowAsync(title, "fa-solid fa-circle-exclamation", info, this);
     }
     private async void SaveNewTheme(object sender, RoutedEventArgs args)
     {
@@ -249,7 +248,7 @@ public sealed partial class CollectionThemeWindow : ReactiveWindow<ThemeSettings
             ]
         });
 
-        if (file.Count > 0 && file[0] != null)
+        if (file.Count > 0 && file[0] is not null)
         {
             // Get the local path from the selected file
             string newThemeFileLocalPath = file[0].Path.LocalPath;

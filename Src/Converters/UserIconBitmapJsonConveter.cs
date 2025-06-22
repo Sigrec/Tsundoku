@@ -1,4 +1,5 @@
 using Avalonia.Media.Imaging;
+
 namespace Tsundoku.Converters;
 
 public sealed class UserIconBitmapJsonConverter : JsonConverter<Bitmap>
@@ -22,7 +23,7 @@ public sealed class UserIconBitmapJsonConverter : JsonConverter<Bitmap>
             // 1. Convert bytes to the original (unscaled) Bitmap
             Bitmap? originalBitmap = BitmapConverter.BytesToBitmap(imageBytes);
 
-            if (originalBitmap == null)
+            if (originalBitmap is null)
             {
                 LOGGER.Error("Failed to create original Bitmap from byte array.");
                 return null;
@@ -55,7 +56,7 @@ public sealed class UserIconBitmapJsonConverter : JsonConverter<Bitmap>
 
     public override void Write(Utf8JsonWriter writer, Bitmap value, JsonSerializerOptions options)
     {
-        if (value == null)
+        if (value is null)
         {
             writer.WriteNullValue();
             LOGGER.Warn("Writing null Bitmap to JSON.");
@@ -69,7 +70,7 @@ public sealed class UserIconBitmapJsonConverter : JsonConverter<Bitmap>
             // Assuming you want to save the original for maximum fidelity.
             byte[]? pngBytes = BitmapConverter.BitmapToPngBytes(value);
 
-            if (pngBytes == null)
+            if (pngBytes is null)
             {
                 writer.WriteNullValue();
                 LOGGER.Error("Failed to convert Bitmap to PNG bytes for serialization.");

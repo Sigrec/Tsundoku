@@ -11,9 +11,9 @@ using System.Reactive.Linq;
 using Tsundoku.Helpers;
 using Tsundoku.Models;
 using Tsundoku.ViewModels;
-using static Tsundoku.Models.TsundokuFilterModel;
 using System.Reactive.Disposables;
-using static Tsundoku.Models.TsundokuLanguageModel;
+using static Tsundoku.Models.Enums.TsundokuLanguageEnums;
+using static Tsundoku.Models.Enums.TsundokuFilterEnums;
 
 namespace Tsundoku.Views;
 
@@ -133,10 +133,12 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
     {
         EditSeriesInfoWindow dialog = App.ServiceProvider.GetRequiredService<EditSeriesInfoWindow>();
         dialog.DataContext = interaction.Input;
+
         MainWindowViewModel? resultFromDialog = await this.OpenManagedDialogWithResultAsync<EditSeriesInfoWindow, EditSeriesInfoViewModel, MainWindowViewModel?>(
             dialog,
             "Edit Series Info Dialog"
         );
+
         interaction.SetOutput(resultFromDialog);
     }
 
@@ -154,7 +156,7 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
         {
             AddNewSeriesWindow? window = this.OpenManagedWindow<AddNewSeriesWindow, AddNewSeriesViewModel>(viewModel.NewSeriesWindow, "Add New Series Window");
 
-            if (window != null)
+            if (window is not null)
             {
                 AddNewSeriesButton.IsChecked = true;
                 window.Closing += (s, e) => AddNewSeriesButton.IsChecked = false;
@@ -170,8 +172,8 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
     {
         if (this.DataContext is MainWindowViewModel viewModel)
         {
-            SettingsWindow? window = this.OpenManagedWindow<SettingsWindow, UserSettingsViewModel>(viewModel.SettingsWindow, "Settings Window");
-            if (window != null)
+            UserSettingsWindow? window = this.OpenManagedWindow<UserSettingsWindow, UserSettingsViewModel>(viewModel.UserSettingsWindow, "Settings Window");
+            if (window is not null)
             {
                 SettingsButton.IsChecked = true;
                 window.Closing += (s, e) => SettingsButton.IsChecked = false;
@@ -188,7 +190,7 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
         if (this.DataContext is MainWindowViewModel viewModel)
         {
             CollectionStatsWindow? window = this.OpenManagedWindow<CollectionStatsWindow, CollectionStatsViewModel>(viewModel.CollectionStatsWindow, "Collection Stats Window");
-            if (window != null)
+            if (window is not null)
             {
                 StatsButton.IsChecked = true;
                 window.Closing += (s, e) => StatsButton.IsChecked = false;
@@ -205,7 +207,7 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
         if (this.DataContext is MainWindowViewModel viewModel)
         {
             PriceAnalysisWindow? window = this.OpenManagedWindow<PriceAnalysisWindow, PriceAnalysisViewModel>(viewModel.PriceAnalysisWindow, "Price Analysis Window");
-            if (window != null)
+            if (window is not null)
             {
                 AnalysisButton.IsChecked = true;
                 window.Closing += (s, e) => AnalysisButton.IsChecked = false;
@@ -222,7 +224,7 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
         if (this.DataContext is MainWindowViewModel viewModel)
         {
             CollectionThemeWindow? window = this.OpenManagedWindow<CollectionThemeWindow, ThemeSettingsViewModel>(viewModel.ThemeSettingsWindow, "Theme Settings Window");
-            if (window != null)
+            if (window is not null)
             {
                 ThemeButton.IsChecked = true;
                 window.Closing += (s, e) => ThemeButton.IsChecked = false;
@@ -239,7 +241,7 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
         if (this.DataContext is MainWindowViewModel viewModel)
         {
             UserNotesWindow? window = this.OpenManagedWindow<UserNotesWindow, UserNotesWindowViewModel>(viewModel.UserNotesWindow, "User Notes Window");
-            if (window != null)
+            if (window is not null)
             {
                 UserNotesButton.IsChecked = true;
                 window.Closing += (s, e) => UserNotesButton.IsChecked = false;
@@ -329,7 +331,7 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
         if (LanguageSelector.SelectedItem is ComboBoxItem selectedItem)
         {
             string? newLang = selectedItem.Content?.ToString();
-            if (newLang != null)
+            if (newLang is not null)
             {
                 TsundokuLanguage selectedEnum = newLang.GetEnumValueFromMemberValue(TsundokuLanguage.Romaji);
                 if (ViewModel.CurrentUser.Language != selectedEnum) // <-- avoid loop

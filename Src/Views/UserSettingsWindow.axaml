@@ -5,7 +5,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
-        x:Class="Tsundoku.Views.SettingsWindow"
+        x:Class="Tsundoku.Views.UserSettingsWindow"
         x:DataType="vm:UserSettingsViewModel"
         Icon="\Assets\Icons\TsundokuLogo.ico"
         Title="Settings"
@@ -61,27 +61,41 @@
                               SelectedIndex="{CompiledBinding SelectedCurrencyIndex}"
 							  Width="80"
                               AutoScrollToSelectedItem="True">
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="$"/>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="€"/>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="£"/>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="¥"/>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₣"/>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₹"/>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₱"/>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₩"/>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₽"/>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₺"/>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₫"/>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="฿"/>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₸"/>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₼"/>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₾"/>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₻"/>
-						<!-- <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Rp"/>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="RM"/>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="﷼"/>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="د.إ"/>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="د. ك"/> -->
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="$"/>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="€"/>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="£"/>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="¥"/>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₹"/>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₱"/>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₩"/>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₽"/>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₺"/>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₫"/>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="฿"/>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₸"/>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₼"/>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₾"/>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Rp"/>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="RM"/>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="R$"/>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₪"/>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₴"/>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="zł"/>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Ft"/>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Kč"/>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="kr"/>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="lei"/>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="৳"/>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₮"/>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="KM"/>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Br"/>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="L"/>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="din"/>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="ден"/>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="ر.س"/>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="د.إ"/>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="د.ك"/>
+                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Rs"/>
 						<ComboBox.Resources>
 							<ResourceDictionary>
 								<ResourceDictionary.MergedDictionaries>

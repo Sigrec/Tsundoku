@@ -156,7 +156,7 @@ public sealed partial class AniList
                 cancellationToken
             );
 
-            if (response == null)
+            if (response is null)
             {
                 LOGGER.Warn("AniList query for {Context} returned null", contextLabel);
                 return null;
@@ -195,7 +195,7 @@ public sealed partial class AniList
                     .SendQueryAsync<JsonDocument?>(request, cancellationToken);
 
                 TimeSpan? delay = GetRateLimitDelay(response.AsGraphQLHttpResponse().ResponseHeaders);
-                if (delay == null)
+                if (delay is null)
                 {
                     return response;
                 }
@@ -211,7 +211,7 @@ public sealed partial class AniList
                 const int paddingSeconds = 5; 
 
                 // Access headers directly from graphqlEx.ResponseHeaders
-                if (ex.ResponseHeaders != null)
+                if (ex.ResponseHeaders is not null)
                 {
                     TimeSpan? headersDelay = GetRateLimitDelay(ex.ResponseHeaders, paddingSeconds);
                     if (headersDelay.HasValue)
@@ -270,7 +270,7 @@ public sealed partial class AniList
         if (headers.TryGetValues("X-RateLimit-Remaining", out var remainingValues) &&
             short.TryParse(remainingValues.FirstOrDefault(), out short remaining))
         {
-            LOGGER.Info("AniList Rate Remaining = {Remaining}", remaining);
+            LOGGER.Debug("AniList Rate Remaining = {Remaining}", remaining);
 
             if (remaining > 0)
             {

@@ -1,5 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using System.Web;
+using Tsundoku.Helpers;
 using Tsundoku.Models.Enums;
 using static Tsundoku.Models.Enums.SeriesGenreEnum;
 
@@ -11,7 +12,7 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
     private readonly HttpClient _mangadexClient = httpClientFactory.CreateClient("MangaDexClient");
 
     [GeneratedRegex(@"(?:(?:\n\n---\n\*\*Links:\*\*)|\n{3,}---|\n\n\*\*|\[(?:Official|Wikipedia).*?\]|\n___\n|\r\n\s+\r\n|\*\*\*Won.*)[\s\S]*|- Winner.*$", RegexOptions.Multiline | RegexOptions.IgnoreCase)]
-    public static partial Regex MangaDexDescCleanupRegex();
+    private static partial Regex MangaDexDescCleanupRegex();
 
     [GeneratedRegex(@"(?<=\bNative\b[^:\n]*:\s*)(?:[\p{P}\s_]+)?(.+?)(?=[\p{P}\p{S}\s]|$)", RegexOptions.IgnoreCase | RegexOptions.Multiline)]
     private static partial Regex NativeStaffRegex();
@@ -274,7 +275,7 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
     /// </returns>
     public async Task<string?> GetCoverLinkAsync(string? id, string? mangaDexId, string title)
     {
-        if (id == null)
+        if (id is null)
         {
             return null;
         }
@@ -301,7 +302,7 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
             mangaDexId ??= data.GetProperty("id").GetString();
             string? coverImage = data.GetProperty("attributes").GetProperty("fileName").GetString();
 
-            if (coverImage == null)
+            if (coverImage is null)
             {
                 LOGGER.Warn("Unable to get MangaDex cover for {Title}", title);
                 return null;
@@ -342,33 +343,40 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
     /// <returns>True if the series matches the invalid criteria; otherwise, false.</returns>
     public static bool IsSeriesDigital(string input, string englishTitle, string? englishAltTitle)
     {
-        if (string.IsNullOrEmpty(englishTitle) ||
-            !englishTitle.AsSpan().Contains("Digital", StringComparison.OrdinalIgnoreCase))
-        {
-            return false;
-        }
-
         ReadOnlySpan<char> userInput = input;
-
         if (userInput.Contains("Digital", StringComparison.OrdinalIgnoreCase) ||
             userInput.Contains("Fan Colored", StringComparison.OrdinalIgnoreCase) ||
             userInput.Contains("Official Colored", StringComparison.OrdinalIgnoreCase))
         {
-            return false;
+            LOGGER.Debug("User Input contains digital string");
+            return true;
         }
 
-        if (!string.IsNullOrWhiteSpace(englishAltTitle))
+        if (!string.IsNullOrWhiteSpace(englishTitle))
         {
-            ReadOnlySpan<char> alt = englishAltTitle;
-            if (alt.Contains("Digital", StringComparison.OrdinalIgnoreCase) || 
-                alt.Contains("Fan Colored", StringComparison.OrdinalIgnoreCase) || 
-                alt.Contains("Official Colored", StringComparison.OrdinalIgnoreCase))
+            ReadOnlySpan<char> enTitleSpan = englishTitle.AsSpan();
+            if (string.IsNullOrWhiteSpace(englishTitle) ||
+                enTitleSpan.Contains("Digital", StringComparison.OrdinalIgnoreCase) ||
+                enTitleSpan.Contains("Fan Colored", StringComparison.OrdinalIgnoreCase) ||
+                enTitleSpan.Contains("Official Colored", StringComparison.OrdinalIgnoreCase))
             {
-                return false;
+                return true;
             }
         }
 
-        return true;
+        if (!string.IsNullOrWhiteSpace(englishAltTitle))
+            {
+                ReadOnlySpan<char> alt = englishAltTitle;
+                if (alt.Contains("Digital", StringComparison.OrdinalIgnoreCase) ||
+                    alt.Contains("Fan Colored", StringComparison.OrdinalIgnoreCase) ||
+                    alt.Contains("Official Colored", StringComparison.OrdinalIgnoreCase))
+                {
+                    LOGGER.Debug("English Alt Title contains digital dtring");
+                    return true;
+                }
+            }
+
+        return false;
     }
 
     /// <summary>
@@ -441,10 +449,11 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
                 : default;
 
             // Check if any alternate title matches the input
-            bool altMatch = false;
+            bool altMatch = enTitle.Contains(input, StringComparison.OrdinalIgnoreCase);
             string? enAlt = null;
-            if (altTitles.ValueKind == JsonValueKind.Array)
+            if (!altMatch && altTitles.ValueKind == JsonValueKind.Array)
             {
+                LOGGER.Debug("Checking alt titles for matching title input");
                 foreach (JsonElement altEntry in altTitles.EnumerateArray())
                 {
                     foreach (JsonProperty prop in altEntry.EnumerateObject())
@@ -460,7 +469,7 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
                             enAlt = altValue;
                         }
 
-                        if (string.Equals(altValue, input, StringComparison.OrdinalIgnoreCase))
+                        if (altValue.Contains(input, StringComparison.OrdinalIgnoreCase))
                         {
                             altMatch = true;
                             break;
@@ -477,11 +486,15 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
             // Determine if this series is acceptable
             if (!IsSeriesDigital(input, enTitle, enAlt) && altMatch)
             {
-                LOGGER.Debug("Series {Input} is digital only, skipping", input);
                 return series;
+            }
+            else
+            {
+                LOGGER.Debug("Series ({Input} | {EnTitle} | {EnAlt}) is digital only, skipping", input, enTitle, enAlt);
             }
         }
 
+        LOGGER.Info("{Input} did not return any valid series from MangaDex", input);
         return default;
     }
 
@@ -586,7 +599,7 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
     {
         JsonElement? altTitlesToProcess = FindAltTitlesElement(root, englishTitle, nativeTitle);
 
-        if (altTitlesToProcess == null || altTitlesToProcess.Value.ValueKind != JsonValueKind.Array)
+        if (altTitlesToProcess is null || altTitlesToProcess.Value.ValueKind != JsonValueKind.Array)
         {
             return [];
         }
@@ -726,10 +739,10 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
             !span.Contains("___", StringComparison.OrdinalIgnoreCase) &&
             !span.Contains("\r\n \r\n", StringComparison.OrdinalIgnoreCase))
         {
-            return seriesDescription.TrimEnd('\n');
+            return ExtensionMethods.NormalizeQuotes(seriesDescription.TrimEnd('\n')).Trim();
         }
         
-        return MangaDexDescCleanupRegex().Replace(seriesDescription, string.Empty).Trim();
+        return ExtensionMethods.NormalizeQuotes(MangaDexDescCleanupRegex().Replace(seriesDescription, string.Empty)).Trim();
     }
 
     private readonly struct AuthorEntry(string id, string type)

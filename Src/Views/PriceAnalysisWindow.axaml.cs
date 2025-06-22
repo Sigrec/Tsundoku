@@ -40,7 +40,7 @@ public sealed partial class PriceAnalysisWindow : ReactiveWindow<PriceAnalysisVi
             e.Cancel = true;
         };
 
-        this.WhenAnyValue(x => x.TitleBox.Text, x => x.MangaButton.IsChecked, x => x.NovelButton.IsChecked, x => x.BrowserSelector.SelectedItem, x => x.RegionComboBox.SelectedItem, x => x.ViewModel.WebsitesSelected, (title, manga, novel, browser, region, websiteCheck) => !string.IsNullOrWhiteSpace(title) && !(manga == false && novel == false && websiteCheck) && browser != null && region != null && websiteCheck)
+        this.WhenAnyValue(x => x.TitleBox.Text, x => x.MangaButton.IsChecked, x => x.NovelButton.IsChecked, x => x.BrowserSelector.SelectedItem, x => x.RegionComboBox.SelectedItem, x => x.ViewModel.WebsitesSelected, (title, manga, novel, browser, region, websiteCheck) => !string.IsNullOrWhiteSpace(title) && !(manga == false && novel == false && websiteCheck) && browser is not null && region is not null && websiteCheck)
             .Subscribe(x => ViewModel.IsAnalyzeButtonEnabled = x);
     }
 
@@ -100,7 +100,7 @@ public sealed partial class PriceAnalysisWindow : ReactiveWindow<PriceAnalysisVi
             
             await Scrape.InitializeScrapeAsync(
                 title: TitleBox.Text, 
-                bookType: MangaButton.IsChecked != null && MangaButton.IsChecked.Value ? BookType.Manga : BookType.LightNovel, 
+                bookType: MangaButton.IsChecked is not null && MangaButton.IsChecked.Value ? BookType.Manga : BookType.LightNovel, 
                 Scrape.GenerateWebsiteList([.. ViewModel.SelectedWebsites.Select(site => site.Content.ToString())])
             );
             StartScrapeButton.IsEnabled = ViewModel.IsAnalyzeButtonEnabled;
@@ -123,7 +123,7 @@ public sealed partial class PriceAnalysisWindow : ReactiveWindow<PriceAnalysisVi
         if (RegionComboBox.SelectedItem is ComboBoxItem selectedItem)
         {
             string? newRegionItem = selectedItem.Content?.ToString();
-            if (newRegionItem != null)
+            if (newRegionItem is not null)
             {
                 Region newRegion = MangaAndLightNovelWebScrape.Helpers.GetRegionFromString(newRegionItem);
                 ViewModel.UpdateUserRegion(newRegion);

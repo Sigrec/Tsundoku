@@ -1,7 +1,6 @@
-using NLog.Filters;
 using System.Globalization;
-using static Tsundoku.Models.TsundokuFilterModel;
-using static Tsundoku.Models.TsundokuLanguageModel;
+using static Tsundoku.Models.Enums.TsundokuFilterEnums;
+using static Tsundoku.Models.Enums.TsundokuLanguageEnums;
 
 namespace Tsundoku.Tests.Models;
 
@@ -115,7 +114,7 @@ public class TsundokuEnumTests
     [Test]
     public void FilterDictionary_Indexes_AreUniqueAndSequential()
     {
-        HashSet<int> seenIndexes = new();
+        HashSet<int> seenIndexes = [];
 
         foreach ((TsundokuFilter filter, int index) in FILTERS)
         {

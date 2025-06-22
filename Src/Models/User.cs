@@ -5,7 +5,7 @@ using Tsundoku.Helpers;
 using Tsundoku.Converters;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using static Tsundoku.Models.TsundokuLanguageModel;
+using static Tsundoku.Models.Enums.TsundokuLanguageEnums;
 using System.Text.Encodings.Web;
 using System.Diagnostics.CodeAnalysis;
 using Tsundoku.ViewModels;
@@ -27,7 +27,7 @@ public sealed class User : ReactiveObject
     [Reactive] public string Display { get; set; } = "Card";
     [Reactive] public string MainTheme { get; set; } = "Default";
     [Reactive] public string Currency { get; set; } = "$";
-    [Reactive] public string CollectionPrice { get; set; }
+    [Reactive] public string CollectionValue { get; set; }
     [Reactive] public uint NumVolumesCollected { get; set; }
     [Reactive] public uint NumVolumesToBeCollected { get; set; }
     [Reactive] public decimal MeanRating { get; set; }
@@ -41,7 +41,7 @@ public sealed class User : ReactiveObject
     [JsonConverter(typeof(UserIconBitmapJsonConverter))]
     [Reactive] public Bitmap? UserIcon { get; set; }
 
-    public User(string UserName, TsundokuLanguage Language, string MainTheme, string Display, double DataVersion, string Currency, string CollectionPrice, Region Region, Dictionary<string, bool> Memberships, List<TsundokuTheme> SavedThemes, List<Series> UserCollection)
+    public User(string UserName, TsundokuLanguage Language, string MainTheme, string Display, double DataVersion, string Currency, string CollectionValue, Region Region, Dictionary<string, bool> Memberships, List<TsundokuTheme> SavedThemes, List<Series> UserCollection)
     {
         this.UserName = UserName;
         this.Language = Language;
@@ -49,7 +49,7 @@ public sealed class User : ReactiveObject
         this.DataVersion = DataVersion;
         this.Currency = Currency;
         this.MainTheme = MainTheme;
-        this.CollectionPrice = CollectionPrice;
+        this.CollectionValue = CollectionValue;
         this.Region = Region;
         this.SavedThemes = SavedThemes;
         this.UserCollection = UserCollection;
@@ -93,7 +93,7 @@ public sealed class User : ReactiveObject
             userData.AsObject().Add(nameof(Currency), "$");
             userData.AsObject().Add(nameof(MeanRating), 0);
             userData.AsObject().Add(nameof(VolumesRead), 0);
-            userData.AsObject().Add(nameof(CollectionPrice), "");
+            userData.AsObject().Add(nameof(CollectionValue), "");
 
             if (userData[nameof(Language)].ToString().Equals("Native"))
             {
@@ -344,7 +344,7 @@ public sealed class User : ReactiveObject
                 {
                     theme.Add("UserIconBorderColor", theme["DividerColor"].ToString());
                 }
-                else if (theme["UserIconBorderColor"] == null)
+                else if (theme["UserIconBorderColor"] is null)
                 {
                     theme["UserIconBorderColor"] = theme["DividerColor"].ToString();
                 }
@@ -367,6 +367,13 @@ public sealed class User : ReactiveObject
             updatedVersion = true;
         }
 
+        if (curVersion < 6.1) // 6.1 Update "CollectionPrice" to "CollectionValue"
+        {
+            userData.AsObject()[nameof(CollectionValue)] = (string)userData["CollectionPrice"];
+            userData.AsObject().Remove("CollectionPrice");
+            userData[nameof(DataVersion)] = 6.1;
+        }
+
         if (!isImport)
         {
             AppFileHelper.WriteUserDataToFile(userData);
@@ -386,4 +393,4 @@ public sealed class User : ReactiveObject
     IncludeFields = false,
     NumberHandling = JsonNumberHandling.AllowReadingFromString
 )]
-internal partial class UserModelContext : JsonSerializerContext { }
+internal sealed partial class UserModelContext : JsonSerializerContext { }

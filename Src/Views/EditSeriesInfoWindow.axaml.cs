@@ -10,7 +10,7 @@ using Tsundoku.Models.Enums;
 using Tsundoku.ViewModels;
 using static Tsundoku.Models.Enums.SeriesDemographicEnum;
 using static Tsundoku.Models.Enums.SeriesGenreEnum;
-using static Tsundoku.Models.TsundokuLanguageModel;
+using static Tsundoku.Models.Enums.TsundokuLanguageEnums;
 
 namespace Tsundoku.Views;
 
@@ -53,9 +53,12 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
         Opened += (s, e) =>
         {
             string curTitle = ViewModel.Series.Titles[ViewModel.CurrentUser.Language];
+
             DiscordRP.SetPresence(state: $"Editing {curTitle} {ViewModel.Series.Format}", refreshTimestamp: true);
             this.Title = $"{curTitle}";
+
             VolumesReadTextBlock.Text = $"{ViewModel.Series.VolumesRead} Vol{(ViewModel.Series.VolumesRead > 1 ? "s" : string.Empty)} Read";
+
             UpdateSelectedGenres();
             _IsInitialized = true;
         };
@@ -68,7 +71,7 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
 
     private void GenerateNewBitmap(Bitmap newCover, string path)
     {
-        if (newCover != null)
+        if (newCover is not null)
         {
             if (!ViewModel.Series.Cover.EndsWith(".png"))
             {
@@ -77,11 +80,11 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
             }
 
             _mainWindowViewModel.ChangeCover(ViewModel.Series, newCover);
-            LOGGER.Info($"Changed Cover for \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\"");
+            LOGGER.Info("Changed Cover for {RomajiTitle}", ViewModel.Series.Titles[TsundokuLanguage.Romaji]);
         }
         else
         {
-            LOGGER.Warn($"\"{path}\" is not a valid Image Url");
+            LOGGER.Warn("{Path} is not a valid Image URL", path);
         }
     }
 
@@ -93,7 +96,7 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
         string fullCoverPath = AppFileHelper.GetFullCoverPath(ViewModel.Series.Cover);
         Bitmap? newCover = await _bitmapHelper.UpdateCoverFromUrlAsync(customImageUrl, fullCoverPath);
 
-        if (newCover != null)
+        if (newCover is not null)
         {
             GenerateNewBitmap(newCover, customImageUrl);
             CoverImageUrlTextBox.Clear();
@@ -116,7 +119,7 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
         {
             string fullCoverPath = AppFileHelper.GetFullCoverPath(ViewModel.Series.Cover);
             Bitmap? newCover = BitmapHelper.UpdateCoverFromFilePath(file[0].Path.LocalPath, fullCoverPath);
-            if (newCover != null)
+            if (newCover is not null)
             {
                 GenerateNewBitmap(newCover, fullCoverPath);
             }
@@ -143,11 +146,16 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
             VolumesReadTextBlock.Text = $"{newVolumesRead} Vol{(newVolumesRead == 1 ? string.Empty : "s")} Read";
             VolumesReadMaskedTextBox.Clear();
 
-            LOGGER.Info($"Updated # of Volumes Read for \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\" from {oldVolumesRead} to {newVolumesRead}");
+            LOGGER.Info(
+                "Updated number of Volumes Read for {RomajiTitle} from {OldVolumesRead} to {NewVolumesRead}",
+                ViewModel.Series.Titles[TsundokuLanguage.Romaji],
+                oldVolumesRead,
+                newVolumesRead
+            );
         }
-        else if (!string.IsNullOrWhiteSpace(volumesReadText))
+        else
         {
-            LOGGER.Warn($"Volumes Read Input \"{volumesReadText}\" is invalid or unchanged.");
+            LOGGER.Warn("Volumes Read Input {VolumesReadText} is invalid or unchanged.", volumesReadText);
         }
 
         if (!RatingMaskedTextBox.Text.StartsWith("__._"))
@@ -156,43 +164,62 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
             if (decimal.TryParse(rawInput, out decimal ratingVal))
             {
                 // Clamp to max value and avoid unnecessary assignment
-                if (ratingVal <= 10.0m && ratingVal != ViewModel.Series.Rating)
+                if (ratingVal <= 10.0m)
                 {
-                    ViewModel.Series.Rating = ratingVal;
-                    RatingTextBlock.Text = $"Rating {decimal.Round(ratingVal, 1)}/10.0";
-                    RatingMaskedTextBox.Clear();
+                    if (ratingVal != ViewModel.Series.Rating)
+                    {
+                        ratingVal = decimal.Round(ratingVal, 1);
+                        ViewModel.Series.Rating = ratingVal;
+                        RatingTextBlock.Text = $"Rating {ratingVal}/10.0";
+                        RatingMaskedTextBox.Clear();
 
-                    LOGGER.Info($"Updating rating for \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\" {(ViewModel.Series.Rating == -1 ? string.Empty : $"from \"{ViewModel.Series.Rating}/10.0\" ")} to \"{decimal.Round(ratingVal, 1)}/10.0\"");
+                        LOGGER.Info(
+                            "Updating rating for {RomajiTitle} from {OldRating}/10.0 to {NewRating}/10.0",
+                            ViewModel.Series.Titles[TsundokuLanguage.Romaji],
+                            ViewModel.Series.Rating,
+                            ratingVal
+                        );
+                    }
                 }
                 else
                 {
-                    LOGGER.Warn($"Rating Value {ratingVal} is larger than 10.0");
+                    LOGGER.Warn("Rating Value {RatingVal} is cannot be larger than 10.0", ratingVal);
                 }
             }
             else
             {
-                LOGGER.Warn($"Invalid Rating Input: {rawInput}");
+                LOGGER.Warn("Invalid Rating Input: {RawInput}", rawInput);
             }
         }
 
-        string costTextRaw = CostMaskedTextBox.Text;
-        if (!costTextRaw.EndsWith("__________________.__") && !string.IsNullOrWhiteSpace(costTextRaw))
+        string valueTextRaw = ValueMaskedTextBox.Text;
+        if (!valueTextRaw.EndsWith("__________________.__") && !string.IsNullOrWhiteSpace(valueTextRaw))
         {
-            string costText = costTextRaw[1..].Replace("_", "0");
-            if (!costText.Contains('_') && decimal.TryParse(costText, out decimal newValue) &&
+            string valueText = valueTextRaw[1..].Replace("_", "0");
+            if (!valueText.Contains('_') && decimal.TryParse(valueText, out decimal newValue) &&
                 decimal.Compare(ViewModel.Series.Value, newValue) != 0)
             {
                 string currency = ViewModel.CurrentUser.Currency;
                 decimal oldValue = ViewModel.Series.Value;
 
                 ViewModel.Series.Value = newValue;
-                CostMaskedTextBox.Clear();
+                ValueMaskedTextBox.Clear();
 
-                LOGGER.Info($"Updated Cost for \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\" from {currency}{oldValue} to {currency}{newValue}");
+                LOGGER.Info(
+                    "Updated Cost for {RomajiTitle} from {Currency}{OldValue} to {Currency}{NewValue}",
+                    ViewModel.Series.Titles[TsundokuLanguage.Romaji],
+                    currency,
+                    oldValue,
+                    currency,
+                    newValue
+                );
             }
             else
             {
-                LOGGER.Warn($"Invalid or unchanged cost input: \"{costTextRaw}\"");
+                LOGGER.Warn(
+                    "Invalid or unchanged value input: {RawCostText}",
+                    valueTextRaw
+                );
             }
         }
 
@@ -203,17 +230,31 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
             ViewModel.Series.Publisher = publisherText;
             PublisherTextBox.Clear();
 
-            LOGGER.Info($"Updated Publisher for \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\" from \"{oldPublisher}\" to \"{publisherText}\"");
+            LOGGER.Info(
+                "Updated Publisher for {RomajiTitle} from {OldPublisher} to {NewPublisher}",
+                ViewModel.Series.Titles[TsundokuLanguage.Romaji],
+                oldPublisher,
+                publisherText
+            );
         }
     }
 
     private void GenreSelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
         if (!_IsInitialized || (e.AddedItems.Count == 0 && e.RemovedItems.Count == 0))
+        {
             return;
+        }
 
         HashSet<SeriesGenre> curGenres = ViewModel!.GetCurrentGenresSelected();
-        LOGGER.Info($"Updating Genres for \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\" from [{string.Join(", ", ViewModel.Series.Genres)}] to [{string.Join(", ", curGenres)}]");
+
+        LOGGER.Info(
+            "Updating Genres for {RomajiTitle} from [{OldGenres}] to [{NewGenres}]",
+            ViewModel.Series.Titles[TsundokuLanguage.Romaji],
+            string.Join(", ", ViewModel.Series.Genres),
+            string.Join(", ", curGenres)
+        );
+
         ViewModel.Series.Genres = curGenres;
     }
 
@@ -225,11 +266,16 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
         if (_IsInitialized && DemographicComboBox.IsDropDownOpen)
         {
             SeriesDemographic demographic = SeriesDemographicEnum.Parse((DemographicComboBox.SelectedItem as ComboBoxItem).Content.ToString());
+
             ViewModel.Series.Demographic = demographic;
-            LOGGER.Info($"Changed Demographic for \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\" to {demographic}");
+
+            LOGGER.Info(
+                "Changed Demographic for {RomajiTitle} to {Demographic}",
+                ViewModel.Series.Titles[TsundokuLanguage.Romaji],
+                demographic
+            );
         }
     }
-
 
     private async void RefreshSeriesAsync(object sender, RoutedEventArgs args)
     {
@@ -255,88 +301,44 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
         // If either field was non‐empty but failed to parse, log a warning and stop:
         if (!string.IsNullOrWhiteSpace(curText) && !hasCur)
         {
-            LOGGER.Warn($"\"{curText}\" is not a valid ushort input for current volume");
+            LOGGER.Warn("{CurText} is not a valid ushort input for current volume", curText);
             return;
         }
         if (!string.IsNullOrWhiteSpace(maxText) && !hasMax)
         {
-            LOGGER.Warn($"\"{maxText}\" is not a valid ushort input for max volume");
+            LOGGER.Warn("{MaxText} is not a valid ushort input for max volume", maxText);
             return;
         }
 
         // Both were provided:
         if (hasCur && hasMax)
         {
-            if (newMax >= newCur)
+            ViewModel.Series.UpdateVolumeCounts(newCur, newMax, () =>
             {
-                uint oldCur = ViewModel.Series.CurVolumeCount;
-                uint oldMax = ViewModel.Series.MaxVolumeCount;
-                ViewModel.Series.CurVolumeCount = newCur;
-                ViewModel.Series.MaxVolumeCount = newMax;
-
-                LOGGER.Info(
-                    $"Changed Series Volume Counts For \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\" " +
-                    $"From {oldCur}/{oldMax} -> {newCur}/{newMax}"
-                );
-
                 CurVolumeMaskedTextBox.Clear();
                 MaxVolumeMaskedTextBox.Clear();
-            }
-            else
-            {
-                LOGGER.Warn($"{newCur} cannot be greater than {newMax}");
-            }
+            });
         }
-        // Only “current” was provided:
-        else if (hasCur)
+        else if (hasCur) // Only “current” was provided:
         {
-            if (newCur <= ViewModel.Series.MaxVolumeCount)
-            {
-                uint oldCur = ViewModel.Series.CurVolumeCount;
-                ViewModel.Series.CurVolumeCount = newCur;
-
-                LOGGER.Info(
-                    $"Updated Series Current Volume Count For \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\" " +
-                    $"From {oldCur} to {newCur}"
-                );
-
-                CurVolumeMaskedTextBox.Clear();
-            }
-            else
-            {
-                LOGGER.Warn($"{newCur} cannot be greater than {ViewModel.Series.MaxVolumeCount}");
-            }
+            ViewModel.Series.UpdateCurVolumeCount(newCur, CurVolumeMaskedTextBox.Clear);
+            CurVolumeMaskedTextBox.Clear();
         }
         // Only “max” was provided:
         else if (hasMax)
         {
-            if (newMax >= ViewModel.Series.CurVolumeCount)
-            {
-                uint oldMax = ViewModel.Series.MaxVolumeCount;
-                ViewModel.Series.MaxVolumeCount = newMax;
-
-                LOGGER.Info(
-                    $"Updated Series Max Volume Count For \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\" " +
-                    $"From {oldMax} to {newMax}"
-                );
-
-                MaxVolumeMaskedTextBox.Clear();
-            }
-            else
-            {
-                LOGGER.Warn($"{newMax} cannot be less than {ViewModel.Series.CurVolumeCount}");
-            }
+            ViewModel.Series.UpdateMaxVolumeCount(newMax, MaxVolumeMaskedTextBox.Clear);
         }
     }
 
     private void UpdateSelectedGenres()
     {
-        if (ViewModel.Series.Genres == null)
+        if (ViewModel.Series.Genres is null)
         {
             return;
         }
 
-        foreach (SeriesGenre genre in ViewModel.Series.Genres)
+        foreach (SeriesGenre genre in ViewModel.Series.Genres.AsValueEnumerable().OrderByDescending(g => g.ToString()))
         {
             if (GenreItemMap.TryGetValue(genre, out object? item))
             {

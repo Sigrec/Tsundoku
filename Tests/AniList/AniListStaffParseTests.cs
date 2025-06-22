@@ -10,7 +10,6 @@ namespace Tsundoku.Tests.AniList;
 [Parallelizable(ParallelScope.All)]
 public class AniListStaffParseTests
 {
-    // TODO - Need a test for "リコリス・リコイル 公式コミックアンソロジー リピート" anthology
     [TestCase("リコリス・リコイル 公式コミックアンソロジー リピート", SeriesFormat.Manga)]
     public async Task ExtractStaffFromAniList_ShouldReturnCorrectStaffString_Anthology(string title, SeriesFormat format)
     {

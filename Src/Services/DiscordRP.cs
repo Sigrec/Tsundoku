@@ -13,7 +13,7 @@ internal static class DiscordRP
 
     public static void Initialize()
     {
-        if (client != null && client.IsInitialized)
+        if (client is not null && client.IsInitialized)
             return;
 
         client = new DiscordRpcClient(APP_ID)
@@ -34,7 +34,7 @@ internal static class DiscordRP
 
     public static void Deinitialize()
     {
-        if (client != null && !client.IsDisposed)
+        if (client is not null && !client.IsDisposed)
         {
             LOGGER.Info("Disconnected from Discord with user: {0}", UserName);
             client.Dispose();
@@ -44,20 +44,20 @@ internal static class DiscordRP
 
     public static void SetPresence(string? details = "Manga & Light Novel Collection Tracking App", string? state = "Browsing Collection", bool refreshTimestamp = false)
     {
-        if (client == null || !client.IsInitialized)
+        if (client is null || !client.IsInitialized)
         {
             return;
         }
 
-        if (details != null)
+        if (details is not null)
         {
             _presence.Details = details;
         }
-        if (state != null)
+        if (state is not null)
         {
             _presence.State = state;
         }
-        if (refreshTimestamp || _presence.Timestamps == null)
+        if (refreshTimestamp || _presence.Timestamps is null)
         {
             _presence.Timestamps = Timestamps.Now;
         }

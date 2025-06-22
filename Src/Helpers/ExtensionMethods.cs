@@ -1,14 +1,77 @@
 using System.Globalization;
+using Avalonia.Media.Imaging;
 
 namespace Tsundoku.Helpers;
 
-public static class StaticExtensionMethods
-{
-    
-}
-
 public static class ExtensionMethods
 {
+    /// <summary>
+    /// Replaces all common “smart” double‐quotes and single‐quotes with
+    /// plain ASCII " and ' in one pass over the input.
+    /// </summary>
+    public static string NormalizeQuotes(this string input)
+    {
+        if (string.IsNullOrEmpty(input))
+            return input;
+
+        // Quick check: if there are no known smart‐quote codepoints, skip allocation
+        if (input.IndexOfAny(new char[]
+        {
+            '\u201C','\u201D','\u201E','\u201F',  // “ ” „ ‟
+            '\u2018','\u2019','\u201A','\u201B'   // ‘ ’ ‚ ‛
+        }) < 0)
+            return input;
+
+        return string.Create(input.Length, input, (span, src) =>
+        {
+            for (int i = 0; i < src.Length; i++)
+            {
+                // grab the char once
+                char c = src[i];
+                switch (c)
+                {
+                    // double‐quotes → ASCII "
+                    case '\u201C': // left double quotation mark
+                    case '\u201D': // right double quotation mark
+                    case '\u201E': // double low-9 quotation mark
+                    case '\u201F': // double high-reversed-9 quotation mark
+                        span[i] = '"';
+                        break;
+
+                    // single‐quotes/apostrophes → ASCII '
+                    case '\u2018': // left single quotation mark
+                    case '\u2019': // right single quotation mark
+                    case '\u201A': // single low-9 quotation mark
+                    case '\u201B': // single high-reversed-9 quotation mark
+                        span[i] = '\'';
+                        break;
+
+                    // all others stay the same
+                    default:
+                        span[i] = c;
+                        break;
+                }
+            }
+        });
+    }
+
+    /// <summary>
+    /// Creates a deep copy of the given Avalonia Bitmap by encoding it to PNG in memory
+    /// and decoding it back into a new Bitmap instance.
+    /// </summary>
+    public static Bitmap? CloneBitmap(this Bitmap? source)
+    {
+        if (source is null)
+        {
+            return null;
+        }
+
+        using MemoryStream ms = new MemoryStream();
+        source.Save(ms);           // Encode to PNG (in-memory)
+        ms.Position = 0;           // Rewind before reading
+        return new Bitmap(ms);     // Decode into new Bitmap
+    }
+    
     public static int Similar(string s, string t, int maxDistance)
     {
         if (string.IsNullOrWhiteSpace(s))
@@ -195,24 +258,25 @@ public static class ExtensionMethods
     public static bool DictionariesEqual<TKey, TValue>(
         Dictionary<TKey, TValue>? a,
         Dictionary<TKey, TValue>? b)
+        where TKey : notnull
     {
         if (ReferenceEquals(a, b))
+        {
             return true;
+        }
 
-        if (a is null || b is null)
+        if (a is null || b is null || (a.Count != b.Count))
+        {
             return false;
-
-        if (a.Count != b.Count)
-            return false;
+        }
 
         // For each key in a, check that b has the same key and identical value
         foreach (KeyValuePair<TKey, TValue> kvp in a)
         {
-            if (!b.TryGetValue(kvp.Key, out TValue? bValue))
+            if (!b.TryGetValue(kvp.Key, out TValue? bValue) || !Equals(kvp.Value, bValue))
+            {
                 return false;
-
-            if (!Equals(kvp.Value, bValue))
-                return false;
+            }
         }
 
         return true;
@@ -224,10 +288,14 @@ public static class ExtensionMethods
     public static bool HashSetsEqual<T>(HashSet<T>? a, HashSet<T>? b)
     {
         if (ReferenceEquals(a, b))
+        {
             return true;
+        }
 
         if (a is null || b is null)
+        {
             return false;
+        }
 
         return a.SetEquals(b);
     }

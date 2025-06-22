@@ -75,10 +75,10 @@ public static class SeriesGenreEnum
             MemberInfo? member = typeof(SeriesGenre).GetMember(enumName).FirstOrDefault();
 
             // If the member info is found and it has the attribute
-            if (member != null)
+            if (member is not null)
             {
                 GenreAliasesAttribute? attribute = member.GetCustomAttribute<GenreAliasesAttribute>();
-                if (attribute != null)
+                if (attribute is not null)
                 {
                     // 3. Add all defined aliases for this genre to the map
                     foreach (string alias in attribute.Aliases)
@@ -136,10 +136,10 @@ public static class SeriesGenreEnum
     public static IEnumerable<string> GetAliases(SeriesGenre genre)
     {
         MemberInfo? member = typeof(SeriesGenre).GetMember(genre.ToString()).FirstOrDefault();
-        if (member != null)
+        if (member is not null)
         {
             GenreAliasesAttribute? attribute = member.GetCustomAttribute<GenreAliasesAttribute>();
-            if (attribute != null && attribute.Aliases.Length > 0)
+            if (attribute is not null && attribute.Aliases.Length > 0)
             {
                 return attribute.Aliases;
             }

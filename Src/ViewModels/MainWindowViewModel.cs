@@ -5,9 +5,9 @@ using Avalonia.Media.Imaging;
 using System.Text.RegularExpressions;
 using Tsundoku.Helpers;
 using Tsundoku.Views;
-using static Tsundoku.Models.TsundokuFilterModel;
+using static Tsundoku.Models.Enums.TsundokuFilterEnums;
 using System.Reactive.Disposables;
-using static Tsundoku.Models.TsundokuLanguageModel;
+using static Tsundoku.Models.Enums.TsundokuLanguageEnums;
 using System.Reactive.Linq;
 using System.Linq.Dynamic.Core;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,7 +29,7 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
 
     // --- Window Instances (Private Fields & Public Readonly Properties) ---
     private AddNewSeriesWindow _newSeriesWindow;
-    private SettingsWindow _settingsWindow;
+    private UserSettingsWindow _userSettingsWindow;
     private CollectionThemeWindow _themeSettingsWindow;
     private PriceAnalysisWindow _priceAnalysisWindow;
     private CollectionStatsWindow _collectionStatsWindow;
@@ -37,7 +37,7 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
     private bool disposedValue;
 
     public AddNewSeriesWindow NewSeriesWindow => _newSeriesWindow;
-    public SettingsWindow SettingsWindow => _settingsWindow;
+    public UserSettingsWindow UserSettingsWindow => _userSettingsWindow;
     public CollectionThemeWindow ThemeSettingsWindow => _themeSettingsWindow;
     public PriceAnalysisWindow PriceAnalysisWindow => _priceAnalysisWindow;
     public CollectionStatsWindow CollectionStatsWindow => _collectionStatsWindow;
@@ -47,7 +47,7 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
     [Reactive] public string AdvancedSearchQuery { get; set; } = string.Empty;
     [Reactive] public string SeriesFilterText { get; set; }
     [Reactive] public TsundokuFilter SelectedFilter { get; set; } = TsundokuFilter.None;
-    [Reactive] public ushort SelectedFilterIndex { get; set; } = 0;
+    [Reactive] public int SelectedFilterIndex { get; set; } = 0;
     [Reactive] public int SelectedLangIndex { get; set; }
     [Reactive] public string NotificationText { get; set; }
     [Reactive] public string AdvancedSearchQueryErrorMessage { get; set; }
@@ -73,6 +73,8 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
         // 1. Bind the UI-facing collection to the one provided by the shared service.
         UserCollection = _sharedSeriesProvider.DynamicUserCollection;
 
+        ConfigureWindows();
+
         // 2. Link the ViewModel's filter properties to the shared provider's properties.
         this.WhenAnyValue(x => x.SeriesFilterText)
             .Subscribe(text => sharedSeriesProvider.SeriesFilterText = text)
@@ -80,18 +82,16 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
 
         // When SelectedFilter changes in this ViewModel, update the shared provider's SelectedFilter.
         this.WhenAnyValue(x => x.SelectedFilter)
-            .Subscribe(filter => sharedSeriesProvider.SelectedFilter = filter)
+            .Subscribe(filter => _sharedSeriesProvider.SelectedFilter = filter)
             .DisposeWith(_disposables);
 
         this.WhenAnyValue(x => x.AdvancedSearchQuery)
-            .Subscribe(query => sharedSeriesProvider.AdvancedSearchQuery = query)
+            .Subscribe(query => _sharedSeriesProvider.AdvancedSearchQuery = query)
             .DisposeWith(_disposables);
 
         this.WhenAnyValue(x => x.AdvancedSearchQueryErrorMessage)
-            .Subscribe(queryErrMsg => sharedSeriesProvider.AdvancedSearchQueryErrorMessage = queryErrMsg)
+            .Subscribe(queryErrMsg => _sharedSeriesProvider.AdvancedSearchQueryErrorMessage = queryErrMsg)
             .DisposeWith(_disposables);
-
-        ConfigureWindows();
 
         this.WhenAnyValue(x => x.CurrentUser.Language)
             .DistinctUntilChanged()
@@ -106,14 +106,11 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
             })
             .DisposeWith(_disposables);
 
-        Observable.Merge(
-            this.WhenAnyValue(x => x.SelectedFilter),
-            this.WhenAnyValue(x => x._sharedSeriesProvider.SelectedFilter)
-        )
-        .DistinctUntilChanged()
-        .ObserveOn(RxApp.MainThreadScheduler)
-        .Subscribe(filter => SelectedFilterIndex = (ushort)FILTERS[filter])
-        .DisposeWith(_disposables);
+        this.WhenAnyValue(x => x.SelectedFilter)
+            .DistinctUntilChanged()
+            .ObserveOn(RxApp.MainThreadScheduler)
+            .Subscribe(filter => SelectedFilterIndex = FILTERS[filter])
+            .DisposeWith(_disposables);
     }
 
     public void SaveUserData()
@@ -135,7 +132,7 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
         LOGGER.Info("Configuring Windows...");
 
         _newSeriesWindow = _serviceProvider.GetRequiredService<AddNewSeriesWindow>();
-        _settingsWindow = _serviceProvider.GetRequiredService<SettingsWindow>();
+        _userSettingsWindow = _serviceProvider.GetRequiredService<UserSettingsWindow>();
         _themeSettingsWindow = _serviceProvider.GetRequiredService<CollectionThemeWindow>();
         _priceAnalysisWindow = _serviceProvider.GetRequiredService<PriceAnalysisWindow>();
         _collectionStatsWindow = _serviceProvider.GetRequiredService<CollectionStatsWindow>();
@@ -192,56 +189,53 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
             originalSeries.Value,
             string.Empty,
             allowDuplicate: false,
-            isRefresh: true);
+            isRefresh: true,
+            isCoverImageRefresh: originalSeries.IsCoverImageEmpty(),
+            coverPath: originalSeries.Cover);
 
-        refreshedSeries.Cover = originalSeries.Cover;
-        _userService.UpdateSeries(originalSeries, refreshedSeries);
+        _userService.RefreshSeries(originalSeries, refreshedSeries);
     }
 
     public void SaveOnClose()
     {
         LOGGER.Info("Closing Tsundoku");
         if (!isReloading) { _userService.SaveUserData(); }
-        DiscordRP.Deinitialize();
 
-        if (NewSeriesWindow != null)
+        if (NewSeriesWindow is not null)
         {
             NewSeriesWindow.Closing += (s, e) => { e.Cancel = false; };
             NewSeriesWindow.Close();
         }
 
-        if (SettingsWindow != null)
+        if (UserSettingsWindow is not null)
         {
-            SettingsWindow.Closing += (s, e) => { e.Cancel = false; };
-            SettingsWindow.Close();
+            UserSettingsWindow.Closing += (s, e) => { e.Cancel = false; };
+            UserSettingsWindow.Close();
         }
 
-        if (ThemeSettingsWindow != null)
+        if (ThemeSettingsWindow is not null)
         {
             ThemeSettingsWindow.Closing += (s, e) => { e.Cancel = false; };
             ThemeSettingsWindow.Close();
         }
 
-        if (PriceAnalysisWindow != null)
+        if (PriceAnalysisWindow is not null)
         {
             PriceAnalysisWindow.Closing += (s, e) => { e.Cancel = false; };
             PriceAnalysisWindow.Close();
         }
 
-        if (CollectionStatsWindow != null)
+        if (CollectionStatsWindow is not null)
         {
             CollectionStatsWindow.Closing += (s, e) => { e.Cancel = false; };
             CollectionStatsWindow.Close();
         }
 
-        if (UserNotesWindow != null)
+        if (UserNotesWindow is not null)
         {
             UserNotesWindow.Closing += (s, e) => { e.Cancel = false; };
             UserNotesWindow.Close();
         }
-
-        LogManager.Shutdown();
-        App.DisposeMutex();
     }
 
     private void Dispose(bool disposing)

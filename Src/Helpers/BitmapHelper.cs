@@ -178,7 +178,7 @@ public sealed class BitmapHelper
     /// <exception cref="System.Exception">Throws an exception if the bitmap saving process fails.</exception>
     public static async Task<byte[]> ImageToPngByteArrayAsync(Bitmap image)
     {
-        if (image == null)
+        if (image is null)
         {
             LOGGER.Warn("Attempted to convert a null Avalonia Bitmap to PNG byte array asynchronously. Returning an empty array.");
             return [];

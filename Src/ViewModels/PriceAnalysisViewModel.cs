@@ -38,7 +38,7 @@ public sealed class PriceAnalysisViewModel : ViewModelBase
         {
             case NotifyCollectionChangedAction.Add:
             case NotifyCollectionChangedAction.Remove:
-                if (SelectedWebsites != null && SelectedWebsites.Any())
+                if (SelectedWebsites is not null && SelectedWebsites.Any())
                 {
                     for (int x = 0; x < SelectedWebsites.Count - 1; x++)
                     {

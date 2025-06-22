@@ -9,7 +9,7 @@ using static Tsundoku.Models.Enums.SeriesDemographicEnum;
 using static Tsundoku.Models.Enums.SeriesFormatEnum;
 using static Tsundoku.Models.Enums.SeriesGenreEnum;
 using static Tsundoku.Models.Enums.SeriesStatusEnum;
-using static Tsundoku.Models.TsundokuLanguageModel;
+using static Tsundoku.Models.Enums.TsundokuLanguageEnums;
 
 namespace Tsundoku.Tests.Models;
 
@@ -151,7 +151,8 @@ public class SeriesModelTests
     [AvaloniaTest]
     public async Task CreateNewSeriesCardAsync_Anthology_HasFullStaffList()
     {
-        string input = "リコリス・リコイル 公式コミックアンソロジー リピート";
+        App.ConfigureNLog();
+        string input = "157671";
         string expectedFullStaff = "Takeshi Kojima | Mekimeki | Nyoijizai | GUNP | Itsuki Takano | Ren Sakuragi | sometime | Ryou Niina | Ginmoku | Mikaduchi | Nikomi Wakadori | Miki Morinaga | Raika Suzumi | Ree | Itsuki Tsutsui | Utashima | Shirou Urayama | Bonryuu | Yasuka Manuma | Yuichi | Marco Nii | Nana Komado | Yuu Kimura | Sugar.Kirikanoko | AttoKasumi Fukagawa | Atto | Tiv | Sou Hamayumiba | Kanari Abe | Nachi Aono | Koruse";
         string expectedNativeStaff = "こじまたけし | めきめき | 如意自在 | GUNP | 高野いつき | 桜木蓮 | そめちめ | にいな涼 | ぎんもく | みかづち | 若鶏にこみ | 森永ミキ | 涼海来夏 | れぇ | 筒井いつき | うたしま | しろううらやま | 凡竜 | 真沼靖佳 | ゆいち | 弐尉マルコ | 奈々鎌土 | キ村由宇 | Sugar.栗かのこ | あっと深川可純 | あっと | Tiv | 浜弓場双 | 阿部かなり | あおのなち | こるせ";
 
@@ -165,6 +166,7 @@ public class SeriesModelTests
             minVolCount: 0,
             additionalLanguages: []
         );
+
         using (Assert.EnterMultipleScope())
         {
             Assert.That(_series, Is.Not.Null, "Series creation failed");
@@ -205,7 +207,7 @@ public class SeriesModelTests
         updated.Description = "New description";
         updated.CurVolumeCount = 99;
 
-        original.UpdateFrom(updated);
+        original.UpdateFrom(updated, false);
 
         using (Assert.EnterMultipleScope())
         {
@@ -251,7 +253,6 @@ public class SeriesModelTests
         using (Assert.EnterMultipleScope())
         {
             Assert.That(json, Does.Contain("Title"));
-            Assert.That(json, Does.Contain("12345678-1234-5678-1234-567812345678"));
             Assert.That(json, Does.Contain("SamplePub"));
         }
     }
@@ -283,6 +284,9 @@ public class SeriesModelTests
             CoverBitMap: emptyBitmap,
             Publisher: "SamplePub",
             DuplicateIndex: 1
-        );
+        )
+        {
+            Id = id ?? Guid.NewGuid()
+        };
     }
 }

@@ -329,6 +329,7 @@
                             <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Drama</ComboBoxItem>
                             <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Ecchi</ComboBoxItem>
                             <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Fantasy</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Hentai</ComboBoxItem>
                             <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Horror</ComboBoxItem>
                             <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Mahou Shoujo</ComboBoxItem>
                             <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Mecha</ComboBoxItem>

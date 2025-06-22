@@ -42,7 +42,6 @@ public class MangaDexClientTests
         }
     }
 
-    // TODO - Check this series https://mangadex.org/title/38204a99-8c9f-43f4-ac29-1e3896841946/my-rei-of-light the viet name is very malformed, need ot check other original langs out also
     [TestCase("dont toy with me miss nagatoro")]
     [TestCase("The Beginning After the End")]
     [TestCase("Radiant")]
@@ -83,6 +82,31 @@ public class MangaDexClientTests
             Assert.That(first.TryGetProperty("relationships", out JsonElement relationships));
             Assert.That(relationships.ValueKind, Is.EqualTo(JsonValueKind.Array), "Relationships should be an array.");
             Assert.That(relationships.EnumerateArray().Any(e => e.TryGetProperty("type", out JsonElement typeProp) && typeProp.GetString() == "cover_art"), "Expected at least one relationship with type 'cover_art'.");
+        }
+    }
+
+    [TestCase("38204a99-8c9f-43f4-ac29-1e3896841946")] // https://mangadex.org/title/38204a99-8c9f-43f4-ac29-1e3896841946/my-rei-of-light
+    public async Task GetSeriesByIdAsync_NoEnglishDesc_DefaultToOriginalLang(string id)
+    {
+        JsonDocument? result = await _mangaDex.GetSeriesByIdAsync(id);
+        Assert.That(result, Is.Not.Null);
+
+        JsonElement root = result!.RootElement;
+        Assert.That(root.TryGetProperty("data", out JsonElement dataElem));
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(dataElem.TryGetProperty("id", out _));
+            Assert.That(dataElem.TryGetProperty("attributes", out JsonElement attrElem));
+            Assert.That(attrElem.TryGetProperty("description", out JsonElement descElem));
+            Assert.That(attrElem.TryGetProperty("originalLanguage", out JsonElement origLangElem), Is.True, "expected an originalLanguage property");
+
+            string lang = origLangElem.GetString()!;
+            Assert.That(lang, Is.EqualTo("vi"));
+
+            Assert.That(descElem.TryGetProperty(lang, out JsonElement localizedDescElem), Is.True, $"expected a description for language '{lang}'");
+            string expectedDesc = "“Tôi muốn cậu trở thành nguồn cảm hứng của tôi!”\n\nHai con người với những đam mê cháy bỏng nhưng lạc lối trong chính câu chuyện của riêng mình. Một cách tình cờ, họ đã gặp được nhau.\n\nỞ cạnh nhau, Yuji và Masa, hai con người yêu cái đẹp, được sống là chính mình. Cùng niềm đam mê quá đỗi đặc biệt họ dần khám phá ra những cảm xúc chôn giấu và điều sẽ thay đổi cuộc đời của họ mãi mãi.";
+            Assert.That(localizedDescElem.GetString(), Is.EqualTo(expectedDesc));
         }
     }
 

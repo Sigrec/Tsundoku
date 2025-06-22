@@ -258,7 +258,7 @@ public static class AppFileHelper
             string jsonString = File.ReadAllText(filePath);
             User? user = JsonSerializer.Deserialize(jsonString, UserModelContext.Default.User);
 
-            if (user != null)
+            if (user is not null)
             {
                 LOGGER.Info("User data successfully deserialized from {FilePath} for user: {Username}", filePath, user.UserName);
             }

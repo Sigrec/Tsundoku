@@ -16,8 +16,7 @@ namespace Tsundoku;
 public sealed partial class App : Application
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
-    private static Mutex _mutex;
-    public static Mutex Mutex { get => _mutex; set => _mutex = value; }
+    public static Mutex? Mutex { get; set; }
     public static IServiceProvider? ServiceProvider { get; private set; }
 
     public App()
@@ -39,12 +38,8 @@ public sealed partial class App : Application
             return;
         }
 
-        // BindingPlugins.DataValidators.RemoveAt(0);
-        ServiceCollection serviceCollection = new ServiceCollection();
-        ConfigureServices(serviceCollection); // Configure your services
-
         const string appName = "Tsundoku";
-        _mutex = new Mutex(true, appName, out bool createdNew);
+        Mutex = new Mutex(true, appName, out bool createdNew);
 
         ConfigureNLog();
 
@@ -56,8 +51,12 @@ public sealed partial class App : Application
         else
         {
             LOGGER.Info("Application starting up.");
+
+            ServiceCollection services = new();
+            ConfigureServices(services);
+            ServiceProvider = services.BuildServiceProvider();
+
             DiscordRP.Initialize();
-            ServiceProvider = serviceCollection.BuildServiceProvider();
 
             IUserService userService = ServiceProvider.GetRequiredService<IUserService>();
 
@@ -72,19 +71,31 @@ public sealed partial class App : Application
                 return;
             }
 
+            desktop.Exit += (_, _) =>
+            {
+                LOGGER.Info("Disposing Application...");
+                DiscordRP.Deinitialize();
+
+                if (ServiceProvider is IDisposable disposable)
+                {
+                    disposable.Dispose();
+                    ServiceProvider = null;
+                }
+
+                LogManager.Shutdown();
+
+                Mutex?.Dispose();
+                Mutex = null;
+            };
+
             // Get the MainWindowViewModel from the DI container
             desktop.MainWindow = new MainWindow(ServiceProvider.GetRequiredService<MainWindowViewModel>());
         }
         base.OnFrameworkInitializationCompleted();
     }
 
-    public static void DisposeMutex()
-    {
-        _mutex?.Dispose();
-    }
-
     // Configure your application's services for Dependency Injection
-    private static void ConfigureServices(IServiceCollection services)
+    public static void ConfigureServices(IServiceCollection services)
     {
         // You can configure a specific named HttpClient if needed
         services.AddHttpClient("AddCoverClient", client =>
@@ -126,6 +137,11 @@ public sealed partial class App : Application
         .SetHandlerLifetime(TimeSpan.FromMinutes(5))
         .AddTypedClient<AniListGraphQLClient>();
 
+        services.AddSingleton<BitmapHelper>();
+        services.AddSingleton<MangaDex>();
+        services.AddSingleton<AniList>();
+        services.AddSingleton<MainWindowViewModel>();
+
         services.AddSingleton<IUserService, UserService>();
         services.AddSingleton<ISharedSeriesCollectionProvider, SharedSeriesCollectionProvider>();
 
@@ -135,7 +151,7 @@ public sealed partial class App : Application
         services.AddSingleton<AddNewSeriesWindow>();
         services.AddSingleton<AddNewSeriesViewModel>();
 
-        services.AddSingleton<SettingsWindow>();
+        services.AddSingleton<UserSettingsWindow>();
         services.AddSingleton<UserSettingsViewModel>();
 
         services.AddSingleton<CollectionThemeWindow>();
@@ -152,14 +168,8 @@ public sealed partial class App : Application
 
         services.AddTransient<EditSeriesInfoWindow>();
 
-        services.AddTransient<PopupWindow>();
-        services.AddTransient<PopupWindowViewModel>();
-
-        services.AddSingleton<BitmapHelper>();
-
-        services.AddSingleton<MangaDex>();
-        services.AddSingleton<AniList>();
-        services.AddSingleton<MainWindowViewModel>();
+        services.AddTransient<PopupDialogViewModel>();
+        services.AddTransient<IPopupDialogService, PopupDialogService>();
     }
 
     public static void ConfigureNLog()
@@ -173,21 +183,17 @@ public sealed partial class App : Application
 
         // 3. Configure (or create) the file target
         FileTarget fileTarget = config.FindTargetByName<FileTarget>("TsundokuLogs");
-        if (fileTarget == null)
+        if (fileTarget is null)
         {
             fileTarget = new FileTarget("TsundokuLogs")
             {
                 Layout = "[${longdate} | ${level:uppercase=true}] (${logger}) ${message} ${exception:format=ToString,StackTrace}",
                 FileName = Path.Combine(localCachePath, "TsundokuLogs.log"),
                 ArchiveFileName = Path.Combine(localCachePath, "TsundokuLogs.{#}.log"),
-                ArchiveNumbering = ArchiveNumberingMode.Rolling,
+                ArchiveSuffixFormat = "_{1:dd_MM_yyyy}_{0:00}",
                 ArchiveEvery = FileArchivePeriod.Day,
-                ArchiveDateFormat = "yyyy-MM-dd",
                 MaxArchiveFiles = 7,
-                ConcurrentWrites = true,
-                CleanupFileName = true,
                 KeepFileOpen = false,
-                EnableArchiveFileCompression = true,
                 AutoFlush = false,
                 BufferSize = 65536,
                 OpenFileCacheSize = 10,
@@ -214,7 +220,7 @@ public sealed partial class App : Application
 #if DEBUG
         // 4. Configure (or create) the console target (only in DEBUG)
         ColoredConsoleTarget consoleTarget = config.FindTargetByName<ColoredConsoleTarget>("TsundokuConsole");
-        if (consoleTarget == null)
+        if (consoleTarget is null)
         {
             consoleTarget = new ColoredConsoleTarget("TsundokuConsole")
             {
@@ -251,4 +257,5 @@ public sealed partial class App : Application
         // 8. Apply the updated configuration
         LogManager.Configuration = config;
     }
+
 }

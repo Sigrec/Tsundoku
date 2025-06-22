@@ -1,6 +1,6 @@
 ﻿using Avalonia.Data.Converters;
 using System.Globalization;
-using static Tsundoku.Models.TsundokuLanguageModel;
+using static Tsundoku.Models.Enums.TsundokuLanguageEnums;
 
 namespace Tsundoku.Converters;
 
@@ -18,7 +18,7 @@ public sealed class StaffLangConverter : IMultiValueConverter
         string? languageString = values[1]?.ToString(); // Use nullable string for safety
 
         // Use the pre-built, optimized dictionary for lookup
-        if (languageString != null && TsundokuLanguageStringValueToLanguageMap.TryGetValue(languageString, out TsundokuLanguage langEnum))
+        if (languageString is not null && TsundokuLanguageStringValueToLanguageMap.TryGetValue(languageString, out TsundokuLanguage langEnum))
         {
             if (staff.TryGetValue(langEnum, out string? result))
             {

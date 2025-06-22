@@ -2,14 +2,12 @@ using System.Globalization;
 using Avalonia.Media;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using static Tsundoku.Models.TsundokuLanguageModel;
+using static Tsundoku.Models.Enums.TsundokuLanguageEnums;
 
 namespace Tsundoku.Models;
 
-public sealed class TsundokuTheme : ReactiveObject, ICloneable, IComparable, IDisposable
+public sealed class TsundokuTheme : ReactiveObject, ICloneable, IComparable
 {
-    [JsonIgnore] private bool disposedValue;
-
     [Reactive] public string ThemeName { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
@@ -138,7 +136,7 @@ public sealed class TsundokuTheme : ReactiveObject, ICloneable, IComparable, IDi
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
     [Reactive] public SolidColorBrush SeriesEditPaneButtonsIconHoverColor { get; set; }
 
-    public static readonly TsundokuTheme DEFAULT_THEME = new TsundokuTheme(
+    public static readonly TsundokuTheme DEFAULT_THEME = new(
         "Default",
         new SolidColorBrush(Color.Parse("#ff20232d")),
         new SolidColorBrush(Color.Parse("#ffb4bddb")),
@@ -346,7 +344,7 @@ public sealed class TsundokuTheme : ReactiveObject, ICloneable, IComparable, IDi
 
     private static SolidColorBrush CloneBrush(SolidColorBrush? brush)
     {
-        if (brush == null) return null!;
+        if (brush is null) return null!;
         return new SolidColorBrush(brush.Color);
     }
 
@@ -411,40 +409,11 @@ public sealed class TsundokuTheme : ReactiveObject, ICloneable, IComparable, IDi
         BrushEquals(SeriesEditPaneButtonsIconHoverColor, other.SeriesEditPaneButtonsIconHoverColor);
     }
 
-    private bool BrushEquals(SolidColorBrush? a, SolidColorBrush? b)
+    private static bool BrushEquals(SolidColorBrush? a, SolidColorBrush? b)
     {
         if (ReferenceEquals(a, b)) return true;
-        if (a == null || b == null) return false;
+        if (a is null || b is null) return false;
         return a.Color.Equals(b.Color);
-    }
-
-    private void Dispose(bool disposing)
-    {
-        if (!disposedValue)
-        {
-            if (disposing)
-            {
-                // dispose managed state (managed objects)
-            }
-
-            // free unmanaged resources (unmanaged objects) and override finalizer
-            // set large fields to null
-            disposedValue = true;
-        }
-    }
-
-    // Override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
-    // ~Series()
-    // {
-    // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-    //     Dispose(disposing: false);
-    // }
-
-    public void Dispose()
-    {
-        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
     }
 
     public class SolidColorBrushJsonConverter : JsonConverter<SolidColorBrush>
@@ -475,7 +444,7 @@ public sealed class TsundokuTheme : ReactiveObject, ICloneable, IComparable, IDi
 
         public override void Write(Utf8JsonWriter writer, SolidColorBrush value, JsonSerializerOptions options)
         {
-            if (value == null)
+            if (value is null)
             {
                 writer.WriteNullValue();
                 LOGGER.Warn("SolidColorBrushJsonConverter: Writing null value for SolidColorBrush.");
@@ -502,9 +471,9 @@ public class TsundokuThemeComparer : IComparer<TsundokuTheme>
     public int Compare(TsundokuTheme? x, TsundokuTheme? y)
     {
         // Handle nulls as per IComparer contract
-        if (x == null && y == null) return 0;
-        if (x == null) return -1;
-        if (y == null) return 1;
+        if (x is null && y is null) return 0;
+        if (x is null) return -1;
+        if (y is null) return 1;
 
         // Assuming you want to compare by ThemeName
         return _themeNameComparer.Compare(x.ThemeName, y.ThemeName);

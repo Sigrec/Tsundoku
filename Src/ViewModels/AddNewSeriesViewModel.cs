@@ -4,11 +4,13 @@ using Avalonia.Controls;
 using System.Collections.Specialized;
 using System.Reactive.Linq;
 using Tsundoku.Helpers;
-using static Tsundoku.Models.TsundokuLanguageModel;
+using static Tsundoku.Models.Enums.TsundokuLanguageEnums;
 using Avalonia.Collections;
 using Tsundoku.Clients;
 using static Tsundoku.Models.Enums.SeriesDemographicEnum;
 using static Tsundoku.Models.Enums.SeriesFormatEnum;
+using ReactiveUI;
+using System.Globalization;
 
 namespace Tsundoku.ViewModels;
 
@@ -26,6 +28,7 @@ public sealed class AddNewSeriesViewModel : ViewModelBase
     [Reactive] public bool AllowDuplicate { get; set; }
     [Reactive] public string AdditionalLanguagesToolTipText { get; set; }
     [Reactive] public bool IsAddSeriesButtonEnabled { get; set; } = false;
+    [Reactive] public string SeriesValueMaskedText { get; set; }
     public AvaloniaList<ListBoxItem> SelectedAdditionalLanguages { get; set; } = [];
     private static readonly StringBuilder CurLanguages = new StringBuilder();
 
@@ -36,6 +39,22 @@ public sealed class AddNewSeriesViewModel : ViewModelBase
         _aniList = aniList;
 
         SelectedAdditionalLanguages.CollectionChanged += AdditionalLanguagesCollectionChanged;
+
+        this.WhenAnyValue(x => x.CurrentUser.Currency)
+            .DistinctUntilChanged()
+            .ObserveOn(RxApp.TaskpoolScheduler)
+            .Subscribe(currency =>
+            {
+                CultureInfo cultureInfo = CultureInfo.GetCultureInfo(AVAILABLE_CURRENCY_WITH_CULTURE[currency].Culture);
+                if (cultureInfo.NumberFormat.CurrencyPositivePattern is 0 or 2) // 0 = "$n", 2 = "$ n"
+                {
+                    SeriesValueMaskedText = $"{currency}0000000000000000.00";
+                }
+                else
+                {
+                    SeriesValueMaskedText = $"0000000000000000.00{currency}";
+                }
+            });
     }
 
     // TODO - Additional Languages selected should persist across app startups? I can traverse the list and and check what additional langs are used or store it in json
@@ -46,7 +65,7 @@ public sealed class AddNewSeriesViewModel : ViewModelBase
         {
             case NotifyCollectionChangedAction.Add:
             case NotifyCollectionChangedAction.Remove:
-                if (SelectedAdditionalLanguages != null && SelectedAdditionalLanguages.Any())
+                if (SelectedAdditionalLanguages is not null && SelectedAdditionalLanguages.Any())
                 {
                     foreach (ListBoxItem lang in SelectedAdditionalLanguages.OrderBy(lang => lang.Content.ToString()))
                     {
@@ -96,7 +115,7 @@ public sealed class AddNewSeriesViewModel : ViewModelBase
         );
 
         bool successfulAdd = false;
-        if (newSeries != null)
+        if (newSeries is not null)
         {
             try
             {

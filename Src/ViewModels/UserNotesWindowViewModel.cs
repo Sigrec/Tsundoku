@@ -15,7 +15,7 @@ public sealed class UserNotesWindowViewModel : ViewModelBase
         this.WhenAnyValue(x => x.Notes)
             .DistinctUntilChanged()
             .Throttle(TimeSpan.FromMilliseconds(1000))
-            .Where(_ => CurrentUser != null)
+            .Where(_ => CurrentUser is not null)
             .Subscribe(notes =>
             {
                 _userService.UpdateUser(user => user.Notes = notes);

@@ -11,14 +11,14 @@ using static Tsundoku.Models.Enums.SeriesDemographicEnum;
 using static Tsundoku.Models.Enums.SeriesFormatEnum;
 using static Tsundoku.Models.Enums.SeriesGenreEnum;
 using static Tsundoku.Models.Enums.SeriesStatusEnum;
-using static Tsundoku.Models.TsundokuLanguageModel;
+using static Tsundoku.Models.Enums.TsundokuLanguageEnums;
 
 namespace Tsundoku.Models;
 
 public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Series?>
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
-    private static SeriesModelContext SeriesJsonModel = new SeriesModelContext(new JsonSerializerOptions()
+    private static readonly SeriesModelContext SeriesJsonModel = new SeriesModelContext(new JsonSerializerOptions()
     {
         WriteIndented = true,
         ReadCommentHandling = JsonCommentHandling.Disallow,
@@ -28,8 +28,8 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
 
     [JsonIgnore] private bool disposedValue;
     [JsonIgnore][Reactive] public Bitmap? CoverBitMap { get; set; }
-    public Guid Id { get; } = Guid.NewGuid();
-    [Reactive] public string Publisher { get; set; }
+    public Guid Id { get; set;  } = Guid.NewGuid();
+    [Reactive] public string Publisher { get; set; } = "Unknown";
     [Reactive] public Dictionary<TsundokuLanguage, string> Titles { get; set; }
     [Reactive] public Dictionary<TsundokuLanguage, string> Staff { get; set; }
     [Reactive] public uint DuplicateIndex { get; set; }
@@ -98,7 +98,6 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
     /// <param name="MD_Query">MangaDex object for the MangaDex HTTP client</param>
     /// <param name="additionalLanguages">List of additional languages to query for</param>
     /// <returns></returns>
-    // TODO - Make it so it doesn't download the image until it's confirmed that the series is not a dupe
     public static async Task<Series?> CreateNewSeriesCardAsync(
         BitmapHelper bitmapHelper,
         MangaDex mangaDex,
@@ -115,7 +114,9 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
         decimal value = 0,
         string customImageUrl = "",
         bool allowDuplicate = false,
-        bool isRefresh = false
+        bool isRefresh = false,
+        bool isCoverImageRefresh = false,
+        string? coverPath = null
     )
     {
         Series? newSeries = null;
@@ -130,31 +131,41 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
 
         try
         {
-            if (int.TryParse(input, out int seriesId)) // Check AniList ID
+            switch (input)
             {
-                // Numeric title is treated as AniList ID
-                mediaDataDoc = await aniList.GetSeriesByIDAsync(seriesId, bookType, pageNum);
-                isAniList = true;
-                isTitleId = true;
-            }
-            else if (MangaDex.IsMangaDexId(input)) // Check MangaDex Id
-            {
-                mediaDataDoc = await mangaDex.GetSeriesByIdAsync(input);
-                curMangaDexId = input;
-                isMangaDex = true;
-                isTitleId = true;
-            }
-            else
-            {
-                mediaDataDoc = await aniList.GetSeriesByTitleAsync(input, bookType, pageNum); // Check AniList Title
-                if (mediaDataDoc == null)
-                {
-                    mediaDataDoc = await mangaDex.GetSeriesByTitleAsync(input); // Check MangaDex Title
+                case string s when int.TryParse(s, out var seriesId):
+                    mediaDataDoc = await aniList
+                        .GetSeriesByIDAsync(seriesId, bookType, pageNum);
+                    isAniList  = true;
+                    isTitleId  = true;
+                    break;
+
+                case string s when MangaDex.IsMangaDexId(s):
+                    mediaDataDoc = await mangaDex
+                        .GetSeriesByIdAsync(s);
+                    curMangaDexId = s;
                     isMangaDex = true;
+                    isTitleId  = true;
+                    break;
+
+                default:
+                    mediaDataDoc = null;
+                    break;
+            }
+
+            // If neither ID-case matched, try “by title” on AniList, then MangaDex:
+            if (!isTitleId)
+            {
+                mediaDataDoc = await aniList.GetSeriesByTitleAsync(input, bookType, pageNum);
+
+                if (mediaDataDoc is not null)
+                {
+                    isAniList = true;
                 }
                 else
                 {
-                    isAniList = true;
+                    mediaDataDoc = await mangaDex.GetSeriesByTitleAsync(input);
+                    isMangaDex = true;
                 }
             }
 
@@ -164,7 +175,6 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
             string japaneseTitle = string.Empty;
             string romajiTitle = string.Empty;
             string englishTitle = string.Empty;
-            string coverPath = string.Empty;
 
             JsonElement[] mangaDexAltTitles = [];
             Dictionary<TsundokuLanguage, string> newTitles = [];
@@ -185,6 +195,7 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
                     additionalLanguages,
                     allowDuplicate,
                     isRefresh,
+                    isCoverImageRefresh,
                     maxVolCount,
                     minVolCount,
                     rating,
@@ -192,6 +203,7 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
                     value,
                     demographic,
                     publisher,
+                    coverPath,
                     bitmapHelper,
                     context
                 );
@@ -208,6 +220,7 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
                         additionalLanguages: additionalLanguages,
                         allowDuplicate: allowDuplicate,
                         isRefresh: isRefresh,
+                        isCoverImageRefresh: isCoverImageRefresh,
                         maxVolCount: maxVolCount,
                         minVolCount: minVolCount,
                         rating: rating,
@@ -216,7 +229,8 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
                         demographic: demographic,
                         publisher: publisher,
                         bitmapHelper: bitmapHelper,
-                        context: context
+                        context: context,
+                        coverPath: coverPath
                     );
                 }
             }
@@ -231,6 +245,7 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
                     additionalLanguages: additionalLanguages,
                     allowDuplicate: allowDuplicate,
                     isRefresh: isRefresh,
+                    isCoverImageRefresh: isCoverImageRefresh,
                     maxVolCount: maxVolCount,
                     minVolCount: minVolCount,
                     rating: rating,
@@ -239,7 +254,8 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
                     demographic: demographic,
                     publisher: publisher,
                     bitmapHelper: bitmapHelper,
-                    context: context
+                    context: context,
+                    coverPath: coverPath
                 );
             }
         }
@@ -265,6 +281,7 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
         TsundokuLanguage[]? additionalLanguages,
         bool allowDuplicate,
         bool isRefresh,
+        bool isCoverImageRefresh,
         uint maxVolCount,
         uint minVolCount,
         decimal rating,
@@ -272,6 +289,7 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
         decimal value,
         SeriesDemographic demographic,
         string? publisher,
+        string coverPath,
         BitmapHelper bitmapHelper,
         BuildContext context)
     {
@@ -343,6 +361,10 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
                 ref context.DupeIndex
             );
         }
+        else
+        {
+            context.CoverPath = coverPath;
+        }
 
         // Fallback to MangaDex to fetch Japanese title for KR/TW/CW origin
         if (bookType != SeriesFormat.Novel && IsAsianNonJapanese(context.CountryOfOrigin))
@@ -398,7 +420,7 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
             if (altTitles.Length == 0)
             {
                 JsonDocument? altTitlesDoc = await mangaDex.GetSeriesByTitleAsync(context.RomajiTitle);
-                if (altTitlesDoc == null)
+                if (altTitlesDoc is null)
                 {
                     LOGGER.Warn("Unable to get MangaDex info for {Title}", context.RomajiTitle);
                     return null;
@@ -435,7 +457,7 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
 
         Bitmap? coverImage = null;
 
-        if (!isRefresh && (allowDuplicate || !string.IsNullOrWhiteSpace(context.CoverPath)))
+        if (isCoverImageRefresh || (!isRefresh && (allowDuplicate || !string.IsNullOrWhiteSpace(context.CoverPath))))
         {
             coverImage = await bitmapHelper.UpdateCoverFromUrlAsync(
                 coverImageUrl,
@@ -478,6 +500,7 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
         TsundokuLanguage[]? additionalLanguages,
         bool allowDuplicate,
         bool isRefresh,
+        bool isCoverImageRefresh,
         uint maxVolCount,
         uint minVolCount,
         decimal rating,
@@ -485,6 +508,7 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
         decimal value,
         SeriesDemographic demographic,
         string? publisher,
+        string coverPath,
         BitmapHelper bitmapHelper,
         BuildContext context)
     {
@@ -560,7 +584,7 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
                 context.FilteredBookType,
                 allowDuplicate,
                 ref context.DupeIndex)
-            : (string.Empty, false);
+            : (coverPath, false);
 
         // Titles
         Dictionary<TsundokuLanguage, string> titles = context.NewTitles;
@@ -598,11 +622,17 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
             context.NewStaff[MANGADEX_LANG_CODES[context.CountryOfOrigin]] = nativeStaff.ToString();
         }
 
-        string desc = attributesBlock.TryGetProperty("description", out JsonElement descriptionProp) &&
-            descriptionProp.ValueKind == JsonValueKind.Object &&
-            descriptionProp.TryGetProperty("en", out JsonElement enProp)
-            ? MangaDex.ParseDescription(enProp.GetString())
-            : string.Empty;
+        string desc = 
+            attributesBlock.TryGetProperty("description", out JsonElement descObj) &&
+            descObj.ValueKind == JsonValueKind.Object
+                ? MangaDex.ParseDescription(
+                    // pick "en", or fallback to original language, or empty
+                    (descObj.TryGetProperty("en", out JsonElement e) ? e :
+                    descObj.TryGetProperty(context.CountryOfOrigin, out JsonElement f) ? f :
+                    default)
+                    .GetString() ?? string.Empty
+                )
+                : string.Empty;
             
         SeriesStatus status = SeriesStatusEnum.Parse(attributesBlock.GetProperty("status").GetString());
 
@@ -610,7 +640,7 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
         HashSet<SeriesGenre> genres = MangaDex.ParseGenreData(context.RomajiTitle, attributesBlock.GetProperty("tags"));
 
         Bitmap? coverImage = null;
-        if (!isRefresh && (!isDupe || allowDuplicate))
+        if (isCoverImageRefresh || (!isRefresh && (!isDupe || allowDuplicate)))
         {
             coverImage = await bitmapHelper.UpdateCoverFromUrlAsync(coverUrl, AppFileHelper.GetFullCoverPath(context.CoverPath));
             if (coverImage is null)
@@ -638,6 +668,84 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
             Publisher: publisher ?? "Unknown",
             DuplicateIndex: context.DupeIndex
         );
+    }
+
+    public void IncrementCurVolumeCount()
+    {
+        if (this.CurVolumeCount < this.MaxVolumeCount)
+        {
+            this.CurVolumeCount++;
+        }
+    }
+
+    public void DecrementCurVolumeCount()
+    {
+        if (this.CurVolumeCount > 0)
+        {
+            this.CurVolumeCount--;
+        }
+    }
+
+    public void UpdateVolumeCounts(uint newCur, uint newMax, Action? action = null)
+    {
+        if (newMax >= newCur)
+        {
+            uint oldCur = this.CurVolumeCount;
+            uint oldMax = this.MaxVolumeCount;
+            this.CurVolumeCount = newCur;
+            this.MaxVolumeCount = newMax;
+
+            LOGGER.Info(
+                "Changed Series Volume Counts For {RomajiTitle} From {OldCur}/{OldMax} -> {NewCur}/{NewMax}",
+                this.Titles[TsundokuLanguage.Romaji], oldCur, oldMax, newCur, newMax
+            );
+
+            action();
+        }
+        else
+        {
+            LOGGER.Warn("{NewCur} cannot be greater than {NewMax}", newCur, newMax);
+        }
+    }
+
+    public void UpdateCurVolumeCount(uint newCur, Action? action = null)
+    {
+        if (newCur <= this.MaxVolumeCount)
+        {
+            uint oldCur = this.CurVolumeCount;
+            this.CurVolumeCount = newCur;
+
+            LOGGER.Info(
+                "Updated Series Current Volume Count For {RomajiTitle} From {OldCur} to {NewCur}",
+                this.Titles[TsundokuLanguage.Romaji], oldCur, newCur
+            );
+
+            action();
+        }
+        else
+        {
+            LOGGER.Warn("{NewCur} cannot be greater than {MaxVolumeCount}", newCur, this.MaxVolumeCount);
+        }
+    }
+
+    public void UpdateMaxVolumeCount(uint newMax, Action? action = null)
+    {
+        if (newMax >= this.CurVolumeCount)
+        {
+            uint oldMax = this.MaxVolumeCount;
+            this.MaxVolumeCount = newMax;
+
+            LOGGER.Info(
+                "Updated Series Max Volume Count For {RomajiTitle} From {OldMax} to {NewMax}",
+                this.Titles[TsundokuLanguage.Romaji], oldMax, newMax
+            );
+
+            action();
+        }
+        else
+        {
+            LOGGER.Warn("{NewMax} cannot be less than {CurVolumeCount}", newMax, this.CurVolumeCount);
+        }
     }
 
     /// <summary>
@@ -701,7 +809,7 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
     {
         RxApp.MainThreadScheduler.Schedule(() =>
         {
-            this.CoverBitMap.Dispose();
+            this.CoverBitMap?.Dispose();
             this.CoverBitMap = newCover;
         });
     }
@@ -717,14 +825,19 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
 
     public override string ToString()
     {
-        if (this != null)
+        if (this is not null)
         {
             return JsonSerializer.Serialize(this, typeof(Series), SeriesJsonModel);
         }
         return "Null Series";
     }
 
-    public void UpdateFrom(Series other)
+    public bool IsCoverImageEmpty()
+    {
+        return this.CoverBitMap is null || this.CoverBitMap.PixelSize.Width == 0 || this.CoverBitMap.PixelSize.Height == 0;
+    }
+
+    public void UpdateFrom(Series other, bool isCoverEmpty)
     {
         // 1. Titles (Dictionary<TsundokuLanguage, string>) – deep‐compare by count + per‐key/value
         if (!ExtensionMethods.DictionariesEqual(Titles, other.Titles))
@@ -821,6 +934,12 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
         {
             DuplicateIndex = other.DuplicateIndex;
         }
+
+        // 17. Cover Image
+        if (isCoverEmpty)
+        {
+            UpdateCover(other.CoverBitMap.CloneBitmap());
+        }
     }
 
     private void Dispose(bool disposing)
@@ -915,9 +1034,9 @@ public class SeriesComparer : IComparer<Series>
     public int Compare(Series? x, Series? y)
     {
         // Handle nulls gracefully, as IComparer expects
-        if (x == null && y == null) return 0;
-        if (x == null) return -1;
-        if (y == null) return 1;
+        if (x is null && y is null) return 0;
+        if (x is null) return -1;
+        if (y is null) return 1;
 
         // Safely get titles, falling back to "Romaji" if preferred language isn't available
         string xTitle = x.Titles.TryGetValue(_curLang, out string? xValue) ? xValue : x.Titles[TsundokuLanguage.Romaji];
@@ -934,7 +1053,7 @@ public class SeriesValueComparer : IEqualityComparer<Series>
 {
     public bool Equals(Series? x, Series? y)
     {
-        if (x == null || y == null)
+        if (x is null || y is null)
             return false;
 
         return x.Format == y.Format

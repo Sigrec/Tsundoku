@@ -1,4 +1,3 @@
-using Avalonia.Controls;
 using Avalonia.ReactiveUI;
 using Avalonia.Threading;
 using Tsundoku.ViewModels;

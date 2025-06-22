@@ -14,7 +14,7 @@ public static class BitmapConverter
     /// <returns>A byte array representing the image in PNG format, or null on failure.</returns>
     public static byte[]? BitmapToPngBytes(Bitmap? bitmap)
     {
-        if (bitmap == null)
+        if (bitmap is null)
         {
             LOGGER.Warn("Attempted to convert a null Bitmap to PNG bytes.");
             return null;
@@ -45,7 +45,7 @@ public static class BitmapConverter
     /// <returns>A byte array representing the image in JPEG format, or null on failure.</returns>
     public static byte[]? BitmapToJpegBytes(Bitmap? bitmap, int quality = 90)
     {
-        if (bitmap == null)
+        if (bitmap is null)
         {
             LOGGER.Warn("Attempted to convert a null Bitmap to JPEG bytes.");
             return null;
@@ -78,7 +78,7 @@ public static class BitmapConverter
     /// <returns>An Avalonia Bitmap object, or null on failure.</returns>
     public static Bitmap? BytesToBitmap(byte[]? imageBytes)
     {
-        if (imageBytes == null || imageBytes.Length == 0)
+        if (imageBytes is null || imageBytes.Length == 0)
         {
             LOGGER.Warn("Attempted to convert a null or empty byte array to Bitmap.");
             return null;

@@ -15,10 +15,12 @@ public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesView
     private ushort MaxVolNum;
     private ushort CurVolNum;
     public bool IsOpen = false;
+    private readonly IPopupDialogService _popupDialogService;
 
-    public AddNewSeriesWindow(AddNewSeriesViewModel viewModel)
+    public AddNewSeriesWindow(AddNewSeriesViewModel viewModel, IPopupDialogService popupDialogService)
     {
         ViewModel = viewModel;
+        _popupDialogService = popupDialogService;
         InitializeComponent();
 
         Opened += (s, e) =>
@@ -39,15 +41,13 @@ public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesView
 
         this.WhenAnyValue(x => x.MaxVolCount.Text).Subscribe(x => MaxVolNum = ConvertNumText(x.Replace("_", "")));
         this.WhenAnyValue(x => x.CurVolCount.Text).Subscribe(x => CurVolNum = ConvertNumText(x.Replace("_", "")));
-        this.WhenAnyValue(x => x.TitleBox.Text, x => x.MaxVolCount.Text, x => x.CurVolCount.Text, x => x.MangaButton.IsChecked, x => x.NovelButton.IsChecked, (title, max, cur, manga, novel) => !string.IsNullOrWhiteSpace(title) && CurVolNum <= MaxVolNum && MaxVolNum != 0 && !(manga == false && novel == false) && manga != null && novel != null).Subscribe(x => ViewModel.IsAddSeriesButtonEnabled = x);
+        this.WhenAnyValue(x => x.TitleBox.Text, x => x.MaxVolCount.Text, x => x.CurVolCount.Text, x => x.MangaButton.IsChecked, x => x.NovelButton.IsChecked, (title, max, cur, manga, novel) => !string.IsNullOrWhiteSpace(title) && CurVolNum <= MaxVolNum && MaxVolNum != 0 && !(manga == false && novel == false) && manga is not null && novel is not null).Subscribe(x => ViewModel.IsAddSeriesButtonEnabled = x);
     }
 
 
     private async Task ShowErrorDialog(string info = "Unable to Add Series")
     {
-        PopupWindow errorDialog = App.ServiceProvider.GetRequiredService<PopupWindow>();
-        errorDialog.SetWindowText("Error", "fa-solid fa-circle-exclamation", info);
-        await errorDialog.ShowDialog(this);
+        await _popupDialogService.ShowAsync("Error", "fa-solid fa-circle-exclamation", info, this);
     }
 
     private void IsMangaButtonClicked(object sender, RoutedEventArgs args)

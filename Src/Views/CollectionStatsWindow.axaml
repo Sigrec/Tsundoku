@@ -36,7 +36,7 @@
                             <controls:ValueStat Text="{CompiledBinding CurrentUser.NumVolumesCollected}" Width="240" Title="Volumes Collected" Icon="fa-solid fa-bookmark" PointerPressed="CopyTextAsync"/>
                             <controls:ValueStat Width="240" Text="{CompiledBinding CurrentUser.NumVolumesToBeCollected}" Title="Volumes To Be Collected" Icon="fa-regular fa-bookmark" PointerPressed="CopyTextAsync"/>
                         </StackPanel>
-                        <controls:ValueStat Grid.Row="2" Grid.Column="0" HorizontalAlignment="Center" Text="{CompiledBinding CurrentUser.CollectionPrice}" Title="Collection Value" Icon="fa-solid fa-sack-dollar" PointerPressed="CopyTextAsync"/>
+                        <controls:ValueStat Grid.Row="2" Grid.Column="0" HorizontalAlignment="Center" Text="{CompiledBinding CurrentUser.CollectionValue}" Title="Collection Value" Icon="fa-solid fa-sack-dollar" PointerPressed="CopyTextAsync"/>
                     </Grid>
                 </Border>
 

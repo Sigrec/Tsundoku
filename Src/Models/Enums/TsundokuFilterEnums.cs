@@ -1,9 +1,9 @@
 using System.Collections.Frozen;
 using System.Runtime.Serialization;
 
-namespace Tsundoku.Models;
+namespace Tsundoku.Models.Enums;
 
-public static class TsundokuFilterModel
+public static class TsundokuFilterEnums
 {
     public static readonly FrozenDictionary<TsundokuFilter, int> FILTERS = 
         Enum.GetValues<TsundokuFilter>().Select((filter, index) => (filter, index))
@@ -35,6 +35,7 @@ public static class TsundokuFilterModel
         [EnumMember(Value = "Drama")] Drama,
         [EnumMember(Value = "Ecchi")] Ecchi,
         [EnumMember(Value = "Fantasy")] Fantasy,
+        [EnumMember(Value = "Hentai")] Hentai,
         [EnumMember(Value = "Horror")] Horror,
         [EnumMember(Value = "Mahou Shoujo")] MahouShoujo,
         [EnumMember(Value = "Mecha")] Mecha,

@@ -1,6 +1,6 @@
 ﻿using Avalonia.Data.Converters;
 using System.Globalization;
-using static Tsundoku.Models.TsundokuLanguageModel;
+using static Tsundoku.Models.Enums.TsundokuLanguageEnums;
 
 namespace Tsundoku.Converters;
 
@@ -22,7 +22,7 @@ public sealed class TitleLangConverter : IMultiValueConverter
         // Prioritize the language from the string value, falling back to Romaji.
         TsundokuLanguage effectiveLanguage = TsundokuLanguage.Romaji; // Default fallback
 
-        if (lang != null && titles.ContainsKey(lang.Value))
+        if (lang is not null && titles.ContainsKey(lang.Value))
         {
             effectiveLanguage = lang.Value;
         }

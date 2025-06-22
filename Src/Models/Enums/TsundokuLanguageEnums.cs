@@ -2,14 +2,14 @@ using System.Collections.Frozen;
 using System.Reflection;
 using System.Runtime.Serialization;
 
-namespace Tsundoku.Models;
+namespace Tsundoku.Models.Enums;
 
-public static class TsundokuLanguageModel
+public static class TsundokuLanguageEnums
 {
     public static readonly IReadOnlyDictionary<string, TsundokuLanguage> TsundokuLanguageStringValueToLanguageMap;
     public static readonly IReadOnlyDictionary<TsundokuLanguage, string> TsundokuLanguageLanguageToStringValueMap;
 
-    static TsundokuLanguageModel()
+    static TsundokuLanguageEnums()
     {
         Dictionary<string, TsundokuLanguage> stringToLangBuilder = new(StringComparer.OrdinalIgnoreCase);
         Dictionary<TsundokuLanguage, string> langToStringBuilder = [];

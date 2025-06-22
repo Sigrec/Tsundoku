@@ -9,13 +9,13 @@ using Tsundoku.Helpers;
 
 namespace Tsundoku.Views;
 
-public sealed partial class SettingsWindow : ReactiveWindow<UserSettingsViewModel>
+public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsViewModel>
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
     public bool IsOpen = false;
     public int currencyLength = 0;
 
-    public SettingsWindow(UserSettingsViewModel viewModel)
+    public UserSettingsWindow(UserSettingsViewModel viewModel)
     {
         InitializeComponent();
 
@@ -41,9 +41,9 @@ public sealed partial class SettingsWindow : ReactiveWindow<UserSettingsViewMode
             e.Cancel = true;
         };
 
-        this.WhenAnyValue(x => x.IndigoButton.IsChecked, (member) => member != null && member == true).Subscribe(x => ViewModel.IndigoMember = x);
-        this.WhenAnyValue(x => x.BooksAMillionButton.IsChecked, (member) => member != null && member == true).Subscribe(x => ViewModel.BooksAMillionMember = x);
-        this.WhenAnyValue(x => x.KinokuniyaUSAButton.IsChecked, (member) => member != null && member == true).Subscribe(x => ViewModel.KinokuniyaUSAMember = x);
+        this.WhenAnyValue(x => x.IndigoButton.IsChecked, (member) => member is not null && member == true).Subscribe(x => ViewModel.IndigoMember = x);
+        this.WhenAnyValue(x => x.BooksAMillionButton.IsChecked, (member) => member is not null && member == true).Subscribe(x => ViewModel.BooksAMillionMember = x);
+        this.WhenAnyValue(x => x.KinokuniyaUSAButton.IsChecked, (member) => member is not null && member == true).Subscribe(x => ViewModel.KinokuniyaUSAMember = x);
 
         this.WhenAnyValue(x => x.UsernameChangeTextBox.Text, (newUsername) => !string.IsNullOrWhiteSpace(newUsername) && !newUsername.Equals(ViewModel.CurrentUser.UserName))
             .Subscribe(x => ViewModel.IsChangeUsernameButtonEnabled = x);
@@ -59,11 +59,11 @@ public sealed partial class SettingsWindow : ReactiveWindow<UserSettingsViewMode
         if (CurrencyComboBox.SelectedItem is ComboBoxItem selectedItem)
         {
             string? newCurrency = selectedItem.Content?.ToString();
-            if (newCurrency != null)
+            if (newCurrency is not null)
             {
                 ViewModel.UpdateUserCurrency(newCurrency);
                 // currencyLength = ViewModelBase.CurCurrency.Length;
-                // _collectionStatsViewModel.CollectionPrice = $"{newCurrency}{ _collectionStatsViewModel.CollectionPrice[currencyLength..]}";
+                // _collectionStatsViewModel.CollectionValue = $"{newCurrency}{ _collectionStatsViewModel.CollectionValue[currencyLength..]}";
                 LOGGER.Info($"Currency Changed To {newCurrency}");
             }
         }

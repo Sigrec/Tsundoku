@@ -2,16 +2,12 @@ using ReactiveUI.Fody.Helpers;
 using ReactiveUI;
 using System.Reactive.Linq;
 using Tsundoku.Models;
-using System.Windows.Input;
 using MangaAndLightNovelWebScrape.Websites;
-using static Tsundoku.Models.TsundokuLanguageModel;
+using static Tsundoku.Models.Enums.TsundokuLanguageEnums;
 using Tsundoku.Helpers;
 using System.Globalization;
-using DynamicData;
 using static Tsundoku.Models.Enums.SeriesFormatEnum;
-using System.Collections.Concurrent;
 using Avalonia.Controls;
-using Tsundoku.Views;
 
 namespace Tsundoku.ViewModels;
 
@@ -33,27 +29,33 @@ public sealed class UserSettingsViewModel : ViewModelBase
         _loadingDialogService = loadingDialogService;
 
         this.WhenAnyValue(x => x.CurrentUser)
-            .Where(user => user != null)
-            .Select(user => user!.Currency)
+            .Select(user => user?.Currency)
             .DistinctUntilChanged()
+            .Where(currency =>
+                !string.IsNullOrWhiteSpace(currency) &&
+                AVAILABLE_CURRENCY_WITH_CULTURE.ContainsKey(currency))
+            .ObserveOn(RxApp.MainThreadScheduler)
             .Subscribe(currency =>
             {
-                SelectedCurrencyIndex = AVAILABLE_CURRENCY.IndexOf(currency);
+                SelectedCurrencyIndex = AVAILABLE_CURRENCY_WITH_CULTURE[currency].Index;
             });
 
         BooksAMillionMember = CurrentUser.Memberships[BooksAMillion.WEBSITE_TITLE];
         this.WhenAnyValue(x => x.BooksAMillionMember)
             .Skip(1)
+            .ObserveOn(RxApp.MainThreadScheduler)
             .Subscribe(isMember => UpdateMembership(BooksAMillion.WEBSITE_TITLE, isMember));
 
         IndigoMember = CurrentUser.Memberships[Indigo.WEBSITE_TITLE];
         this.WhenAnyValue(x => x.IndigoMember)
             .Skip(1)
+            .ObserveOn(RxApp.MainThreadScheduler)
             .Subscribe(isMember => UpdateMembership(Indigo.WEBSITE_TITLE, isMember));
 
         KinokuniyaUSAMember = CurrentUser.Memberships[KinokuniyaUSA.WEBSITE_TITLE];
         this.WhenAnyValue(x => x.KinokuniyaUSAMember)
             .Skip(1)
+            .ObserveOn(RxApp.MainThreadScheduler)
             .Subscribe(isMember => UpdateMembership(KinokuniyaUSA.WEBSITE_TITLE, isMember));
     }
 

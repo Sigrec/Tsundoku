@@ -10,10 +10,10 @@ using MangaAndLightNovelWebScrape.Websites;
 using Tsundoku.ViewModels;
 using Tsundoku.Converters;
 using System.Text.Json.Nodes;
-using static Tsundoku.Models.TsundokuLanguageModel;
+using static Tsundoku.Models.Enums.TsundokuLanguageEnums;
 using System.Diagnostics.CodeAnalysis;
 using DynamicData.Kernel;
-using static Tsundoku.Models.TsundokuFilterModel;
+using static Tsundoku.Models.Enums.TsundokuFilterEnums;
 using ReactiveUI.Fody.Helpers;
 using Tsundoku.Models;
 
@@ -29,7 +29,6 @@ public interface IUserService : IDisposable
     void SaveUserData(User user);
     void SaveUserData();
     void ImportUserDataFromJson(string filePath);
-    void ImportUserDataFromGoodreads(string filePath);
     void UpdateUserIcon(string filePath);
     User? GetCurrentUserSnapshot();
     uint GetCurrentThemeIndex();
@@ -49,7 +48,7 @@ public interface IUserService : IDisposable
     TsundokuTheme? GetCurrentThemeSnapshot();
     TsundokuTheme? GetMainTheme();
     bool AddSeries(Series? series, bool allowDuplicate = false);
-    bool UpdateSeries(Series originalSeries, Series? refreshdSeries);
+    bool RefreshSeries(Series originalSeries, Series? refreshdSeries);
     void UpdateSeriesCoverBitmap(Guid seriesId, Bitmap bitmap);
     void RemoveSeries(Series series);
 
@@ -91,7 +90,7 @@ public sealed class UserService : IUserService, IDisposable
     public UserService()
     {
         // IObservable<IComparer<TsundokuTheme>> themeComparerChanged = _userSubject
-        //     .Where(user => user != null)
+        //     .Where(user => user is not null)
         //     .Select(user => user!.Language)
         //     .DistinctUntilChanged()
         //     .Select(curLang => (IComparer<TsundokuTheme>)new TsundokuThemeComparer(curLang));
@@ -103,7 +102,7 @@ public sealed class UserService : IUserService, IDisposable
             .DisposeWith(_disposables);
 
         _userSubject
-            .Where(user => user != null)
+            .Where(user => user is not null)
             .Select(user => user!.MainTheme)
             .DistinctUntilChanged()
             .ObserveOn(RxApp.MainThreadScheduler)
@@ -118,7 +117,7 @@ public sealed class UserService : IUserService, IDisposable
                     theme = _savedThemes.FirstOrDefault();
 
                     User user = _userSubject.Value;
-                    if (theme != null)
+                    if (theme is not null)
                     {
                         LOGGER.Warn($"MainTheme '{mainThemeName}' not found, defaulted to '{theme.ThemeName}'.");
                     }
@@ -164,7 +163,7 @@ public sealed class UserService : IUserService, IDisposable
         else
         {
             JsonNode? userData = JsonNode.Parse(userFileData);
-            if (userData != null)
+            if (userData is not null)
             {
                 User.UpdateSchemaVersion(userData, false);
                 loadedUser = userData.Deserialize(UserModelContext.Default.User);
@@ -335,12 +334,12 @@ public sealed class UserService : IUserService, IDisposable
 
     private void RefreshSourceCache(User? user)
     {
-        if (user!.SavedThemes != null)
+        if (user!.SavedThemes is not null)
         {
             _savedThemesSourceCache.Clear();
             _savedThemesSourceCache.AddOrUpdate(user!.SavedThemes);
         }
-        if (user!.UserCollection != null)
+        if (user!.UserCollection is not null)
         {
             _userCollectionSourceCache.Clear();
             _userCollectionSourceCache.AddOrUpdate(user!.UserCollection);
@@ -375,120 +374,6 @@ public sealed class UserService : IUserService, IDisposable
     }
 
     public void ImportUserDataFromJson(string filePath)
-    {
-        try
-        {
-            JsonNode? uploadedUserData = JsonNode.Parse(File.ReadAllText(filePath));
-
-            if (uploadedUserData is null)
-            {
-                LOGGER.Warn("File '{}' could not be parsed it is Malformed", filePath);
-                return;
-            }
-
-            // Ensure schema is updated (optional flag depending on your implementation)
-            User.UpdateSchemaVersion(uploadedUserData, true);
-
-            User? newUser = uploadedUserData.Deserialize(UserModelContext.Default.User);
-            if (newUser is null)
-            {
-                LOGGER.Warn("Deserialization returned null User from file '{}'.", filePath);
-                return;
-            }
-
-            // Backup current data before replacing
-            int count = 1;
-            string backupFileName;
-            do
-            {
-                backupFileName = $"UserData_Backup_{count}.json";
-                count++;
-            } while (File.Exists(backupFileName));
-
-            string originalUserDataPath = AppFileHelper.GetUserDataJsonPath(); // This is the user data file you want to modify
-            string backupOfOriginalPath = AppFileHelper.GetFilePath(backupFileName); // This is where the old data will be backed up
-
-            try
-            {
-                // 1. Validate that the source of new content exists
-                if (!File.Exists(filePath))
-                {
-                    LOGGER.Error("ImportUserData failed: Temporary source file with new content not found. File path: {filePath}", filePath);
-                    return; // Or throw an exception, as you can't proceed without the new data
-                }
-
-                // 2. Make a backup of the original file (if it exists)
-                if (File.Exists(originalUserDataPath))
-                {
-                    try
-                    {
-                        // Copy the original file to the backup location. Overwrite if backup already exists.
-                        File.Copy(originalUserDataPath, backupOfOriginalPath, true);
-                        LOGGER.Info("Successfully backed up original user data. Original path: {originalPath}, Backup path: {backupPath}", originalUserDataPath, backupOfOriginalPath);
-                    }
-                    catch (Exception ex)
-                    {
-                        // Log as an Error because backup failure is now critical
-                        LOGGER.Error(ex, "CRITICAL: Failed to create backup of original user data. Import operation aborted. Original path: {originalPath}, Backup path: {backupPath}. Error: {errorMessage}", originalUserDataPath, backupOfOriginalPath, ex.Message);
-                        // Re-throw the exception to ensure the outer catch block handles it and stops the import.
-                        throw;
-                    }
-                }
-                else
-                {
-                    // If original file doesn't exist, no backup is made, but it's not a failure condition for backup itself.
-                    LOGGER.Info("Original user data file not found. Path: {originalPath}. No backup created before importing new data.", originalUserDataPath);
-                }
-
-                // 3. Write the new content to the original destination path (this will overwrite the old file)
-                File.Copy(filePath, originalUserDataPath, true); // 'true' means overwrite the destination file
-                LOGGER.Info("Successfully imported new user data. Source path: {sourcePath}, Destination path: {destinationPath}", filePath, originalUserDataPath);
-
-                // 4. Optionally, delete the temporary source file once it's no longer needed
-                try
-                {
-                    File.Delete(filePath);
-                    LOGGER.Debug("Deleted temporary user data file. Path: {filePath}", filePath);
-                }
-                catch (Exception ex)
-                {
-                    LOGGER.Warn(ex, "Failed to delete temporary user data file. File path: {filePath}. Error: {errorMessage}", filePath, ex.Message);
-                }
-            }
-            catch (IOException ex)
-            {
-                // This catch block will handle if the File.Copy(new, original, true) fails due to locking,
-                // or if the initial backup copy failed and was re-thrown.
-                LOGGER.Error(ex, "IOException during user data import. The destination file might be locked by another process. Destination path: {destinationPath}. Error: {errorMessage}", originalUserDataPath, ex.Message);
-                // You might want to attempt to restore from backup here if this copy failed and backup was successful
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                LOGGER.Error(ex, "Permission error during user data import. Ensure the application has write access to the destination path. Destination path: {destinationPath}. Error: {errorMessage}", originalUserDataPath, ex.Message);
-            }
-            catch (Exception ex)
-            {
-                LOGGER.Error(ex, "An unexpected error occurred during user data import. Error: {errorMessage}", ex.Message);
-            }
-
-            // Push to reactive stream
-            RefreshSourceCache(newUser);
-            _userSubject.OnNext(newUser);
-            SaveUserData();
-
-            LOGGER.Info("Successfully imported user data from '{}'. Backup created as '{}'.", filePath, backupFileName);
-        }
-        catch (JsonException ex)
-        {
-            LOGGER.Error(ex, "File '{}' is not valid JSON.", filePath);
-        }
-        catch (Exception ex)
-        {
-            LOGGER.Error(ex, "Unexpected error during ImportUserData from '{}'.", filePath);
-        }
-    }
-
-    public void ImportUserDataFromGoodreads(string filePath)
     {
         try
         {
@@ -667,7 +552,7 @@ public sealed class UserService : IUserService, IDisposable
     [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "<Pending>")]
     public void SaveUserData(User user)
     {
-        if (user == null) return;
+        if (user is null) return;
 
         string userDataFullPath = AppFileHelper.GetUserDataJsonPath();
         LOGGER.Info($"Saving \"{user.UserName}'s\" Collection Data to {userDataFullPath}");
@@ -689,7 +574,7 @@ public sealed class UserService : IUserService, IDisposable
     public void SaveUserData()
     {
         User user = GetCurrentUserSnapshot();
-        if (user == null) return;
+        if (user is null) return;
 
         string userDataFullPath = AppFileHelper.GetUserDataJsonPath();
         LOGGER.Info($"Saving \"{user.UserName}'s\" Collection Data to {userDataFullPath}");
@@ -739,15 +624,17 @@ public sealed class UserService : IUserService, IDisposable
         return true;
     }
 
-    public bool UpdateSeries(Series originalSeries, Series? refreshedSeries)
+    public bool RefreshSeries(Series originalSeries, Series? refreshedSeries)
     {
-        if (refreshedSeries == null)
+        if (refreshedSeries is null)
         {
             LOGGER.Warn("{title} returned a null series entry on refresh", originalSeries.Titles[TsundokuLanguage.Romaji]);
         }
         else if (_userCollectionSourceCache.Lookup(originalSeries.Id).HasValue)
         {
-            originalSeries.UpdateFrom(refreshedSeries);
+            bool isCoverEmpty = originalSeries.IsCoverImageEmpty();
+            originalSeries.UpdateFrom(refreshedSeries, isCoverEmpty);
+
             UpdateUser(user =>
             {
                 int index = user.UserCollection.BinarySearch(originalSeries, new SeriesComparer(user.Language));
@@ -756,16 +643,18 @@ public sealed class UserService : IUserService, IDisposable
                 user.UserCollection.Insert(index, originalSeries);
             });
 
-            LOGGER.Info("Refreshed {series} ({id}) in Collection", originalSeries.Titles[TsundokuLanguage.Romaji] + (originalSeries.DuplicateIndex == 0 ? string.Empty : $" ({originalSeries.DuplicateIndex})"), originalSeries.Id);
+            LOGGER.Info("Refreshed {series} ({id} | {CoverEmpty?}) in Collection", originalSeries.Titles[TsundokuLanguage.Romaji] + (originalSeries.DuplicateIndex == 0 ? string.Empty : $" ({originalSeries.DuplicateIndex})"), originalSeries.Id, isCoverEmpty);
             return true;
         }
+        
+        refreshedSeries.Cover = string.Empty;
         refreshedSeries?.Dispose();
         return false;
     }
 
     public void RemoveSeries(Series series)
     {
-        if (series == null)
+        if (series is null)
         {
             return;
         }
@@ -797,7 +686,7 @@ public sealed class UserService : IUserService, IDisposable
 
     public void AddTheme(TsundokuTheme theme)
     {
-        if (theme == null)
+        if (theme is null)
         {
             throw new ArgumentNullException(nameof(theme), "Theme cannot be null.");
         }
@@ -849,7 +738,7 @@ public sealed class UserService : IUserService, IDisposable
 
     public void RemoveTheme(TsundokuTheme theme)
     {
-        if (theme == null)
+        if (theme is null)
             return;
 
         if (_savedThemesSourceCache.Count <= 1)
@@ -863,7 +752,7 @@ public sealed class UserService : IUserService, IDisposable
             .Where(t => !t.ThemeName.Equals(theme.ThemeName, StringComparison.OrdinalIgnoreCase))
             .FirstOrDefault();
 
-        if (newCurrentTheme != null)
+        if (newCurrentTheme is not null)
         {
             SetCurrentTheme(newCurrentTheme);
             LOGGER.Debug($"Switched current theme to '{newCurrentTheme.ThemeName}' before removal");
@@ -897,7 +786,7 @@ public sealed class UserService : IUserService, IDisposable
 
         TsundokuTheme? themeToRemove = _savedThemesSourceCache.Lookup(themeName).Value;
 
-        if (themeToRemove != null)
+        if (themeToRemove is not null)
         {
             RemoveTheme(themeToRemove);
         }
@@ -912,7 +801,7 @@ public sealed class UserService : IUserService, IDisposable
     public void ExportTheme(string fileName)
     {
         TsundokuTheme theme = _currentThemeSubject.Value;
-        if (theme == null)
+        if (theme is null)
             throw new ArgumentNullException(nameof(theme));
 
         string themesFolderPath = AppFileHelper.GetThemesFolderPath();
@@ -949,7 +838,7 @@ public sealed class UserService : IUserService, IDisposable
             await using FileStream openStream = File.OpenRead(themeFilePath);
             TsundokuTheme? importedTheme = await JsonSerializer.DeserializeAsync(openStream, TsundokuThemeModelContext.Default.TsundokuTheme);
 
-            if (importedTheme != null)
+            if (importedTheme is not null)
             {
                 AddTheme(importedTheme); // This will also set it as the current theme and persist
                 LOGGER.Info("Successfully imported and set theme '{name}' from {themeFilePath}", importedTheme.ThemeName, themeFilePath);
@@ -975,7 +864,7 @@ public sealed class UserService : IUserService, IDisposable
     public void UpdateUserIcon(string filePath)
     {
         User currentUser = GetCurrentUserSnapshot();
-        if (currentUser == null)
+        if (currentUser is null)
         {
             LOGGER.Warn("Attempted to update user icon, but no user is currently loaded.");
             return;

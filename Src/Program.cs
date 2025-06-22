@@ -7,16 +7,11 @@ namespace Tsundoku;
 
 internal sealed class Program
 {
-    // TODO - Add a static property to hold the ServiceProvider for dependency injection
-
     // This is your main entry point
     [STAThread]
     public static void Main(string[] args)
     {
         BuildAvaloniaApp().StartWithClassicDesktopLifetime(args, Avalonia.Controls.ShutdownMode.OnMainWindowClose);
-
-        // TODO -  Optional: When the app shuts down, dispose of the service provider
-        //(ServiceProvider as IDisposable)?.Dispose();
     }
 
     // Avalonia configuration, don't remove; also used by visual designer.

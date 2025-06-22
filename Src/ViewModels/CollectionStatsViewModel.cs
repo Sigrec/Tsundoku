@@ -16,6 +16,7 @@ using static Tsundoku.Models.Enums.SeriesStatusEnum;
 using static Tsundoku.Models.Enums.SeriesDemographicEnum;
 using static Tsundoku.Models.Enums.SeriesFormatEnum;
 using static Tsundoku.Models.Enums.SeriesGenreEnum;
+using System.Globalization;
 
 namespace Tsundoku.ViewModels;
 
@@ -116,13 +117,14 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
     public Axis[] GenreXAxes { get; set; } = [];
     public Axis[] GenreYAxes { get; set; } = [];
 
-    [Reactive] public uint SeriesCount { get; set; }
-    [Reactive] public uint FavoriteCount { get; set; }
+    [Reactive] public int SeriesCount { get; set; }
+    [Reactive] public int FavoriteCount { get; set; }
 
     [Reactive] public SolidColorBrush PaneBackgroundColor { get; set; }
     [Reactive] public SolidColorBrush UnknownRectangleColor { get; set; }
     [Reactive] public SolidColorBrush ManhuaRectangleColor { get; set; }
     [Reactive] public SolidColorBrush ManfraRectangleColor { get; set; }
+    [Reactive] public string CollectionValueText { get; set; }
 
     public ReadOnlyObservableCollection<Series> UserCollection { get; }
     private readonly ISharedSeriesCollectionProvider _sharedSeriesProvider;
@@ -216,6 +218,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
             ? CurrentTheme.SeriesCardTitleColor
             : CurrentTheme.SeriesCardDescColor;
     }
+
     private void UpdateManhuaRectangleColor()
     {
         ManhuaRectangleColor = GetManhwaColor();
@@ -236,31 +239,34 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
     private void SetupStats()
     {
         _userService.UserCollectionChanges
-            .Filter(series => series.Rating >= 0)
             .AutoRefresh(x => x.Rating)
             .DistinctUntilChanged()
-            .Throttle(TimeSpan.FromMilliseconds(500))
+            .Throttle(TimeSpan.FromMilliseconds(100))
+            .ObserveOn(RxApp.MainThreadScheduler)
             .ToCollection()
             .Select(list =>
             {
                 decimal total = 0;
+                int seriesCount = 0;
                 foreach (Series series in list)
                 {
-                    total += series.Rating;
+                    if (series.Rating >= 0.00m)
+                    {
+                        total += series.Rating;
+                        seriesCount++;
+                    }
                 }
-                return SeriesCount != 0 ? decimal.Round(decimal.Divide(total, SeriesCount), 2) : 0.00m;
+                return seriesCount != 0 ? decimal.Round(decimal.Divide(total, seriesCount), 2) : 0.00m;
             })
-            .ObserveOn(RxApp.MainThreadScheduler)
             .Subscribe(rating => _userService.UpdateUser(user => user.MeanRating = rating));
 
         _userService.UserCollectionChanges
-            .Filter(series => series.VolumesRead > 0)
             .AutoRefresh(x => x.VolumesRead)
             .DistinctUntilChanged()
-            .Throttle(TimeSpan.FromMilliseconds(500))
+            .Throttle(TimeSpan.FromMilliseconds(100))
+            .ObserveOn(RxApp.MainThreadScheduler)
             .ToCollection()
             .Select(seriesCollection => (uint)seriesCollection.Sum(item => item.VolumesRead))
-            .ObserveOn(RxApp.MainThreadScheduler)
             .Subscribe(volumesRead =>
             {
                 _userService.UpdateUser(user => user.VolumesRead = volumesRead);
@@ -268,38 +274,47 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
 
         Observable.CombineLatest(
             _userService.UserCollectionChanges
-                .Filter(series => series.Value > 0m)
                 .AutoRefresh(x => x.Value)
                 .DistinctUntilChanged()
+                .Throttle(TimeSpan.FromMilliseconds(100))
+                .ObserveOn(RxApp.MainThreadScheduler)
                 .ToCollection()
-                .Select(seriesCollection => decimal.Round(seriesCollection.Sum(item => item.Value), 2))
-                .ObserveOn(RxApp.MainThreadScheduler),
+                .Select(seriesCollection => decimal.Round(seriesCollection.Sum(item => item.Value), 2)),
             this.WhenAnyValue(x => x.CurrentUser.Currency),
-            (value, currency) => new { value, currency }
+            (Value, Currency) => new { Value, Currency }
         )
-        .Throttle(TimeSpan.FromMilliseconds(500))
+        .ObserveOn(RxApp.MainThreadScheduler)
         .Subscribe(result =>
         {
+            CultureInfo cultureInfo = CultureInfo.GetCultureInfo(AVAILABLE_CURRENCY_WITH_CULTURE[result.Currency].Culture);
+            if (cultureInfo.NumberFormat.CurrencyPositivePattern is 0 or 2) // 0 = "$n", 2 = "$ n"
+            {
+                CollectionValueText = $"{result.Currency}{result.Value}";
+            }
+            else
+            {
+                CollectionValueText = $"{result.Value}{result.Currency}";
+            }
+
             _userService.UpdateUser(user =>
-                user.CollectionPrice = $"{result.currency}{result.value}");
+                user.CollectionValue = CollectionValueText);
         });
 
         _userService.UserCollectionChanges
             .DistinctUntilChanged()
-            .ToCollection()
             .ObserveOn(RxApp.MainThreadScheduler)
+            .ToCollection()
             .Subscribe(seriesList =>
             {
-                SeriesCount = (uint)seriesList.Count;
+                SeriesCount = seriesList.Count;
             });
 
         _userService.UserCollectionChanges
-            .Filter(series => series.IsFavorite)
             .AutoRefresh(x => x.IsFavorite)
             .DistinctUntilChanged()
-            .ToCollection()
-            .Select(seriesList => (uint)seriesList.Count(x => x.IsFavorite))
             .ObserveOn(RxApp.MainThreadScheduler)
+            .ToCollection()
+            .Select(seriesList => seriesList.Count(x => x.IsFavorite))
             .Subscribe(count =>
             {
                 FavoriteCount = count;
@@ -309,6 +324,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
             .AutoRefresh(x => x.CurVolumeCount)
             .AutoRefresh(x => x.MaxVolumeCount)
             .DistinctUntilChanged()
+            .ObserveOn(RxApp.MainThreadScheduler)
             .Throttle(TimeSpan.FromMilliseconds(500))
             .ToCollection()
             .Select(seriesList =>
@@ -323,7 +339,6 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
                 }
                 return (totalCurVolumes, totalVolumesToBeCollected);
             })
-            .ObserveOn(RxApp.MainThreadScheduler)
             .Subscribe(tuple =>
             {
                 _userService.UpdateUser(user =>
@@ -410,8 +425,9 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
         RatingYAxes.Add(ratingYAxisObject);
 
         _ = _userService.UserCollectionChanges
-                .AutoRefresh(x => x.Rating) // <--- This is key: it triggers re-evaluation if x.Rating changes
-                .QueryWhenChanged(query => query.Items.ToArray()) // Get the current snapshot of all items
+                .AutoRefresh(x => x.Rating)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .QueryWhenChanged(query => query.Items)
                 .Select(seriesList => // Perform all your counting logic on this snapshot
                 {
                     int[] counts = new int[11]; // For ratings 0-10
@@ -457,7 +473,6 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
                         Max = counts.Max()
                     };
                 })
-                .ObserveOn(RxApp.MainThreadScheduler) // Ensure updates to ObservableValue properties are on the UI thread
                 .Subscribe(calculatedValues =>
                 {
                     // Update your ObservableValue properties with the new counts
@@ -572,7 +587,8 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
 
         _userService.UserCollectionChanges
             .AutoRefresh(x => x.MaxVolumeCount)
-            .QueryWhenChanged(query => query.Items.ToArray())
+            .ObserveOn(RxApp.MainThreadScheduler)
+            .QueryWhenChanged(query => query.Items)
             .Select(seriesList =>
             {
                 int[] volumeCounts = new int[11];
@@ -645,7 +661,6 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
                     Max = max
                 };
             })
-            .ObserveOn(RxApp.MainThreadScheduler) // Ensure UI updates are on the main thread
             .Subscribe(calculatedValues =>
             {
                 ZeroVolumeCount.Value = calculatedValues.Zero;
@@ -747,7 +762,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
 
         foreach (Series series in UserCollection)
         {
-            if (series.Genres != null)
+            if (series.Genres is not null)
             {
                 foreach (SeriesGenre genre in series.Genres)
                 {
@@ -773,7 +788,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
         }
 
         // 4. Update the Y-axis labels
-        if (GenreYAxes != null && GenreYAxes.Length > 0)
+        if (GenreYAxes is not null && GenreYAxes.Length > 0)
         {
             GenreYAxes[0].Labels = [.. GenreData.Keys]; // Update the labels of the existing axis
         }
@@ -782,7 +797,8 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
             .AutoRefresh(x => x.Genres)
             .DistinctUntilChanged()
             .Throttle(TimeSpan.FromMilliseconds(500))
-            .QueryWhenChanged(query => query.Items.ToArray()) // Get the current snapshot of all Series
+            .ObserveOn(RxApp.MainThreadScheduler)
+            .QueryWhenChanged(query => query.Items) // Get the current snapshot of all Series
             .Select(seriesList => // Perform the genre counting logic
             {
                 GenreData.Clear();
@@ -808,7 +824,6 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
 
                 return GenreData.OrderBy(x => x.Value).ToArray();
             })
-            .ObserveOn(RxApp.MainThreadScheduler)
             .Subscribe(calculatedGenreData =>
             {
                 if (GenreDistribution.Count > 0 && GenreDistribution[0] is RowSeries<KeyValuePair<string, int>> genreBarObject)
@@ -816,7 +831,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
                     genreBarObject.Values = calculatedGenreData;
                 }
 
-                if (GenreYAxes != null && GenreYAxes.Length > 0)
+                if (GenreYAxes is not null && GenreYAxes.Length > 0)
                 {
                     GenreYAxes[0].Labels = calculatedGenreData.Select(kvp => kvp.Key).ToArray();
                 }
@@ -840,7 +855,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
         }
 
         // Apply colors to the Y-axis (genre labels)
-        if (GenreYAxes != null && GenreYAxes.Length > 0)
+        if (GenreYAxes is not null && GenreYAxes.Length > 0)
         {
             Axis genreYAxisObject = GenreYAxes[0];
             genreYAxisObject.LabelsPaint = new SolidColorPaint(menuTextColor);
@@ -848,7 +863,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
         }
 
         // Apply colors to the X-axis (counts)
-        if (GenreXAxes != null && GenreXAxes.Length > 0)
+        if (GenreXAxes is not null && GenreXAxes.Length > 0)
         {
             Axis genreXAxisObject = GenreXAxes[0];
             genreXAxisObject.TicksPaint = new SolidColorPaint(menuTextColor);
@@ -1142,8 +1157,11 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
 
     private static decimal CalculatePercentage(double? count, decimal total)
     {
-        if (count  == null || total == 0) return 0M;
-        return Math.Round((decimal)count / total * 100M, 2);
+        if (count is null || total == 0)
+        {
+            return 0m;
+        }
+        return decimal.Round((decimal)count / total * 100m, 2);
     }
 
     private static SKColor ConvertAvaloniaBrushToSKColor(SolidColorBrush brush)

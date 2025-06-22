@@ -302,7 +302,7 @@
 						   BorderThickness="2"
                            HorizontalContentAlignment="Center"
 						   FontWeight="Bold"
-                           Mask="{Binding CurrentUser.Currency, StringFormat='{}{0}000000000000000000.00'}"
+                           Mask="{CompiledBinding SeriesValueMaskedText}"
 						   FontSize="18"/>
 			<TextBlock Text="Add Series"
 					   Grid.Row="15"

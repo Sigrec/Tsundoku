@@ -164,7 +164,6 @@
 							Click="PerformAnalysis"
 							Content="Analyze"/>
 				</StackPanel>
-				<!-- TODO CornerRadius doesn't apply to column headers -->
 				<DataGrid Name="AnalysisDataGrid"
 						  ItemsSource="{CompiledBinding AnalyzedList}"
 						  Classes="Menu"

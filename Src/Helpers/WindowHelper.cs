@@ -23,7 +23,7 @@ public static class WindowHelper
         where TWindow : ReactiveWindow<TViewModel>
         where TViewModel : class
     {
-        if (windowInstance == null)
+        if (windowInstance is null)
         {
             LOGGER.Error($"{windowNameForLogging} instance is null. Cannot open window.");
             return null;
@@ -40,6 +40,7 @@ public static class WindowHelper
             else
             {
                 windowInstance.Activate();
+                windowInstance.Focus();
             }
             return windowInstance;
         }
@@ -68,9 +69,9 @@ public static class WindowHelper
         where TWindow : ReactiveWindow<TViewModel>
         where TViewModel : class // Constraint for the ViewModel type
     {
-        if (dialogInstance == null)
+        if (dialogInstance is null)
         {
-            LOGGER.Error($"{windowNameForLogging} instance is null. Cannot open dialog.");
+            LOGGER.Error("{Window} instance is null. Cannot open dialog.", windowNameForLogging);
             return default; // Return default if instance is null
         }
 
