@@ -3,17 +3,21 @@
   <PropertyGroup>
     <TargetFramework>net9.0-windows10.0.26100.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>disable</Nullable>
+	  <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
     <LangVersion>preview</LangVersion>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="AniList\AniListTestData\ToManyStaffIlustrators.json" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageReference Include="NUnit" Version="4.3.2" />
     <PackageReference Include="NUnit3TestAdapter" Version="5.0.0" />
     <PackageReference Include="Avalonia.Headless.NUnit" Version="11.3.1" />
-    <PackageReference Include="NUnit.Analyzers" Version="4.9.1">
+    <PackageReference Include="NUnit.Analyzers" Version="4.9.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -21,6 +25,32 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Src\Tsundoku.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<Using Include="NUnit.Framework" />
+	<Using Include="Tsundoku.Helpers" />
+	<Using Include="Tsundoku.Clients" />
+	<Using Include="Tsundoku.Models" />
+	<Using Include="Avalonia.Headless.NUnit" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<AvaloniaXaml Remove="bin\**" />
+	<AvaloniaXaml Remove="obj\**" />
+	<Compile Remove="**\*.json" />
+	<Compile Remove="bin\**" />
+	<Compile Remove="obj\**" />
+	<None Include="**\*.json">
+	  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	</None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove="bin\**" />
+    <EmbeddedResource Remove="obj\**" />
+    <None Remove="bin\**" />
+    <None Remove="obj\**" />
   </ItemGroup>
 
 </Project>

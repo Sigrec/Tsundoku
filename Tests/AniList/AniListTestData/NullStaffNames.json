@@ -1,0 +1,69 @@
+﻿{
+  "staff": {
+    "pageInfo": {
+      "hasNextPage": false
+    },
+    "edges": [
+      {
+        "role": "Story",
+        "node": {
+          "name": {
+            "full": "FullNameOnly",
+            "native": null,
+            "alternative": []
+          }
+        }
+      },
+      {
+        "role": "Art",
+        "node": {
+          "name": {
+            "full": null,
+            "native": "NativeOnly",
+            "alternative": []
+          }
+        }
+      },
+      {
+        "role": "Original Story",
+        "node": {
+          "name": {
+            "full": null,
+            "native": "NativeWithAlt",
+            "alternative": [ "Alt1", "Alt2" ]
+          }
+        }
+      },
+      {
+        "role": "Character Design",
+        "node": {
+          "name": {
+            "full": null,
+            "native": null,
+            "alternative": [ "AltOnly1", "AltOnly2" ]
+          }
+        }
+      },
+      {
+        "role": "Original Character Design",
+        "node": {
+          "name": {
+            "full": "FullWithAlt",
+            "native": null,
+            "alternative": [ "AltForFull" ]
+          }
+        }
+      },
+      {
+        "role": "Mechanical Design",
+        "node": {
+          "name": {
+            "full": null,
+            "native": null,
+            "alternative": []
+          }
+        }
+      }
+    ]
+  }
+}

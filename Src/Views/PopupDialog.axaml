@@ -1,0 +1,25 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+        xmlns:vm="using:Tsundoku.ViewModels"
+        x:Class="Tsundoku.Views.PopupDialog"
+        Icon="\Assets\Icons\TsundokuLogo.ico"
+        FontFamily="Segoe UI"
+        Classes="Menu"
+        WindowStartupLocation="CenterScreen"
+        SizeToContent="Height"
+        Width="300"
+        x:DataType="vm:PopupDialogViewModel"
+        Topmost="True"
+        Title="{CompiledBinding Title}"
+        CanResize="false">
+
+    <Border Classes="Menu" BorderThickness="5" CornerRadius="0,0,8,8" ClipToBounds="True">
+        <StackPanel Orientation="Vertical" Margin="10" Spacing="5">
+            <i:Icon Value="{CompiledBinding Icon}" FontSize="25" FontWeight="Bold" Foreground="{CompiledBinding CurrentTheme.DividerColor}" Classes="Menu"/>
+            <TextBlock Text="{CompiledBinding InfoText}" FontSize="20" TextAlignment="Center" FontWeight="Bold" TextWrapping="Wrap" Classes="Menu"/>
+        </StackPanel>
+    </Border>
+</Window>

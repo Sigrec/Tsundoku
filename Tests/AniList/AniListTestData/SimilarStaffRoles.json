@@ -1,0 +1,67 @@
+﻿{
+  "staff": {
+    "pageInfo": {
+      "hasNextPage": false
+    },
+    "edges": [
+      {
+        "role": "Original Story",
+        "node": {
+          "name": {
+            "full": "Chu-Gong",
+            "native": "추공",
+            "alternative": [
+              "Chugong"
+            ]
+          }
+        }
+      },
+      {
+        "role": "Story (2018-2019)",
+        "node": {
+          "name": {
+            "full": "So-Ryeong Gi",
+            "native": "기소령",
+            "alternative": []
+          }
+        }
+      },
+      {
+        "role": "Story (2019-)",
+        "node": {
+          "name": {
+            "full": "Hyeon-Gun",
+            "native": "현군",
+            "alternative": [
+              "h-goon"
+            ]
+          }
+        }
+      },
+      {
+        "role": "Art",
+        "node": {
+          "name": {
+            "full": "Seong-Rak Jang",
+            "native": "장성락",
+            "alternative": [
+              "DUBU"
+            ]
+          }
+        }
+      },
+      {
+        "role": "Translator (Polish)",
+        "node": {
+          "name": {
+            "full": "Adrianna Jarzębowska",
+            "native": null,
+            "alternative": [
+              "Adrianna Jarzebowska"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

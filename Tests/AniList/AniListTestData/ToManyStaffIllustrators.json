@@ -1,0 +1,290 @@
+﻿{
+  "staff": {
+    "pageInfo": {
+      "hasNextPage": true
+    },
+    "edges": [
+      {
+        "role": "Story & Art",
+        "node": {
+          "name": {
+            "full": "Ito Oogure",
+            "native": "大暮維人",
+            "alternative": [
+              "Oh! Great",
+              "Oh!great"
+            ]
+          }
+        }
+      },
+      {
+        "role": "Original Story",
+        "node": {
+          "name": {
+            "full": "NISIOISIN",
+            "native": "西尾維新",
+            "alternative": [
+              "Ishin Nishio",
+              "Nisio Isin"
+            ]
+          }
+        }
+      },
+      {
+        "role": "Character Design",
+        "node": {
+          "name": {
+            "full": "VOFAN",
+            "native": "戴源亨",
+            "alternative": [
+              "Yuanheng Dai"
+            ]
+          }
+        }
+      },
+      {
+        "role": "Character Design",
+        "node": {
+          "name": {
+            "full": "Akio Watanabe",
+            "native": "渡辺明夫",
+            "alternative": [
+              "渡辺あきお",
+              "Poyoyon Rock (ぽよよんろっく)",
+              "Poyoyon♥Rock (ぽよよん♥ろっく)",
+              "Pucchin Purin"
+            ]
+          }
+        }
+      },
+      {
+        "role": "Illustration (ch 20)",
+        "node": {
+          "name": {
+            "full": "You Asami",
+            "native": "浅見よう",
+            "alternative": []
+          }
+        }
+      },
+      {
+        "role": "Illustration (ch 21)",
+        "node": {
+          "name": {
+            "full": "Nanashi",
+            "native": "ナナシ",
+            "alternative": [
+              "774",
+              "774ハウス"
+            ]
+          }
+        }
+      },
+      {
+        "role": "Illustration (ch 22)",
+        "node": {
+          "name": {
+            "full": "Hiromu Arakawa",
+            "native": "荒川弘",
+            "alternative": [
+              "Hiromi Arakawa (荒川弘美)"
+            ]
+          }
+        }
+      },
+      {
+        "role": "Illustration (ch 23)",
+        "node": {
+          "name": {
+            "full": "Mitsuru Hattori",
+            "native": "はっとりみつる",
+            "alternative": [
+              "服部充"
+            ]
+          }
+        }
+      },
+      {
+        "role": "Illustration (ch 24)",
+        "node": {
+          "name": {
+            "full": "Atsushi Uchiyama",
+            "native": "内山敦司",
+            "alternative": [
+              "Attsun (あっつん)"
+            ]
+          }
+        }
+      },
+      {
+        "role": "Illustration (ch 25)",
+        "node": {
+          "name": {
+            "full": "Akira Sugito",
+            "native": "杉戸アキラ",
+            "alternative": []
+          }
+        }
+      },
+      {
+        "role": "Illustration (ch 26)",
+        "node": {
+          "name": {
+            "full": "Yuki Urushibara",
+            "native": "漆原友紀",
+            "alternative": [
+              "Soyogo Shima (志摩冬青)",
+              "Yuki Yoshiyama (吉山友紀)"
+            ]
+          }
+        }
+      },
+      {
+        "role": "Illustration (ch 27)",
+        "node": {
+          "name": {
+            "full": "Atsuya Uki",
+            "native": "宇木敦哉",
+            "alternative": []
+          }
+        }
+      },
+      {
+        "role": "Illustration (ch 28)",
+        "node": {
+          "name": {
+            "full": "Hiroyuki",
+            "native": "ヒロユキ",
+            "alternative": []
+          }
+        }
+      },
+      {
+        "role": "Illustration (ch 29)",
+        "node": {
+          "name": {
+            "full": "Kaihei Nakahara",
+            "native": "中原開平",
+            "alternative": []
+          }
+        }
+      },
+      {
+        "role": "Illustration (ch 30)",
+        "node": {
+          "name": {
+            "full": "Shizumu Watanabe",
+            "native": "渡辺静",
+            "alternative": []
+          }
+        }
+      },
+      {
+        "role": "Illustration (ch 31)",
+        "node": {
+          "name": {
+            "full": "Midori Endou",
+            "native": "遠藤ミドリ",
+            "alternative": []
+          }
+        }
+      },
+      {
+        "role": "Illustration (ch 32)",
+        "node": {
+          "name": {
+            "full": "Masakuni Igarashi",
+            "native": "五十嵐正邦",
+            "alternative": []
+          }
+        }
+      },
+      {
+        "role": "Illustration (ch 33)",
+        "node": {
+          "name": {
+            "full": "Shinobu Ohashi",
+            "native": "大橋忍",
+            "alternative": []
+          }
+        }
+      },
+      {
+        "role": "Illustration (ch 34)",
+        "node": {
+          "name": {
+            "full": "Shin Shinmoto",
+            "native": "慎本真",
+            "alternative": []
+          }
+        }
+      },
+      {
+        "role": "Illustration (ch 35)",
+        "node": {
+          "name": {
+            "full": "Chomoran",
+            "native": "チョモラン",
+            "alternative": []
+          }
+        }
+      },
+      {
+        "role": "Illustration (ch 36)",
+        "node": {
+          "name": {
+            "full": "Mosco",
+            "native": "もすこ",
+            "alternative": [
+              "Mosuko",
+              "Mosko",
+              "Мосуко"
+            ]
+          }
+        }
+      },
+      {
+        "role": "Illustration (ch 37)",
+        "node": {
+          "name": {
+            "full": "CHANxCO",
+            "native": "ちゃんこ",
+            "alternative": []
+          }
+        }
+      },
+      {
+        "role": "Illustration (ch 38)",
+        "node": {
+          "name": {
+            "full": "Yuuki Doumoto",
+            "native": "堂本裕貴",
+            "alternative": [
+              "Yuki Domoto"
+            ]
+          }
+        }
+      },
+      {
+        "role": "Illustration (ch 39)",
+        "node": {
+          "name": {
+            "full": "Hideki",
+            "native": "英貴",
+            "alternative": []
+          }
+        }
+      },
+      {
+        "role": "Illustration (ch 40)",
+        "node": {
+          "name": {
+            "full": "maruco",
+            "native": "maruco",
+            "alternative": []
+          }
+        }
+      }
+    ]
+  }
+}

@@ -91,7 +91,7 @@
           <Image
               Height="{CompiledBinding Source={x:Static m:Constants.IMAGE_HEIGHT}}"
               Width="{CompiledBinding Source={x:Static m:Constants.LEFT_SIDE_CARD_WIDTH}}"
-              Source="{Binding Series.CoverBitMap, ElementName=Root}"
+              Source="{CompiledBinding Series.CoverBitMap, ElementName=Root}"
               ClipToBounds="True" />
 
           <!-- Bottom Left: Status | Format -->

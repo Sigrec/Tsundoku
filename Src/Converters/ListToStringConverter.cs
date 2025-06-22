@@ -1,27 +1,26 @@
 using System.Globalization;
 using Avalonia.Data.Converters;
 
-namespace Tsundoku.Converters
-{
-    public class ListToStringConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (value is IEnumerable<string> filters)
-            {
-                StringBuilder listAsString = new StringBuilder();
-                foreach (string filter in filters)
-                {
-                    listAsString.AppendLine(filter);
-                }
-                return listAsString.ToString().Trim();
-            }
-            throw new NotSupportedException();
-        }
+namespace Tsundoku.Converters;
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+public sealed class ListToStringConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is IEnumerable<string> filters)
         {
-            throw new NotSupportedException();
+            StringBuilder listAsString = new StringBuilder();
+            foreach (string filter in filters)
+            {
+                listAsString.AppendLine(filter);
+            }
+            return listAsString.ToString().Trim();
         }
+        throw new NotSupportedException();
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        throw new NotSupportedException();
     }
 }

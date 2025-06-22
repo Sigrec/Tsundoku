@@ -94,51 +94,66 @@
 					 Grid.Column="4"
                      VerticalAlignment="Top"
 					 Theme="{StaticResource QueryListBox}">
-						<ListBoxItem Name="Arabic" Theme="{StaticResource QueryListBoxItem}">Arabic</ListBoxItem>
-						<ListBoxItem Name="Azerbaijan" Theme="{StaticResource QueryListBoxItem}">Azerbaijan</ListBoxItem>
-						<ListBoxItem Name="Bengali" Theme="{StaticResource QueryListBoxItem}">Bengali</ListBoxItem>
-						<ListBoxItem Name="Bulgarian" Theme="{StaticResource QueryListBoxItem}">Bulgarian</ListBoxItem>
-						<ListBoxItem Name="Burmese" Theme="{StaticResource QueryListBoxItem}">Burmese</ListBoxItem>
-						<ListBoxItem Name="Catalan" Theme="{StaticResource QueryListBoxItem}">Catalan</ListBoxItem>
-						<ListBoxItem Name="Chinese" Theme="{StaticResource QueryListBoxItem}">Chinese</ListBoxItem>
-						<ListBoxItem Name="Croatian" Theme="{StaticResource QueryListBoxItem}">Croatian</ListBoxItem>
-						<ListBoxItem Name="Czech" Theme="{StaticResource QueryListBoxItem}">Czech</ListBoxItem>
-						<ListBoxItem Name="Danish" Theme="{StaticResource QueryListBoxItem}">Danish</ListBoxItem>
-						<ListBoxItem Name="Dutch" Theme="{StaticResource QueryListBoxItem}">Dutch</ListBoxItem>
-						<ListBoxItem Name="Esperanto" Theme="{StaticResource QueryListBoxItem}">Esperanto</ListBoxItem>
-						<ListBoxItem Name="Estonian" Theme="{StaticResource QueryListBoxItem}">Estonian</ListBoxItem>
-						<ListBoxItem Name="Filipino" Theme="{StaticResource QueryListBoxItem}">Filipino</ListBoxItem>
-						<ListBoxItem Name="Finnish" Theme="{StaticResource QueryListBoxItem}">Finnish</ListBoxItem>
-						<ListBoxItem Name="French" Theme="{StaticResource QueryListBoxItem}">French</ListBoxItem>
-						<ListBoxItem Name="German" Theme="{StaticResource QueryListBoxItem}">German</ListBoxItem>
-						<ListBoxItem Name="Greek" Theme="{StaticResource QueryListBoxItem}">Greek</ListBoxItem>
-						<ListBoxItem Name="Hebrew" Theme="{StaticResource QueryListBoxItem}">Hebrew</ListBoxItem>
-						<ListBoxItem Name="Hindi" Theme="{StaticResource QueryListBoxItem}">Hindi</ListBoxItem>
-						<ListBoxItem Name="Hungarian" Theme="{StaticResource QueryListBoxItem}">Hungarian</ListBoxItem>
-						<ListBoxItem Name="Indonesian" Theme="{StaticResource QueryListBoxItem}">Indonesian</ListBoxItem>
-						<ListBoxItem Name="Italian" Theme="{StaticResource QueryListBoxItem}">Italian</ListBoxItem>
-						<ListBoxItem Name="Kazakh" Theme="{StaticResource QueryListBoxItem}">Kazakh</ListBoxItem>
-						<ListBoxItem Name="Korean" Theme="{StaticResource QueryListBoxItem}">Korean</ListBoxItem>
-						<ListBoxItem Name="Latin" Theme="{StaticResource QueryListBoxItem}">Latin</ListBoxItem>
-						<ListBoxItem Name="Lithuanian" Theme="{StaticResource QueryListBoxItem}">Lithuanian</ListBoxItem>
-						<ListBoxItem Name="Malay" Theme="{StaticResource QueryListBoxItem}">Malay</ListBoxItem>
-						<ListBoxItem Name="Mongolian" Theme="{StaticResource QueryListBoxItem}">Mongolian</ListBoxItem>
-						<ListBoxItem Name="Nepali" Theme="{StaticResource QueryListBoxItem}">Nepali</ListBoxItem>
-						<ListBoxItem Name="Norwegian" Theme="{StaticResource QueryListBoxItem}">Norwegian</ListBoxItem>
-						<ListBoxItem Name="Persian" Theme="{StaticResource QueryListBoxItem}">Persian</ListBoxItem>
-						<ListBoxItem Name="Polish" Theme="{StaticResource QueryListBoxItem}">Polish</ListBoxItem>
-						<ListBoxItem Name="Portuguese" Theme="{StaticResource QueryListBoxItem}">Portuguese</ListBoxItem>
-						<ListBoxItem Name="Romanian" Theme="{StaticResource QueryListBoxItem}">Romanian</ListBoxItem>
-						<ListBoxItem Name="Russian" Theme="{StaticResource QueryListBoxItem}">Russian</ListBoxItem>
-						<ListBoxItem Name="Serbian" Theme="{StaticResource QueryListBoxItem}">Serbian</ListBoxItem>
-						<ListBoxItem Name="Slovak" Theme="{StaticResource QueryListBoxItem}">Slovak</ListBoxItem>
-						<ListBoxItem Name="Spanish" Theme="{StaticResource QueryListBoxItem}">Spanish</ListBoxItem>
-						<ListBoxItem Name="Swedish" Theme="{StaticResource QueryListBoxItem}">Swedish</ListBoxItem>
-						<ListBoxItem Name="Tamil" Theme="{StaticResource QueryListBoxItem}">Tamil</ListBoxItem>
-						<ListBoxItem Name="Thai" Theme="{StaticResource QueryListBoxItem}">Thai</ListBoxItem>
-						<ListBoxItem Name="Turkish" Theme="{StaticResource QueryListBoxItem}">Turkish</ListBoxItem>
-						<ListBoxItem Name="Ukrainian" Theme="{StaticResource QueryListBoxItem}">Ukrainian</ListBoxItem>
-						<ListBoxItem Name="Vietnamese" Theme="{StaticResource QueryListBoxItem}">Vietnamese</ListBoxItem>
+						<ListBoxItem Name="Albanian" Theme="{StaticResource QueryListBoxItem}">Albanian</ListBoxItem>
+                        <ListBoxItem Name="Arabic" Theme="{StaticResource QueryListBoxItem}">Arabic</ListBoxItem>
+                        <ListBoxItem Name="Azerbaijan" Theme="{StaticResource QueryListBoxItem}">Azerbaijan</ListBoxItem>
+                        <ListBoxItem Name="Belarusian" Theme="{StaticResource QueryListBoxItem}">Belarusian</ListBoxItem>
+                        <ListBoxItem Name="Bengali" Theme="{StaticResource QueryListBoxItem}">Bengali</ListBoxItem>
+                        <ListBoxItem Name="Bosnian" Theme="{StaticResource QueryListBoxItem}">Bosnian</ListBoxItem>
+                        <ListBoxItem Name="Bulgarian" Theme="{StaticResource QueryListBoxItem}">Bulgarian</ListBoxItem>
+                        <ListBoxItem Name="Burmese" Theme="{StaticResource QueryListBoxItem}">Burmese</ListBoxItem>
+                        <ListBoxItem Name="Catalan" Theme="{StaticResource QueryListBoxItem}">Catalan</ListBoxItem>
+                        <ListBoxItem Name="Chinese" Theme="{StaticResource QueryListBoxItem}">Chinese</ListBoxItem>
+                        <ListBoxItem Name="Croatian" Theme="{StaticResource QueryListBoxItem}">Croatian</ListBoxItem>
+                        <ListBoxItem Name="Czech" Theme="{StaticResource QueryListBoxItem}">Czech</ListBoxItem>
+                        <ListBoxItem Name="Danish" Theme="{StaticResource QueryListBoxItem}">Danish</ListBoxItem>
+                        <ListBoxItem Name="Dutch" Theme="{StaticResource QueryListBoxItem}">Dutch</ListBoxItem>
+                        <ListBoxItem Name="Esperanto" Theme="{StaticResource QueryListBoxItem}">Esperanto</ListBoxItem>
+                        <ListBoxItem Name="Estonian" Theme="{StaticResource QueryListBoxItem}">Estonian</ListBoxItem>
+                        <ListBoxItem Name="Filipino" Theme="{StaticResource QueryListBoxItem}">Filipino</ListBoxItem>
+                        <ListBoxItem Name="Finnish" Theme="{StaticResource QueryListBoxItem}">Finnish</ListBoxItem>
+                        <ListBoxItem Name="French" Theme="{StaticResource QueryListBoxItem}">French</ListBoxItem>
+                        <ListBoxItem Name="Galician" Theme="{StaticResource QueryListBoxItem}">Galician</ListBoxItem>
+                        <ListBoxItem Name="German" Theme="{StaticResource QueryListBoxItem}">German</ListBoxItem>
+                        <ListBoxItem Name="Greek" Theme="{StaticResource QueryListBoxItem}">Greek</ListBoxItem>
+                        <ListBoxItem Name="Gujarati" Theme="{StaticResource QueryListBoxItem}">Gujarati</ListBoxItem>
+                        <ListBoxItem Name="Hebrew" Theme="{StaticResource QueryListBoxItem}">Hebrew</ListBoxItem>
+                        <ListBoxItem Name="Hindi" Theme="{StaticResource QueryListBoxItem}">Hindi</ListBoxItem>
+                        <ListBoxItem Name="Hungarian" Theme="{StaticResource QueryListBoxItem}">Hungarian</ListBoxItem>
+                        <ListBoxItem Name="Icelandic" Theme="{StaticResource QueryListBoxItem}">Icelandic</ListBoxItem>
+                        <ListBoxItem Name="Indonesian" Theme="{StaticResource QueryListBoxItem}">Indonesian</ListBoxItem>
+                        <ListBoxItem Name="Italian" Theme="{StaticResource QueryListBoxItem}">Italian</ListBoxItem>
+                        <ListBoxItem Name="Kannada" Theme="{StaticResource QueryListBoxItem}">Kannada</ListBoxItem>
+                        <ListBoxItem Name="Kazakh" Theme="{StaticResource QueryListBoxItem}">Kazakh</ListBoxItem>
+                        <ListBoxItem Name="Korean" Theme="{StaticResource QueryListBoxItem}">Korean</ListBoxItem>
+                        <ListBoxItem Name="Latin" Theme="{StaticResource QueryListBoxItem}">Latin</ListBoxItem>
+                        <ListBoxItem Name="Latvian" Theme="{StaticResource QueryListBoxItem}">Latvian</ListBoxItem>
+                        <ListBoxItem Name="Lithuanian" Theme="{StaticResource QueryListBoxItem}">Lithuanian</ListBoxItem>
+                        <ListBoxItem Name="Malay" Theme="{StaticResource QueryListBoxItem}">Malay</ListBoxItem>
+                        <ListBoxItem Name="Malayalam" Theme="{StaticResource QueryListBoxItem}">Malayalam</ListBoxItem>
+                        <ListBoxItem Name="Macedonian" Theme="{StaticResource QueryListBoxItem}">Macedonian</ListBoxItem>
+                        <ListBoxItem Name="Marathi" Theme="{StaticResource QueryListBoxItem}">Marathi</ListBoxItem>
+                        <ListBoxItem Name="Mongolian" Theme="{StaticResource QueryListBoxItem}">Mongolian</ListBoxItem>
+                        <ListBoxItem Name="Nepali" Theme="{StaticResource QueryListBoxItem}">Nepali</ListBoxItem>
+                        <ListBoxItem Name="Norwegian" Theme="{StaticResource QueryListBoxItem}">Norwegian</ListBoxItem>
+                        <ListBoxItem Name="Persian" Theme="{StaticResource QueryListBoxItem}">Persian</ListBoxItem>
+                        <ListBoxItem Name="Polish" Theme="{StaticResource QueryListBoxItem}">Polish</ListBoxItem>
+                        <ListBoxItem Name="Portuguese" Theme="{StaticResource QueryListBoxItem}">Portuguese</ListBoxItem>
+                        <ListBoxItem Name="Punjabi" Theme="{StaticResource QueryListBoxItem}">Punjabi</ListBoxItem>
+                        <ListBoxItem Name="Romanian" Theme="{StaticResource QueryListBoxItem}">Romanian</ListBoxItem>
+                        <ListBoxItem Name="Russian" Theme="{StaticResource QueryListBoxItem}">Russian</ListBoxItem>
+                        <ListBoxItem Name="Serbian" Theme="{StaticResource QueryListBoxItem}">Serbian</ListBoxItem>
+                        <ListBoxItem Name="Slovak" Theme="{StaticResource QueryListBoxItem}">Slovak</ListBoxItem>
+                        <ListBoxItem Name="Slovenian" Theme="{StaticResource QueryListBoxItem}">Slovenian</ListBoxItem>
+                        <ListBoxItem Name="Spanish" Theme="{StaticResource QueryListBoxItem}">Spanish</ListBoxItem>
+                        <ListBoxItem Name="Swedish" Theme="{StaticResource QueryListBoxItem}">Swedish</ListBoxItem>
+                        <ListBoxItem Name="Tamil" Theme="{StaticResource QueryListBoxItem}">Tamil</ListBoxItem>
+                        <ListBoxItem Name="Telugu" Theme="{StaticResource QueryListBoxItem}">Telugu</ListBoxItem>
+                        <ListBoxItem Name="Thai" Theme="{StaticResource QueryListBoxItem}">Thai</ListBoxItem>
+                        <ListBoxItem Name="Turkish" Theme="{StaticResource QueryListBoxItem}">Turkish</ListBoxItem>
+                        <ListBoxItem Name="Ukrainian" Theme="{StaticResource QueryListBoxItem}">Ukrainian</ListBoxItem>
+                        <ListBoxItem Name="Urdu" Theme="{StaticResource QueryListBoxItem}">Urdu</ListBoxItem>
+                        <ListBoxItem Name="Vietnamese" Theme="{StaticResource QueryListBoxItem}">Vietnamese</ListBoxItem>
 			</ListBox>
 			<TextBlock Text="Enter Title or ID" Grid.Row="0" Grid.Column="0" FontSize="20" FontWeight="Bold" Classes="Menu" Margin="2,0,0,1" ToolTip.Tip="{CompiledBinding TitleText}"/>
 			<TextBox Name="TitleBox"
@@ -287,7 +302,7 @@
 						   BorderThickness="2"
                            HorizontalContentAlignment="Center"
 						   FontWeight="Bold"
-                           Mask="{Binding CurrentUser.Currency, StringFormat='{}{0}000000000000000000.00'}"
+                           Mask="{CompiledBinding SeriesValueMaskedText}"
 						   FontSize="18"/>
 			<TextBlock Text="Add Series"
 					   Grid.Row="15"
