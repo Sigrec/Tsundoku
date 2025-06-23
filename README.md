@@ -10,11 +10,7 @@ If you lose or delete the UserData.json file you will lose your entire collectio
 ### P.S. This Application is Something I Do For Fun during my Free Time
 
 ### Reporting Bugs/Issues
-To report a issue please go to the issues link [Tsundoku Issues](https://github.com/Sigrec/TsundokuApp/issues) and create a issue ticket explaining the problem and how I can reproduce it. You can check back anytime to see if the ticket is completed and what version the change was made in.
-
-
-### Here is one of my own custom themes, showcasing what the app looks like when run in Fullscreen (F11)
-![Tsundoku Example App](https://github.com/Sigrec/TsundokuApp/blob/main/Src/Assets/ThemeExample.png)
+To report a issue please go to the issues link [Tsundoku Issues](https://github.com/Sigrec/Tsundoku/issues/new/choose) and create a issue ticket explaining the problem and how I can reproduce it. You can check back anytime to see if the ticket is completed and what version the change was made in.
 
 ***
 

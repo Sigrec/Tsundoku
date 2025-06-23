@@ -18,6 +18,7 @@ This project adheres to [Semantic Versioning](https://semver.org/) and follows t
 - Added support for the following currencies: `Rp, RM, R$, ₪, ₴, zł, Ft, Kč, kr, lei, ৳, ₮, KM, Br, L, din, ден, ر.س, د.إ, د.ك, Rs`
 - Changed maximum value format to `0000000000000000.00`
 - App will automatically clean up unused cover images on startup
+- Added supports for importing collections from Libib via their csv export
 
 #### Performance Improvements
 - Improved performance of the AniList client
