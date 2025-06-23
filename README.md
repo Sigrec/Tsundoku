@@ -1,21 +1,21 @@
-# [Tsundoku](https://en.wikipedia.org/wiki/Tsundoku) (Desktop Manga & Light Novel Collection App)
-### [Join The Discord](https://discord.gg/QcZ5jcFPeU) | [Follow Me on AL](https://anilist.co/user/Preminence/)
-***
+# [Tsundoku](https://en.wikipedia.org/wiki/Tsundoku) (Desktop Manga & Light Novel Collection App) | [Follow Me on AL](https://anilist.co/user/Preminence/)
+### This Application is Something I Do For Fun during my Free Time
+
 >**[Windows Download (v1.3.0)](https://apps.microsoft.com/detail/9p85xxdqfhs2?hl=en-us&gl=US&ocid=pdpshare)**
-#### This Application is Something I Do For Fun during my Free Time
 
-If you lose or delete the UserData.json file you will lose your entire collection, so do not delete it, otherwise you  will have to start over again (you can create a backup if needed), the Covers folder is visible incase a user wants to change the image shown for a particular series, just make sure u copy the EXACT name and extension (awlays `.png`) from the image file.
+If you lose or delete the UserData.json file you will lose your entire collection, so do not delete it, otherwise you  will have to start over again (you can create a backup if needed), the Covers folder is visible incase a user wants to change the image shown for a particular series, just make sure u copy the EXACT name and extension (always `.png`) from the image file.
 
-***
 ## Support
 
 To report a issue please go to the issues link [Tsundoku Issues](https://github.com/Sigrec/Tsundoku/issues/new/choose) and create a issue ticket explaining the problem and how I can reproduce it. You can check back anytime to see if the ticket is completed and what version the change was made in.
 
-Additionally you can contact in my discord server, the link for the discord server is at the top of this README.
-
-***
+Additionally you can contact in my discord server, the link for the discord server below.
 
 ## Useful Links
+**Tsundoku Links**
+- [Discord](https://discord.gg/QcZ5jcFPeU)
+
+**Anime/Manga Related Links**
 - [AniList](https://anilist.co/hom)
 - [AniChart](https://anichart.net/Summer-2025)
 - [Japanese Publisher Search](https://comic.k-manga.jp/)
