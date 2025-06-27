@@ -193,7 +193,7 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
         }
 
         string valueTextRaw = ValueMaskedTextBox.Text;
-        if (!valueTextRaw.EndsWith("__________________.__") && !string.IsNullOrWhiteSpace(valueTextRaw))
+        if (!string.IsNullOrWhiteSpace(valueTextRaw) && valueTextRaw.Any(char.IsDigit))
         {
             string valueText = valueTextRaw[1..].Replace("_", "0");
             if (!valueText.Contains('_') && decimal.TryParse(valueText, out decimal newValue) &&

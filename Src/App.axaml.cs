@@ -187,7 +187,7 @@ public sealed partial class App : Application
         {
             fileTarget = new FileTarget("TsundokuLogs")
             {
-                Layout = "[${longdate} | ${level:uppercase=true}] (${logger}) ${message} ${exception:format=ToString,StackTrace}",
+                Layout = "${longdate:universalTime=true} [${uppercase:${level:format=TriLetter}}] (${logger}) - ${message} ${exception:format=ToString,StackTrace}",
                 FileName = Path.Combine(localCachePath, "TsundokuLogs.log"),
                 ArchiveFileName = Path.Combine(localCachePath, "TsundokuLogs.{#}.log"),
                 ArchiveSuffixFormat = "_{1:dd_MM_yyyy}_{0:00}",
@@ -224,7 +224,7 @@ public sealed partial class App : Application
         {
             consoleTarget = new ColoredConsoleTarget("TsundokuConsole")
             {
-                Layout = "[${longdate} | ${level:uppercase=true}] (${logger}) ${message} ${exception:format=ToString,StackTrace}"
+                Layout = "${longdate:universalTime=true} [${uppercase:${level:format=TriLetter}}] (${logger}) - ${message} ${exception:format=ToString,StackTrace}"
             };
             config.AddTarget(consoleTarget);
         }

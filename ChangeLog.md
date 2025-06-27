@@ -6,6 +6,14 @@ This project adheres to [Semantic Versioning](https://semver.org/) and follows t
 <details>
 <summary>1.x Releases</summary>
 
+### 1.3.1 – 2025-06-27
+#### Changed
+- Updated all **Avlonia** libs to `11.3.2`
+- Updated logging format message
+
+#### Fixed
+- Changing rating or volumes read and saving no longer clears/resets the value amount
+
 ### 1.3.0 – 2025-06-22
 #### Changed
 - Updated **NLog** to `6.0.0`

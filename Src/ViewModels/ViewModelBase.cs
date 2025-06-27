@@ -15,7 +15,7 @@ public class ViewModelBase : ReactiveObject
     public static bool updatedVersion = false;
     public static bool newCoverCheck = false;
     public bool isReloading = false;
-    public const string CUR_TSUNDOKU_VERSION = "1.3.0";
+    public const string CUR_TSUNDOKU_VERSION = "1.3.1";
     public const double SCHEMA_VERSION = 6.1;
     public const string USER_DATA_FILEPATH = @"UserData.json";
     
