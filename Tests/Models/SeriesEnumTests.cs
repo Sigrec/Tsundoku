@@ -27,15 +27,15 @@ public class SeriesEnumTests
         Assert.That(result, Is.EqualTo(expected));
     }
 
-    [TestCase("Shounen", SeriesDemographicEnum.SeriesDemographic.Shounen)]
-    [TestCase("shoujo", SeriesDemographicEnum.SeriesDemographic.Shoujo)]
-    [TestCase("Seinen", SeriesDemographicEnum.SeriesDemographic.Seinen)]
-    [TestCase("JOSEI", SeriesDemographicEnum.SeriesDemographic.Josei)]
-    [TestCase("Unknown", SeriesDemographicEnum.SeriesDemographic.Unknown)]
-    [TestCase("nonexistent", SeriesDemographicEnum.SeriesDemographic.Unknown)]
-    public void SeriesDemographic_Parse_WorksCorrectly(string input, SeriesDemographicEnum.SeriesDemographic expected)
+    [TestCase("Shounen", SeriesDemographicModel.SeriesDemographic.Shounen)]
+    [TestCase("shoujo", SeriesDemographicModel.SeriesDemographic.Shoujo)]
+    [TestCase("Seinen", SeriesDemographicModel.SeriesDemographic.Seinen)]
+    [TestCase("JOSEI", SeriesDemographicModel.SeriesDemographic.Josei)]
+    [TestCase("Unknown", SeriesDemographicModel.SeriesDemographic.Unknown)]
+    [TestCase("nonexistent", SeriesDemographicModel.SeriesDemographic.Unknown)]
+    public void SeriesDemographic_Parse_WorksCorrectly(string input, SeriesDemographicModel.SeriesDemographic expected)
     {
-        SeriesDemographicEnum.SeriesDemographic result = SeriesDemographicEnum.Parse(input);
+        SeriesDemographicModel.SeriesDemographic result = SeriesDemographicModel.Parse(input);
         Assert.That(result, Is.EqualTo(expected));
     }
 

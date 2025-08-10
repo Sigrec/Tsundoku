@@ -2,7 +2,7 @@ using System.Globalization;
 using Avalonia.Media;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using static Tsundoku.Models.Enums.TsundokuLanguageEnums;
+using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 
 namespace Tsundoku.Models;
 

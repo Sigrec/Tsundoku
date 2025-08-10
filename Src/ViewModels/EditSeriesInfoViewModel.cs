@@ -7,7 +7,7 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Tsundoku.Models;
 using Tsundoku.Models.Enums;
-using static Tsundoku.Models.Enums.SeriesDemographicEnum;
+using static Tsundoku.Models.Enums.SeriesDemographicModel;
 using static Tsundoku.Models.Enums.SeriesGenreModel;
 
 namespace Tsundoku.ViewModels;
@@ -29,7 +29,7 @@ public sealed class EditSeriesInfoViewModel : ViewModelBase
         this.WhenAnyValue(x => x.Series.Demographic)
             .DistinctUntilChanged()
             .ObserveOn(RxApp.TaskpoolScheduler)
-            .Subscribe(x => DemographicIndex = SERIES_DEMOGRAPHICS[x]);
+            .Subscribe(x => DemographicIndex = SERIES_DEMOGRAPHICS_DICT[x]);
 
         this.WhenAnyValue(x => x.CurrentUser.Currency)
             .DistinctUntilChanged()

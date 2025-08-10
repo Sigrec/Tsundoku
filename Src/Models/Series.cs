@@ -7,11 +7,11 @@ using System.Text.Encodings.Web;
 using Tsundoku.Clients;
 using Tsundoku.Helpers;
 using Tsundoku.Models.Enums;
-using static Tsundoku.Models.Enums.SeriesDemographicEnum;
+using static Tsundoku.Models.Enums.SeriesDemographicModel;
 using static Tsundoku.Models.Enums.SeriesFormatEnum;
 using static Tsundoku.Models.Enums.SeriesGenreModel;
 using static Tsundoku.Models.Enums.SeriesStatusEnum;
-using static Tsundoku.Models.Enums.TsundokuLanguageEnums;
+using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 
 namespace Tsundoku.Models;
 
@@ -28,7 +28,7 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
 
     [JsonIgnore] private bool disposedValue;
     [JsonIgnore][Reactive] public Bitmap? CoverBitMap { get; set; }
-    public Guid Id { get; set;  } = Guid.NewGuid();
+    public Guid Id { get; set; } = Guid.NewGuid();
     [Reactive] public string Publisher { get; set; } = "Unknown";
     [Reactive] public Dictionary<TsundokuLanguage, string> Titles { get; set; }
     [Reactive] public Dictionary<TsundokuLanguage, string> Staff { get; set; }
@@ -38,14 +38,14 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
     [Reactive] public SeriesStatus Status { get; set; }
     [Reactive] public string Cover { get; set; }
     public Uri Link { get; set; }
-    [Reactive] public HashSet<SeriesGenre>? Genres { get; set; }
-    [Reactive] public string SeriesNotes { get; set; }
+    [Reactive] public HashSet<SeriesGenre> Genres { get; set; } = [];
+    [Reactive] public string SeriesNotes { get; set; } = string.Empty;
     [Reactive] public uint MaxVolumeCount { get; set; }
-    [Reactive] public uint CurVolumeCount { get; set; }
-    [Reactive] public uint VolumesRead { get; set; }
-    [Reactive] public decimal Value { get; set; }
-    [Reactive] public decimal Rating { get; set; }
-    [Reactive] public SeriesDemographic Demographic { get; set; }
+    [Reactive] public uint CurVolumeCount { get; set; } = 0;
+    [Reactive] public uint VolumesRead { get; set; } = 0;
+    [Reactive] public decimal Value { get; set; } = 0.00m;
+    [Reactive] public decimal Rating { get; set; } = -1;
+    [Reactive] public SeriesDemographic Demographic { get; set; } = SeriesDemographic.Unknown;
     [Reactive] public bool IsFavorite { get; set; } = false;
 
     [JsonConstructor]
@@ -823,6 +823,11 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
             .ToArray();
     }
 
+    public bool HasGenre(SeriesGenre genre)
+    {
+        return this.Genres is not null && this.Genres.Contains(genre);
+    }
+
     public override string ToString()
     {
         if (this is not null)
@@ -1020,16 +1025,10 @@ internal partial class SeriesModelContext : JsonSerializerContext
 {
 }
 
-public class SeriesComparer : IComparer<Series>
+public class SeriesComparer(TsundokuLanguage curLang) : IComparer<Series>
 {
-    private readonly TsundokuLanguage _curLang; // Changed to match common C# naming convention
-    private readonly StringComparer _seriesTitleComparer; // Changed to match common C# naming convention
-
-    public SeriesComparer(TsundokuLanguage curLang)
-    {
-        _curLang = curLang;
-        _seriesTitleComparer = StringComparer.Create(new CultureInfo(CULTURE_LANG_CODES[curLang]), false);
-    }
+    private readonly TsundokuLanguage _curLang = curLang; // Changed to match common C# naming convention
+    private readonly StringComparer _seriesTitleComparer = StringComparer.Create(new CultureInfo(CULTURE_LANG_CODES[curLang]), false); // Changed to match common C# naming convention
 
     public int Compare(Series? x, Series? y)
     {

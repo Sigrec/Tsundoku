@@ -95,39 +95,19 @@ public sealed partial class AniList
 
         const int perPage = 1000;
 
-        string mediaArgs;
-        string variableDecl;
-        object variables;
-        bool isId = false;
-
-        // NOTE: We do NOT include `type: MANGA` so that format_in=[MANGA,NOVEL] truly searches both,
-        // and `format: MANGA|NOVEL` filters precisely when specified.
-        if (int.TryParse(search, out int inputId) && inputId >= 0 && inputId <= 999_999)
-        {
-            mediaArgs = "id: $search, format_in: [MANGA, NOVEL], sort: [SEARCH_MATCH, POPULARITY_DESC]";
-            variableDecl = "$search: Int!, $perPage: Int!";
-            isId = true;
-        }
-        else
-        {
-            mediaArgs = "search: $search, format_in: [MANGA, NOVEL], sort: [SEARCH_MATCH, POPULARITY_DESC]";
-            variableDecl = "$search: String!, $perPage: Int!";
-        }
-        variables = new { search = search, perPage = perPage };
-
         GraphQLRequest request = new()
         {
             Query = $@"
-            query ({variableDecl}) {{
+            query ($search: String!, $perPage: Int!) {{
                 Page(perPage: $perPage) {{
-                    media({mediaArgs}) {{
+                    media(search: $search, format_in: [MANGA, NOVEL], sort: [SEARCH_MATCH, POPULARITY_DESC]) {{
                         id
                         format
                         title {{ romaji english native }}
                     }}
                 }}
             }}",
-            Variables = variables
+            Variables = new { search = search, perPage = perPage }
         };
 
         GraphQLResponse<JsonDocument?>? response = await SendWithRateLimitRetryAsync<JsonDocument?>(
@@ -173,7 +153,9 @@ public sealed partial class AniList
 
             int id = idEl.GetInt32();
 
-            string romaji = m.GetProperty("title").GetProperty("romaji").GetString() ?? string.Empty;
+            string? romaji = m.GetProperty("title").GetProperty("romaji").GetString();
+            if (romaji is null) continue;
+
             string? english = m.GetProperty("title").GetProperty("english").GetString();
             string? native = m.GetProperty("title").GetProperty("native").GetString();
 
@@ -205,7 +187,7 @@ public sealed partial class AniList
             }
 
             string? format = m.TryGetProperty("format", out JsonElement f) && f.ValueKind == JsonValueKind.String ? f.GetString().Trim() : null;
-            string display = $"{chosen} ({format ?? "MEDIA"}){(!isId ? $" [{id}]" : string.Empty)}";
+            string display = $"{chosen} ({format ?? "MEDIA"}) [{id}]";
 
             list.Add(new AniListPickerSuggestion(id, display, format));
         }

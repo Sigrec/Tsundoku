@@ -4,12 +4,12 @@ using System.Runtime.Serialization;
 
 namespace Tsundoku.Models.Enums;
 
-public static class TsundokuLanguageEnums
+public static class TsundokuLanguageModel
 {
     public static readonly FrozenDictionary<string, TsundokuLanguage> TsundokuLanguageStringValueToLanguageMap;
     public static readonly FrozenDictionary<TsundokuLanguage, string> TsundokuLanguageLanguageToStringValueMap;
 
-    static TsundokuLanguageEnums()
+    static TsundokuLanguageModel()
     {
         Dictionary<string, TsundokuLanguage> stringToLangBuilder = new(StringComparer.OrdinalIgnoreCase);
         Dictionary<TsundokuLanguage, string> langToStringBuilder = [];

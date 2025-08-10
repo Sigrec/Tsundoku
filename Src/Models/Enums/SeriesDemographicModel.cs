@@ -2,7 +2,7 @@ using System.Collections.Frozen;
 
 namespace Tsundoku.Models.Enums;
 
-public static class SeriesDemographicEnum
+public static class SeriesDemographicModel
 {
     public enum SeriesDemographic
     {
@@ -13,8 +13,11 @@ public static class SeriesDemographicEnum
         Unknown
     }
 
-    public static readonly FrozenDictionary<SeriesDemographic, int> SERIES_DEMOGRAPHICS =
-    Enum.GetValues<SeriesDemographic>()
+    public static readonly FrozenSet<SeriesDemographic> SERIES_DEMOGRAPHIC_SET = Enum.GetValues<SeriesDemographic>().ToFrozenSet();
+
+    public static readonly FrozenDictionary<SeriesDemographic, int> SERIES_DEMOGRAPHICS_DICT =
+    SERIES_DEMOGRAPHIC_SET
+        .AsValueEnumerable()
         .Select((value, index) => new KeyValuePair<SeriesDemographic, int>(value, index))
         .ToFrozenDictionary(pair => pair.Key, pair => pair.Value);
 

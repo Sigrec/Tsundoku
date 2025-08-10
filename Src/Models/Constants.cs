@@ -48,12 +48,14 @@ public static class Constants
             "Value==", "Value>=", "Value<="
         }.ToFrozenSet();
 
-    public static FrozenDictionary<string, (int Index, string Culture)> AVAILABLE_CURRENCY_WITH_CULTURE { get; } = new[]
-        {
-            "$", "€", "£", "¥", "₹", "₱", "₩", "₽", "₺", "₫", "฿", "₸", "₼", "₾",
-            "Rp", "RM", "R$", "₪", "₴", "zł", "Ft", "Kč", "kr", "lei", "৳", "₮",
-            "KM", "Br", "L", "din", "ден", "ر.س", "د.إ", "د.ك", "Rs"
-        }
+    public static readonly FrozenSet<string> AVAILABLE_CURRENCIES = new[]
+    {
+        "$", "€", "£", "¥", "₹", "₱", "₩", "₽", "₺", "₫", "฿", "₸", "₼", "₾",
+        "Rp", "RM", "R$", "₪", "₴", "zł", "Ft", "Kč", "kr", "lei", "৳", "₮",
+        "KM", "Br", "L", "din", "ден", "ر.س", "د.إ", "د.ك", "Rs"
+    }.ToFrozenSet();
+
+    public static FrozenDictionary<string, (int Index, string Culture)> AVAILABLE_CURRENCY_WITH_CULTURE { get; } = AVAILABLE_CURRENCIES
         .AsValueEnumerable()
         .Select((symbol, index) =>
         {

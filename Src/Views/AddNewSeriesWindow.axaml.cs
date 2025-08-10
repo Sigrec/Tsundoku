@@ -1,20 +1,19 @@
 using System.Reactive.Linq;
-using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.ReactiveUI;
-using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
-using Tsundoku.Models.Enums;
 using Tsundoku.ViewModels;
+using static Tsundoku.Models.Enums.SeriesDemographicModel;
 using static Tsundoku.Models.Enums.SeriesFormatEnum;
 
 namespace Tsundoku.Views;
 
+// TODO: Need to make it so if a user has selected a suggestion it uses the ID from that entry
 public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesViewModel>
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
-    private ushort MaxVolNum;
-    private ushort CurVolNum;
+    private readonly ushort MaxVolNum;
+    private readonly ushort CurVolNum;
     public bool IsOpen = false;
     private readonly IPopupDialogService _popupDialogService;
 
@@ -41,28 +40,27 @@ public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesView
             e.Cancel = true;
         };
 
-        // this.WhenAnyValue(x => x.MaxVolCount.Text).Subscribe(x => MaxVolNum = ConvertNumText(x.Replace("_", "")));
-        // this.WhenAnyValue(x => x.CurVolCount.Text).Subscribe(x => CurVolNum = ConvertNumText(x.Replace("_", "")));
-        // this.WhenAnyValue(x => x.TitleBox.Text, x => x.MaxVolCount.Text, x => x.CurVolCount.Text, x => x.MangaButton.IsChecked, x => x.NovelButton.IsChecked, (title, max, cur, manga, novel) => !string.IsNullOrWhiteSpace(title) && CurVolNum <= MaxVolNum && MaxVolNum != 0 && !(manga == false && novel == false) && manga is not null && novel is not null).Subscribe(x => ViewModel.IsAddSeriesButtonEnabled = x);
+        this.WhenAnyValue(
+            x => x.TitleBox.Text,
+            x => x.CurVolCount.Text,
+            x => x.MaxVolCount.Text,
+            x => x.MangaButton.IsChecked,
+            x => x.NovelButton.IsChecked,
+        (title, curVolText, maxVolText, mangaChecked, novelChecked) =>
+        {
+            // Convert the volume text to numbers
+            ushort currentVolume = ConvertNumText(curVolText.Replace("_", ""));
+            ushort maxVolume = ConvertNumText(maxVolText.Replace("_", ""));
 
-        IObservable<(ushort CurVolNum, ushort MaxVolNum)> volCountStream = 
-            this.WhenAnyValue(x => x.CurVolCount.Text, x => x.MaxVolCount.Text)
-                .Select(tuple => (
-                    CurVolNum: ConvertNumText(tuple.Item1.Replace("_", "")),
-                    MaxVolNum: ConvertNumText(tuple.Item2.Replace("_", ""))
-                ));
+            // Use the named variables for clarity
+            bool isAnyChecked = mangaChecked.GetValueOrDefault() || novelChecked.GetValueOrDefault();
 
-        this.WhenAnyValue(x => x.TitleBox.Text, x => x.MangaButton.IsChecked, x => x.NovelButton.IsChecked)
-            .WithLatestFrom(volCountStream, (title, mangaChecked, novelChecked) =>
-            {
-                bool isAnyChecked = mangaChecked.GetValueOrDefault() || novelChecked.GetValueOrDefault();
-                
-                return !string.IsNullOrWhiteSpace(title) &&
-                    volNums.CurVolNum <= volNums.MaxVolNum && 
-                    volNums.MaxVolNum != 0 &&
-                    isAnyChecked;
-            })
-            .Subscribe(isEnabled => ViewModel.IsAddSeriesButtonEnabled = isEnabled);
+            return !string.IsNullOrWhiteSpace(title) &&
+                currentVolume <= maxVolume &&
+                maxVolume != 0 &&
+                isAnyChecked;
+        })
+        .Subscribe(isEnabled => ViewModel.IsAddSeriesButtonEnabled = isEnabled);
 
         this.WhenAnyValue(x => x.ViewModel.SelectedSuggestion)
             .Subscribe(selectedSuggestion =>
@@ -117,7 +115,7 @@ public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesView
         CurVolCount.Text = string.Empty;
         MaxVolCount.Text = string.Empty;
         PublisherTextBox.Text = string.Empty;
-        DemographicCombobox.SelectedIndex = 4;
+        DemographicCombobox.SelectedItem = SeriesDemographic.Unknown;
         VolumesRead.Text = string.Empty;
         Rating.Text = string.Empty;
         CostMaskedTextBox.Text = string.Empty;
@@ -126,7 +124,7 @@ public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesView
 
     private static ushort ConvertNumText(string value)
     {
-        return (ushort)(string.IsNullOrWhiteSpace(value) ? 0 : ushort.Parse(value));
+        return string.IsNullOrWhiteSpace(value) ? (ushort)0 : ushort.Parse(value);
     }
 
     public async void OnAddSeriesButtonClicked(object sender, RoutedEventArgs args)
@@ -137,22 +135,22 @@ public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesView
         _ = uint.TryParse(VolumesRead.Text.Replace("_", ""), out uint volumesRead);
         _ = decimal.TryParse(Rating.Text[..4].Replace("_", "0"), out decimal rating);
         _ = decimal.TryParse(CostMaskedTextBox.Text[1..].Replace("_", "0"), out decimal seriesValue);
-        
+
         KeyValuePair<bool, string> validSeries = await ViewModel!.GetSeriesDataAsync(
-            TitleBox.Text.Trim(), 
-            (MangaButton.IsChecked == true) ? SeriesFormat.Manga : SeriesFormat.Novel, 
-            CurVolNum, 
-            MaxVolNum, 
+            TitleBox.Text.Trim(),
+            (MangaButton.IsChecked == true) ? SeriesFormat.Manga : SeriesFormat.Novel,
+            CurVolNum,
+            MaxVolNum,
             ViewModel!.SelectedAdditionalLanguages.Count != 0 ? ViewModel.ConvertSelectedLangList() : [],
-            !string.IsNullOrWhiteSpace(customImageUrl) ? customImageUrl.Trim() : string.Empty, 
+            !string.IsNullOrWhiteSpace(customImageUrl) ? customImageUrl.Trim() : string.Empty,
             !string.IsNullOrWhiteSpace(PublisherTextBox.Text) ? PublisherTextBox.Text.Trim() : "Unknown",
-            SeriesDemographicEnum.Parse((DemographicCombobox.SelectedItem as ComboBoxItem).Content.ToString()), 
-            volumesRead, 
-            !Rating.Text[..4].StartsWith("__._") ? rating : -1, 
+            DemographicCombobox.SelectedItem is null ? SeriesDemographic.Unknown : (SeriesDemographic)DemographicCombobox.SelectedItem,
+            volumesRead,
+            !Rating.Text[..4].StartsWith("__._") ? rating : -1,
             seriesValue,
             AllowDuplicateButton.IsChecked.GetValueOrDefault(false)
         );
-        
+
         if (validSeries.Key) // Boolean returns whether the series added succeeded
         {
             // _collectionStatsViewModel.UpdateAllStats(CurVolNum, (uint)(MaxVolNum - CurVolNum));

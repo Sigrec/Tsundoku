@@ -8,13 +8,16 @@ This project adheres to [Semantic Versioning](https://semver.org/) and follows t
 
 ### 1.3.2 - 
 #### Changed
-- Updated **Avalonia** to `11.3.3`
+- Updated all **Avalonia** libs to `11.3.3`
 - Updated **NLog** to `6.0.2`
 - Added search support when adding new series, basically a list will popup on the left and you can select the one you want to add
 X Added goodreads import support
-X Changed from `NLog` to `Serilog` for logging
 #### Fixed
-
+- Fixed styling issue within ComboBo boxe selection
+- Added `Hentai` as a filter option, prior it would show up but would not be selectable
+- Fixed crash introduced in last version when selecting a genre as a filter option
+- Fixed issue where changing a series demographic woudl cause the percentages to not calculate properly
+X Fixed issue where closing the main window while other windows were up would not just close all windows
 
 ### 1.3.1 – 2025-06-27
 #### Changed

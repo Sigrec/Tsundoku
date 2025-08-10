@@ -3,7 +3,7 @@ using ReactiveUI;
 using System.Reactive.Linq;
 using Tsundoku.Models;
 using MangaAndLightNovelWebScrape.Websites;
-using static Tsundoku.Models.Enums.TsundokuLanguageEnums;
+using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 using Tsundoku.Helpers;
 using System.Globalization;
 using static Tsundoku.Models.Enums.SeriesFormatEnum;

@@ -42,7 +42,9 @@ public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsView
         };
 
         this.WhenAnyValue(x => x.IndigoButton.IsChecked, (member) => member is not null && member == true).Subscribe(x => ViewModel.IndigoMember = x);
+        
         this.WhenAnyValue(x => x.BooksAMillionButton.IsChecked, (member) => member is not null && member == true).Subscribe(x => ViewModel.BooksAMillionMember = x);
+
         this.WhenAnyValue(x => x.KinokuniyaUSAButton.IsChecked, (member) => member is not null && member == true).Subscribe(x => ViewModel.KinokuniyaUSAMember = x);
 
         this.WhenAnyValue(x => x.UsernameChangeTextBox.Text, (newUsername) => !string.IsNullOrWhiteSpace(newUsername) && !newUsername.Equals(ViewModel.CurrentUser.UserName))
@@ -56,16 +58,10 @@ public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsView
 
     private void CurrencyChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (CurrencyComboBox.SelectedItem is ComboBoxItem selectedItem)
+        if (CurrencyComboBox.SelectedItem is string selectedCurrency)
         {
-            string? newCurrency = selectedItem.Content?.ToString();
-            if (newCurrency is not null)
-            {
-                ViewModel.UpdateUserCurrency(newCurrency);
-                // currencyLength = ViewModelBase.CurCurrency.Length;
-                // _collectionStatsViewModel.CollectionValue = $"{newCurrency}{ _collectionStatsViewModel.CollectionValue[currencyLength..]}";
-                LOGGER.Info($"Currency Changed To {newCurrency}");
-            }
+            ViewModel.UpdateUserCurrency(selectedCurrency);
+            LOGGER.Info($"Currency Changed To {selectedCurrency}");
         }
     }
 

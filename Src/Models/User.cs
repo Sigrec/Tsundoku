@@ -5,11 +5,11 @@ using Tsundoku.Helpers;
 using Tsundoku.Converters;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using static Tsundoku.Models.Enums.TsundokuLanguageEnums;
+using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 using System.Text.Encodings.Web;
 using System.Diagnostics.CodeAnalysis;
 using Tsundoku.ViewModels;
-using static Tsundoku.Models.Enums.SeriesDemographicEnum;
+using static Tsundoku.Models.Enums.SeriesDemographicModel;
 
 namespace Tsundoku.Models;
 

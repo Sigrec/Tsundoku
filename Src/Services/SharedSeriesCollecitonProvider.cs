@@ -8,11 +8,11 @@ using DynamicData;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Tsundoku.Models;
-using static Tsundoku.Models.Enums.SeriesDemographicEnum;
+using static Tsundoku.Models.Enums.SeriesDemographicModel;
 using static Tsundoku.Models.Enums.SeriesFormatEnum;
 using static Tsundoku.Models.Enums.SeriesGenreModel;
 using static Tsundoku.Models.Enums.SeriesStatusEnum;
-using static Tsundoku.Models.Enums.TsundokuFilterEnums;
+using static Tsundoku.Models.Enums.TsundokuFilterModel;
 
 namespace Tsundoku.Services;
 
@@ -42,7 +42,7 @@ public interface ISharedSeriesCollectionProvider
 public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISharedSeriesCollectionProvider, IDisposable
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
-    private readonly CompositeDisposable _disposables = new CompositeDisposable();
+    private readonly CompositeDisposable _disposables = [];
     private ReadOnlyObservableCollection<Series> _dynamicUserCollection;
 
     /// <summary>
@@ -118,7 +118,7 @@ public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISh
                         TsundokuFilter.Manfra => series.Format == SeriesFormat.Manfra,
                         TsundokuFilter.Manhwa => series.Format == SeriesFormat.Manhwa,
                         TsundokuFilter.Manhua => series.Format == SeriesFormat.Manhua,
-                        TsundokuFilter.Comic => series.Format == SeriesFormat.Comic, 
+                        TsundokuFilter.Comic => series.Format == SeriesFormat.Comic,
                         TsundokuFilter.Novel => series.Format == SeriesFormat.Novel,
 
                         // Demographic Filters
@@ -132,24 +132,25 @@ public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISh
                         TsundokuFilter.Unread => series.VolumesRead == 0,
 
                         // Genre Filters
-                        TsundokuFilter.Action => series.Genres.Contains(SeriesGenre.Action),
-                        TsundokuFilter.Adventure => series.Genres.Contains(SeriesGenre.Adventure),
-                        TsundokuFilter.Comedy => series.Genres.Contains(SeriesGenre.Comedy),
-                        TsundokuFilter.Drama => series.Genres.Contains(SeriesGenre.Drama),
-                        TsundokuFilter.Ecchi => series.Genres.Contains(SeriesGenre.Ecchi),
-                        TsundokuFilter.Fantasy => series.Genres.Contains(SeriesGenre.Fantasy),
-                        TsundokuFilter.Horror => series.Genres.Contains(SeriesGenre.Horror),
-                        TsundokuFilter.MahouShoujo => series.Genres.Contains(SeriesGenre.MahouShoujo),
-                        TsundokuFilter.Mecha => series.Genres.Contains(SeriesGenre.Mecha),
-                        TsundokuFilter.Music => series.Genres.Contains(SeriesGenre.Music),
-                        TsundokuFilter.Mystery => series.Genres.Contains(SeriesGenre.Mystery),
-                        TsundokuFilter.Psychological => series.Genres.Contains(SeriesGenre.Psychological),
-                        TsundokuFilter.Romance => series.Genres.Contains(SeriesGenre.Romance),
-                        TsundokuFilter.SciFi => series.Genres.Contains(SeriesGenre.SciFi),
-                        TsundokuFilter.SliceOfLife => series.Genres.Contains(SeriesGenre.SliceOfLife),
-                        TsundokuFilter.Sports => series.Genres.Contains(SeriesGenre.Sports),
-                        TsundokuFilter.Supernatural => series.Genres.Contains(SeriesGenre.Supernatural),
-                        TsundokuFilter.Thriller => series.Genres.Contains(SeriesGenre.Thriller),
+                        TsundokuFilter.Action => series.HasGenre(SeriesGenre.Action),
+                        TsundokuFilter.Adventure => series.HasGenre(SeriesGenre.Adventure),
+                        TsundokuFilter.Comedy => series.HasGenre(SeriesGenre.Comedy),
+                        TsundokuFilter.Drama => series.HasGenre(SeriesGenre.Drama),
+                        TsundokuFilter.Ecchi => series.HasGenre(SeriesGenre.Ecchi),
+                        TsundokuFilter.Fantasy => series.HasGenre(SeriesGenre.Fantasy),
+                        TsundokuFilter.Hentai => series.HasGenre(SeriesGenre.Hentai),
+                        TsundokuFilter.Horror => series.HasGenre(SeriesGenre.Horror),
+                        TsundokuFilter.MahouShoujo => series.HasGenre(SeriesGenre.MahouShoujo),
+                        TsundokuFilter.Mecha => series.HasGenre(SeriesGenre.Mecha),
+                        TsundokuFilter.Music => series.HasGenre(SeriesGenre.Music),
+                        TsundokuFilter.Mystery => series.HasGenre(SeriesGenre.Mystery),
+                        TsundokuFilter.Psychological => series.HasGenre(SeriesGenre.Psychological),
+                        TsundokuFilter.Romance => series.HasGenre(SeriesGenre.Romance),
+                        TsundokuFilter.SciFi => series.HasGenre(SeriesGenre.SciFi),
+                        TsundokuFilter.SliceOfLife => series.HasGenre(SeriesGenre.SliceOfLife),
+                        TsundokuFilter.Sports => series.HasGenre(SeriesGenre.Sports),
+                        TsundokuFilter.Supernatural => series.HasGenre(SeriesGenre.Supernatural),
+                        TsundokuFilter.Thriller => series.HasGenre(SeriesGenre.Thriller),
 
                         // Default case: No filter applied
                         _ => true
@@ -198,19 +199,19 @@ public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISh
 
         // 3. Combine filter predicates into a single observable predicate
         IObservable<Func<Series, bool>> combinedFilter = Observable.CombineLatest(
-            textFilter,
-            tsundokuFilter,
-            advancedFilter,
-            (textPred, tsundokuPred, advancedPred) =>
+            textFilter, tsundokuFilter, advancedFilter,
+            (textSearchPred, tsundokuFilterPred, advancedSearchPred) =>
                 (Func<Series, bool>)(series =>
-                    textPred(series) && tsundokuPred(series) && advancedPred(series)
+                    (textSearchPred is null || textSearchPred(series)) &&
+                    (tsundokuFilterPred is null || tsundokuFilterPred(series)) &&
+                    (advancedSearchPred is null || advancedSearchPred(series))
                 )
         );
 
         // 4. Define the series comparer (for sorting) based on the current user's language
         IObservable<IComparer<Series>> seriesComparerChanged = _userService.CurrentUser
             .Where(user => user is not null)
-            .Select(user => user!.Language)
+            .Select(user => user.Language)
             .DistinctUntilChanged()
             .Select(curLang => (IComparer<Series>)new SeriesComparer(curLang));
         // .PublishReplay(1) // Ensures new subscribers immediately get the last emitted comparer
@@ -218,6 +219,7 @@ public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISh
 
         // 5. Build the DynamicData pipeline
         _userService.UserCollectionChanges
+            .Filter(series => series is not null)
             .Filter(combinedFilter)
             .ObserveOn(RxApp.MainThreadScheduler)
             .SortAndBind(out _dynamicUserCollection, seriesComparerChanged)
@@ -309,7 +311,7 @@ public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISh
 
             "series" =>
                 filterValue.Equals("Complete", StringComparison.OrdinalIgnoreCase) ? $"it.CurVolumeCount > 0 && it.CurVolumeCount == it.MaxVolumeCount" :
-                filterValue.Equals("InComplete", StringComparison.OrdinalIgnoreCase) ? $"it.MaxVolumeCount > 0 && it.CurVolumeCount < it.MaxVolumeCount || it.MaxVolumeCount == 0" : 
+                filterValue.Equals("InComplete", StringComparison.OrdinalIgnoreCase) ? $"it.MaxVolumeCount > 0 && it.CurVolumeCount < it.MaxVolumeCount || it.MaxVolumeCount == 0" :
                 string.Empty,
 
             "favorite" => $"{(filterValue.Equals("True") ? '!' : "")}it.IsFavorite",
@@ -326,7 +328,7 @@ public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISh
             _ => string.Empty,
         };
     }
-    
+
     private static string EscapeForCSharpStringLiteral(string value)
     {
         // Replace backslashes first, then quotes

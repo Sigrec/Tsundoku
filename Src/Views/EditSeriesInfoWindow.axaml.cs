@@ -8,9 +8,9 @@ using System.Collections.Frozen;
 using Tsundoku.Helpers;
 using Tsundoku.Models.Enums;
 using Tsundoku.ViewModels;
-using static Tsundoku.Models.Enums.SeriesDemographicEnum;
+using static Tsundoku.Models.Enums.SeriesDemographicModel;
 using static Tsundoku.Models.Enums.SeriesGenreModel;
-using static Tsundoku.Models.Enums.TsundokuLanguageEnums;
+using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 
 namespace Tsundoku.Views;
 
@@ -265,14 +265,13 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
     {
         if (_IsInitialized && DemographicComboBox.IsDropDownOpen)
         {
-            SeriesDemographic demographic = SeriesDemographicEnum.Parse((DemographicComboBox.SelectedItem as ComboBoxItem).Content.ToString());
-
-            ViewModel.Series.Demographic = demographic;
+            SeriesDemographic newDemographic = DemographicComboBox.SelectedItem is null ? SeriesDemographic.Unknown : (SeriesDemographic)DemographicComboBox.SelectedItem;
+            ViewModel.Series.Demographic = newDemographic;
 
             LOGGER.Info(
                 "Changed Demographic for {RomajiTitle} to {Demographic}",
                 ViewModel.Series.Titles[TsundokuLanguage.Romaji],
-                demographic
+                newDemographic
             );
         }
     }

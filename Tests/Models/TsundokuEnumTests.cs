@@ -1,6 +1,6 @@
 using System.Globalization;
-using static Tsundoku.Models.Enums.TsundokuFilterEnums;
-using static Tsundoku.Models.Enums.TsundokuLanguageEnums;
+using static Tsundoku.Models.Enums.TsundokuFilterModel;
+using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 
 namespace Tsundoku.Tests.Models;
 

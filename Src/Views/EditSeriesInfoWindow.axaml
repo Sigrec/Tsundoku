@@ -5,7 +5,6 @@
         xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
         xmlns:vm="clr-namespace:Tsundoku.ViewModels"
         xmlns:enums="clr-namespace:Tsundoku.Models.Enums"
-        xmlns:local="clr-namespace:Tsundoku.Models"
         x:Class="Tsundoku.Views.EditSeriesInfoWindow"
         x:DataType="vm:EditSeriesInfoViewModel"
         Classes="Menu"
@@ -248,6 +247,7 @@
                         FontSize="20"/>
                     <ComboBox
                         x:Name="DemographicComboBox"
+                        ItemsSource="{x:Static enums:SeriesDemographicModel.SERIES_DEMOGRAPHIC_SET}"
                         SelectionChanged="DemographicChanged"
                         Grid.Row="1"
                         Grid.Column="2"
@@ -261,12 +261,13 @@
                         VerticalAlignment="Center"
                         HorizontalAlignment="Center"
                         Cursor="Hand"
+                        ItemContainerTheme="{StaticResource MenuComboBoxItem}"
                         AutoScrollToSelectedItem="True">
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Shounen</ComboBoxItem>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Shoujo</ComboBoxItem>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Seinen</ComboBoxItem>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Josei</ComboBoxItem>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Unknown</ComboBoxItem>
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
                     </ComboBox>
                     <TextBlock
                         Grid.Row="0"

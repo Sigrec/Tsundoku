@@ -5,9 +5,9 @@ using Avalonia.Media.Imaging;
 using System.Text.RegularExpressions;
 using Tsundoku.Helpers;
 using Tsundoku.Views;
-using static Tsundoku.Models.Enums.TsundokuFilterEnums;
+using static Tsundoku.Models.Enums.TsundokuFilterModel;
 using System.Reactive.Disposables;
-using static Tsundoku.Models.Enums.TsundokuLanguageEnums;
+using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 using System.Reactive.Linq;
 using System.Linq.Dynamic.Core;
 using Microsoft.Extensions.DependencyInjection;
@@ -52,22 +52,19 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
     [Reactive] public string NotificationText { get; set; }
     [Reactive] public string AdvancedSearchQueryErrorMessage { get; set; }
 
-    // --- Collections (Public Readonly / Static) ---
     public ReadOnlyObservableCollection<Series> UserCollection { get; }
     public static readonly List<Series> CoverChangedSeriesList = [];
 
-    // --- Commands and Interactions (Public Readonly) ---
     public Interaction<EditSeriesInfoViewModel, MainWindowViewModel?> EditSeriesInfoDialog { get; } = new Interaction<EditSeriesInfoViewModel, MainWindowViewModel?>();
 
-    // --- Helper Properties / Methods (Regex, etc.) ---
     [GeneratedRegex(@"(\w+)(==|<=|>=)(\d+|\w+|(?:'|"")(?:.*?)(?:'|""))")] public static partial Regex AdvancedQueryRegex();
 
     public MainWindowViewModel(IUserService userService, ISharedSeriesCollectionProvider sharedSeriesProvider, BitmapHelper bitmapHelper, MangaDex mangaDex, AniList aniList, IServiceProvider serviceProvider) : base(userService)
     {
         _sharedSeriesProvider = sharedSeriesProvider ?? throw new ArgumentNullException(nameof(sharedSeriesProvider));
-        _bitmapHelper = bitmapHelper;
-        _mangaDex = mangaDex;
-        _aniList = aniList;
+        _bitmapHelper = bitmapHelper ?? throw new ArgumentNullException(nameof(bitmapHelper));
+        _mangaDex = mangaDex ?? throw new ArgumentNullException(nameof(mangaDex));
+        _aniList = aniList ?? throw new ArgumentNullException(nameof(aniList));
         _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
 
         // 1. Bind the UI-facing collection to the one provided by the shared service.
@@ -80,9 +77,17 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
             .Subscribe(text => sharedSeriesProvider.SeriesFilterText = text)
             .DisposeWith(_disposables);
 
-        // When SelectedFilter changes in this ViewModel, update the shared provider's SelectedFilter.
         this.WhenAnyValue(x => x.SelectedFilter)
-            .Subscribe(filter => _sharedSeriesProvider.SelectedFilter = filter)
+            .DistinctUntilChanged()
+            .ObserveOn(RxApp.MainThreadScheduler)
+            .Subscribe(filter =>
+            {
+                // First action: update the local index
+                SelectedFilterIndex = TSUNDOKU_FILTER_DICT[filter];
+
+                // Second action: update the shared provider
+                _sharedSeriesProvider.SelectedFilter = filter;
+            })
             .DisposeWith(_disposables);
 
         this.WhenAnyValue(x => x.AdvancedSearchQuery)
@@ -104,12 +109,6 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
                     SelectedLangIndex = newIndex;
                 }
             })
-            .DisposeWith(_disposables);
-
-        this.WhenAnyValue(x => x.SelectedFilter)
-            .DistinctUntilChanged()
-            .ObserveOn(RxApp.MainThreadScheduler)
-            .Subscribe(filter => SelectedFilterIndex = FILTERS[filter])
             .DisposeWith(_disposables);
     }
 

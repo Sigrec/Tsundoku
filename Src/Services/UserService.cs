@@ -10,10 +10,10 @@ using MangaAndLightNovelWebScrape.Websites;
 using Tsundoku.ViewModels;
 using Tsundoku.Converters;
 using System.Text.Json.Nodes;
-using static Tsundoku.Models.Enums.TsundokuLanguageEnums;
+using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 using System.Diagnostics.CodeAnalysis;
 using DynamicData.Kernel;
-using static Tsundoku.Models.Enums.TsundokuFilterEnums;
+using static Tsundoku.Models.Enums.TsundokuFilterModel;
 using ReactiveUI.Fody.Helpers;
 using Tsundoku.Models;
 
