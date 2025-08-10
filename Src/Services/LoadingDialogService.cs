@@ -10,14 +10,9 @@ public interface ILoadingDialogService
     void Show(string message, Action<LoadingDialogViewModel> work, Window owner);
 }
 
-public class LoadingDialogService : ILoadingDialogService
+public sealed class LoadingDialogService(LoadingDialogViewModel viewModel) : ILoadingDialogService
 {
-    private readonly LoadingDialogViewModel _viewModel;
-
-    public LoadingDialogService(LoadingDialogViewModel viewModel)
-    {
-        _viewModel = viewModel;
-    }
+    private readonly LoadingDialogViewModel _viewModel = viewModel;
 
     public async Task ShowAsync(
         string message,
@@ -26,7 +21,7 @@ public class LoadingDialogService : ILoadingDialogService
     {
         _viewModel.StatusText = message;
 
-        LoadingDialog dialog = new LoadingDialog
+        LoadingDialog dialog = new()
         {
             ViewModel = _viewModel
         };

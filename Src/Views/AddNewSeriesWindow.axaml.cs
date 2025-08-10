@@ -41,7 +41,7 @@ public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesView
         };
 
         this.WhenAnyValue(
-            x => x.TitleBox.Text,
+            x => x.SeriesInputTextBox.Text,
             x => x.CurVolCount.Text,
             x => x.MaxVolCount.Text,
             x => x.MangaButton.IsChecked,
@@ -111,7 +111,7 @@ public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesView
     {
         NovelButton.IsChecked = false;
         MangaButton.IsChecked = false;
-        TitleBox.Text = string.Empty;
+        SeriesInputTextBox.Text = string.Empty;
         CurVolCount.Text = string.Empty;
         MaxVolCount.Text = string.Empty;
         PublisherTextBox.Text = string.Empty;
@@ -130,35 +130,34 @@ public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesView
     public async void OnAddSeriesButtonClicked(object sender, RoutedEventArgs args)
     {
         AddSeriesButton.IsEnabled = false;
-        ViewModelBase.newCoverCheck = true;
         string customImageUrl = CoverImageUrlTextBox.Text;
         _ = uint.TryParse(VolumesRead.Text.Replace("_", ""), out uint volumesRead);
         _ = decimal.TryParse(Rating.Text[..4].Replace("_", "0"), out decimal rating);
         _ = decimal.TryParse(CostMaskedTextBox.Text[1..].Replace("_", "0"), out decimal seriesValue);
 
         KeyValuePair<bool, string> validSeries = await ViewModel!.GetSeriesDataAsync(
-            TitleBox.Text.Trim(),
-            (MangaButton.IsChecked == true) ? SeriesFormat.Manga : SeriesFormat.Novel,
-            CurVolNum,
-            MaxVolNum,
-            ViewModel!.SelectedAdditionalLanguages.Count != 0 ? ViewModel.ConvertSelectedLangList() : [],
-            !string.IsNullOrWhiteSpace(customImageUrl) ? customImageUrl.Trim() : string.Empty,
-            !string.IsNullOrWhiteSpace(PublisherTextBox.Text) ? PublisherTextBox.Text.Trim() : "Unknown",
-            DemographicCombobox.SelectedItem is null ? SeriesDemographic.Unknown : (SeriesDemographic)DemographicCombobox.SelectedItem,
-            volumesRead,
-            !Rating.Text[..4].StartsWith("__._") ? rating : -1,
-            seriesValue,
-            AllowDuplicateButton.IsChecked.GetValueOrDefault(false)
+            input: ViewModel.SelectedSuggestion is not null ? ViewModel.SelectedSuggestion.Id : SeriesInputTextBox.Text.Trim(),
+            bookType: (MangaButton.IsChecked == true) ? SeriesFormat.Manga : SeriesFormat.Novel,
+            curVolCount: CurVolNum,
+            maxVolCount: MaxVolNum,
+            additionalLanguages: ViewModel!.SelectedAdditionalLanguages.Count != 0 ? ViewModel.ConvertSelectedLangList() : [],
+            customImageUrl: !string.IsNullOrWhiteSpace(customImageUrl) ? customImageUrl.Trim() : string.Empty,
+            publisher: !string.IsNullOrWhiteSpace(PublisherTextBox.Text) ? PublisherTextBox.Text.Trim() : "Unknown",
+            demographic: DemographicCombobox.SelectedItem is null ? SeriesDemographic.Unknown : (SeriesDemographic)DemographicCombobox.SelectedItem,
+            volumesRead: volumesRead,
+            rating: !Rating.Text[..4].StartsWith("__._") ? rating : -1,
+            value: seriesValue,
+            allowDuplicate: AllowDuplicateButton.IsChecked.GetValueOrDefault(false)
         );
 
         if (validSeries.Key) // Boolean returns whether the series added succeeded
         {
-            // _collectionStatsViewModel.UpdateAllStats(CurVolNum, (uint)(MaxVolNum - CurVolNum));
             ClearFields();
+            ViewModel.ClearSuggestions();
         }
         else
         {
-            await ShowErrorDialog($"Unable to add \"{TitleBox.Text.Trim()}\" to Collection{(!string.IsNullOrWhiteSpace(validSeries.Value) ? $", {validSeries.Value}" : string.Empty)}");
+            await ShowErrorDialog($"Unable to add \"{SeriesInputTextBox.Text.Trim()}\" to Collection{(!string.IsNullOrWhiteSpace(validSeries.Value) ? $", {validSeries.Value}" : string.Empty)}");
         }
         AddSeriesButton.IsEnabled = ViewModel.IsAddSeriesButtonEnabled;
     }

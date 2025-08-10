@@ -61,17 +61,13 @@ public static partial class LibibParser
                 while (csv.Read())
                 {
                     string? rawTitle = csv.GetField("title");
-                    string? description = csv.GetField("description");
-                    string? publisher = csv.GetField("publisher");
+                    if (string.IsNullOrWhiteSpace(rawTitle)) continue;
 
-                    if (string.IsNullOrWhiteSpace(rawTitle) || string.IsNullOrWhiteSpace(description) || string.IsNullOrWhiteSpace(publisher) || rawTitle.Contains(publisher, StringComparison.OrdinalIgnoreCase))
-                    {
-                        continue;
-                    }
+                    string description = csv.ParseCsvString("description", string.Empty);
+                    string publisher = csv.ParseCsvString("publisher", "Unknown");
 
                     ReadOnlySpan<char> titleSpan = rawTitle.AsSpan();
                     ReadOnlySpan<char> descSpan = description.AsSpan();
-                    ReadOnlySpan<char> publisherSpan = publisher.AsSpan();
 
                     SeriesFormat format = (
                         titleSpan.Contains("Light Novel", StringComparison.OrdinalIgnoreCase) ||
@@ -88,29 +84,37 @@ public static partial class LibibParser
                         continue;
                     }
 
-                    if (publisherSpan.Contains("Tokyopop", StringComparison.OrdinalIgnoreCase))
+                    if (!publisher.Equals("Unknown"))
                     {
-                        publisher = "TOKYOPOP";
-                    }
-                    if (publisherSpan.Contains("JNovel", StringComparison.OrdinalIgnoreCase) || publisherSpan.Contains("J-Novel", StringComparison.OrdinalIgnoreCase))
-                    {
-                        publisher = "J-Novel Club";
-                    }
-                    if (publisherSpan.Contains("VIZ Media", StringComparison.OrdinalIgnoreCase))
-                    {
-                        publisher = "Viz Media";
-                    }
-                    if (publisherSpan.Contains("Yen On", StringComparison.OrdinalIgnoreCase))
-                    {
-                        publisher = "Yen Press";
-                    }
-                    if (publisherSpan.Contains("Denpa", StringComparison.OrdinalIgnoreCase))
-                    {
-                        publisher = "DENPA";
-                    }
-                    if (publisherSpan.Contains("ComicsOne", StringComparison.OrdinalIgnoreCase))
-                    {
-                        publisher = publisher.Replace("ComicsOne Corporation", "ComicsOne");
+                        ReadOnlySpan<char> publisherSpan = publisher.AsSpan();
+                        if (publisherSpan.Contains("Tokyopop", StringComparison.OrdinalIgnoreCase))
+                        {
+                            publisher = "TOKYOPOP";
+                        }
+                        else if (publisherSpan.Contains("JNovel", StringComparison.OrdinalIgnoreCase) || publisherSpan.Contains("J-Novel", StringComparison.OrdinalIgnoreCase))
+                        {
+                            publisher = "J-Novel Club";
+                        }
+                        else if (publisherSpan.Contains("VIZ Media", StringComparison.OrdinalIgnoreCase))
+                        {
+                            publisher = "Viz Media";
+                        }
+                        else if (publisherSpan.Contains("Yen On", StringComparison.OrdinalIgnoreCase))
+                        {
+                            publisher = "Yen Press";
+                        }
+                        else if (publisherSpan.Contains("Denpa", StringComparison.OrdinalIgnoreCase))
+                        {
+                            publisher = "DENPA";
+                        }
+                        else if (publisherSpan.Contains("ComicsOne", StringComparison.OrdinalIgnoreCase))
+                        {
+                            publisher = publisher.Replace("ComicsOne Corporation", "ComicsOne");
+                        }
+                        else if (publisherSpan.Contains("Kodama", StringComparison.OrdinalIgnoreCase))
+                        {
+                            publisher = "Kodama";
+                        }
                     }
 
                     string cleanedTitle = TitleCleanRegex().Replace(rawTitle, string.Empty).Trim();
@@ -160,7 +164,7 @@ public static partial class LibibParser
         return result;
     }
 
-    public sealed class TitleFormatComparer : IEqualityComparer<(string Title, SeriesFormat Format, string Publisher)>
+    private sealed class TitleFormatComparer : IEqualityComparer<(string Title, SeriesFormat Format, string Publisher)>
     {
         public bool Equals((string Title, SeriesFormat Format, string Publisher) x, (string Title, SeriesFormat Format, string Publisher) y)
         {

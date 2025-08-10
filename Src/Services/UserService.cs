@@ -89,12 +89,6 @@ public sealed class UserService : IUserService, IDisposable
 
     public UserService()
     {
-        SavedThemeChanges
-            .SortAndBind(out _savedThemes, new TsundokuThemeComparer(TsundokuLanguage.English))
-            .ObserveOn(RxApp.MainThreadScheduler)
-            .Subscribe()
-            .DisposeWith(_disposables);
-
         _userSubject
             .Where(user => user is not null)
             .Select(user => user!.MainTheme)
@@ -132,6 +126,12 @@ public sealed class UserService : IUserService, IDisposable
                 _currentThemeSubject.OnNext(theme);
                 LOGGER.Info($"Set Theme to '{theme?.ThemeName ?? "null"}'");
             })
+            .DisposeWith(_disposables);
+
+        SavedThemeChanges
+            .SortAndBind(out _savedThemes, new TsundokuThemeComparer(TsundokuLanguage.English))
+            .ObserveOn(RxApp.MainThreadScheduler)
+            .Subscribe()
             .DisposeWith(_disposables);
     }
     public ReadOnlyObservableCollection<TsundokuTheme> SavedThemes => _savedThemes;

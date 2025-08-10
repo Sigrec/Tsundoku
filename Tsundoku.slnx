@@ -1,0 +1,19 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="ARM" />
+    <Platform Name="ARM64" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+  </Folder>
+  <Project Path="Src/Tsundoku.csproj" />
+  <Project Path="Tests/Tsundoku.Tests.csproj" />
+  <Project Path="TsundokuPackage/TsundokuPackage.wapproj" Type="c7167f0d-bc9f-4e6e-afe1-012c56b48db5">
+    <BuildType Solution="Debug|Any CPU" Project="Release" />
+    <Platform Solution="*|Any CPU" Project="x64" />
+    <Deploy />
+  </Project>
+</Solution>

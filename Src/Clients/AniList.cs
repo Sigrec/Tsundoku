@@ -4,7 +4,7 @@ using GraphQL.Client.Serializer.SystemTextJson;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
-using Tsundoku.Models.Enums;
+using Tsundoku.Models;
 using static Tsundoku.Models.Enums.SeriesFormatModel;
 using static Tsundoku.Models.Enums.SeriesGenreModel;
 
@@ -77,12 +77,6 @@ public sealed partial class AniList
 
         return await ExecuteAniListQueryAsync("Id", variables, $"SeriesId: {seriesId}");
     }
-    
-    public sealed record AniListPickerSuggestion(
-        int Id,
-        string Display,
-        string Format
-    );
 
     public async Task<IReadOnlyList<AniListPickerSuggestion>> GetPickerSuggestionsAsync(
         string search,
@@ -100,7 +94,7 @@ public sealed partial class AniList
             Query = $@"
             query ($search: String!, $perPage: Int!) {{
                 Page(perPage: $perPage) {{
-                    media(search: $search, format_in: [MANGA, NOVEL], sort: [SEARCH_MATCH, POPULARITY_DESC]) {{
+                    media(search: $search, type: MANGA, format_in: [MANGA, NOVEL], sort: [SEARCH_MATCH, POPULARITY_DESC]) {{
                         id
                         format
                         title {{ romaji english native }}
@@ -150,8 +144,7 @@ public sealed partial class AniList
         foreach (JsonElement m in media.EnumerateArray())
         {
             if (!m.TryGetProperty("id", out JsonElement idEl)) continue;
-
-            int id = idEl.GetInt32();
+            string id = idEl.GetInt32().ToString();
 
             string? romaji = m.GetProperty("title").GetProperty("romaji").GetString();
             if (romaji is null) continue;

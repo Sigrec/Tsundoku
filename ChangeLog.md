@@ -6,20 +6,22 @@ This project adheres to [Semantic Versioning](https://semver.org/) and follows t
 <details>
 <summary>1.x Releases</summary>
 
-### 1.3.2 - 
+### 1.4.0 - 2025-08-10
 #### Changed
-- Updated all **Avalonia** libs to `11.3.3`
-- Updated **NLog** to `6.0.2`
-- Added search support when adding new series, basically a list will popup on the left and you can select the one you want to add
-X When doing a price analysis you no longer are able to interact with the other controls until the scrape is finished
-X Added goodreads import support
+- Updated **Avalonia** to `11.3.3`.
+- Updated **NLog** to `6.0.3`.
+- Added search when adding a new series: a list appears on the left; select an item to use add it.
+- Added **Goodreads** import.
+- During price analysis, other controls are disabled until the scrape completes.
+
 #### Fixed
-- Fixed styling issue within ComboBo boxe selection
-- Added `Hentai` as a filter option, prior it would show up but would not be selectable
-- Fixed crash introduced in last version when selecting a genre as a filter option
-- Fixed issue where changing a series demographic woudl cause the percentages to not calculate properly
-- Fixed issue where pie chart text would sometimes misalign when values change
-X Fixed issue where closing the main window while other windows were up would not just close all windows
+- ComboBox & ListBox selection styling.
+- `Hentai` filter is now selectable.
+- Crash when selecting a genre filter (introduced in the last version).
+- Changing a series’ demographic now updates percentages correctly.
+- Pie chart labels no longer misalign when values change.
+- Import no longer crashes on file I/O errors.
+- Price analysis window resets correctly if the scrape fails.
 
 ### 1.3.1 – 2025-06-27
 #### Changed

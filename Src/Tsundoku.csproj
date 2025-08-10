@@ -33,9 +33,9 @@
 		<JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
 
 		<!-- Metadata -->
-		<Version>1.3.1</Version>
-		<FileVersion>1.3.1</FileVersion>
-		<AssemblyVersion>1.3.1.0</AssemblyVersion>
+		<Version>1.4.0</Version>
+		<FileVersion>1.4.0</FileVersion>
+		<AssemblyVersion>1.4.0.0</AssemblyVersion>
 		<RepositoryUrl>https://github.com/Sigrec/Tsundoku</RepositoryUrl>
 		<Description>Desktop Manga and Light Novel Collection App</Description>
 		<ApplicationIcon>Assets\Icons\TsundokuLogo.ico</ApplicationIcon>
@@ -97,7 +97,7 @@
 		<PackageReference Include="GraphQL.Client.Serializer.SystemTextJson" Version="6.1.0" />
 		<PackageReference Include="MangaAndLightNovelWebScrape" Version="4.0.2" />
 		<PackageReference Include="Microsoft.Extensions.Http" Version="9.0.8" />
-		<PackageReference Include="NLog" Version="6.0.2" />
+		<PackageReference Include="NLog" Version="6.0.3" />
 		<PackageReference Include="FileWatcherEx" Version="2.7.0" />
 		<PackageReference Include="Projektanker.Icons.Avalonia.FontAwesome" Version="9.6.2" />
 		<PackageReference Include="System.Linq.Dynamic.Core" Version="1.6.7" />
@@ -106,14 +106,5 @@
 		<PackageReference Include="ReactiveUI.Fody" Version="19.5.41" />
 		<PackageReference Include="LiveChartsCore.SkiaSharpView.Avalonia" Version="2.0.0-rc3.3" />
 		<PackageReference Include="ZLinq" Version="1.5.2" />
-	</ItemGroup>
-	
-	<ItemGroup>
-	  <Compile Update="Views\PopupDialog.axaml.cs">
-	    <DependentUpon>PopupDialog.axaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\ThemeSettingsWindow.axaml.cs">
-	    <DependentUpon>ThemeSettingsWindow.axaml</DependentUpon>
-	  </Compile>
 	</ItemGroup>
 </Project>

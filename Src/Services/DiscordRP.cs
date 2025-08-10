@@ -3,7 +3,7 @@ using DiscordRPC.Logging;
 
 namespace Tsundoku.Services;
 
-internal static class DiscordRP
+public static class DiscordRP
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
     private static DiscordRpcClient? client;

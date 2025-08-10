@@ -108,7 +108,6 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
 
     private async void ChangeSeriesCoverFromFileAsync(object sender, RoutedEventArgs args)
     {
-        ViewModelBase.newCoverCheck = true;
         IReadOnlyList<IStorageFile> file = await this.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {
             AllowMultiple = false,

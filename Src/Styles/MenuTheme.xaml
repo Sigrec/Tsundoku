@@ -3,46 +3,11 @@
 		xmlns:vm="clr-namespace:Tsundoku.ViewModels"
 		x:DataType="vm:ViewModelBase">
 
-    <!-- <Style Selector="AutoCompleteBox.query">
-        <Style Selector=" ^ ListBox.query > ListBoxItem">
-            <Setter Property="FontWeight" Value="Bold" />
-            <Setter Property="FontSize" Value="15" />
-            <Setter Property="Foreground" Value="{Binding CurrentTheme.MenuButtonTextAndIconColor}"/>
-            <Setter Property="Background" Value="Transparent"/>
-
-            <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-                <Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGHoverColor}"/>
-                <Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderHoverColor}"/>
-            </Style>
-
-            <Style Selector="^:pressed /template/ ContentPresenter#PART_ContentPresenter">
-                <Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGHoverColor}"/>
-                <Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderHoverColor}"/>
-            </Style>
-
-            <Style Selector="^:selected">
-                <Style Selector="^ /template/ ContentPresenter#PART_ContentPresenter">
-                    <Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGHoverColor}"/>
-                    <Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderHoverColor}"/>
-                </Style>
-
-                <Style Selector="^:not(:focus) /template/ ContentPresenter#PART_ContentPresenter">
-                    <Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGHoverColor}"/>
-                    <Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderHoverColor}"/>
-                </Style>
-
-                <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-                    <Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGColor}"/>
-                    <Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderColor}"/>
-                </Style>
-
-                <Style Selector="^:pressed /template/ ContentPresenter#PART_ContentPresenter">
-                    <Setter Property="Background" Value="{Binding CurrentTheme.MenuButtonBGColor}"/>
-                    <Setter Property="BorderBrush" Value="{Binding CurrentTheme.MenuButtonBorderColor}"/>
-                </Style>
-            </Style>
+    <Style Selector="AutoCompleteBox.query">
+        <Style Selector="^ /template/ ListBox">
+            <Setter Property="ItemContainerTheme" Value="{StaticResource QueryListBoxItem}"/>
         </Style>
-    </Style> -->
+    </Style>
 
 	<Style Selector="Border.Menu">
 		<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuBGColor}"/>
@@ -113,6 +78,15 @@
 			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.SearchBarBGColor}"/>
 			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.SearchBarBorderColor}"/>
 		</Style>
+
+        <Style Selector="^:disabled">
+            <Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.SearchBarTextColor}" />
+
+            <Style Selector="^ /template/ Border#PART_BorderElement">
+                <Setter Property="Background" Value="{CompiledBinding CurrentTheme.SearchBarBGColor}"/>
+		        <Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.SearchBarBorderColor}"/>
+            </Style>
+        </Style>
 
         <Style Selector="^ /template/ ScrollViewer#PART_ScrollViewer">
 			<Setter Property="Theme" Value="{StaticResource ReverseCollectionScroll}"/>

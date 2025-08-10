@@ -14,9 +14,11 @@ public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsView
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
     public bool IsOpen = false;
     public int currencyLength = 0;
+    private readonly IPopupDialogService _popupDialogService;
 
-    public UserSettingsWindow(UserSettingsViewModel viewModel)
+    public UserSettingsWindow(UserSettingsViewModel viewModel, IPopupDialogService popupDialogService)
     {
+        _popupDialogService = popupDialogService;
         InitializeComponent();
 
         ViewModel = viewModel;
@@ -42,7 +44,7 @@ public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsView
         };
 
         this.WhenAnyValue(x => x.IndigoButton.IsChecked, (member) => member is not null && member == true).Subscribe(x => ViewModel.IndigoMember = x);
-        
+
         this.WhenAnyValue(x => x.BooksAMillionButton.IsChecked, (member) => member is not null && member == true).Subscribe(x => ViewModel.BooksAMillionMember = x);
 
         this.WhenAnyValue(x => x.KinokuniyaUSAButton.IsChecked, (member) => member is not null && member == true).Subscribe(x => ViewModel.KinokuniyaUSAMember = x);
@@ -65,53 +67,106 @@ public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsView
         }
     }
 
+    private async Task ShowFileErrorDialog(string info = "Unable to Open File\nCheck if it is being used by another app")
+    {
+        await _popupDialogService.ShowAsync("Error", "fa-solid fa-circle-exclamation", info, this);
+    }
 
     /// <summary>
     /// Allows user to import a new Json file to be used as their new data, it additionall creates a backup file of the users last save
     /// </summary>
     private async void ImportUserDataAsync(object sender, RoutedEventArgs args)
     {
-        IReadOnlyList<IStorageFile> files = await this.StorageProvider.OpenFilePickerAsync(
-            new FilePickerOpenOptions
-            {
-                AllowMultiple = false,
-                FileTypeFilter =
-                [
-                    new FilePickerFileType("JSON File")
-                    {
-                        Patterns = [ "*.json" ]
-                    }
-                ]
-            }
-        );
-        if (files.Count == 1)
+        try
         {
-            ViewModel.ImportUserDataFromJson(files[0].Path.LocalPath, this);
+            IReadOnlyList<IStorageFile> files = await this.StorageProvider.OpenFilePickerAsync(
+                new FilePickerOpenOptions
+                {
+                    AllowMultiple = false,
+                    FileTypeFilter =
+                    [
+                        new FilePickerFileType("JSON File")
+                        {
+                            Patterns = [ "*.json" ]
+                        }
+                    ]
+                }
+            );
+            if (files.Count == 1)
+            {
+                ViewModel.ImportUserDataFromJson(files[0].Path.LocalPath, this);
+            }
+        }
+        catch (IOException ex)
+        {
+            LOGGER.Error(ex);
+            await ShowFileErrorDialog();
         }
     }
 
     private async void ImportLibibDataAsync(object sender, RoutedEventArgs args)
     {
-        IReadOnlyList<IStorageFile> files = await this.StorageProvider.OpenFilePickerAsync(
-            new FilePickerOpenOptions
-            {
-                AllowMultiple = true,
-                FileTypeFilter =
-                [
-                    new FilePickerFileType("JSON File")
+        try
+        {
+            IReadOnlyList<IStorageFile> files = await this.StorageProvider.OpenFilePickerAsync(
+                new FilePickerOpenOptions
+                {
+                    AllowMultiple = true,
+                    FileTypeFilter =
+                    [
+                        new FilePickerFileType("JSON File")
                     {
                         Patterns = [ "*.csv" ]
                     }
-                ]
+                    ]
+                }
+            );
+            if (files.Count > 0)
+            {
+                await ViewModel.ImportLibibDataFromCsv([.. files.Select(f => f.Path.LocalPath)], this.Owner as Window);
             }
-        );
-        if (files.Count > 0)
-        {
-            await ViewModel.ImportLibibDataFromCsv([.. files.Select(f => f.Path.LocalPath)], this.Owner as Window);
+            else
+            {
+                LOGGER.Debug("User tried to import libib data but no files were selected");
+            }
         }
-        else
+        catch (IOException ex)
         {
-            LOGGER.Debug("User tried to import libib data but no files were selected");
+            LOGGER.Error(ex);
+            await ShowFileErrorDialog();
+        }
+    }
+
+    private async void ImportGoodreadsDataAsync(object sender, RoutedEventArgs args)
+    {
+        try
+        {
+            IReadOnlyList<IStorageFile> files = await this.StorageProvider.OpenFilePickerAsync(
+                new FilePickerOpenOptions
+                {
+                    AllowMultiple = true,
+                    FileTypeFilter =
+                    [
+                        new FilePickerFileType("JSON File")
+                        {
+                            Patterns = [ "*.csv" ]
+                        }
+                    ]
+                }
+            );
+            if (files.Count > 0)
+            {
+                await ViewModel.ImportGoodreadsDataFromCsv([.. files.Select(f => f.Path.LocalPath)], this.Owner as Window);
+            }
+            else
+            {
+                LOGGER.Debug("User tried to import goodreads data but no files were selected");
+            }
+        }
+        catch (IOException ex)
+        {
+            LOGGER.Error(ex);
+            await ShowFileErrorDialog();
         }
     }
 

@@ -12,7 +12,7 @@
         FontFamily="Segoe UI"
         MaxWidth="491"
         MinWidth="491"
-        MaxHeight="845"
+        MaxHeight="895"
         WindowStartupLocation="2"
         KeyboardNavigation.TabNavigation="None">
     
@@ -26,7 +26,7 @@
 
     <Border Classes="Menu" BorderThickness="3" CornerRadius="0,0,8,8" ClipToBounds="True">
         <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Theme="{StaticResource ReverseCollectionScroll}"> 
-            <StackPanel Margin="20,10,20,20" Spacing="10">
+            <StackPanel Margin="20,10,20,15" Spacing="10">
                 <StackPanel Spacing="5">
                     <TextBlock Text="Change Username" 
                                TextDecorations="Underline" 
@@ -225,7 +225,12 @@
                                FontSize="20"
                                FontWeight="Bold"
                                Classes="Menu"/>
-                    <StackPanel Orientation="Horizontal" Width="450" Margin="-5,0,0,0">
+                    <WrapPanel Width="450" Margin="-5,0,0,0">
+                        <WrapPanel.Styles>
+                            <Style Selector="Button">
+                                <Setter Property="Margin" Value="5"/>
+                            </Style>
+                        </WrapPanel.Styles>
                         <Button Theme="{StaticResource UserSettingsButton}"
                                 Click="OpenAniListLink"
                                 HorizontalAlignment="Center"
@@ -246,7 +251,12 @@
                                 HorizontalAlignment="Center"
                                 x:Name="ImportLibibData"
                                 Content="Libib Import"/>
-                    </StackPanel>
+                        <Button Theme="{StaticResource UserSettingsButton}"
+                                Click="ImportGoodreadsDataAsync"
+                                HorizontalAlignment="Center"
+                                x:Name="ImportGoodreadsData"
+                                Content="Goodreads Import"/>
+                    </WrapPanel>
                 </StackPanel>
             </StackPanel>
         </ScrollViewer>

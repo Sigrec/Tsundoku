@@ -1,18 +1,17 @@
-﻿using ReactiveUI;
-using Tsundoku.Models;
-using ReactiveUI.Fody.Helpers;
-using Avalonia.Media.Imaging;
+﻿using System.Collections.ObjectModel;
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Text.RegularExpressions;
+using Avalonia.Media.Imaging;
+using Microsoft.Extensions.DependencyInjection;
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
+using Tsundoku.Clients;
 using Tsundoku.Helpers;
+using Tsundoku.Models;
 using Tsundoku.Views;
 using static Tsundoku.Models.Enums.TsundokuFilterModel;
-using System.Reactive.Disposables;
 using static Tsundoku.Models.Enums.TsundokuLanguageModel;
-using System.Reactive.Linq;
-using System.Linq.Dynamic.Core;
-using Microsoft.Extensions.DependencyInjection;
-using System.Collections.ObjectModel;
-using Tsundoku.Clients;
 
 namespace Tsundoku.ViewModels;
 
@@ -158,7 +157,6 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
 
     public void DeleteSeries(Series series)
     {
-        newCoverCheck = false;
         _userService.RemoveSeries(series);
     }
 
@@ -171,7 +169,6 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
     {
         LOGGER.Info("Refreshing {series} ({id})", originalSeries.Titles[TsundokuLanguage.Romaji] + (originalSeries.DuplicateIndex == 0 ? string.Empty : $" ({originalSeries.DuplicateIndex})"), originalSeries.Id);
 
-        newCoverCheck = true;
         Series? refreshedSeries = await Series.CreateNewSeriesCardAsync(
             _bitmapHelper,
             _mangaDex,
@@ -198,43 +195,7 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
     public void SaveOnClose()
     {
         LOGGER.Info("Closing Tsundoku");
-        if (!isReloading) { _userService.SaveUserData(); }
-
-        if (NewSeriesWindow is not null)
-        {
-            NewSeriesWindow.Closing += (s, e) => { e.Cancel = false; };
-            NewSeriesWindow.Close();
-        }
-
-        if (UserSettingsWindow is not null)
-        {
-            UserSettingsWindow.Closing += (s, e) => { e.Cancel = false; };
-            UserSettingsWindow.Close();
-        }
-
-        if (ThemeSettingsWindow is not null)
-        {
-            ThemeSettingsWindow.Closing += (s, e) => { e.Cancel = false; };
-            ThemeSettingsWindow.Close();
-        }
-
-        if (PriceAnalysisWindow is not null)
-        {
-            PriceAnalysisWindow.Closing += (s, e) => { e.Cancel = false; };
-            PriceAnalysisWindow.Close();
-        }
-
-        if (CollectionStatsWindow is not null)
-        {
-            CollectionStatsWindow.Closing += (s, e) => { e.Cancel = false; };
-            CollectionStatsWindow.Close();
-        }
-
-        if (UserNotesWindow is not null)
-        {
-            UserNotesWindow.Closing += (s, e) => { e.Cancel = false; };
-            UserNotesWindow.Close();
-        }
+        if (!isReloading) _userService.SaveUserData();
     }
 
     private void Dispose(bool disposing)

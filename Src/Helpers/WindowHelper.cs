@@ -25,12 +25,13 @@ public static class WindowHelper
     {
         if (windowInstance is null)
         {
-            LOGGER.Error($"{windowNameForLogging} instance is null. Cannot open window.");
+            LOGGER.Error("{Window} instance is null. Cannot open window", windowNameForLogging);
             return null;
         }
 
         try
         {
+            windowInstance.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             windowInstance.WindowState = WindowState.Normal;
 
             if (!windowInstance.IsVisible)
@@ -46,7 +47,7 @@ public static class WindowHelper
         }
         catch (Exception ex)
         {
-            LOGGER.Error(ex, $"Failed to open or activate {windowNameForLogging}.");
+            LOGGER.Error(ex, "Failed to open or activate {Window}", windowNameForLogging);
             return null;
         }
     }
@@ -71,16 +72,17 @@ public static class WindowHelper
     {
         if (dialogInstance is null)
         {
-            LOGGER.Error("{Window} instance is null. Cannot open dialog.", windowNameForLogging);
+            LOGGER.Error("{Window} instance is null. Cannot open dialog", windowNameForLogging);
             return default; // Return default if instance is null
         }
 
         try
         {
             // Ensure the dialog is in a normal state before showing
+            dialogInstance.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             dialogInstance.WindowState = WindowState.Normal;
-
-            LOGGER.Debug($"Opening {windowNameForLogging} as a modal dialog.");
+            LOGGER.Debug("Opening {Window} as a modal dialog", windowNameForLogging);
+            
             // Await ShowDialog, passing the TResult type argument to get the dialog's return value
             TResult? result = await dialogInstance.ShowDialog<TResult?>(parentWindow);
             LOGGER.Debug($"{windowNameForLogging} dialog closed with result: {result}");
@@ -88,7 +90,7 @@ public static class WindowHelper
         }
         catch (Exception ex)
         {
-            LOGGER.Error(ex, $"Failed to open {windowNameForLogging} as a dialog.");
+            LOGGER.Error(ex, "Failed to open {Window} as a dialog", windowNameForLogging);
             return default; // Return default on error
         }
     }

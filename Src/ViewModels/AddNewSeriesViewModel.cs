@@ -70,10 +70,10 @@ public sealed class AddNewSeriesViewModel : ViewModelBase
 
     private void SetupTitleSuggestions()
     {
-        _suggestionsSource
-            .Connect()
-            .ObserveOn(RxApp.MainThreadScheduler)
+        _suggestionsSource.Connect()
+            .Sort(new AniListPickerSuggestionComparer())
             .Bind(out ReadOnlyObservableCollection<AniListPickerSuggestion> _suggestions)
+            .ObserveOn(RxApp.MainThreadScheduler)
             .Subscribe()
             .DisposeWith(_disposables);
 
@@ -86,39 +86,37 @@ public sealed class AddNewSeriesViewModel : ViewModelBase
             .Subscribe(x => IsSuggestionsOpen = x)
             .DisposeWith(_disposables);
 
+
         this.WhenAnyValue(x => x.TitleText)
             .Select(x => x is null ? string.Empty : x.Trim())
-            .Throttle(TimeSpan.FromMilliseconds(500), RxApp.TaskpoolScheduler)
+            .Throttle(TimeSpan.FromMilliseconds(300), RxApp.TaskpoolScheduler)
             .DistinctUntilChanged()
             .Select(x =>
             {
                 if (string.IsNullOrWhiteSpace(x) || x.Length < 2)
-                {
                     return Observable.Return(Array.Empty<AniListPickerSuggestion>());
-                }
 
                 return Observable.FromAsync(async ct =>
                 {
-                    IReadOnlyList<AniListPickerSuggestion> results = await _aniList.GetPickerSuggestionsAsync(x, ct);
-
-                    return results;
+                    return await _aniList.GetPickerSuggestionsAsync(x, ct);
                 });
             })
             .Switch()
             .ObserveOn(RxApp.MainThreadScheduler)
             .Subscribe(items =>
-        {
-            _suggestionsSource.Edit(list =>
             {
-                list.Clear();
-                list.AddRange(items);
-            });
-        })
-        .DisposeWith(_disposables);
+                _suggestionsSource.Edit(list =>
+                {
+                    list.Clear();
+                    list.AddRange(items);
+                });
+            })
+            .DisposeWith(_disposables);
     }
 
     public void ClearSuggestions()
     {
+        SelectedSuggestion = null;
         _suggestionsSource.Clear();
     }
 
