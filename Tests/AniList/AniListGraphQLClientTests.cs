@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Net.Http.Headers;
 using System.Text.Json;
-using static Tsundoku.Models.Enums.SeriesFormatEnum;
+using static Tsundoku.Models.Enums.SeriesFormatModel;
 
 namespace Tsundoku.Tests.AniList;
 

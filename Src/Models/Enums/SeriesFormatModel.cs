@@ -1,6 +1,6 @@
 ﻿namespace Tsundoku.Models.Enums;
 
-public static class SeriesFormatEnum
+public static class SeriesFormatModel
 {
     public enum SeriesFormat
     {

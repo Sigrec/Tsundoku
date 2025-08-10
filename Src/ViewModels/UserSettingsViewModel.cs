@@ -6,7 +6,7 @@ using MangaAndLightNovelWebScrape.Websites;
 using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 using Tsundoku.Helpers;
 using System.Globalization;
-using static Tsundoku.Models.Enums.SeriesFormatEnum;
+using static Tsundoku.Models.Enums.SeriesFormatModel;
 using Avalonia.Controls;
 
 namespace Tsundoku.ViewModels;

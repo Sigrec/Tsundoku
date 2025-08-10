@@ -1,6 +1,6 @@
 using System.Security.Policy;
 using static Tsundoku.Helpers.LibibParser;
-using static Tsundoku.Models.Enums.SeriesFormatEnum;
+using static Tsundoku.Models.Enums.SeriesFormatModel;
 
 namespace Tsundoku.Tests.Extensions
 {

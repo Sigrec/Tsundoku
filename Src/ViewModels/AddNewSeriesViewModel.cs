@@ -7,7 +7,7 @@ using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 using Avalonia.Collections;
 using Tsundoku.Clients;
 using static Tsundoku.Models.Enums.SeriesDemographicModel;
-using static Tsundoku.Models.Enums.SeriesFormatEnum;
+using static Tsundoku.Models.Enums.SeriesFormatModel;
 using ReactiveUI;
 using System.Globalization;
 using System.Reactive.Linq;

@@ -6,9 +6,9 @@ using System.Net;
 using System.Net.Http.Headers;
 using Tsundoku.ViewModels;
 using static Tsundoku.Models.Enums.SeriesDemographicModel;
-using static Tsundoku.Models.Enums.SeriesFormatEnum;
+using static Tsundoku.Models.Enums.SeriesFormatModel;
 using static Tsundoku.Models.Enums.SeriesGenreModel;
-using static Tsundoku.Models.Enums.SeriesStatusEnum;
+using static Tsundoku.Models.Enums.SeriesStatusModel;
 using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 
 namespace Tsundoku.Tests.Models;

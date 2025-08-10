@@ -3,7 +3,6 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:vm="using:Tsundoku.ViewModels"
-		xmlns:models="using:MangaAndLightNovelWebScrape.EntryModel"
         x:Class="Tsundoku.Views.PriceAnalysisWindow"
         Icon="\Assets\Icons\TsundokuLogo.ico"
         Title="Price Analysis"
@@ -111,37 +110,37 @@
 					<ComboBox x:Name="RegionComboBox"
 							  Height="37"
 							  Width="182"
+                              ItemsSource="{x:Static vm:PriceAnalysisViewModel.ANALYSIS_COUNTRY_OPTIONS}"
 							  SelectedIndex="{CompiledBinding CurRegionIndex}"
 							  AutoScrollToSelectedItem="True"
 							  HorizontalAlignment="Left"
                               SelectionChanged="RegionChanged"
+                              ItemContainerTheme="{StaticResource MenuComboBoxItem}"
 							  Theme="{StaticResource MenuComboBox}">
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="America"/>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Australia"/>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Britain"/>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Canada"/>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Europe"/>
-						<!-- <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Japan"/> -->
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
 					</ComboBox>
 				</StackPanel>
 				<StackPanel Grid.Column="2" Grid.Row="2">
 					<TextBlock Text="Stock Status Filters" FontSize="20" FontWeight="Bold" Classes="Menu" Margin="0,0,0,3" ToolTip.Tip="OOS (Out of Stock) \n PO (Pre-Order) \n BO (Backorder)"/>
 					<ComboBox Name="StockFilterSelector"
+                              ItemsSource="{x:Static vm:PriceAnalysisViewModel.EXCLUDE_ANALYSIS_OPTIONS}"
 							  Height="37"
 							  Width="182"
 							  SelectedIndex="0"
 							  AutoScrollToSelectedItem="True"
 							  HorizontalAlignment="Left"
                               ToolTip.Tip="OOS (Out of Stock)&#x0a;PO (Pre-Order)&#x0a;BO (Backorder)"
+                              ItemContainerTheme="{StaticResource MenuComboBoxItem}"
 							  Theme="{StaticResource MenuComboBox}">
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Exclude None"/>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Exclude All"/>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Exclude OOS &#x26; PO"/>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Exclude OOS &#x26; BO"/>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Exclude PO &#x26; BO"/>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Exclude OOS"/>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Exclude PO"/>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Exclude BO"/>
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" />
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
 					</ComboBox>
 				</StackPanel>
 				<StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" HorizontalAlignment="Center">

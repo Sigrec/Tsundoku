@@ -4,7 +4,7 @@ using Avalonia.ReactiveUI;
 using ReactiveUI;
 using Tsundoku.ViewModels;
 using static Tsundoku.Models.Enums.SeriesDemographicModel;
-using static Tsundoku.Models.Enums.SeriesFormatEnum;
+using static Tsundoku.Models.Enums.SeriesFormatModel;
 
 namespace Tsundoku.Views;
 

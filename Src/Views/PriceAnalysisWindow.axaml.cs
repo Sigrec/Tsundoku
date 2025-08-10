@@ -15,7 +15,7 @@ public sealed partial class PriceAnalysisWindow : ReactiveWindow<PriceAnalysisVi
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
     public bool IsOpen = false, Manga;
-    public readonly MasterScrape Scrape = new MasterScrape(StockStatusFilter.EXCLUDE_NONE_FILTER);
+    public readonly MasterScrape Scrape = new(StockStatusFilter.EXCLUDE_NONE_FILTER);
 
 
     public PriceAnalysisWindow(PriceAnalysisViewModel viewModel)
@@ -95,13 +95,14 @@ public sealed partial class PriceAnalysisWindow : ReactiveWindow<PriceAnalysisVi
             Scrape.IsBooksAMillionMember = ViewModel.CurrentUser.Memberships[BooksAMillion.WEBSITE_TITLE];
             Scrape.IsKinokuniyaUSAMember = ViewModel.CurrentUser.Memberships[KinokuniyaUSA.WEBSITE_TITLE];
             Scrape.IsIndigoMember = ViewModel.CurrentUser.Memberships[Indigo.WEBSITE_TITLE];
+            HashSet<string> websiteList = [.. ViewModel.SelectedWebsites.AsValueEnumerable().Select(website => website.Content.ToString())];
 
-            LOGGER.Info($"Started Scrape For \"{TitleBox.Text}\" on {Scrape.Browser} Browser w/ Region = \"{Scrape.Region}\" & \"{(StockFilterSelector.SelectedItem as ComboBoxItem).Content} Filter\" & Websites = [{string.Join(", ", ViewModel.SelectedWebsites.Select(site => site.Content.ToString()))}] & Memberships = ({string.Join(" & ", ViewModel.CurrentUser.Memberships)})");
+            LOGGER.Info($"Started Scrape For \"{TitleBox.Text}\" on {Scrape.Browser} Browser w/ Region = \"{Scrape.Region}\" & \"{(StockFilterSelector.SelectedItem as ComboBoxItem).Content} Filter\" & Websites = [{string.Join(", ", websiteList)}] & Memberships = ({string.Join(" & ", ViewModel.CurrentUser.Memberships)})");
             
             await Scrape.InitializeScrapeAsync(
                 title: TitleBox.Text, 
                 bookType: MangaButton.IsChecked is not null && MangaButton.IsChecked.Value ? BookType.Manga : BookType.LightNovel, 
-                Scrape.GenerateWebsiteList([.. ViewModel.SelectedWebsites.Select(site => site.Content.ToString())])
+                Scrape.GenerateWebsiteList(websiteList)
             );
             StartScrapeButton.IsEnabled = ViewModel.IsAnalyzeButtonEnabled;
             StartScrapeButton.Content = "Analyze"; 
@@ -120,15 +121,11 @@ public sealed partial class PriceAnalysisWindow : ReactiveWindow<PriceAnalysisVi
 
     private void RegionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (RegionComboBox.SelectedItem is ComboBoxItem selectedItem)
+        if (RegionComboBox.SelectedItem is string selectedRegion)
         {
-            string? newRegionItem = selectedItem.Content?.ToString();
-            if (newRegionItem is not null)
-            {
-                Region newRegion = MangaAndLightNovelWebScrape.Helpers.GetRegionFromString(newRegionItem);
-                ViewModel.UpdateUserRegion(newRegion);
-                LOGGER.Info("Region Changed to {}", newRegionItem);
-            }
+            Region newRegion = MangaAndLightNovelWebScrape.Helpers.GetRegionFromString(selectedRegion);
+            ViewModel.UpdateUserRegion(newRegion);
+            LOGGER.Info("Region Changed to {}", selectedRegion);
         }
     }
 

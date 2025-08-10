@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Collections.Specialized;
 using System.Reactive.Linq;
 using Avalonia.Collections;
@@ -18,7 +19,28 @@ public sealed class PriceAnalysisViewModel : ViewModelBase
     [Reactive] public string WebsitesToolTipText { get; set; }
     [Reactive] public int CurRegionIndex { get; set; }
     public AvaloniaList<ListBoxItem> SelectedWebsites { get; } = [];
-    private static readonly StringBuilder CurWebsites = new StringBuilder();
+    private static readonly StringBuilder CurWebsites = new();
+
+    public static readonly FrozenSet<string> ANALYSIS_COUNTRY_OPTIONS = new[]
+    {
+        "America",
+        "Australia",
+        "Britain",
+        "Canada",
+        "Europe"
+    }.ToFrozenSet();
+
+    public static readonly FrozenSet<string> EXCLUDE_ANALYSIS_OPTIONS = new[]
+    {
+        "Exclude None",
+        "Exclude All",
+        "Exclude OOS & PO",
+        "Exclude OOS & BO",
+        "Exclude PO & BO",
+        "Exclude OOS",
+        "Exclude PO",
+        "Exclude BO"
+    }.ToFrozenSet();
 
     public PriceAnalysisViewModel(IUserService userService) : base(userService)
     {
@@ -38,7 +60,7 @@ public sealed class PriceAnalysisViewModel : ViewModelBase
         {
             case NotifyCollectionChangedAction.Add:
             case NotifyCollectionChangedAction.Remove:
-                if (SelectedWebsites is not null && SelectedWebsites.Any())
+                if (SelectedWebsites is not null && SelectedWebsites.Count != 0)
                 {
                     for (int x = 0; x < SelectedWebsites.Count - 1; x++)
                     {

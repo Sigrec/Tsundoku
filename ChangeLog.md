@@ -11,6 +11,7 @@ This project adheres to [Semantic Versioning](https://semver.org/) and follows t
 - Updated all **Avalonia** libs to `11.3.3`
 - Updated **NLog** to `6.0.2`
 - Added search support when adding new series, basically a list will popup on the left and you can select the one you want to add
+X When doing a price analysis you no longer are able to interact with the other controls until the scrape is finished
 X Added goodreads import support
 #### Fixed
 - Fixed styling issue within ComboBo boxe selection

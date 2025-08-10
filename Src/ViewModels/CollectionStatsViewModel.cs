@@ -12,9 +12,9 @@ using DynamicData;
 using Avalonia.Media;
 using ReactiveUI;
 using System.Reactive.Disposables;
-using static Tsundoku.Models.Enums.SeriesStatusEnum;
+using static Tsundoku.Models.Enums.SeriesStatusModel;
 using static Tsundoku.Models.Enums.SeriesDemographicModel;
-using static Tsundoku.Models.Enums.SeriesFormatEnum;
+using static Tsundoku.Models.Enums.SeriesFormatModel;
 using static Tsundoku.Models.Enums.SeriesGenreModel;
 using System.Globalization;
 
@@ -901,7 +901,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
 
         _userService.UserCollectionChanges
             .Where(series => series is not null)
-            .AutoRefresh(series => series.Demographic) // detect property changes
+            .AutoRefresh(series => series.Demographic)
             .Group(user => user.Demographic)
             .Subscribe(groupChangeSet =>
             {

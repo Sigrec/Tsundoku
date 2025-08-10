@@ -8,9 +8,9 @@ using Tsundoku.Clients;
 using Tsundoku.Helpers;
 using Tsundoku.Models.Enums;
 using static Tsundoku.Models.Enums.SeriesDemographicModel;
-using static Tsundoku.Models.Enums.SeriesFormatEnum;
+using static Tsundoku.Models.Enums.SeriesFormatModel;
 using static Tsundoku.Models.Enums.SeriesGenreModel;
-using static Tsundoku.Models.Enums.SeriesStatusEnum;
+using static Tsundoku.Models.Enums.SeriesStatusModel;
 using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 
 namespace Tsundoku.Models;
@@ -343,7 +343,7 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
 
         context.CountryOfOrigin = mediaData.GetProperty("countryOfOrigin").GetString();
         context.FilteredBookType = bookType == SeriesFormat.Manga
-            ? SeriesFormatEnum.Parse(context.CountryOfOrigin)
+            ? SeriesFormatModel.Parse(context.CountryOfOrigin)
             : SeriesFormat.Novel;
 
         if (!isRefresh)
@@ -449,7 +449,7 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
             ? AniList.ParseSeriesDescription(descriptionProp.GetString())
             : string.Empty;
 
-        SeriesStatus status = SeriesStatusEnum.Parse(mediaData.GetProperty("status").GetString());
+        SeriesStatus status = SeriesStatusModel.Parse(mediaData.GetProperty("status").GetString());
 
         Uri link = new Uri(mediaData.GetProperty("siteUrl").GetString());
 
@@ -551,7 +551,7 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
         context.CountryOfOrigin = attributesBlock.GetProperty("originalLanguage").GetString();
         context.RomajiTitle = MangaDex.GetAltTitle("ja-ro", altTitleList) ?? context.EnglishTitle;
         context.NativeTitle = MangaDex.GetAltTitle(context.CountryOfOrigin, altTitleList) ?? context.RomajiTitle;
-        context.FilteredBookType = SeriesFormatEnum.Parse(context.CountryOfOrigin);
+        context.FilteredBookType = SeriesFormatModel.Parse(context.CountryOfOrigin);
 
         if (!MangaDex.TryGetAltTitle("ja", altTitleList, out context.JapaneseTitle))
         {
@@ -634,7 +634,7 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
                 )
                 : string.Empty;
             
-        SeriesStatus status = SeriesStatusEnum.Parse(attributesBlock.GetProperty("status").GetString());
+        SeriesStatus status = SeriesStatusModel.Parse(attributesBlock.GetProperty("status").GetString());
 
         Uri link = MangaDex.ConstructMangaLink(attributesBlock, data, curMangaDexId);
         HashSet<SeriesGenre> genres = MangaDex.ParseGenreData(context.RomajiTitle, attributesBlock.GetProperty("tags"));
