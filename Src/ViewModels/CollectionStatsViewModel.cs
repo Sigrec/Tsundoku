@@ -918,8 +918,6 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
                                 ? decimal.Round(((decimal)count / SeriesCount) * 100, 2)
                                 : 0m;
 
-                            LOGGER.Debug("UPDATING DEMO PERCENTAGE = {} | {} | {}", percentage, SeriesCount, count);
-
                             switch (group.Key)
                             {
                                 case SeriesDemographic.Shounen:

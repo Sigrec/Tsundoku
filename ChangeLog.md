@@ -17,6 +17,7 @@ X Added goodreads import support
 - Added `Hentai` as a filter option, prior it would show up but would not be selectable
 - Fixed crash introduced in last version when selecting a genre as a filter option
 - Fixed issue where changing a series demographic woudl cause the percentages to not calculate properly
+- Fixed issue where pie chart text would sometimes misalign when values change
 X Fixed issue where closing the main window while other windows were up would not just close all windows
 
 ### 1.3.1 – 2025-06-27
