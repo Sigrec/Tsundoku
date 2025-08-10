@@ -4,8 +4,9 @@ using GraphQL.Client.Serializer.SystemTextJson;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
-using static Tsundoku.Models.Enums.SeriesFormatEnum;
-using static Tsundoku.Models.Enums.SeriesGenreEnum;
+using Tsundoku.Models;
+using static Tsundoku.Models.Enums.SeriesFormatModel;
+using static Tsundoku.Models.Enums.SeriesGenreModel;
 
 namespace Tsundoku.Clients;
 
@@ -77,6 +78,116 @@ public sealed partial class AniList
         return await ExecuteAniListQueryAsync("Id", variables, $"SeriesId: {seriesId}");
     }
 
+    public async Task<IReadOnlyList<AniListPickerSuggestion>> GetPickerSuggestionsAsync(
+        string search,
+        CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(search))
+        {
+            return [];
+        }
+
+        const int perPage = 1000;
+
+        GraphQLRequest request = new()
+        {
+            Query = $@"
+            query ($search: String!, $perPage: Int!) {{
+                Page(perPage: $perPage) {{
+                    media(search: $search, type: MANGA, format_in: [MANGA, NOVEL], sort: [SEARCH_MATCH, POPULARITY_DESC]) {{
+                        id
+                        format
+                        title {{ romaji english native }}
+                    }}
+                }}
+            }}",
+            Variables = new { search = search, perPage = perPage }
+        };
+
+        GraphQLResponse<JsonDocument?>? response = await SendWithRateLimitRetryAsync<JsonDocument?>(
+            request,
+            $"Picker Typeahead: '{search}'",
+            cancellationToken: cancellationToken);
+
+        if (response?.Data is null)
+        {
+            return [];
+        }
+
+        if (!response.Data.RootElement.TryGetProperty("Page", out JsonElement page) ||
+            !page.TryGetProperty("media", out JsonElement media) ||
+            media.ValueKind != JsonValueKind.Array)
+        {
+            return [];
+        }
+
+        static int MatchScore(string candidate, string needle)
+        {
+            if (candidate.Equals(needle, StringComparison.OrdinalIgnoreCase))
+            {
+                return 3;
+            }
+            if (candidate.StartsWith(needle, StringComparison.OrdinalIgnoreCase))
+            {
+                return 2;
+            }
+            if (candidate.Contains(needle, StringComparison.OrdinalIgnoreCase))
+            {
+                return 1;
+            }
+            return 0;
+        }
+
+        List<AniListPickerSuggestion> list = new(Math.Min(media.GetArrayLength(), perPage));
+        string needle = search.Trim();
+
+        foreach (JsonElement m in media.EnumerateArray())
+        {
+            if (!m.TryGetProperty("id", out JsonElement idEl)) continue;
+            string id = idEl.GetInt32().ToString();
+
+            string? romaji = m.GetProperty("title").GetProperty("romaji").GetString();
+            if (romaji is null) continue;
+
+            string? english = m.GetProperty("title").GetProperty("english").GetString();
+            string? native = m.GetProperty("title").GetProperty("native").GetString();
+
+            bool isRomajiNotEmpty = !string.IsNullOrWhiteSpace(romaji);
+            bool isEnglishNotEmpty = !string.IsNullOrWhiteSpace(english);
+            bool isNativeNotEmpty = !string.IsNullOrWhiteSpace(native);
+
+            bool inRomaji = isRomajiNotEmpty && romaji.Contains(needle, StringComparison.OrdinalIgnoreCase);
+            bool inEnglish = isEnglishNotEmpty && english.Contains(needle, StringComparison.OrdinalIgnoreCase);
+            bool inNative = isNativeNotEmpty && native.Contains(needle, StringComparison.OrdinalIgnoreCase);
+            if (!inRomaji && !inEnglish && !inNative) continue;
+
+            List<string> candidates = new(3);
+            if (isRomajiNotEmpty) candidates.Add(romaji);
+            if (isEnglishNotEmpty) candidates.Add(english!);
+            if (isNativeNotEmpty) candidates.Add(native!);
+
+            string chosen = romaji;
+            int best = 0;
+            foreach (string c in candidates)
+            {
+                int score = MatchScore(c, needle);
+                if (score > best)
+                {
+                    best = score;
+                    chosen = c;
+                    if (best == 3) break;
+                }
+            }
+
+            string? format = m.TryGetProperty("format", out JsonElement f) && f.ValueKind == JsonValueKind.String ? f.GetString().Trim() : null;
+            string display = $"{chosen} ({format ?? "MEDIA"}) [{id}]";
+
+            list.Add(new AniListPickerSuggestion(id, display, format));
+        }
+
+        return list;
+    }
+
     /// <summary>
     /// Executes a GraphQL query against the AniList API using the given media selector and variables.
     /// Includes automatic retry handling if rate-limited.
@@ -101,16 +212,16 @@ public sealed partial class AniList
             string variableDeclarations;
             if (queryType.Equals("Title", StringComparison.OrdinalIgnoreCase))
             {
-                field = "Media(search: $title, format: $format, sort: POPULARITY_DESC)";
-                variableDeclarations = "($title: String, $format: MediaFormat, $pageNum: Int)";
+                field = "Media(search: $title, format: $format, sort: [SEARCH_MATCH, POPULARITY_DESC])";
+                variableDeclarations = "($title: String!, $format: MediaFormat!, $pageNum: Int!)";
             }
             else
             {
-                field = "Media(id: $seriesId, format: $format, sort: POPULARITY_DESC)";
-                variableDeclarations = "($seriesId: Int, $format: MediaFormat, $pageNum: Int)";
+                field = "Media(id: $seriesId, format: $format, sort: [SEARCH_MATCH, POPULARITY_DESC])";
+                variableDeclarations = "($seriesId: Int!, $format: MediaFormat!, $pageNum: Int!)";
             }
 
-            GraphQLRequest queryRequest = new GraphQLRequest
+            GraphQLRequest queryRequest = new()
             {
                 Query = @$"
                 query {variableDeclarations} {{
@@ -148,7 +259,7 @@ public sealed partial class AniList
                 }}",
                 Variables = variables
             };
-            
+
             GraphQLResponse<JsonDocument?>? response = await SendWithRateLimitRetryAsync<JsonDocument?>(
                 queryRequest,
                 contextLabel,
@@ -172,6 +283,8 @@ public sealed partial class AniList
             return null;
         }
     }
+    
+
 
     private async Task<GraphQLResponse<JsonDocument?>?> SendWithRateLimitRetryAsync<T>(
         GraphQLRequest request,
@@ -208,7 +321,7 @@ public sealed partial class AniList
             {
                 attempts++;
                 TimeSpan delay;
-                const int paddingSeconds = 5; 
+                const int paddingSeconds = 5;
 
                 // Access headers directly from graphqlEx.ResponseHeaders
                 if (ex.ResponseHeaders is not null)

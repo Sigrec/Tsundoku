@@ -48,12 +48,14 @@ public static class Constants
             "Value==", "Value>=", "Value<="
         }.ToFrozenSet();
 
-    public static FrozenDictionary<string, (int Index, string Culture)> AVAILABLE_CURRENCY_WITH_CULTURE { get; } = new[]
-        {
-            "$", "€", "£", "¥", "₹", "₱", "₩", "₽", "₺", "₫", "฿", "₸", "₼", "₾",
-            "Rp", "RM", "R$", "₪", "₴", "zł", "Ft", "Kč", "kr", "lei", "৳", "₮",
-            "KM", "Br", "L", "din", "ден", "ر.س", "د.إ", "د.ك", "Rs"
-        }
+    public static readonly FrozenSet<string> AVAILABLE_CURRENCIES = new[]
+    {
+        "$", "€", "£", "¥", "₹", "₱", "₩", "₽", "₺", "₫", "฿", "₸", "₼", "₾",
+        "Rp", "RM", "R$", "₪", "₴", "zł", "Ft", "Kč", "kr", "lei", "৳", "₮",
+        "KM", "Br", "L", "din", "ден", "ر.س", "د.إ", "د.ك", "Rs"
+    }.ToFrozenSet();
+
+    public static FrozenDictionary<string, (int Index, string Culture)> AVAILABLE_CURRENCY_WITH_CULTURE { get; } = AVAILABLE_CURRENCIES
         .AsValueEnumerable()
         .Select((symbol, index) =>
         {
@@ -78,12 +80,12 @@ public static class Constants
             {
                 var fallback = symbol switch
                 {
-                    "din" => "sr-RS",   // Serbian Dinar
-                    "ден" => "mk-MK",   // Macedonian Denar
-                    "ر.س" => "ar-SA",   // Saudi Riyal
+                    "din" => "sr-RS",  // Serbian Dinar
+                    "ден" => "mk-MK",  // Macedonian Denar
+                    "ر.س" => "ar-SA", // Saudi Riyal
                     "د.إ" => "ar-AE",   // UAE Dirham
-                    "د.ك" => "ar-KW",   // Kuwaiti Dinar
-                    "lei" => "ro-RO",   // Romanian Leu
+                    "د.ك" => "ar-KW",  // Kuwaiti Dinar
+                    "lei" => "ro-RO",  // Romanian Leu
                     _ => "unknown"
                 };
 

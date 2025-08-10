@@ -1,7 +1,7 @@
 using Tsundoku.ViewModels;
 using Tsundoku.Models;
 using System.Text.Json.Nodes;
-using static Tsundoku.Models.Enums.SeriesFormatEnum; // Assuming Tsundoku.Models contains User, Format, etc.
+using static Tsundoku.Models.Enums.SeriesFormatModel; // Assuming Tsundoku.Models contains User, Format, etc.
 #if RELEASE
 using Windows.Storage;
 #endif

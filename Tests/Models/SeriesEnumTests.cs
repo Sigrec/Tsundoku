@@ -6,36 +6,36 @@ namespace Tsundoku.Tests.Models;
 [Parallelizable(ParallelScope.All)]
 public class SeriesEnumTests
 {
-    [TestCase("KR", SeriesFormatEnum.SeriesFormat.Manhwa)]
-    [TestCase("ko-ro", SeriesFormatEnum.SeriesFormat.Manhwa)]
-    [TestCase("ko", SeriesFormatEnum.SeriesFormat.Manhwa)]
-    [TestCase("CN", SeriesFormatEnum.SeriesFormat.Manhua)]
-    [TestCase("TW", SeriesFormatEnum.SeriesFormat.Manhua)]
-    [TestCase("zh", SeriesFormatEnum.SeriesFormat.Manhua)]
-    [TestCase("zh-hk", SeriesFormatEnum.SeriesFormat.Manhua)]
-    [TestCase("zh-ro", SeriesFormatEnum.SeriesFormat.Manhua)]
-    [TestCase("FR", SeriesFormatEnum.SeriesFormat.Manfra)]
-    [TestCase("fr", SeriesFormatEnum.SeriesFormat.Manfra)]
-    [TestCase("EN", SeriesFormatEnum.SeriesFormat.Comic)]
-    [TestCase("en", SeriesFormatEnum.SeriesFormat.Comic)]
-    [TestCase("JP", SeriesFormatEnum.SeriesFormat.Manga)]
-    [TestCase("ja", SeriesFormatEnum.SeriesFormat.Manga)]
-    [TestCase("UNKNOWN", SeriesFormatEnum.SeriesFormat.Manga)]
-    public void SeriesFormat_Parse_WorksCorrectly(string input, SeriesFormatEnum.SeriesFormat expected)
+    [TestCase("KR", SeriesFormatModel.SeriesFormat.Manhwa)]
+    [TestCase("ko-ro", SeriesFormatModel.SeriesFormat.Manhwa)]
+    [TestCase("ko", SeriesFormatModel.SeriesFormat.Manhwa)]
+    [TestCase("CN", SeriesFormatModel.SeriesFormat.Manhua)]
+    [TestCase("TW", SeriesFormatModel.SeriesFormat.Manhua)]
+    [TestCase("zh", SeriesFormatModel.SeriesFormat.Manhua)]
+    [TestCase("zh-hk", SeriesFormatModel.SeriesFormat.Manhua)]
+    [TestCase("zh-ro", SeriesFormatModel.SeriesFormat.Manhua)]
+    [TestCase("FR", SeriesFormatModel.SeriesFormat.Manfra)]
+    [TestCase("fr", SeriesFormatModel.SeriesFormat.Manfra)]
+    [TestCase("EN", SeriesFormatModel.SeriesFormat.Comic)]
+    [TestCase("en", SeriesFormatModel.SeriesFormat.Comic)]
+    [TestCase("JP", SeriesFormatModel.SeriesFormat.Manga)]
+    [TestCase("ja", SeriesFormatModel.SeriesFormat.Manga)]
+    [TestCase("UNKNOWN", SeriesFormatModel.SeriesFormat.Manga)]
+    public void SeriesFormat_Parse_WorksCorrectly(string input, SeriesFormatModel.SeriesFormat expected)
     {
-        SeriesFormatEnum.SeriesFormat result = SeriesFormatEnum.Parse(input);
+        SeriesFormatModel.SeriesFormat result = SeriesFormatModel.Parse(input);
         Assert.That(result, Is.EqualTo(expected));
     }
 
-    [TestCase("Shounen", SeriesDemographicEnum.SeriesDemographic.Shounen)]
-    [TestCase("shoujo", SeriesDemographicEnum.SeriesDemographic.Shoujo)]
-    [TestCase("Seinen", SeriesDemographicEnum.SeriesDemographic.Seinen)]
-    [TestCase("JOSEI", SeriesDemographicEnum.SeriesDemographic.Josei)]
-    [TestCase("Unknown", SeriesDemographicEnum.SeriesDemographic.Unknown)]
-    [TestCase("nonexistent", SeriesDemographicEnum.SeriesDemographic.Unknown)]
-    public void SeriesDemographic_Parse_WorksCorrectly(string input, SeriesDemographicEnum.SeriesDemographic expected)
+    [TestCase("Shounen", SeriesDemographicModel.SeriesDemographic.Shounen)]
+    [TestCase("shoujo", SeriesDemographicModel.SeriesDemographic.Shoujo)]
+    [TestCase("Seinen", SeriesDemographicModel.SeriesDemographic.Seinen)]
+    [TestCase("JOSEI", SeriesDemographicModel.SeriesDemographic.Josei)]
+    [TestCase("Unknown", SeriesDemographicModel.SeriesDemographic.Unknown)]
+    [TestCase("nonexistent", SeriesDemographicModel.SeriesDemographic.Unknown)]
+    public void SeriesDemographic_Parse_WorksCorrectly(string input, SeriesDemographicModel.SeriesDemographic expected)
     {
-        SeriesDemographicEnum.SeriesDemographic result = SeriesDemographicEnum.Parse(input);
+        SeriesDemographicModel.SeriesDemographic result = SeriesDemographicModel.Parse(input);
         Assert.That(result, Is.EqualTo(expected));
     }
 
@@ -43,47 +43,47 @@ public class SeriesEnumTests
     [Test]
     public void SeriesGenre_TryParse_KnownAlias_ReturnsTrue()
     {
-        bool success = SeriesGenreEnum.TryParse("Magical Girls", out SeriesGenreEnum.SeriesGenre genre);
+        bool success = SeriesGenreModel.TryParse("Magical Girls", out SeriesGenreModel.SeriesGenre genre);
         Assert.That(success, Is.True);
-        Assert.That(genre, Is.EqualTo(SeriesGenreEnum.SeriesGenre.MahouShoujo));
+        Assert.That(genre, Is.EqualTo(SeriesGenreModel.SeriesGenre.MahouShoujo));
     }
 
     [Test]
     public void SeriesGenre_TryParse_UnknownAlias_ReturnsFalse()
     {
-        bool success = SeriesGenreEnum.TryParse("NoSuchGenre", out SeriesGenreEnum.SeriesGenre genre);
+        bool success = SeriesGenreModel.TryParse("NoSuchGenre", out SeriesGenreModel.SeriesGenre genre);
         Assert.That(success, Is.False);
-        Assert.That(genre, Is.EqualTo(SeriesGenreEnum.SeriesGenre.Unknown));
+        Assert.That(genre, Is.EqualTo(SeriesGenreModel.SeriesGenre.Unknown));
     }
 
     [Test]
     public void SeriesGenre_Parse_KnownAlias_ReturnsCorrectGenre()
     {
-        SeriesGenreEnum.SeriesGenre genre = SeriesGenreEnum.Parse("SciFi");
-        Assert.That(genre, Is.EqualTo(SeriesGenreEnum.SeriesGenre.SciFi));
+        SeriesGenreModel.SeriesGenre genre = SeriesGenreModel.Parse("SciFi");
+        Assert.That(genre, Is.EqualTo(SeriesGenreModel.SeriesGenre.SciFi));
     }
 
     [Test]
     public void SeriesGenre_GetAliases_ReturnsAliases()
     {
-        IEnumerable<string> aliases = SeriesGenreEnum.GetAliases(SeriesGenreEnum.SeriesGenre.SliceOfLife);
+        IEnumerable<string> aliases = SeriesGenreModel.GetAliases(SeriesGenreModel.SeriesGenre.SliceOfLife);
         Assert.That(aliases, Contains.Item("Slice of Life"));
         Assert.That(aliases, Contains.Item("SliceOfLife"));
     }
 
-    [TestCase("RELEASING", SeriesStatusEnum.SeriesStatus.Ongoing)]
-    [TestCase("NOT_YET_RELEASED", SeriesStatusEnum.SeriesStatus.Ongoing)]
-    [TestCase("ongoing", SeriesStatusEnum.SeriesStatus.Ongoing)]
-    [TestCase("FINISHED", SeriesStatusEnum.SeriesStatus.Finished)]
-    [TestCase("completed", SeriesStatusEnum.SeriesStatus.Finished)]
-    [TestCase("CANCELLED", SeriesStatusEnum.SeriesStatus.Cancelled)]
-    [TestCase("cancelled", SeriesStatusEnum.SeriesStatus.Cancelled)]
-    [TestCase("HIATUS", SeriesStatusEnum.SeriesStatus.Hiatus)]
-    [TestCase("hiatus", SeriesStatusEnum.SeriesStatus.Hiatus)]
-    [TestCase("invalid", SeriesStatusEnum.SeriesStatus.Error)]
-    public void SeriesStatus_Parse_ReturnsExpectedResult(string input, SeriesStatusEnum.SeriesStatus expected)
+    [TestCase("RELEASING", SeriesStatusModel.SeriesStatus.Ongoing)]
+    [TestCase("NOT_YET_RELEASED", SeriesStatusModel.SeriesStatus.Ongoing)]
+    [TestCase("ongoing", SeriesStatusModel.SeriesStatus.Ongoing)]
+    [TestCase("FINISHED", SeriesStatusModel.SeriesStatus.Finished)]
+    [TestCase("completed", SeriesStatusModel.SeriesStatus.Finished)]
+    [TestCase("CANCELLED", SeriesStatusModel.SeriesStatus.Cancelled)]
+    [TestCase("cancelled", SeriesStatusModel.SeriesStatus.Cancelled)]
+    [TestCase("HIATUS", SeriesStatusModel.SeriesStatus.Hiatus)]
+    [TestCase("hiatus", SeriesStatusModel.SeriesStatus.Hiatus)]
+    [TestCase("invalid", SeriesStatusModel.SeriesStatus.Error)]
+    public void SeriesStatus_Parse_ReturnsExpectedResult(string input, SeriesStatusModel.SeriesStatus expected)
     {
-        SeriesStatusEnum.SeriesStatus result = SeriesStatusEnum.Parse(input);
+        SeriesStatusModel.SeriesStatus result = SeriesStatusModel.Parse(input);
         Assert.That(result, Is.EqualTo(expected));
     }
 }

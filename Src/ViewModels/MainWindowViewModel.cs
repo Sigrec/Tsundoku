@@ -1,18 +1,17 @@
-﻿using ReactiveUI;
-using Tsundoku.Models;
-using ReactiveUI.Fody.Helpers;
-using Avalonia.Media.Imaging;
-using System.Text.RegularExpressions;
-using Tsundoku.Helpers;
-using Tsundoku.Views;
-using static Tsundoku.Models.Enums.TsundokuFilterEnums;
+﻿using System.Collections.ObjectModel;
 using System.Reactive.Disposables;
-using static Tsundoku.Models.Enums.TsundokuLanguageEnums;
 using System.Reactive.Linq;
-using System.Linq.Dynamic.Core;
+using System.Text.RegularExpressions;
+using Avalonia.Media.Imaging;
 using Microsoft.Extensions.DependencyInjection;
-using System.Collections.ObjectModel;
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 using Tsundoku.Clients;
+using Tsundoku.Helpers;
+using Tsundoku.Models;
+using Tsundoku.Views;
+using static Tsundoku.Models.Enums.TsundokuFilterModel;
+using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 
 namespace Tsundoku.ViewModels;
 
@@ -52,22 +51,19 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
     [Reactive] public string NotificationText { get; set; }
     [Reactive] public string AdvancedSearchQueryErrorMessage { get; set; }
 
-    // --- Collections (Public Readonly / Static) ---
     public ReadOnlyObservableCollection<Series> UserCollection { get; }
     public static readonly List<Series> CoverChangedSeriesList = [];
 
-    // --- Commands and Interactions (Public Readonly) ---
     public Interaction<EditSeriesInfoViewModel, MainWindowViewModel?> EditSeriesInfoDialog { get; } = new Interaction<EditSeriesInfoViewModel, MainWindowViewModel?>();
 
-    // --- Helper Properties / Methods (Regex, etc.) ---
     [GeneratedRegex(@"(\w+)(==|<=|>=)(\d+|\w+|(?:'|"")(?:.*?)(?:'|""))")] public static partial Regex AdvancedQueryRegex();
 
     public MainWindowViewModel(IUserService userService, ISharedSeriesCollectionProvider sharedSeriesProvider, BitmapHelper bitmapHelper, MangaDex mangaDex, AniList aniList, IServiceProvider serviceProvider) : base(userService)
     {
         _sharedSeriesProvider = sharedSeriesProvider ?? throw new ArgumentNullException(nameof(sharedSeriesProvider));
-        _bitmapHelper = bitmapHelper;
-        _mangaDex = mangaDex;
-        _aniList = aniList;
+        _bitmapHelper = bitmapHelper ?? throw new ArgumentNullException(nameof(bitmapHelper));
+        _mangaDex = mangaDex ?? throw new ArgumentNullException(nameof(mangaDex));
+        _aniList = aniList ?? throw new ArgumentNullException(nameof(aniList));
         _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
 
         // 1. Bind the UI-facing collection to the one provided by the shared service.
@@ -80,9 +76,17 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
             .Subscribe(text => sharedSeriesProvider.SeriesFilterText = text)
             .DisposeWith(_disposables);
 
-        // When SelectedFilter changes in this ViewModel, update the shared provider's SelectedFilter.
         this.WhenAnyValue(x => x.SelectedFilter)
-            .Subscribe(filter => _sharedSeriesProvider.SelectedFilter = filter)
+            .DistinctUntilChanged()
+            .ObserveOn(RxApp.MainThreadScheduler)
+            .Subscribe(filter =>
+            {
+                // First action: update the local index
+                SelectedFilterIndex = TSUNDOKU_FILTER_DICT[filter];
+
+                // Second action: update the shared provider
+                _sharedSeriesProvider.SelectedFilter = filter;
+            })
             .DisposeWith(_disposables);
 
         this.WhenAnyValue(x => x.AdvancedSearchQuery)
@@ -104,12 +108,6 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
                     SelectedLangIndex = newIndex;
                 }
             })
-            .DisposeWith(_disposables);
-
-        this.WhenAnyValue(x => x.SelectedFilter)
-            .DistinctUntilChanged()
-            .ObserveOn(RxApp.MainThreadScheduler)
-            .Subscribe(filter => SelectedFilterIndex = FILTERS[filter])
             .DisposeWith(_disposables);
     }
 
@@ -141,9 +139,9 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
         LOGGER.Info("Finished Configuring Windows!");
     }
 
-    public void UpdateUserLanguage(string newLang)
+    public void UpdateUserLanguage(TsundokuLanguage newLang)
     {
-        _userService.UpdateUser(user => user.Language = newLang.GetEnumValueFromMemberValue(TsundokuLanguage.Romaji));
+        _userService.UpdateUser(user => user.Language = newLang);
     }
 
     /// <summary>
@@ -159,7 +157,6 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
 
     public void DeleteSeries(Series series)
     {
-        newCoverCheck = false;
         _userService.RemoveSeries(series);
     }
 
@@ -172,7 +169,6 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
     {
         LOGGER.Info("Refreshing {series} ({id})", originalSeries.Titles[TsundokuLanguage.Romaji] + (originalSeries.DuplicateIndex == 0 ? string.Empty : $" ({originalSeries.DuplicateIndex})"), originalSeries.Id);
 
-        newCoverCheck = true;
         Series? refreshedSeries = await Series.CreateNewSeriesCardAsync(
             _bitmapHelper,
             _mangaDex,
@@ -199,43 +195,7 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
     public void SaveOnClose()
     {
         LOGGER.Info("Closing Tsundoku");
-        if (!isReloading) { _userService.SaveUserData(); }
-
-        if (NewSeriesWindow is not null)
-        {
-            NewSeriesWindow.Closing += (s, e) => { e.Cancel = false; };
-            NewSeriesWindow.Close();
-        }
-
-        if (UserSettingsWindow is not null)
-        {
-            UserSettingsWindow.Closing += (s, e) => { e.Cancel = false; };
-            UserSettingsWindow.Close();
-        }
-
-        if (ThemeSettingsWindow is not null)
-        {
-            ThemeSettingsWindow.Closing += (s, e) => { e.Cancel = false; };
-            ThemeSettingsWindow.Close();
-        }
-
-        if (PriceAnalysisWindow is not null)
-        {
-            PriceAnalysisWindow.Closing += (s, e) => { e.Cancel = false; };
-            PriceAnalysisWindow.Close();
-        }
-
-        if (CollectionStatsWindow is not null)
-        {
-            CollectionStatsWindow.Closing += (s, e) => { e.Cancel = false; };
-            CollectionStatsWindow.Close();
-        }
-
-        if (UserNotesWindow is not null)
-        {
-            UserNotesWindow.Closing += (s, e) => { e.Cancel = false; };
-            UserNotesWindow.Close();
-        }
+        if (!isReloading) _userService.SaveUserData();
     }
 
     private void Dispose(bool disposing)

@@ -2,15 +2,19 @@
 using ReactiveUI.Fody.Helpers;
 using Avalonia.Controls;
 using System.Collections.Specialized;
-using System.Reactive.Linq;
 using Tsundoku.Helpers;
-using static Tsundoku.Models.Enums.TsundokuLanguageEnums;
+using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 using Avalonia.Collections;
 using Tsundoku.Clients;
-using static Tsundoku.Models.Enums.SeriesDemographicEnum;
-using static Tsundoku.Models.Enums.SeriesFormatEnum;
+using static Tsundoku.Models.Enums.SeriesDemographicModel;
+using static Tsundoku.Models.Enums.SeriesFormatModel;
 using ReactiveUI;
 using System.Globalization;
+using System.Reactive.Linq;
+using System.Collections.ObjectModel;
+using DynamicData;
+using System.Reactive.Disposables;
+using static Tsundoku.Clients.AniList;
 
 namespace Tsundoku.ViewModels;
 
@@ -29,8 +33,12 @@ public sealed class AddNewSeriesViewModel : ViewModelBase
     [Reactive] public string AdditionalLanguagesToolTipText { get; set; }
     [Reactive] public bool IsAddSeriesButtonEnabled { get; set; } = false;
     [Reactive] public string SeriesValueMaskedText { get; set; }
-    public AvaloniaList<ListBoxItem> SelectedAdditionalLanguages { get; set; } = [];
-    private static readonly StringBuilder CurLanguages = new StringBuilder();
+    public AvaloniaList<TsundokuLanguage> SelectedAdditionalLanguages { get; set; } = [];
+    private readonly SourceList<AniListPickerSuggestion> _suggestionsSource = new();
+    public ReadOnlyObservableCollection<AniListPickerSuggestion> Suggestions { get; private set; }
+    [Reactive] public AniListPickerSuggestion? SelectedSuggestion { get; set; }
+    [Reactive] public bool IsSuggestionsOpen { get; set; }
+    private static readonly StringBuilder CurLanguages = new();
 
     public AddNewSeriesViewModel(IUserService userService, BitmapHelper bitmapHelper, MangaDex mangaDex, AniList aniList) : base(userService)
     {
@@ -54,7 +62,62 @@ public sealed class AddNewSeriesViewModel : ViewModelBase
                 {
                     SeriesValueMaskedText = $"0000000000000000.00{currency}";
                 }
-            });
+            })
+            .DisposeWith(_disposables);
+
+        SetupTitleSuggestions();
+    }
+
+    private void SetupTitleSuggestions()
+    {
+        _suggestionsSource.Connect()
+            .Sort(new AniListPickerSuggestionComparer())
+            .Bind(out ReadOnlyObservableCollection<AniListPickerSuggestion> _suggestions)
+            .ObserveOn(RxApp.MainThreadScheduler)
+            .Subscribe()
+            .DisposeWith(_disposables);
+
+        Suggestions = _suggestions;
+
+        _suggestionsSource
+            .CountChanged
+            .Select(count => count > 0)
+            .ObserveOn(RxApp.MainThreadScheduler)
+            .Subscribe(x => IsSuggestionsOpen = x)
+            .DisposeWith(_disposables);
+
+
+        this.WhenAnyValue(x => x.TitleText)
+            .Select(x => x is null ? string.Empty : x.Trim())
+            .Throttle(TimeSpan.FromMilliseconds(300), RxApp.TaskpoolScheduler)
+            .DistinctUntilChanged()
+            .Select(x =>
+            {
+                if (string.IsNullOrWhiteSpace(x) || x.Length < 2)
+                    return Observable.Return(Array.Empty<AniListPickerSuggestion>());
+
+                return Observable.FromAsync(async ct =>
+                {
+                    return await _aniList.GetPickerSuggestionsAsync(x, ct);
+                });
+            })
+            .Switch()
+            .ObserveOn(RxApp.MainThreadScheduler)
+            .Subscribe(items =>
+            {
+                _suggestionsSource.Edit(list =>
+                {
+                    list.Clear();
+                    list.AddRange(items);
+                });
+            })
+            .DisposeWith(_disposables);
+    }
+
+    public void ClearSuggestions()
+    {
+        SelectedSuggestion = null;
+        _suggestionsSource.Clear();
     }
 
     // TODO - Additional Languages selected should persist across app startups? I can traverse the list and and check what additional langs are used or store it in json
@@ -65,11 +128,11 @@ public sealed class AddNewSeriesViewModel : ViewModelBase
         {
             case NotifyCollectionChangedAction.Add:
             case NotifyCollectionChangedAction.Remove:
-                if (SelectedAdditionalLanguages is not null && SelectedAdditionalLanguages.Any())
+                if (SelectedAdditionalLanguages is not null && SelectedAdditionalLanguages.Count != 0)
                 {
-                    foreach (ListBoxItem lang in SelectedAdditionalLanguages.OrderBy(lang => lang.Content.ToString()))
+                    foreach (TsundokuLanguage lang in SelectedAdditionalLanguages.AsValueEnumerable().OrderBy(lang => lang))
                     {
-                        CurLanguages.AppendLine(lang.Content.ToString());
+                        CurLanguages.AppendLine(lang.ToString());
                     }
                     AdditionalLanguagesToolTipText = CurLanguages.ToString().Trim();
                 }
@@ -140,7 +203,6 @@ public sealed class AddNewSeriesViewModel : ViewModelBase
     {
         return SelectedAdditionalLanguages
             .AsValueEnumerable()
-            .Select(lang => lang.Content.ToString().GetEnumValueFromMemberValue<TsundokuLanguage>())
             .ToArray();
     }
 }

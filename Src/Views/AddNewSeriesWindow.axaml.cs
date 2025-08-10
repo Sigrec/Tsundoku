@@ -1,19 +1,19 @@
-using Avalonia.Controls;
+using System.Reactive.Linq;
 using Avalonia.Interactivity;
 using Avalonia.ReactiveUI;
-using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
-using Tsundoku.Models.Enums;
 using Tsundoku.ViewModels;
-using static Tsundoku.Models.Enums.SeriesFormatEnum;
+using static Tsundoku.Models.Enums.SeriesDemographicModel;
+using static Tsundoku.Models.Enums.SeriesFormatModel;
 
 namespace Tsundoku.Views;
 
+// TODO: Need to make it so if a user has selected a suggestion it uses the ID from that entry
 public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesViewModel>
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
-    private ushort MaxVolNum;
-    private ushort CurVolNum;
+    private readonly ushort MaxVolNum;
+    private readonly ushort CurVolNum;
     public bool IsOpen = false;
     private readonly IPopupDialogService _popupDialogService;
 
@@ -35,13 +35,60 @@ public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesView
                 this.Hide();
                 IsOpen ^= true;
                 Topmost = false;
+                viewModel.ClearSuggestions();
             }
             e.Cancel = true;
         };
 
-        this.WhenAnyValue(x => x.MaxVolCount.Text).Subscribe(x => MaxVolNum = ConvertNumText(x.Replace("_", "")));
-        this.WhenAnyValue(x => x.CurVolCount.Text).Subscribe(x => CurVolNum = ConvertNumText(x.Replace("_", "")));
-        this.WhenAnyValue(x => x.TitleBox.Text, x => x.MaxVolCount.Text, x => x.CurVolCount.Text, x => x.MangaButton.IsChecked, x => x.NovelButton.IsChecked, (title, max, cur, manga, novel) => !string.IsNullOrWhiteSpace(title) && CurVolNum <= MaxVolNum && MaxVolNum != 0 && !(manga == false && novel == false) && manga is not null && novel is not null).Subscribe(x => ViewModel.IsAddSeriesButtonEnabled = x);
+        this.WhenAnyValue(
+            x => x.SeriesInputTextBox.Text,
+            x => x.CurVolCount.Text,
+            x => x.MaxVolCount.Text,
+            x => x.MangaButton.IsChecked,
+            x => x.NovelButton.IsChecked,
+        (title, curVolText, maxVolText, mangaChecked, novelChecked) =>
+        {
+            // Convert the volume text to numbers
+            ushort currentVolume = ConvertNumText(curVolText.Replace("_", ""));
+            ushort maxVolume = ConvertNumText(maxVolText.Replace("_", ""));
+
+            // Use the named variables for clarity
+            bool isAnyChecked = mangaChecked.GetValueOrDefault() || novelChecked.GetValueOrDefault();
+
+            return !string.IsNullOrWhiteSpace(title) &&
+                currentVolume <= maxVolume &&
+                maxVolume != 0 &&
+                isAnyChecked;
+        })
+        .Subscribe(isEnabled => ViewModel.IsAddSeriesButtonEnabled = isEnabled);
+
+        this.WhenAnyValue(x => x.ViewModel.SelectedSuggestion)
+            .Subscribe(selectedSuggestion =>
+            {
+                if (selectedSuggestion is not null)
+                {
+                    if (selectedSuggestion.Format.Equals("NOVEL", StringComparison.OrdinalIgnoreCase))
+                    {
+                        NovelButton.IsChecked = true;
+                        MangaButton.IsChecked = false;
+                    }
+                    else if (selectedSuggestion.Format.Equals("MANGA", StringComparison.OrdinalIgnoreCase))
+                    {
+                        NovelButton.IsChecked = false;
+                        MangaButton.IsChecked = true;
+                    }
+                    else
+                    {
+                        NovelButton.IsChecked = false;
+                        MangaButton.IsChecked = false;
+                    }
+                }
+                else
+                {
+                    NovelButton.IsChecked = false;
+                    MangaButton.IsChecked = false;
+                }
+            });
     }
 
 
@@ -64,11 +111,11 @@ public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesView
     {
         NovelButton.IsChecked = false;
         MangaButton.IsChecked = false;
-        TitleBox.Text = string.Empty;
+        SeriesInputTextBox.Text = string.Empty;
         CurVolCount.Text = string.Empty;
         MaxVolCount.Text = string.Empty;
         PublisherTextBox.Text = string.Empty;
-        DemographicCombobox.SelectedIndex = 4;
+        DemographicCombobox.SelectedItem = SeriesDemographic.Unknown;
         VolumesRead.Text = string.Empty;
         Rating.Text = string.Empty;
         CostMaskedTextBox.Text = string.Empty;
@@ -77,41 +124,40 @@ public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesView
 
     private static ushort ConvertNumText(string value)
     {
-        return (ushort)(string.IsNullOrWhiteSpace(value) ? 0 : ushort.Parse(value));
+        return string.IsNullOrWhiteSpace(value) ? (ushort)0 : ushort.Parse(value);
     }
 
     public async void OnAddSeriesButtonClicked(object sender, RoutedEventArgs args)
     {
         AddSeriesButton.IsEnabled = false;
-        ViewModelBase.newCoverCheck = true;
         string customImageUrl = CoverImageUrlTextBox.Text;
         _ = uint.TryParse(VolumesRead.Text.Replace("_", ""), out uint volumesRead);
         _ = decimal.TryParse(Rating.Text[..4].Replace("_", "0"), out decimal rating);
         _ = decimal.TryParse(CostMaskedTextBox.Text[1..].Replace("_", "0"), out decimal seriesValue);
-        
+
         KeyValuePair<bool, string> validSeries = await ViewModel!.GetSeriesDataAsync(
-            TitleBox.Text.Trim(), 
-            (MangaButton.IsChecked == true) ? SeriesFormat.Manga : SeriesFormat.Novel, 
-            CurVolNum, 
-            MaxVolNum, 
-            ViewModel.SelectedAdditionalLanguages.Count != 0 ? ViewModel.ConvertSelectedLangList() : [],
-            !string.IsNullOrWhiteSpace(customImageUrl) ? customImageUrl.Trim() : string.Empty, 
-            !string.IsNullOrWhiteSpace(PublisherTextBox.Text) ? PublisherTextBox.Text.Trim() : "Unknown",
-            SeriesDemographicEnum.Parse((DemographicCombobox.SelectedItem as ComboBoxItem).Content.ToString()), 
-            volumesRead, 
-            !Rating.Text[..4].StartsWith("__._") ? rating : -1, 
-            seriesValue,
-            AllowDuplicateButton.IsChecked.GetValueOrDefault(false)
+            input: ViewModel.SelectedSuggestion is not null ? ViewModel.SelectedSuggestion.Id : SeriesInputTextBox.Text.Trim(),
+            bookType: (MangaButton.IsChecked == true) ? SeriesFormat.Manga : SeriesFormat.Novel,
+            curVolCount: CurVolNum,
+            maxVolCount: MaxVolNum,
+            additionalLanguages: ViewModel!.SelectedAdditionalLanguages.Count != 0 ? ViewModel.ConvertSelectedLangList() : [],
+            customImageUrl: !string.IsNullOrWhiteSpace(customImageUrl) ? customImageUrl.Trim() : string.Empty,
+            publisher: !string.IsNullOrWhiteSpace(PublisherTextBox.Text) ? PublisherTextBox.Text.Trim() : "Unknown",
+            demographic: DemographicCombobox.SelectedItem is null ? SeriesDemographic.Unknown : (SeriesDemographic)DemographicCombobox.SelectedItem,
+            volumesRead: volumesRead,
+            rating: !Rating.Text[..4].StartsWith("__._") ? rating : -1,
+            value: seriesValue,
+            allowDuplicate: AllowDuplicateButton.IsChecked.GetValueOrDefault(false)
         );
-        
+
         if (validSeries.Key) // Boolean returns whether the series added succeeded
         {
-            // _collectionStatsViewModel.UpdateAllStats(CurVolNum, (uint)(MaxVolNum - CurVolNum));
             ClearFields();
+            ViewModel.ClearSuggestions();
         }
         else
         {
-            await ShowErrorDialog($"Unable to add \"{TitleBox.Text.Trim()}\" to Collection{(!string.IsNullOrWhiteSpace(validSeries.Value) ? $", {validSeries.Value}" : string.Empty)}");
+            await ShowErrorDialog($"Unable to add \"{SeriesInputTextBox.Text.Trim()}\" to Collection{(!string.IsNullOrWhiteSpace(validSeries.Value) ? $", {validSeries.Value}" : string.Empty)}");
         }
         AddSeriesButton.IsEnabled = ViewModel.IsAddSeriesButtonEnabled;
     }

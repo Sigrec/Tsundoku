@@ -1,6 +1,6 @@
 ﻿using Avalonia.Data.Converters;
 using System.Globalization;
-using static Tsundoku.Models.Enums.TsundokuLanguageEnums;
+using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 
 namespace Tsundoku.Converters;
 

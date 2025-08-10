@@ -2,7 +2,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Avalonia.Data.Converters;
-using static Tsundoku.Models.Enums.TsundokuFilterEnums;
+using static Tsundoku.Models.Enums.TsundokuFilterModel;
 
 namespace Tsundoku.Converters;
 

@@ -10,10 +10,10 @@ using MangaAndLightNovelWebScrape.Websites;
 using Tsundoku.ViewModels;
 using Tsundoku.Converters;
 using System.Text.Json.Nodes;
-using static Tsundoku.Models.Enums.TsundokuLanguageEnums;
+using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 using System.Diagnostics.CodeAnalysis;
 using DynamicData.Kernel;
-using static Tsundoku.Models.Enums.TsundokuFilterEnums;
+using static Tsundoku.Models.Enums.TsundokuFilterModel;
 using ReactiveUI.Fody.Helpers;
 using Tsundoku.Models;
 
@@ -63,18 +63,18 @@ public interface IUserService : IDisposable
 
 public sealed class UserService : IUserService, IDisposable
 {
-    public static string USER_AGENT = "Tsundoku/1.0";
+    public static readonly string USER_AGENT = "Tsundoku/1.0";
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
-    private readonly BehaviorSubject<User?> _userSubject = new BehaviorSubject<User?>(null);
+    private readonly BehaviorSubject<User?> _userSubject = new(null);
     public IObservable<User?> CurrentUser => _userSubject.AsObservable();
 
-    private readonly BehaviorSubject<TsundokuTheme?> _currentThemeSubject = new BehaviorSubject<TsundokuTheme?>(null);
+    private readonly BehaviorSubject<TsundokuTheme?> _currentThemeSubject = new(null);
     public IObservable<TsundokuTheme?> CurrentTheme => _currentThemeSubject.AsObservable();
 
 
-    private readonly SourceCache<Series, Guid> _userCollectionSourceCache = new SourceCache<Series, Guid>(s => s.Id);
+    private readonly SourceCache<Series, Guid> _userCollectionSourceCache = new(s => s.Id);
     public IObservable<IChangeSet<Series, Guid>> UserCollectionChanges => _userCollectionSourceCache.Connect();
-    private readonly SourceCache<TsundokuTheme, string> _savedThemesSourceCache = new SourceCache<TsundokuTheme, string>(t => t.ThemeName);
+    private readonly SourceCache<TsundokuTheme, string> _savedThemesSourceCache = new(t => t.ThemeName);
     public IObservable<IChangeSet<TsundokuTheme, string>> SavedThemeChanges => _savedThemesSourceCache.Connect();
 
     // private readonly ReadOnlyObservableCollection<Series> _userCollection;
@@ -84,23 +84,11 @@ public sealed class UserService : IUserService, IDisposable
     [Reactive] public TsundokuFilter SelectedFilter { get; set; } = TsundokuFilter.None;
     [Reactive] public uint SelectedThemeIndex { get; set; }
 
-    private readonly CompositeDisposable _disposables = new CompositeDisposable();
+    private readonly CompositeDisposable _disposables = [];
     private bool _disposed = false;
 
     public UserService()
     {
-        // IObservable<IComparer<TsundokuTheme>> themeComparerChanged = _userSubject
-        //     .Where(user => user is not null)
-        //     .Select(user => user!.Language)
-        //     .DistinctUntilChanged()
-        //     .Select(curLang => (IComparer<TsundokuTheme>)new TsundokuThemeComparer(curLang));
-
-        SavedThemeChanges
-            .SortAndBind(out _savedThemes, new TsundokuThemeComparer(TsundokuLanguage.English))
-            .ObserveOn(RxApp.MainThreadScheduler)
-            .Subscribe()
-            .DisposeWith(_disposables);
-
         _userSubject
             .Where(user => user is not null)
             .Select(user => user!.MainTheme)
@@ -138,6 +126,12 @@ public sealed class UserService : IUserService, IDisposable
                 _currentThemeSubject.OnNext(theme);
                 LOGGER.Info($"Set Theme to '{theme?.ThemeName ?? "null"}'");
             })
+            .DisposeWith(_disposables);
+
+        SavedThemeChanges
+            .SortAndBind(out _savedThemes, new TsundokuThemeComparer(TsundokuLanguage.English))
+            .ObserveOn(RxApp.MainThreadScheduler)
+            .Subscribe()
             .DisposeWith(_disposables);
     }
     public ReadOnlyObservableCollection<TsundokuTheme> SavedThemes => _savedThemes;

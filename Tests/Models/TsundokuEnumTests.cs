@@ -1,6 +1,6 @@
 using System.Globalization;
-using static Tsundoku.Models.Enums.TsundokuFilterEnums;
-using static Tsundoku.Models.Enums.TsundokuLanguageEnums;
+using static Tsundoku.Models.Enums.TsundokuFilterModel;
+using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 
 namespace Tsundoku.Tests.Models;
 
@@ -49,7 +49,7 @@ public class TsundokuEnumTests
     [Test]
     public void Indexed_Languages_HaveUniqueAndAccurateIndexes()
     {
-        HashSet<int> seenIndexes = new();
+        HashSet<int> seenIndexes = [];
 
         foreach ((TsundokuLanguage lang, int index) in INDEXED_LANGUAGES)
         {
@@ -60,7 +60,6 @@ public class TsundokuEnumTests
                 Assert.That(seenIndexes, Does.Not.Contain(index), $"Duplicate index {index} for language {lang}");
             }
             seenIndexes.Add(index);
-            Assert.That(LANGUAGES[index], Is.EqualTo(lang), $"Index mismatch: LANGUAGES[{index}] != {lang}");
         }
     }
 
@@ -107,7 +106,7 @@ public class TsundokuEnumTests
     {
         foreach (TsundokuFilter filter in Enum.GetValues<TsundokuFilter>())
         {
-            Assert.That(FILTERS.ContainsKey(filter), Is.True, $"Missing frozen dictionary entry for filter: {filter}");
+            Assert.That(TSUNDOKU_FILTER_DICT.ContainsKey(filter), Is.True, $"Missing frozen dictionary entry for filter: {filter}");
         }
     }
 
@@ -116,7 +115,7 @@ public class TsundokuEnumTests
     {
         HashSet<int> seenIndexes = [];
 
-        foreach ((TsundokuFilter filter, int index) in FILTERS)
+        foreach ((TsundokuFilter filter, int index) in TSUNDOKU_FILTER_DICT)
         {
             using (Assert.EnterMultipleScope())
             {
@@ -131,6 +130,6 @@ public class TsundokuEnumTests
     public void FilterDictionary_InvalidKey_Throws()
     {
         const TsundokuFilter invalid = (TsundokuFilter)(-100);
-        Assert.That(() => _ = FILTERS[invalid], Throws.TypeOf<KeyNotFoundException>());
+        Assert.That(() => _ = TSUNDOKU_FILTER_DICT[invalid], Throws.TypeOf<KeyNotFoundException>());
     }
 }

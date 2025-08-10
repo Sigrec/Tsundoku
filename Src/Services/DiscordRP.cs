@@ -3,23 +3,27 @@ using DiscordRPC.Logging;
 
 namespace Tsundoku.Services;
 
-internal static class DiscordRP
+public static class DiscordRP
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
     private static DiscordRpcClient? client;
     private static string UserName;
-    private const string APP_ID = "1050229234674696252";
     private static PresenceState _presence = new();
 
     public static void Initialize()
     {
         if (client is not null && client.IsInitialized)
-            return;
-
-        client = new DiscordRpcClient(APP_ID)
         {
-            Logger = new ConsoleLogger(DiscordRPC.Logging.LogLevel.Error, true)
+            return;
+        }
+
+        client = new DiscordRpcClient("1050229234674696252")
+        {
+            Logger = new ConsoleLogger(DiscordRPC.Logging.LogLevel.Warning)
         };
+
+        client.OnError += (_, e) => LOGGER.Error("DiscordRPC error {0}: {1}", e.Code, e.Message);
+        client.OnConnectionFailed += (_, e) => LOGGER.Error("DiscordRPC connection failed: {0}", e);
 
         client.OnReady += (_, msg) =>
         {
@@ -42,7 +46,10 @@ internal static class DiscordRP
         }
     }
 
-    public static void SetPresence(string? details = "Manga & Light Novel Collection Tracking App", string? state = "Browsing Collection", bool refreshTimestamp = false)
+    public static void SetPresence(
+        string? details = null,
+        string? state = null,
+        bool refreshTimestamp = false)
     {
         if (client is null || !client.IsInitialized)
         {
@@ -62,6 +69,11 @@ internal static class DiscordRP
             _presence.Timestamps = Timestamps.Now;
         }
 
+        ResetPresence();
+    }
+
+    private static void ResetPresence()
+    {
         client.SetPresence(new RichPresence
         {
             Details = _presence.Details,
@@ -77,21 +89,27 @@ internal static class DiscordRP
             Assets = new Assets
             {
                 LargeImageKey = "rp_large_icon",
-                LargeImageText = "Tsundoku"
+                LargeImageText = "Tsundoku",
+                SmallImageKey  = string.Empty,
+                SmallImageText = string.Empty
             }
         });
     }
 
     public static void ClearPresence()
     {
+        if (client is null || !client.IsInitialized)
+        {
+            return;
+        }
         _presence = new PresenceState();
-        client?.ClearPresence();
+        ResetPresence();
     }
 
-    private sealed class PresenceState
+    private sealed record PresenceState
     {
-        public string? Details { get; set; }
-        public string? State { get; set; }
+        public string? Details { get; set; } = "Manga & Light Novel Collection Tracking App";
+        public string? State { get; set; } = "Browsing Collection";
         public Timestamps? Timestamps { get; set; }
     }
 }

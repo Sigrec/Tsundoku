@@ -8,9 +8,9 @@ using System.Collections.Frozen;
 using Tsundoku.Helpers;
 using Tsundoku.Models.Enums;
 using Tsundoku.ViewModels;
-using static Tsundoku.Models.Enums.SeriesDemographicEnum;
-using static Tsundoku.Models.Enums.SeriesGenreEnum;
-using static Tsundoku.Models.Enums.TsundokuLanguageEnums;
+using static Tsundoku.Models.Enums.SeriesDemographicModel;
+using static Tsundoku.Models.Enums.SeriesGenreModel;
+using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 
 namespace Tsundoku.Views;
 
@@ -28,27 +28,27 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
         _mainWindowViewModel = mainWindowViewModel;
         InitializeComponent();
 
-        GenreItemMap = new Dictionary<SeriesGenre, object>
-        {
-            [SeriesGenre.Action] = ActionListBoxItem,
-            [SeriesGenre.Adventure] = AdventureListBoxItem,
-            [SeriesGenre.Comedy] = ComedyListBoxItem,
-            [SeriesGenre.Drama] = DramaListBoxItem,
-            [SeriesGenre.Ecchi] = EcchiListBoxItem,
-            [SeriesGenre.Fantasy] = FantasyListBoxItem,
-            [SeriesGenre.Horror] = HorrorListBoxItem,
-            [SeriesGenre.MahouShoujo] = MahouShoujoListBoxItem,
-            [SeriesGenre.Mecha] = MechaListBoxItem,
-            [SeriesGenre.Music] = MusicListBoxItem,
-            [SeriesGenre.Mystery] = MysteryListBoxItem,
-            [SeriesGenre.Psychological] = PsychologicalListBoxItem,
-            [SeriesGenre.Romance] = RomanceListBoxItem,
-            [SeriesGenre.SciFi] = SciFiListBoxItem,
-            [SeriesGenre.SliceOfLife] = SliceOfLifeListBoxItem,
-            [SeriesGenre.Sports] = SportsListBoxItem,
-            [SeriesGenre.Supernatural] = SupernaturalListBoxItem,
-            [SeriesGenre.Thriller] = ThrillerListBoxItem
-        }.ToFrozenDictionary();
+        // GenreItemMap = new Dictionary<SeriesGenre, object>
+        // {
+        //     [SeriesGenre.Action] = ActionListBoxItem,
+        //     [SeriesGenre.Adventure] = AdventureListBoxItem,
+        //     [SeriesGenre.Comedy] = ComedyListBoxItem,
+        //     [SeriesGenre.Drama] = DramaListBoxItem,
+        //     [SeriesGenre.Ecchi] = EcchiListBoxItem,
+        //     [SeriesGenre.Fantasy] = FantasyListBoxItem,
+        //     [SeriesGenre.Horror] = HorrorListBoxItem,
+        //     [SeriesGenre.MahouShoujo] = MahouShoujoListBoxItem,
+        //     [SeriesGenre.Mecha] = MechaListBoxItem,
+        //     [SeriesGenre.Music] = MusicListBoxItem,
+        //     [SeriesGenre.Mystery] = MysteryListBoxItem,
+        //     [SeriesGenre.Psychological] = PsychologicalListBoxItem,
+        //     [SeriesGenre.Romance] = RomanceListBoxItem,
+        //     [SeriesGenre.SciFi] = SciFiListBoxItem,
+        //     [SeriesGenre.SliceOfLife] = SliceOfLifeListBoxItem,
+        //     [SeriesGenre.Sports] = SportsListBoxItem,
+        //     [SeriesGenre.Supernatural] = SupernaturalListBoxItem,
+        //     [SeriesGenre.Thriller] = ThrillerListBoxItem
+        // }.ToFrozenDictionary();
 
         Opened += (s, e) =>
         {
@@ -108,7 +108,6 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
 
     private async void ChangeSeriesCoverFromFileAsync(object sender, RoutedEventArgs args)
     {
-        ViewModelBase.newCoverCheck = true;
         IReadOnlyList<IStorageFile> file = await this.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {
             AllowMultiple = false,
@@ -265,14 +264,13 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
     {
         if (_IsInitialized && DemographicComboBox.IsDropDownOpen)
         {
-            SeriesDemographic demographic = SeriesDemographicEnum.Parse((DemographicComboBox.SelectedItem as ComboBoxItem).Content.ToString());
-
-            ViewModel.Series.Demographic = demographic;
+            SeriesDemographic newDemographic = DemographicComboBox.SelectedItem is null ? SeriesDemographic.Unknown : (SeriesDemographic)DemographicComboBox.SelectedItem;
+            ViewModel.Series.Demographic = newDemographic;
 
             LOGGER.Info(
                 "Changed Demographic for {RomajiTitle} to {Demographic}",
                 ViewModel.Series.Titles[TsundokuLanguage.Romaji],
-                demographic
+                newDemographic
             );
         }
     }
@@ -338,12 +336,9 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
             return;
         }
 
-        foreach (SeriesGenre genre in ViewModel.Series.Genres.AsValueEnumerable().OrderByDescending(g => g.ToString()))
+        foreach (SeriesGenre genre in ViewModel.Series.Genres.AsValueEnumerable().OrderBy(g => g.ToString()))
         {
-            if (GenreItemMap.TryGetValue(genre, out object? item))
-            {
-                GenreSelector.SelectedItems.Add(item);
-            }
+            GenreSelector.SelectedItems.Add(GetPrimaryAlias(genre));
         }
     }
 }

@@ -1,120 +1,112 @@
-# [Tsundoku](https://en.wikipedia.org/wiki/Tsundoku) (Desktop Manga & Light Novel Collection App) | [Follow Me on AL](https://anilist.co/user/Preminence/)
-### This Application is Something I Do For Fun during my Free Time
+# [Tsundoku](https://en.wikipedia.org/wiki/Tsundoku) — Desktop Manga & Light Novel Collection App · [Follow me on AniList](https://anilist.co/user/Preminence/)
 
->**[Windows Download (v1.3.1)](https://apps.microsoft.com/detail/9p85xxdqfhs2?hl=en-us&gl=US&ocid=pdpshare)**
+> **[Windows Download (v1.4.0)](https://apps.microsoft.com/detail/9p85xxdqfhs2?hl=en-us&gl=US&ocid=pdpshare)**
 
-If you lose or delete the UserData.json file you will lose your entire collection, so do not delete it, otherwise you  will have to start over again (you can create a backup if needed), the Covers folder is visible incase a user wants to change the image shown for a particular series, just make sure u copy the EXACT name and extension (always `.png`) from the image file.
+**Important:** Your collection is stored in `UserData.json`. If you delete or lose this file, your library will be lost (unless you have a backup). The `Covers` folder is provided so you can replace cover images if you want—just keep the **exact** filename and extension (always `.png`).
+
+---
 
 ## Support
 
-To report a issue please go to the issues link [Tsundoku Issues](https://github.com/Sigrec/Tsundoku/issues/new/choose) and create a issue ticket explaining the problem and how I can reproduce it. You can check back anytime to see if the ticket is completed and what version the change was made in.
+To report an issue, please open a ticket here: **[Tsundoku Issues](https://github.com/Sigrec/Tsundoku/issues/new/choose)** and include clear steps to reproduce.  
+You can also reach me on Discord (link below).
 
-Additionally you can contact in my discord server, the link for the discord server below.
+---
 
 ## Useful Links
-**Tsundoku Links**
+
+**Tsundoku**
 - [Discord](https://discord.gg/QcZ5jcFPeU)
 
-**Anime/Manga Related Links**
-- [AniList](https://anilist.co/hom)
+**Anime / Manga**
+- [AniList](https://anilist.co/)
 - [AniChart](https://anichart.net/Summer-2025)
 - [Japanese Publisher Search](https://comic.k-manga.jp/)
-- [Hiatus Chart](https://www.reddit.com/r/HiatusCharts/comments/pfqlbz/all_charts/)
-- [PreMID (Discord Anime Extension)](h**t**tps://premid.app/)
+- [Hiatus Charts](https://www.reddit.com/r/HiatusCharts/comments/pfqlbz/all_charts/)
+- [PreMiD (Discord presence)](https://premid.app/)
 - [MAL Sync](https://malsync.moe/)
 
-***Manga Streaming***
+**Manga Streaming**
 - [MangaDex](https://mangadex.org/)
 - [MangaFire](https://mangafire.to/home)
-- [MangaPLus](https://mangaplus.shueisha.co.jp/updates)
+- [MANGA Plus](https://mangaplus.shueisha.co.jp/updates)
 - [MangaSee](https://mangasee123.com/)
-- [MangaFox](hhttps://fanfox.net/)
+- [MangaFox](https://fanfox.net/)
 
-***Anime Streaming***
+**Anime Streaming**
 - [AnimeKai](https://animekai.to/home)
 - [HiAnime](https://hianime.to/home)
-- 
-***
 
-## Links to Buy Manga (List in Order of Value Proposition)
-***English (America)***
-- [CrunchyRoll](https://store.crunchyroll.com/collections/manga-books/)
-- [RobertsAnimeCornerStore](https://www.animecornerstore.com/graphicnovels1.html)
-- [InStockTrades](https://www.instocktrades.com/)
+---
+
+## Where to Buy Manga (ordered by value proposition)
+
+**English (US)**
+- [Crunchyroll Store](https://store.crunchyroll.com/collections/manga-books/)
+- [Robert’s Anime Corner Store](https://www.animecornerstore.com/graphicnovels1.html)
 - [Barnes & Noble](https://www.barnesandnoble.com/b/books/graphic-novels-comics/manga/_/N-1sZ29Z8q8Zucc)
-- [Books A Million](https://www.booksamillion.com/manga)
+- [InStockTrades](https://www.instocktrades.com/)
 - [Amazon](https://www.amazon.com/Manga-Comics-Graphic-Novels-Books/b?node=4367)
-- [Kinokuniya](https://united-states.kinokuniya.com/)
+- [Kinokuniya USA](https://united-states.kinokuniya.com/)
+- [Books-A-Million](https://www.booksamillion.com/manga)
 - [SciFier](https://scifier.com/)
 - [MerryManga](https://www.merrymanga.com/)
 
-***English (Canada)***
-- [Indigo](https://www.Indigo.com/)
-- [SciFier](https://scifier.com/?setCurrencyId=6)
+**English (Canada)**
+- [Indigo](https://www.indigo.ca/)
+- [SciFier (CAD)](https://scifier.com/?setCurrencyId=6)
 
-***Japanese***
-- [CD Japan](https://www.cdjapan.co.jp/)
+**Japanese**
+- [CDJapan](https://www.cdjapan.co.jp/)
 - [Amazon Japan](https://www.amazon.co.jp/)
 - [Kinokuniya](https://united-states.kinokuniya.com/)
 
-***
+---
 
-## Twitter Accounts to Follow for Manga News
-- https://twitter.com/shonenjump_plus (Japanese News)
-- https://twitter.com/Josu_ke (Japanese News)
-- https://twitter.com/Wsstalkback (Japanese News)
-- https://twitter.com/MangaMoguraRE (Japanese News)
-- https://twitter.com/al_mavivi (Japanese News)
-- https://twitter.com/TheOASG (English News)
-- https://twitter.com/MangaPlusENG (English News)
-- https://twitter.com/WSJ_manga (English & Japanese News)
+## X (Twitter) Accounts for Manga News
+- https://twitter.com/shonenjump_plus (Japanese)
+- https://twitter.com/Josu_ke (Japanese)
+- https://twitter.com/Wsstalkback (Japanese)
+- https://twitter.com/MangaMoguraRE (Japanese)
+- https://twitter.com/al_mavivi (Japanese)
+- https://twitter.com/TheOASG (English)
+- https://twitter.com/MangaPlusENG (English)
+- https://twitter.com/WSJ_manga (English & Japanese)
 
-***
+---
 
 ## Privacy Policy
 
-_Last updated: 2025-05-30_
+*Last updated: 2025-05-30*
 
-Tsundoku ("we", "our", or "us") respects your privacy and is committed to protecting it through this Privacy Policy.
+Tsundoku (“we”, “our”, or “us”) respects your privacy and is committed to protecting it.
 
 ### Information We Collect
-
-Tsundoku is a desktop application designed to help you track your manga and light novel collections. We want to be transparent about what data we collect:
-
-- **Personal Data**: We do **not** collect any personal information such as your name, email, or contact details.
-- **Usage Data**: Tsundoku runs locally on your device and does not send any usage data or analytics to external servers.
-- **Local Data**: All your collection data is stored locally on your device and is not shared unless you choose to back it up or export it manually.
+- **Personal Data:** We do **not** collect personal information (name, email, etc.).
+- **Usage Data:** Tsundoku runs locally and does not send analytics or telemetry.
+- **Local Data:** Your collection is stored locally and is only shared if *you* export or back it up.
 
 ### How We Use Your Data
-
-Since all your data stays on your device, we do not use or share your data with third parties.
+We don’t send or share your data with third parties. Everything stays on your device.
 
 ### Third-Party Services
+Tsundoku uses these APIs to fetch metadata:
+- **AniList API**
+- **MangaDex API**
 
-Tsundoku interacts with the following third-party APIs:
-
-- **AniList API**: To fetch manga and light novel metadata.
-- **MangaDex API**: To access manga information and updates.
-
-Please refer to their privacy policies for information on how they handle data:
-
+See their privacy policies:
 - [AniList Privacy Policy](https://anilist.co/privacy/)
 - [MangaDex Privacy Policy](https://mangadex.org/privacy)
 
 ### Data Security
-
-We recommend you keep your device secure and back up your data regularly. The app does save whenever you open and close the app but you can save yourself by pressing `CTRL+S`. Tsundoku does not have access to your data and cannot recover it if lost.
+Keep your device secure and back up regularly. The app autosaves on open/close; you can also save manually with `Ctrl+S`. Tsundoku can’t access or recover your data if it’s lost.
 
 ### Children’s Privacy
-
 Tsundoku is not directed to children under 13, and we do not knowingly collect data from children.
 
-### Changes to This Privacy Policy
+### Changes to This Policy
+If we update this policy, we’ll change the “Last updated” date above.
 
-We may update this Privacy Policy occasionally. If so, we will update the “Last updated” date at the top of this page.
-
-### Contact Us
-
-If you have any questions or concerns about this Privacy Policy, please contact us via the GitHub repository:
-
-[https://github.com/Sigrec/Tsundoku](https://github.com/Sigrec/Tsundoku)
+### Contact
+Questions or concerns? Open an issue on GitHub:  
+**https://github.com/Sigrec/Tsundoku**

@@ -12,10 +12,10 @@ using DynamicData;
 using Avalonia.Media;
 using ReactiveUI;
 using System.Reactive.Disposables;
-using static Tsundoku.Models.Enums.SeriesStatusEnum;
-using static Tsundoku.Models.Enums.SeriesDemographicEnum;
-using static Tsundoku.Models.Enums.SeriesFormatEnum;
-using static Tsundoku.Models.Enums.SeriesGenreEnum;
+using static Tsundoku.Models.Enums.SeriesStatusModel;
+using static Tsundoku.Models.Enums.SeriesDemographicModel;
+using static Tsundoku.Models.Enums.SeriesFormatModel;
+using static Tsundoku.Models.Enums.SeriesGenreModel;
 using System.Globalization;
 
 namespace Tsundoku.ViewModels;
@@ -900,7 +900,8 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
         Demographics.Add(CreatePieSeries(UnknownCount, "Unknown"));
 
         _userService.UserCollectionChanges
-            .AutoRefresh(x => x.Demographic) // detect property changes
+            .Where(series => series is not null)
+            .AutoRefresh(series => series.Demographic)
             .Group(user => user.Demographic)
             .Subscribe(groupChangeSet =>
             {
@@ -914,7 +915,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
                         .Subscribe(count =>
                         {
                             decimal percentage = SeriesCount != 0
-                                ? decimal.Round((decimal)(count / SeriesCount) * 100, 2)
+                                ? decimal.Round(((decimal)count / SeriesCount) * 100, 2)
                                 : 0m;
 
                             switch (group.Key)

@@ -1,6 +1,6 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:vm="using:Tsundoku.ViewModels"
-        xmlns:model="clr-namespace:Tsundoku.Models"
+        xmlns:models="clr-namespace:Tsundoku.Models"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -12,7 +12,7 @@
         FontFamily="Segoe UI"
         MaxWidth="491"
         MinWidth="491"
-        MaxHeight="845"
+        MaxHeight="895"
         WindowStartupLocation="2"
         KeyboardNavigation.TabNavigation="None">
     
@@ -26,7 +26,7 @@
 
     <Border Classes="Menu" BorderThickness="3" CornerRadius="0,0,8,8" ClipToBounds="True">
         <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Theme="{StaticResource ReverseCollectionScroll}"> 
-            <StackPanel Margin="20,10,20,20" Spacing="10">
+            <StackPanel Margin="20,10,20,15" Spacing="10">
                 <StackPanel Spacing="5">
                     <TextBlock Text="Change Username" 
                                TextDecorations="Underline" 
@@ -56,46 +56,18 @@
                     <TextBlock Text="Currency" TextDecorations="Underline" FontSize="20" FontWeight="Bold" Classes="Menu"/>
                     <ComboBox x:Name="CurrencyComboBox"
                               SelectionChanged="CurrencyChanged"
+                              ItemsSource="{x:Static models:Constants.AVAILABLE_CURRENCIES}"
                               Theme="{StaticResource MenuComboBox}"
                               HorizontalAlignment="Left"
                               SelectedIndex="{CompiledBinding SelectedCurrencyIndex}"
+                              ItemContainerTheme="{StaticResource MenuComboBoxItem}"
 							  Width="80"
                               AutoScrollToSelectedItem="True">
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="$"/>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="€"/>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="£"/>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="¥"/>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₹"/>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₱"/>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₩"/>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₽"/>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₺"/>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₫"/>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="฿"/>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₸"/>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₼"/>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₾"/>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Rp"/>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="RM"/>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="R$"/>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₪"/>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₴"/>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="zł"/>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Ft"/>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Kč"/>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="kr"/>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="lei"/>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="৳"/>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="₮"/>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="KM"/>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Br"/>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="L"/>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="din"/>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="ден"/>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="ر.س"/>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="د.إ"/>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="د.ك"/>
-                        <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}" Content="Rs"/>
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
 						<ComboBox.Resources>
 							<ResourceDictionary>
 								<ResourceDictionary.MergedDictionaries>
@@ -253,7 +225,12 @@
                                FontSize="20"
                                FontWeight="Bold"
                                Classes="Menu"/>
-                    <StackPanel Orientation="Horizontal" Width="450" Margin="-5,0,0,0">
+                    <WrapPanel Width="450" Margin="-5,0,0,0">
+                        <WrapPanel.Styles>
+                            <Style Selector="Button">
+                                <Setter Property="Margin" Value="5"/>
+                            </Style>
+                        </WrapPanel.Styles>
                         <Button Theme="{StaticResource UserSettingsButton}"
                                 Click="OpenAniListLink"
                                 HorizontalAlignment="Center"
@@ -274,7 +251,12 @@
                                 HorizontalAlignment="Center"
                                 x:Name="ImportLibibData"
                                 Content="Libib Import"/>
-                    </StackPanel>
+                        <Button Theme="{StaticResource UserSettingsButton}"
+                                Click="ImportGoodreadsDataAsync"
+                                HorizontalAlignment="Center"
+                                x:Name="ImportGoodreadsData"
+                                Content="Goodreads Import"/>
+                    </WrapPanel>
                 </StackPanel>
             </StackPanel>
         </ScrollViewer>

@@ -1,13 +1,17 @@
 using System.Collections.Frozen;
+using System.Collections.Immutable;
 using System.Runtime.Serialization;
+using Tsundoku.Helpers;
 
 namespace Tsundoku.Models.Enums;
 
-public static class TsundokuFilterEnums
+public static class TsundokuFilterModel
 {
-    public static readonly FrozenDictionary<TsundokuFilter, int> FILTERS = 
-        Enum.GetValues<TsundokuFilter>().Select((filter, index) => (filter, index))
+    public static readonly ImmutableArray<string> TSUNDOKU_FILTER_LIST = Enum.GetValues<TsundokuFilter>().AsValueEnumerable().Select(filter => filter.GetEnumMemberValue()).ToImmutableArray();
+    public static readonly FrozenDictionary<TsundokuFilter, int> TSUNDOKU_FILTER_DICT =
+        Enum.GetValues<TsundokuFilter>().AsValueEnumerable().Select((filter, index) => (filter, index))
             .ToFrozenDictionary(x => x.filter, x => x.index);
+
     public enum TsundokuFilter
     {
         [EnumMember(Value = "None")] None,

@@ -1,3 +1,4 @@
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
@@ -37,7 +38,7 @@ public sealed partial class App : Application
             base.OnFrameworkInitializationCompleted(); // Still required
             return;
         }
-
+        
         const string appName = "Tsundoku";
         Mutex = new Mutex(true, appName, out bool createdNew);
 
@@ -174,14 +175,13 @@ public sealed partial class App : Application
 
     public static void ConfigureNLog()
     {
-        // 1. Get the LocalCacheFolder path
         string localCachePath = AppFileHelper.GetFolderPath("Logs");
 
-        // 2. Grab (or create) your existing NLog configuration
+        // Grab (or create) existing NLog configuration
         LoggingConfiguration config = LogManager.Configuration;
         config ??= new LoggingConfiguration();
 
-        // 3. Configure (or create) the file target
+        // Configure (or create) the file target
         FileTarget fileTarget = config.FindTargetByName<FileTarget>("TsundokuLogs");
         if (fileTarget is null)
         {
@@ -207,7 +207,7 @@ public sealed partial class App : Application
             fileTarget.ArchiveFileName = Path.Combine(localCachePath, "TsundokuLogs.{#}.log");
         }
 
-        AsyncTargetWrapper asyncWrapper = new AsyncTargetWrapper(fileTarget)
+        AsyncTargetWrapper asyncWrapper = new(fileTarget)
         {
             Name = "TsundokuLogsAsync",
             OverflowAction = AsyncTargetWrapperOverflowAction.Discard,
@@ -218,7 +218,7 @@ public sealed partial class App : Application
         config.AddTarget(asyncWrapper);
 
 #if DEBUG
-        // 4. Configure (or create) the console target (only in DEBUG)
+        // Configure (or create) the console target (only in DEBUG)
         ColoredConsoleTarget consoleTarget = config.FindTargetByName<ColoredConsoleTarget>("TsundokuConsole");
         if (consoleTarget is null)
         {
@@ -230,7 +230,7 @@ public sealed partial class App : Application
         }
 #endif
 
-        // 5. Clear existing rules for these targets (to avoid duplicates)
+        // Clear existing rules for these targets (to avoid duplicates)
         for (int i = config.LoggingRules.Count - 1; i >= 0; i--)
         {
             LoggingRule rule = config.LoggingRules[i];
@@ -244,17 +244,14 @@ public sealed partial class App : Application
             }
         }
 
-        // 6. Create rule: File = Info+ only
-        LoggingRule fileRule = new LoggingRule("*", LogLevel.Info, asyncWrapper);
+        LoggingRule fileRule = new("*", LogLevel.Info, asyncWrapper);
         config.LoggingRules.Add(fileRule);
 
 #if DEBUG
-        // 7. Create rule: Console = all levels (Debug+), only in DEBUG
-        LoggingRule consoleRule = new LoggingRule("*", LogLevel.Debug, consoleTarget);
+        LoggingRule consoleRule = new("*", LogLevel.Debug, consoleTarget);
         config.LoggingRules.Add(consoleRule);
 #endif
 
-        // 8. Apply the updated configuration
         LogManager.Configuration = config;
     }
 

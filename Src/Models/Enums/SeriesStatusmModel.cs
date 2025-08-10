@@ -1,6 +1,6 @@
 namespace Tsundoku.Models.Enums;
 
-public static class SeriesStatusEnum
+public static class SeriesStatusModel
 {
     public enum SeriesStatus
     {

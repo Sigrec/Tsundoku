@@ -1,5 +1,5 @@
 ﻿using System.Text.Json;
-using static Tsundoku.Models.Enums.SeriesGenreEnum;
+using static Tsundoku.Models.Enums.SeriesGenreModel;
 
 namespace Tsundoku.Tests.AniList;
 

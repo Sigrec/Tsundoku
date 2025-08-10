@@ -1,6 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:vm="using:Tsundoku.ViewModels"
 		xmlns:v="using:Tsundoku.Views"
+        xmlns:enums="clr-namespace:Tsundoku.Models.Enums"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -14,6 +15,7 @@
 		WindowStartupLocation="2"
 		KeyboardNavigation.TabNavigation="Cycle"
 		x:DataType="vm:AddNewSeriesViewModel"
+        x:Name="Root"
 		CanResize="false">
 
 	<Border Classes="Menu" BorderThickness="3" CornerRadius="0,0,8,8" ClipToBounds="True">
@@ -73,104 +75,75 @@
                     </Style>
                 </Style>
             </Grid.Styles>
-			<TextBlock Name="AdditionalLangTitle"
-                       HorizontalAlignment="Center" 
-                       Grid.Row="0" 
-                       Grid.Column="4" 
-                       Text="Additional Languages" 
-                       FontSize="19" 
-                       FontWeight="Bold" 
-                       Classes="Menu" 
-                       Margin="2,0,0,3" 
-                       ToolTip.Tip="{CompiledBinding AdditionalLanguagesToolTipText}" 
-                       ToolTip.IsEnabled="{CompiledBinding AdditionalLanguagesToolTipText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
-			<ListBox Name="AdditionalLangSelector"
-					 SelectedItems="{CompiledBinding SelectedAdditionalLanguages}"
-					 SelectionMode="Multiple,Toggle"
-					 Grid.Row="1"
-                     Height="510" 
-                     Width="225"
-					 Grid.RowSpan="19"
-					 Grid.Column="4"
-                     VerticalAlignment="Top"
-					 Theme="{StaticResource QueryListBox}">
-						<ListBoxItem Name="Albanian" Theme="{StaticResource QueryListBoxItem}">Albanian</ListBoxItem>
-                        <ListBoxItem Name="Arabic" Theme="{StaticResource QueryListBoxItem}">Arabic</ListBoxItem>
-                        <ListBoxItem Name="Azerbaijan" Theme="{StaticResource QueryListBoxItem}">Azerbaijan</ListBoxItem>
-                        <ListBoxItem Name="Belarusian" Theme="{StaticResource QueryListBoxItem}">Belarusian</ListBoxItem>
-                        <ListBoxItem Name="Bengali" Theme="{StaticResource QueryListBoxItem}">Bengali</ListBoxItem>
-                        <ListBoxItem Name="Bosnian" Theme="{StaticResource QueryListBoxItem}">Bosnian</ListBoxItem>
-                        <ListBoxItem Name="Bulgarian" Theme="{StaticResource QueryListBoxItem}">Bulgarian</ListBoxItem>
-                        <ListBoxItem Name="Burmese" Theme="{StaticResource QueryListBoxItem}">Burmese</ListBoxItem>
-                        <ListBoxItem Name="Catalan" Theme="{StaticResource QueryListBoxItem}">Catalan</ListBoxItem>
-                        <ListBoxItem Name="Chinese" Theme="{StaticResource QueryListBoxItem}">Chinese</ListBoxItem>
-                        <ListBoxItem Name="Croatian" Theme="{StaticResource QueryListBoxItem}">Croatian</ListBoxItem>
-                        <ListBoxItem Name="Czech" Theme="{StaticResource QueryListBoxItem}">Czech</ListBoxItem>
-                        <ListBoxItem Name="Danish" Theme="{StaticResource QueryListBoxItem}">Danish</ListBoxItem>
-                        <ListBoxItem Name="Dutch" Theme="{StaticResource QueryListBoxItem}">Dutch</ListBoxItem>
-                        <ListBoxItem Name="Esperanto" Theme="{StaticResource QueryListBoxItem}">Esperanto</ListBoxItem>
-                        <ListBoxItem Name="Estonian" Theme="{StaticResource QueryListBoxItem}">Estonian</ListBoxItem>
-                        <ListBoxItem Name="Filipino" Theme="{StaticResource QueryListBoxItem}">Filipino</ListBoxItem>
-                        <ListBoxItem Name="Finnish" Theme="{StaticResource QueryListBoxItem}">Finnish</ListBoxItem>
-                        <ListBoxItem Name="French" Theme="{StaticResource QueryListBoxItem}">French</ListBoxItem>
-                        <ListBoxItem Name="Galician" Theme="{StaticResource QueryListBoxItem}">Galician</ListBoxItem>
-                        <ListBoxItem Name="German" Theme="{StaticResource QueryListBoxItem}">German</ListBoxItem>
-                        <ListBoxItem Name="Greek" Theme="{StaticResource QueryListBoxItem}">Greek</ListBoxItem>
-                        <ListBoxItem Name="Gujarati" Theme="{StaticResource QueryListBoxItem}">Gujarati</ListBoxItem>
-                        <ListBoxItem Name="Hebrew" Theme="{StaticResource QueryListBoxItem}">Hebrew</ListBoxItem>
-                        <ListBoxItem Name="Hindi" Theme="{StaticResource QueryListBoxItem}">Hindi</ListBoxItem>
-                        <ListBoxItem Name="Hungarian" Theme="{StaticResource QueryListBoxItem}">Hungarian</ListBoxItem>
-                        <ListBoxItem Name="Icelandic" Theme="{StaticResource QueryListBoxItem}">Icelandic</ListBoxItem>
-                        <ListBoxItem Name="Indonesian" Theme="{StaticResource QueryListBoxItem}">Indonesian</ListBoxItem>
-                        <ListBoxItem Name="Italian" Theme="{StaticResource QueryListBoxItem}">Italian</ListBoxItem>
-                        <ListBoxItem Name="Kannada" Theme="{StaticResource QueryListBoxItem}">Kannada</ListBoxItem>
-                        <ListBoxItem Name="Kazakh" Theme="{StaticResource QueryListBoxItem}">Kazakh</ListBoxItem>
-                        <ListBoxItem Name="Korean" Theme="{StaticResource QueryListBoxItem}">Korean</ListBoxItem>
-                        <ListBoxItem Name="Latin" Theme="{StaticResource QueryListBoxItem}">Latin</ListBoxItem>
-                        <ListBoxItem Name="Latvian" Theme="{StaticResource QueryListBoxItem}">Latvian</ListBoxItem>
-                        <ListBoxItem Name="Lithuanian" Theme="{StaticResource QueryListBoxItem}">Lithuanian</ListBoxItem>
-                        <ListBoxItem Name="Malay" Theme="{StaticResource QueryListBoxItem}">Malay</ListBoxItem>
-                        <ListBoxItem Name="Malayalam" Theme="{StaticResource QueryListBoxItem}">Malayalam</ListBoxItem>
-                        <ListBoxItem Name="Macedonian" Theme="{StaticResource QueryListBoxItem}">Macedonian</ListBoxItem>
-                        <ListBoxItem Name="Marathi" Theme="{StaticResource QueryListBoxItem}">Marathi</ListBoxItem>
-                        <ListBoxItem Name="Mongolian" Theme="{StaticResource QueryListBoxItem}">Mongolian</ListBoxItem>
-                        <ListBoxItem Name="Nepali" Theme="{StaticResource QueryListBoxItem}">Nepali</ListBoxItem>
-                        <ListBoxItem Name="Norwegian" Theme="{StaticResource QueryListBoxItem}">Norwegian</ListBoxItem>
-                        <ListBoxItem Name="Persian" Theme="{StaticResource QueryListBoxItem}">Persian</ListBoxItem>
-                        <ListBoxItem Name="Polish" Theme="{StaticResource QueryListBoxItem}">Polish</ListBoxItem>
-                        <ListBoxItem Name="Portuguese" Theme="{StaticResource QueryListBoxItem}">Portuguese</ListBoxItem>
-                        <ListBoxItem Name="Punjabi" Theme="{StaticResource QueryListBoxItem}">Punjabi</ListBoxItem>
-                        <ListBoxItem Name="Romanian" Theme="{StaticResource QueryListBoxItem}">Romanian</ListBoxItem>
-                        <ListBoxItem Name="Russian" Theme="{StaticResource QueryListBoxItem}">Russian</ListBoxItem>
-                        <ListBoxItem Name="Serbian" Theme="{StaticResource QueryListBoxItem}">Serbian</ListBoxItem>
-                        <ListBoxItem Name="Slovak" Theme="{StaticResource QueryListBoxItem}">Slovak</ListBoxItem>
-                        <ListBoxItem Name="Slovenian" Theme="{StaticResource QueryListBoxItem}">Slovenian</ListBoxItem>
-                        <ListBoxItem Name="Spanish" Theme="{StaticResource QueryListBoxItem}">Spanish</ListBoxItem>
-                        <ListBoxItem Name="Swedish" Theme="{StaticResource QueryListBoxItem}">Swedish</ListBoxItem>
-                        <ListBoxItem Name="Tamil" Theme="{StaticResource QueryListBoxItem}">Tamil</ListBoxItem>
-                        <ListBoxItem Name="Telugu" Theme="{StaticResource QueryListBoxItem}">Telugu</ListBoxItem>
-                        <ListBoxItem Name="Thai" Theme="{StaticResource QueryListBoxItem}">Thai</ListBoxItem>
-                        <ListBoxItem Name="Turkish" Theme="{StaticResource QueryListBoxItem}">Turkish</ListBoxItem>
-                        <ListBoxItem Name="Ukrainian" Theme="{StaticResource QueryListBoxItem}">Ukrainian</ListBoxItem>
-                        <ListBoxItem Name="Urdu" Theme="{StaticResource QueryListBoxItem}">Urdu</ListBoxItem>
-                        <ListBoxItem Name="Vietnamese" Theme="{StaticResource QueryListBoxItem}">Vietnamese</ListBoxItem>
+			<TextBlock x:Name="AdditionalLangTitle"
+                HorizontalAlignment="Center" 
+                Grid.Row="0" 
+                Grid.Column="4" 
+                Text="Additional Languages" 
+                FontSize="19" 
+                FontWeight="Bold" 
+                Classes="Menu" 
+                Margin="2,0,0,3" 
+                ToolTip.Tip="{CompiledBinding AdditionalLanguagesToolTipText}" 
+                ToolTip.IsEnabled="{CompiledBinding AdditionalLanguagesToolTipText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+			<ListBox x:Name="AdditionalLangSelector"
+                    ItemsSource="{x:Static enums:TsundokuLanguageModel.LANGUAGES}"
+                    SelectedItems="{CompiledBinding SelectedAdditionalLanguages}"
+                    SelectionMode="Multiple,Toggle"
+                    Grid.Row="1"
+                    Height="510" 
+                    Width="225"
+                    Grid.RowSpan="19"
+                    Grid.Column="4"
+                    VerticalAlignment="Top"
+                    ItemContainerTheme="{StaticResource QueryListBoxItem}"
+                    Theme="{StaticResource QueryListBox}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding}" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
 			</ListBox>
-			<TextBlock Text="Enter Title or ID" Grid.Row="0" Grid.Column="0" FontSize="20" FontWeight="Bold" Classes="Menu" Margin="2,0,0,1" ToolTip.Tip="{CompiledBinding TitleText}"/>
-			<TextBox Name="TitleBox"
-					 FontSize="18"
-					 Grid.Row="1"
-					 Width="518.5"
-					 Grid.Column="0"
-					 Grid.ColumnSpan="3"
-					 FontWeight="Bold"
-                     Height="74"
-					 Text="{CompiledBinding TitleText}"
-					 Classes="Menu"
-					 BorderThickness="2"
-					 TextWrapping="Wrap"
-					 Watermark="Title or AniList/MangaDex ID..."/>
+			<TextBlock Text="Enter Title or ID" Grid.Row="0" Grid.Column="0" FontSize="20" FontWeight="Bold" Classes="Menu" Margin="2,0,0,1" ToolTip.Tip="{CompiledBinding #SeriesInputTextBox.Text}"/>
+			<TextBox x:Name="SeriesInputTextBox"
+                FontSize="18"
+                Grid.Row="1"
+                Width="518.5"
+                Grid.Column="0"
+                Grid.ColumnSpan="3"
+                FontWeight="Bold"
+                Height="74"
+                Text="{CompiledBinding TitleText}"
+                Classes="Menu"
+                BorderThickness="2"
+                TextWrapping="Wrap"
+                Watermark="Title or AniList/MangaDex ID..."/>
+            <Popup
+                IsOpen="{CompiledBinding IsSuggestionsOpen}"
+                PlacementTarget="{CompiledBinding #Root}"
+                PlacementMode="Left"
+                HorizontalOffset="-10"
+                VerticalOffset="-15"
+                ToolTip.Tip="Search via Romaji">
+                <Border Padding="8" CornerRadius="8" Classes="Menu" BorderThickness="3">
+                    <ListBox
+                        ItemsSource="{CompiledBinding Suggestions}"
+                        SelectionMode="Single"
+                        SelectedItem="{CompiledBinding SelectedSuggestion, Mode=TwoWay}"
+                        Height="{CompiledBinding #Root.Bounds.Height}"
+                        Theme="{StaticResource QueryListBox}"
+                        Width="250"
+                        ItemContainerTheme="{StaticResource QueryListBoxItem}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Display}" FontSize="16" TextWrapping="Wrap"/>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Border>
+            </Popup>
             <TextBlock Text="Publisher" Grid.Row="3" Grid.Column="0" FontSize="20" FontWeight="Bold" Classes="Menu" Margin="2,0,0,1" ToolTip.Tip="{CompiledBinding PublisherText}"/>
-			<TextBox Name="PublisherTextBox"
+			<TextBox x:Name="PublisherTextBox"
 					 FontSize="18"
 					 Grid.Row="4"
 					 Width="518"
@@ -184,7 +157,7 @@
 					 BorderThickness="2"
                      MaxLength="24"/>
 			<TextBlock Text="Cur Volumes" Grid.Row="6" Grid.Column="0" FontSize="20" FontWeight="Bold" Classes="Menu" Margin="2,0,0,1"/>
-			<MaskedTextBox Name="CurVolCount"
+			<MaskedTextBox x:Name="CurVolCount"
 						   Width="247"
 						   Classes="Menu"
 						   Grid.Row="7"
@@ -196,7 +169,7 @@
 						   Mask="000"
 						   MaxLength="3"/>
 			<TextBlock Text="Max Volumes" Grid.Row="6" Grid.Column="2" FontSize="20" FontWeight="Bold" Classes="Menu" Margin="2,0,0,1"/>
-			<MaskedTextBox Name="MaxVolCount"
+			<MaskedTextBox x:Name="MaxVolCount"
 						   Width="247"
 						   Grid.Row="7"
 						   Grid.Column="2"
@@ -215,12 +188,12 @@
 					   Margin="2,0,0,3"
 					   Classes="Menu"/>
 			<StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Width="180" Grid.Row="10" Grid.Column="0" Spacing="5" Margin="0,0,10,0">
-				<ToggleButton Name="MangaButton"
+				<ToggleButton x:Name="MangaButton"
 						 	  Width="121"
 							  Checked="IsMangaButtonClicked"
 							  Theme="{StaticResource MenuToggleButton}"
 							  Content="Manga"/>
-				<ToggleButton Name="NovelButton"
+				<ToggleButton x:Name="NovelButton"
 							  Width="121"
 							  Checked="IsNovelButtonClicked"
 							  Theme="{StaticResource MenuToggleButton}"
@@ -233,19 +206,21 @@
 					   Grid.Column="2"
                        Margin="2,0,0,3"
                        Classes="Menu"/>
-            <ComboBox Name="DemographicCombobox"
+            <ComboBox x:Name="DemographicCombobox"
+                      ItemsSource="{x:Static enums:SeriesDemographicModel.SERIES_DEMOGRAPHIC_SET}"
                       Theme="{StaticResource MenuComboBox}"
+                      ItemContainerTheme="{StaticResource MenuComboBoxItem}"
                       SelectedIndex="4"
                       ToolTip.Tip="Optional"
                       Width="247"
                       Height="37"
                       Grid.Row="10"
 					  Grid.Column="2">
-                <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Shounen</ComboBoxItem>
-                <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Shoujo</ComboBoxItem>
-                <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Seinen</ComboBoxItem>
-                <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Josei</ComboBoxItem>
-                <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Unknown</ComboBoxItem>
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
             </ComboBox>
             <TextBlock Text="Volumes Read"
                        FontWeight="Bold"
@@ -254,7 +229,7 @@
 					   Grid.Column="0"
                        Margin="2,0,0,3"
                        Classes="Menu"/>
-            <MaskedTextBox Name="VolumesRead"
+            <MaskedTextBox x:Name="VolumesRead"
                            HorizontalAlignment="Left"
                            ToolTip.Tip="Optional"
 						   Width="247"
@@ -273,7 +248,7 @@
 					   Grid.Column="2"
                        Margin="2,0,0,3"
                        Classes="Menu"/>
-            <MaskedTextBox Name="Rating"
+            <MaskedTextBox x:Name="Rating"
 						   Width="247"
 						   Grid.Row="13"
 						   Grid.Column="2"
@@ -291,7 +266,7 @@
 					   FontWeight="Bold"
 					   Margin="2,0,0,3"
 					   Classes="Menu"/>
-            <MaskedTextBox Name="CostMaskedTextBox"
+            <MaskedTextBox x:Name="CostMaskedTextBox"
                            HorizontalAlignment="Left"
                            ToolTip.Tip="Optional"
                            PromptChar=" "
@@ -311,7 +286,7 @@
 					   FontWeight="Bold"
 					   Margin="2,0,0,3"
 					   Classes="Menu"/>
-			<Button Name="AddSeriesButton"
+			<Button x:Name="AddSeriesButton"
 					Content="Add New Series"
 					Click="OnAddSeriesButtonClicked"
 					Theme="{StaticResource MenuButton}"
@@ -324,7 +299,7 @@
 			</Button>
             <TextBlock Text="Cover Image" Grid.Row="18" Grid.Column="0" Grid.ColumnSpan="3" FontSize="20" FontWeight="Bold" Classes="Menu" Margin="2,0,0,3" ToolTip.Tip="{CompiledBinding CoverImageUrl}"/>
 			<StackPanel Orientation="Horizontal" Spacing="5" Grid.Row="19" Grid.Column="0" Grid.ColumnSpan="4">
-                <TextBox Name="CoverImageUrlTextBox"
+                <TextBox x:Name="CoverImageUrlTextBox"
 					 FontSize="18"
                      Width="474"
 					 FontWeight="Bold"
@@ -334,7 +309,7 @@
 					 BorderThickness="2"
                      ToolTip.Tip="Optional"
 					 Watermark="Optional Image Url (Hover Title to see Full Text)"/>
-                <ToggleButton Name="AllowDuplicateButton"
+                <ToggleButton x:Name="AllowDuplicateButton"
                               FontSize="20"
                               Theme="{StaticResource MenuToggleButton}"
                               ToolTip.Tip="Allow Duplicate"

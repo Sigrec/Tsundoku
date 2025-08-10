@@ -12,10 +12,8 @@ public class ViewModelBase : ReactiveObject
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
 
     public static string Filter { get; set; }
-    public static bool updatedVersion = false;
-    public static bool newCoverCheck = false;
     public bool isReloading = false;
-    public const string CUR_TSUNDOKU_VERSION = "1.3.1";
+    public const string CUR_TSUNDOKU_VERSION = "1.4.0";
     public const double SCHEMA_VERSION = 6.1;
     public const string USER_DATA_FILEPATH = @"UserData.json";
     
@@ -23,7 +21,7 @@ public class ViewModelBase : ReactiveObject
     [Reactive] public User CurrentUser { get; protected set; }
     
     protected readonly IUserService _userService;
-    protected readonly CompositeDisposable _disposables = new();
+    protected readonly CompositeDisposable _disposables = [];
 
     protected ViewModelBase(IUserService userService)
     {

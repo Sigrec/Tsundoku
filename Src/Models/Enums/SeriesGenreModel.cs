@@ -1,63 +1,32 @@
+using System.Collections.Frozen;
+using System.Collections.Immutable;
 using System.Reflection;
 
 namespace Tsundoku.Models.Enums;
 
-public static class SeriesGenreEnum
+public static class SeriesGenreModel
 {
     /// <summary>
     /// Attribute for specifying one or more string aliases for a Genre enum value.
     /// This attribute is nested to clearly indicate its relation to this enum.
     /// </summary>
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
-    public sealed class GenreAliasesAttribute : Attribute
+    public sealed class GenreAliasesAttribute(params string[] aliases) : Attribute
     {
-        public string[] Aliases { get; }
-
-        public GenreAliasesAttribute(params string[] aliases)
-        {
-            Aliases = aliases ?? []; // Ensure aliases is not null
-        }
-    }
-
-    /// <summary>
-    /// Enum representing possible genres associated with anime/manga.
-    /// Includes a default 'Unknown' value for robustness.
-    /// </summary>
-    public enum SeriesGenre
-    {
-        [GenreAliases("Action")] Action,
-        [GenreAliases("Adventure")] Adventure,
-        [GenreAliases("Comedy")] Comedy,
-        [GenreAliases("Drama")] Drama,
-        [GenreAliases("Ecchi")] Ecchi,
-        [GenreAliases("Fantasy")] Fantasy,
-        [GenreAliases("Hentai")] Hentai,
-        [GenreAliases("Horror")] Horror,
-        [GenreAliases("Mahou Shoujo", "Magical Girls")] MahouShoujo,
-        [GenreAliases("Mecha")] Mecha,
-        [GenreAliases("Music")] Music,
-        [GenreAliases("Mystery")] Mystery,
-        [GenreAliases("Psychological")] Psychological,
-        [GenreAliases("Romance")] Romance,
-        [GenreAliases("Sci-Fi", "SciFi")] SciFi,
-        [GenreAliases("Slice of Life", "SliceOfLife")] SliceOfLife,
-        [GenreAliases("Sports")] Sports,
-        [GenreAliases("Supernatural")] Supernatural,
-        [GenreAliases("Thriller")] Thriller,
-        [GenreAliases("Unknown")] Unknown // Add a default/fallback genre
+        public string[] Aliases { get; } = aliases ?? []; // Ensure aliases is not null
     }
 
     // A static readonly array to easily access all enum values, consistent with other enums.
-    public static readonly SeriesGenre[] AllSeriesGenres = Enum.GetValues<SeriesGenre>();
+    public static readonly ImmutableArray<string> SERIES_GENRES = Enum.GetValues<SeriesGenre>().AsValueEnumerable().Select(GetPrimaryAlias).OrderBy(alias => alias).ToImmutableArray();
 
     // Private static dictionary to store the mapping from alias/string to enum value.
     // It uses StringComparer.OrdinalIgnoreCase for case-insensitive lookups.
-    private static readonly Dictionary<string, SeriesGenre> GenreMap;
+    private static readonly FrozenDictionary<string, SeriesGenre> GENRE_MAP;
 
-    // Static constructor: This code runs once, the first time any member of SeriesGenreEnums is accessed.
-    static SeriesGenreEnum()
+    // Static constructor: This code runs once, the first time any member of SeriesGenreModels is accessed.
+    static SeriesGenreModel()
     {
-        GenreMap = new Dictionary<string, SeriesGenre>(StringComparer.OrdinalIgnoreCase);
+        Dictionary<string, SeriesGenre> genreMap = new(StringComparer.OrdinalIgnoreCase);
 
         // Iterate through each enum value to build the map
         foreach (SeriesGenre genre in Enum.GetValues<SeriesGenre>())
@@ -67,7 +36,7 @@ public static class SeriesGenreEnum
             // 1. Add the enum's own name (e.g., "Action") to the map.
             // This ensures that if the direct enum name is used as input, it's recognized.
             // We use TryAdd to avoid issues if an alias somehow matches the enum's name.
-            GenreMap.TryAdd(enumName, genre);
+            genreMap.TryAdd(enumName, genre);
 
             // 2. Get the custom GenreAliasesAttribute for the current enum member
             // Using typeof(SeriesGenre).GetMember(enumName).FirstOrDefault()
@@ -85,11 +54,26 @@ public static class SeriesGenreEnum
                     {
                         // If an alias conflicts with a previous entry, the last one processed wins.
                         // For aliases, overwriting is often acceptable.
-                        GenreMap[alias] = genre;
+                        genreMap[alias] = genre;
                     }
                 }
             }
         }
+
+        GENRE_MAP = genreMap.ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Gets the primary alias for a SeriesGenre value.
+    /// </summary>
+    /// <param name="genre">The SeriesGenre value.</param>
+    /// <returns>The first alias defined in the GenreAliases attribute, or the enum's name if no aliases are defined.</returns>
+    public static string GetPrimaryAlias(SeriesGenre genre)
+    {
+        // Get the aliases using the existing GetAliases method.
+        // FirstOrDefault() safely gets the first element or a default value (null for strings)
+        // if the sequence is empty.
+        return GetAliases(genre).FirstOrDefault() ?? genre.ToString();
     }
 
     /// <summary>
@@ -102,7 +86,7 @@ public static class SeriesGenreEnum
     public static bool TryParse(string genreString, out SeriesGenre result)
     {
         // The dictionary's StringComparer.OrdinalIgnoreCase handles case-insensitivity.
-        if (GenreMap.TryGetValue(genreString, out result))
+        if (GENRE_MAP.TryGetValue(genreString, out result))
         {
             return true;
         }
@@ -146,5 +130,33 @@ public static class SeriesGenreEnum
         }
         // If no aliases attribute or no aliases defined, return the enum's own name
         return [genre.ToString()];
+    }
+
+    /// <summary>
+    /// Enum representing possible genres associated with anime/manga.
+    /// Includes a default 'Unknown' value for robustness.
+    /// </summary>
+    public enum SeriesGenre
+    {
+        [GenreAliases("Action")] Action,
+        [GenreAliases("Adventure")] Adventure,
+        [GenreAliases("Comedy")] Comedy,
+        [GenreAliases("Drama")] Drama,
+        [GenreAliases("Ecchi")] Ecchi,
+        [GenreAliases("Fantasy")] Fantasy,
+        [GenreAliases("Hentai")] Hentai,
+        [GenreAliases("Horror")] Horror,
+        [GenreAliases("Mahou Shoujo", "Magical Girls")] MahouShoujo,
+        [GenreAliases("Mecha")] Mecha,
+        [GenreAliases("Music")] Music,
+        [GenreAliases("Mystery")] Mystery,
+        [GenreAliases("Psychological")] Psychological,
+        [GenreAliases("Romance")] Romance,
+        [GenreAliases("Sci-Fi", "SciFi")] SciFi,
+        [GenreAliases("Slice of Life", "SliceOfLife")] SliceOfLife,
+        [GenreAliases("Sports")] Sports,
+        [GenreAliases("Supernatural")] Supernatural,
+        [GenreAliases("Thriller")] Thriller,
+        [GenreAliases("Unknown")] Unknown // Add a default/fallback genre
     }
 }

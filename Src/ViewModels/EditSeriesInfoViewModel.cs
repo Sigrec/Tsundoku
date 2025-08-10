@@ -7,8 +7,8 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Tsundoku.Models;
 using Tsundoku.Models.Enums;
-using static Tsundoku.Models.Enums.SeriesDemographicEnum;
-using static Tsundoku.Models.Enums.SeriesGenreEnum;
+using static Tsundoku.Models.Enums.SeriesDemographicModel;
+using static Tsundoku.Models.Enums.SeriesGenreModel;
 
 namespace Tsundoku.ViewModels;
 
@@ -21,7 +21,7 @@ public sealed class EditSeriesInfoViewModel : ViewModelBase
     [Reactive] public string GenresToolTipText { get; set; }
     [Reactive] public string SeriesValueText { get; set; }
     [Reactive] public string SeriesValueMaskedText { get; set; }
-    public AvaloniaList<ListBoxItem> SelectedGenres { get; set; } = [];
+    public AvaloniaList<string> SelectedGenres { get; set; } = [];
 
     public EditSeriesInfoViewModel(Series series, IUserService userService) : base(userService)
     {
@@ -29,7 +29,7 @@ public sealed class EditSeriesInfoViewModel : ViewModelBase
         this.WhenAnyValue(x => x.Series.Demographic)
             .DistinctUntilChanged()
             .ObserveOn(RxApp.TaskpoolScheduler)
-            .Subscribe(x => DemographicIndex = SERIES_DEMOGRAPHICS[x]);
+            .Subscribe(x => DemographicIndex = SERIES_DEMOGRAPHICS_DICT[x]);
 
         this.WhenAnyValue(x => x.CurrentUser.Currency)
             .DistinctUntilChanged()
@@ -76,9 +76,9 @@ public sealed class EditSeriesInfoViewModel : ViewModelBase
                 if (SelectedGenres is { Count: > 0 })
                 {
                     StringBuilder builder = new();
-                    foreach (ListBoxItem genre in SelectedGenres.OrderBy(g => g.Content?.ToString()))
+                    foreach (string genre in SelectedGenres.OrderBy(g => g.ToString()))
                     {
-                        builder.AppendLine(genre.Content?.ToString());
+                        builder.AppendLine(genre);
                     }
                     GenresToolTipText = builder.ToString().Trim();
                 }
@@ -97,9 +97,9 @@ public sealed class EditSeriesInfoViewModel : ViewModelBase
     public HashSet<SeriesGenre> GetCurrentGenresSelected()
     {
         HashSet<SeriesGenre> newGenres = [];
-        foreach (ListBoxItem genreItem in SelectedGenres)
+        foreach (string genreItem in SelectedGenres)
         {
-            if (SeriesGenreEnum.TryParse(genreItem.Content.ToString(), out SeriesGenre genre))
+            if (TryParse(genreItem, out SeriesGenre genre))
             {
                 newGenres.Add(genre);
             }

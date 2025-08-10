@@ -12,8 +12,8 @@ using Tsundoku.Helpers;
 using Tsundoku.Models;
 using Tsundoku.ViewModels;
 using System.Reactive.Disposables;
-using static Tsundoku.Models.Enums.TsundokuLanguageEnums;
-using static Tsundoku.Models.Enums.TsundokuFilterEnums;
+using static Tsundoku.Models.Enums.TsundokuLanguageModel;
+using static Tsundoku.Models.Enums.TsundokuFilterModel;
 
 namespace Tsundoku.Views;
 
@@ -21,9 +21,9 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
     WindowState previousWindowState;
-    private static StringBuilder newSearchText = new StringBuilder();
+    private static readonly StringBuilder newSearchText = new();
     private static string itemString;
-    private static readonly TimeSpan AdvancedSearchPopulateDelay = new TimeSpan(TimeSpan.TicksPerSecond / 4);
+    private static readonly TimeSpan AdvancedSearchPopulateDelay = new(TimeSpan.TicksPerSecond / 4);
 
     public MainWindow(MainWindowViewModel viewModel)
     {
@@ -328,18 +328,10 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
     /// </summary>
     private void LanguageChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (LanguageSelector.SelectedItem is ComboBoxItem selectedItem)
+        if (LanguageSelector.SelectedItem is TsundokuLanguage selectedItem)
         {
-            string? newLang = selectedItem.Content?.ToString();
-            if (newLang is not null)
-            {
-                TsundokuLanguage selectedEnum = newLang.GetEnumValueFromMemberValue(TsundokuLanguage.Romaji);
-                if (ViewModel.CurrentUser.Language != selectedEnum) // <-- avoid loop
-                {
-                    ViewModel.UpdateUserLanguage(newLang);
-                    LOGGER.Info("Changed Language to {Lang}", newLang);
-                }
-            }
+            ViewModel.UpdateUserLanguage(selectedItem);
+            LOGGER.Info("Changed Language to {Lang}", selectedItem);
         }
     }
 
@@ -348,11 +340,10 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
     /// </summary>
     private void CollectionFilterChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (CollectionFilterSelector.SelectedItem is ComboBoxItem selectedItem)
+        if (CollectionFilterSelector.SelectedItem is string selectedItem)
         {
-            string newFilter = selectedItem.Content?.ToString() ?? string.Empty;
-            LOGGER.Debug("Changing Filter to {filter}", newFilter);
-            ViewModel.SelectedFilter = newFilter.GetEnumValueFromMemberValue(TsundokuFilter.None);
+            LOGGER.Debug("Changing Filter to {filter}", selectedItem);
+            ViewModel.SelectedFilter = selectedItem.GetEnumValueFromMemberValue(TsundokuFilter.None);
         }
     }
 

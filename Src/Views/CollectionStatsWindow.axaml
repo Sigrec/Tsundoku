@@ -54,7 +54,7 @@
                                                 <Rectangle Fill="{CompiledBinding CurrentTheme.MenuBGColor}" ClipToBounds="True" Width="18" Height="18"/>
                                             </Border>
                                             <Border Grid.Row="0" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="165" Height="24" OpacityMask="White">
-                                                <TextBlock Background="{CompiledBinding CurrentTheme.MenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
+                                                <TextBlock Background="{CompiledBinding CurrentTheme.MenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" FontSize="14" HorizontalAlignment="Stretch">
                                                     <TextBlock.Text>
                                                         <MultiBinding StringFormat="Shounen {0}% ({1})" Mode="OneWay">
                                                             <Binding Path="ShounenPercentage"/>
@@ -67,7 +67,7 @@
                                                 <Rectangle Fill="{CompiledBinding CurrentTheme.MenuTextColor}" ClipToBounds="True" Width="18" Height="18"/>
                                             </Border>
                                             <Border Grid.Row="2" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="165" Height="24">
-                                                <TextBlock Background="{CompiledBinding CurrentTheme.MenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
+                                                <TextBlock Background="{CompiledBinding CurrentTheme.MenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" FontSize="14" HorizontalAlignment="Stretch">
                                                     <TextBlock.Text>
                                                         <MultiBinding StringFormat="Shoujo {0}% ({1})" Mode="OneWay">
                                                             <Binding Path="ShoujoPercentage"/>
@@ -80,7 +80,7 @@
                                                 <Rectangle Fill="{CompiledBinding CurrentTheme.MenuButtonBGColor}" ClipToBounds="True" Width="18" Height="18"/>
                                             </Border>
                                             <Border Grid.Row="4" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="165" Height="24">
-                                                <TextBlock Background="{CompiledBinding CurrentTheme.MenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
+                                                <TextBlock Background="{CompiledBinding CurrentTheme.MenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" FontSize="14" HorizontalAlignment="Stretch">
                                                     <TextBlock.Text>
                                                         <MultiBinding StringFormat="Seinen {0}% ({1})" Mode="OneWay">
                                                             <Binding Path="SeinenPercentage"/>
@@ -93,7 +93,7 @@
                                                 <Rectangle Fill="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="18" Height="18"/>
                                             </Border>
                                             <Border Grid.Row="6" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="165" Height="24">
-                                                <TextBlock Background="{CompiledBinding CurrentTheme.MenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
+                                                <TextBlock Background="{CompiledBinding CurrentTheme.MenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" HorizontalAlignment="Stretch" FontSize="14">
                                                 <TextBlock.Text>
                                                         <MultiBinding StringFormat="Josei {0}% ({1})" Mode="OneWay">
                                                             <Binding Path="JoseiPercentage"/>

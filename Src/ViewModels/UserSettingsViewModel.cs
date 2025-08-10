@@ -3,10 +3,10 @@ using ReactiveUI;
 using System.Reactive.Linq;
 using Tsundoku.Models;
 using MangaAndLightNovelWebScrape.Websites;
-using static Tsundoku.Models.Enums.TsundokuLanguageEnums;
+using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 using Tsundoku.Helpers;
 using System.Globalization;
-using static Tsundoku.Models.Enums.SeriesFormatEnum;
+using static Tsundoku.Models.Enums.SeriesFormatModel;
 using Avalonia.Controls;
 
 namespace Tsundoku.ViewModels;
@@ -105,11 +105,44 @@ public sealed class UserSettingsViewModel : ViewModelBase
 
                     if (addSeriesResult.Key)
                     {
-                        LOGGER.Info("Successfully added series {Series} | {Format} | {Publisher} | {Count}", entry.Key.Title, entry.Key.Format, entry.Key.Publisher, entry.Value);
+                        LOGGER.Info("Successfully added series {Series} | {Format} | {Publisher} | {Count} from Libib", entry.Key.Title, entry.Key.Format, entry.Key.Publisher, entry.Value);
                     }
                     else
                     {
                         LOGGER.Info("Unable to add series {Series} from Libib", entry.Key.Title);
+                    }
+                }
+            }
+        }, owner);
+    }
+
+    public async Task ImportGoodreadsDataFromCsv(string[] filePaths, Window owner)
+    {
+        await _loadingDialogService.ShowAsync("Importing Goodreads Data", async vm =>
+        {
+            Dictionary<(string Title, SeriesFormat Format, string Publisher, decimal Rating), uint>? result = await GoodreadsParser.ExtractUniqueTitles(filePaths);
+            if (result is not null)
+            {
+                vm.ProgressMaximum = result.Count - 1;
+                foreach (KeyValuePair<(string Title, SeriesFormat Format, string Publisher, decimal Rating), uint> entry in result)
+                {
+                    KeyValuePair<bool, string> addSeriesResult = await _addNewSeriesViewModel.GetSeriesDataAsync(
+                        input: entry.Key.Title,
+                        bookType: entry.Key.Format,
+                        publisher: entry.Key.Publisher,
+                        curVolCount: entry.Value,
+                        maxVolCount: entry.Value,
+                        rating: entry.Key.Rating
+                    );
+                    vm.ProgressValue++;
+
+                    if (addSeriesResult.Key)
+                    {
+                        LOGGER.Info("Successfully added series {Series} | {Format} | {Publisher} | {Count} from Goodreads", entry.Key.Title, entry.Key.Format, entry.Key.Publisher, entry.Value);
+                    }
+                    else
+                    {
+                        LOGGER.Info("Unable to add series {Series} from Goodreads", entry.Key.Title);
                     }
                 }
             }

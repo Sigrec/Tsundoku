@@ -15,7 +15,7 @@ public sealed partial class PriceAnalysisWindow : ReactiveWindow<PriceAnalysisVi
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
     public bool IsOpen = false, Manga;
-    public readonly MasterScrape Scrape = new MasterScrape(StockStatusFilter.EXCLUDE_NONE_FILTER);
+    public readonly MasterScrape Scrape = new(StockStatusFilter.EXCLUDE_NONE_FILTER);
 
 
     public PriceAnalysisWindow(PriceAnalysisViewModel viewModel)
@@ -33,14 +33,14 @@ public sealed partial class PriceAnalysisWindow : ReactiveWindow<PriceAnalysisVi
             if (IsOpen)
             {
                 this.Hide();
-                TitleBox.Text = string.Empty;
+                SearchTextBox.Text = string.Empty;
                 Topmost = false;
                 IsOpen ^= true;
             }
             e.Cancel = true;
         };
 
-        this.WhenAnyValue(x => x.TitleBox.Text, x => x.MangaButton.IsChecked, x => x.NovelButton.IsChecked, x => x.BrowserSelector.SelectedItem, x => x.RegionComboBox.SelectedItem, x => x.ViewModel.WebsitesSelected, (title, manga, novel, browser, region, websiteCheck) => !string.IsNullOrWhiteSpace(title) && !(manga == false && novel == false && websiteCheck) && browser is not null && region is not null && websiteCheck)
+        this.WhenAnyValue(x => x.SearchTextBox.Text, x => x.MangaButton.IsChecked, x => x.NovelButton.IsChecked, x => x.BrowserSelector.SelectedItem, x => x.RegionComboBox.SelectedItem, x => x.ViewModel.WebsitesSelected, (title, manga, novel, browser, region, websiteCheck) => !string.IsNullOrWhiteSpace(title) && !(manga == false && novel == false && websiteCheck) && browser is not null && region is not null && websiteCheck)
             .Subscribe(x => ViewModel.IsAnalyzeButtonEnabled = x);
     }
 
@@ -81,30 +81,33 @@ public sealed partial class PriceAnalysisWindow : ReactiveWindow<PriceAnalysisVi
         }
         return true;
     }
-    
+
     public async void PerformAnalysis(object sender, RoutedEventArgs args)
     {
         string scrapeScenario = string.Empty;
         try
         {
-            StartScrapeButton.IsEnabled = false;
-            StartScrapeButton.Content = "Analyzing..."; 
+            HashSet<string> websiteList = [.. ViewModel.SelectedWebsites.AsValueEnumerable().Select(website => website.Content.ToString())];
+
+            scrapeScenario = $"\"{SearchTextBox.Text}\" on {Scrape.Browser} Browser w/ Region = \"{Scrape.Region}\" & \"{StockFilterSelector.SelectedItem as string} Filter\" & Websites = [{string.Join(", ", websiteList)}] & Memberships = ({string.Join(" & ", ViewModel.CurrentUser.Memberships)})";
+
+            ToggleControlEnablement();
+            StartScrapeButton.Content = "Analyzing...";
+
             Scrape.Browser = MangaAndLightNovelWebScrape.Helpers.GetBrowserFromString((BrowserSelector.SelectedItem as ComboBoxItem).Content.ToString());
             Scrape.Region = ViewModel.CurrentUser.Region;
-            Scrape.Filter = MangaAndLightNovelWebScrape.Helpers.GetStockStatusFilterFromString((StockFilterSelector.SelectedItem as ComboBoxItem).Content.ToString());
+            Scrape.Filter = MangaAndLightNovelWebScrape.Helpers.GetStockStatusFilterFromString(StockFilterSelector.SelectedItem as string);
             Scrape.IsBooksAMillionMember = ViewModel.CurrentUser.Memberships[BooksAMillion.WEBSITE_TITLE];
             Scrape.IsKinokuniyaUSAMember = ViewModel.CurrentUser.Memberships[KinokuniyaUSA.WEBSITE_TITLE];
             Scrape.IsIndigoMember = ViewModel.CurrentUser.Memberships[Indigo.WEBSITE_TITLE];
 
-            LOGGER.Info($"Started Scrape For \"{TitleBox.Text}\" on {Scrape.Browser} Browser w/ Region = \"{Scrape.Region}\" & \"{(StockFilterSelector.SelectedItem as ComboBoxItem).Content} Filter\" & Websites = [{string.Join(", ", ViewModel.SelectedWebsites.Select(site => site.Content.ToString()))}] & Memberships = ({string.Join(" & ", ViewModel.CurrentUser.Memberships)})");
-            
+            LOGGER.Info("Started Scrape For {Scenario}", scrapeScenario);
+
             await Scrape.InitializeScrapeAsync(
-                title: TitleBox.Text, 
-                bookType: MangaButton.IsChecked is not null && MangaButton.IsChecked.Value ? BookType.Manga : BookType.LightNovel, 
-                Scrape.GenerateWebsiteList([.. ViewModel.SelectedWebsites.Select(site => site.Content.ToString())])
+                title: SearchTextBox.Text,
+                bookType: MangaButton.IsChecked is not null && MangaButton.IsChecked.Value ? BookType.Manga : BookType.LightNovel,
+                Scrape.GenerateWebsiteList(websiteList)
             );
-            StartScrapeButton.IsEnabled = ViewModel.IsAnalyzeButtonEnabled;
-            StartScrapeButton.Content = "Analyze"; 
             LOGGER.Info($"Scrape Finished");
 
             ViewModel.AnalyzedList.Clear();
@@ -112,23 +115,37 @@ public sealed partial class PriceAnalysisWindow : ReactiveWindow<PriceAnalysisVi
             // AnalysisDataGrid.Columns[3].Width = DataGridLength.SizeToCells;
             this.SizeToContent = SizeToContent.Height;
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            LOGGER.Error("Price Analysis Scrape {} Failed -> {}", scrapeScenario, e.Message);
+            LOGGER.Error(ex, "Price Analysis Scrape {Scenario} Failed", scrapeScenario);
         }
+        finally
+        {
+            ToggleControlEnablement();
+            StartScrapeButton.IsEnabled = ViewModel.IsAnalyzeButtonEnabled;
+            StartScrapeButton.Content = "Analyze";
+        }
+    }
+
+    private void ToggleControlEnablement()
+    {
+        SearchTextBox.IsEnabled ^= true;
+        MangaButton.IsEnabled ^= true;
+        NovelButton.IsEnabled ^= true;
+        WebsiteSelector.IsEnabled ^= true;
+        BrowserSelector.IsEnabled ^= true;
+        StockFilterSelector.IsEnabled ^= true;
+        RegionComboBox.IsEnabled ^= true;
+        StartScrapeButton.IsEnabled ^= true;
     }
 
     private void RegionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (RegionComboBox.SelectedItem is ComboBoxItem selectedItem)
+        if (RegionComboBox.SelectedItem is string selectedRegion)
         {
-            string? newRegionItem = selectedItem.Content?.ToString();
-            if (newRegionItem is not null)
-            {
-                Region newRegion = MangaAndLightNovelWebScrape.Helpers.GetRegionFromString(newRegionItem);
-                ViewModel.UpdateUserRegion(newRegion);
-                LOGGER.Info("Region Changed to {}", newRegionItem);
-            }
+            Region newRegion = MangaAndLightNovelWebScrape.Helpers.GetRegionFromString(selectedRegion);
+            ViewModel.UpdateUserRegion(newRegion);
+            LOGGER.Info("Region Changed to {}", selectedRegion);
         }
     }
 
