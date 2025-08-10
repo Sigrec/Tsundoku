@@ -141,9 +141,9 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
         LOGGER.Info("Finished Configuring Windows!");
     }
 
-    public void UpdateUserLanguage(string newLang)
+    public void UpdateUserLanguage(TsundokuLanguage newLang)
     {
-        _userService.UpdateUser(user => user.Language = newLang.GetEnumValueFromMemberValue(TsundokuLanguage.Romaji));
+        _userService.UpdateUser(user => user.Language = newLang);
     }
 
     /// <summary>

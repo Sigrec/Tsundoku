@@ -680,6 +680,7 @@
                                     ItemsSource="{CompiledBinding SavedThemes, Mode=OneWay}"
                                     SelectedIndex="{CompiledBinding SelectedThemeIndex, Mode=OneWay}"
                                     BorderThickness="2"
+                                    ItemContainerTheme="{StaticResource MenuComboBoxItem}"
                                     Theme="{StaticResource MenuComboBox}">
                                 <ComboBox.ItemTemplate>
                                     <DataTemplate>

@@ -127,7 +127,7 @@
 		<Setter Property="Padding" Value="{DynamicResource ComboBoxItemThemePadding}" />
 		<Setter Property="HorizontalContentAlignment" Value="Stretch" />
 		<Setter Property="Background" Value="Transparent"/>
-		<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor}"/>
+		<Setter Property="Foreground" Value="{Binding DataContext.CurrentTheme.MenuButtonTextAndIconColor, RelativeSource={RelativeSource AncestorType=Window}}"/>
 
 		<Setter Property="Template">
 			<ControlTemplate>
@@ -146,19 +146,19 @@
 		</Setter>
 
 		<Style Selector="^:pressed">
-			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}"/>
-			<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor}"/>
+			<Setter Property="Background" Value="{Binding DataContext.CurrentTheme.MenuButtonBGHoverColor, RelativeSource={RelativeSource AncestorType=Window}}"/>
+			<Setter Property="Foreground" Value="{Binding DataContext.CurrentTheme.MenuButtonTextAndIconHoverColor, RelativeSource={RelativeSource AncestorType=Window}}"/>
 		</Style>
 
 		<Style Selector="^:pointerover">
-			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}"/>
-			<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor}"/>
+			<Setter Property="Background" Value="{Binding DataContext.CurrentTheme.MenuButtonBGHoverColor, RelativeSource={RelativeSource AncestorType=Window}}"/>
+			<Setter Property="Foreground" Value="{Binding DataContext.CurrentTheme.MenuButtonTextAndIconHoverColor, RelativeSource={RelativeSource AncestorType=Window}}"/>
 		</Style>
 
 		<Style Selector="^:selected">
 			<Style Selector="^">
-				<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}"/>
-				<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor}"/>
+				<Setter Property="Background" Value="{Binding DataContext.CurrentTheme.MenuButtonBGHoverColor, RelativeSource={RelativeSource AncestorType=Window}}"/>
+				<Setter Property="Foreground" Value="{Binding DataContext.CurrentTheme.MenuButtonTextAndIconHoverColor, RelativeSource={RelativeSource AncestorType=Window}}"/>
 			</Style>
 		</Style>
 	</ControlTheme>
@@ -324,8 +324,8 @@
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Padding" Value="12,9,12,12" />
         <Setter Property="BorderThickness" Value="0,1,0,1" />
-        <Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor}"/>
-        <Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor}"/>
+        <Setter Property="BorderBrush" Value="{Binding DataContext.CurrentTheme.MenuButtonBorderColor, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
+        <Setter Property="Foreground" Value="{Binding DataContext.CurrentTheme.MenuButtonTextAndIconColor, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
         <Setter Property="VerticalContentAlignment" Value="Stretch"/>
         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
         
@@ -348,34 +348,34 @@
         </Setter>
 
         <Style Selector="^:pointerover">
-			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}"/>
-			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor}"/>
+			<Setter Property="Background" Value="{Binding DataContext.CurrentTheme.MenuButtonBGHoverColor, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
+			<Setter Property="BorderBrush" Value="{Binding DataContext.CurrentTheme.MenuButtonBorderHoverColor, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
 		</Style>
 
         <Style Selector="^:pressed">
-			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}"/>
-			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor}"/>
+			<Setter Property="Background" Value="{Binding DataContext.CurrentTheme.MenuButtonBGHoverColor, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
+			<Setter Property="BorderBrush" Value="{Binding DataContext.CurrentTheme.MenuButtonBorderHoverColor, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
 		</Style>
 
 		<Style Selector="^:selected">
 			<Style Selector="^">
-				<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}"/>
-				<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor}"/>
+				<Setter Property="Background" Value="{Binding DataContext.CurrentTheme.MenuButtonBGHoverColor, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
+				<Setter Property="BorderBrush" Value="{Binding DataContext.CurrentTheme.MenuButtonBorderHoverColor, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
 			</Style>
 
             <Style Selector="^:not(:focus)">
-				<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}"/>
-				<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor}"/>
+				<Setter Property="Background" Value="{Binding DataContext.CurrentTheme.MenuButtonBGHoverColor, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
+				<Setter Property="BorderBrush" Value="{Binding DataContext.CurrentTheme.MenuButtonBorderHoverColor, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
 			</Style>
 
 			<!-- <Style Selector="^:pointerover">
-				<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGColor}"/>
-				<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor}"/>
+				<Setter Property="Background" Value="{Binding DataContext.CurrentTheme.MenuButtonBGColor, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
+				<Setter Property="BorderBrush" Value="{Binding DataContext.CurrentTheme.MenuButtonBorderColor, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
 			</Style> -->
 
             <Style Selector="^:pressed">
-				<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGColor}"/>
-				<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor}"/>
+				<Setter Property="Background" Value="{Binding DataContext.CurrentTheme.MenuButtonBGColor, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
+				<Setter Property="BorderBrush" Value="{Binding DataContext.CurrentTheme.MenuButtonBorderColor, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
 			</Style>
 		</Style>
     </ControlTheme>

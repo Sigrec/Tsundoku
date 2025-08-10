@@ -10,7 +10,7 @@ using ReactiveUI.Fody.Helpers;
 using Tsundoku.Models;
 using static Tsundoku.Models.Enums.SeriesDemographicEnum;
 using static Tsundoku.Models.Enums.SeriesFormatEnum;
-using static Tsundoku.Models.Enums.SeriesGenreEnum;
+using static Tsundoku.Models.Enums.SeriesGenreModel;
 using static Tsundoku.Models.Enums.SeriesStatusEnum;
 using static Tsundoku.Models.Enums.TsundokuFilterEnums;
 

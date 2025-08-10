@@ -23,7 +23,7 @@ public class ViewModelBase : ReactiveObject
     [Reactive] public User CurrentUser { get; protected set; }
     
     protected readonly IUserService _userService;
-    protected readonly CompositeDisposable _disposables = new();
+    protected readonly CompositeDisposable _disposables = [];
 
     protected ViewModelBase(IUserService userService)
     {

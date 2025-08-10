@@ -6,8 +6,8 @@ namespace Tsundoku.Models.Enums;
 
 public static class TsundokuLanguageEnums
 {
-    public static readonly IReadOnlyDictionary<string, TsundokuLanguage> TsundokuLanguageStringValueToLanguageMap;
-    public static readonly IReadOnlyDictionary<TsundokuLanguage, string> TsundokuLanguageLanguageToStringValueMap;
+    public static readonly FrozenDictionary<string, TsundokuLanguage> TsundokuLanguageStringValueToLanguageMap;
+    public static readonly FrozenDictionary<TsundokuLanguage, string> TsundokuLanguageLanguageToStringValueMap;
 
     static TsundokuLanguageEnums()
     {
@@ -28,13 +28,14 @@ public static class TsundokuLanguageEnums
             langToStringBuilder[langEnum] = stringValue;
         }
 
-        TsundokuLanguageStringValueToLanguageMap = stringToLangBuilder;
-        TsundokuLanguageLanguageToStringValueMap = langToStringBuilder;  
+        TsundokuLanguageStringValueToLanguageMap = stringToLangBuilder.ToFrozenDictionary();
+        TsundokuLanguageLanguageToStringValueMap = langToStringBuilder.ToFrozenDictionary();  
     }
     
-    public static readonly IReadOnlyList<TsundokuLanguage> LANGUAGES = Enum.GetValues<TsundokuLanguage>();
-    public static readonly FrozenDictionary<TsundokuLanguage, int> INDEXED_LANGUAGES = 
-        LANGUAGES.Select((lang, index) => (lang, index))
+    public static readonly FrozenSet<TsundokuLanguage> LANGUAGES = Enum.GetValues<TsundokuLanguage>().AsValueEnumerable().ToFrozenSet();
+    
+    public static readonly FrozenDictionary<TsundokuLanguage, int> INDEXED_LANGUAGES =
+        LANGUAGES.AsValueEnumerable().Select((lang, index) => (lang, index))
             .ToFrozenDictionary(x => x.lang, x => x.index);
 
     public enum TsundokuLanguage

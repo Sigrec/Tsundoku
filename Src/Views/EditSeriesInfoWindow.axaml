@@ -4,6 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
         xmlns:vm="clr-namespace:Tsundoku.ViewModels"
+        xmlns:enums="clr-namespace:Tsundoku.Models.Enums"
         xmlns:local="clr-namespace:Tsundoku.Models"
         x:Class="Tsundoku.Views.EditSeriesInfoWindow"
         x:DataType="vm:EditSeriesInfoViewModel"
@@ -368,32 +369,20 @@
                         ToolTip.IsEnabled="{CompiledBinding GenresToolTipText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
                     <ListBox
                         x:Name="GenreSelector"
+                        ItemsSource="{x:Static enums:SeriesGenreModel.SERIES_GENRES}"
                         SelectedItems="{CompiledBinding SelectedGenres}"
                         SelectionMode="Multiple,Toggle"
                         Height="424" 
                         Width="186"
                         VerticalAlignment="Top"
                         SelectionChanged="GenreSelectionChanged"
+                        ItemContainerTheme="{StaticResource QueryListBoxItem}"
                         Theme="{StaticResource QueryListBox}">
-                            <ListBoxItem x:Name="ActionListBoxItem" Theme="{StaticResource QueryListBoxItem}">Action</ListBoxItem>
-                            <ListBoxItem x:Name="AdventureListBoxItem" Theme="{StaticResource QueryListBoxItem}">Adventure</ListBoxItem>
-                            <ListBoxItem x:Name="ComedyListBoxItem" Theme="{StaticResource QueryListBoxItem}">Comedy</ListBoxItem>
-                            <ListBoxItem x:Name="DramaListBoxItem" Theme="{StaticResource QueryListBoxItem}">Drama</ListBoxItem>
-                            <ListBoxItem x:Name="EcchiListBoxItem" Theme="{StaticResource QueryListBoxItem}">Ecchi</ListBoxItem>
-                            <ListBoxItem x:Name="FantasyListBoxItem" Theme="{StaticResource QueryListBoxItem}">Fantasy</ListBoxItem>
-                            <ListBoxItem x:Name="HentaiListBoxItem" Theme="{StaticResource QueryListBoxItem}">Hentai</ListBoxItem>
-                            <ListBoxItem x:Name="HorrorListBoxItem" Theme="{StaticResource QueryListBoxItem}">Horror</ListBoxItem>
-                            <ListBoxItem x:Name="MahouShoujoListBoxItem" Theme="{StaticResource QueryListBoxItem}">Mahou Shoujo</ListBoxItem>
-                            <ListBoxItem x:Name="MechaListBoxItem" Theme="{StaticResource QueryListBoxItem}">Mecha</ListBoxItem>
-                            <ListBoxItem x:Name="MusicListBoxItem" Theme="{StaticResource QueryListBoxItem}">Music</ListBoxItem>
-                            <ListBoxItem x:Name="MysteryListBoxItem" Theme="{StaticResource QueryListBoxItem}">Mystery</ListBoxItem>
-                            <ListBoxItem x:Name="PsychologicalListBoxItem" Theme="{StaticResource QueryListBoxItem}">Psychological</ListBoxItem>
-                            <ListBoxItem x:Name="RomanceListBoxItem" Theme="{StaticResource QueryListBoxItem}">Romance</ListBoxItem>
-                            <ListBoxItem x:Name="SciFiListBoxItem" Theme="{StaticResource QueryListBoxItem}">Sci-Fi</ListBoxItem>
-                            <ListBoxItem x:Name="SliceOfLifeListBoxItem" Theme="{StaticResource QueryListBoxItem}">Slice of Life</ListBoxItem>
-                            <ListBoxItem x:Name="SportsListBoxItem" Theme="{StaticResource QueryListBoxItem}">Sports</ListBoxItem>
-                            <ListBoxItem x:Name="SupernaturalListBoxItem" Theme="{StaticResource QueryListBoxItem}">Supernatural</ListBoxItem>
-                            <ListBoxItem x:Name="ThrillerListBoxItem" Theme="{StaticResource QueryListBoxItem}">Thriller</ListBoxItem>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" />
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
                     </ListBox>
                 </StackPanel>
             </Grid>

@@ -1,3 +1,4 @@
+using System.Reactive.Linq;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.ReactiveUI;
@@ -35,13 +36,61 @@ public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesView
                 this.Hide();
                 IsOpen ^= true;
                 Topmost = false;
+                viewModel.ClearSuggestions();
             }
             e.Cancel = true;
         };
 
-        this.WhenAnyValue(x => x.MaxVolCount.Text).Subscribe(x => MaxVolNum = ConvertNumText(x.Replace("_", "")));
-        this.WhenAnyValue(x => x.CurVolCount.Text).Subscribe(x => CurVolNum = ConvertNumText(x.Replace("_", "")));
-        this.WhenAnyValue(x => x.TitleBox.Text, x => x.MaxVolCount.Text, x => x.CurVolCount.Text, x => x.MangaButton.IsChecked, x => x.NovelButton.IsChecked, (title, max, cur, manga, novel) => !string.IsNullOrWhiteSpace(title) && CurVolNum <= MaxVolNum && MaxVolNum != 0 && !(manga == false && novel == false) && manga is not null && novel is not null).Subscribe(x => ViewModel.IsAddSeriesButtonEnabled = x);
+        // this.WhenAnyValue(x => x.MaxVolCount.Text).Subscribe(x => MaxVolNum = ConvertNumText(x.Replace("_", "")));
+        // this.WhenAnyValue(x => x.CurVolCount.Text).Subscribe(x => CurVolNum = ConvertNumText(x.Replace("_", "")));
+        // this.WhenAnyValue(x => x.TitleBox.Text, x => x.MaxVolCount.Text, x => x.CurVolCount.Text, x => x.MangaButton.IsChecked, x => x.NovelButton.IsChecked, (title, max, cur, manga, novel) => !string.IsNullOrWhiteSpace(title) && CurVolNum <= MaxVolNum && MaxVolNum != 0 && !(manga == false && novel == false) && manga is not null && novel is not null).Subscribe(x => ViewModel.IsAddSeriesButtonEnabled = x);
+
+        IObservable<(ushort CurVolNum, ushort MaxVolNum)> volCountStream = 
+            this.WhenAnyValue(x => x.CurVolCount.Text, x => x.MaxVolCount.Text)
+                .Select(tuple => (
+                    CurVolNum: ConvertNumText(tuple.Item1.Replace("_", "")),
+                    MaxVolNum: ConvertNumText(tuple.Item2.Replace("_", ""))
+                ));
+
+        this.WhenAnyValue(x => x.TitleBox.Text, x => x.MangaButton.IsChecked, x => x.NovelButton.IsChecked)
+            .WithLatestFrom(volCountStream, (title, mangaChecked, novelChecked) =>
+            {
+                bool isAnyChecked = mangaChecked.GetValueOrDefault() || novelChecked.GetValueOrDefault();
+                
+                return !string.IsNullOrWhiteSpace(title) &&
+                    volNums.CurVolNum <= volNums.MaxVolNum && 
+                    volNums.MaxVolNum != 0 &&
+                    isAnyChecked;
+            })
+            .Subscribe(isEnabled => ViewModel.IsAddSeriesButtonEnabled = isEnabled);
+
+        this.WhenAnyValue(x => x.ViewModel.SelectedSuggestion)
+            .Subscribe(selectedSuggestion =>
+            {
+                if (selectedSuggestion is not null)
+                {
+                    if (selectedSuggestion.Format.Equals("NOVEL", StringComparison.OrdinalIgnoreCase))
+                    {
+                        NovelButton.IsChecked = true;
+                        MangaButton.IsChecked = false;
+                    }
+                    else if (selectedSuggestion.Format.Equals("MANGA", StringComparison.OrdinalIgnoreCase))
+                    {
+                        NovelButton.IsChecked = false;
+                        MangaButton.IsChecked = true;
+                    }
+                    else
+                    {
+                        NovelButton.IsChecked = false;
+                        MangaButton.IsChecked = false;
+                    }
+                }
+                else
+                {
+                    NovelButton.IsChecked = false;
+                    MangaButton.IsChecked = false;
+                }
+            });
     }
 
 
@@ -94,7 +143,7 @@ public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesView
             (MangaButton.IsChecked == true) ? SeriesFormat.Manga : SeriesFormat.Novel, 
             CurVolNum, 
             MaxVolNum, 
-            ViewModel.SelectedAdditionalLanguages.Count != 0 ? ViewModel.ConvertSelectedLangList() : [],
+            ViewModel!.SelectedAdditionalLanguages.Count != 0 ? ViewModel.ConvertSelectedLangList() : [],
             !string.IsNullOrWhiteSpace(customImageUrl) ? customImageUrl.Trim() : string.Empty, 
             !string.IsNullOrWhiteSpace(PublisherTextBox.Text) ? PublisherTextBox.Text.Trim() : "Unknown",
             SeriesDemographicEnum.Parse((DemographicCombobox.SelectedItem as ComboBoxItem).Content.ToString()), 

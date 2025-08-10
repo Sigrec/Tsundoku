@@ -43,30 +43,30 @@ public class SeriesEnumTests
     [Test]
     public void SeriesGenre_TryParse_KnownAlias_ReturnsTrue()
     {
-        bool success = SeriesGenreEnum.TryParse("Magical Girls", out SeriesGenreEnum.SeriesGenre genre);
+        bool success = SeriesGenreModel.TryParse("Magical Girls", out SeriesGenreModel.SeriesGenre genre);
         Assert.That(success, Is.True);
-        Assert.That(genre, Is.EqualTo(SeriesGenreEnum.SeriesGenre.MahouShoujo));
+        Assert.That(genre, Is.EqualTo(SeriesGenreModel.SeriesGenre.MahouShoujo));
     }
 
     [Test]
     public void SeriesGenre_TryParse_UnknownAlias_ReturnsFalse()
     {
-        bool success = SeriesGenreEnum.TryParse("NoSuchGenre", out SeriesGenreEnum.SeriesGenre genre);
+        bool success = SeriesGenreModel.TryParse("NoSuchGenre", out SeriesGenreModel.SeriesGenre genre);
         Assert.That(success, Is.False);
-        Assert.That(genre, Is.EqualTo(SeriesGenreEnum.SeriesGenre.Unknown));
+        Assert.That(genre, Is.EqualTo(SeriesGenreModel.SeriesGenre.Unknown));
     }
 
     [Test]
     public void SeriesGenre_Parse_KnownAlias_ReturnsCorrectGenre()
     {
-        SeriesGenreEnum.SeriesGenre genre = SeriesGenreEnum.Parse("SciFi");
-        Assert.That(genre, Is.EqualTo(SeriesGenreEnum.SeriesGenre.SciFi));
+        SeriesGenreModel.SeriesGenre genre = SeriesGenreModel.Parse("SciFi");
+        Assert.That(genre, Is.EqualTo(SeriesGenreModel.SeriesGenre.SciFi));
     }
 
     [Test]
     public void SeriesGenre_GetAliases_ReturnsAliases()
     {
-        IEnumerable<string> aliases = SeriesGenreEnum.GetAliases(SeriesGenreEnum.SeriesGenre.SliceOfLife);
+        IEnumerable<string> aliases = SeriesGenreModel.GetAliases(SeriesGenreModel.SeriesGenre.SliceOfLife);
         Assert.That(aliases, Contains.Item("Slice of Life"));
         Assert.That(aliases, Contains.Item("SliceOfLife"));
     }

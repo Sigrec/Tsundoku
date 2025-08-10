@@ -78,12 +78,12 @@ public static class Constants
             {
                 var fallback = symbol switch
                 {
-                    "din" => "sr-RS",   // Serbian Dinar
-                    "ден" => "mk-MK",   // Macedonian Denar
-                    "ر.س" => "ar-SA",   // Saudi Riyal
+                    "din" => "sr-RS",  // Serbian Dinar
+                    "ден" => "mk-MK",  // Macedonian Denar
+                    "ر.س" => "ar-SA", // Saudi Riyal
                     "د.إ" => "ar-AE",   // UAE Dirham
-                    "د.ك" => "ar-KW",   // Kuwaiti Dinar
-                    "lei" => "ro-RO",   // Romanian Leu
+                    "د.ك" => "ar-KW",  // Kuwaiti Dinar
+                    "lei" => "ro-RO",  // Romanian Leu
                     _ => "unknown"
                 };
 

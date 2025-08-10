@@ -2,7 +2,7 @@
 using System.Web;
 using Tsundoku.Helpers;
 using Tsundoku.Models.Enums;
-using static Tsundoku.Models.Enums.SeriesGenreEnum;
+using static Tsundoku.Models.Enums.SeriesGenreModel;
 
 namespace Tsundoku.Clients;
 
@@ -716,7 +716,7 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
                 continue;
             }
 
-            if (SeriesGenreEnum.TryParse(enName.GetString(), out SeriesGenre genre))
+            if (SeriesGenreModel.TryParse(enName.GetString(), out SeriesGenre genre))
             {
                 genres.Add(genre);
             }

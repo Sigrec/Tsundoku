@@ -1,5 +1,6 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:enums="clr-namespace:Tsundoku.Models.Enums"
 		xmlns:m="clr-namespace:Tsundoku.Models"
         xmlns:vm="clr-namespace:Tsundoku.ViewModels"
 		xmlns:help="clr-namespace:Tsundoku.Helpers"
@@ -218,6 +219,7 @@
                     </StackPanel>
                     <StackPanel HorizontalAlignment="Left" Grid.Column="3" Grid.Row="0" Grid.RowSpan="2" Spacing="6">
                         <ComboBox Name="LanguageSelector"
+                                ItemsSource="{x:Static enums:TsundokuLanguageEnums.LANGUAGES}"
                                 SelectionChanged="LanguageChanged"
                                 Height="35"
                                 Width="185"
@@ -228,8 +230,14 @@
                                 ToolTip.HorizontalOffset="-5"
                                 ToolTip.VerticalOffset="0"
                                 Cursor="Hand"
+                                ItemContainerTheme="{StaticResource MenuComboBoxItem}"
                                 Theme="{StaticResource MenuComboBox}">
-                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Romaji</ComboBoxItem>
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            <!-- <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Romaji</ComboBoxItem>
                             <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">English</ComboBoxItem>
                             <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Japanese</ComboBoxItem>
                             <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Albanian</ComboBoxItem>
@@ -291,7 +299,7 @@
                             <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Turkish</ComboBoxItem>
                             <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Ukrainian</ComboBoxItem>
                             <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Urdu</ComboBoxItem>
-                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Vietnamese</ComboBoxItem>
+                            <ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Vietnamese</ComboBoxItem> -->
                         </ComboBox>
                         <ComboBox Name="CollectionFilterSelector"
                                 SelectionChanged="CollectionFilterChanged"
@@ -374,8 +382,8 @@
                          <DataTemplate DataType="m:Series">
                             <controls:SeriesCardDisplay
                                 Series="{CompiledBinding}"
-                                CardTheme="{CompiledBinding #CollectionPane.DataContext.CurrentTheme}"
-                                Language="{CompiledBinding #CollectionPane.DataContext.CurrentUser.Language}" />
+                                CardTheme="{Binding #CollectionPane.DataContext.CurrentTheme}"
+                                Language="{Binding #CollectionPane.DataContext.CurrentUser.Language}" />
                         </DataTemplate>
                     </ItemsRepeater.ItemTemplate>
                 </ItemsRepeater>
