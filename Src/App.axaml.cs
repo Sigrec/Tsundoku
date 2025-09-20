@@ -178,8 +178,7 @@ public sealed partial class App : Application
         string localCachePath = AppFileHelper.GetFolderPath("Logs");
 
         // Grab (or create) existing NLog configuration
-        LoggingConfiguration config = LogManager.Configuration;
-        config ??= new LoggingConfiguration();
+        LoggingConfiguration config = LogManager.Configuration ?? new LoggingConfiguration();
 
         // Configure (or create) the file target
         FileTarget fileTarget = config.FindTargetByName<FileTarget>("TsundokuLogs");
@@ -207,17 +206,16 @@ public sealed partial class App : Application
             fileTarget.ArchiveFileName = Path.Combine(localCachePath, "TsundokuLogs.{#}.log");
         }
 
-        AsyncTargetWrapper asyncWrapper = new(fileTarget)
+        var asyncWrapper = new AsyncTargetWrapper(fileTarget)
         {
             Name = "TsundokuLogsAsync",
             OverflowAction = AsyncTargetWrapperOverflowAction.Discard,
             QueueLimit = 10000,
             TimeToSleepBetweenBatches = 50
         };
-
         config.AddTarget(asyncWrapper);
 
-#if DEBUG
+    #if DEBUG
         // Configure (or create) the console target (only in DEBUG)
         ColoredConsoleTarget consoleTarget = config.FindTargetByName<ColoredConsoleTarget>("TsundokuConsole");
         if (consoleTarget is null)
@@ -228,31 +226,55 @@ public sealed partial class App : Application
             };
             config.AddTarget(consoleTarget);
         }
-#endif
+    #endif
 
-        // Clear existing rules for these targets (to avoid duplicates)
+        // Clear existing rules for these targets (avoid duplicates)
         for (int i = config.LoggingRules.Count - 1; i >= 0; i--)
         {
-            LoggingRule rule = config.LoggingRules[i];
-            if (rule.Targets.Any(t => t == fileTarget
-#if DEBUG
-                                        || t == consoleTarget
-#endif
-                                        ))
+            var rule = config.LoggingRules[i];
+            if (rule.Targets.Any(t =>
+                t == fileTarget
+                || t == asyncWrapper
+    #if DEBUG
+                || t == consoleTarget
+    #endif
+            ))
             {
                 config.LoggingRules.RemoveAt(i);
             }
         }
 
-        LoggingRule fileRule = new("*", LogLevel.Info, asyncWrapper);
-        config.LoggingRules.Add(fileRule);
+        // --- Namespace-specific filtering for MangaAndLightNovelWebScrape.* ---
 
-#if DEBUG
-        LoggingRule consoleRule = new("*", LogLevel.Debug, consoleTarget);
-        config.LoggingRules.Add(consoleRule);
-#endif
+        // Null target to swallow low levels
+        var blackHole = config.FindTargetByName<NLog.Targets.NullTarget>("BlackHole") 
+                        ?? new NLog.Targets.NullTarget("BlackHole");
+        if (blackHole.Name == null) config.AddTarget(blackHole); // defensive; Name is set above
+
+        // 1) Drop Trace..Info for that namespace, and stop processing
+        var dropLowLevels = new LoggingRule("MangaAndLightNovelWebScrape.*", LogLevel.Trace, LogLevel.Info, blackHole)
+        {
+            Final = true
+        };
+        config.LoggingRules.Add(dropLowLevels);
+
+        // 2) Allow Warn..Fatal for that namespace, and stop processing (so it won't hit catch-alls)
+        var allowWarnPlus = new LoggingRule("MangaAndLightNovelWebScrape.*", LogLevel.Warn, LogLevel.Fatal, asyncWrapper)
+        {
+            Final = true
+        };
+    #if DEBUG
+        allowWarnPlus.Targets.Add(consoleTarget);
+    #endif
+        config.LoggingRules.Add(allowWarnPlus);
+
+        // --- Default catch-alls ---
+        config.LoggingRules.Add(new LoggingRule("*", LogLevel.Info, LogLevel.Fatal, asyncWrapper));
+    #if DEBUG
+        config.LoggingRules.Add(new LoggingRule("*", LogLevel.Debug, LogLevel.Fatal, consoleTarget));
+    #endif
 
         LogManager.Configuration = config;
+        LogManager.ReconfigExistingLoggers();
     }
-
 }

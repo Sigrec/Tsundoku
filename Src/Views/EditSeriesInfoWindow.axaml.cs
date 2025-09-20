@@ -20,35 +20,12 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
     private readonly BitmapHelper _bitmapHelper;
     private readonly MainWindowViewModel _mainWindowViewModel;
     private bool _IsInitialized = false;
-    private readonly FrozenDictionary<SeriesGenre, object> GenreItemMap;
 
     public EditSeriesInfoWindow(MainWindowViewModel mainWindowViewModel, BitmapHelper bitmapHelper)
     {
         _bitmapHelper = bitmapHelper;
         _mainWindowViewModel = mainWindowViewModel;
         InitializeComponent();
-
-        // GenreItemMap = new Dictionary<SeriesGenre, object>
-        // {
-        //     [SeriesGenre.Action] = ActionListBoxItem,
-        //     [SeriesGenre.Adventure] = AdventureListBoxItem,
-        //     [SeriesGenre.Comedy] = ComedyListBoxItem,
-        //     [SeriesGenre.Drama] = DramaListBoxItem,
-        //     [SeriesGenre.Ecchi] = EcchiListBoxItem,
-        //     [SeriesGenre.Fantasy] = FantasyListBoxItem,
-        //     [SeriesGenre.Horror] = HorrorListBoxItem,
-        //     [SeriesGenre.MahouShoujo] = MahouShoujoListBoxItem,
-        //     [SeriesGenre.Mecha] = MechaListBoxItem,
-        //     [SeriesGenre.Music] = MusicListBoxItem,
-        //     [SeriesGenre.Mystery] = MysteryListBoxItem,
-        //     [SeriesGenre.Psychological] = PsychologicalListBoxItem,
-        //     [SeriesGenre.Romance] = RomanceListBoxItem,
-        //     [SeriesGenre.SciFi] = SciFiListBoxItem,
-        //     [SeriesGenre.SliceOfLife] = SliceOfLifeListBoxItem,
-        //     [SeriesGenre.Sports] = SportsListBoxItem,
-        //     [SeriesGenre.Supernatural] = SupernaturalListBoxItem,
-        //     [SeriesGenre.Thriller] = ThrillerListBoxItem
-        // }.ToFrozenDictionary();
 
         Opened += (s, e) =>
         {

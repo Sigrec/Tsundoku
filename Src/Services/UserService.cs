@@ -344,7 +344,7 @@ public sealed class UserService : IUserService, IDisposable
     private static User CreateDefaultUser()
     {
         LOGGER.Info("Creating New User");
-        User user = new User(
+        User user = new(
                     "UserName",
                     TsundokuLanguage.Romaji,
                     "Default",
@@ -355,9 +355,8 @@ public sealed class UserService : IUserService, IDisposable
                     Region.America,
                     new Dictionary<string, bool>
                     {
-                        { BooksAMillion.WEBSITE_TITLE, false },
-                        { Indigo.WEBSITE_TITLE, false },
-                        { KinokuniyaUSA.WEBSITE_TITLE , false }
+                        { BooksAMillion.TITLE, false },
+                        { KinokuniyaUSA.TITLE , false }
                     },
                     [],
                     []

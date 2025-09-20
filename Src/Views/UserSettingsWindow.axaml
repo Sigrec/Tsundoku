@@ -93,10 +93,6 @@
 								  IsChecked="{CompiledBinding KinokuniyaUSAMember}"
 							      Theme="{StaticResource MenuToggleButton}"
 							      Content="Kinokuniya USA"/>
-                    <ToggleButton x:Name="IndigoButton"
-								  IsChecked="{CompiledBinding IndigoMember}"
-							      Theme="{StaticResource MenuToggleButton}"
-							      Content="Indigo"/>
 					</WrapPanel>
                 </StackPanel>
                 <StackPanel Spacing="5">

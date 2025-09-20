@@ -8,12 +8,8 @@ using static Tsundoku.Models.Enums.SeriesFormatModel;
 
 namespace Tsundoku.Views;
 
-// TODO: Need to make it so if a user has selected a suggestion it uses the ID from that entry
 public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesViewModel>
 {
-    private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
-    private readonly ushort MaxVolNum;
-    private readonly ushort CurVolNum;
     public bool IsOpen = false;
     private readonly IPopupDialogService _popupDialogService;
 
@@ -124,7 +120,7 @@ public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesView
 
     private static ushort ConvertNumText(string value)
     {
-        return string.IsNullOrWhiteSpace(value) ? (ushort)0 : ushort.Parse(value);
+        return string.IsNullOrWhiteSpace(value) ? (ushort)1 : ushort.Parse(value);
     }
 
     public async void OnAddSeriesButtonClicked(object sender, RoutedEventArgs args)
@@ -138,8 +134,8 @@ public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesView
         KeyValuePair<bool, string> validSeries = await ViewModel!.GetSeriesDataAsync(
             input: ViewModel.SelectedSuggestion is not null ? ViewModel.SelectedSuggestion.Id : SeriesInputTextBox.Text.Trim(),
             bookType: (MangaButton.IsChecked == true) ? SeriesFormat.Manga : SeriesFormat.Novel,
-            curVolCount: CurVolNum,
-            maxVolCount: MaxVolNum,
+            curVolCount: ConvertNumText(CurVolCount.Text.Replace("_", "")),
+            maxVolCount: ConvertNumText(MaxVolCount.Text.Replace("_", "")),
             additionalLanguages: ViewModel!.SelectedAdditionalLanguages.Count != 0 ? ViewModel.ConvertSelectedLangList() : [],
             customImageUrl: !string.IsNullOrWhiteSpace(customImageUrl) ? customImageUrl.Trim() : string.Empty,
             publisher: !string.IsNullOrWhiteSpace(PublisherTextBox.Text) ? PublisherTextBox.Text.Trim() : "Unknown",

@@ -11,19 +11,19 @@ public sealed partial class SeriesCardDisplay : ReactiveUserControl<SeriesCardDi
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
 
-    public static readonly StyledProperty<Series?> SeriesProperty =
-            AvaloniaProperty.Register<SeriesCardDisplay, Series?>(nameof(Series));
+    public static readonly StyledProperty<Series> SeriesProperty =
+            AvaloniaProperty.Register<SeriesCardDisplay, Series>(nameof(Series));
 
-    public Series? Series
+    public Series Series
     {
         get => GetValue(SeriesProperty);
         set => SetValue(SeriesProperty, value);
     }
 
-    public static readonly StyledProperty<TsundokuTheme?> CardThemeProperty =
-        AvaloniaProperty.Register<SeriesCardDisplay, TsundokuTheme?>(nameof(CardTheme));
+    public static readonly StyledProperty<TsundokuTheme> CardThemeProperty =
+        AvaloniaProperty.Register<SeriesCardDisplay, TsundokuTheme>(nameof(CardTheme));
 
-    public TsundokuTheme? CardTheme
+    public TsundokuTheme CardTheme
     {
         get => GetValue(CardThemeProperty);
         set => SetValue(CardThemeProperty, value);

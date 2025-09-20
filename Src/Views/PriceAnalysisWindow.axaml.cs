@@ -4,10 +4,11 @@ using Tsundoku.ViewModels;
 using MangaAndLightNovelWebScrape;
 using ReactiveUI;
 using System.Reactive.Linq;
-using MangaAndLightNovelWebScrape.Websites;
 using MangaAndLightNovelWebScrape.Models;
 using System.Collections;
 using Avalonia.ReactiveUI;
+using System.Linq.Dynamic.Core;
+using MangaAndLightNovelWebScrape.Websites;
 
 namespace Tsundoku.Views;
 
@@ -15,7 +16,8 @@ public sealed partial class PriceAnalysisWindow : ReactiveWindow<PriceAnalysisVi
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
     public bool IsOpen = false, Manga;
-    public readonly MasterScrape Scrape = new(StockStatusFilter.EXCLUDE_NONE_FILTER);
+    public readonly MasterScrape _scrape = new(StockStatusFilter.EXCLUDE_NONE_FILTER);
+    private static Region CurRegion;
 
 
     public PriceAnalysisWindow(PriceAnalysisViewModel viewModel)
@@ -54,64 +56,35 @@ public sealed partial class PriceAnalysisWindow : ReactiveWindow<PriceAnalysisVi
         MangaButton.IsChecked = false;
     }
 
-    private bool IsWebsiteListValid(IList input)
-    {
-        Region region = ViewModel.CurrentUser.Region;
-        foreach (ListBoxItem website in input)
-        {
-            bool isValid = website.Content.ToString() switch
-            {
-                AmazonJapan.WEBSITE_TITLE => AmazonJapan.REGION.HasFlag(region),
-                AmazonUSA.WEBSITE_TITLE => AmazonUSA.REGION.HasFlag(region),
-                BooksAMillion.WEBSITE_TITLE => BooksAMillion.REGION.HasFlag(region),
-                CDJapan.WEBSITE_TITLE => CDJapan.REGION.HasFlag(region),
-                Crunchyroll.WEBSITE_TITLE => Crunchyroll.REGION.HasFlag(region),
-                ForbiddenPlanet.WEBSITE_TITLE => ForbiddenPlanet.REGION.HasFlag(region),
-                Indigo.WEBSITE_TITLE => Indigo.REGION.HasFlag(region),
-                InStockTrades.WEBSITE_TITLE => InStockTrades.REGION.HasFlag(region),
-                KinokuniyaUSA.WEBSITE_TITLE => KinokuniyaUSA.REGION.HasFlag(region),
-                MangaMate.WEBSITE_TITLE => MangaMate.REGION.HasFlag(region),
-                MerryManga.WEBSITE_TITLE => MerryManga.REGION.HasFlag(region),
-                RobertsAnimeCornerStore.WEBSITE_TITLE => RobertsAnimeCornerStore.REGION.HasFlag(region),
-                SciFier.WEBSITE_TITLE => SciFier.REGION.HasFlag(region),
-                Waterstones.WEBSITE_TITLE => Waterstones.REGION.HasFlag(region),
-                _ => throw new NotImplementedException(),
-            };
-            if (!isValid) { return false; }
-        }
-        return true;
-    }
-
     public async void PerformAnalysis(object sender, RoutedEventArgs args)
     {
         string scrapeScenario = string.Empty;
         try
         {
-            HashSet<string> websiteList = [.. ViewModel.SelectedWebsites.AsValueEnumerable().Select(website => website.Content.ToString())];
+            HashSet<Website> websiteList = [.. ViewModel.SelectedWebsites.AsValueEnumerable().Select(website => MangaAndLightNovelWebScrape.Helpers.GetWebsiteFromString(website.Content.ToString()))];
 
-            scrapeScenario = $"\"{SearchTextBox.Text}\" on {Scrape.Browser} Browser w/ Region = \"{Scrape.Region}\" & \"{StockFilterSelector.SelectedItem as string} Filter\" & Websites = [{string.Join(", ", websiteList)}] & Memberships = ({string.Join(" & ", ViewModel.CurrentUser.Memberships)})";
+            scrapeScenario = $"\"{SearchTextBox.Text}\" on {_scrape.Browser} Browser w/ Region = \"{_scrape.Region}\" & \"{StockFilterSelector.SelectedItem as string} Filter\" & Websites = [{string.Join(", ", websiteList)}] & Memberships = ({string.Join(" & ", ViewModel.CurrentUser.Memberships)})";
 
             ToggleControlEnablement();
             StartScrapeButton.Content = "Analyzing...";
 
-            Scrape.Browser = MangaAndLightNovelWebScrape.Helpers.GetBrowserFromString((BrowserSelector.SelectedItem as ComboBoxItem).Content.ToString());
-            Scrape.Region = ViewModel.CurrentUser.Region;
-            Scrape.Filter = MangaAndLightNovelWebScrape.Helpers.GetStockStatusFilterFromString(StockFilterSelector.SelectedItem as string);
-            Scrape.IsBooksAMillionMember = ViewModel.CurrentUser.Memberships[BooksAMillion.WEBSITE_TITLE];
-            Scrape.IsKinokuniyaUSAMember = ViewModel.CurrentUser.Memberships[KinokuniyaUSA.WEBSITE_TITLE];
-            Scrape.IsIndigoMember = ViewModel.CurrentUser.Memberships[Indigo.WEBSITE_TITLE];
+            _scrape.Browser = MangaAndLightNovelWebScrape.Helpers.GetBrowserFromString((BrowserSelector.SelectedItem as ComboBoxItem).Content.ToString());
+            _scrape.Region = ViewModel.CurrentUser.Region;
+            _scrape.Filter = MangaAndLightNovelWebScrape.Helpers.GetStockStatusFilterFromString(StockFilterSelector.SelectedItem as string);
+            _scrape.IsBooksAMillionMember = ViewModel.CurrentUser.Memberships[BooksAMillion.TITLE];
+            _scrape.IsKinokuniyaUSAMember = ViewModel.CurrentUser.Memberships[KinokuniyaUSA.TITLE];
 
             LOGGER.Info("Started Scrape For {Scenario}", scrapeScenario);
 
-            await Scrape.InitializeScrapeAsync(
+            await _scrape.InitializeScrapeAsync(
                 title: SearchTextBox.Text,
                 bookType: MangaButton.IsChecked is not null && MangaButton.IsChecked.Value ? BookType.Manga : BookType.LightNovel,
-                Scrape.GenerateWebsiteList(websiteList)
+                websiteList
             );
             LOGGER.Info($"Scrape Finished");
 
             ViewModel.AnalyzedList.Clear();
-            ViewModel.AnalyzedList.AddRange(Scrape.GetResults());
+            ViewModel.AnalyzedList.AddRange(_scrape.GetResults());
             // AnalysisDataGrid.Columns[3].Width = DataGridLength.SizeToCells;
             this.SizeToContent = SizeToContent.Height;
         }
@@ -144,6 +117,7 @@ public sealed partial class PriceAnalysisWindow : ReactiveWindow<PriceAnalysisVi
         if (RegionComboBox.SelectedItem is string selectedRegion)
         {
             Region newRegion = MangaAndLightNovelWebScrape.Helpers.GetRegionFromString(selectedRegion);
+            CurRegion = newRegion;
             ViewModel.UpdateUserRegion(newRegion);
             LOGGER.Info("Region Changed to {}", selectedRegion);
         }
@@ -151,12 +125,12 @@ public sealed partial class PriceAnalysisWindow : ReactiveWindow<PriceAnalysisVi
 
     private void WebsiteSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        IList? list = (sender as ListBox).SelectedItems;
-        ViewModel.WebsitesSelected = list.Count != 0 && IsWebsiteListValid(list);
+        string[] list = [.. (sender as ListBox).SelectedItems.AsValueEnumerable().Cast<ListBoxItem>().Select(x => x.Content.ToString())];
+        ViewModel.WebsitesSelected = list.Length != 0 && MangaAndLightNovelWebScrape.Helpers.IsWebsiteListValid(CurRegion, list);
     }
 
     private async void OpenSiteLinkAsync(object sender, PointerPressedEventArgs args)
     {
-        await ViewModelBase.OpenSiteLink(Scrape.GetResultUrls()[(sender as TextBlock).Text]);
+        await ViewModelBase.OpenSiteLink(_scrape.GetResultUrls()[MangaAndLightNovelWebScrape.Helpers.GetWebsiteFromString((sender as TextBlock).Text)]);
     }
 }

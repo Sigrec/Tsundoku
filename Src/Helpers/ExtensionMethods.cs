@@ -72,7 +72,7 @@ public static class ExtensionMethods
         return new Bitmap(ms);     // Decode into new Bitmap
     }
     
-    public static int Similar(string s, string t, int maxDistance)
+    public static int Similar(string? s, string? t, int maxDistance)
     {
         if (string.IsNullOrWhiteSpace(s))
         {

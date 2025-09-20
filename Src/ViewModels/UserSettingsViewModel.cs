@@ -15,7 +15,6 @@ public sealed class UserSettingsViewModel : ViewModelBase
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
     [Reactive] public bool IsChangeUsernameButtonEnabled { get; set; }
-    [Reactive] public bool IndigoMember { get; set; }
     [Reactive] public bool BooksAMillionMember { get; set; }
     [Reactive] public bool KinokuniyaUSAMember { get; set; }
     [Reactive] public int SelectedCurrencyIndex { get; set; } = 0;
@@ -40,23 +39,17 @@ public sealed class UserSettingsViewModel : ViewModelBase
                 SelectedCurrencyIndex = AVAILABLE_CURRENCY_WITH_CULTURE[currency].Index;
             });
 
-        BooksAMillionMember = CurrentUser.Memberships[BooksAMillion.WEBSITE_TITLE];
+        BooksAMillionMember = CurrentUser.Memberships[BooksAMillion.TITLE];
         this.WhenAnyValue(x => x.BooksAMillionMember)
             .Skip(1)
             .ObserveOn(RxApp.MainThreadScheduler)
-            .Subscribe(isMember => UpdateMembership(BooksAMillion.WEBSITE_TITLE, isMember));
+            .Subscribe(isMember => UpdateMembership(BooksAMillion.TITLE, isMember));
 
-        IndigoMember = CurrentUser.Memberships[Indigo.WEBSITE_TITLE];
-        this.WhenAnyValue(x => x.IndigoMember)
-            .Skip(1)
-            .ObserveOn(RxApp.MainThreadScheduler)
-            .Subscribe(isMember => UpdateMembership(Indigo.WEBSITE_TITLE, isMember));
-
-        KinokuniyaUSAMember = CurrentUser.Memberships[KinokuniyaUSA.WEBSITE_TITLE];
+        KinokuniyaUSAMember = CurrentUser.Memberships[KinokuniyaUSA.TITLE];
         this.WhenAnyValue(x => x.KinokuniyaUSAMember)
             .Skip(1)
             .ObserveOn(RxApp.MainThreadScheduler)
-            .Subscribe(isMember => UpdateMembership(KinokuniyaUSA.WEBSITE_TITLE, isMember));
+            .Subscribe(isMember => UpdateMembership(KinokuniyaUSA.TITLE, isMember));
     }
 
     private void UpdateMembership(string websiteTitle, bool isMember)

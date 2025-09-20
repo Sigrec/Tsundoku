@@ -205,9 +205,8 @@ public sealed class User : ReactiveObject
         {
             userData[nameof(Memberships)] = new JsonObject
             {
-                [BooksAMillion.WEBSITE_TITLE] = false,
-                [Indigo.WEBSITE_TITLE] = false,
-                [KinokuniyaUSA.WEBSITE_TITLE] = false
+                [BooksAMillion.TITLE] = false,
+                [KinokuniyaUSA.TITLE] = false
             };
 
             userData.AsObject()[nameof(MeanRating)] = (decimal)userData["MeanScore"];

@@ -43,8 +43,6 @@ public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsView
             e.Cancel = true;
         };
 
-        this.WhenAnyValue(x => x.IndigoButton.IsChecked, (member) => member is not null && member == true).Subscribe(x => ViewModel.IndigoMember = x);
-
         this.WhenAnyValue(x => x.BooksAMillionButton.IsChecked, (member) => member is not null && member == true).Subscribe(x => ViewModel.BooksAMillionMember = x);
 
         this.WhenAnyValue(x => x.KinokuniyaUSAButton.IsChecked, (member) => member is not null && member == true).Subscribe(x => ViewModel.KinokuniyaUSAMember = x);
