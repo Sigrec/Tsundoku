@@ -6,6 +6,14 @@ This project adheres to [Semantic Versioning](https://semver.org/) and follows t
 <details>
 <summary>1.x Releases</summary>
 
+### 1.4.2 - 2025-09-29
+
+#### Changed
+
+- Added and updated tooltips for EditSeriesWindow buttons for clarity
+- Updated **ZLinq** to `1.5.3`
+- Updated **System.Linq.Dynamic.Core** to `1.6.8`
+
 ### 1.4.1 - 2025-09-20
 
 #### Changed

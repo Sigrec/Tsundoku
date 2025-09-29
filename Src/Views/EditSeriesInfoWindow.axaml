@@ -56,6 +56,7 @@
                             FontSize="28" 
                             Height="45"
                             Padding="0,0,1,0"
+                            ToolTip.Tip="Delete Series"
                             Theme="{StaticResource MenuButton}"
                             Click="RemoveSeries"/>
                         <MaskedTextBox
@@ -97,6 +98,7 @@
                             Height="45"
                             Padding="0,0,1,0"
                             Theme="{StaticResource MenuButton}"
+                            ToolTip.Tip="Update Volume Count"
                             Click="ChangeSeriesVolumeCounts"/>
                     </StackPanel>
                 </StackPanel>
@@ -325,7 +327,7 @@
                         FontSize="17"
                         VerticalContentAlignment="Center"
                         HorizontalContentAlignment="Center"
-                        ToolTip.Tip="Save Changed Data"
+                        ToolTip.Tip="Save Stats"
                         Click="SaveStats"
                         Theme="{StaticResource MenuButton}">
                         <Button.Content>
