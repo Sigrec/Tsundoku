@@ -10,7 +10,7 @@
   <Identity
     Name="Uchu.Tsundoku"
     Publisher="CN=87BEFF14-BC25-4198-8A97-9D91409FCD2B"
-    Version="1.4.2.0" />
+    Version="1.4.3.0" />
 
   <Properties>
     <DisplayName>Tsundoku</DisplayName>

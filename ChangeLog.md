@@ -6,6 +6,20 @@ This project adheres to [Semantic Versioning](https://semver.org/) and follows t
 <details>
 <summary>1.x Releases</summary>
 
+### 1.4.3 - 2025-10-18
+
+#### Changed
+
+- Updated discord app icon to the new app icon
+- Added a button when editing a series in discord rich presence to go that series AL or MangaDex link
+- Removed **ReactiveUI.Fody** for **ReactiveUI.SourceGenerators**
+- Removed **Avalonia.ReactiveUI** for **ReactiveUI.Avalonia**
+- Updated **Avalonia** to `11.3.7`
+- Updated **System.Drawing.Common** to `9.0.10`
+- Updated **NLog** to `6.0.5`
+- Updated **Microsoft.Extensions.Http** to `9.0.10`
+- Updated **System.Linq.Dynamic.Core** to `1.6.9`
+
 ### 1.4.2 - 2025-09-29
 
 #### Changed

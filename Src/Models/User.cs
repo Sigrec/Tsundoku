@@ -4,7 +4,7 @@ using System.Text.Json.Nodes;
 using Tsundoku.Helpers;
 using Tsundoku.Converters;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+using ReactiveUI.SourceGenerators;
 using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 using System.Text.Encodings.Web;
 using System.Diagnostics.CodeAnalysis;

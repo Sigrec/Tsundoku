@@ -1,8 +1,9 @@
 using System.Diagnostics;
 using System.Reactive.Disposables;
+using System.Reactive.Disposables.Fluent;
 using System.Reactive.Linq;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+using ReactiveUI.SourceGenerators;
 using Tsundoku.Models;
 
 namespace Tsundoku.ViewModels;
@@ -13,7 +14,7 @@ public class ViewModelBase : ReactiveObject
 
     public static string Filter { get; set; }
     public bool isReloading = false;
-    public const string CUR_TSUNDOKU_VERSION = "1.4.2";
+    public const string CUR_TSUNDOKU_VERSION = "1.4.3";
     public const double SCHEMA_VERSION = 6.1;
     public const string USER_DATA_FILEPATH = @"UserData.json";
     

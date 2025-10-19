@@ -2,7 +2,6 @@ using Avalonia.Controls;
 using Microsoft.Extensions.DependencyInjection;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
-using Avalonia.ReactiveUI;
 using ReactiveUI;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -11,9 +10,10 @@ using System.Reactive.Linq;
 using Tsundoku.Helpers;
 using Tsundoku.Models;
 using Tsundoku.ViewModels;
-using System.Reactive.Disposables;
 using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 using static Tsundoku.Models.Enums.TsundokuFilterModel;
+using ReactiveUI.Avalonia;
+using System.Reactive.Disposables.Fluent;
 
 namespace Tsundoku.Views;
 

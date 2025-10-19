@@ -5,14 +5,13 @@ using Avalonia.Collections;
 using Avalonia.Controls;
 using MangaAndLightNovelWebScrape;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+using ReactiveUI.SourceGenerators;
 
 namespace Tsundoku.ViewModels;
 
-public sealed class PriceAnalysisViewModel : ViewModelBase
+public sealed partial class PriceAnalysisViewModel : ViewModelBase
 {
-    private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
-    public AvaloniaList<EntryModel> AnalyzedList { get; set; } = [];
+    [Reactive] public AvaloniaList<EntryModel> AnalyzedList { get; set; } = [];
     [Reactive] public int BrowserIndex { get; set; }
     [Reactive] public bool IsAnalyzeButtonEnabled { get; set; } = false;
     [Reactive] public bool WebsitesSelected { get; set; } = false;

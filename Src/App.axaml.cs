@@ -57,6 +57,9 @@ public sealed partial class App : Application
             ConfigureServices(services);
             ServiceProvider = services.BuildServiceProvider();
 
+            // Bridge MS DI to Splat after ServiceProvider is ready
+            // ServiceProvider.UseMicrosoftDependencyResolver();
+
             DiscordRP.Initialize();
 
             IUserService userService = ServiceProvider.GetRequiredService<IUserService>();

@@ -1,6 +1,5 @@
 ﻿using Tsundoku.Models;
-using ReactiveUI.Fody.Helpers;
-using Avalonia.Controls;
+using ReactiveUI.SourceGenerators;
 using System.Collections.Specialized;
 using Tsundoku.Helpers;
 using static Tsundoku.Models.Enums.TsundokuLanguageModel;
@@ -13,17 +12,17 @@ using System.Globalization;
 using System.Reactive.Linq;
 using System.Collections.ObjectModel;
 using DynamicData;
-using System.Reactive.Disposables;
-using static Tsundoku.Clients.AniList;
+using System.Reactive.Disposables.Fluent;
 
 namespace Tsundoku.ViewModels;
 
-public sealed class AddNewSeriesViewModel : ViewModelBase
+public sealed partial class AddNewSeriesViewModel : ViewModelBase
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
     private readonly BitmapHelper _bitmapHelper;
     private readonly MangaDex _mangaDex;
     private readonly AniList _aniList;
+
     [Reactive] public string TitleText { get; set; }
     [Reactive] public string PublisherText { get; set; }
     [Reactive] public string CoverImageUrl { get; set; }
@@ -33,11 +32,13 @@ public sealed class AddNewSeriesViewModel : ViewModelBase
     [Reactive] public string AdditionalLanguagesToolTipText { get; set; }
     [Reactive] public bool IsAddSeriesButtonEnabled { get; set; } = false;
     [Reactive] public string SeriesValueMaskedText { get; set; }
-    public AvaloniaList<TsundokuLanguage> SelectedAdditionalLanguages { get; set; } = [];
+    [Reactive] public AvaloniaList<TsundokuLanguage> SelectedAdditionalLanguages { get; set; } = [];
+
     private readonly SourceList<AniListPickerSuggestion> _suggestionsSource = new();
     public ReadOnlyObservableCollection<AniListPickerSuggestion> Suggestions { get; private set; }
     [Reactive] public AniListPickerSuggestion? SelectedSuggestion { get; set; }
     [Reactive] public bool IsSuggestionsOpen { get; set; }
+
     private static readonly StringBuilder CurLanguages = new();
 
     public AddNewSeriesViewModel(IUserService userService, BitmapHelper bitmapHelper, MangaDex mangaDex, AniList aniList) : base(userService)

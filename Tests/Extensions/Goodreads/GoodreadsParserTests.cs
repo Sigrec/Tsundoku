@@ -150,6 +150,7 @@ public class GoodreadsParserTests
     }
 
     [Test]
+    [Parallelizable(ParallelScope.None)]
     public async Task ExtractUniqueTitles_SkipsKindleBinding()
     {
         string csv =

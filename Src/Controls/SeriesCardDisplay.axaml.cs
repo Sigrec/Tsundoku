@@ -1,6 +1,6 @@
 using Avalonia.Controls;
-using Avalonia.ReactiveUI;
 using Microsoft.Extensions.DependencyInjection;
+using ReactiveUI.Avalonia;
 using Tsundoku.Models;
 using Tsundoku.ViewModels;
 using static Tsundoku.Models.Enums.TsundokuLanguageModel;

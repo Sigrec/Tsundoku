@@ -1,4 +1,4 @@
-using Avalonia.ReactiveUI;
+using ReactiveUI.Avalonia;
 using Tsundoku.ViewModels;
 
 namespace Tsundoku.Views;

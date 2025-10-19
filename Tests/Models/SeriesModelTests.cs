@@ -153,8 +153,8 @@ public class SeriesModelTests
     {
         App.ConfigureNLog();
         string input = "157671";
-        string expectedFullStaff = "Takeshi Kojima | Mekimeki | Nyoijizai | GUNP | Itsuki Takano | Ren Sakuragi | sometime | Ryou Niina | Ginmoku | Mikaduchi | Nikomi Wakadori | Miki Morinaga | Raika Suzumi | Ree | Itsuki Tsutsui | Utashima | Shirou Urayama | Bonryuu | Yasuka Manuma | Yuichi | Marco Nii | Nana Komado | Yuu Kimura | Sugar.Kirikanoko | AttoKasumi Fukagawa | Atto | Tiv | Sou Hamayumiba | Kanari Abe | Nachi Aono | Koruse";
-        string expectedNativeStaff = "こじまたけし | めきめき | 如意自在 | GUNP | 高野いつき | 桜木蓮 | そめちめ | にいな涼 | ぎんもく | みかづち | 若鶏にこみ | 森永ミキ | 涼海来夏 | れぇ | 筒井いつき | うたしま | しろううらやま | 凡竜 | 真沼靖佳 | ゆいち | 弐尉マルコ | 奈々鎌土 | キ村由宇 | Sugar.栗かのこ | あっと深川可純 | あっと | Tiv | 浜弓場双 | 阿部かなり | あおのなち | こるせ";
+        string expectedFullStaff = "Takeshi Kojima | Mekimeki | Nyoijizai | GUNP | Itsuki Takano | Ren Sakuragi | sometime | Ryou Niina | Ginmoku | Mikaduchi | Nikomi Wakadori | Miki Morinaga | Raika Suzumi | Ree | Itsuki Tsutsui | Utashima | Shirou Urayama | Bonryuu | Yasuka Manuma | Yuichi | Marco Nii | Nana Komado | Yuu Kimura | sugar. | AttoKasumi Fukagawa | Atto | Tiv | Sou Hamayumiba | Kanari Abe | Nachi Aono | Koruse";
+        string expectedNativeStaff = "こじまたけし | めきめき | 如意自在 | GUNP | 高野いつき | 桜木蓮 | そめちめ | にいな涼 | ぎんもく | みかづち | 若鶏にこみ | 森永ミキ | 涼海来夏 | れぇ | 筒井いつき | うたしま | しろううらやま | 凡竜 | 真沼靖佳 | ゆいち | 弐尉マルコ | 奈々鎌土 | キ村由宇 | sugar. | あっと深川可純 | あっと | Tiv | 浜弓場双 | 阿部かなり | あおのなち | こるせ";
 
         _series = await Series.CreateNewSeriesCardAsync(
             bitmapHelper: _bitmapHelper,

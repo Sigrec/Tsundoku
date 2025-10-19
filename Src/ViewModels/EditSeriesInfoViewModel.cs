@@ -2,17 +2,15 @@ using System.Collections.Specialized;
 using System.Globalization;
 using System.Reactive.Linq;
 using Avalonia.Collections;
-using Avalonia.Controls;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+using ReactiveUI.SourceGenerators;
 using Tsundoku.Models;
-using Tsundoku.Models.Enums;
 using static Tsundoku.Models.Enums.SeriesDemographicModel;
 using static Tsundoku.Models.Enums.SeriesGenreModel;
 
 namespace Tsundoku.ViewModels;
 
-public sealed class EditSeriesInfoViewModel : ViewModelBase
+public sealed partial class EditSeriesInfoViewModel : ViewModelBase
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
     public Series Series { get; }
@@ -21,7 +19,7 @@ public sealed class EditSeriesInfoViewModel : ViewModelBase
     [Reactive] public string GenresToolTipText { get; set; }
     [Reactive] public string SeriesValueText { get; set; }
     [Reactive] public string SeriesValueMaskedText { get; set; }
-    public AvaloniaList<string> SelectedGenres { get; set; } = [];
+    [Reactive] private AvaloniaList<string> _selectedGenres = [];
 
     public EditSeriesInfoViewModel(Series series, IUserService userService) : base(userService)
     {

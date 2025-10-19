@@ -5,10 +5,9 @@ using MangaAndLightNovelWebScrape;
 using ReactiveUI;
 using System.Reactive.Linq;
 using MangaAndLightNovelWebScrape.Models;
-using System.Collections;
-using Avalonia.ReactiveUI;
 using System.Linq.Dynamic.Core;
 using MangaAndLightNovelWebScrape.Websites;
+using ReactiveUI.Avalonia;
 
 namespace Tsundoku.Views;
 

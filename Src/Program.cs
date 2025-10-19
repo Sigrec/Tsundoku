@@ -1,6 +1,6 @@
-using Avalonia.ReactiveUI;
 using Projektanker.Icons.Avalonia;
 using Projektanker.Icons.Avalonia.FontAwesome;
+using ReactiveUI.Avalonia;
 using System.Runtime.CompilerServices;
 
 namespace Tsundoku;
@@ -28,6 +28,7 @@ internal sealed class Program
 #if DEBUG
             .LogToTrace()
 #endif
-            .UseReactiveUI();
+            .UseReactiveUI()
+            .RegisterReactiveUIViewsFromEntryAssembly();
     }
 }

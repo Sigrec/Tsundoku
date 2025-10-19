@@ -1,4 +1,4 @@
-using ReactiveUI.Fody.Helpers;
+using ReactiveUI.SourceGenerators;
 using ReactiveUI;
 using System.Reactive.Linq;
 using Tsundoku.Models;

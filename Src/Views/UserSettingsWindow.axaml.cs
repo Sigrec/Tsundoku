@@ -4,8 +4,8 @@ using Avalonia.Controls;
 using System.Diagnostics;
 using ReactiveUI;
 using Avalonia.Platform.Storage;
-using Avalonia.ReactiveUI;
 using Tsundoku.Helpers;
+using ReactiveUI.Avalonia;
 
 namespace Tsundoku.Views;
 

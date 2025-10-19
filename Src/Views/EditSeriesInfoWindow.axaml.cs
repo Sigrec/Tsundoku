@@ -2,11 +2,9 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
-using Avalonia.ReactiveUI;
 using Projektanker.Icons.Avalonia;
-using System.Collections.Frozen;
+using ReactiveUI.Avalonia;
 using Tsundoku.Helpers;
-using Tsundoku.Models.Enums;
 using Tsundoku.ViewModels;
 using static Tsundoku.Models.Enums.SeriesDemographicModel;
 using static Tsundoku.Models.Enums.SeriesGenreModel;
@@ -31,7 +29,11 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
         {
             string curTitle = ViewModel.Series.Titles[ViewModel.CurrentUser.Language];
 
-            DiscordRP.SetPresence(state: $"Editing {curTitle} {ViewModel.Series.Format}", refreshTimestamp: true);
+            DiscordRP.SetPresence(
+                state: $"Editing {curTitle} {ViewModel.Series.Format}",
+                refreshTimestamp: true,
+                additionalButton: new DiscordRPC.Button { Label = "AniList", Url = ViewModel.Series.Link.ToString() });
+                
             this.Title = $"{curTitle}";
 
             VolumesReadTextBlock.Text = $"{ViewModel.Series.VolumesRead} Vol{(ViewModel.Series.VolumesRead > 1 ? "s" : string.Empty)} Read";

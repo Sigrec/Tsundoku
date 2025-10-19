@@ -14,8 +14,9 @@ using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 using System.Diagnostics.CodeAnalysis;
 using DynamicData.Kernel;
 using static Tsundoku.Models.Enums.TsundokuFilterModel;
-using ReactiveUI.Fody.Helpers;
+using ReactiveUI.SourceGenerators;
 using Tsundoku.Models;
+using System.Reactive.Disposables.Fluent;
 
 namespace Tsundoku.Services;
 

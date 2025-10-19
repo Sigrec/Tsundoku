@@ -1,5 +1,5 @@
 using System.Collections.ObjectModel;
-using ReactiveUI.Fody.Helpers;
+using ReactiveUI.SourceGenerators;
 using Tsundoku.Models;
 
 namespace Tsundoku.ViewModels;

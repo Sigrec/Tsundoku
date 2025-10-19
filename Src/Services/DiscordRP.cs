@@ -17,23 +17,42 @@ public static class DiscordRP
             return;
         }
 
-        client = new DiscordRpcClient("1050229234674696252")
+        try
         {
-            Logger = new ConsoleLogger(DiscordRPC.Logging.LogLevel.Warning)
-        };
+            client = new DiscordRpcClient("1050229234674696252")
+            {
+#if DEBUG
+                Logger = new ConsoleLogger(DiscordRPC.Logging.LogLevel.Warning)
+#else
+                Logger = null  // Disable logging in Release builds
+#endif
+            };
 
-        client.OnError += (_, e) => LOGGER.Error("DiscordRPC error {0}: {1}", e.Code, e.Message);
-        client.OnConnectionFailed += (_, e) => LOGGER.Error("DiscordRPC connection failed: {0}", e);
+            client.OnError += (_, e) => LOGGER.Error("DiscordRPC error {0}: {1}", e.Code, e.Message);
+            client.OnConnectionFailed += (_, e) => LOGGER.Error("DiscordRPC connection failed: {0}", e);
 
-        client.OnReady += (_, msg) =>
+            client.OnReady += (_, msg) =>
+            {
+                try
+                {
+                    UserName = msg.User.Username;
+                    LOGGER.Info("Connected to Discord with user: {0}", UserName);
+                }
+                catch (Exception ex)
+                {
+                    LOGGER.Error(ex, "Error in OnReady handler");
+                }
+            };
+
+            client.Initialize();
+            SetPresence();
+        }
+        catch (Exception ex)
         {
-            UserName = msg.User.Username;
-            LOGGER.Info("Connected to Discord with user: {0}", UserName);
-        };
-
-        client.Initialize();
-
-        SetPresence();
+            LOGGER.Error(ex, "Failed to initialize Discord Rich Presence. Discord may not be running.");
+            client?.Dispose();
+            client = null;
+        }
     }
 
     public static void Deinitialize()
@@ -49,7 +68,8 @@ public static class DiscordRP
     public static void SetPresence(
         string? details = null,
         string? state = null,
-        bool refreshTimestamp = false)
+        bool refreshTimestamp = true,
+        Button? additionalButton = null)
     {
         if (client is null || !client.IsInitialized)
         {
@@ -60,13 +80,22 @@ public static class DiscordRP
         {
             _presence.Details = details;
         }
+
         if (state is not null)
         {
             _presence.State = state;
         }
+
         if (refreshTimestamp || _presence.Timestamps is null)
         {
             _presence.Timestamps = Timestamps.Now;
+        }
+
+        _presence.Buttons.RemoveRange(1, _presence.Buttons.Count - 1);
+        if (additionalButton is not null)
+        {
+            LOGGER.Debug("Adding additional button");
+            _presence.Buttons.Add(additionalButton);
         }
 
         ResetPresence();
@@ -79,19 +108,11 @@ public static class DiscordRP
             Details = _presence.Details,
             State = _presence.State,
             Timestamps = _presence.Timestamps,
-            Buttons = [
-                new Button
-                {
-                    Label = "Download Tsundoku",
-                    Url = "https://apps.microsoft.com/detail/9P85XXDQFHS2?hl=en-us&gl=US&ocid=pdpshare"
-                }
-            ],
+            Buttons = [.. _presence.Buttons],
             Assets = new Assets
             {
                 LargeImageKey = "rp_large_icon",
-                LargeImageText = "Tsundoku",
-                SmallImageKey  = string.Empty,
-                SmallImageText = string.Empty
+                LargeImageText = "Tsundoku"
             }
         });
     }
@@ -111,5 +132,12 @@ public static class DiscordRP
         public string? Details { get; set; } = "Manga & Light Novel Collection Tracking App";
         public string? State { get; set; } = "Browsing Collection";
         public Timestamps? Timestamps { get; set; }
+        public List<Button> Buttons { get; set; } = [
+            new Button
+            {
+                Label = "Download Tsundoku",
+                Url = "https://apps.microsoft.com/detail/9P85XXDQFHS2?hl=en-us&gl=US&ocid=pdpshare"
+            }
+        ];
     }
 }

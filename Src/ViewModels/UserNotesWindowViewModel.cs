@@ -1,6 +1,6 @@
 ﻿using System.Reactive.Linq;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+using ReactiveUI.SourceGenerators;
 
 namespace Tsundoku.ViewModels;
 

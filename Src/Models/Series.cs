@@ -1,6 +1,6 @@
 using Avalonia.Media.Imaging;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+using ReactiveUI.SourceGenerators;
 using System.Globalization;
 using System.Reactive.Concurrency;
 using System.Text.Encodings.Web;
@@ -15,7 +15,25 @@ using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 
 namespace Tsundoku.Models;
 
-public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Series?>
+[method: JsonConstructor]
+public sealed partial class Series(
+    Dictionary<TsundokuLanguage, string> Titles,
+    Dictionary<TsundokuLanguage, string> Staff,
+    string Description,
+    SeriesFormat Format,
+    SeriesStatus Status,
+    string Cover,
+    Uri Link,
+    HashSet<SeriesGenre> Genres,
+    uint MaxVolumeCount,
+    uint CurVolumeCount,
+    decimal Rating,
+    uint VolumesRead,
+    decimal Value,
+    SeriesDemographic Demographic,
+    Bitmap CoverBitMap,
+    string Publisher = "Unknown",
+    uint DuplicateIndex = 0) : ReactiveObject, IDisposable, IEquatable<Series?>
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
     private static readonly SeriesModelContext SeriesJsonModel = new SeriesModelContext(new JsonSerializerOptions()
@@ -27,65 +45,26 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
     });
 
     [JsonIgnore] private bool disposedValue;
-    [JsonIgnore][Reactive] public Bitmap? CoverBitMap { get; set; }
+    [JsonIgnore][Reactive] public Bitmap? CoverBitMap { get; set; } = CoverBitMap;
     public Guid Id { get; set; } = Guid.NewGuid();
-    [Reactive] public string Publisher { get; set; } = "Unknown";
-    [Reactive] public Dictionary<TsundokuLanguage, string> Titles { get; set; }
-    [Reactive] public Dictionary<TsundokuLanguage, string> Staff { get; set; }
-    [Reactive] public uint DuplicateIndex { get; set; }
-    [Reactive] public string Description { get; set; }
-    [Reactive] public SeriesFormat Format { get; set; }
-    [Reactive] public SeriesStatus Status { get; set; }
-    [Reactive] public string Cover { get; set; }
-    public Uri Link { get; set; }
-    [Reactive] public HashSet<SeriesGenre> Genres { get; set; } = [];
+    [Reactive] public string Publisher { get; set; } = Publisher;
+    [Reactive] public Dictionary<TsundokuLanguage, string> Titles { get; set; } = Titles;
+    [Reactive] public Dictionary<TsundokuLanguage, string> Staff { get; set; } = Staff;
+    [Reactive] public uint DuplicateIndex { get; set; } = DuplicateIndex;
+    [Reactive] public string Description { get; set; } = Description;
+    [Reactive] public SeriesFormat Format { get; set; } = Format;
+    [Reactive] public SeriesStatus Status { get; set; } = Status;
+    [Reactive] public string Cover { get; set; } = Cover;
+    public Uri Link { get; set; } = Link;
+    [Reactive] public HashSet<SeriesGenre> Genres { get; set; } = Genres;
     [Reactive] public string SeriesNotes { get; set; } = string.Empty;
-    [Reactive] public uint MaxVolumeCount { get; set; }
-    [Reactive] public uint CurVolumeCount { get; set; } = 0;
-    [Reactive] public uint VolumesRead { get; set; } = 0;
-    [Reactive] public decimal Value { get; set; } = 0.00m;
-    [Reactive] public decimal Rating { get; set; } = -1;
-    [Reactive] public SeriesDemographic Demographic { get; set; } = SeriesDemographic.Unknown;
+    [Reactive] public uint MaxVolumeCount { get; set; } = MaxVolumeCount;
+    [Reactive] public uint CurVolumeCount { get; set; } = CurVolumeCount;
+    [Reactive] public uint VolumesRead { get; set; } = VolumesRead;
+    [Reactive] public decimal Value { get; set; } = Value;
+    [Reactive] public decimal Rating { get; set; } = Rating;
+    [Reactive] public SeriesDemographic Demographic { get; set; } = Demographic;
     [Reactive] public bool IsFavorite { get; set; } = false;
-
-    [JsonConstructor]
-    public Series(
-        Dictionary<TsundokuLanguage, string> Titles,
-        Dictionary<TsundokuLanguage, string> Staff,
-        string Description,
-        SeriesFormat Format,
-        SeriesStatus Status,
-        string Cover,
-        Uri Link,
-        HashSet<SeriesGenre> Genres,
-        uint MaxVolumeCount,
-        uint CurVolumeCount,
-        decimal Rating,
-        uint VolumesRead,
-        decimal Value,
-        SeriesDemographic Demographic,
-        Bitmap CoverBitMap,
-        string Publisher = "Unknown",
-        uint DuplicateIndex = 0)
-    {
-        this.Publisher = Publisher;
-        this.Titles = Titles;
-        this.Staff = Staff;
-        this.Description = Description;
-        this.Format = Format;
-        this.Status = Status;
-        this.Cover = Cover;
-        this.Link = Link;
-        this.Genres = Genres;
-        this.MaxVolumeCount = MaxVolumeCount;
-        this.CurVolumeCount = CurVolumeCount;
-        this.Rating = Rating;
-        this.VolumesRead = VolumesRead;
-        this.Value = Value;
-        this.Demographic = Demographic;
-        this.CoverBitMap = CoverBitMap;
-        this.DuplicateIndex = DuplicateIndex;
-    }
 
     /// <summary>
     /// All Chinese or Taiwanese series use "Chinese (Simplified)" and go to "Chinese"
@@ -179,7 +158,7 @@ public sealed partial class Series : ReactiveObject, IDisposable, IEquatable<Ser
             JsonElement[] mangaDexAltTitles = [];
             Dictionary<TsundokuLanguage, string> newTitles = [];
 
-            BuildContext context = new BuildContext();
+            BuildContext context = new();
 
             // AniList Query Check
             if (isAniList)
