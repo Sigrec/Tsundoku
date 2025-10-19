@@ -6,11 +6,16 @@ This project adheres to [Semantic Versioning](https://semver.org/) and follows t
 <details>
 <summary>1.x Releases</summary>
 
-### 1.5.0 - 2025-10-19
+### 1.5.1 - 2025-10-19
+> I attached a zip file if you run the `install.ps1` script it will install the update without having to wait.
+
+Fix breaking changes from the last version `1.4.3`
 
 #### Fixed
 
-- Fix breaking changes from the last version `1.4.3` by reverting **ReactiveUI.Avalonia** back to **Avalonia.ReactiveUI** and **ReactiveUI.SourceGenerators** back to **ReactiveUI.Fody**
+- Revert **ReactiveUI.Avalonia** back to **Avalonia.ReactiveUI**
+- Revert **ReactiveUI.SourceGenerators** back to **ReactiveUI.Fody**
+- Revery **LiveChartsCore.SkiaSharpView.Avalonia** version to **2.0.0-rc5.4** from **2.0.0-rc6.1**
 
 ### 1.4.3 - 2025-10-18
 
