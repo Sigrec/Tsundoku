@@ -15,7 +15,7 @@ Fix breaking changes from the last version `1.4.3`
 
 - Revert **ReactiveUI.Avalonia** back to **Avalonia.ReactiveUI**
 - Revert **ReactiveUI.SourceGenerators** back to **ReactiveUI.Fody**
-- Revery **LiveChartsCore.SkiaSharpView.Avalonia** version to **2.0.0-rc5.4** from **2.0.0-rc6.1**
+- Downgrade **LiveChartsCore.SkiaSharpView.Avalonia** version to **2.0.0-rc5.4** from **2.0.0-rc6.1**
 
 ### 1.4.3 - 2025-10-18
 
