@@ -1,4 +1,5 @@
 using System.Collections.Frozen;
+using System.Collections.Immutable;
 using System.Reflection;
 using System.Runtime.Serialization;
 
@@ -17,7 +18,7 @@ public static class TsundokuLanguageModel
         foreach (TsundokuLanguage langEnum in Enum.GetValues<TsundokuLanguage>())
         {
             // Get the FieldInfo for the current enum member
-            string name = Enum.GetName(typeof(TsundokuLanguage), langEnum)!;
+            string name = Enum.GetName(langEnum)!;
             FieldInfo? field = typeof(TsundokuLanguage).GetField(name);
 
             // Get the EnumMemberAttribute value, or fallback to the enum's name
@@ -32,7 +33,7 @@ public static class TsundokuLanguageModel
         TsundokuLanguageLanguageToStringValueMap = langToStringBuilder.ToFrozenDictionary();  
     }
     
-    public static readonly FrozenSet<TsundokuLanguage> LANGUAGES = Enum.GetValues<TsundokuLanguage>().AsValueEnumerable().ToFrozenSet();
+    public static readonly ImmutableArray<TsundokuLanguage> LANGUAGES = Enum.GetValues<TsundokuLanguage>().AsValueEnumerable().ToImmutableArray();
     
     public static readonly FrozenDictionary<TsundokuLanguage, int> INDEXED_LANGUAGES =
         LANGUAGES.AsValueEnumerable().Select((lang, index) => (lang, index))

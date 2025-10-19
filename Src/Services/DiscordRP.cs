@@ -112,7 +112,9 @@ public static class DiscordRP
             Assets = new Assets
             {
                 LargeImageKey = "rp_large_icon",
-                LargeImageText = "Tsundoku"
+                LargeImageText = "Tsundoku",
+                SmallImageKey = string.Empty,
+                SmallImageUrl = string.Empty
             }
         });
     }

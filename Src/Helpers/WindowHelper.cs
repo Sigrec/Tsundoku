@@ -1,5 +1,5 @@
 using Avalonia.Controls;
-using ReactiveUI.Avalonia;
+using Avalonia.ReactiveUI;
 
 namespace Tsundoku.Helpers;
 

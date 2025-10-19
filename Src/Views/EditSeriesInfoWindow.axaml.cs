@@ -3,7 +3,7 @@ using Avalonia.Interactivity;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
 using Projektanker.Icons.Avalonia;
-using ReactiveUI.Avalonia;
+using Avalonia.ReactiveUI;
 using Tsundoku.Helpers;
 using Tsundoku.ViewModels;
 using static Tsundoku.Models.Enums.SeriesDemographicModel;

@@ -263,6 +263,7 @@ public class LibibParserTests
     }
 
     [Test]
+    [Parallelizable(ParallelScope.None)]
     public async Task ExtractUniqueTitles_SkipsInvalidEntries()
     {
         string csvContent = "title,description,publisher\n" +
@@ -284,6 +285,7 @@ public class LibibParserTests
     }
 
     [Test]
+    [Parallelizable(ParallelScope.None)]
     public async Task ExtractUniqueTitles_DuplicateTitles_HandledByComparer()
     {
         string csvContent = "title,description,publisher\n" +

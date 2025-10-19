@@ -1,7 +1,7 @@
 using System.Reactive.Linq;
 using Avalonia.Interactivity;
 using ReactiveUI;
-using ReactiveUI.Avalonia;
+using Avalonia.ReactiveUI;
 using Tsundoku.ViewModels;
 using static Tsundoku.Models.Enums.SeriesDemographicModel;
 using static Tsundoku.Models.Enums.SeriesFormatModel;

@@ -2,12 +2,12 @@ using System.Collections.ObjectModel;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Reactive.Disposables;
-using System.Reactive.Disposables.Fluent;
+
 using System.Reactive.Linq;
 using System.Text.RegularExpressions;
 using DynamicData;
 using ReactiveUI;
-using ReactiveUI.SourceGenerators;
+using ReactiveUI.Fody.Helpers;
 using Tsundoku.Models;
 using static Tsundoku.Models.Enums.SeriesDemographicModel;
 using static Tsundoku.Models.Enums.SeriesFormatModel;
@@ -214,9 +214,9 @@ public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISh
             .Where(user => user is not null)
             .Select(user => user.Language)
             .DistinctUntilChanged()
-            .Select(curLang => (IComparer<Series>)new SeriesComparer(curLang));
-        // .PublishReplay(1) // Ensures new subscribers immediately get the last emitted comparer
-        // .RefCount();      // Ensures the observable stays active as long as there are subscribers
+            .Select(curLang => (IComparer<Series>)new SeriesComparer(curLang))
+            .Replay(1)
+            .RefCount();
 
         // 5. Build the DynamicData pipeline
         _userService.UserCollectionChanges

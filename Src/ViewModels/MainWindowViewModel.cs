@@ -1,12 +1,12 @@
 ﻿using System.Collections.ObjectModel;
 using System.Reactive.Disposables;
-using System.Reactive.Disposables.Fluent;
+
 using System.Reactive.Linq;
 using System.Text.RegularExpressions;
 using Avalonia.Media.Imaging;
 using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
-using ReactiveUI.SourceGenerators;
+using ReactiveUI.Fody.Helpers;
 using Tsundoku.Clients;
 using Tsundoku.Helpers;
 using Tsundoku.Models;
@@ -51,6 +51,7 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
     [Reactive] public int SelectedLangIndex { get; set; }
     [Reactive] public string NotificationText { get; set; }
     [Reactive] public string AdvancedSearchQueryErrorMessage { get; set; }
+    [Reactive] public TsundokuLanguage SelectedLanguage { get; set; }
 
     public ReadOnlyObservableCollection<Series> UserCollection { get; }
     public static readonly List<Series> CoverChangedSeriesList = [];
@@ -80,6 +81,7 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
         this.WhenAnyValue(x => x.SelectedFilter)
             .DistinctUntilChanged()
             .ObserveOn(RxApp.MainThreadScheduler)
+            .Do(filter => LOGGER.Info("Applying filter: {Filter}", filter))
             .Subscribe(filter =>
             {
                 // First action: update the local index

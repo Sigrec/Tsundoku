@@ -12,8 +12,8 @@ using Tsundoku.Models;
 using Tsundoku.ViewModels;
 using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 using static Tsundoku.Models.Enums.TsundokuFilterModel;
-using ReactiveUI.Avalonia;
-using System.Reactive.Disposables.Fluent;
+using Avalonia.ReactiveUI;
+using System.Reactive.Disposables;
 
 namespace Tsundoku.Views;
 
@@ -357,10 +357,10 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
 
     private async void ChangeUserIcon(object sender, PointerPressedEventArgs args)
     {
-        IReadOnlyList<IStorageFile> file = await this.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+        IReadOnlyList<IStorageFile> file = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {
             AllowMultiple = false,
-            FileTypeFilter = new List<FilePickerFileType>() { new FilePickerFileType("Images") { Patterns = ["*.png", "*.jpg", "*.jpeg"] } }
+            FileTypeFilter = [new FilePickerFileType("Images") { Patterns = ["*.png", "*.jpg", "*.jpeg"] }]
         });
         if (file.Count == 1)
         {

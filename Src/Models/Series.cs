@@ -1,6 +1,6 @@
 using Avalonia.Media.Imaging;
 using ReactiveUI;
-using ReactiveUI.SourceGenerators;
+using ReactiveUI.Fody.Helpers;
 using System.Globalization;
 using System.Reactive.Concurrency;
 using System.Text.Encodings.Web;
@@ -16,7 +16,7 @@ using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 namespace Tsundoku.Models;
 
 [method: JsonConstructor]
-public sealed partial class Series(
+public sealed class Series(
     Dictionary<TsundokuLanguage, string> Titles,
     Dictionary<TsundokuLanguage, string> Staff,
     string Description,

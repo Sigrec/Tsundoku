@@ -23,9 +23,6 @@
 
 	<Window.Resources>
 		<ResourceDictionary>
-			<cv:TitleLangConverter x:Key="ConvertTitle"/>
-			<cv:StaffLangConverter x:Key="ConvertStaff"/>
-            <cv:ListToStringConverter x:Key="ListToString"/>
 			<ResourceDictionary.MergedDictionaries>
 				<ResourceInclude Source="/Styles/CollectionControlThemes.xaml"/>
 			</ResourceDictionary.MergedDictionaries>

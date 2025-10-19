@@ -56,7 +56,7 @@ public class TsundokuEnumTests
             Assert.That(index, Is.GreaterThanOrEqualTo(0));
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(index, Is.LessThan(LANGUAGES.Count));
+                Assert.That(index, Is.LessThan(LANGUAGES.Length));
                 Assert.That(seenIndexes, Does.Not.Contain(index), $"Duplicate index {index} for language {lang}");
             }
             seenIndexes.Add(index);

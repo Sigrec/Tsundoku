@@ -6,6 +6,12 @@ This project adheres to [Semantic Versioning](https://semver.org/) and follows t
 <details>
 <summary>1.x Releases</summary>
 
+### 1.5.0 - 2025-10-19
+
+#### Fixed
+
+- Fix breaking changes from the last version `1.4.3` by reverting **ReactiveUI.Avalonia** back to **Avalonia.ReactiveUI** and **ReactiveUI.SourceGenerators** back to **ReactiveUI.Fody**
+
 ### 1.4.3 - 2025-10-18
 
 #### Changed

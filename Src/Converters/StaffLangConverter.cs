@@ -1,5 +1,6 @@
-﻿using Avalonia.Data.Converters;
-using System.Globalization;
+﻿using System.Globalization;
+using System.Runtime.CompilerServices;
+using Avalonia.Data.Converters;
 using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 
 namespace Tsundoku.Converters;
@@ -10,30 +11,67 @@ public sealed class StaffLangConverter : IMultiValueConverter
 
     public object? Convert(IList<object?> values, Type targetType, object? parameter, CultureInfo culture)
     {
-        if (values[0] is not Dictionary<TsundokuLanguage, string> staff)
+        if (values is null || values.Count < 2)
+            return "ERROR";
+
+        if (!TryGetMap(values[0], out IReadOnlyDictionary<TsundokuLanguage, string> staff))
+            return "ERROR";
+
+        TsundokuLanguage effective = TsundokuLanguage.Romaji;
+
+        // Handle either enum or string for values[1]
+        if (values[1] is TsundokuLanguage langEnum)
+        {
+            if (staff.ContainsKey(langEnum))
+                effective = langEnum;
+        }
+        else if (values[1] is string langString)
+        {
+            if (TsundokuLanguageStringValueToLanguageMap.TryGetValue(langString, out TsundokuLanguage mapped) && staff.ContainsKey(mapped))
+                effective = mapped;
+        }
+        else if (values[1] is not null)
         {
             return "ERROR";
         }
 
-        string? languageString = values[1]?.ToString(); // Use nullable string for safety
-
-        // Use the pre-built, optimized dictionary for lookup
-        if (languageString is not null && TsundokuLanguageStringValueToLanguageMap.TryGetValue(languageString, out TsundokuLanguage langEnum))
+        if (!staff.TryGetValue(effective, out string result) || string.IsNullOrWhiteSpace(result))
         {
-            if (staff.TryGetValue(langEnum, out string? result))
+            if (effective != TsundokuLanguage.Romaji &&
+                (!staff.TryGetValue(TsundokuLanguage.Romaji, out result) || string.IsNullOrWhiteSpace(result)))
             {
-                return result;
+                return "ERROR";
             }
+
+            if (effective == TsundokuLanguage.Romaji)
+                return "ERROR";
         }
 
-        // Fallback to Romaji if the language string was invalid, or not found in staff
-        return staff[TsundokuLanguage.Romaji];
+        return result;
     }
 
-    // IMultiValueConverter also requires a ConvertBack method.
-    // If you don't need two-way conversion, you can implement it to throw a NotImplementedException.
     public object? ConvertBack(object? value, Type[] targetTypes, object? parameter, CultureInfo culture)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static bool TryGetMap(object? source, out IReadOnlyDictionary<TsundokuLanguage, string> dict)
+    {
+        if (source is IReadOnlyDictionary<TsundokuLanguage, string> ro)
+        {
+            dict = ro;
+            return true;
+        }
+
+        if (source is IDictionary<TsundokuLanguage, string> d)
+        {
+            IReadOnlyDictionary<TsundokuLanguage, string>? ro2 = d as IReadOnlyDictionary<TsundokuLanguage, string>;
+            dict = ro2 ?? new Dictionary<TsundokuLanguage, string>(d);
+            return true;
+        }
+
+        dict = default!;
+        return false;
     }
 }

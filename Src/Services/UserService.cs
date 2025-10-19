@@ -14,9 +14,8 @@ using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 using System.Diagnostics.CodeAnalysis;
 using DynamicData.Kernel;
 using static Tsundoku.Models.Enums.TsundokuFilterModel;
-using ReactiveUI.SourceGenerators;
+using ReactiveUI.Fody.Helpers;
 using Tsundoku.Models;
-using System.Reactive.Disposables.Fluent;
 
 namespace Tsundoku.Services;
 
@@ -633,8 +632,15 @@ public sealed class UserService : IUserService, IDisposable
             {
                 int index = user.UserCollection.BinarySearch(originalSeries, new SeriesComparer(user.Language));
                 index = index < 0 ? ~index : index;
-                user.UserCollection.RemoveAt(index);
-                user.UserCollection.Insert(index, originalSeries);
+                if (index != -1)
+                {
+                    user.UserCollection.RemoveAt(index);
+                    user.UserCollection.Insert(index, originalSeries);
+                }
+                else
+                {
+                    LOGGER.Error("Tried to remove {Title} series during refresh but had no index", originalSeries.Titles[TsundokuLanguage.Romaji]);
+                }
             });
 
             LOGGER.Info("Refreshed {series} ({id} | {CoverEmpty?}) in Collection", originalSeries.Titles[TsundokuLanguage.Romaji] + (originalSeries.DuplicateIndex == 0 ? string.Empty : $" ({originalSeries.DuplicateIndex})"), originalSeries.Id, isCoverEmpty);

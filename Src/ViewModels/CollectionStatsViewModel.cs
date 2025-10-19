@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using LiveChartsCore;
 using System.Reactive.Linq;
-using ReactiveUI.SourceGenerators;
+using ReactiveUI.Fody.Helpers;
 using LiveChartsCore.Defaults;
 using LiveChartsCore.SkiaSharpView;
 using Tsundoku.Models;
@@ -16,7 +16,7 @@ using static Tsundoku.Models.Enums.SeriesDemographicModel;
 using static Tsundoku.Models.Enums.SeriesFormatModel;
 using static Tsundoku.Models.Enums.SeriesGenreModel;
 using System.Globalization;
-using System.Reactive.Disposables.Fluent;
+using System.Reactive.Disposables;
 
 namespace Tsundoku.ViewModels;
 

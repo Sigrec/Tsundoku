@@ -250,7 +250,7 @@
                     <TextBlock.Text>
                       <MultiBinding Converter="{StaticResource ConvertTitle}" Mode="OneWay">
                         <Binding Path="Titles" />
-                        <Binding Path="#Root.Language"/>
+                        <Binding Path="Language" ElementName="Root"/>
                       </MultiBinding>
                     </TextBlock.Text>
                     <ToolTip.Tip>
@@ -264,7 +264,7 @@
                         <TextBlock.Text>
                           <MultiBinding Converter="{StaticResource ConvertTitle}" Mode="OneWay">
                             <Binding Path="Titles" />
-                            <Binding Path="#Root.Language"/>
+                            <Binding Path="Language" ElementName="Root"/>
                             <Binding Path="DuplicateIndex"/>
                           </MultiBinding>
                         </TextBlock.Text>

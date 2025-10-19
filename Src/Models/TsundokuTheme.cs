@@ -1,12 +1,12 @@
 using System.Globalization;
 using Avalonia.Media;
 using ReactiveUI;
-using ReactiveUI.SourceGenerators;
+using ReactiveUI.Fody.Helpers;
 using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 
 namespace Tsundoku.Models;
 
-public sealed class TsundokuTheme : ReactiveObject, ICloneable, IComparable
+public sealed partial class TsundokuTheme : ReactiveObject, ICloneable, IComparable
 {
     [Reactive] public string ThemeName { get; set; }
 

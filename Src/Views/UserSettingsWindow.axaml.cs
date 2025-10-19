@@ -5,7 +5,7 @@ using System.Diagnostics;
 using ReactiveUI;
 using Avalonia.Platform.Storage;
 using Tsundoku.Helpers;
-using ReactiveUI.Avalonia;
+using Avalonia.ReactiveUI;
 
 namespace Tsundoku.Views;
 

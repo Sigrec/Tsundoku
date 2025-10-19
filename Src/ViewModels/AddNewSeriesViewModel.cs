@@ -1,5 +1,5 @@
 ﻿using Tsundoku.Models;
-using ReactiveUI.SourceGenerators;
+using ReactiveUI.Fody.Helpers;
 using System.Collections.Specialized;
 using Tsundoku.Helpers;
 using static Tsundoku.Models.Enums.TsundokuLanguageModel;
@@ -12,7 +12,7 @@ using System.Globalization;
 using System.Reactive.Linq;
 using System.Collections.ObjectModel;
 using DynamicData;
-using System.Reactive.Disposables.Fluent;
+using System.Reactive.Disposables;
 
 namespace Tsundoku.ViewModels;
 

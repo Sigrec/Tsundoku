@@ -1,5 +1,5 @@
 using Avalonia.Threading;
-using ReactiveUI.Avalonia;
+using Avalonia.ReactiveUI;
 using Tsundoku.ViewModels;
 
 namespace Tsundoku.Views;

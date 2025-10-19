@@ -22,11 +22,9 @@ public static class BitmapConverter
 
         try
         {
-            using (MemoryStream stream = new MemoryStream())
-            {
-                bitmap.Save(stream, 100);
-                return stream.ToArray();
-            }
+            using MemoryStream stream = new();
+            bitmap.Save(stream, 100);
+            return stream.ToArray();
         }
         catch (Exception ex)
         {
