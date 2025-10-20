@@ -6,8 +6,8 @@ This project adheres to [Semantic Versioning](https://semver.org/) and follows t
 <details>
 <summary>1.x Releases</summary>
 
-### 1.5.1 - 2025-10-19
-> I attached a zip file if you run the `install.ps1` script it will install the update without having to wait.
+### 1.5.2 - 2025-10-19
+> I attached a zip file if you run the `install.ps1` script it will install the new version with the updates without having to wait for the Microsoft store upload.
 
 Fix breaking changes from the last version `1.4.3`
 
