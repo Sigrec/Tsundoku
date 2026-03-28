@@ -1,0 +1,80 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Tsundoku.ViewModels"
+        xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+        x:Class="Tsundoku.Views.ChangelogWindow"
+        Icon="\Assets\Icons\TsundokuLogo.ico"
+        FontFamily="Segoe UI"
+        WindowStartupLocation="CenterOwner"
+        SizeToContent="Height"
+        Width="480"
+        CanResize="False"
+        Topmost="True"
+        ShowInTaskbar="False"
+        SystemDecorations="None"
+        Background="Transparent"
+        TransparencyLevelHint="Transparent"
+        x:DataType="vm:ViewModelBase">
+
+    <Border Background="{CompiledBinding CurrentTheme.MenuBGColor}"
+            BorderBrush="{CompiledBinding CurrentTheme.DividerColor}"
+            BorderThickness="3"
+            CornerRadius="8"
+            ClipToBounds="True">
+        <StackPanel Margin="24,20,24,24" Spacing="16">
+            <!-- Header -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
+                <i:Icon Value="fa-solid fa-bolt" FontSize="22"
+                        Foreground="{CompiledBinding CurrentTheme.DividerColor}"/>
+                <TextBlock x:Name="VersionHeader"
+                           FontSize="22"
+                           FontWeight="Bold"
+                           VerticalAlignment="Center"
+                           Foreground="{CompiledBinding CurrentTheme.MenuTextColor}"/>
+            </StackPanel>
+
+            <!-- Divider -->
+            <Border Height="2"
+                    Background="{CompiledBinding CurrentTheme.DividerColor}"
+                    CornerRadius="1"
+                    Opacity="0.6"/>
+
+            <!-- Changelog entries -->
+            <ItemsControl x:Name="ChangelogItems">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="x:String">
+                        <Grid ColumnDefinitions="Auto,*" Margin="0,4">
+                            <TextBlock Grid.Column="0"
+                                       Text="&#x2022;"
+                                       FontSize="16"
+                                       FontWeight="Bold"
+                                       VerticalAlignment="Top"
+                                       Margin="0,0,10,0"
+                                       Foreground="{CompiledBinding $parent[Window].((vm:ViewModelBase)DataContext).CurrentTheme.DividerColor}"/>
+                            <TextBlock Grid.Column="1"
+                                       Text="{CompiledBinding}"
+                                       FontSize="14"
+                                       FontWeight="SemiBold"
+                                       TextWrapping="Wrap"
+                                       LineHeight="22"
+                                       VerticalAlignment="Top"
+                                       Foreground="{CompiledBinding $parent[Window].((vm:ViewModelBase)DataContext).CurrentTheme.MenuTextColor}"/>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!-- Dismiss button -->
+            <Button Content="Got it!"
+                    FontSize="15"
+                    FontWeight="Bold"
+                    HorizontalAlignment="Center"
+                    Padding="32,8"
+                    CornerRadius="4"
+                    BorderThickness="2"
+                    Cursor="Hand"
+                    Theme="{StaticResource MenuButton}"
+                    Click="OnDismissClicked"/>
+        </StackPanel>
+    </Border>
+</Window>

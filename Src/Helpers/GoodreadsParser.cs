@@ -78,7 +78,7 @@ public static partial class GoodreadsParser
                         continue;
                     }
 
-                    if (!publisher.Equals("Unknown"))
+                    if (!publisher.Equals("Unknown", StringComparison.Ordinal))
                     {
                         ReadOnlySpan<char> publisherSpan = publisher.AsSpan();
                         if (publisherSpan.Contains("VIZ Media", StringComparison.OrdinalIgnoreCase))

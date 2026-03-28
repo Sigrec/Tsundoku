@@ -1,6 +1,6 @@
 using Avalonia.Media.Imaging;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+using ReactiveUI.SourceGenerators;
 using System.Globalization;
 using System.Reactive.Concurrency;
 using System.Text.Encodings.Web;
@@ -16,7 +16,7 @@ using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 namespace Tsundoku.Models;
 
 [method: JsonConstructor]
-public sealed class Series(
+public sealed partial class Series(
     Dictionary<TsundokuLanguage, string> Titles,
     Dictionary<TsundokuLanguage, string> Staff,
     string Description,
@@ -45,26 +45,26 @@ public sealed class Series(
     });
 
     [JsonIgnore] private bool disposedValue;
-    [JsonIgnore][Reactive] public Bitmap? CoverBitMap { get; set; } = CoverBitMap;
+    [JsonIgnore][Reactive] public partial Bitmap? CoverBitMap { get; set; } = CoverBitMap;
     public Guid Id { get; set; } = Guid.NewGuid();
-    [Reactive] public string Publisher { get; set; } = Publisher;
-    [Reactive] public Dictionary<TsundokuLanguage, string> Titles { get; set; } = Titles;
-    [Reactive] public Dictionary<TsundokuLanguage, string> Staff { get; set; } = Staff;
-    [Reactive] public uint DuplicateIndex { get; set; } = DuplicateIndex;
-    [Reactive] public string Description { get; set; } = Description;
-    [Reactive] public SeriesFormat Format { get; set; } = Format;
-    [Reactive] public SeriesStatus Status { get; set; } = Status;
-    [Reactive] public string Cover { get; set; } = Cover;
+    [Reactive] public partial string Publisher { get; set; } = Publisher;
+    [Reactive] public partial Dictionary<TsundokuLanguage, string> Titles { get; set; } = Titles;
+    [Reactive] public partial Dictionary<TsundokuLanguage, string> Staff { get; set; } = Staff;
+    [Reactive] public partial uint DuplicateIndex { get; set; } = DuplicateIndex;
+    [Reactive] public partial string Description { get; set; } = Description;
+    [Reactive] public partial SeriesFormat Format { get; set; } = Format;
+    [Reactive] public partial SeriesStatus Status { get; set; } = Status;
+    [Reactive] public partial string Cover { get; set; } = Cover;
     public Uri Link { get; set; } = Link;
-    [Reactive] public HashSet<SeriesGenre> Genres { get; set; } = Genres;
-    [Reactive] public string SeriesNotes { get; set; } = string.Empty;
-    [Reactive] public uint MaxVolumeCount { get; set; } = MaxVolumeCount;
-    [Reactive] public uint CurVolumeCount { get; set; } = CurVolumeCount;
-    [Reactive] public uint VolumesRead { get; set; } = VolumesRead;
-    [Reactive] public decimal Value { get; set; } = Value;
-    [Reactive] public decimal Rating { get; set; } = Rating;
-    [Reactive] public SeriesDemographic Demographic { get; set; } = Demographic;
-    [Reactive] public bool IsFavorite { get; set; } = false;
+    [Reactive] public partial HashSet<SeriesGenre> Genres { get; set; } = Genres;
+    [Reactive] public partial string SeriesNotes { get; set; } = string.Empty;
+    [Reactive] public partial uint MaxVolumeCount { get; set; } = MaxVolumeCount;
+    [Reactive] public partial uint CurVolumeCount { get; set; } = CurVolumeCount;
+    [Reactive] public partial uint VolumesRead { get; set; } = VolumesRead;
+    [Reactive] public partial decimal Value { get; set; } = Value;
+    [Reactive] public partial decimal Rating { get; set; } = Rating;
+    [Reactive] public partial SeriesDemographic Demographic { get; set; } = Demographic;
+    [Reactive] public partial bool IsFavorite { get; set; } = false;
 
     /// <summary>
     /// All Chinese or Taiwanese series use "Chinese (Simplified)" and go to "Chinese"
@@ -303,15 +303,15 @@ public sealed class Series(
         bool isSimilar = false;
         if (!string.IsNullOrWhiteSpace(context.EnglishTitle))
         {
-            isSimilar |= ExtensionMethods.Similar(input, context.EnglishTitle.Replace("and", "&"), ExtensionMethods.SimilarThreshold(input, context.EnglishTitle)) != -1 || context.EnglishTitle.Contains(input);
+            isSimilar |= ExtensionMethods.Similar(input, context.EnglishTitle.Replace("and", "&"), ExtensionMethods.SimilarThreshold(input, context.EnglishTitle)) != -1 || context.EnglishTitle.Contains(input, StringComparison.OrdinalIgnoreCase);
         }
         if (!string.IsNullOrWhiteSpace(context.RomajiTitle))
         {
-            isSimilar |= ExtensionMethods.Similar(input, context.RomajiTitle.Replace("and", "&"), ExtensionMethods.SimilarThreshold(input, context.RomajiTitle)) != -1 || context.RomajiTitle.Contains(input);
+            isSimilar |= ExtensionMethods.Similar(input, context.RomajiTitle.Replace("and", "&"), ExtensionMethods.SimilarThreshold(input, context.RomajiTitle)) != -1 || context.RomajiTitle.Contains(input, StringComparison.OrdinalIgnoreCase);
         }
         if (!string.IsNullOrWhiteSpace(context.NativeTitle))
         {
-            isSimilar |= ExtensionMethods.Similar(input, context.NativeTitle.Replace("and", "&"), ExtensionMethods.SimilarThreshold(input, context.NativeTitle)) != -1 || context.NativeTitle.Contains(input);
+            isSimilar |= ExtensionMethods.Similar(input, context.NativeTitle.Replace("and", "&"), ExtensionMethods.SimilarThreshold(input, context.NativeTitle)) != -1 || context.NativeTitle.Contains(input, StringComparison.OrdinalIgnoreCase);
         }
 
         if (!isAniListId && !isSimilar)
@@ -786,7 +786,7 @@ public sealed class Series(
 
     public void UpdateCover(Bitmap newCover)
     {
-        RxApp.MainThreadScheduler.Schedule(() =>
+        RxSchedulers.MainThreadScheduler.Schedule(() =>
         {
             this.CoverBitMap?.Dispose();
             this.CoverBitMap = newCover;
@@ -1004,7 +1004,7 @@ internal partial class SeriesModelContext : JsonSerializerContext
 {
 }
 
-public class SeriesComparer(TsundokuLanguage curLang) : IComparer<Series>
+public sealed class SeriesComparer(TsundokuLanguage curLang) : IComparer<Series>
 {
     private readonly TsundokuLanguage _curLang = curLang; // Changed to match common C# naming convention
     private readonly StringComparer _seriesTitleComparer = StringComparer.Create(new CultureInfo(CULTURE_LANG_CODES[curLang]), false); // Changed to match common C# naming convention
@@ -1027,7 +1027,7 @@ public class SeriesComparer(TsundokuLanguage curLang) : IComparer<Series>
     }
 }
 
-public class SeriesValueComparer : IEqualityComparer<Series>
+public sealed class SeriesValueComparer : IEqualityComparer<Series>
 {
     public bool Equals(Series? x, Series? y)
     {

@@ -32,7 +32,7 @@ public sealed class UserIconBitmapJsonConverter : JsonConverter<Bitmap>
             // 2. Apply the scaling
             // Ensure PixelSize and BitmapInterpolationMode are accessible
             Bitmap? scaledBitmap = originalBitmap.CreateScaledBitmap(
-                new PixelSize(USER_ICON_WIDTH, USER_ICON_HEIGHT),
+                new PixelSize(USER_ICON_WIDTH * BITMAP_SCALE, USER_ICON_HEIGHT * BITMAP_SCALE),
                 BitmapInterpolationMode.HighQuality
             );
 

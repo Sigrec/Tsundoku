@@ -7,6 +7,12 @@ public static class Constants
 {
     #region Layout
 
+    /// <summary>
+    /// Bitmap storage scale factor for high-DPI displays.
+    /// Covers and icons are stored at this multiplier of logical size.
+    /// </summary>
+    public const byte BITMAP_SCALE = 3;
+
     public const byte USER_ICON_WIDTH = 71;
     public const byte USER_ICON_HEIGHT = 71;
 

@@ -1,0 +1,38 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(dotnet --version)",
+      "Bash(dotnet restore:*)",
+      "Bash(dotnet build:*)",
+      "Bash(dotnet test:*)",
+      "WebFetch(domain:mcpmarket.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(cp -r /tmp/avalonia-skill/SKILL.md \"$HOME/.claude/skills/avalonia.md\")",
+      "Bash(cp -r /tmp/avalonia-skill/references \"$HOME/.claude/skills/avalonia-references\")",
+      "Bash(mkdir -p \"$HOME/.claude/skills/avalonia\")",
+      "Bash(cp /tmp/avalonia-skill/SKILL.md \"$HOME/.claude/skills/avalonia/SKILL.md\")",
+      "Bash(cp -r /tmp/avalonia-skill/references \"$HOME/.claude/skills/avalonia/references\")",
+      "Bash(rm \"$HOME/.claude/skills/avalonia.md\")",
+      "Bash(rm -rf \"$HOME/.claude/skills/avalonia-references\")",
+      "Read(//c/Tsundoku/$HOME/.claude/skills/**)",
+      "WebFetch(domain:atsu.moe)",
+      "Bash(dotnet list:*)",
+      "WebFetch(domain:docs.avaloniaui.net)",
+      "WebFetch(domain:www.reactiveui.net)",
+      "WebFetch(domain:reference.avaloniaui.net)",
+      "WebFetch(domain:api-docs.avaloniaui.net)",
+      "Read(//c/Users/Sean/.nuget/packages/reactiveui/23.1.8/lib/**)",
+      "Bash(dotnet Src/bin/Debug/net10.0-windows10.0.26100.0/win-x64/ref/*.dll)",
+      "Bash(find Src/obj -name *.g.cs -path *ReactiveUI*)",
+      "Bash(find Src/obj -name *.g.cs)",
+      "Bash(python3 -c \":*)",
+      "Bash(dotnet --list-sdks)",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); libs=[k for k in d[''''libraries''''] if ''''ReactiveUI/'''' in k]; print\\(''''\\\\n''''.join\\(libs\\)\\)\")",
+      "Bash(python3:*)",
+      "Bash(mkdir -p .claude/commands)",
+      "Bash(mv .claude/skills/changelog.md .claude/commands/changelog.md)"
+    ]
+  }
+}

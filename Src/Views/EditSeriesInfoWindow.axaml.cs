@@ -3,7 +3,7 @@ using Avalonia.Interactivity;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
 using Projektanker.Icons.Avalonia;
-using Avalonia.ReactiveUI;
+using ReactiveUI.Avalonia;
 using Tsundoku.Helpers;
 using Tsundoku.ViewModels;
 using static Tsundoku.Models.Enums.SeriesDemographicModel;
@@ -52,7 +52,7 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
     {
         if (newCover is not null)
         {
-            if (!ViewModel.Series.Cover.EndsWith(".png"))
+            if (!ViewModel.Series.Cover.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
             {
                 ViewModel.Series.DeleteCover();
                 ViewModel.Series.Cover = Path.ChangeExtension(ViewModel.Series.Cover, ".png");
@@ -136,7 +136,7 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
             LOGGER.Warn("Volumes Read Input {VolumesReadText} is invalid or unchanged.", volumesReadText);
         }
 
-        if (!RatingMaskedTextBox.Text.StartsWith("__._"))
+        if (!RatingMaskedTextBox.Text.StartsWith("__._", StringComparison.Ordinal))
         {
             string rawInput = RatingMaskedTextBox.Text[..4].Trim().Replace("_", "0");
             if (decimal.TryParse(rawInput, out decimal ratingVal))

@@ -96,6 +96,21 @@
 					</WrapPanel>
                 </StackPanel>
                 <StackPanel Spacing="5">
+                    <TextBlock Text="Preferences" TextDecorations="Underline" FontSize="20" FontWeight="Bold" Classes="Menu"/>
+                    <WrapPanel Width="450" Margin="-5,0,0,0">
+						<WrapPanel.Styles>
+                            <Style Selector="ToggleButton">
+                                <Setter Property="Margin" Value="3"/>
+                            </Style>
+                        </WrapPanel.Styles>
+                        <ToggleButton x:Name="RefreshCoversButton"
+                                      IsChecked="{CompiledBinding RefreshCovers}"
+                                      Theme="{StaticResource MenuToggleButton}"
+                                      Content="Refresh Covers"
+                                      ToolTip.Tip="Re-download cover images when refreshing a series"/>
+                    </WrapPanel>
+                </StackPanel>
+                <StackPanel Spacing="5">
                     <TextBlock Text="Settings" TextDecorations="Underline" FontSize="20" FontWeight="Bold" Classes="Menu"/>
                     <WrapPanel Width="450" Margin="-5,0,0,0">
                         <WrapPanel.Styles>
@@ -238,7 +253,11 @@
                                 x:Name="MangadexCredit"
                                 Content="Mangadex"/>
                         <Button Theme="{StaticResource UserSettingsButton}"
-                                Click="ImportUserDataAsync" 
+                                Click="RefreshAllCoversAsync"
+                                HorizontalAlignment="Center"
+                                Content="Refresh Series"/>
+                        <Button Theme="{StaticResource UserSettingsButton}"
+                                Click="ImportUserDataAsync"
                                 HorizontalAlignment="Center"
                                 x:Name="ImportUserData"
                                 Content="Json Import"/>

@@ -21,11 +21,7 @@ public static class DiscordRP
         {
             client = new DiscordRpcClient("1050229234674696252")
             {
-#if DEBUG
-                Logger = new ConsoleLogger(DiscordRPC.Logging.LogLevel.Warning)
-#else
-                Logger = null  // Disable logging in Release builds
-#endif
+                Logger = new ConsoleLogger(DiscordRPC.Logging.LogLevel.Error)
             };
 
             client.OnError += (_, e) => LOGGER.Error("DiscordRPC error {0}: {1}", e.Code, e.Message);
@@ -103,6 +99,11 @@ public static class DiscordRP
 
     private static void ResetPresence()
     {
+        if (client is null || !client.IsInitialized || client.IsDisposed)
+        {
+            return;
+        }
+
         client.SetPresence(new RichPresence
         {
             Details = _presence.Details,
@@ -112,9 +113,7 @@ public static class DiscordRP
             Assets = new Assets
             {
                 LargeImageKey = "rp_large_icon",
-                LargeImageText = "Tsundoku",
-                SmallImageKey = string.Empty,
-                SmallImageUrl = string.Empty
+                LargeImageText = "Tsundoku"
             }
         });
     }

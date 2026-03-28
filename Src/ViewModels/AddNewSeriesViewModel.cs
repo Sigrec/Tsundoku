@@ -1,5 +1,5 @@
 ﻿using Tsundoku.Models;
-using ReactiveUI.Fody.Helpers;
+using ReactiveUI.SourceGenerators;
 using System.Collections.Specialized;
 using Tsundoku.Helpers;
 using static Tsundoku.Models.Enums.TsundokuLanguageModel;
@@ -13,6 +13,7 @@ using System.Reactive.Linq;
 using System.Collections.ObjectModel;
 using DynamicData;
 using System.Reactive.Disposables;
+using System.Reactive.Disposables.Fluent;
 
 namespace Tsundoku.ViewModels;
 
@@ -23,21 +24,21 @@ public sealed partial class AddNewSeriesViewModel : ViewModelBase
     private readonly MangaDex _mangaDex;
     private readonly AniList _aniList;
 
-    [Reactive] public string TitleText { get; set; }
-    [Reactive] public string PublisherText { get; set; }
-    [Reactive] public string CoverImageUrl { get; set; }
-    [Reactive] public string MaxVolumeCount { get; set; }
-    [Reactive] public string CurVolumeCount { get; set; }
-    [Reactive] public bool AllowDuplicate { get; set; }
-    [Reactive] public string AdditionalLanguagesToolTipText { get; set; }
-    [Reactive] public bool IsAddSeriesButtonEnabled { get; set; } = false;
-    [Reactive] public string SeriesValueMaskedText { get; set; }
-    [Reactive] public AvaloniaList<TsundokuLanguage> SelectedAdditionalLanguages { get; set; } = [];
+    [Reactive] public partial string TitleText { get; set; }
+    [Reactive] public partial string PublisherText { get; set; }
+    [Reactive] public partial string CoverImageUrl { get; set; }
+    [Reactive] public partial string MaxVolumeCount { get; set; }
+    [Reactive] public partial string CurVolumeCount { get; set; }
+    [Reactive] public partial bool AllowDuplicate { get; set; }
+    [Reactive] public partial string AdditionalLanguagesToolTipText { get; set; }
+    [Reactive] public partial bool IsAddSeriesButtonEnabled { get; set; } = false;
+    [Reactive] public partial string SeriesValueMaskedText { get; set; }
+    [Reactive] public partial AvaloniaList<TsundokuLanguage> SelectedAdditionalLanguages { get; set; } = [];
 
     private readonly SourceList<AniListPickerSuggestion> _suggestionsSource = new();
     public ReadOnlyObservableCollection<AniListPickerSuggestion> Suggestions { get; private set; }
-    [Reactive] public AniListPickerSuggestion? SelectedSuggestion { get; set; }
-    [Reactive] public bool IsSuggestionsOpen { get; set; }
+    [Reactive] public partial AniListPickerSuggestion? SelectedSuggestion { get; set; }
+    [Reactive] public partial bool IsSuggestionsOpen { get; set; }
 
     private static readonly StringBuilder CurLanguages = new();
 
@@ -51,7 +52,7 @@ public sealed partial class AddNewSeriesViewModel : ViewModelBase
 
         this.WhenAnyValue(x => x.CurrentUser.Currency)
             .DistinctUntilChanged()
-            .ObserveOn(RxApp.TaskpoolScheduler)
+            .ObserveOn(RxSchedulers.TaskpoolScheduler)
             .Subscribe(currency =>
             {
                 CultureInfo cultureInfo = CultureInfo.GetCultureInfo(AVAILABLE_CURRENCY_WITH_CULTURE[currency].Culture);
@@ -74,7 +75,7 @@ public sealed partial class AddNewSeriesViewModel : ViewModelBase
         _suggestionsSource.Connect()
             .Sort(new AniListPickerSuggestionComparer())
             .Bind(out ReadOnlyObservableCollection<AniListPickerSuggestion> _suggestions)
-            .ObserveOn(RxApp.MainThreadScheduler)
+            .ObserveOn(RxSchedulers.MainThreadScheduler)
             .Subscribe()
             .DisposeWith(_disposables);
 
@@ -83,14 +84,14 @@ public sealed partial class AddNewSeriesViewModel : ViewModelBase
         _suggestionsSource
             .CountChanged
             .Select(count => count > 0)
-            .ObserveOn(RxApp.MainThreadScheduler)
+            .ObserveOn(RxSchedulers.MainThreadScheduler)
             .Subscribe(x => IsSuggestionsOpen = x)
             .DisposeWith(_disposables);
 
 
         this.WhenAnyValue(x => x.TitleText)
             .Select(x => x is null ? string.Empty : x.Trim())
-            .Throttle(TimeSpan.FromMilliseconds(300), RxApp.TaskpoolScheduler)
+            .Throttle(TimeSpan.FromMilliseconds(300), RxSchedulers.TaskpoolScheduler)
             .DistinctUntilChanged()
             .Select(x =>
             {
@@ -103,7 +104,7 @@ public sealed partial class AddNewSeriesViewModel : ViewModelBase
                 });
             })
             .Switch()
-            .ObserveOn(RxApp.MainThreadScheduler)
+            .ObserveOn(RxSchedulers.MainThreadScheduler)
             .Subscribe(items =>
             {
                 _suggestionsSource.Edit(list =>
@@ -183,7 +184,7 @@ public sealed partial class AddNewSeriesViewModel : ViewModelBase
         {
             try
             {
-                LOGGER.Debug($"\nAdding New Series (Allow Dupe ?= {allowDuplicate}) -> \"{input}\" | \"{bookType}\" | {curVolCount} | {maxVolCount}\n{newSeries}");
+                LOGGER.Debug("Adding New Series (Allow Dupe ?= {AllowDuplicate}) -> \"{Input}\" | \"{BookType}\" | {CurVolCount} | {MaxVolCount}\n{NewSeries}", allowDuplicate, input, bookType, curVolCount, maxVolCount, newSeries);
                 successfulAdd = _userService.AddSeries(newSeries, allowDuplicate);
                 if (!successfulAdd)
                 {

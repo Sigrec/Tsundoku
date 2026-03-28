@@ -61,7 +61,7 @@ public static class AppFileHelper
     {
         string safeTitle = ExtensionMethods.RemoveInPlaceCharArray(string.Concat(title.Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries))).Replace(",", string.Empty);
 
-        string extension = Path.GetExtension(coverLink).ToLowerInvariant();
+        string extension = Path.GetExtension(coverLink);
 
         if (!VALID_IMAGE_EXTENSIONS.Contains(extension))
         {
@@ -69,7 +69,7 @@ public static class AppFileHelper
         }
         extension = ".png";
 
-        string baseFileName = $"{safeTitle}_{bookType.ToString().ToUpper()}";
+        string baseFileName = $"{safeTitle}_{bookType.ToString().ToUpperInvariant()}";
         bool isDuplicate = false;
         if (CheckCoverFileExists(baseFileName + extension) && allowDuplicate)
         {
@@ -306,7 +306,7 @@ public static class AppFileHelper
     public static string GetFullCoverPath(string coverFileName)
     {
         string fullPath = Path.Combine(GetCoversFolderPath(), coverFileName);
-        string extension = Path.GetExtension(coverFileName).ToLowerInvariant();
+        string extension = Path.GetExtension(coverFileName);
 
         if (VALID_IMAGE_EXTENSIONS.Contains(extension))
         {

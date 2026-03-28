@@ -9,6 +9,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using Tsundoku.Clients;
 using Tsundoku.Helpers;
+using Tsundoku.Models;
 using Tsundoku.ViewModels;
 using Tsundoku.Views;
 
@@ -90,7 +91,24 @@ public sealed partial class App : Application
             };
 
             // Get the MainWindowViewModel from the DI container
-            desktop.MainWindow = new MainWindow(ServiceProvider.GetRequiredService<MainWindowViewModel>());
+            MainWindowViewModel mainViewModel = ServiceProvider.GetRequiredService<MainWindowViewModel>();
+            MainWindow mainWindow = new MainWindow(mainViewModel);
+            desktop.MainWindow = mainWindow;
+
+            mainWindow.Opened += async (_, _) =>
+            {
+                if (mainViewModel.ShouldShowChangelog())
+                {
+                    // Delay briefly so the main window finishes rendering and gains focus
+                    await Task.Delay(500);
+                    mainWindow.Activate();
+
+                    ChangelogWindow changelog = new() { DataContext = mainViewModel };
+                    changelog.SetVersion(ViewModelBase.CUR_TSUNDOKU_VERSION);
+                    await changelog.ShowDialog(mainWindow);
+                    mainViewModel.MarkChangelogSeen();
+                }
+            };
         }
         base.OnFrameworkInitializationCompleted();
     }

@@ -1,7 +1,9 @@
+using System.Reactive.Disposables;
+using System.Reactive.Disposables.Fluent;
 using System.Reactive.Linq;
 using Avalonia.Interactivity;
 using ReactiveUI;
-using Avalonia.ReactiveUI;
+using ReactiveUI.Avalonia;
 using Tsundoku.ViewModels;
 using static Tsundoku.Models.Enums.SeriesDemographicModel;
 using static Tsundoku.Models.Enums.SeriesFormatModel;
@@ -36,55 +38,65 @@ public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesView
             e.Cancel = true;
         };
 
-        this.WhenAnyValue(
-            x => x.SeriesInputTextBox.Text,
-            x => x.CurVolCount.Text,
-            x => x.MaxVolCount.Text,
-            x => x.MangaButton.IsChecked,
-            x => x.NovelButton.IsChecked,
-        (title, curVolText, maxVolText, mangaChecked, novelChecked) =>
+        Deactivated += (s, e) =>
         {
-            // Convert the volume text to numbers
-            ushort currentVolume = ConvertNumText(curVolText.Replace("_", ""));
-            ushort maxVolume = ConvertNumText(maxVolText.Replace("_", ""));
+            viewModel.IsSuggestionsOpen = false;
+        };
 
-            // Use the named variables for clarity
-            bool isAnyChecked = mangaChecked.GetValueOrDefault() || novelChecked.GetValueOrDefault();
-
-            return !string.IsNullOrWhiteSpace(title) &&
-                currentVolume <= maxVolume &&
-                maxVolume != 0 &&
-                isAnyChecked;
-        })
-        .Subscribe(isEnabled => ViewModel.IsAddSeriesButtonEnabled = isEnabled);
-
-        this.WhenAnyValue(x => x.ViewModel.SelectedSuggestion)
-            .Subscribe(selectedSuggestion =>
+        this.WhenActivated(disposables =>
+        {
+            this.WhenAnyValue(
+                x => x.SeriesInputTextBox.Text,
+                x => x.CurVolCount.Text,
+                x => x.MaxVolCount.Text,
+                x => x.MangaButton.IsChecked,
+                x => x.NovelButton.IsChecked,
+            (title, curVolText, maxVolText, mangaChecked, novelChecked) =>
             {
-                if (selectedSuggestion is not null)
+                // Convert the volume text to numbers
+                ushort currentVolume = ConvertNumText(curVolText.Replace("_", string.Empty));
+                ushort maxVolume = ConvertNumText(maxVolText.Replace("_", string.Empty));
+
+                // Use the named variables for clarity
+                bool isAnyChecked = mangaChecked.GetValueOrDefault() || novelChecked.GetValueOrDefault();
+
+                return !string.IsNullOrWhiteSpace(title) &&
+                    currentVolume <= maxVolume &&
+                    maxVolume != 0 &&
+                    isAnyChecked;
+            })
+            .Subscribe(isEnabled => ViewModel.IsAddSeriesButtonEnabled = isEnabled)
+            .DisposeWith(disposables);
+
+            this.WhenAnyValue(x => x.ViewModel.SelectedSuggestion)
+                .Subscribe(selectedSuggestion =>
                 {
-                    if (selectedSuggestion.Format.Equals("NOVEL", StringComparison.OrdinalIgnoreCase))
+                    if (selectedSuggestion is not null)
                     {
-                        NovelButton.IsChecked = true;
-                        MangaButton.IsChecked = false;
-                    }
-                    else if (selectedSuggestion.Format.Equals("MANGA", StringComparison.OrdinalIgnoreCase))
-                    {
-                        NovelButton.IsChecked = false;
-                        MangaButton.IsChecked = true;
+                        if (selectedSuggestion.Format.Equals("NOVEL", StringComparison.OrdinalIgnoreCase))
+                        {
+                            NovelButton.IsChecked = true;
+                            MangaButton.IsChecked = false;
+                        }
+                        else if (selectedSuggestion.Format.Equals("MANGA", StringComparison.OrdinalIgnoreCase))
+                        {
+                            NovelButton.IsChecked = false;
+                            MangaButton.IsChecked = true;
+                        }
+                        else
+                        {
+                            NovelButton.IsChecked = false;
+                            MangaButton.IsChecked = false;
+                        }
                     }
                     else
                     {
                         NovelButton.IsChecked = false;
                         MangaButton.IsChecked = false;
                     }
-                }
-                else
-                {
-                    NovelButton.IsChecked = false;
-                    MangaButton.IsChecked = false;
-                }
-            });
+                })
+                .DisposeWith(disposables);
+        });
     }
 
 
@@ -141,7 +153,7 @@ public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesView
             publisher: !string.IsNullOrWhiteSpace(PublisherTextBox.Text) ? PublisherTextBox.Text.Trim() : "Unknown",
             demographic: DemographicCombobox.SelectedItem is null ? SeriesDemographic.Unknown : (SeriesDemographic)DemographicCombobox.SelectedItem,
             volumesRead: volumesRead,
-            rating: !Rating.Text[..4].StartsWith("__._") ? rating : -1,
+            rating: !Rating.Text[..4].StartsWith("__._", StringComparison.Ordinal) ? rating : -1,
             value: seriesValue,
             allowDuplicate: AllowDuplicateButton.IsChecked.GetValueOrDefault(false)
         );

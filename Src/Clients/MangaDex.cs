@@ -46,7 +46,7 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
             string queryString = string.Join("&", query.Select(kvp => $"{kvp.Key}={kvp.Value}"));
             string endpoint = $"manga?{queryString}";
 
-            LOGGER.Debug($"MangaDex: Getting series by title async \"{_mangadexClient.BaseAddress}{endpoint}\"");
+            LOGGER.Debug("MangaDex: Getting series by title async \"{BaseAddress}{Endpoint}\"", _mangadexClient.BaseAddress, endpoint);
 
             using HttpResponseMessage response = await _mangadexClient.GetAsync(endpoint);
             response.EnsureSuccessStatusCode();
@@ -133,19 +133,20 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
             string name = attributes.GetProperty("name").GetString()!;
             string? bio = null;
 
-            if (attributes.TryGetProperty("biography", out JsonElement bioElem))
+            if (attributes.TryGetProperty("biography", out JsonElement bioElem) && bioElem.ValueKind == JsonValueKind.Object)
             {
-                // Try to get an English or any available language entry from the object
-                if (bioElem.ValueKind == JsonValueKind.Object && bioElem.EnumerateObject().Any())
+                // Prefer English ("en") biography if available
+                if (bioElem.TryGetProperty("en", out JsonElement enBio))
                 {
-                    // Prefer English ("en") biography if available
-                    if (bioElem.TryGetProperty("en", out JsonElement enBio))
+                    bio = enBio.GetString();
+                }
+                else
+                {
+                    // Get first available language entry
+                    using JsonElement.ObjectEnumerator enumerator = bioElem.EnumerateObject();
+                    if (enumerator.MoveNext())
                     {
-                        bio = enBio.GetString();
-                    }
-                    else
-                    {
-                        bio = bioElem.EnumerateObject().First().Value.GetString();
+                        bio = enumerator.Current.Value.GetString();
                     }
                 }
             }
@@ -184,22 +185,31 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
         StringBuilder nativeStaffBuilder = new StringBuilder();
         StringBuilder fullStaffBuilder = new StringBuilder();
 
-        AuthorEntry[] authorEntries =
-        [
-        .. relationships.AsValueEnumerable()
-            .Where(static r =>
-                r.TryGetProperty("type", out JsonElement typeElem) &&
+        // Deduplicate author/artist entries by ID, joining types (e.g., "author & artist")
+        Dictionary<string, string> authorTypeMap = new();
+        foreach (JsonElement r in relationships)
+        {
+            if (r.TryGetProperty("type", out JsonElement typeElem) &&
                 r.TryGetProperty("id", out JsonElement idElem) &&
                 (typeElem.ValueEquals("author") || typeElem.ValueEquals("artist")) &&
                 idElem.ValueKind == JsonValueKind.String)
-            .Select(static r => new AuthorEntry(
-                r.GetProperty("id").GetString()!,
-                r.GetProperty("type").GetString()!))
-            .GroupBy(static e => e.Id)
-            .Select(static g => new AuthorEntry(
-                g.Key,
-                string.Join(" & ", g.Select(static e => e.Type).Distinct(StringComparer.Ordinal))))
-        ];
+            {
+                string id = idElem.GetString()!;
+                string type = typeElem.GetString()!;
+                if (authorTypeMap.TryGetValue(id, out string? existing))
+                {
+                    if (!existing.Contains(type, StringComparison.Ordinal))
+                    {
+                        authorTypeMap[id] = $"{existing} & {type}";
+                    }
+                }
+                else
+                {
+                    authorTypeMap[id] = type;
+                }
+            }
+        }
+        AuthorEntry[] authorEntries = [.. authorTypeMap.Select(static kvp => new AuthorEntry(kvp.Key, kvp.Value))];
 
         SemaphoreSlim semaphore = new SemaphoreSlim(5);
         Task<(AuthorEntry Entry, string StaffNameRaw, string? Bio)>[] fetchTasks = [.. authorEntries.Select(async entry =>
@@ -528,7 +538,7 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
                     string? titleValue = titleEn.GetString();
                     if (!string.IsNullOrWhiteSpace(titleValue))
                     {
-                        LOGGER.Debug($"Checking title[\"en\"] = \"{titleValue}\" against \"{englishTitle}\"");
+                        LOGGER.Debug("Checking title[\"en\"] = \"{TitleValue}\" against \"{EnglishTitle}\"", titleValue, englishTitle);
 
                         if (string.Equals(titleValue, englishTitle, StringComparison.OrdinalIgnoreCase))
                         {
@@ -555,11 +565,11 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
                             string? altValue = altProp.Value.GetString();
                             if (!string.IsNullOrWhiteSpace(altValue))
                             {
-                                LOGGER.Debug($"Checking altTitles[{altProp.Name}] = \"{altValue}\" against \"{nativeTitle}\"");
+                                LOGGER.Debug("Checking altTitles[{AltPropName}] = \"{AltValue}\" against \"{NativeTitle}\"", altProp.Name, altValue, nativeTitle);
 
                                 if (string.Equals(altValue, nativeTitle, StringComparison.OrdinalIgnoreCase))
                                 {
-                                    LOGGER.Debug($"Match found in altTitles[{altProp.Name}]");
+                                    LOGGER.Debug("Match found in altTitles[{AltPropName}]", altProp.Name);
                                     return altTitles;
                                 }
                             }

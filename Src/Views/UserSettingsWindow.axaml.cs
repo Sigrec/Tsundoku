@@ -2,10 +2,12 @@ using Avalonia.Interactivity;
 using Tsundoku.ViewModels;
 using Avalonia.Controls;
 using System.Diagnostics;
+using System.Reactive.Disposables;
+using System.Reactive.Disposables.Fluent;
 using ReactiveUI;
 using Avalonia.Platform.Storage;
 using Tsundoku.Helpers;
-using Avalonia.ReactiveUI;
+using ReactiveUI.Avalonia;
 
 namespace Tsundoku.Views;
 
@@ -43,12 +45,25 @@ public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsView
             e.Cancel = true;
         };
 
-        this.WhenAnyValue(x => x.BooksAMillionButton.IsChecked, (member) => member is not null && member == true).Subscribe(x => ViewModel.BooksAMillionMember = x);
+        this.WhenActivated(disposables =>
+        {
+            this.WhenAnyValue(x => x.BooksAMillionButton.IsChecked, (member) => member is not null && member == true)
+                .Subscribe(x => ViewModel.BooksAMillionMember = x)
+                .DisposeWith(disposables);
 
-        this.WhenAnyValue(x => x.KinokuniyaUSAButton.IsChecked, (member) => member is not null && member == true).Subscribe(x => ViewModel.KinokuniyaUSAMember = x);
+            this.WhenAnyValue(x => x.KinokuniyaUSAButton.IsChecked, (member) => member is not null && member == true)
+                .Subscribe(x => ViewModel.KinokuniyaUSAMember = x)
+                .DisposeWith(disposables);
 
-        this.WhenAnyValue(x => x.UsernameChangeTextBox.Text, (newUsername) => !string.IsNullOrWhiteSpace(newUsername) && !newUsername.Equals(ViewModel.CurrentUser.UserName))
-            .Subscribe(x => ViewModel.IsChangeUsernameButtonEnabled = x);
+            this.WhenAnyValue(x => x.UsernameChangeTextBox.Text, (newUsername) => !string.IsNullOrWhiteSpace(newUsername) && !newUsername.Equals(ViewModel.CurrentUser.UserName))
+                .Subscribe(x => ViewModel.IsChangeUsernameButtonEnabled = x)
+                .DisposeWith(disposables);
+        });
+    }
+
+    private async void RefreshAllCoversAsync(object sender, RoutedEventArgs args)
+    {
+        await ViewModel.RefreshAllCoversAsync(this);
     }
 
     private async void ExportToSpreadSheetAsync(object sender, RoutedEventArgs e)
@@ -61,7 +76,7 @@ public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsView
         if (CurrencyComboBox.SelectedItem is string selectedCurrency)
         {
             ViewModel.UpdateUserCurrency(selectedCurrency);
-            LOGGER.Info($"Currency Changed To {selectedCurrency}");
+            LOGGER.Info("Currency Changed To {Currency}", selectedCurrency);
         }
     }
 
@@ -198,7 +213,7 @@ public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsView
                     UseShellExecute = true, // Essential for letting the OS shell handle opening the folder
                     Verb = "open"           // Explicitly ask the shell to "open" the target
                 });
-                LOGGER.Debug($"Opened Tsundoku application data folder: {tsundokuAppFolderPath}");
+                LOGGER.Debug("Opened Tsundoku application data folder: {FolderPath}", tsundokuAppFolderPath);
             }
             catch (System.ComponentModel.Win32Exception ex)
             {
@@ -235,7 +250,7 @@ public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsView
                     UseShellExecute = true, // Essential for letting the OS shell handle opening the folder
                     Verb = "open"           // Explicitly ask the shell to "open" the target
                 });
-                LOGGER.Debug($"Opened Covers folder: {coversPath}");
+                LOGGER.Debug("Opened Covers folder: {FolderPath}", coversPath);
             }
             catch (System.ComponentModel.Win32Exception ex)
             {
@@ -272,7 +287,7 @@ public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsView
                     UseShellExecute = true,
                     Verb = "open"
                 });
-                LOGGER.Debug($"Opened Screenshots folder: {screenshotsPath}");
+                LOGGER.Debug("Opened Screenshots folder: {FolderPath}", screenshotsPath);
             }
             catch (System.ComponentModel.Win32Exception ex)
             {
@@ -299,7 +314,7 @@ public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsView
                     UseShellExecute = true,
                     Verb = "open"
                 });
-                LOGGER.Debug($"Opened Themes folder: {themesPath}");
+                LOGGER.Debug("Opened Themes folder: {FolderPath}", themesPath);
             }
             catch (System.ComponentModel.Win32Exception ex)
             {

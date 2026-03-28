@@ -1,5 +1,5 @@
 using Tsundoku.ViewModels;
-using Avalonia.ReactiveUI;
+using ReactiveUI.Avalonia;
 
 namespace Tsundoku.Views;
 
@@ -40,7 +40,7 @@ public sealed partial class CollectionStatsWindow : ReactiveWindow<CollectionSta
     private async void CopyTextAsync(object sender, PointerPressedEventArgs args)
     {
         string curText = $"{(sender as Controls.ValueStat).Text} {(sender as Controls.ValueStat).Title}";
-        LOGGER.Info($"Copying {curText} to Clipboard");
+        LOGGER.Info("Copying {Text} to Clipboard", curText);
         await TextCopy.ClipboardService.SetTextAsync(curText);
     }
 }

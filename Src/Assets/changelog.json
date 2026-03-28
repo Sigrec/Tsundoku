@@ -1,0 +1,11 @@
+{
+  "2.0.0": [
+    "Migrated to ReactiveUI.Avalonia & ReactiveUI.SourceGenerators",
+    "Cover images are now stored at higher resolution for sharper display on high-DPI screens",
+    "To get higher quality covers for existing series, refresh them via the edit dialog or re-upload custom covers",
+    "Performance improvements across string handling, bitmap memory, and reactive subscriptions",
+    "Added version changelog popup on new updates",
+    "Added Refresh Series button to mass refresh series data and covers",
+    "Added Refresh Covers toggle in Preferences to re-download covers on single series refresh"
+  ]
+}

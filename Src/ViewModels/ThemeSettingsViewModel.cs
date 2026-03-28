@@ -1,15 +1,15 @@
 using System.Collections.ObjectModel;
-using ReactiveUI.Fody.Helpers;
+using ReactiveUI.SourceGenerators;
 using Tsundoku.Models;
 
 namespace Tsundoku.ViewModels;
 
-public sealed class ThemeSettingsViewModel : ViewModelBase
+public sealed partial class ThemeSettingsViewModel : ViewModelBase
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
-    [Reactive] public bool IsSaveThemeButtonEnabled { get; set; }
-    [Reactive] public bool IsGenerateThemeButtonEnabled { get; set; } = false;
-    [Reactive] public uint SelectedThemeIndex { get; set; }
+    [Reactive] public partial bool IsSaveThemeButtonEnabled { get; set; }
+    [Reactive] public partial bool IsGenerateThemeButtonEnabled { get; set; } = false;
+    [Reactive] public partial uint SelectedThemeIndex { get; set; }
 
     public ReadOnlyObservableCollection<TsundokuTheme> SavedThemes => _userService.SavedThemes;
 

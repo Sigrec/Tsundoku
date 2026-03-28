@@ -1,140 +1,140 @@
 using System.Globalization;
 using Avalonia.Media;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+using ReactiveUI.SourceGenerators;
 using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 
 namespace Tsundoku.Models;
 
 public sealed partial class TsundokuTheme : ReactiveObject, ICloneable, IComparable
 {
-    [Reactive] public string ThemeName { get; set; }
+    [Reactive] public partial string ThemeName { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public SolidColorBrush MenuBGColor { get; set; }
+    [Reactive] public partial SolidColorBrush MenuBGColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public SolidColorBrush UsernameColor { get; set; }
+    [Reactive] public partial SolidColorBrush UsernameColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public SolidColorBrush UserIconBorderColor { get; set; }
+    [Reactive] public partial SolidColorBrush UserIconBorderColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public SolidColorBrush MenuTextColor { get; set; }
+    [Reactive] public partial SolidColorBrush MenuTextColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public SolidColorBrush SearchBarBGColor { get; set; }
+    [Reactive] public partial SolidColorBrush SearchBarBGColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public SolidColorBrush SearchBarBorderColor { get; set; }
+    [Reactive] public partial SolidColorBrush SearchBarBorderColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public SolidColorBrush SearchBarTextColor { get; set; }
+    [Reactive] public partial SolidColorBrush SearchBarTextColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public SolidColorBrush DividerColor { get; set; }
+    [Reactive] public partial SolidColorBrush DividerColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public SolidColorBrush MenuButtonBGColor { get; set; }
+    [Reactive] public partial SolidColorBrush MenuButtonBGColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public SolidColorBrush MenuButtonBGHoverColor { get; set; }
+    [Reactive] public partial SolidColorBrush MenuButtonBGHoverColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public SolidColorBrush MenuButtonBorderColor { get; set; }
+    [Reactive] public partial SolidColorBrush MenuButtonBorderColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public SolidColorBrush MenuButtonBorderHoverColor { get; set; }
+    [Reactive] public partial SolidColorBrush MenuButtonBorderHoverColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public SolidColorBrush MenuButtonTextAndIconColor { get; set; }
+    [Reactive] public partial SolidColorBrush MenuButtonTextAndIconColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public SolidColorBrush MenuButtonTextAndIconHoverColor { get; set; }
+    [Reactive] public partial SolidColorBrush MenuButtonTextAndIconHoverColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public SolidColorBrush CollectionBGColor { get; set; }
+    [Reactive] public partial SolidColorBrush CollectionBGColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public SolidColorBrush StatusAndBookTypeBGColor { get; set; }
+    [Reactive] public partial SolidColorBrush StatusAndBookTypeBGColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public SolidColorBrush StatusAndBookTypeBGHoverColor { get; set; }
+    [Reactive] public partial SolidColorBrush StatusAndBookTypeBGHoverColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public SolidColorBrush StatusAndBookTypeTextColor { get; set; }
+    [Reactive] public partial SolidColorBrush StatusAndBookTypeTextColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public SolidColorBrush StatusAndBookTypeTextHoverColor { get; set; }
+    [Reactive] public partial SolidColorBrush StatusAndBookTypeTextHoverColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public SolidColorBrush SeriesCardBGColor { get; set; }
+    [Reactive] public partial SolidColorBrush SeriesCardBGColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public SolidColorBrush SeriesCardTitleColor { get; set; }
+    [Reactive] public partial SolidColorBrush SeriesCardTitleColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public SolidColorBrush SeriesCardPublisherColor { get; set; }
+    [Reactive] public partial SolidColorBrush SeriesCardPublisherColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public SolidColorBrush SeriesCardStaffColor { get; set; }
+    [Reactive] public partial SolidColorBrush SeriesCardStaffColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public SolidColorBrush SeriesCardDescColor { get; set; }
+    [Reactive] public partial SolidColorBrush SeriesCardDescColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public SolidColorBrush SeriesProgressBGColor { get; set; }
+    [Reactive] public partial SolidColorBrush SeriesProgressBGColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public SolidColorBrush SeriesProgressBarColor { get; set; }
+    [Reactive] public partial SolidColorBrush SeriesProgressBarColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public SolidColorBrush SeriesProgressBarBGColor { get; set; }
+    [Reactive] public partial SolidColorBrush SeriesProgressBarBGColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public SolidColorBrush SeriesProgressBarBorderColor { get; set; }
+    [Reactive] public partial SolidColorBrush SeriesProgressBarBorderColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public SolidColorBrush SeriesProgressTextColor { get; set; }
+    [Reactive] public partial SolidColorBrush SeriesProgressTextColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public SolidColorBrush SeriesProgressButtonsHoverColor { get; set; }
+    [Reactive] public partial SolidColorBrush SeriesProgressButtonsHoverColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public SolidColorBrush SeriesButtonIconColor { get; set; }
+    [Reactive] public partial SolidColorBrush SeriesButtonIconColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public SolidColorBrush SeriesButtonIconHoverColor { get; set; }
+    [Reactive] public partial SolidColorBrush SeriesButtonIconHoverColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public SolidColorBrush SeriesEditPaneBGColor { get; set; }
+    [Reactive] public partial SolidColorBrush SeriesEditPaneBGColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public SolidColorBrush SeriesNotesBGColor { get; set; }
+    [Reactive] public partial SolidColorBrush SeriesNotesBGColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public SolidColorBrush SeriesNotesBorderColor { get; set; }
+    [Reactive] public partial SolidColorBrush SeriesNotesBorderColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public SolidColorBrush SeriesNotesTextColor { get; set; }
+    [Reactive] public partial SolidColorBrush SeriesNotesTextColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public SolidColorBrush SeriesEditPaneButtonsBGColor { get; set; }
+    [Reactive] public partial SolidColorBrush SeriesEditPaneButtonsBGColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public SolidColorBrush SeriesEditPaneButtonsBGHoverColor { get; set; }
+    [Reactive] public partial SolidColorBrush SeriesEditPaneButtonsBGHoverColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public SolidColorBrush SeriesEditPaneButtonsBorderColor { get; set; }
+    [Reactive] public partial SolidColorBrush SeriesEditPaneButtonsBorderColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public SolidColorBrush SeriesEditPaneButtonsBorderHoverColor { get; set; }
+    [Reactive] public partial SolidColorBrush SeriesEditPaneButtonsBorderHoverColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public SolidColorBrush SeriesEditPaneButtonsIconColor { get; set; }
+    [Reactive] public partial SolidColorBrush SeriesEditPaneButtonsIconColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public SolidColorBrush SeriesEditPaneButtonsIconHoverColor { get; set; }
+    [Reactive] public partial SolidColorBrush SeriesEditPaneButtonsIconHoverColor { get; set; }
 
     public static readonly TsundokuTheme DEFAULT_THEME = new(
         "Default",
@@ -416,7 +416,7 @@ public sealed partial class TsundokuTheme : ReactiveObject, ICloneable, ICompara
         return a.Color.Equals(b.Color);
     }
 
-    public class SolidColorBrushJsonConverter : JsonConverter<SolidColorBrush>
+    public sealed class SolidColorBrushJsonConverter : JsonConverter<SolidColorBrush>
     {
         private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger(); // Logger for the converter
 
@@ -456,7 +456,7 @@ public sealed partial class TsundokuTheme : ReactiveObject, ICloneable, ICompara
     }
 }
 
-public class TsundokuThemeComparer : IComparer<TsundokuTheme>
+public sealed class TsundokuThemeComparer : IComparer<TsundokuTheme>
 {
     private readonly TsundokuLanguage _curLang;
     private readonly StringComparer _themeNameComparer;

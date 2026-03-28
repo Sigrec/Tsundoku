@@ -1,13 +1,13 @@
 ﻿using System.Reactive.Linq;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+using ReactiveUI.SourceGenerators;
 
 namespace Tsundoku.ViewModels;
 
-public sealed class UserNotesWindowViewModel : ViewModelBase
+public sealed partial class UserNotesWindowViewModel : ViewModelBase
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
-    [Reactive] public string Notes { get; set; }
+    [Reactive] public partial string Notes { get; set; }
 
     public UserNotesWindowViewModel(IUserService userService) : base(userService)
     {
@@ -19,7 +19,7 @@ public sealed class UserNotesWindowViewModel : ViewModelBase
             .Subscribe(notes =>
             {
                 _userService.UpdateUser(user => user.Notes = notes);
-                LOGGER.Trace($"User notes updated to '{notes}'");
+                LOGGER.Trace("User notes updated to '{Notes}'", notes);
             });
     }
 }

@@ -3,11 +3,13 @@ using Avalonia.Interactivity;
 using Tsundoku.ViewModels;
 using MangaAndLightNovelWebScrape;
 using ReactiveUI;
+using System.Reactive.Disposables;
+using System.Reactive.Disposables.Fluent;
 using System.Reactive.Linq;
 using MangaAndLightNovelWebScrape.Models;
 using System.Linq.Dynamic.Core;
 using MangaAndLightNovelWebScrape.Websites;
-using Avalonia.ReactiveUI;
+using ReactiveUI.Avalonia;
 
 namespace Tsundoku.Views;
 
@@ -41,8 +43,30 @@ public sealed partial class PriceAnalysisWindow : ReactiveWindow<PriceAnalysisVi
             e.Cancel = true;
         };
 
-        this.WhenAnyValue(x => x.SearchTextBox.Text, x => x.MangaButton.IsChecked, x => x.NovelButton.IsChecked, x => x.BrowserSelector.SelectedItem, x => x.RegionComboBox.SelectedItem, x => x.ViewModel.WebsitesSelected, (title, manga, novel, browser, region, websiteCheck) => !string.IsNullOrWhiteSpace(title) && !(manga == false && novel == false && websiteCheck) && browser is not null && region is not null && websiteCheck)
-            .Subscribe(x => ViewModel.IsAnalyzeButtonEnabled = x);
+        this.WhenActivated(disposables =>
+        {
+            this.WhenAnyValue(
+                    x => x.SearchTextBox.Text,
+                    x => x.MangaButton.IsChecked,
+                    x => x.NovelButton.IsChecked)
+                .CombineLatest(
+                    this.WhenAnyValue(
+                        x => x.BrowserSelector.SelectedItem,
+                        x => x.RegionComboBox.SelectedItem,
+                        x => x.ViewModel.WebsitesSelected))
+                .Select(values =>
+                {
+                    var (title, manga, novel) = values.First;
+                    var (browser, region, websiteCheck) = values.Second;
+                    return !string.IsNullOrWhiteSpace(title)
+                        && !(manga == false && novel == false && websiteCheck)
+                        && browser is not null
+                        && region is not null
+                        && websiteCheck;
+                })
+                .Subscribe(x => ViewModel.IsAnalyzeButtonEnabled = x)
+                .DisposeWith(disposables);
+        });
     }
 
     private void IsMangaButtonClicked(object sender, RoutedEventArgs args)
@@ -80,12 +104,10 @@ public sealed partial class PriceAnalysisWindow : ReactiveWindow<PriceAnalysisVi
                 bookType: MangaButton.IsChecked is not null && MangaButton.IsChecked.Value ? BookType.Manga : BookType.LightNovel,
                 websiteList
             );
-            LOGGER.Info($"Scrape Finished");
+            LOGGER.Info("Scrape Finished");
 
             ViewModel.AnalyzedList.Clear();
             ViewModel.AnalyzedList.AddRange(_scrape.GetResults());
-            // AnalysisDataGrid.Columns[3].Width = DataGridLength.SizeToCells;
-            this.SizeToContent = SizeToContent.Height;
         }
         catch (Exception ex)
         {

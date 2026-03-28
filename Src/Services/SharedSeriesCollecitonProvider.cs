@@ -2,12 +2,13 @@ using System.Collections.ObjectModel;
 using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Reactive.Disposables;
+using System.Reactive.Disposables.Fluent;
 
 using System.Reactive.Linq;
 using System.Text.RegularExpressions;
 using DynamicData;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+using ReactiveUI.SourceGenerators;
 using Tsundoku.Models;
 using static Tsundoku.Models.Enums.SeriesDemographicModel;
 using static Tsundoku.Models.Enums.SeriesFormatModel;
@@ -53,12 +54,12 @@ public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISh
 
     // These Reactive properties will now drive the global filtering.
     // ViewModels that want to control the global filter will bind to these properties.
-    [Reactive] public string SeriesFilterText { get; set; } = string.Empty;
-    [Reactive] public TsundokuFilter SelectedFilter { get; set; } = TsundokuFilter.None;
-    [Reactive] public string AdvancedSearchQueryErrorMessage { get; set; }
-    [Reactive] public string AdvancedSearchQuery { get; set; }
+    [Reactive] public partial string SeriesFilterText { get; set; } = string.Empty;
+    [Reactive] public partial TsundokuFilter SelectedFilter { get; set; } = TsundokuFilter.None;
+    [Reactive] public partial string AdvancedSearchQueryErrorMessage { get; set; }
+    [Reactive] public partial string AdvancedSearchQuery { get; set; }
 
-    [GeneratedRegex(@"(?<FilterName>\w+)(?<Operator>==|>=|<=|>|<)(?<FilterValue>\"".*?\""|\w+)?", RegexOptions.ExplicitCapture | RegexOptions.Compiled)] public static partial Regex AdvancedQueryRegex();
+    [GeneratedRegex(@"(?<FilterName>\w+)(?<Operator>==|>=|<=|>|<)(?<FilterValue>\"".*?\""|\w+)?", RegexOptions.ExplicitCapture)] public static partial Regex AdvancedQueryRegex();
 
     private readonly IUserService _userService; // Injected to get raw data and user language
 
@@ -222,7 +223,7 @@ public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISh
         _userService.UserCollectionChanges
             .Filter(series => series is not null)
             .Filter(combinedFilter)
-            .ObserveOn(RxApp.MainThreadScheduler)
+            .ObserveOn(RxSchedulers.MainThreadScheduler)
             .SortAndBind(out _dynamicUserCollection, seriesComparerChanged)
             .Subscribe()
             .DisposeWith(_disposables);

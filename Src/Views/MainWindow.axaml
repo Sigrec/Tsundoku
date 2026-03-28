@@ -266,7 +266,7 @@
             </Border>
 
             <!-- Collection -->
-            <ScrollViewer Name="CollectionPane" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" DockPanel.Dock="Bottom" Theme="{StaticResource CollectionScroll}"> 
+            <ScrollViewer Name="CollectionPane" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" IsScrollInertiaEnabled="True" DockPanel.Dock="Bottom" Theme="{StaticResource CollectionScroll}">
                 <ItemsRepeater Name="CollectionItems" Margin="20,30,20,30" ItemsSource="{CompiledBinding UserCollection}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                     <ItemsRepeater.Layout>
                         <UniformGridLayout 
@@ -278,8 +278,8 @@
                          <DataTemplate DataType="m:Series">
                             <controls:SeriesCardDisplay
                                 Series="{CompiledBinding}"
-                                CardTheme="{Binding #CollectionPane.DataContext.CurrentTheme}"
-                                Language="{Binding #CollectionPane.DataContext.CurrentUser.Language}" />
+                                CardTheme="{CompiledBinding $parent[Window].((vm:MainWindowViewModel)DataContext).CurrentTheme}"
+                                Language="{CompiledBinding $parent[Window].((vm:MainWindowViewModel)DataContext).CurrentUser.Language}" />
                         </DataTemplate>
                     </ItemsRepeater.ItemTemplate>
                 </ItemsRepeater>

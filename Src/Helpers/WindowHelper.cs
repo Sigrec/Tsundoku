@@ -1,5 +1,5 @@
 using Avalonia.Controls;
-using Avalonia.ReactiveUI;
+using ReactiveUI.Avalonia;
 
 namespace Tsundoku.Helpers;
 
@@ -85,7 +85,7 @@ public static class WindowHelper
             
             // Await ShowDialog, passing the TResult type argument to get the dialog's return value
             TResult? result = await dialogInstance.ShowDialog<TResult?>(parentWindow);
-            LOGGER.Debug($"{windowNameForLogging} dialog closed with result: {result}");
+            LOGGER.Debug("{Window} dialog closed with result: {Result}", windowNameForLogging, result);
             return result;
         }
         catch (Exception ex)

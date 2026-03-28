@@ -4,6 +4,7 @@ using System.Reactive.Subjects;
 using DynamicData;
 using ReactiveUI;
 using System.Reactive.Disposables;
+using System.Reactive.Disposables.Fluent;
 using Avalonia.Media.Imaging;
 using Tsundoku.Helpers;
 using MangaAndLightNovelWebScrape.Websites;
@@ -14,7 +15,7 @@ using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 using System.Diagnostics.CodeAnalysis;
 using DynamicData.Kernel;
 using static Tsundoku.Models.Enums.TsundokuFilterModel;
-using ReactiveUI.Fody.Helpers;
+using ReactiveUI.SourceGenerators;
 using Tsundoku.Models;
 
 namespace Tsundoku.Services;
@@ -61,7 +62,7 @@ public interface IUserService : IDisposable
     void ClearUserCollection();
 }
 
-public sealed class UserService : IUserService, IDisposable
+public sealed partial class UserService : ReactiveObject, IUserService, IDisposable
 {
     public static readonly string USER_AGENT = "Tsundoku/1.0";
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
@@ -80,9 +81,9 @@ public sealed class UserService : IUserService, IDisposable
     // private readonly ReadOnlyObservableCollection<Series> _userCollection;
     private readonly ReadOnlyObservableCollection<TsundokuTheme> _savedThemes;
 
-    [Reactive] public string SeriesFilterText { get; set; } = string.Empty;
-    [Reactive] public TsundokuFilter SelectedFilter { get; set; } = TsundokuFilter.None;
-    [Reactive] public uint SelectedThemeIndex { get; set; }
+    [Reactive] public partial string SeriesFilterText { get; set; } = string.Empty;
+    [Reactive] public partial TsundokuFilter SelectedFilter { get; set; } = TsundokuFilter.None;
+    [Reactive] public partial uint SelectedThemeIndex { get; set; }
 
     private readonly CompositeDisposable _disposables = [];
     private bool _disposed = false;
@@ -93,7 +94,7 @@ public sealed class UserService : IUserService, IDisposable
             .Where(user => user is not null)
             .Select(user => user!.MainTheme)
             .DistinctUntilChanged()
-            .ObserveOn(RxApp.MainThreadScheduler)
+            .ObserveOn(RxSchedulers.MainThreadScheduler)
             .Subscribe(mainThemeName =>
             {
                 Optional<TsundokuTheme> lookupTheme = _savedThemesSourceCache.Lookup(mainThemeName);
@@ -107,7 +108,7 @@ public sealed class UserService : IUserService, IDisposable
                     User user = _userSubject.Value;
                     if (theme is not null)
                     {
-                        LOGGER.Warn($"MainTheme '{mainThemeName}' not found, defaulted to '{theme.ThemeName}'.");
+                        LOGGER.Warn("MainTheme '{MainThemeName}' not found, defaulted to '{ThemeName}'.", mainThemeName, theme.ThemeName);
                     }
                     else
                     {
@@ -124,13 +125,13 @@ public sealed class UserService : IUserService, IDisposable
                 }
 
                 _currentThemeSubject.OnNext(theme);
-                LOGGER.Info($"Set Theme to '{theme?.ThemeName ?? "null"}'");
+                LOGGER.Info("Set Theme to '{ThemeName}'", theme?.ThemeName ?? "null");
             })
             .DisposeWith(_disposables);
 
         SavedThemeChanges
             .SortAndBind(out _savedThemes, new TsundokuThemeComparer(TsundokuLanguage.English))
-            .ObserveOn(RxApp.MainThreadScheduler)
+            .ObserveOn(RxSchedulers.MainThreadScheduler)
             .Subscribe()
             .DisposeWith(_disposables);
     }
@@ -172,7 +173,7 @@ public sealed class UserService : IUserService, IDisposable
         RefreshSourceCache(loadedUser);
         _userSubject.OnNext(loadedUser);
         SaveUserData();
-        LOGGER.Info($"Finished Loading \"{loadedUser.UserName}'s\" Data!");
+        LOGGER.Info("Finished Loading \"{UserName}'s\" Data!", loadedUser.UserName);
     }
 
     public uint GetCurrentThemeIndex()
@@ -246,7 +247,7 @@ public sealed class UserService : IUserService, IDisposable
                     }
                     else
                     {
-                        if (!curSeries.Cover.EndsWith(".png"))
+                        if (!curSeries.Cover.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
                         {
                             curSeries.Cover = Path.ChangeExtension(curSeries.Cover, ".png");
                         }
@@ -296,9 +297,11 @@ public sealed class UserService : IUserService, IDisposable
             fullCoverPath = Path.ChangeExtension(fullCoverPath, ".png");
         }
 
-        if (loadedBitmap.Size.Width != LEFT_SIDE_CARD_WIDTH || loadedBitmap.Size.Height != IMAGE_HEIGHT)
+        int targetWidth = LEFT_SIDE_CARD_WIDTH * BITMAP_SCALE;
+        int targetHeight = IMAGE_HEIGHT * BITMAP_SCALE;
+        if (loadedBitmap.Size.Width > targetWidth || loadedBitmap.Size.Height > targetHeight)
         {
-            Bitmap scaledBitmap = loadedBitmap.CreateScaledBitmap(new PixelSize(LEFT_SIDE_CARD_WIDTH, IMAGE_HEIGHT), BitmapInterpolationMode.HighQuality);
+            Bitmap scaledBitmap = loadedBitmap.CreateScaledBitmap(new PixelSize(targetWidth, targetHeight), BitmapInterpolationMode.HighQuality);
             LOGGER.Debug("Scaled {} Cover Image", series.Titles[TsundokuLanguage.Romaji]);
             loadedBitmap.Dispose();
 
@@ -495,7 +498,7 @@ public sealed class UserService : IUserService, IDisposable
         User user = _userSubject.Value;
         updateAction(user);
         _userSubject.OnNext(user);
-        LOGGER.Trace($"User properties updated for: {user.UserName}");
+        LOGGER.Trace("User properties updated for: {UserName}", user.UserName);
     }
 
     public User? GetCurrentUserSnapshot()
@@ -548,18 +551,18 @@ public sealed class UserService : IUserService, IDisposable
         if (user is null) return;
 
         string userDataFullPath = AppFileHelper.GetUserDataJsonPath();
-        LOGGER.Info($"Saving \"{user.UserName}'s\" Collection Data to {userDataFullPath}");
+        LOGGER.Info("Saving \"{UserName}'s\" Collection Data to {Path}", user.UserName, userDataFullPath);
 
         try
         {
             using FileStream createStream = File.Create(userDataFullPath);
             JsonSerializer.Serialize(createStream, user, User.JSON_SERIALIZATION_OPTIONS);
             createStream.Flush();
-            LOGGER.Debug($"Successfully saved user data to: {userDataFullPath}");
+            LOGGER.Debug("Successfully saved user data to: {Path}", userDataFullPath);
         }
         catch (Exception ex)
         {
-            LOGGER.Error(ex, $"Failed to save user data to {userDataFullPath}.");
+            LOGGER.Error(ex, "Failed to save user data to {Path}.", userDataFullPath);
         }
     }
 
@@ -570,18 +573,18 @@ public sealed class UserService : IUserService, IDisposable
         if (user is null) return;
 
         string userDataFullPath = AppFileHelper.GetUserDataJsonPath();
-        LOGGER.Info($"Saving \"{user.UserName}'s\" Collection Data to {userDataFullPath}");
+        LOGGER.Info("Saving \"{UserName}'s\" Collection Data to {Path}", user.UserName, userDataFullPath);
 
         try
         {
             using FileStream createStream = File.Create(userDataFullPath);
             JsonSerializer.Serialize(createStream, user, User.JSON_SERIALIZATION_OPTIONS);
             createStream.Flush();
-            LOGGER.Debug($"Successfully saved user data to: {userDataFullPath}");
+            LOGGER.Debug("Successfully saved user data to: {Path}", userDataFullPath);
         }
         catch (Exception ex)
         {
-            LOGGER.Error(ex, $"Failed to save user data to {userDataFullPath}.");
+            LOGGER.Error(ex, "Failed to save user data to {Path}.", userDataFullPath);
         }
     }
 
@@ -622,34 +625,37 @@ public sealed class UserService : IUserService, IDisposable
         if (refreshedSeries is null)
         {
             LOGGER.Warn("{title} returned a null series entry on refresh", originalSeries.Titles[TsundokuLanguage.Romaji]);
+            return false;
         }
-        else if (_userCollectionSourceCache.Lookup(originalSeries.Id).HasValue)
+
+        if (!_userCollectionSourceCache.Lookup(originalSeries.Id).HasValue)
         {
-            bool isCoverEmpty = originalSeries.IsCoverImageEmpty();
-            originalSeries.UpdateFrom(refreshedSeries, isCoverEmpty);
-
-            UpdateUser(user =>
-            {
-                int index = user.UserCollection.BinarySearch(originalSeries, new SeriesComparer(user.Language));
-                index = index < 0 ? ~index : index;
-                if (index != -1)
-                {
-                    user.UserCollection.RemoveAt(index);
-                    user.UserCollection.Insert(index, originalSeries);
-                }
-                else
-                {
-                    LOGGER.Error("Tried to remove {Title} series during refresh but had no index", originalSeries.Titles[TsundokuLanguage.Romaji]);
-                }
-            });
-
-            LOGGER.Info("Refreshed {series} ({id} | {CoverEmpty?}) in Collection", originalSeries.Titles[TsundokuLanguage.Romaji] + (originalSeries.DuplicateIndex == 0 ? string.Empty : $" ({originalSeries.DuplicateIndex})"), originalSeries.Id, isCoverEmpty);
-            return true;
+            refreshedSeries.Cover = string.Empty;
+            refreshedSeries.Dispose();
+            return false;
         }
-        
-        refreshedSeries.Cover = string.Empty;
-        refreshedSeries?.Dispose();
-        return false;
+
+        bool shouldRefreshCover = originalSeries.IsCoverImageEmpty() || (GetCurrentUserSnapshot()?.RefreshCovers ?? false);
+        originalSeries.UpdateFrom(refreshedSeries, shouldRefreshCover);
+
+        UpdateUser(user =>
+        {
+            int index = user.UserCollection.BinarySearch(originalSeries, new SeriesComparer(user.Language));
+            index = index < 0 ? ~index : index;
+            if (index != -1)
+            {
+                user.UserCollection.RemoveAt(index);
+                user.UserCollection.Insert(index, originalSeries);
+            }
+            else
+            {
+                LOGGER.Error("Tried to remove {Title} series during refresh but had no index", originalSeries.Titles[TsundokuLanguage.Romaji]);
+            }
+        });
+
+        LOGGER.Info("Refreshed {series} ({id} | CoverRefresh={CoverRefresh}) in Collection", originalSeries.Titles[TsundokuLanguage.Romaji] + (originalSeries.DuplicateIndex == 0 ? string.Empty : $" ({originalSeries.DuplicateIndex})"), originalSeries.Id, shouldRefreshCover);
+        refreshedSeries.Dispose();
+        return true;
     }
 
     public void RemoveSeries(Series series)
@@ -672,7 +678,7 @@ public sealed class UserService : IUserService, IDisposable
         }
         else
         {
-            LOGGER.Warn($"Series with ID {series.Id} not found in cache before removal.");
+            LOGGER.Warn("Series with ID {SeriesId} not found in cache before removal.", series.Id);
         }
 
         UpdateUser(user =>
@@ -719,7 +725,7 @@ public sealed class UserService : IUserService, IDisposable
             {
                 // Remove the existing theme from its current position.
                 user.SavedThemes.RemoveAt(insertionIndex);
-                LOGGER.Debug($"Removed existing theme '{theme.ThemeName}' at index {insertionIndex} for update");
+                LOGGER.Debug("Removed existing theme '{ThemeName}' at index {Index} for update", theme.ThemeName, insertionIndex);
             }
             else
             {
@@ -729,7 +735,7 @@ public sealed class UserService : IUserService, IDisposable
             // Insert the new/updated theme at the determined sorted position.
             user.SavedThemes.Insert(insertionIndex, theme);
             user.MainTheme = theme.ThemeName;
-            LOGGER.Debug($"Inserted theme '{theme.ThemeName}' at index {insertionIndex}");
+            LOGGER.Debug("Inserted theme '{ThemeName}' at index {Index}", theme.ThemeName, insertionIndex);
         });
         
         // _currentThemeSubject.OnNext(theme);
@@ -743,7 +749,7 @@ public sealed class UserService : IUserService, IDisposable
 
         if (_savedThemesSourceCache.Count <= 1)
         {
-            LOGGER.Warn($"Cannot remove theme '{theme.ThemeName}'. There must be at least one theme saved");
+            LOGGER.Warn("Cannot remove theme '{ThemeName}'. There must be at least one theme saved", theme.ThemeName);
             throw new InvalidOperationException("Cannot remove the last remaining theme. There must be at least one theme saved");
         }
 
@@ -755,7 +761,7 @@ public sealed class UserService : IUserService, IDisposable
         if (newCurrentTheme is not null)
         {
             SetCurrentTheme(newCurrentTheme);
-            LOGGER.Debug($"Switched current theme to '{newCurrentTheme.ThemeName}' before removal");
+            LOGGER.Debug("Switched current theme to '{ThemeName}' before removal", newCurrentTheme.ThemeName);
         }
         else
         {
@@ -773,7 +779,7 @@ public sealed class UserService : IUserService, IDisposable
         }
         else
         {
-            LOGGER.Warn($"Attempted to remove theme '{theme.ThemeName}' which was not found in saved themes");
+            LOGGER.Warn("Attempted to remove theme '{ThemeName}' which was not found in saved themes", theme.ThemeName);
         }
     }
 
@@ -792,7 +798,7 @@ public sealed class UserService : IUserService, IDisposable
         }
         else
         {
-            LOGGER.Warn($"Theme '{themeName}' not found. Cannot remove");
+            LOGGER.Warn("Theme '{ThemeName}' not found. Cannot remove", themeName);
         }
     }
     
@@ -845,7 +851,7 @@ public sealed class UserService : IUserService, IDisposable
             }
             else
             {
-                LOGGER.Error($"Deserialization failed for theme file: {themeFilePath}. The file might be corrupted or malformed.");
+                LOGGER.Error("Deserialization failed for theme file: {ThemeFilePath}. The file might be corrupted or malformed.", themeFilePath);
                 throw new JsonException("Failed to deserialize theme file. Invalid JSON format.");
             }
         }
@@ -870,7 +876,10 @@ public sealed class UserService : IUserService, IDisposable
             return;
         }
         
-        currentUser.UserIcon = new Bitmap(filePath).CreateScaledBitmap(new PixelSize(USER_ICON_WIDTH, USER_ICON_HEIGHT), BitmapInterpolationMode.HighQuality);
+        using Bitmap originalIcon = new Bitmap(filePath);
+        Bitmap scaledIcon = originalIcon.CreateScaledBitmap(new PixelSize(USER_ICON_WIDTH * BITMAP_SCALE, USER_ICON_HEIGHT * BITMAP_SCALE), BitmapInterpolationMode.HighQuality);
+        currentUser.UserIcon?.Dispose();
+        currentUser.UserIcon = scaledIcon;
 
         _userSubject.OnNext(currentUser);
         LOGGER.Info("Updated UserIcon.");

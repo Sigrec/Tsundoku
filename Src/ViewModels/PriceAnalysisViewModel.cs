@@ -5,18 +5,18 @@ using Avalonia.Collections;
 using Avalonia.Controls;
 using MangaAndLightNovelWebScrape;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+using ReactiveUI.SourceGenerators;
 
 namespace Tsundoku.ViewModels;
 
 public sealed partial class PriceAnalysisViewModel : ViewModelBase
 {
-    [Reactive] public AvaloniaList<EntryModel> AnalyzedList { get; set; } = [];
-    [Reactive] public int BrowserIndex { get; set; }
-    [Reactive] public bool IsAnalyzeButtonEnabled { get; set; } = false;
-    [Reactive] public bool WebsitesSelected { get; set; } = false;
-    [Reactive] public string WebsitesToolTipText { get; set; }
-    [Reactive] public int CurRegionIndex { get; set; }
+    [Reactive] public partial AvaloniaList<EntryModel> AnalyzedList { get; set; } = [];
+    [Reactive] public partial int BrowserIndex { get; set; }
+    [Reactive] public partial bool IsAnalyzeButtonEnabled { get; set; } = false;
+    [Reactive] public partial bool WebsitesSelected { get; set; } = false;
+    [Reactive] public partial string WebsitesToolTipText { get; set; }
+    [Reactive] public partial int CurRegionIndex { get; set; }
     public AvaloniaList<ListBoxItem> SelectedWebsites { get; } = [];
     private static readonly StringBuilder CurWebsites = new();
 

@@ -88,6 +88,7 @@
                     Height="{CompiledBinding Source={x:Static m:Constants.IMAGE_HEIGHT}}"
                     Width="{CompiledBinding Source={x:Static m:Constants.LEFT_SIDE_CARD_WIDTH}}"
                     Source="{CompiledBinding CoverBitMap}"
+                    RenderOptions.BitmapInterpolationMode="MediumQuality"
                     ClipToBounds="True" />
 
                 <!-- Bottom Left: Status | Format -->
@@ -205,7 +206,7 @@
                     Grid.Row="0"
                     Width="{CompiledBinding Source={x:Static m:Constants.RIGHT_SIDE_CARD_WIDTH}}"
                     Grid.RowDefinitions="Auto,Auto,Auto,*"
-                    Background="{Binding CardTheme.SeriesCardBGColor, ElementName=Root}"
+                    Background="{CompiledBinding CardTheme.SeriesCardBGColor, ElementName=Root}"
                     ShowGridLines="False">
 
                   <Grid.Styles>
@@ -222,8 +223,9 @@
 
                   <!-- Publisher -->
                   <TextBlock
+                      x:Name="SeriesPublisherTextBlock"
                       Grid.Row="0"
-                      Foreground="{Binding CardTheme.SeriesCardPublisherColor, ElementName=Root}"
+                      Foreground="{CompiledBinding CardTheme.SeriesCardPublisherColor, ElementName=Root}"
                       MaxLines="1"
                       FontWeight="Bold"
                       FontSize="15"
@@ -235,18 +237,18 @@
                       Grid.Row="1"
                       x:Name="SeriesTitleTextBlock"
                       TextWrapping="Wrap"
-                      Foreground="{Binding CardTheme.SeriesCardTitleColor, ElementName=Root}"
+                      Foreground="{CompiledBinding CardTheme.SeriesCardTitleColor, ElementName=Root}"
                       FontWeight="Bold"
                       FontSize="23"
                       MaxHeight="{CompiledBinding Source={x:Static m:Constants.TOP_SECTION_CARD_HEIGHT}}"
                       PointerPressed="CopySeriesTitleAsync"
-                      Padding="8,0,7,2"
+                      Padding="8,0,7,0"
                       Cursor="Hand"
                       TextAlignment="Left"
                       TextTrimming="WordEllipsis"
                       MaxLines="3"
-                      Width="{CompiledBinding Source={x:Static m:Constants.RIGHT_SIDE_CARD_WIDTH}}"
-                      LineHeight="25">
+                      LetterSpacing="0"
+                      Width="{CompiledBinding Source={x:Static m:Constants.RIGHT_SIDE_CARD_WIDTH}}">
                     <TextBlock.Text>
                       <MultiBinding Converter="{StaticResource ConvertTitle}" Mode="OneWay">
                         <Binding Path="Titles" />
@@ -260,7 +262,7 @@
                           FontSize="18"
                           TextTrimming="None"
                           MaxLines="100"
-                          LineHeight="25">
+                          LineSpacing="2">
                         <TextBlock.Text>
                           <MultiBinding Converter="{StaticResource ConvertTitle}" Mode="OneWay">
                             <Binding Path="Titles" />
@@ -277,9 +279,10 @@
                       TextWrapping="Wrap"
                       Grid.Row="2"
                       FontWeight="Bold"
-                      Foreground="{Binding CardTheme.SeriesCardStaffColor, ElementName=Root}"
+                      Foreground="{CompiledBinding CardTheme.SeriesCardStaffColor, ElementName=Root}"
                       MaxLines="2"
                       TextTrimming="WordEllipsis"
+                      LetterSpacing="0"
                       FontSize="15"
                       Padding="9,0,4,3">
                     <TextBlock.Text>
@@ -312,7 +315,7 @@
                     <TextBlock
                         TextWrapping="Wrap"
                         FontWeight="Bold"
-                        Foreground="{Binding CardTheme.SeriesCardDescColor, ElementName=Root}"
+                        Foreground="{CompiledBinding CardTheme.SeriesCardDescColor, ElementName=Root}"
                         Opacity="0.9"
                         Text="{CompiledBinding Description}"
                         Padding="10,-2,20,5" />
@@ -322,7 +325,7 @@
                 <!-- Bottom Right Side (Progress + Buttons) -->
                 <Grid
                     Height="{CompiledBinding Source={x:Static m:Constants.BOTTOM_SECTION_CARD_HEIGHT}}"
-                    Background="{Binding CardTheme.SeriesProgressBGColor, ElementName=Root}"
+                    Background="{CompiledBinding CardTheme.SeriesProgressBGColor, ElementName=Root}"
                     Width="{CompiledBinding Source={x:Static m:Constants.RIGHT_SIDE_CARD_WIDTH}}"
                     Grid.Row="1"
                     ColumnDefinitions="Auto,Auto">
@@ -362,9 +365,9 @@
                         Grid.Row="0"
                         Grid.Column="0"
                         Value="{CompiledBinding CurVolumeCount}"
-                        Background="{Binding CardTheme.SeriesProgressBarBGColor, ElementName=Root}"
-                        Foreground="{Binding CardTheme.SeriesProgressBarColor, ElementName=Root}"
-                        BorderBrush="{Binding CardTheme.SeriesProgressBarBorderColor, ElementName=Root}"
+                        Background="{CompiledBinding CardTheme.SeriesProgressBarBGColor, ElementName=Root}"
+                        Foreground="{CompiledBinding CardTheme.SeriesProgressBarColor, ElementName=Root}"
+                        BorderBrush="{CompiledBinding CardTheme.SeriesProgressBarBorderColor, ElementName=Root}"
                         BorderThickness="1.5"
                         Orientation="Horizontal"
                         Padding="2"
@@ -384,7 +387,7 @@
                         Margin="10,0,0,0">
                       <Button
                           Background="Transparent"
-                          Foreground="{Binding CardTheme.SeriesProgressTextColor, ElementName=Root}"
+                          Foreground="{CompiledBinding CardTheme.SeriesProgressTextColor, ElementName=Root}"
                           FontWeight="Bold"
                           Height="15"
                           Width="32"
@@ -401,7 +404,7 @@
                           TextAlignment="Center"
                           FontSize="16"
                           FontWeight="Bold"
-                          Foreground="{Binding CardTheme.SeriesProgressTextColor, ElementName=Root}"
+                          Foreground="{CompiledBinding CardTheme.SeriesProgressTextColor, ElementName=Root}"
                           Margin="0,7.5,0,0">
                         <TextBlock.Text>
                           <MultiBinding StringFormat="{}{0}/{1}" Mode="OneWay">
@@ -413,7 +416,7 @@
 
                       <Button
                           Background="Transparent"
-                          Foreground="{Binding CardTheme.SeriesProgressTextColor, ElementName=Root}"
+                          Foreground="{CompiledBinding CardTheme.SeriesProgressTextColor, ElementName=Root}"
                           FontWeight="Bold"
                           Height="20"
                           Width="21"
@@ -432,15 +435,15 @@
                   <!-- Edit Series Info Button (icon) -->
                   <Button
                       Grid.Column="1"
-                      Background="{Binding CardTheme.SeriesProgressBGColor, ElementName=Root}"
+                      Background="{CompiledBinding CardTheme.SeriesProgressBGColor, ElementName=Root}"
                       FontSize="30"
                       Margin="0,0,3,0"
                       BorderThickness="0"
                       HorizontalAlignment="Left"
                       HorizontalContentAlignment="Center"
-                      BorderBrush="{Binding CardTheme.SeriesButtonIconColor, ElementName=Root}"
+                      BorderBrush="{CompiledBinding CardTheme.SeriesButtonIconColor, ElementName=Root}"
                       Height="{CompiledBinding Source={x:Static m:Constants.BOTTOM_SECTION_CARD_HEIGHT}}"
-                      Foreground="{Binding CardTheme.SeriesButtonIconColor, ElementName=Root}"
+                      Foreground="{CompiledBinding CardTheme.SeriesButtonIconColor, ElementName=Root}"
                       i:Attached.Icon="fa-solid fa-square-pen"
                       Cursor="Hand"
                       Click="OpenEditSeriesInfoWindow" />

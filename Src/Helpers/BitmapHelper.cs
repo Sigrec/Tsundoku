@@ -22,9 +22,9 @@ public sealed class BitmapHelper
     /// <returns>The generated and scaled Avalonia Bitmap, or null if any operation fails.</returns>
     public static Bitmap? UpdateCoverFromFilePath(string sourceFilePath, string destinationCoverPath)
     {
-        if (string.IsNullOrWhiteSpace(sourceFilePath) || !File.Exists(sourceFilePath))
+        if (string.IsNullOrWhiteSpace(sourceFilePath))
         {
-            LOGGER.Error("Provided source file path is null/empty or does not exist: {SourceFilePath}", sourceFilePath);
+            LOGGER.Error("Provided source file path is null or empty: {SourceFilePath}", sourceFilePath);
             return null;
         }
 
@@ -38,6 +38,11 @@ public sealed class BitmapHelper
                 // ProcessAndSaveBitmap is synchronous, so it runs within this Task.Run context
                 return ProcessAndSaveBitmap(loadedBitmap, destinationCoverPath, sourceFilePath);
             }
+        }
+        catch (FileNotFoundException)
+        {
+            LOGGER.Error("Source file does not exist: {SourceFilePath}", sourceFilePath);
+            return null;
         }
         catch (ArgumentException argEx)
         {
@@ -123,17 +128,19 @@ public sealed class BitmapHelper
     private static Bitmap? ProcessAndSaveBitmap(Bitmap originalBitmap, string savePath, string sourceIdentifier)
     {
         Bitmap? scaledBitmap = null;
+        int targetWidth = LEFT_SIDE_CARD_WIDTH * BITMAP_SCALE;
+        int targetHeight = IMAGE_HEIGHT * BITMAP_SCALE;
         try
         {
-            if (originalBitmap.PixelSize.Width != LEFT_SIDE_CARD_WIDTH || originalBitmap.PixelSize.Height != IMAGE_HEIGHT)
+            if (originalBitmap.PixelSize.Width != targetWidth || originalBitmap.PixelSize.Height != targetHeight)
             {
                 LOGGER.Debug("Scaling bitmap from {Width}x{Height} to {TargetWidth}x{TargetHeight} for {Source}.",
                     originalBitmap.PixelSize.Width, originalBitmap.PixelSize.Height,
-                    LEFT_SIDE_CARD_WIDTH, IMAGE_HEIGHT,
+                    targetWidth, targetHeight,
                     sourceIdentifier);
 
                 scaledBitmap = originalBitmap.CreateScaledBitmap(
-                    new PixelSize(LEFT_SIDE_CARD_WIDTH, IMAGE_HEIGHT),
+                    new PixelSize(targetWidth, targetHeight),
                     BitmapInterpolationMode.HighQuality);
             }
             else
@@ -187,7 +194,9 @@ public sealed class BitmapHelper
         // Offload the potentially long-running operation to a background thread.
         return await Task.Run(() =>
         {
-            using MemoryStream stream = new();
+            // Estimate capacity: 4 bytes per pixel (RGBA) is an upper bound for PNG
+            int estimatedCapacity = image.PixelSize.Width * image.PixelSize.Height * 4;
+            using MemoryStream stream = new(estimatedCapacity);
             try
             {
                 // 3. Core Logic (executed on a background thread): Save the Avalonia Bitmap.

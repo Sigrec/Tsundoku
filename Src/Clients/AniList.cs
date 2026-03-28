@@ -144,7 +144,6 @@ public sealed partial class AniList
         foreach (JsonElement m in media.EnumerateArray())
         {
             if (!m.TryGetProperty("id", out JsonElement idEl)) continue;
-            string id = idEl.GetInt32().ToString();
 
             string? romaji = m.GetProperty("title").GetProperty("romaji").GetString();
             if (romaji is null) continue;
@@ -161,28 +160,25 @@ public sealed partial class AniList
             bool inNative = isNativeNotEmpty && native.Contains(needle, StringComparison.OrdinalIgnoreCase);
             if (!inRomaji && !inEnglish && !inNative) continue;
 
-            List<string> candidates = new(3);
-            if (isRomajiNotEmpty) candidates.Add(romaji);
-            if (isEnglishNotEmpty) candidates.Add(english!);
-            if (isNativeNotEmpty) candidates.Add(native!);
-
+            // Find best matching title without allocating a list per iteration
             string chosen = romaji;
-            int best = 0;
-            foreach (string c in candidates)
+            int best = isRomajiNotEmpty ? MatchScore(romaji, needle) : 0;
+            if (best < 3 && isEnglishNotEmpty)
             {
-                int score = MatchScore(c, needle);
-                if (score > best)
-                {
-                    best = score;
-                    chosen = c;
-                    if (best == 3) break;
-                }
+                int score = MatchScore(english!, needle);
+                if (score > best) { best = score; chosen = english!; }
+            }
+            if (best < 3 && isNativeNotEmpty)
+            {
+                int score = MatchScore(native!, needle);
+                if (score > best) { chosen = native!; }
             }
 
-            string? format = m.TryGetProperty("format", out JsonElement f) && f.ValueKind == JsonValueKind.String ? f.GetString().Trim() : null;
+            string? format = m.TryGetProperty("format", out JsonElement f) && f.ValueKind == JsonValueKind.String ? f.GetString()!.Trim() : null;
+            int id = idEl.GetInt32();
             string display = $"{chosen} ({format ?? "MEDIA"}) [{id}]";
 
-            list.Add(new AniListPickerSuggestion(id, display, format));
+            list.Add(new AniListPickerSuggestion(id.ToString(), display, format));
         }
 
         return list;
@@ -349,14 +345,21 @@ public sealed partial class AniList
                 await Task.Delay(delay, cancellationToken);
                 continue;
             }
+            catch (GraphQLHttpRequestException ex) when (ex.StatusCode == HttpStatusCode.InternalServerError)
+            {
+                attempts++;
+                LOGGER.Warn("AniList returned 500 for {Context} (attempt {Attempt}/{Max}). Retrying after 5s...", context, attempts, maxRetries);
+                await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken);
+                continue;
+            }
             catch (GraphQLHttpRequestException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
             {
                 LOGGER.Warn("{Series} not found", context);
                 return null;
             }
-            catch (TaskCanceledException ex)
+            catch (TaskCanceledException)
             {
-                LOGGER.Info(ex, "Request canceled during send or delay.");
+                LOGGER.Debug("Request canceled during send or delay.");
                 return null;
             }
             catch (Exception ex)

@@ -1,25 +1,29 @@
 using System.Diagnostics;
 using System.Reactive.Disposables;
-
+using System.Reactive.Disposables.Fluent;
+using System.Reflection;
 using System.Reactive.Linq;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+using ReactiveUI.SourceGenerators;
 using Tsundoku.Models;
 
 namespace Tsundoku.ViewModels;
 
-public class ViewModelBase : ReactiveObject
+public partial class ViewModelBase : ReactiveObject
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
 
     public static string Filter { get; set; }
     public bool isReloading = false;
-    public const string CUR_TSUNDOKU_VERSION = "1.5.2";
+    public static readonly string CUR_TSUNDOKU_VERSION = Assembly.GetEntryAssembly()!
+        .GetCustomAttribute<AssemblyInformationalVersionAttribute>()!
+        .InformationalVersion
+        .Split('+')[0];
     public const double SCHEMA_VERSION = 6.1;
     public const string USER_DATA_FILEPATH = @"UserData.json";
     
-    [Reactive] public TsundokuTheme CurrentTheme { get; protected set; }
-    [Reactive] public User CurrentUser { get; protected set; }
+    [Reactive] public partial TsundokuTheme CurrentTheme { get; protected set; }
+    [Reactive] public partial User CurrentUser { get; protected set; }
     
     protected readonly IUserService _userService;
     protected readonly CompositeDisposable _disposables = [];
@@ -29,7 +33,7 @@ public class ViewModelBase : ReactiveObject
         _userService = userService;
         _userService.CurrentTheme
             .Where(theme => theme is not null)
-            .ObserveOn(RxApp.MainThreadScheduler)
+            .ObserveOn(RxSchedulers.MainThreadScheduler)
             .Subscribe(theme => CurrentTheme = theme!)
             .DisposeWith(_disposables);
 
@@ -42,7 +46,7 @@ public class ViewModelBase : ReactiveObject
     {
         await Task.Run(() =>
         {
-            LOGGER.Info($"Opening Link {link}");
+            LOGGER.Info("Opening Link {Link}", link);
             try
             {
                 Process.Start(new ProcessStartInfo(link) { UseShellExecute = true });

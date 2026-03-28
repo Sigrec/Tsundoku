@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using LiveChartsCore;
 using System.Reactive.Linq;
-using ReactiveUI.Fody.Helpers;
+using ReactiveUI.SourceGenerators;
 using LiveChartsCore.Defaults;
 using LiveChartsCore.SkiaSharpView;
 using Tsundoku.Models;
@@ -17,6 +17,7 @@ using static Tsundoku.Models.Enums.SeriesFormatModel;
 using static Tsundoku.Models.Enums.SeriesGenreModel;
 using System.Globalization;
 using System.Reactive.Disposables;
+using System.Reactive.Disposables.Fluent;
 
 namespace Tsundoku.ViewModels;
 
@@ -30,21 +31,21 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
     public ObservableValue ShoujoCount { get; } = new ObservableValue(0);
     public ObservableValue JoseiCount { get; } = new ObservableValue(0);
     public ObservableValue UnknownCount { get; } = new ObservableValue(0);
-    [Reactive] public decimal ShounenPercentage { get; set; }
-    [Reactive] public decimal SeinenPercentage { get; set; }
-    [Reactive] public decimal ShoujoPercentage { get; set; }
-    [Reactive] public decimal JoseiPercentage { get; set; }
-    [Reactive] public decimal UnknownPercentage { get; set; }
+    [Reactive] public partial decimal ShounenPercentage { get; set; }
+    [Reactive] public partial decimal SeinenPercentage { get; set; }
+    [Reactive] public partial decimal ShoujoPercentage { get; set; }
+    [Reactive] public partial decimal JoseiPercentage { get; set; }
+    [Reactive] public partial decimal UnknownPercentage { get; set; }
 
     public ObservableCollection<ISeries> StatusDistribution { get; set; } = [];
     public ObservableValue OngoingCount { get; } = new ObservableValue(0);
     public ObservableValue FinishedCount { get; } = new ObservableValue(0);
     public ObservableValue CancelledCount { get; } = new ObservableValue(0);
     public ObservableValue HiatusCount { get; } = new ObservableValue(0);
-    [Reactive] public decimal FinishedPercentage { get; set; }
-    [Reactive] public decimal OngoingPercentage { get; set; }
-    [Reactive] public decimal CancelledPercentage { get; set; }
-    [Reactive] public decimal HiatusPercentage { get; set; }
+    [Reactive] public partial decimal FinishedPercentage { get; set; }
+    [Reactive] public partial decimal OngoingPercentage { get; set; }
+    [Reactive] public partial decimal CancelledPercentage { get; set; }
+    [Reactive] public partial decimal HiatusPercentage { get; set; }
 
     public ObservableCollection<ISeries> Formats { get; set; } = [];
     public ObservableValue MangaCount { get; } = new ObservableValue(0);
@@ -53,12 +54,12 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
     public ObservableValue ManfraCount { get; } = new ObservableValue(0);
     public ObservableValue ComicCount { get; } = new ObservableValue(0);
     public ObservableValue NovelCount { get; } = new ObservableValue(0);
-    [Reactive] public decimal MangaPercentage { get; set; }
-    [Reactive] public decimal ManhwaPercentage { get; set; }
-    [Reactive] public decimal ManhuaPercentage { get; set; }
-    [Reactive] public decimal ManfraPercentage { get; set; }
-    [Reactive] public decimal ComicPercentage { get; set; }
-    [Reactive] public decimal NovelPercentage { get; set; }
+    [Reactive] public partial decimal MangaPercentage { get; set; }
+    [Reactive] public partial decimal ManhwaPercentage { get; set; }
+    [Reactive] public partial decimal ManhuaPercentage { get; set; }
+    [Reactive] public partial decimal ManfraPercentage { get; set; }
+    [Reactive] public partial decimal ComicPercentage { get; set; }
+    [Reactive] public partial decimal NovelPercentage { get; set; }
 
     public ObservableCollection<ISeries> RatingDistribution { get; set; } = [];
     public ObservableCollection<Axis> RatingXAxes { get; } = [];
@@ -117,14 +118,14 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
     public Axis[] GenreXAxes { get; set; } = [];
     public Axis[] GenreYAxes { get; set; } = [];
 
-    [Reactive] public int SeriesCount { get; set; }
-    [Reactive] public int FavoriteCount { get; set; }
+    [Reactive] public partial int SeriesCount { get; set; }
+    [Reactive] public partial int FavoriteCount { get; set; }
 
-    [Reactive] public SolidColorBrush PaneBackgroundColor { get; set; }
-    [Reactive] public SolidColorBrush UnknownRectangleColor { get; set; }
-    [Reactive] public SolidColorBrush ManhuaRectangleColor { get; set; }
-    [Reactive] public SolidColorBrush ManfraRectangleColor { get; set; }
-    [Reactive] public string CollectionValueText { get; set; }
+    [Reactive] public partial SolidColorBrush PaneBackgroundColor { get; set; }
+    [Reactive] public partial SolidColorBrush UnknownRectangleColor { get; set; }
+    [Reactive] public partial SolidColorBrush ManhuaRectangleColor { get; set; }
+    [Reactive] public partial SolidColorBrush ManfraRectangleColor { get; set; }
+    [Reactive] public partial string CollectionValueText { get; set; }
 
     public ReadOnlyObservableCollection<Series> UserCollection { get; }
     private readonly ISharedSeriesCollectionProvider _sharedSeriesProvider;
@@ -242,7 +243,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
             .AutoRefresh(x => x.Rating)
             .DistinctUntilChanged()
             .Throttle(TimeSpan.FromMilliseconds(100))
-            .ObserveOn(RxApp.MainThreadScheduler)
+            .ObserveOn(RxSchedulers.MainThreadScheduler)
             .ToCollection()
             .Select(list =>
             {
@@ -264,7 +265,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
             .AutoRefresh(x => x.VolumesRead)
             .DistinctUntilChanged()
             .Throttle(TimeSpan.FromMilliseconds(100))
-            .ObserveOn(RxApp.MainThreadScheduler)
+            .ObserveOn(RxSchedulers.MainThreadScheduler)
             .ToCollection()
             .Select(seriesCollection => (uint)seriesCollection.Sum(item => item.VolumesRead))
             .Subscribe(volumesRead =>
@@ -277,13 +278,13 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
                 .AutoRefresh(x => x.Value)
                 .DistinctUntilChanged()
                 .Throttle(TimeSpan.FromMilliseconds(100))
-                .ObserveOn(RxApp.MainThreadScheduler)
+                .ObserveOn(RxSchedulers.MainThreadScheduler)
                 .ToCollection()
                 .Select(seriesCollection => decimal.Round(seriesCollection.Sum(item => item.Value), 2)),
             this.WhenAnyValue(x => x.CurrentUser.Currency),
             (Value, Currency) => new { Value, Currency }
         )
-        .ObserveOn(RxApp.MainThreadScheduler)
+        .ObserveOn(RxSchedulers.MainThreadScheduler)
         .Subscribe(result =>
         {
             CultureInfo cultureInfo = CultureInfo.GetCultureInfo(AVAILABLE_CURRENCY_WITH_CULTURE[result.Currency].Culture);
@@ -302,7 +303,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
 
         _userService.UserCollectionChanges
             .DistinctUntilChanged()
-            .ObserveOn(RxApp.MainThreadScheduler)
+            .ObserveOn(RxSchedulers.MainThreadScheduler)
             .ToCollection()
             .Subscribe(seriesList =>
             {
@@ -312,7 +313,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
         _userService.UserCollectionChanges
             .AutoRefresh(x => x.IsFavorite)
             .DistinctUntilChanged()
-            .ObserveOn(RxApp.MainThreadScheduler)
+            .ObserveOn(RxSchedulers.MainThreadScheduler)
             .ToCollection()
             .Select(seriesList => seriesList.Count(x => x.IsFavorite))
             .Subscribe(count =>
@@ -324,7 +325,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
             .AutoRefresh(x => x.CurVolumeCount)
             .AutoRefresh(x => x.MaxVolumeCount)
             .DistinctUntilChanged()
-            .ObserveOn(RxApp.MainThreadScheduler)
+            .ObserveOn(RxSchedulers.MainThreadScheduler)
             .Throttle(TimeSpan.FromMilliseconds(500))
             .ToCollection()
             .Select(seriesList =>
@@ -426,7 +427,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
 
         _ = _userService.UserCollectionChanges
                 .AutoRefresh(x => x.Rating)
-                .ObserveOn(RxApp.MainThreadScheduler)
+                .ObserveOn(RxSchedulers.MainThreadScheduler)
                 .QueryWhenChanged(query => query.Items)
                 .Select(seriesList => // Perform all your counting logic on this snapshot
                 {
@@ -587,7 +588,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
 
         _userService.UserCollectionChanges
             .AutoRefresh(x => x.MaxVolumeCount)
-            .ObserveOn(RxApp.MainThreadScheduler)
+            .ObserveOn(RxSchedulers.MainThreadScheduler)
             .QueryWhenChanged(query => query.Items)
             .Select(seriesList =>
             {
@@ -797,7 +798,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
             .AutoRefresh(x => x.Genres)
             .DistinctUntilChanged()
             .Throttle(TimeSpan.FromMilliseconds(500))
-            .ObserveOn(RxApp.MainThreadScheduler)
+            .ObserveOn(RxSchedulers.MainThreadScheduler)
             .QueryWhenChanged(query => query.Items) // Get the current snapshot of all Series
             .Select(seriesList => // Perform the genre counting logic
             {

@@ -4,7 +4,7 @@ using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using ReactiveUI;
-using Avalonia.ReactiveUI;
+using ReactiveUI.Avalonia;
 using Tsundoku.Helpers;
 using Tsundoku.Models;
 using Tsundoku.ViewModels;

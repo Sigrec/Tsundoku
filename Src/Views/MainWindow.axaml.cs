@@ -12,8 +12,9 @@ using Tsundoku.Models;
 using Tsundoku.ViewModels;
 using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 using static Tsundoku.Models.Enums.TsundokuFilterModel;
-using Avalonia.ReactiveUI;
+using ReactiveUI.Avalonia;
 using System.Reactive.Disposables;
+using System.Reactive.Disposables.Fluent;
 
 namespace Tsundoku.Views;
 
@@ -43,7 +44,7 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
 
         SetupAdvancedSearchBar(" & ");
 
-        KeyDown += async (s, e) => 
+        KeyDown += async (s, e) =>
         {
             if (e.Key == Key.F11) // Fullscreen
             {
@@ -60,7 +61,7 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
             }
             else if (e.KeyModifiers == KeyModifiers.Control && e.Key == Key.P) // Take Screenshot
             {
-                LOGGER.Info($"Saving Screenshot of Collection for \"{ViewModel.CurrentTheme.ThemeName} Theme\"");
+                LOGGER.Info("Saving Screenshot of Collection for \"{ThemeName} Theme\"", ViewModel.CurrentTheme.ThemeName);
                 await ScreenCaptureWindows();
             }
             else if (e.KeyModifiers == KeyModifiers.Control && e.Key == Key.S) // Save User Data
@@ -290,17 +291,17 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
             {
                 return itemString.StartsWith(query, StringComparison.OrdinalIgnoreCase);
             }
-            else if (query.Contains(itemString) || itemString.Last() != '=' && query.Contains(itemString[..itemString.IndexOf("==")]))
+            else if (query.Contains(itemString, StringComparison.Ordinal) || itemString.Last() != '=' && query.Contains(itemString[..itemString.IndexOf("==", StringComparison.Ordinal)], StringComparison.Ordinal))
             {
                 return false;
             }
 
             string filterName = itemString[..^2];
-            if (itemString.Contains("==") && (query.Contains($"{filterName}<=") || query.Contains($"{filterName}>=")))
+            if (itemString.Contains("==", StringComparison.Ordinal) && (query.Contains($"{filterName}<=", StringComparison.Ordinal) || query.Contains($"{filterName}>=", StringComparison.Ordinal)))
             {
                 return false;
             }
-            else if ((itemString.Contains('>') || itemString.Contains('<')) && query.Contains($"{filterName}=="))
+            else if ((itemString.Contains('>') || itemString.Contains('<')) && query.Contains($"{filterName}==", StringComparison.Ordinal))
             {
                 return false;
             }
@@ -365,7 +366,7 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
         if (file.Count == 1)
         {
             string path = file[0].Path.LocalPath;
-            if (Path.GetExtension(path).Equals(".png"))
+            if (Path.GetExtension(path).Equals(".png", StringComparison.OrdinalIgnoreCase))
             {
                 Path.ChangeExtension(path, ".png");
             }
@@ -382,7 +383,7 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
     /// </summary>
     private void OpenDonationLink(object sender, RoutedEventArgs args)
     {
-        LOGGER.Info($"Opening PayPal Donation Lionk");
+        LOGGER.Info("Opening PayPal Donation Link");
         try
         {
             Process.Start(new ProcessStartInfo("https://www.paypal.com/donate/?business=JAYCVEJGDF4GY&no_recurring=0&item_name=Help+keep+Tsundoku+Supported+into+the+Future%21&currency_code=USD") { UseShellExecute = true });

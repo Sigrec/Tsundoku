@@ -1,12 +1,13 @@
 ﻿using System.Collections.ObjectModel;
 using System.Reactive.Disposables;
+using System.Reactive.Disposables.Fluent;
 
 using System.Reactive.Linq;
 using System.Text.RegularExpressions;
 using Avalonia.Media.Imaging;
 using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+using ReactiveUI.SourceGenerators;
 using Tsundoku.Clients;
 using Tsundoku.Helpers;
 using Tsundoku.Models;
@@ -44,14 +45,14 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
     public UserNotesWindow UserNotesWindow => _userNotesWindow;
 
     // --- Reactive Properties (Public) ---
-    [Reactive] public string AdvancedSearchQuery { get; set; } = string.Empty;
-    [Reactive] public string SeriesFilterText { get; set; }
-    [Reactive] public TsundokuFilter SelectedFilter { get; set; } = TsundokuFilter.None;
-    [Reactive] public int SelectedFilterIndex { get; set; } = 0;
-    [Reactive] public int SelectedLangIndex { get; set; }
-    [Reactive] public string NotificationText { get; set; }
-    [Reactive] public string AdvancedSearchQueryErrorMessage { get; set; }
-    [Reactive] public TsundokuLanguage SelectedLanguage { get; set; }
+    [Reactive] public partial string AdvancedSearchQuery { get; set; } = string.Empty;
+    [Reactive] public partial string SeriesFilterText { get; set; }
+    [Reactive] public partial TsundokuFilter SelectedFilter { get; set; } = TsundokuFilter.None;
+    [Reactive] public partial int SelectedFilterIndex { get; set; } = 0;
+    [Reactive] public partial int SelectedLangIndex { get; set; }
+    [Reactive] public partial string NotificationText { get; set; }
+    [Reactive] public partial string AdvancedSearchQueryErrorMessage { get; set; }
+    [Reactive] public partial TsundokuLanguage SelectedLanguage { get; set; }
 
     public ReadOnlyObservableCollection<Series> UserCollection { get; }
     public static readonly List<Series> CoverChangedSeriesList = [];
@@ -80,7 +81,7 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
 
         this.WhenAnyValue(x => x.SelectedFilter)
             .DistinctUntilChanged()
-            .ObserveOn(RxApp.MainThreadScheduler)
+            .ObserveOn(RxSchedulers.MainThreadScheduler)
             .Do(filter => LOGGER.Info("Applying filter: {Filter}", filter))
             .Subscribe(filter =>
             {
@@ -102,7 +103,7 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
 
         this.WhenAnyValue(x => x.CurrentUser.Language)
             .DistinctUntilChanged()
-            .ObserveOn(RxApp.MainThreadScheduler)
+            .ObserveOn(RxSchedulers.MainThreadScheduler)
             .Subscribe(lang =>
             {
                 int newIndex = INDEXED_LANGUAGES[lang];
@@ -117,6 +118,17 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
     public void SaveUserData()
     {
         _userService.SaveUserData();
+    }
+
+    public bool ShouldShowChangelog()
+    {
+        string lastSeen = _userService.GetCurrentUserSnapshot()?.LastSeenAppVersion ?? string.Empty;
+        return Changelog.ShouldShow(CUR_TSUNDOKU_VERSION, lastSeen);
+    }
+
+    public void MarkChangelogSeen()
+    {
+        _userService.UpdateUser(user => user.LastSeenAppVersion = CUR_TSUNDOKU_VERSION);
     }
 
     public async Task CreateEditSeriesDialog(Series series)
@@ -189,7 +201,7 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
             string.Empty,
             allowDuplicate: false,
             isRefresh: true,
-            isCoverImageRefresh: originalSeries.IsCoverImageEmpty(),
+            isCoverImageRefresh: originalSeries.IsCoverImageEmpty() || (_userService.GetCurrentUserSnapshot()?.RefreshCovers ?? false),
             coverPath: originalSeries.Cover);
 
         _userService.RefreshSeries(originalSeries, refreshedSeries);

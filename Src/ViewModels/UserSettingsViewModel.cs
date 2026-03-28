@@ -1,4 +1,4 @@
-using ReactiveUI.Fody.Helpers;
+using ReactiveUI.SourceGenerators;
 using ReactiveUI;
 using System.Reactive.Linq;
 using Tsundoku.Models;
@@ -8,24 +8,32 @@ using Tsundoku.Helpers;
 using System.Globalization;
 using static Tsundoku.Models.Enums.SeriesFormatModel;
 using Avalonia.Controls;
+using Tsundoku.Views;
 
 namespace Tsundoku.ViewModels;
 
-public sealed class UserSettingsViewModel : ViewModelBase
+public sealed partial class UserSettingsViewModel : ViewModelBase
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
-    [Reactive] public bool IsChangeUsernameButtonEnabled { get; set; }
-    [Reactive] public bool BooksAMillionMember { get; set; }
-    [Reactive] public bool KinokuniyaUSAMember { get; set; }
-    [Reactive] public int SelectedCurrencyIndex { get; set; } = 0;
+    [Reactive] public partial bool IsChangeUsernameButtonEnabled { get; set; }
+    [Reactive] public partial bool BooksAMillionMember { get; set; }
+    [Reactive] public partial bool KinokuniyaUSAMember { get; set; }
+    [Reactive] public partial bool RefreshCovers { get; set; }
+    [Reactive] public partial int SelectedCurrencyIndex { get; set; } = 0;
 
     private readonly AddNewSeriesViewModel _addNewSeriesViewModel;
     private readonly ILoadingDialogService _loadingDialogService;
+    private readonly BitmapHelper _bitmapHelper;
+    private readonly Clients.MangaDex _mangaDex;
+    private readonly Clients.AniList _aniList;
 
-    public UserSettingsViewModel(IUserService userService, AddNewSeriesViewModel addNewSeriesViewModel, ILoadingDialogService loadingDialogService) : base(userService)
+    public UserSettingsViewModel(IUserService userService, AddNewSeriesViewModel addNewSeriesViewModel, ILoadingDialogService loadingDialogService, BitmapHelper bitmapHelper, Clients.MangaDex mangaDex, Clients.AniList aniList) : base(userService)
     {
         _addNewSeriesViewModel = addNewSeriesViewModel;
         _loadingDialogService = loadingDialogService;
+        _bitmapHelper = bitmapHelper;
+        _mangaDex = mangaDex;
+        _aniList = aniList;
 
         this.WhenAnyValue(x => x.CurrentUser)
             .Select(user => user?.Currency)
@@ -33,7 +41,7 @@ public sealed class UserSettingsViewModel : ViewModelBase
             .Where(currency =>
                 !string.IsNullOrWhiteSpace(currency) &&
                 AVAILABLE_CURRENCY_WITH_CULTURE.ContainsKey(currency))
-            .ObserveOn(RxApp.MainThreadScheduler)
+            .ObserveOn(RxSchedulers.MainThreadScheduler)
             .Subscribe(currency =>
             {
                 SelectedCurrencyIndex = AVAILABLE_CURRENCY_WITH_CULTURE[currency].Index;
@@ -42,14 +50,24 @@ public sealed class UserSettingsViewModel : ViewModelBase
         BooksAMillionMember = CurrentUser.Memberships[BooksAMillion.TITLE];
         this.WhenAnyValue(x => x.BooksAMillionMember)
             .Skip(1)
-            .ObserveOn(RxApp.MainThreadScheduler)
+            .ObserveOn(RxSchedulers.MainThreadScheduler)
             .Subscribe(isMember => UpdateMembership(BooksAMillion.TITLE, isMember));
 
         KinokuniyaUSAMember = CurrentUser.Memberships[KinokuniyaUSA.TITLE];
         this.WhenAnyValue(x => x.KinokuniyaUSAMember)
             .Skip(1)
-            .ObserveOn(RxApp.MainThreadScheduler)
+            .ObserveOn(RxSchedulers.MainThreadScheduler)
             .Subscribe(isMember => UpdateMembership(KinokuniyaUSA.TITLE, isMember));
+
+        RefreshCovers = CurrentUser.RefreshCovers;
+        this.WhenAnyValue(x => x.RefreshCovers)
+            .Skip(1)
+            .ObserveOn(RxSchedulers.MainThreadScheduler)
+            .Subscribe(value =>
+            {
+                _userService.UpdateUser(user => user.RefreshCovers = value);
+                LOGGER.Debug("Updated RefreshCovers to {Value}", value);
+            });
     }
 
     private void UpdateMembership(string websiteTitle, bool isMember)
@@ -204,6 +222,64 @@ public sealed class UserSettingsViewModel : ViewModelBase
                     LOGGER.Warn("Could not Export Collection Spreadsheet Data to -> {filePath}\n{ex.Message}", filePath, ex.Message);
                 }
             });
+        }, owner);
+    }
+
+    public async Task RefreshAllCoversAsync(Window owner)
+    {
+        SeriesPickerWindow picker = new(_userService.GetUserCollection(), CurrentUser.Language)
+        {
+            DataContext = this
+        };
+        await picker.ShowDialog(owner);
+
+        List<Series>? selected = picker.SelectedSeries;
+        if (selected is null || selected.Count == 0) return;
+
+        await _loadingDialogService.ShowCancellableAsync("Refreshing Series", async (vm, ct) =>
+        {
+            vm.ProgressMaximum = selected.Count;
+            vm.ProgressValue = 0;
+
+            foreach (Series series in selected)
+            {
+                if (ct.IsCancellationRequested) break;
+
+                try
+                {
+                    vm.StatusText = $"Refreshing {series.Titles[TsundokuLanguage.Romaji]}";
+
+                    Series? refreshed = await Series.CreateNewSeriesCardAsync(
+                        _bitmapHelper,
+                        _mangaDex,
+                        _aniList,
+                        series.Link.Segments.Last(),
+                        series.Format,
+                        series.MaxVolumeCount,
+                        series.CurVolumeCount,
+                        series.SeriesContainsAdditionalLanagues(),
+                        series.Publisher,
+                        series.Demographic,
+                        series.VolumesRead,
+                        series.Rating,
+                        series.Value,
+                        string.Empty,
+                        allowDuplicate: false,
+                        isRefresh: true,
+                        isCoverImageRefresh: true,
+                        coverPath: series.Cover);
+
+                    _userService.RefreshSeries(series, refreshed);
+                    LOGGER.Info("Refreshed {Title}", series.Titles[TsundokuLanguage.Romaji]);
+                }
+                catch (Exception ex)
+                {
+                    LOGGER.Error(ex, "Failed to refresh {Title}", series.Titles[TsundokuLanguage.Romaji]);
+                }
+                vm.ProgressValue++;
+            }
+
+            _userService.SaveUserData();
         }, owner);
     }
 }

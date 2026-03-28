@@ -84,7 +84,7 @@ public static partial class LibibParser
                         continue;
                     }
 
-                    if (!publisher.Equals("Unknown"))
+                    if (!publisher.Equals("Unknown", StringComparison.Ordinal))
                     {
                         ReadOnlySpan<char> publisherSpan = publisher.AsSpan();
                         if (publisherSpan.Contains("Tokyopop", StringComparison.OrdinalIgnoreCase))

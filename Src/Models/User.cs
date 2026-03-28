@@ -4,7 +4,7 @@ using System.Text.Json.Nodes;
 using Tsundoku.Helpers;
 using Tsundoku.Converters;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+using ReactiveUI.SourceGenerators;
 using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 using System.Text.Encodings.Web;
 using System.Diagnostics.CodeAnalysis;
@@ -13,7 +13,7 @@ using static Tsundoku.Models.Enums.SeriesDemographicModel;
 
 namespace Tsundoku.Models;
 
-public sealed class User : ReactiveObject
+public sealed partial class User : ReactiveObject
 {
     public static readonly JsonSerializerOptions JSON_SERIALIZATION_OPTIONS = new JsonSerializerOptions(UserModelContext.Default.Options)
     {
@@ -21,25 +21,27 @@ public sealed class User : ReactiveObject
     };
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
 
-    [Reactive] public double DataVersion { get; set; } = ViewModelBase.SCHEMA_VERSION;
-    [Reactive] public string UserName { get; set; } = "UserName";
-    [Reactive] public TsundokuLanguage Language { get; set; } = TsundokuLanguage.Romaji;
-    [Reactive] public string Display { get; set; } = "Card";
-    [Reactive] public string MainTheme { get; set; } = "Default";
-    [Reactive] public string Currency { get; set; } = "$";
-    [Reactive] public string CollectionValue { get; set; }
-    [Reactive] public uint NumVolumesCollected { get; set; }
-    [Reactive] public uint NumVolumesToBeCollected { get; set; }
-    [Reactive] public decimal MeanRating { get; set; }
-    [Reactive] public uint VolumesRead { get; set; }
-    [Reactive] public Region Region { get; set; } = Region.America;
-    [Reactive] public Dictionary<string, bool> Memberships { get; set; }
-    [Reactive] public string Notes { get; set; }
+    [Reactive] public partial double DataVersion { get; set; } = ViewModelBase.SCHEMA_VERSION;
+    [Reactive] public partial string UserName { get; set; } = "UserName";
+    [Reactive] public partial TsundokuLanguage Language { get; set; } = TsundokuLanguage.Romaji;
+    [Reactive] public partial string Display { get; set; } = "Card";
+    [Reactive] public partial string MainTheme { get; set; } = "Default";
+    [Reactive] public partial string Currency { get; set; } = "$";
+    [Reactive] public partial string CollectionValue { get; set; }
+    [Reactive] public partial uint NumVolumesCollected { get; set; }
+    [Reactive] public partial uint NumVolumesToBeCollected { get; set; }
+    [Reactive] public partial decimal MeanRating { get; set; }
+    [Reactive] public partial uint VolumesRead { get; set; }
+    [Reactive] public partial Region Region { get; set; } = Region.America;
+    [Reactive] public partial Dictionary<string, bool> Memberships { get; set; }
+    [Reactive] public partial string Notes { get; set; }
+    [Reactive] public partial bool RefreshCovers { get; set; }
+    public string LastSeenAppVersion { get; set; } = string.Empty;
     public List<TsundokuTheme> SavedThemes { get; set; }
     public List<Series> UserCollection { get; set; }
 
     [JsonConverter(typeof(UserIconBitmapJsonConverter))]
-    [Reactive] public Bitmap? UserIcon { get; set; }
+    [Reactive] public partial Bitmap? UserIcon { get; set; }
 
     public User(string UserName, TsundokuLanguage Language, string MainTheme, string Display, double DataVersion, string Currency, string CollectionValue, Region Region, Dictionary<string, bool> Memberships, List<TsundokuTheme> SavedThemes, List<Series> UserCollection)
     {
@@ -192,7 +194,8 @@ public sealed class User : ReactiveObject
                 coverPath = collectionJsonArray.ElementAt(x)["Cover"].ToString();
                 if (File.Exists(coverPath))
                 {
-                    Bitmap resizedBitMap = new Bitmap(coverPath).CreateScaledBitmap(new PixelSize(LEFT_SIDE_CARD_WIDTH, IMAGE_HEIGHT), BitmapInterpolationMode.HighQuality);
+                    using Bitmap originalBitmap = new Bitmap(coverPath);
+                    Bitmap resizedBitMap = originalBitmap.CreateScaledBitmap(new PixelSize(LEFT_SIDE_CARD_WIDTH * BITMAP_SCALE, IMAGE_HEIGHT * BITMAP_SCALE), BitmapInterpolationMode.HighQuality);
                     resizedBitMap.Save(coverPath, 100);
                 }
             }
@@ -267,9 +270,9 @@ public sealed class User : ReactiveObject
             {
                 series = collectionJsonArray.ElementAt(x).AsObject();
                 string[] coverFileName = series["Cover"].ToString().Split('_');
-                string format = series["Format"].ToString().ToUpper();
+                string format = series["Format"].ToString();
                 string oldCoverFileName = series["Cover"].ToString();
-                if (!coverFileName[1].StartsWith(format) && File.Exists(oldCoverFileName))
+                if (!coverFileName[1].StartsWith(format, StringComparison.OrdinalIgnoreCase) && File.Exists(oldCoverFileName))
                 {
                     series["Cover"] = $@"{coverFileName[0]}_{format}.{oldCoverFileName.Substring(oldCoverFileName.Length - 3)}";
                     File.Move(oldCoverFileName, series["Cover"].ToString());

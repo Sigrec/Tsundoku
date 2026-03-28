@@ -7,6 +7,7 @@ namespace Tsundoku.Services;
 public interface ILoadingDialogService
 {
     Task ShowAsync(string message, Func<LoadingDialogViewModel, Task> work, Window owner);
+    Task ShowCancellableAsync(string message, Func<LoadingDialogViewModel, CancellationToken, Task> work, Window owner);
     void Show(string message, Action<LoadingDialogViewModel> work, Window owner);
 }
 
@@ -38,6 +39,30 @@ public sealed class LoadingDialogService(LoadingDialogViewModel viewModel) : ILo
         }
     }
 
+    public async Task ShowCancellableAsync(
+        string message,
+        Func<LoadingDialogViewModel, CancellationToken, Task> work,
+        Window owner)
+    {
+        _viewModel.StatusText = message;
+
+        LoadingDialog dialog = new()
+        {
+            ViewModel = _viewModel
+        };
+        dialog.EnableCancellation();
+        dialog.Show(owner);
+
+        try
+        {
+            await work(_viewModel, dialog.CancellationToken);
+        }
+        finally
+        {
+            dialog.Close();
+        }
+    }
+
     public void Show(
         string message,
         Action<LoadingDialogViewModel> work,
@@ -45,7 +70,7 @@ public sealed class LoadingDialogService(LoadingDialogViewModel viewModel) : ILo
     {
         _viewModel.StatusText = message;
 
-        LoadingDialog dialog = new LoadingDialog
+        LoadingDialog dialog = new()
         {
             ViewModel = _viewModel
         };
