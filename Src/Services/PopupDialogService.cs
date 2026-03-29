@@ -4,15 +4,14 @@ using Tsundoku.Views;
 
 namespace Tsundoku.Services;
 
-public interface IPopupDialogService
-{
-    Task ShowAsync(string title, string icon, string info,  Window owner);
-}
-
+/// <summary>
+/// Displays popup dialogs to the user using the <see cref="PopupDialog"/> window.
+/// </summary>
 public sealed class PopupDialogService(PopupDialogViewModel viewModel) : IPopupDialogService
 {
     private readonly PopupDialogViewModel _viewModel = viewModel;
 
+    /// <inheritdoc />
     public async Task ShowAsync(
         string title,
         string icon,

@@ -6,10 +6,25 @@ using static Tsundoku.Models.Enums.SeriesGenreModel;
 
 namespace Tsundoku.Clients;
 
+/// <summary>
+/// Client for querying the MangaDex API for manga metadata, covers, and staff information.
+/// </summary>
 public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
     private readonly HttpClient _mangadexClient = httpClientFactory.CreateClient("MangaDexClient");
+
+    /// <summary>Maximum number of concurrent requests when fetching staff relationships.</summary>
+    private const int MaxConcurrentRequests = 5;
+
+    /// <summary>Separator used between staff names in the formatted output.</summary>
+    private const string StaffSeparator = " | ";
+
+    /// <summary>Length of the staff separator, used when trimming trailing separators.</summary>
+    private static readonly int StaffSeparatorLength = StaffSeparator.Length;
+
+    /// <summary>Preferred language code for biography lookups.</summary>
+    private const string PreferredBiographyLanguage = "en";
 
     [GeneratedRegex(@"(?:(?:\n\n---\n\*\*Links:\*\*)|\n{3,}---|\n\n\*\*|\[(?:Official|Wikipedia).*?\]|\n___\n|\r\n\s+\r\n|\*\*\*Won.*)[\s\S]*|- Winner.*$", RegexOptions.Multiline | RegexOptions.IgnoreCase)]
     private static partial Regex MangaDexDescCleanupRegex();
@@ -43,7 +58,7 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
                 ["order[relevance]"] = "desc"
             };
 
-            string queryString = string.Join("&", query.Select(kvp => $"{kvp.Key}={kvp.Value}"));
+            string queryString = string.Join('&', query.Select(kvp => $"{kvp.Key}={kvp.Value}"));
             string endpoint = $"manga?{queryString}";
 
             LOGGER.Debug("MangaDex: Getting series by title async \"{BaseAddress}{Endpoint}\"", _mangadexClient.BaseAddress, endpoint);
@@ -56,15 +71,15 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
         }
         catch (HttpRequestException ex)
         {
-            LOGGER.Error(ex, $"HTTP error while getting series for title: \"{title}\"");
+            LOGGER.Error(ex, "HTTP error while getting series for title: {Title}", title);
         }
         catch (JsonException ex)
         {
-            LOGGER.Error(ex, $"JSON parsing error for series title: \"{title}\"");
+            LOGGER.Error(ex, "JSON parsing error for series title: {Title}", title);
         }
         catch (Exception ex)
         {
-            LOGGER.Error(ex, $"Unexpected error for series title: \"{title}\"");
+            LOGGER.Error(ex, "Unexpected error for series title: {Title}", title);
         }
 
         return null;
@@ -92,15 +107,15 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
         }
         catch (HttpRequestException ex)
         {
-            LOGGER.Error(ex, $"MangaDex HTTP error while getting series for ID: {id}");
+            LOGGER.Error(ex, "MangaDex HTTP error while getting series for ID: {Id}", id);
         }
         catch (JsonException ex)
         {
-            LOGGER.Error(ex, $"MangaDex JSON parsing error for series ID: {id}");
+            LOGGER.Error(ex, "MangaDex JSON parsing error for series ID: {Id}", id);
         }
         catch (Exception ex)
         {
-            LOGGER.Error(ex, $"MangaDex unexpected error for series ID: {id}");
+            LOGGER.Error(ex, "MangaDex unexpected error for series ID: {Id}", id);
         }
 
         return null;
@@ -135,8 +150,8 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
 
             if (attributes.TryGetProperty("biography", out JsonElement bioElem) && bioElem.ValueKind == JsonValueKind.Object)
             {
-                // Prefer English ("en") biography if available
-                if (bioElem.TryGetProperty("en", out JsonElement enBio))
+                // Prefer English biography if available
+                if (bioElem.TryGetProperty(PreferredBiographyLanguage, out JsonElement enBio))
                 {
                     bio = enBio.GetString();
                 }
@@ -155,15 +170,15 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
         }
         catch (HttpRequestException ex)
         {
-            LOGGER.Error(ex, $"MangaDex HTTP error while getting author for ID: {id}");
+            LOGGER.Error(ex, "MangaDex HTTP error while getting author for ID: {Id}", id);
         }
         catch (JsonException ex)
         {
-            LOGGER.Error(ex, $"MangaDex JSON parsing error for author ID: {id}");
+            LOGGER.Error(ex, "MangaDex JSON parsing error for author ID: {Id}", id);
         }
         catch (Exception ex)
         {
-            LOGGER.Error(ex, $"MangaDex unexpected error for author ID: {id}");
+            LOGGER.Error(ex, "MangaDex unexpected error for author ID: {Id}", id);
         }
 
         return (string.Empty, null);
@@ -209,9 +224,9 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
                 }
             }
         }
-        AuthorEntry[] authorEntries = [.. authorTypeMap.Select(static kvp => new AuthorEntry(kvp.Key, kvp.Value))];
+        AuthorEntry[] authorEntries = [.. authorTypeMap.AsValueEnumerable().Select(static kvp => new AuthorEntry(kvp.Key, kvp.Value))];
 
-        SemaphoreSlim semaphore = new SemaphoreSlim(5);
+        SemaphoreSlim semaphore = new SemaphoreSlim(MaxConcurrentRequests);
         Task<(AuthorEntry Entry, string StaffNameRaw, string? Bio)>[] fetchTasks = [.. authorEntries.Select(async entry =>
         {
             await semaphore.WaitAsync();
@@ -257,18 +272,18 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
                 }
             }
 
-            nativeStaffBuilder.Append(string.IsNullOrWhiteSpace(nativeName) ? staffName : nativeName).Append(" | ");
-            fullStaffBuilder.Append(staffName).Append(" | ");
+            nativeStaffBuilder.Append(string.IsNullOrWhiteSpace(nativeName) ? staffName : nativeName).Append(StaffSeparator);
+            fullStaffBuilder.Append(staffName).Append(StaffSeparator);
         }
 
-        if (fullStaffBuilder.Length > 3)
+        if (fullStaffBuilder.Length > StaffSeparatorLength)
         {
-            fullStaffBuilder.Length -= 3;
+            fullStaffBuilder.Length -= StaffSeparatorLength;
         }
 
-        if (nativeStaffBuilder.Length > 3)
+        if (nativeStaffBuilder.Length > StaffSeparatorLength)
         {
-            nativeStaffBuilder.Length -= 3;
+            nativeStaffBuilder.Length -= StaffSeparatorLength;
         }
 
         return (fullStaffBuilder, nativeStaffBuilder);
@@ -301,16 +316,31 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
             using Stream contentStream = await response.Content.ReadAsStreamAsync();
             using JsonDocument json = await JsonDocument.ParseAsync(contentStream);
 
-            JsonElement data = json.RootElement.GetProperty("data");
+            if (!json.RootElement.TryGetProperty("data", out JsonElement data))
+            {
+                LOGGER.Warn("MangaDex cover response missing 'data' for ID: {Id}", id);
+                return null;
+            }
 
             if (data.ValueKind == JsonValueKind.Array)
             {
-                JsonElement? first = data.EnumerateArray().FirstOrDefault();
-                return first?.GetProperty("attributes").GetProperty("fileName").GetString();
+                JsonElement first = data.EnumerateArray().FirstOrDefault();
+                return first.ValueKind == JsonValueKind.Object
+                    && first.TryGetProperty("attributes", out JsonElement firstAttr)
+                    && firstAttr.TryGetProperty("fileName", out JsonElement firstFile)
+                    ? firstFile.GetString()
+                    : null;
             }
 
-            mangaDexId ??= data.GetProperty("id").GetString();
-            string? coverImage = data.GetProperty("attributes").GetProperty("fileName").GetString();
+            if (string.IsNullOrWhiteSpace(mangaDexId) && data.TryGetProperty("id", out JsonElement dataId))
+            {
+                mangaDexId = dataId.GetString();
+            }
+
+            string? coverImage = data.TryGetProperty("attributes", out JsonElement attrs)
+                && attrs.TryGetProperty("fileName", out JsonElement fileEl)
+                ? fileEl.GetString()
+                : null;
 
             if (coverImage is null)
             {
@@ -322,20 +352,25 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
         }
         catch (HttpRequestException ex)
         {
-            LOGGER.Error(ex, $"MangaDex HTTP error while getting cover for ID: {id}");
+            LOGGER.Error(ex, "MangaDex HTTP error while getting cover for ID: {Id}", id);
         }
         catch (JsonException ex)
         {
-            LOGGER.Error(ex, $"MangaDex JSON parsing error for cover ID: {id}");
+            LOGGER.Error(ex, "MangaDex JSON parsing error for cover ID: {Id}", id);
         }
         catch (Exception ex)
         {
-            LOGGER.Error(ex, $"MangaDex unexpected error for cover ID: {id}");
+            LOGGER.Error(ex, "MangaDex unexpected error for cover ID: {Id}", id);
         }
 
         return null;
     }
 
+    /// <summary>
+    /// Determines whether the input string is a valid MangaDex UUID.
+    /// </summary>
+    /// <param name="input">The string to validate as a GUID.</param>
+    /// <returns><c>true</c> if the input is a valid GUID; otherwise, <c>false</c>.</returns>
     public static bool IsMangaDexId(string input)
     {
         return Guid.TryParse(input, out _);
@@ -365,8 +400,7 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
         if (!string.IsNullOrWhiteSpace(englishTitle))
         {
             ReadOnlySpan<char> enTitleSpan = englishTitle.AsSpan();
-            if (string.IsNullOrWhiteSpace(englishTitle) ||
-                enTitleSpan.Contains("Digital", StringComparison.OrdinalIgnoreCase) ||
+            if (enTitleSpan.Contains("Digital", StringComparison.OrdinalIgnoreCase) ||
                 enTitleSpan.Contains("Fan Colored", StringComparison.OrdinalIgnoreCase) ||
                 enTitleSpan.Contains("Official Colored", StringComparison.OrdinalIgnoreCase))
             {
@@ -735,6 +769,11 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
         return genres;
     }
 
+    /// <summary>
+    /// Cleans a MangaDex series description by removing awards, links, and normalizing quotes.
+    /// </summary>
+    /// <param name="seriesDescription">The raw description text from MangaDex.</param>
+    /// <returns>A cleaned plain-text description.</returns>
     public static string ParseDescription(string seriesDescription)
     {
         ReadOnlySpan<char> span = seriesDescription.AsSpan();

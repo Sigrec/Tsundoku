@@ -9,312 +9,177 @@
         x:Class="Tsundoku.Views.AddNewSeriesWindow"
 		Icon="\Assets\Icons\TsundokuLogo.ico"
         Title="Add New Series"
-		FontFamily="Segoe UI"
 		SizeToContent="WidthAndHeight"
         Classes="Menu"
-		WindowStartupLocation="2"
+		WindowStartupLocation="CenterOwner"
 		KeyboardNavigation.TabNavigation="Cycle"
 		x:DataType="vm:AddNewSeriesViewModel"
         x:Name="Root"
 		CanResize="false">
 
-	<Border Classes="Menu" BorderThickness="3" CornerRadius="0,0,8,8" ClipToBounds="True">
-		<Grid ColumnDefinitions="*,15,*,15,*" RowDefinitions="Auto,Auto,5,Auto,Auto,5,Auto,Auto,5,Auto,Auto,5,Auto,Auto,5,Auto,Auto,5,Auto,Auto" Margin="20,20,20,30" ShowGridLines="false">
-            <Grid.Styles>
-                <Style Selector="ScrollBar:vertical">
-                    <Style Selector="^ /template/ Rectangle#TrackRect">
-                        <Setter Property="Fill" Value="{CompiledBinding CurrentTheme.CollectionBGColor}" />
-                    </Style>
+	<Border Classes="Menu" BorderThickness="2" CornerRadius="0,0,8,8" ClipToBounds="True">
+		<Grid RowDefinitions="Auto,*">
+			<!-- Header -->
+			<Border Grid.Row="0" BorderThickness="0,0,0,2" BorderBrush="{DynamicResource TsundokuDividerColor}" Padding="16,12">
+				<StackPanel Orientation="Horizontal" Spacing="8">
+					<i:Icon Value="fa-solid fa-square-plus" FontSize="16" Foreground="{DynamicResource TsundokuDividerColor}"/>
+					<TextBlock Text="Add New Series" FontSize="18" FontWeight="ExtraBold" Foreground="{DynamicResource TsundokuUsernameColor}" VerticalAlignment="Center"/>
+				</StackPanel>
+			</Border>
 
-                    <Style Selector="^ /template/ Thumb">
-                        <Setter Property="Background" Value="{CompiledBinding CurrentTheme.DividerColor}" />
-                        <Style Selector="^:pointerover /template/ Border">
-                            <Setter Property="Background" Value="{CompiledBinding CurrentTheme.DividerColor}" />
-                        </Style>
-                        <Style Selector="^:pressed /template/ Border">
-                            <Setter Property="Background" Value="{CompiledBinding CurrentTheme.DividerColor}" />
-                        </Style>
-                    </Style>
+			<!-- Form Content -->
+			<Grid Grid.Row="1" ColumnDefinitions="*,16,Auto" Margin="20,14,20,20">
+				<!-- Left: Form Fields -->
+				<StackPanel Grid.Column="0" Spacing="12" Name="FormFields" Width="520">
+					<!-- Title -->
+					<StackPanel Spacing="4">
+						<TextBlock Text="TITLE OR ID" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuSeriesCardPublisherColor}" LetterSpacing="1" Opacity="0.8" ToolTip.Tip="{Binding #SeriesInputTextBox.Text}"/>
+						<TextBox x:Name="SeriesInputTextBox"
+							FontSize="13" FontWeight="Bold" Height="60"
+							Text="{CompiledBinding TitleText}" Classes="Menu"
+							BorderThickness="2" TextWrapping="Wrap"
+							Watermark="Title or AniList/MangaDex ID..."/>
+					</StackPanel>
 
-                    <Style Selector="^[IsExpanded=true]">
-                        <Style Selector="^ /template/ Thumb">
-                            <Setter Property="Background" Value="{CompiledBinding CurrentTheme.DividerColor}" />
-                        </Style>
+					<Popup
+						IsOpen="{CompiledBinding IsSuggestionsOpen}"
+						PlacementTarget="{Binding #Root}"
+						PlacementMode="Left"
+						HorizontalOffset="-10" VerticalOffset="-15"
+						ToolTip.Tip="Search via Romaji">
+						<Border Padding="10"
+								CornerRadius="10"
+								Background="{DynamicResource TsundokuMenuBGColor}"
+								BorderBrush="{DynamicResource TsundokuDividerColor}"
+								BorderThickness="2"
+								BoxShadow="0 8 24 0 #4D000000"
+								Height="{Binding #Root.Bounds.Height}">
+							<Grid RowDefinitions="Auto,Auto,*">
+								<TextBlock Text="SEARCH RESULTS" FontSize="11" FontWeight="Bold"
+									Foreground="{DynamicResource TsundokuSeriesCardPublisherColor}"
+									LetterSpacing="1" Opacity="0.8" HorizontalAlignment="Center" Margin="0,0,0,6"/>
+								<Border Grid.Row="1" Height="2" Background="{DynamicResource TsundokuDividerColor}" Opacity="0.3" Margin="0,0,0,6"/>
+								<ListBox Grid.Row="2"
+									ItemsSource="{CompiledBinding Suggestions}"
+									SelectionMode="Single"
+									SelectedItem="{CompiledBinding SelectedSuggestion, Mode=TwoWay}"
+									Theme="{StaticResource QueryListBox}" Width="260"
+									ClipToBounds="True"
+									ItemContainerTheme="{StaticResource QueryListBoxItem}">
+									<ListBox.ItemTemplate>
+										<DataTemplate>
+											<TextBlock Text="{Binding Display}" FontSize="13" TextWrapping="Wrap"/>
+										</DataTemplate>
+									</ListBox.ItemTemplate>
+								</ListBox>
+							</Grid>
+						</Border>
+					</Popup>
 
-                        <Style Selector="^ /template/ PathIcon">
-                            <Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.DividerColor}" />
-                        </Style>
+					<!-- Publisher + Total Value -->
+					<Grid ColumnDefinitions="*,12,*">
+						<StackPanel Spacing="4">
+							<TextBlock FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuSeriesCardPublisherColor}" LetterSpacing="1" Opacity="0.8" ToolTip.Tip="{CompiledBinding PublisherText}"><Run Text="PUBLISHER "/><Run Text="(opt)" FontSize="9" Foreground="{DynamicResource TsundokuMenuTextColor}"/></TextBlock>
+							<TextBox x:Name="PublisherTextBox"
+								FontSize="13" FontWeight="Bold" Height="34"
+								Text="{CompiledBinding PublisherText}" Classes="Menu"
+								BorderThickness="2" MaxLength="24" ToolTip.Tip="Optional"/>
+						</StackPanel>
+						<StackPanel Grid.Column="2" Spacing="4">
+							<TextBlock FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuSeriesCardPublisherColor}" LetterSpacing="1" Opacity="0.8"><Run Text="TOTAL VALUE "/><Run Text="(opt)" FontSize="9" Foreground="{DynamicResource TsundokuMenuTextColor}"/></TextBlock>
+							<MaskedTextBox x:Name="CostMaskedTextBox" Classes="Menu" BorderThickness="2" FontWeight="Bold" FontSize="13" Mask="{CompiledBinding SeriesValueMaskedText}" Height="34" PromptChar=" " HorizontalContentAlignment="Center" ToolTip.Tip="Optional"/>
+						</StackPanel>
+					</Grid>
 
-                        <Style Selector="^ /template/ Rectangle#TrackRect">
-                            <Setter Property="Fill" Value="{CompiledBinding CurrentTheme.MenuBGColor}" />
-                        </Style>
-                    </Style>
+					<!-- Cur / Max / Read Volumes -->
+					<Grid ColumnDefinitions="*,12,*,12,*">
+						<StackPanel Spacing="4">
+							<TextBlock Text="CUR VOLUMES" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuSeriesCardPublisherColor}" LetterSpacing="1" Opacity="0.8"/>
+							<MaskedTextBox x:Name="CurVolCount" Classes="Menu" BorderThickness="2" FontWeight="Bold" FontSize="13" Mask="000" MaxLength="3" Height="34"/>
+						</StackPanel>
+						<StackPanel Grid.Column="2" Spacing="4">
+							<TextBlock Text="MAX VOLUMES" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuSeriesCardPublisherColor}" LetterSpacing="1" Opacity="0.8"/>
+							<MaskedTextBox x:Name="MaxVolCount" Classes="Menu" BorderThickness="2" FontWeight="Bold" FontSize="13" Mask="000" MaxLength="3" Height="34"/>
+						</StackPanel>
+						<StackPanel Grid.Column="4" Spacing="4">
+							<TextBlock FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuSeriesCardPublisherColor}" LetterSpacing="1" Opacity="0.8"><Run Text="VOLS READ "/><Run Text="(opt)" FontSize="9" Foreground="{DynamicResource TsundokuMenuTextColor}"/></TextBlock>
+							<MaskedTextBox x:Name="VolumesRead" Classes="Menu" BorderThickness="2" FontWeight="Bold" FontSize="13" Mask="000" MaxLength="3" Height="34"/>
+						</StackPanel>
+					</Grid>
 
-                    <Style Selector="^ /template/ RepeatButton#PART_LineUpButton, ^ /template/ RepeatButton#PART_LineDownButton">
-                        <Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentTheme.DividerColor}"/>
-                        <Style Selector="^:pointerover">
-                            <Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor}"/>
+					<!-- Format + Demographic + Rating -->
+					<Grid ColumnDefinitions="*,12,*,12,*">
+						<StackPanel Spacing="4">
+							<TextBlock Text="FORMAT" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuSeriesCardPublisherColor}" LetterSpacing="1" Opacity="0.8"/>
+							<Grid ColumnDefinitions="*,4,*">
+								<ToggleButton x:Name="MangaButton" Checked="IsMangaButtonClicked" Theme="{StaticResource MenuToggleButton}" Content="Manga" FontSize="13" Height="34" HorizontalAlignment="Stretch"/>
+								<ToggleButton x:Name="NovelButton" Grid.Column="2" Checked="IsNovelButtonClicked" Theme="{StaticResource MenuToggleButton}" Content="Novel" FontSize="13" Height="34" HorizontalAlignment="Stretch"/>
+							</Grid>
+						</StackPanel>
+						<StackPanel Grid.Column="2" Spacing="4">
+							<TextBlock FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuSeriesCardPublisherColor}" LetterSpacing="1" Opacity="0.8"><Run Text="DEMOGRAPHIC "/><Run Text="(opt)" FontSize="9" Foreground="{DynamicResource TsundokuMenuTextColor}"/></TextBlock>
+							<ComboBox x:Name="DemographicCombobox"
+								ItemsSource="{x:Static enums:SeriesDemographicModel.SERIES_DEMOGRAPHIC_SET}"
+								Theme="{StaticResource MenuComboBox}" ItemContainerTheme="{StaticResource MenuComboBoxItem}"
+								SelectedIndex="4" ToolTip.Tip="Optional" Height="34" HorizontalAlignment="Stretch">
+								<ComboBox.ItemTemplate>
+									<DataTemplate><TextBlock Text="{Binding}"/></DataTemplate>
+								</ComboBox.ItemTemplate>
+							</ComboBox>
+						</StackPanel>
+						<StackPanel Grid.Column="4" Spacing="4">
+							<TextBlock FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuSeriesCardPublisherColor}" LetterSpacing="1" Opacity="0.8"><Run Text="RATING "/><Run Text="(opt)" FontSize="9" Foreground="{DynamicResource TsundokuMenuTextColor}"/></TextBlock>
+							<MaskedTextBox x:Name="Rating" Classes="Menu" BorderThickness="2" FontWeight="Bold" FontSize="13" Mask="90.0/1\0.\0" Height="34" HorizontalContentAlignment="Center"/>
+						</StackPanel>
+					</Grid>
 
-                            <Style Selector="^ /template/ ContentPresenter" >
-                                <Setter Property="Background" Value="{CompiledBinding CurrentTheme.DividerColor}"/>
-                            </Style>
-                            <Style Selector="^ PathIcon">
-                                <Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.CollectionBGColor}" />
-                            </Style>
-                        </Style>
+					<!-- Cover Image (full width) -->
+					<StackPanel Spacing="4">
+						<TextBlock FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuSeriesCardPublisherColor}" LetterSpacing="1" Opacity="0.8" ToolTip.Tip="{CompiledBinding CoverImageUrl}"><Run Text="COVER IMAGE "/><Run Text="(opt)" FontSize="9" Foreground="{DynamicResource TsundokuMenuTextColor}"/></TextBlock>
+						<Grid ColumnDefinitions="*,Auto">
+							<TextBox x:Name="CoverImageUrlTextBox"
+								FontSize="13" FontWeight="Bold" Height="34"
+								Text="{CompiledBinding CoverImageUrl}" Classes="Menu"
+								BorderThickness="2" ToolTip.Tip="Optional"
+								Watermark="Optional Image URL..."/>
+							<ToggleButton x:Name="AllowDuplicateButton" Grid.Column="1"
+								Margin="6,0,0,0" FontSize="14" Width="34" Height="34"
+								Theme="{StaticResource MenuToggleButton}"
+								ToolTip.Tip="Allow Duplicate"
+								i:Attached.Icon="fa-solid fa-clone"/>
+						</Grid>
+					</StackPanel>
 
-                        <Style Selector="^:pressed">
-                            <Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentTheme.MenuBGColor}"/>
-                            <Style Selector="^ /template/ ContentPresenter" >
-                                <Setter Property="Background" Value="{CompiledBinding CurrentTheme.DividerColor}" />
-                            </Style>
-                            <Style Selector="^ PathIcon">
-                                <Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.CollectionBGColor}" />
-                            </Style>
-                        </Style>
-                    </Style>
-                </Style>
-            </Grid.Styles>
-			<TextBlock x:Name="AdditionalLangTitle"
-                HorizontalAlignment="Center" 
-                Grid.Row="0" 
-                Grid.Column="4" 
-                Text="Additional Languages" 
-                FontSize="19" 
-                FontWeight="Bold" 
-                Classes="Menu" 
-                Margin="2,0,0,3" 
-                ToolTip.Tip="{CompiledBinding AdditionalLanguagesToolTipText}" 
-                ToolTip.IsEnabled="{CompiledBinding AdditionalLanguagesToolTipText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
-			<ListBox x:Name="AdditionalLangSelector"
-                    ItemsSource="{x:Static enums:TsundokuLanguageModel.LANGUAGES}"
-                    SelectedItems="{CompiledBinding SelectedAdditionalLanguages}"
-                    SelectionMode="Multiple,Toggle"
-                    Grid.Row="1"
-                    Height="510" 
-                    Width="225"
-                    Grid.RowSpan="19"
-                    Grid.Column="4"
-                    VerticalAlignment="Top"
-                    ItemContainerTheme="{StaticResource QueryListBoxItem}"
-                    Theme="{StaticResource QueryListBox}">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding}" />
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-			</ListBox>
-			<TextBlock Text="Enter Title or ID" Grid.Row="0" Grid.Column="0" FontSize="20" FontWeight="Bold" Classes="Menu" Margin="2,0,0,1" ToolTip.Tip="{CompiledBinding #SeriesInputTextBox.Text}"/>
-			<TextBox x:Name="SeriesInputTextBox"
-                FontSize="18"
-                Grid.Row="1"
-                Width="518.5"
-                Grid.Column="0"
-                Grid.ColumnSpan="3"
-                FontWeight="Bold"
-                Height="74"
-                Text="{CompiledBinding TitleText}"
-                Classes="Menu"
-                BorderThickness="2"
-                TextWrapping="Wrap"
-                Watermark="Title or AniList/MangaDex ID..."/>
-            <Popup
-                IsOpen="{CompiledBinding IsSuggestionsOpen}"
-                PlacementTarget="{CompiledBinding #Root}"
-                PlacementMode="Left"
-                HorizontalOffset="-10"
-                VerticalOffset="-15"
-                ToolTip.Tip="Search via Romaji">
-                <Border Padding="8" CornerRadius="8" Classes="Menu" BorderThickness="3">
-                    <ListBox
-                        ItemsSource="{CompiledBinding Suggestions}"
-                        SelectionMode="Single"
-                        SelectedItem="{CompiledBinding SelectedSuggestion, Mode=TwoWay}"
-                        Height="{CompiledBinding #Root.Bounds.Height}"
-                        Theme="{StaticResource QueryListBox}"
-                        Width="250"
-                        ItemContainerTheme="{StaticResource QueryListBoxItem}">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Display}" FontSize="16" TextWrapping="Wrap"/>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
-                </Border>
-            </Popup>
-            <TextBlock Text="Publisher" Grid.Row="3" Grid.Column="0" FontSize="20" FontWeight="Bold" Classes="Menu" Margin="2,0,0,1" ToolTip.Tip="{CompiledBinding PublisherText}"/>
-			<TextBox x:Name="PublisherTextBox"
-					 FontSize="18"
-					 Grid.Row="4"
-					 Width="518"
-					 Grid.Column="0"
-					 Grid.ColumnSpan="3"
-					 FontWeight="Bold"
-                     Height="37"
-					 Text="{CompiledBinding PublisherText}"
-					 Classes="Menu"
-                     ToolTip.Tip="Optional"
-					 BorderThickness="2"
-                     MaxLength="24"/>
-			<TextBlock Text="Cur Volumes" Grid.Row="6" Grid.Column="0" FontSize="20" FontWeight="Bold" Classes="Menu" Margin="2,0,0,1"/>
-			<MaskedTextBox x:Name="CurVolCount"
-						   Width="247"
-						   Classes="Menu"
-						   Grid.Row="7"
-						   Grid.Column="0"
-						   BorderThickness="2"
-						   FontWeight="Bold"
-						   Margin="0,0,10,0"
-						   FontSize="18"
-						   Mask="000"
-						   MaxLength="3"/>
-			<TextBlock Text="Max Volumes" Grid.Row="6" Grid.Column="2" FontSize="20" FontWeight="Bold" Classes="Menu" Margin="2,0,0,1"/>
-			<MaskedTextBox x:Name="MaxVolCount"
-						   Width="247"
-						   Grid.Row="7"
-						   Grid.Column="2"
-						   Classes="Menu"
-						   BorderThickness="2"
-						   FontWeight="Bold"
-						   FontSize="18"
-						   Mask="000"
-						   MaxLength="3"/>
-			<TextBlock HorizontalAlignment="Left"
-					   Text="Select Book Type"
-					   Grid.Row="9"
-					   Grid.Column="0"
-					   FontSize="20"
-					   FontWeight="Bold"
-					   Margin="2,0,0,3"
-					   Classes="Menu"/>
-			<StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Width="180" Grid.Row="10" Grid.Column="0" Spacing="5" Margin="0,0,10,0">
-				<ToggleButton x:Name="MangaButton"
-						 	  Width="121"
-							  Checked="IsMangaButtonClicked"
-							  Theme="{StaticResource MenuToggleButton}"
-							  Content="Manga"/>
-				<ToggleButton x:Name="NovelButton"
-							  Width="121"
-							  Checked="IsNovelButtonClicked"
-							  Theme="{StaticResource MenuToggleButton}"
-							  Content="Novel"/>
-			</StackPanel>
-            <TextBlock Text="Demographic"
-                       FontWeight="Bold"
-                       FontSize="20"
-                       Grid.Row="9"
-					   Grid.Column="2"
-                       Margin="2,0,0,3"
-                       Classes="Menu"/>
-            <ComboBox x:Name="DemographicCombobox"
-                      ItemsSource="{x:Static enums:SeriesDemographicModel.SERIES_DEMOGRAPHIC_SET}"
-                      Theme="{StaticResource MenuComboBox}"
-                      ItemContainerTheme="{StaticResource MenuComboBoxItem}"
-                      SelectedIndex="4"
-                      ToolTip.Tip="Optional"
-                      Width="247"
-                      Height="37"
-                      Grid.Row="10"
-					  Grid.Column="2">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding}" />
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-            </ComboBox>
-            <TextBlock Text="Volumes Read"
-                       FontWeight="Bold"
-                       FontSize="20"
-                       Grid.Row="12"
-					   Grid.Column="0"
-                       Margin="2,0,0,3"
-                       Classes="Menu"/>
-            <MaskedTextBox x:Name="VolumesRead"
-                           HorizontalAlignment="Left"
-                           ToolTip.Tip="Optional"
-						   Width="247"
-						   Grid.Row="13"
-						   Grid.Column="0"
-						   Classes="Menu"
-						   BorderThickness="2"
-						   FontWeight="Bold"
-						   FontSize="18"
-						   Mask="000"
-						   MaxLength="3"/>
-            <TextBlock Text="Rating"
-                       FontWeight="Bold"
-                       FontSize="20"
-                       Grid.Row="12"
-					   Grid.Column="2"
-                       Margin="2,0,0,3"
-                       Classes="Menu"/>
-            <MaskedTextBox x:Name="Rating"
-						   Width="247"
-						   Grid.Row="13"
-						   Grid.Column="2"
-                           ToolTip.Tip="Optional"
-						   Classes="Menu"
-						   BorderThickness="2"
-						   FontWeight="Bold"
-						   FontSize="18"
-                           HorizontalContentAlignment="Center"
-                           Mask="90.0/1\0.\0"/>
-            <TextBlock Text="Total Value"
-					   Grid.Row="15"
-					   Grid.Column="0"
-					   FontSize="20"
-					   FontWeight="Bold"
-					   Margin="2,0,0,3"
-					   Classes="Menu"/>
-            <MaskedTextBox x:Name="CostMaskedTextBox"
-                           HorizontalAlignment="Left"
-                           ToolTip.Tip="Optional"
-                           PromptChar=" "
-						   Width="247"
-						   Grid.Row="16"
-						   Grid.Column="0"
-						   Classes="Menu"
-						   BorderThickness="2"
-                           HorizontalContentAlignment="Center"
-						   FontWeight="Bold"
-                           Mask="{CompiledBinding SeriesValueMaskedText}"
-						   FontSize="18"/>
-			<TextBlock Text="Add Series"
-					   Grid.Row="15"
-					   Grid.Column="2"
-					   FontSize="20"
-					   FontWeight="Bold"
-					   Margin="2,0,0,3"
-					   Classes="Menu"/>
-			<Button x:Name="AddSeriesButton"
-					Content="Add New Series"
-					Click="OnAddSeriesButtonClicked"
-					Theme="{StaticResource MenuButton}"
-					Width="247"
-					Height="37"
-					IsEnabled="{CompiledBinding IsAddSeriesButtonEnabled}"
-					FontSize="18"
-					Grid.Row="16"
-					Grid.Column="2">
-			</Button>
-            <TextBlock Text="Cover Image" Grid.Row="18" Grid.Column="0" Grid.ColumnSpan="3" FontSize="20" FontWeight="Bold" Classes="Menu" Margin="2,0,0,3" ToolTip.Tip="{CompiledBinding CoverImageUrl}"/>
-			<StackPanel Orientation="Horizontal" Spacing="5" Grid.Row="19" Grid.Column="0" Grid.ColumnSpan="4">
-                <TextBox x:Name="CoverImageUrlTextBox"
-					 FontSize="18"
-                     Width="474"
-					 FontWeight="Bold"
-                     Height="37"
-					 Text="{CompiledBinding CoverImageUrl}"
-					 Classes="Menu"
-					 BorderThickness="2"
-                     ToolTip.Tip="Optional"
-					 Watermark="Optional Image Url (Hover Title to see Full Text)"/>
-                <ToggleButton x:Name="AllowDuplicateButton"
-                              FontSize="20"
-                              Theme="{StaticResource MenuToggleButton}"
-                              ToolTip.Tip="Allow Duplicate"
-                              i:Attached.Icon="fa-solid fa-clone"/>
-            </StackPanel>
+					<!-- Add Button (full width) -->
+					<Button x:Name="AddSeriesButton" Content="Add Series" Click="OnAddSeriesButtonClicked"
+						Theme="{StaticResource MenuButton}" Height="36" HorizontalAlignment="Stretch"
+						IsEnabled="{CompiledBinding IsAddSeriesButtonEnabled}" FontSize="14"
+						Name="AddSeriesBtn"/>
+				</StackPanel>
+
+				<!-- Right: Additional Languages -->
+				<StackPanel Grid.Column="2" Width="200" Spacing="4">
+					<TextBlock x:Name="AdditionalLangTitle" Text="LANGUAGES" FontSize="11" FontWeight="Bold"
+						Foreground="{DynamicResource TsundokuSeriesCardPublisherColor}" LetterSpacing="1" Opacity="0.8"
+						HorizontalAlignment="Center"
+						ToolTip.Tip="{CompiledBinding AdditionalLanguagesToolTipText}"
+						ToolTip.IsEnabled="{CompiledBinding AdditionalLanguagesToolTipText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+					<ListBox x:Name="AdditionalLangSelector"
+						Height="382"
+						ClipToBounds="True"
+						ItemsSource="{x:Static enums:TsundokuLanguageModel.LANGUAGES}"
+						SelectedItems="{CompiledBinding SelectedAdditionalLanguages}"
+						SelectionMode="Multiple,Toggle"
+						ItemContainerTheme="{StaticResource QueryListBoxItem}"
+						Theme="{StaticResource QueryListBox}">
+						<ListBox.ItemTemplate>
+							<DataTemplate>
+								<TextBlock Text="{Binding}" FontSize="12"/>
+							</DataTemplate>
+						</ListBox.ItemTemplate>
+					</ListBox>
+				</StackPanel>
+			</Grid>
 		</Grid>
 	</Border>
 </Window>

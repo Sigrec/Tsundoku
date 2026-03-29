@@ -14,17 +14,17 @@ public sealed partial class UserNotesWindow : ReactiveWindow<UserNotesWindowView
         
         Opened += (s, e) =>
         {
-            IsOpen ^= true;
+            IsOpen = true;
         };
 
         Closing += (s, e) =>
         {
-            if (IsOpen) 
+            if (IsOpen)
             {
                 this.Hide();
-                IsOpen ^= true;
+                IsOpen = false;
+                e.Cancel = true;
             }
-            e.Cancel = true;
         };
     }
 }

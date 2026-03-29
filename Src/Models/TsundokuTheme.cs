@@ -290,7 +290,8 @@ public sealed partial class TsundokuTheme : ReactiveObject, ICloneable, ICompara
 
     public int CompareTo(object? obj)
     {
-        return this.ThemeName.CompareTo((obj as TsundokuTheme).ThemeName);
+        if (obj is not TsundokuTheme other) return 1;
+        return this.ThemeName.CompareTo(other.ThemeName);
     }
 
     public TsundokuTheme Cloning()
@@ -342,9 +343,9 @@ public sealed partial class TsundokuTheme : ReactiveObject, ICloneable, ICompara
         );
     }
 
-    private static SolidColorBrush CloneBrush(SolidColorBrush? brush)
+    private static SolidColorBrush? CloneBrush(SolidColorBrush? brush)
     {
-        if (brush is null) return null!;
+        if (brush is null) return null;
         return new SolidColorBrush(brush.Color);
     }
 

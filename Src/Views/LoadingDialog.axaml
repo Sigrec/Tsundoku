@@ -14,7 +14,7 @@
         x:DataType="vm:LoadingDialogViewModel"
         Topmost="True"
         x:Class="Tsundoku.Views.LoadingDialog">
-    <Border Classes="Menu" BorderThickness="5" CornerRadius="0,0,8,8" ClipToBounds="True">
+    <Border Classes="Menu" BorderThickness="2" CornerRadius="14" ClipToBounds="True">
         <StackPanel Margin="20,16" Spacing="10">
             <TextBlock
                 x:Name="StatusTextBlock"
@@ -30,19 +30,20 @@
                 Value="{CompiledBinding ProgressValue}"
                 Maximum="{CompiledBinding ProgressMaximum}"
                 IsIndeterminate="{CompiledBinding IsLoadingIndeterminate}"
-                Background="{CompiledBinding CurrentTheme.SeriesProgressBarBGColor}"
-                Foreground="{CompiledBinding CurrentTheme.SeriesProgressBarColor}"
-                BorderBrush="{CompiledBinding CurrentTheme.SeriesProgressBarBorderColor}"
-                BorderThickness="1.5"
-                CornerRadius="4"
-                Height="22" />
+                Background="{DynamicResource TsundokuSeriesProgressBarBGColor}"
+                Foreground="{DynamicResource TsundokuSeriesProgressBarColor}"
+                BorderBrush="{DynamicResource TsundokuSeriesProgressBarBorderColor}"
+                BorderThickness="2"
+                CornerRadius="6"
+                Padding="3"
+                Height="28" />
             <Button x:Name="CancelButton"
                     Content="Cancel"
                     FontSize="13"
                     FontWeight="Bold"
                     HorizontalAlignment="Center"
-                    Padding="20,4"
-                    CornerRadius="4"
+                    Padding="20,6"
+                    CornerRadius="9"
                     BorderThickness="2"
                     Cursor="Hand"
                     IsVisible="False"

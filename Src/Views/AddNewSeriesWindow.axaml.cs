@@ -12,6 +12,7 @@ namespace Tsundoku.Views;
 
 public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesViewModel>
 {
+    private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
     public bool IsOpen = false;
     private readonly IPopupDialogService _popupDialogService;
 
@@ -23,7 +24,7 @@ public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesView
 
         Opened += (s, e) =>
         {
-            IsOpen ^= true;
+            IsOpen = true;
         };
 
         Closing += (s, e) =>
@@ -31,11 +32,11 @@ public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesView
             if (IsOpen)
             {
                 this.Hide();
-                IsOpen ^= true;
+                IsOpen = false;
                 Topmost = false;
                 viewModel.ClearSuggestions();
+                e.Cancel = true;
             }
-            e.Cancel = true;
         };
 
         Deactivated += (s, e) =>
@@ -132,41 +133,60 @@ public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesView
 
     private static ushort ConvertNumText(string value)
     {
-        return string.IsNullOrWhiteSpace(value) ? (ushort)1 : ushort.Parse(value);
+        return ushort.TryParse(value, out ushort result) ? result : (ushort)1;
     }
 
     public async void OnAddSeriesButtonClicked(object sender, RoutedEventArgs args)
     {
-        AddSeriesButton.IsEnabled = false;
-        string customImageUrl = CoverImageUrlTextBox.Text;
-        _ = uint.TryParse(VolumesRead.Text.Replace("_", ""), out uint volumesRead);
-        _ = decimal.TryParse(Rating.Text[..4].Replace("_", "0"), out decimal rating);
-        _ = decimal.TryParse(CostMaskedTextBox.Text[1..].Replace("_", "0"), out decimal seriesValue);
-
-        KeyValuePair<bool, string> validSeries = await ViewModel!.GetSeriesDataAsync(
-            input: ViewModel.SelectedSuggestion is not null ? ViewModel.SelectedSuggestion.Id : SeriesInputTextBox.Text.Trim(),
-            bookType: (MangaButton.IsChecked == true) ? SeriesFormat.Manga : SeriesFormat.Novel,
-            curVolCount: ConvertNumText(CurVolCount.Text.Replace("_", "")),
-            maxVolCount: ConvertNumText(MaxVolCount.Text.Replace("_", "")),
-            additionalLanguages: ViewModel!.SelectedAdditionalLanguages.Count != 0 ? ViewModel.ConvertSelectedLangList() : [],
-            customImageUrl: !string.IsNullOrWhiteSpace(customImageUrl) ? customImageUrl.Trim() : string.Empty,
-            publisher: !string.IsNullOrWhiteSpace(PublisherTextBox.Text) ? PublisherTextBox.Text.Trim() : "Unknown",
-            demographic: DemographicCombobox.SelectedItem is null ? SeriesDemographic.Unknown : (SeriesDemographic)DemographicCombobox.SelectedItem,
-            volumesRead: volumesRead,
-            rating: !Rating.Text[..4].StartsWith("__._", StringComparison.Ordinal) ? rating : -1,
-            value: seriesValue,
-            allowDuplicate: AllowDuplicateButton.IsChecked.GetValueOrDefault(false)
-        );
-
-        if (validSeries.Key) // Boolean returns whether the series added succeeded
+        try
         {
-            ClearFields();
-            ViewModel.ClearSuggestions();
+            AddSeriesButton.IsEnabled = false;
+            string customImageUrl = CoverImageUrlTextBox.Text;
+            _ = uint.TryParse(VolumesRead.Text?.Replace("_", string.Empty), out uint volumesRead);
+
+            string ratingText = Rating.Text ?? string.Empty;
+            _ = decimal.TryParse(
+                (ratingText.Length >= 4 ? ratingText[..4] : ratingText).Replace("_", "0"),
+                out decimal rating);
+
+            string costText = CostMaskedTextBox.Text ?? string.Empty;
+            _ = decimal.TryParse(
+                (costText.Length > 1 ? costText[1..] : costText).Replace("_", "0"),
+                out decimal seriesValue);
+
+            KeyValuePair<bool, string> validSeries = await ViewModel!.GetSeriesDataAsync(
+                input: ViewModel.SelectedSuggestion is not null ? ViewModel.SelectedSuggestion.Id : SeriesInputTextBox.Text.Trim(),
+                bookType: (MangaButton.IsChecked == true) ? SeriesFormat.Manga : SeriesFormat.Novel,
+                curVolCount: ConvertNumText(CurVolCount.Text.Replace("_", string.Empty)),
+                maxVolCount: ConvertNumText(MaxVolCount.Text.Replace("_", string.Empty)),
+                additionalLanguages: ViewModel!.SelectedAdditionalLanguages.Count != 0 ? ViewModel.ConvertSelectedLangList() : [],
+                customImageUrl: !string.IsNullOrWhiteSpace(customImageUrl) ? customImageUrl.Trim() : string.Empty,
+                publisher: !string.IsNullOrWhiteSpace(PublisherTextBox.Text) ? PublisherTextBox.Text.Trim() : "Unknown",
+                demographic: DemographicCombobox.SelectedItem is null ? SeriesDemographic.Unknown : (SeriesDemographic)DemographicCombobox.SelectedItem,
+                volumesRead: volumesRead,
+                rating: ratingText.Length >= 4 && !ratingText[..4].StartsWith("__._", StringComparison.Ordinal) ? rating : -1,
+                value: seriesValue,
+                allowDuplicate: AllowDuplicateButton.IsChecked.GetValueOrDefault(false)
+            );
+
+            if (validSeries.Key) // Boolean returns whether the series added succeeded
+            {
+                ClearFields();
+                ViewModel.ClearSuggestions();
+            }
+            else
+            {
+                await ShowErrorDialog($"Unable to add \"{SeriesInputTextBox.Text.Trim()}\" to Collection{(!string.IsNullOrWhiteSpace(validSeries.Value) ? $", {validSeries.Value}" : string.Empty)}");
+            }
         }
-        else
+        catch (Exception ex)
         {
-            await ShowErrorDialog($"Unable to add \"{SeriesInputTextBox.Text.Trim()}\" to Collection{(!string.IsNullOrWhiteSpace(validSeries.Value) ? $", {validSeries.Value}" : string.Empty)}");
+            LOGGER.Error(ex, "Failed to add series");
+            await ShowErrorDialog();
         }
-        AddSeriesButton.IsEnabled = ViewModel.IsAddSeriesButtonEnabled;
+        finally
+        {
+            AddSeriesButton.IsEnabled = ViewModel!.IsAddSeriesButtonEnabled;
+        }
     }
 }

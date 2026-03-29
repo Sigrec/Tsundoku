@@ -36,8 +36,9 @@ public sealed partial class LoadingDialog : ReactiveWindow<LoadingDialogViewMode
 
     private void OnDotTimerTick(object? sender, EventArgs e)
     {
+        if (ViewModel is null) return;
         _dotCount = (_dotCount + 1) % 4;
-        StatusTextBlock.Text = ViewModel!.StatusText + new string('.', _dotCount);
+        StatusTextBlock.Text = ViewModel.StatusText + new string('.', _dotCount);
     }
 
     private void OnCancelClicked(object? sender, RoutedEventArgs e)

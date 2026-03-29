@@ -1,8 +1,7 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
 					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-					xmlns:vm="clr-namespace:Tsundoku.ViewModels"
                     xmlns:local="clr-namespace:Tsundoku.Models"
-					x:DataType="vm:ViewModelBase">
+					>
     <ControlTheme x:Key="LeftSideTextBlock" TargetType="TextBlock">
 		<Setter Property="FontWeight" Value="Bold"/>
 		<Setter Property="FontSize" Value="17"/>
@@ -11,15 +10,14 @@
         <Setter Property="Padding" Value="0,8,0,0"/>
         <Setter Property="TextAlignment" Value="Center"/>
 		<Setter Property="RenderTransform" Value="none"/>
-		<!-- <Setter Property="Padding" Value="{DynamicResource ButtonPadding}"/> -->
 
 		<Style Selector="TextBlock.mouseover">
-            <Setter Property="Background" Value="{CompiledBinding CurrentTheme.StatusAndBookTypeBGHoverColor}"/>
-            <Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.StatusAndBookTypeTextHoverColor}"/>
+            <Setter Property="Background" Value="{DynamicResource TsundokuStatusAndBookTypeBGHoverColor}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TsundokuStatusAndBookTypeTextHoverColor}"/>
         </Style>
         <Style Selector="TextBlock.nomouseover">
-            <Setter Property="Background" Value="{CompiledBinding CurrentTheme.StatusAndBookTypeBGColor}"/>
-            <Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.StatusAndBookTypeTextColor}"/>
+            <Setter Property="Background" Value="{DynamicResource TsundokuStatusAndBookTypeBGColor}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TsundokuStatusAndBookTypeTextColor}"/>
         </Style>
 	</ControlTheme>
 </ResourceDictionary>

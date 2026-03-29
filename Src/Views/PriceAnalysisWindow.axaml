@@ -25,7 +25,7 @@
 		</ResourceDictionary>
 	</Window.Resources>
 
-	<Border Classes="Menu" BorderThickness="3" CornerRadius="0,0,8,8" ClipToBounds="True">
+	<Border Classes="Menu" BorderThickness="2" CornerRadius="0,0,8,8" ClipToBounds="True">
 		<ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Theme="{StaticResource ReverseCollectionScroll}"> 
 			<Grid ColumnDefinitions="Auto,10,Auto,10,200" RowDefinitions="Auto,Auto,Auto,Auto,10,Auto" Margin="20,10,20,20" HorizontalAlignment="Center" ShowGridLines="false">
 				<StackPanel Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3">

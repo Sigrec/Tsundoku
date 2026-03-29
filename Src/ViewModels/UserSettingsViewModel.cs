@@ -1,10 +1,12 @@
 using ReactiveUI.SourceGenerators;
 using ReactiveUI;
+using System.Reactive.Disposables.Fluent;
 using System.Reactive.Linq;
 using Tsundoku.Models;
 using MangaAndLightNovelWebScrape.Websites;
 using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 using Tsundoku.Helpers;
+using Tsundoku.Services;
 using System.Globalization;
 using static Tsundoku.Models.Enums.SeriesFormatModel;
 using Avalonia.Controls;
@@ -12,6 +14,9 @@ using Tsundoku.Views;
 
 namespace Tsundoku.ViewModels;
 
+/// <summary>
+/// View model for user settings, managing preferences such as currency, memberships, data import/export, and cover refresh.
+/// </summary>
 public sealed partial class UserSettingsViewModel : ViewModelBase
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
@@ -19,6 +24,7 @@ public sealed partial class UserSettingsViewModel : ViewModelBase
     [Reactive] public partial bool BooksAMillionMember { get; set; }
     [Reactive] public partial bool KinokuniyaUSAMember { get; set; }
     [Reactive] public partial bool RefreshCovers { get; set; }
+    [Reactive] public partial bool GlassmorphismEnabled { get; set; }
     [Reactive] public partial int SelectedCurrencyIndex { get; set; } = 0;
 
     private readonly AddNewSeriesViewModel _addNewSeriesViewModel;
@@ -45,29 +51,58 @@ public sealed partial class UserSettingsViewModel : ViewModelBase
             .Subscribe(currency =>
             {
                 SelectedCurrencyIndex = AVAILABLE_CURRENCY_WITH_CULTURE[currency].Index;
-            });
+            })
+            .DisposeWith(_disposables);
 
-        BooksAMillionMember = CurrentUser.Memberships[BooksAMillion.TITLE];
+        // Sync initial values once CurrentUser is available
+        this.WhenAnyValue(x => x.CurrentUser)
+            .Where(user => user is not null)
+            .Take(1)
+            .Subscribe(user =>
+            {
+                BooksAMillionMember = user.Memberships.TryGetValue(BooksAMillion.TITLE, out bool bam) && bam;
+                KinokuniyaUSAMember = user.Memberships.TryGetValue(KinokuniyaUSA.TITLE, out bool kino) && kino;
+                RefreshCovers = user.RefreshCovers;
+                GlassmorphismEnabled = user.GlassmorphismEnabled;
+            })
+            .DisposeWith(_disposables);
+
         this.WhenAnyValue(x => x.BooksAMillionMember)
             .Skip(1)
+            .DistinctUntilChanged()
             .ObserveOn(RxSchedulers.MainThreadScheduler)
-            .Subscribe(isMember => UpdateMembership(BooksAMillion.TITLE, isMember));
+            .Subscribe(isMember => UpdateMembership(BooksAMillion.TITLE, isMember))
+            .DisposeWith(_disposables);
 
-        KinokuniyaUSAMember = CurrentUser.Memberships[KinokuniyaUSA.TITLE];
         this.WhenAnyValue(x => x.KinokuniyaUSAMember)
             .Skip(1)
+            .DistinctUntilChanged()
             .ObserveOn(RxSchedulers.MainThreadScheduler)
-            .Subscribe(isMember => UpdateMembership(KinokuniyaUSA.TITLE, isMember));
+            .Subscribe(isMember => UpdateMembership(KinokuniyaUSA.TITLE, isMember))
+            .DisposeWith(_disposables);
 
-        RefreshCovers = CurrentUser.RefreshCovers;
         this.WhenAnyValue(x => x.RefreshCovers)
             .Skip(1)
+            .DistinctUntilChanged()
             .ObserveOn(RxSchedulers.MainThreadScheduler)
             .Subscribe(value =>
             {
                 _userService.UpdateUser(user => user.RefreshCovers = value);
                 LOGGER.Debug("Updated RefreshCovers to {Value}", value);
-            });
+            })
+            .DisposeWith(_disposables);
+
+        this.WhenAnyValue(x => x.GlassmorphismEnabled)
+            .Skip(1)
+            .DistinctUntilChanged()
+            .ObserveOn(RxSchedulers.MainThreadScheduler)
+            .Subscribe(value =>
+            {
+                _userService.UpdateUser(user => user.GlassmorphismEnabled = value);
+                GlassmorphismService.Apply(value);
+                LOGGER.Debug("Updated GlassmorphismEnabled to {Value}", value);
+            })
+            .DisposeWith(_disposables);
     }
 
     private void UpdateMembership(string websiteTitle, bool isMember)
@@ -76,16 +111,29 @@ public sealed partial class UserSettingsViewModel : ViewModelBase
         LOGGER.Debug("Updated {site} Membership to {isMember}", websiteTitle, isMember);
     }
 
+    /// <summary>
+    /// Updates the current user's currency preference.
+    /// </summary>
+    /// <param name="newCurrency">The new currency symbol to set.</param>
     public void UpdateUserCurrency(string newCurrency)
     {
         _userService.UpdateUser(user => user.Currency = newCurrency);
     }
 
+    /// <summary>
+    /// Updates the current user's display name.
+    /// </summary>
+    /// <param name="newUsername">The new username to set.</param>
     public void UpdateUserName(string newUsername)
     {
         _userService.UpdateUser(user => user.UserName = newUsername);
     }
 
+    /// <summary>
+    /// Imports user data from an external JSON file, showing a loading dialog during the operation.
+    /// </summary>
+    /// <param name="filePath">The path to the JSON file to import.</param>
+    /// <param name="owner">The parent window for the loading dialog.</param>
     public void ImportUserDataFromJson(string filePath, Window owner)
     {
         _loadingDialogService.Show("Importing User Data from Json", vm =>
@@ -95,6 +143,11 @@ public sealed partial class UserSettingsViewModel : ViewModelBase
         }, owner);
     }
 
+    /// <summary>
+    /// Imports series data from Libib CSV export files.
+    /// </summary>
+    /// <param name="filePaths">The CSV file paths to import from.</param>
+    /// <param name="owner">The parent window for the loading dialog.</param>
     public async Task ImportLibibDataFromCsv(string[] filePaths, Window owner)
     {
         await _loadingDialogService.ShowAsync("Importing Libib Data", async vm =>
@@ -127,6 +180,11 @@ public sealed partial class UserSettingsViewModel : ViewModelBase
         }, owner);
     }
 
+    /// <summary>
+    /// Imports series data from Goodreads CSV export files.
+    /// </summary>
+    /// <param name="filePaths">The CSV file paths to import from.</param>
+    /// <param name="owner">The parent window for the loading dialog.</param>
     public async Task ImportGoodreadsDataFromCsv(string[] filePaths, Window owner)
     {
         await _loadingDialogService.ShowAsync("Importing Goodreads Data", async vm =>
@@ -160,6 +218,10 @@ public sealed partial class UserSettingsViewModel : ViewModelBase
         }, owner);
     }
 
+    /// <summary>
+    /// Exports the user's collection to a CSV spreadsheet file.
+    /// </summary>
+    /// <param name="owner">The parent window for the loading dialog.</param>
     public async Task ExportToSpreadSheetAsync(Window owner)
     {
         await _loadingDialogService.ShowAsync("Exporting Data to CSV", async vm =>
@@ -225,6 +287,10 @@ public sealed partial class UserSettingsViewModel : ViewModelBase
         }, owner);
     }
 
+    /// <summary>
+    /// Opens a picker dialog for selecting series, then refreshes cover images for the selected series.
+    /// </summary>
+    /// <param name="owner">The parent window for the picker and loading dialogs.</param>
     public async Task RefreshAllCoversAsync(Window owner)
     {
         SeriesPickerWindow picker = new(_userService.GetUserCollection(), CurrentUser.Language)

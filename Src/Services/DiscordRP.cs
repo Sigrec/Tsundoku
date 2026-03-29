@@ -7,7 +7,7 @@ public static class DiscordRP
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
     private static DiscordRpcClient? client;
-    private static string UserName;
+    private static string UserName = string.Empty;
     private static PresenceState _presence = new();
 
     public static void Initialize()
@@ -87,7 +87,10 @@ public static class DiscordRP
             _presence.Timestamps = Timestamps.Now;
         }
 
-        _presence.Buttons.RemoveRange(1, _presence.Buttons.Count - 1);
+        if (_presence.Buttons.Count > 1)
+        {
+            _presence.Buttons.RemoveRange(1, _presence.Buttons.Count - 1);
+        }
         if (additionalButton is not null)
         {
             LOGGER.Debug("Adding additional button");

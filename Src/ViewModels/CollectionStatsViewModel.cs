@@ -21,6 +21,9 @@ using System.Reactive.Disposables.Fluent;
 
 namespace Tsundoku.ViewModels;
 
+/// <summary>
+/// View model for the collection statistics window, computing demographic, status, format, rating, genre, and volume distributions.
+/// </summary>
 public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposable
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
@@ -259,7 +262,8 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
                 }
                 return seriesCount != 0 ? decimal.Round(decimal.Divide(total, seriesCount), 2) : 0.00m;
             })
-            .Subscribe(rating => _userService.UpdateUser(user => user.MeanRating = rating));
+            .Subscribe(rating => _userService.UpdateUser(user => user.MeanRating = rating))
+            .DisposeWith(_disposables);
 
         _userService.UserCollectionChanges
             .AutoRefresh(x => x.VolumesRead)
@@ -271,7 +275,8 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
             .Subscribe(volumesRead =>
             {
                 _userService.UpdateUser(user => user.VolumesRead = volumesRead);
-            });
+            })
+            .DisposeWith(_disposables);
 
         Observable.CombineLatest(
             _userService.UserCollectionChanges
@@ -299,7 +304,8 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
 
             _userService.UpdateUser(user =>
                 user.CollectionValue = CollectionValueText);
-        });
+        })
+        .DisposeWith(_disposables);
 
         _userService.UserCollectionChanges
             .DistinctUntilChanged()
@@ -308,7 +314,8 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
             .Subscribe(seriesList =>
             {
                 SeriesCount = seriesList.Count;
-            });
+            })
+            .DisposeWith(_disposables);
 
         _userService.UserCollectionChanges
             .AutoRefresh(x => x.IsFavorite)
@@ -319,7 +326,8 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
             .Subscribe(count =>
             {
                 FavoriteCount = count;
-            });
+            })
+            .DisposeWith(_disposables);
 
         _userService.UserCollectionChanges
             .AutoRefresh(x => x.CurVolumeCount)
@@ -347,7 +355,8 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
                     user.NumVolumesCollected = tuple.totalCurVolumes;
                     user.NumVolumesToBeCollected = tuple.totalVolumesToBeCollected;
                 });
-            });
+            })
+            .DisposeWith(_disposables);
     }
 #endregion
 
@@ -779,13 +788,13 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
         // 2. Order genres by their count for consistent display
         // Convert to Dictionary after ordering to maintain order (though Dictionary itself doesn't guarantee order)
         // ToDictionary(x => x.Key, x => x.Value) ensures a new dictionary with the order.
-        GenreData = GenreData.OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
+        GenreData = GenreData.AsValueEnumerable().OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
 
         // 3. Update the chart series values
         // Access the first (and only) RowSeries in your distribution collection.
         if (GenreDistribution.Count > 0 && GenreDistribution[0] is RowSeries<KeyValuePair<string, int>> genreBarObject)
         {
-            genreBarObject.Values = GenreData.ToArray(); // Update the values of the existing series
+            genreBarObject.Values = GenreData.AsValueEnumerable().ToArray(); // Update the values of the existing series
         }
 
         // 4. Update the Y-axis labels
@@ -823,7 +832,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
                     }
                 }
 
-                return GenreData.OrderBy(x => x.Value).ToArray();
+                return GenreData.AsValueEnumerable().OrderBy(x => x.Value).ToArray();
             })
             .Subscribe(calculatedGenreData =>
             {
@@ -834,7 +843,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
 
                 if (GenreYAxes is not null && GenreYAxes.Length > 0)
                 {
-                    GenreYAxes[0].Labels = calculatedGenreData.Select(kvp => kvp.Key).ToArray();
+                    GenreYAxes[0].Labels = calculatedGenreData.AsValueEnumerable().Select(kvp => kvp.Key).ToArray();
                 }
             })
             .DisposeWith(_disposables);
@@ -910,7 +919,6 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
                 {
                     IGroup<Series, Guid, SeriesDemographic> group = change.Current;
 
-                    // Subscribe to count changes in this group
                     group?.Cache.CountChanged
                         .StartWith(group.Cache.Count)
                         .Subscribe(count =>
@@ -942,9 +950,11 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
                                     UnknownPercentage = percentage;
                                     break;
                             }
-                        });
+                        })
+                        .DisposeWith(_disposables);
                 }
-            });
+            })
+            .DisposeWith(_disposables);
 
         ShounenPercentage = CalculatePercentage(ShounenCount.Value, initialUserCollectionCount);
         SeinenPercentage = CalculatePercentage(SeinenCount.Value, initialUserCollectionCount);
@@ -961,7 +971,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
         StatusDistribution.Add(CreatePieSeries(HiatusCount, "Josei"));
 
         _userService.UserCollectionChanges
-            .AutoRefresh(x => x.Status) // detect property changes
+            .AutoRefresh(x => x.Status)
             .Group(user => user.Status)
             .Subscribe(groupChangeSet =>
             {
@@ -969,7 +979,6 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
                 {
                     IGroup<Series, Guid, SeriesStatus> group = change.Current;
 
-                    // Subscribe to count changes in this group
                     group?.Cache.CountChanged
                         .StartWith(group.Cache.Count)
                         .Subscribe(count =>
@@ -997,9 +1006,11 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
                                     HiatusPercentage = percentage;
                                     break;
                             }
-                        });
+                        })
+                        .DisposeWith(_disposables);
                 }
-            });
+            })
+            .DisposeWith(_disposables);
             
         FinishedPercentage = CalculatePercentage(FinishedCount.Value, initialUserCollectionCount);
         OngoingPercentage = CalculatePercentage(OngoingCount.Value, initialUserCollectionCount);
@@ -1024,7 +1035,6 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
                 {
                     IGroup<Series, Guid, SeriesFormat> group = change.Current;
 
-                    // Subscribe to count changes in this group
                     group?.Cache.CountChanged
                         .StartWith(group.Cache.Count)
                         .Subscribe(count =>
@@ -1060,9 +1070,11 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
                                     ComicPercentage = percentage;
                                     break;
                             }
-                        });
+                        })
+                        .DisposeWith(_disposables);
                 }
-            });
+            })
+            .DisposeWith(_disposables);
 
         MangaPercentage = CalculatePercentage(MangaCount.Value, initialUserCollectionCount);
         ManhwaPercentage = CalculatePercentage(ManhwaCount.Value, initialUserCollectionCount);

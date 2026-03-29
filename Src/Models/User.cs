@@ -13,9 +13,13 @@ using static Tsundoku.Models.Enums.SeriesDemographicModel;
 
 namespace Tsundoku.Models;
 
+/// <summary>
+/// Represents the application user, including preferences, collection data, and saved themes.
+/// </summary>
 public sealed partial class User : ReactiveObject
 {
-    public static readonly JsonSerializerOptions JSON_SERIALIZATION_OPTIONS = new JsonSerializerOptions(UserModelContext.Default.Options)
+    /// <summary>Shared JSON serialization options with relaxed encoding for user data persistence.</summary>
+    public static readonly JsonSerializerOptions JSON_SERIALIZATION_OPTIONS = new(UserModelContext.Default.Options)
     {
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
     };
@@ -36,6 +40,8 @@ public sealed partial class User : ReactiveObject
     [Reactive] public partial Dictionary<string, bool> Memberships { get; set; }
     [Reactive] public partial string Notes { get; set; }
     [Reactive] public partial bool RefreshCovers { get; set; }
+    [Reactive] public partial bool GlassmorphismEnabled { get; set; }
+    [Reactive] public partial double NotesFontSize { get; set; } = 16;
     public string LastSeenAppVersion { get; set; } = string.Empty;
     public List<TsundokuTheme> SavedThemes { get; set; }
     public List<Series> UserCollection { get; set; }
@@ -61,6 +67,10 @@ public sealed partial class User : ReactiveObject
         Notes = string.Empty;
     }
 
+    /// <summary>
+    /// Serializes this user instance to a JSON string using the shared serialization options.
+    /// </summary>
+    /// <returns>A JSON string representing the user data.</returns>
     [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "<Pending>")]
     public string Serialize()
     {
@@ -95,7 +105,7 @@ public sealed partial class User : ReactiveObject
             userData.AsObject().Add(nameof(Currency), "$");
             userData.AsObject().Add(nameof(MeanRating), 0);
             userData.AsObject().Add(nameof(VolumesRead), 0);
-            userData.AsObject().Add(nameof(CollectionValue), "");
+            userData.AsObject().Add(nameof(CollectionValue), string.Empty);
 
             if (userData[nameof(Language)].ToString().Equals("Native"))
             {
@@ -212,11 +222,11 @@ public sealed partial class User : ReactiveObject
                 [KinokuniyaUSA.TITLE] = false
             };
 
-            userData.AsObject()[nameof(MeanRating)] = (decimal)userData["MeanScore"];
+            userData.AsObject()[nameof(MeanRating)] = decimal.TryParse(userData["MeanScore"]?.ToString(), out decimal meanScore) ? meanScore : 0m;
             for (int x = 0; x < collectionJsonArray.Count; x++)
             {
                 series = collectionJsonArray.ElementAt(x).AsObject();
-                series["Rating"] = decimal.Parse(series["Score"].ToString());
+                series["Rating"] = decimal.TryParse(series["Score"]?.ToString(), out decimal score) ? score : 0m;
             }
             userData.AsObject().Remove("MeanScore");
 
@@ -269,10 +279,10 @@ public sealed partial class User : ReactiveObject
             for (int x = 0; x < collectionJsonArray.Count; x++)
             {
                 series = collectionJsonArray.ElementAt(x).AsObject();
-                string[] coverFileName = series["Cover"].ToString().Split('_');
-                string format = series["Format"].ToString();
-                string oldCoverFileName = series["Cover"].ToString();
-                if (!coverFileName[1].StartsWith(format, StringComparison.OrdinalIgnoreCase) && File.Exists(oldCoverFileName))
+                string[] coverFileName = series["Cover"]?.ToString().Split('_') ?? [];
+                string format = series["Format"]?.ToString() ?? string.Empty;
+                string oldCoverFileName = series["Cover"]?.ToString() ?? string.Empty;
+                if (coverFileName.Length > 1 && !coverFileName[1].StartsWith(format, StringComparison.OrdinalIgnoreCase) && File.Exists(oldCoverFileName))
                 {
                     series["Cover"] = $@"{coverFileName[0]}_{format}.{oldCoverFileName.Substring(oldCoverFileName.Length - 3)}";
                     File.Move(oldCoverFileName, series["Cover"].ToString());
@@ -291,7 +301,10 @@ public sealed partial class User : ReactiveObject
                 theme = themeJsonArray.ElementAt(x).AsObject();
                 foreach (System.Reflection.PropertyInfo property in typeof(TsundokuTheme).GetProperties().Skip(1))
                 {
-                    theme[property.Name] = Avalonia.Media.Color.FromUInt32(uint.Parse(theme[property.Name].ToString())).ToString();
+                    if (uint.TryParse(theme[property.Name]?.ToString(), out uint colorValue))
+                    {
+                        theme[property.Name] = Avalonia.Media.Color.FromUInt32(colorValue).ToString();
+                    }
                 }
             }
             userData[nameof(DataVersion)] = 3.0;

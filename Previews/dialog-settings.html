@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tsundoku - Settings Dialog</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: var(--menu-bg); }
+  ::-webkit-scrollbar-thumb { background: var(--divider); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--btn-text); }
+
+  body {
+    font-family: 'Geist', sans-serif;
+    background: var(--menu-bg);
+    margin: 0;
+  }
+
+  .dialog {
+    background: var(--menu-bg);
+    border: none;
+    border-radius: 0;
+    width: 100%;
+    overflow-y: auto;
+  }
+  .dialog::-webkit-scrollbar-track { background: var(--menu-bg); }
+
+  .dialog-header {
+    padding: 20px 24px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .dialog-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--username);
+  }
+  .dialog-close {
+    width: 32px; height: 32px; border-radius: 8px;
+    border: 2px solid var(--btn-border); background: var(--btn-bg);
+    color: var(--btn-text); cursor: pointer; font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .dialog-close:hover {
+    background: var(--btn-bg-hover); border-color: var(--btn-border-hover); color: var(--btn-text-hover);
+  }
+
+  .section { padding: 16px 24px; }
+  .section + .section { border-top: 2px solid var(--divider); }
+
+  .section-label {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1px; color: var(--card-publisher); margin-bottom: 10px;
+  }
+
+  .field-row {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+  }
+  .field-row:last-child { margin-bottom: 0; }
+
+  .field-label {
+    font-size: 13px; font-weight: 600; color: var(--card-desc);
+    min-width: 100px; flex-shrink: 0;
+  }
+
+  .text-input {
+    flex: 1; background: var(--search-bg); border: 2px solid var(--search-border);
+    border-radius: 8px; padding: 8px 12px; color: var(--search-text);
+    font-size: 13px; font-weight: 500; font-family: inherit; outline: none;
+    transition: all 0.15s;
+  }
+  .text-input:focus { border-color: var(--btn-border-hover); }
+
+  .select-input {
+    flex: 1; background: var(--btn-bg); border: 2px solid var(--btn-border);
+    border-radius: 8px; padding: 8px 12px; color: var(--btn-text);
+    font-size: 13px; font-weight: 500; font-family: inherit; outline: none;
+    cursor: pointer; appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 28px;
+  }
+
+  .btn {
+    padding: 8px 16px; border-radius: 8px;
+    border: 2px solid var(--btn-border); background: var(--btn-bg);
+    color: var(--btn-text); font-size: 13px; font-weight: 600;
+    cursor: pointer; font-family: inherit; transition: all 0.15s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .btn:hover {
+    background: var(--btn-bg-hover); border-color: var(--btn-border-hover); color: var(--btn-text-hover);
+  }
+
+  .icon-btn {
+    width: 36px; height: 36px; border-radius: 8px;
+    border: 2px solid var(--btn-border); background: var(--btn-bg);
+    color: var(--btn-text); cursor: pointer; font-size: 15px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .icon-btn:hover {
+    background: var(--btn-bg-hover); border-color: var(--btn-border-hover); color: var(--btn-text-hover);
+  }
+
+  .toggle-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 0;
+  }
+  .toggle-label {
+    font-size: 13px; font-weight: 600; color: var(--card-desc);
+  }
+  .toggle {
+    width: 40px; height: 22px; border-radius: 11px;
+    border: 2px solid var(--btn-border); background: var(--btn-bg);
+    cursor: pointer; position: relative; transition: all 0.2s;
+  }
+  .toggle.on { background: var(--progress-bar); border-color: var(--progress-bar); }
+  .toggle::after {
+    content: ''; position: absolute; top: 2px; left: 2px;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--card-desc); transition: all 0.2s;
+  }
+  .toggle.on::after { left: 20px; background: var(--menu-bg); }
+
+  .icon-grid {
+    display: flex; flex-wrap: wrap; gap: 6px;
+  }
+
+  .shortcut-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 4px 0;
+  }
+  .shortcut-label { font-size: 12px; color: var(--card-desc); font-weight: 500; }
+  .shortcut-key {
+    font-size: 11px; font-weight: 700; color: var(--btn-text);
+    background: var(--btn-bg); border: 2px solid var(--btn-border);
+    border-radius: 5px; padding: 2px 8px;
+  }
+
+  .version-text {
+    text-align: center; font-size: 12px; color: var(--card-staff);
+    font-weight: 500; padding: 12px 0 16px;
+  }
+
+  :root {
+    --menu-bg: #12293d; --username: #f1d2b6; --user-icon-border: #7b6b43;
+    --search-bg: #473633; --search-border: #7b6b43; --search-text: #f1d2b6;
+    --divider: #7b6b43; --btn-bg: #473633; --btn-bg-hover: #3e2a35;
+    --btn-border: #7b6b43; --btn-border-hover: #7b6b43;
+    --btn-text: #f1d2b6; --btn-text-hover: #12293d;
+    --card-publisher: #f1d2b6; --card-title: #7b6b43; --card-desc: #f9eae1;
+    --card-staff: #f1d2b6; --progress-bar: #f1d2b6; --progress-bar-bg: #12293d;
+  }
+</style>
+</head>
+<body>
+<div class="dialog">
+  <div class="dialog-header">
+    <span class="dialog-title">Settings</span>
+    <button class="dialog-close"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Profile</div>
+    <div class="field-row">
+      <span class="field-label">Username</span>
+      <input type="text" class="text-input" value="Prem" maxlength="20">
+      <button class="icon-btn" title="Confirm"><i class="fa-solid fa-check"></i></button>
+    </div>
+    <div class="field-row">
+      <span class="field-label">Currency</span>
+      <select class="select-input">
+        <option>¥</option><option>$</option><option>€</option><option>£</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Memberships</div>
+    <div class="toggle-row">
+      <span class="toggle-label">Books-A-Million</span>
+      <div class="toggle"></div>
+    </div>
+    <div class="toggle-row">
+      <span class="toggle-label">Kinokuniya USA</span>
+      <div class="toggle"></div>
+    </div>
+    <div class="toggle-row">
+      <span class="toggle-label">Indigo</span>
+      <div class="toggle"></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Preferences</div>
+    <div class="toggle-row">
+      <span class="toggle-label">Refresh Covers on Startup</span>
+      <div class="toggle on"></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Quick Actions</div>
+    <div class="icon-grid">
+      <button class="icon-btn" title="App Folder"><i class="fa-solid fa-folder-open"></i></button>
+      <button class="icon-btn" title="Covers Folder"><i class="fa-solid fa-images"></i></button>
+      <button class="icon-btn" title="Screenshot"><i class="fa-solid fa-camera"></i></button>
+      <button class="icon-btn" title="Themes"><i class="fa-solid fa-swatchbook"></i></button>
+      <button class="icon-btn" title="Bug Report"><i class="fa-solid fa-bug"></i></button>
+      <button class="icon-btn" title="CSV Export"><i class="fa-solid fa-file-csv"></i></button>
+      <button class="icon-btn" title="Coolors"><i class="fa-solid fa-palette"></i></button>
+      <button class="icon-btn" title="Discord"><i class="fa-brands fa-discord"></i></button>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Controls</div>
+    <div class="shortcut-row">
+      <span class="shortcut-label">Copy Title on Series Card</span>
+      <span class="shortcut-key">CTRL + Click</span>
+    </div>
+    <div class="shortcut-row">
+      <span class="shortcut-label">Open Advanced Search</span>
+      <span class="shortcut-key">CTRL + F</span>
+    </div>
+    <div class="shortcut-row">
+      <span class="shortcut-label">Clear Collection Search</span>
+      <span class="shortcut-key">ESC</span>
+    </div>
+    <div class="shortcut-row">
+      <span class="shortcut-label">Switch Language</span>
+      <span class="shortcut-key">CTRL + L</span>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Data</div>
+    <div class="field-row" style="flex-wrap:wrap; gap:8px;">
+      <button class="btn"><i class="fa-solid fa-rotate"></i> Refresh Series</button>
+      <button class="btn"><i class="fa-solid fa-file-import"></i> JSON Import</button>
+      <button class="btn"><i class="fa-solid fa-file-import"></i> Libib Import</button>
+      <button class="btn"><i class="fa-solid fa-file-import"></i> Goodreads</button>
+    </div>
+  </div>
+
+  <div class="version-text">v2.0.0</div>
+</div>
+
+<script>
+document.querySelectorAll('.toggle').forEach(t => t.addEventListener('click', () => t.classList.toggle('on')));
+document.querySelector('.dialog-close').addEventListener('click', () => {
+  window.parent.postMessage('close-dialog', '*');
+});
+window.addEventListener('load', () => {
+  const dialog = document.querySelector('.dialog');
+  dialog.style.overflowY = 'visible';
+  const h = dialog.offsetHeight;
+  dialog.style.overflowY = '';
+  window.parent.postMessage({ type: 'dialog-height', height: h }, '*');
+});
+</script>
+</body>
+</html>

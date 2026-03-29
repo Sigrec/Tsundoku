@@ -1,12 +1,16 @@
+using System.Reactive.Disposables;
+using System.Reactive.Disposables.Fluent;
 using System.Reactive.Linq;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
+using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
 using ReactiveUI.Avalonia;
 using Tsundoku.Helpers;
 using Tsundoku.Models;
+using Tsundoku.Services;
 using Tsundoku.ViewModels;
 
 namespace Tsundoku.Views;
@@ -19,11 +23,14 @@ public sealed partial class CollectionThemeWindow : ReactiveWindow<ThemeSettings
     private bool _isInitialized = false;
     private string CurThemeName;
     private readonly IPopupDialogService _popupDialogService;
+    private readonly IThemeResourceService _themeResourceService;
+    private IDisposable? _themeObserveDisposable;
 
     public CollectionThemeWindow(ThemeSettingsViewModel viewModel, IPopupDialogService popupDialogService)
     {
         ViewModel = viewModel;
         _popupDialogService = popupDialogService;
+        _themeResourceService = App.ServiceProvider!.GetRequiredService<IThemeResourceService>();
         InitializeComponent();
 
         Opened += (s, e) =>
@@ -33,6 +40,8 @@ public sealed partial class CollectionThemeWindow : ReactiveWindow<ThemeSettings
             CurThemeName = curTheme.ThemeName;
             BackupCurrentTheme.ThemeName = "Backup";
             ViewModel.OverrideCurrentTheme(BackupCurrentTheme);
+            _themeResourceService.ApplyTheme(BackupCurrentTheme);
+            _themeObserveDisposable = _themeResourceService.ObserveAndApply(BackupCurrentTheme);
             IsOpen = true;
         };
 
@@ -40,8 +49,11 @@ public sealed partial class CollectionThemeWindow : ReactiveWindow<ThemeSettings
         {
             if (IsOpen)
             {
+                _themeObserveDisposable?.Dispose();
+                _themeObserveDisposable = null;
+
                 this.Hide();
-                NewThemeName.Text = "";
+                NewThemeName.Text = string.Empty;
                 Topmost = false;
                 IsOpen = false;
 
@@ -50,16 +62,23 @@ public sealed partial class CollectionThemeWindow : ReactiveWindow<ThemeSettings
                 {
                     ViewModel.SetTheme(curSelectedTheme);
                 }
+                _themeResourceService.ApplyTheme(curSelectedTheme!);
                 BackupCurrentTheme = null;
+                e.Cancel = true;
             }
-            e.Cancel = true;
         };
 
-        this.WhenAnyValue(x => x.NewThemeName.Text, x => x.MainColor1.Text, x => x.MainColor2.Text, x => x.TextColor1.Text, x => x.TextColor2.Text, x => x.AccentColor1.Text, x => x.AccentColor2.Text, (name, mc1, mc2, tc1, tc2, ac1, ac2) => _isInitialized && !string.IsNullOrWhiteSpace(name) && !name.Equals("Default", StringComparison.OrdinalIgnoreCase) && !mc1.Contains('_') && !mc2.Contains('_') && !tc1.Contains('_') && !tc2.Contains('_') && !ac1.Contains('_') && !ac2.Contains('_')).Subscribe(x => ViewModel.IsGenerateThemeButtonEnabled = x);
+        this.WhenActivated(disposables =>
+        {
+            this.WhenAnyValue(x => x.NewThemeName.Text, x => x.MainColor1.Text, x => x.MainColor2.Text, x => x.TextColor1.Text, x => x.TextColor2.Text, x => x.AccentColor1.Text, x => x.AccentColor2.Text, (name, mc1, mc2, tc1, tc2, ac1, ac2) => _isInitialized && !string.IsNullOrWhiteSpace(name) && !name.Equals("Default", StringComparison.OrdinalIgnoreCase) && !mc1.Contains('_') && !mc2.Contains('_') && !tc1.Contains('_') && !tc2.Contains('_') && !ac1.Contains('_') && !ac2.Contains('_'))
+                .Subscribe(x => ViewModel.IsGenerateThemeButtonEnabled = x)
+                .DisposeWith(disposables);
 
-        this.WhenAnyValue(x => x.NewThemeName.Text, (newName) => _isInitialized && !string.IsNullOrWhiteSpace(newName) && !newName.Equals("Default", StringComparison.OrdinalIgnoreCase))
-            .DistinctUntilChanged()
-            .Subscribe(x => ViewModel.IsSaveThemeButtonEnabled = x);
+            this.WhenAnyValue(x => x.NewThemeName.Text, (newName) => _isInitialized && !string.IsNullOrWhiteSpace(newName) && !newName.Equals("Default", StringComparison.OrdinalIgnoreCase))
+                .DistinctUntilChanged()
+                .Subscribe(x => ViewModel.IsSaveThemeButtonEnabled = x)
+                .DisposeWith(disposables);
+        });
 
         _isInitialized = true;
     }
@@ -133,8 +152,10 @@ public sealed partial class CollectionThemeWindow : ReactiveWindow<ThemeSettings
         BackupCurrentTheme.SeriesEditPaneButtonsIconColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
         BackupCurrentTheme.SeriesEditPaneButtonsIconHoverColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
 
-        // Generate Theme
-        ViewModel.SaveTheme(BackupCurrentTheme);  
+        // Save a clone so BackupCurrentTheme stays independent for further editing
+        TsundokuTheme themeToSave = BackupCurrentTheme.Cloning();
+        themeToSave.ThemeName = NewThemeName.Text.Trim();
+        ViewModel.SaveTheme(themeToSave);
     }
 
     /// <summary>
@@ -192,8 +213,10 @@ public sealed partial class CollectionThemeWindow : ReactiveWindow<ThemeSettings
         BackupCurrentTheme.SeriesEditPaneButtonsIconColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
         BackupCurrentTheme.SeriesEditPaneButtonsIconHoverColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
 
-        // Generate Theme
-        ViewModel.SaveTheme(BackupCurrentTheme);    
+        // Save a clone so BackupCurrentTheme stays independent for further editing
+        TsundokuTheme themeToSave = BackupCurrentTheme.Cloning();
+        themeToSave.ThemeName = NewThemeName.Text.Trim();
+        ViewModel.SaveTheme(themeToSave);
     }
 
     private async Task ShowDialog(string title, string info = "Unable to Add Theme")
@@ -204,12 +227,13 @@ public sealed partial class CollectionThemeWindow : ReactiveWindow<ThemeSettings
     {
         try
         {
-            BackupCurrentTheme.ThemeName = NewThemeName.Text.Trim();
-            ViewModel.SaveTheme(BackupCurrentTheme);
+            TsundokuTheme themeToSave = BackupCurrentTheme.Cloning();
+            themeToSave.ThemeName = NewThemeName.Text.Trim();
+            ViewModel.SaveTheme(themeToSave);
         }
         catch (Exception ex)
         {
-            await ShowDialog("Error", $"Unable to Save New Theme \"{BackupCurrentTheme.ThemeName}\"");
+            await ShowDialog("Error", $"Unable to Save New Theme \"{NewThemeName.Text}\"");
             LOGGER.Warn(ex.Message);
         }
     }
@@ -261,7 +285,7 @@ public sealed partial class CollectionThemeWindow : ReactiveWindow<ThemeSettings
                 await ShowDialog("Error", $"Unable to Import Theme @ \"{newThemeFileLocalPath}\"");
             }
         }
-        NewThemeName.Text = "";
+        NewThemeName.Text = string.Empty;
     }
 
     private async void RemoveSavedTheme(object sender, RoutedEventArgs args)
@@ -293,6 +317,10 @@ public sealed partial class CollectionThemeWindow : ReactiveWindow<ThemeSettings
                 BackupCurrentTheme = selectedTheme.Cloning();
                 BackupCurrentTheme.ThemeName = "Backup";
                 ViewModel.OverrideCurrentTheme(BackupCurrentTheme);
+
+                _themeObserveDisposable?.Dispose();
+                _themeResourceService.ApplyTheme(BackupCurrentTheme);
+                _themeObserveDisposable = _themeResourceService.ObserveAndApply(BackupCurrentTheme);
             }
         }
     }

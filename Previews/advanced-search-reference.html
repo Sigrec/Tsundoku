@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tsundoku - Advanced Search Reference</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--divider); border-radius: 4px; }
+
+  :root {
+    --bg: #12293d; --surface: #1a3550; --surface-2: #473633;
+    --divider: #7b6b43; --text: #f9eae1; --text-muted: #f1d2b6;
+    --accent: #7b6b43; --accent-text: #12293d;
+    --and-color: #6bae6b; --or-color: #d4a44a;
+    --code-bg: #0d1f2d; --code-border: #2a4a5e;
+    --tag-bg: #2a3f55; --tag-border: #3d5a75;
+  }
+
+  body {
+    font-family: 'Geist', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 32px;
+    max-width: 900px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  h1 {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  h1 i { color: var(--divider); }
+
+  .subtitle {
+    font-size: 14px;
+    color: var(--text-muted);
+    opacity: 0.6;
+    margin-bottom: 28px;
+  }
+
+  h2 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--divider);
+    margin: 28px 0 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* Syntax section */
+  .syntax-box {
+    background: var(--code-bg);
+    border: 1.5px solid var(--code-border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+  }
+  .syntax-box .line {
+    font-family: 'Geist Mono', monospace;
+    font-size: 14px;
+    margin: 6px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .syntax-box .comment {
+    color: var(--text-muted);
+    opacity: 0.4;
+    font-size: 12px;
+  }
+
+  /* Connector pills */
+  .conn {
+    display: inline-block;
+    padding: 1px 8px;
+    border-radius: 4px;
+    font-family: 'Geist Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .conn-and { background: rgba(107,174,107,0.15); color: var(--and-color); border: 1px solid rgba(107,174,107,0.3); }
+  .conn-or { background: rgba(212,164,74,0.15); color: var(--or-color); border: 1px solid rgba(212,164,74,0.3); }
+
+  /* Filter table */
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-bottom: 20px;
+  }
+  thead th {
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    opacity: 0.5;
+    padding: 8px 12px;
+    border-bottom: 2px solid var(--divider);
+  }
+  tbody td {
+    padding: 10px 12px;
+    font-size: 13px;
+    border-bottom: 1px solid rgba(123,107,67,0.2);
+    vertical-align: top;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+
+  .filter-name {
+    font-family: 'Geist Mono', monospace;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  .ops {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+  .op {
+    font-family: 'Geist Mono', monospace;
+    font-size: 12px;
+    background: var(--tag-bg);
+    border: 1px solid var(--tag-border);
+    border-radius: 4px;
+    padding: 1px 6px;
+    color: var(--text-muted);
+  }
+
+  .values {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+  .val {
+    font-family: 'Geist Mono', monospace;
+    font-size: 11px;
+    background: rgba(123,107,67,0.12);
+    border: 1px solid rgba(123,107,67,0.25);
+    border-radius: 4px;
+    padding: 1px 6px;
+    color: var(--divider);
+  }
+
+  /* Examples */
+  .examples {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .example {
+    background: var(--code-bg);
+    border: 1px solid var(--code-border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+  }
+  .example-query {
+    font-family: 'Geist Mono', monospace;
+    font-size: 13px;
+    color: var(--text);
+    white-space: nowrap;
+  }
+  .example-desc {
+    font-size: 12px;
+    color: var(--text-muted);
+    opacity: 0.6;
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .example-query .kw { color: var(--text-muted); }
+  .example-query .op-hl { color: var(--divider); }
+  .example-query .and-hl { color: var(--and-color); font-weight: 700; }
+  .example-query .or-hl { color: var(--or-color); font-weight: 700; }
+</style>
+</head>
+<body>
+
+<h1><i class="fa-solid fa-magnifying-glass"></i> Advanced Search</h1>
+<p class="subtitle">Filter your collection with precise queries. Combine conditions with AND / OR logic.</p>
+
+<h2>Syntax</h2>
+<div class="syntax-box">
+  <div class="line">
+    <span><span class="kw">Filter</span><span class="op-hl">==</span>Value</span>
+    <span class="comment">// single filter</span>
+  </div>
+  <div class="line">
+    <span><span class="kw">Filter</span><span class="op-hl">==</span>Value <span class="conn conn-and">&</span> <span class="kw">Filter</span><span class="op-hl">>=</span>Value</span>
+    <span class="comment">// AND &mdash; both must match</span>
+  </div>
+  <div class="line">
+    <span><span class="kw">Filter</span><span class="op-hl">==</span>Value <span class="conn conn-or">|</span> <span class="kw">Filter</span><span class="op-hl">==</span>Value</span>
+    <span class="comment">// OR &mdash; either can match</span>
+  </div>
+  <div class="line">
+    <span><span class="kw">A</span><span class="op-hl">==</span>x <span class="conn conn-and">&</span> <span class="kw">B</span><span class="op-hl">==</span>y <span class="conn conn-or">|</span> <span class="kw">C</span><span class="op-hl">==</span>z</span>
+    <span class="comment">// mix &mdash; evaluated left to right</span>
+  </div>
+</div>
+
+<h2>Available Filters</h2>
+<table>
+  <thead>
+    <tr><th>Filter</th><th>Operators</th><th>Values</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="filter-name">Rating</td>
+      <td><div class="ops"><span class="op">==</span><span class="op">>=</span><span class="op"><=</span></div></td>
+      <td>Number (0&ndash;10)</td>
+    </tr>
+    <tr>
+      <td class="filter-name">Value</td>
+      <td><div class="ops"><span class="op">==</span><span class="op">>=</span><span class="op"><=</span></div></td>
+      <td>Number (price)</td>
+    </tr>
+    <tr>
+      <td class="filter-name">Read</td>
+      <td><div class="ops"><span class="op">==</span><span class="op">>=</span><span class="op"><=</span></div></td>
+      <td>Number (volumes read)</td>
+    </tr>
+    <tr>
+      <td class="filter-name">CurVolumes</td>
+      <td><div class="ops"><span class="op">==</span><span class="op">>=</span><span class="op"><=</span></div></td>
+      <td>Number (current volumes owned)</td>
+    </tr>
+    <tr>
+      <td class="filter-name">MaxVolumes</td>
+      <td><div class="ops"><span class="op">==</span><span class="op">>=</span><span class="op"><=</span></div></td>
+      <td>Number (total volumes available)</td>
+    </tr>
+    <tr>
+      <td class="filter-name">Format</td>
+      <td><div class="ops"><span class="op">==</span></div></td>
+      <td><div class="values"><span class="val">Manga</span><span class="val">Novel</span><span class="val">Manhwa</span><span class="val">Manhua</span><span class="val">Manfra</span><span class="val">Comic</span></div></td>
+    </tr>
+    <tr>
+      <td class="filter-name">Status</td>
+      <td><div class="ops"><span class="op">==</span></div></td>
+      <td><div class="values"><span class="val">Ongoing</span><span class="val">Finished</span><span class="val">Hiatus</span><span class="val">Cancelled</span></div></td>
+    </tr>
+    <tr>
+      <td class="filter-name">Demographic</td>
+      <td><div class="ops"><span class="op">==</span></div></td>
+      <td><div class="values"><span class="val">Shounen</span><span class="val">Shoujo</span><span class="val">Seinen</span><span class="val">Josei</span><span class="val">Unknown</span></div></td>
+    </tr>
+    <tr>
+      <td class="filter-name">Series</td>
+      <td><div class="ops"><span class="op">==</span></div></td>
+      <td><div class="values"><span class="val">Complete</span><span class="val">InComplete</span></div></td>
+    </tr>
+    <tr>
+      <td class="filter-name">Favorite</td>
+      <td><div class="ops"><span class="op">==</span></div></td>
+      <td><div class="values"><span class="val">True</span><span class="val">False</span></div></td>
+    </tr>
+    <tr>
+      <td class="filter-name">Genre</td>
+      <td><div class="ops"><span class="op">==</span></div></td>
+      <td><div class="values"><span class="val">Action</span><span class="val">Adventure</span><span class="val">Comedy</span><span class="val">Drama</span><span class="val">Ecchi</span><span class="val">Fantasy</span><span class="val">Horror</span><span class="val">MahouShoujo</span><span class="val">Mecha</span><span class="val">Music</span><span class="val">Mystery</span><span class="val">Psychological</span><span class="val">Romance</span><span class="val">SciFi</span><span class="val">SliceOfLife</span><span class="val">Sports</span><span class="val">Supernatural</span><span class="val">Thriller</span></div></td>
+    </tr>
+    <tr>
+      <td class="filter-name">Notes</td>
+      <td><div class="ops"><span class="op">==</span></div></td>
+      <td>Text (searches within notes)</td>
+    </tr>
+    <tr>
+      <td class="filter-name">Publisher</td>
+      <td><div class="ops"><span class="op">==</span></div></td>
+      <td>Text (searches within publisher name)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>Examples</h2>
+<div class="examples">
+  <div class="example">
+    <span class="example-query"><span class="kw">Rating</span><span class="op-hl">>=</span>8</span>
+    <span class="example-desc">Series rated 8 or higher</span>
+  </div>
+  <div class="example">
+    <span class="example-query"><span class="kw">Format</span><span class="op-hl">==</span>Manga <span class="and-hl">&</span> <span class="kw">Status</span><span class="op-hl">==</span>Ongoing</span>
+    <span class="example-desc">Ongoing manga only</span>
+  </div>
+  <div class="example">
+    <span class="example-query"><span class="kw">Genre</span><span class="op-hl">==</span>Romance <span class="or-hl">|</span> <span class="kw">Genre</span><span class="op-hl">==</span>Drama</span>
+    <span class="example-desc">Romance or Drama series</span>
+  </div>
+  <div class="example">
+    <span class="example-query"><span class="kw">Rating</span><span class="op-hl">>=</span>7 <span class="and-hl">&</span> <span class="kw">Series</span><span class="op-hl">==</span>InComplete <span class="and-hl">&</span> <span class="kw">Format</span><span class="op-hl">==</span>Manga</span>
+    <span class="example-desc">High-rated incomplete manga</span>
+  </div>
+  <div class="example">
+    <span class="example-query"><span class="kw">Demographic</span><span class="op-hl">==</span>Seinen <span class="or-hl">|</span> <span class="kw">Demographic</span><span class="op-hl">==</span>Josei</span>
+    <span class="example-desc">Seinen or Josei demographic</span>
+  </div>
+  <div class="example">
+    <span class="example-query"><span class="kw">Publisher</span><span class="op-hl">==</span>Viz <span class="and-hl">&</span> <span class="kw">CurVolumes</span><span class="op-hl">>=</span>5</span>
+    <span class="example-desc">Viz series with 5+ volumes owned</span>
+  </div>
+  <div class="example">
+    <span class="example-query"><span class="kw">Favorite</span><span class="op-hl">==</span>True <span class="and-hl">&</span> <span class="kw">Rating</span><span class="op-hl">>=</span>9 <span class="or-hl">|</span> <span class="kw">Read</span><span class="op-hl">>=</span>10</span>
+    <span class="example-desc">Favorited 9+ rated, or 10+ volumes read</span>
+  </div>
+  <div class="example">
+    <span class="example-query"><span class="kw">Notes</span><span class="op-hl">==</span>"limited edition"</span>
+    <span class="example-desc">Series with "limited edition" in notes</span>
+  </div>
+</div>
+
+</body>
+</html>

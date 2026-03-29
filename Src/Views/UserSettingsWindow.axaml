@@ -9,11 +9,10 @@
         x:DataType="vm:UserSettingsViewModel"
         Icon="\Assets\Icons\TsundokuLogo.ico"
         Title="Settings"
-        FontFamily="Segoe UI"
         MaxWidth="491"
         MinWidth="491"
-        MaxHeight="895"
-        WindowStartupLocation="2"
+        SizeToContent="Height"
+        WindowStartupLocation="CenterOwner"
         KeyboardNavigation.TabNavigation="None">
     
     <Window.Resources>
@@ -24,256 +23,292 @@
 		</ResourceDictionary>
 	</Window.Resources>
 
-    <Border Classes="Menu" BorderThickness="3" CornerRadius="0,0,8,8" ClipToBounds="True">
-        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Theme="{StaticResource ReverseCollectionScroll}"> 
-            <StackPanel Margin="20,10,20,15" Spacing="10">
-                <StackPanel Spacing="5">
-                    <TextBlock Text="Change Username" 
-                               TextDecorations="Underline" 
-                               FontSize="20" 
-                               FontWeight="Bold"
-                               Classes="Menu"/>
-                    <StackPanel Orientation="Horizontal" Spacing="5">
+    <Window.Styles>
+        <!-- Style ToggleButtons as toggle switches -->
+        <Style Selector="ToggleButton.toggle-switch">
+            <Setter Property="Width" Value="40"/>
+            <Setter Property="Height" Value="22"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="CornerRadius" Value="11"/>
+            <Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGColor}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource TsundokuMenuButtonBorderColor}"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="Foreground" Value="{DynamicResource TsundokuDividerColor}"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{TemplateBinding CornerRadius}">
+                        <Canvas Width="36" Height="18">
+                            <Ellipse Width="12" Height="12"
+                                     Fill="{TemplateBinding Foreground}"
+                                     Canvas.Left="3" Canvas.Top="3"
+                                     Name="Knob">
+                                <Ellipse.Transitions>
+                                    <Transitions>
+                                        <DoubleTransition Property="Canvas.Left" Duration="0:0:0.15"/>
+                                    </Transitions>
+                                </Ellipse.Transitions>
+                            </Ellipse>
+                        </Canvas>
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="ToggleButton.toggle-switch:pointerover">
+            <Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGHoverColor}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource TsundokuMenuButtonBorderHoverColor}"/>
+        </Style>
+        <Style Selector="ToggleButton.toggle-switch:checked">
+            <Setter Property="Background" Value="{DynamicResource TsundokuSeriesProgressBarColor}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource TsundokuSeriesProgressBarColor}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TsundokuMenuBGColor}"/>
+        </Style>
+        <Style Selector="ToggleButton.toggle-switch:checked /template/ Ellipse#Knob">
+            <Setter Property="Canvas.Left" Value="21"/>
+        </Style>
+        <Style Selector="ToggleButton.toggle-switch:checked:pointerover">
+            <Setter Property="Background" Value="{DynamicResource TsundokuSeriesProgressBarColor}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource TsundokuSeriesProgressBarColor}"/>
+        </Style>
+    </Window.Styles>
+
+    <Border Classes="Menu" BorderThickness="2" CornerRadius="0,0,8,8" ClipToBounds="True">
+        <Grid RowDefinitions="Auto,*">
+            <!-- Header -->
+            <Border Grid.Row="0" BorderThickness="0,0,0,2" BorderBrush="{DynamicResource TsundokuDividerColor}" Padding="16,12">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <i:Icon Value="fa-solid fa-gear" FontSize="16" Foreground="{DynamicResource TsundokuDividerColor}"/>
+                    <TextBlock Text="Settings" FontSize="18" FontWeight="ExtraBold" Foreground="{DynamicResource TsundokuUsernameColor}" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+
+            <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Theme="{StaticResource ReverseCollectionScroll}">
+            <StackPanel>
+                <!-- Profile -->
+                <StackPanel Margin="20,16,20,14" Spacing="10">
+                    <TextBlock Text="PROFILE" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuSeriesCardPublisherColor}" LetterSpacing="1" Opacity="0.8"/>
+                    <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,0">
+                        <TextBlock Text="Username" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="{DynamicResource TsundokuMenuTextColor}" Width="80"/>
                         <TextBox x:Name="UsernameChangeTextBox"
-                                Width="400"
-                                FontWeight="Bold"
-                                Classes="Menu"
-                                FontSize="15"
-                                MaxLength="20"
-                                Height="35"
-                                Watermark="Enter New Username..."
-                                BorderThickness="2"/>
+                                 Grid.Column="1"
+                                 FontWeight="Bold"
+                                 Classes="Menu"
+                                 FontSize="13"
+                                 MaxLength="20"
+                                 Height="34"
+                                 Watermark="Enter New Username..."
+                                 BorderThickness="2"
+                                 CornerRadius="9"/>
                         <Button x:Name="ChangeUsernameButton"
-                                FontSize="18"
-                                BorderThickness="2"
-                                Theme="{StaticResource UserSettingsButton}"
-                                i:Attached.Icon="fa-check" 
+                                Grid.Column="2"
+                                Width="34" Height="34"
+                                Margin="6,0,0,0"
+                                Theme="{StaticResource MenuButton}"
+                                i:Attached.Icon="fa-check"
+                                FontSize="14"
                                 Click="ChangeUsername"
                                 IsEnabled="{CompiledBinding IsChangeUsernameButtonEnabled}"/>
-                    </StackPanel>
+                    </Grid>
                 </StackPanel>
-                <StackPanel Spacing="5">
-                    <TextBlock Text="Currency" TextDecorations="Underline" FontSize="20" FontWeight="Bold" Classes="Menu"/>
-                    <ComboBox x:Name="CurrencyComboBox"
-                              SelectionChanged="CurrencyChanged"
-                              ItemsSource="{x:Static models:Constants.AVAILABLE_CURRENCIES}"
-                              Theme="{StaticResource MenuComboBox}"
-                              HorizontalAlignment="Left"
-                              SelectedIndex="{CompiledBinding SelectedCurrencyIndex}"
-                              ItemContainerTheme="{StaticResource MenuComboBoxItem}"
-							  Width="80"
-                              AutoScrollToSelectedItem="True">
+
+                <!-- Memberships -->
+                <Border BorderThickness="0,2,0,0" BorderBrush="{DynamicResource TsundokuDividerColor}" Opacity="0.3"/>
+                <StackPanel Margin="20,14,20,14" Spacing="6">
+                    <TextBlock Text="MEMBERSHIPS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuSeriesCardPublisherColor}" LetterSpacing="1" Opacity="0.8" Margin="0,0,0,4"/>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Text="Books-A-Million" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="{DynamicResource TsundokuMenuTextColor}"/>
+                        <ToggleButton x:Name="BooksAMillionButton" Grid.Column="1" IsChecked="{CompiledBinding BooksAMillionMember}" Classes="toggle-switch" VerticalAlignment="Center"/>
+                    </Grid>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Text="Kinokuniya USA" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="{DynamicResource TsundokuMenuTextColor}"/>
+                        <ToggleButton x:Name="KinokuniyaUSAButton" Grid.Column="1" IsChecked="{CompiledBinding KinokuniyaUSAMember}" Classes="toggle-switch" VerticalAlignment="Center"/>
+                    </Grid>
+                </StackPanel>
+
+                <!-- Preferences -->
+                <Border BorderThickness="0,2,0,0" BorderBrush="{DynamicResource TsundokuDividerColor}" Opacity="0.3"/>
+                <StackPanel Margin="20,14,20,14" Spacing="6">
+                    <TextBlock Text="PREFERENCES" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuSeriesCardPublisherColor}" LetterSpacing="1" Opacity="0.8" Margin="0,0,0,4"/>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Text="Refresh Covers on Startup" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="{DynamicResource TsundokuMenuTextColor}"/>
+                        <ToggleButton x:Name="RefreshCoversButton" Grid.Column="1" IsChecked="{CompiledBinding RefreshCovers}" Classes="toggle-switch" VerticalAlignment="Center" ToolTip.Tip="Re-download cover images when refreshing a series"/>
+                    </Grid>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Text="Glass Effect" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="{DynamicResource TsundokuMenuTextColor}"/>
+                        <ToggleButton x:Name="GlassmorphismButton" Grid.Column="1" IsChecked="{CompiledBinding GlassmorphismEnabled}" Classes="toggle-switch" VerticalAlignment="Center" ToolTip.Tip="Enable transparent blur effect on windows"/>
+                    </Grid>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Text="Currency" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="{DynamicResource TsundokuMenuTextColor}"/>
+                        <ComboBox x:Name="CurrencyComboBox"
+                                  Grid.Column="1"
+                                  SelectionChanged="CurrencyChanged"
+                                  ItemsSource="{x:Static models:Constants.AVAILABLE_CURRENCIES}"
+                                  Theme="{StaticResource MenuComboBox}"
+                                  HorizontalAlignment="Right"
+                                  SelectedIndex="{CompiledBinding SelectedCurrencyIndex}"
+                                  ItemContainerTheme="{StaticResource MenuComboBoxItem}"
+                                  Width="80" Height="34"
+                                  AutoScrollToSelectedItem="True">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding}" />
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
-						<ComboBox.Resources>
-							<ResourceDictionary>
-								<ResourceDictionary.MergedDictionaries>
-									<ResourceInclude Source="/Styles/CollectionControlThemes.xaml"/>
-								</ResourceDictionary.MergedDictionaries>
-							</ResourceDictionary>
-						</ComboBox.Resources>
-					</ComboBox>
+                            <ComboBox.Resources>
+                                <ResourceDictionary>
+                                    <ResourceDictionary.MergedDictionaries>
+                                        <ResourceInclude Source="/Styles/CollectionControlThemes.xaml"/>
+                                    </ResourceDictionary.MergedDictionaries>
+                                </ResourceDictionary>
+                            </ComboBox.Resources>
+                        </ComboBox>
+                    </Grid>
                 </StackPanel>
-                <StackPanel Spacing="5">
-                    <TextBlock Text="Memberships" TextDecorations="Underline" FontSize="20" FontWeight="Bold" Classes="Menu"/>
-                    <WrapPanel Width="450" Margin="-5,0,0,0">
-						<WrapPanel.Styles>
-                            <Style Selector="ToggleButton">
-                                <Setter Property="Margin" Value="3"/>
-                            </Style>
-                        </WrapPanel.Styles>
-					<ToggleButton x:Name="BooksAMillionButton"
-								  IsChecked="{CompiledBinding BooksAMillionMember}"
-							      Theme="{StaticResource MenuToggleButton}"
-							      Content="Books-A-Million"/>
-					<ToggleButton x:Name="KinokuniyaUSAButton"
-								  IsChecked="{CompiledBinding KinokuniyaUSAMember}"
-							      Theme="{StaticResource MenuToggleButton}"
-							      Content="Kinokuniya USA"/>
-					</WrapPanel>
-                </StackPanel>
-                <StackPanel Spacing="5">
-                    <TextBlock Text="Preferences" TextDecorations="Underline" FontSize="20" FontWeight="Bold" Classes="Menu"/>
-                    <WrapPanel Width="450" Margin="-5,0,0,0">
-						<WrapPanel.Styles>
-                            <Style Selector="ToggleButton">
-                                <Setter Property="Margin" Value="3"/>
-                            </Style>
-                        </WrapPanel.Styles>
-                        <ToggleButton x:Name="RefreshCoversButton"
-                                      IsChecked="{CompiledBinding RefreshCovers}"
-                                      Theme="{StaticResource MenuToggleButton}"
-                                      Content="Refresh Covers"
-                                      ToolTip.Tip="Re-download cover images when refreshing a series"/>
-                    </WrapPanel>
-                </StackPanel>
-                <StackPanel Spacing="5">
-                    <TextBlock Text="Settings" TextDecorations="Underline" FontSize="20" FontWeight="Bold" Classes="Menu"/>
-                    <WrapPanel Width="450" Margin="-5,0,0,0">
+
+                <!-- Quick Actions -->
+                <Border BorderThickness="0,2,0,0" BorderBrush="{DynamicResource TsundokuDividerColor}" Opacity="0.3"/>
+                <StackPanel Margin="20,14,20,14" Spacing="10">
+                    <TextBlock Text="QUICK ACTIONS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuSeriesCardPublisherColor}" LetterSpacing="1" Opacity="0.8"/>
+                    <WrapPanel>
                         <WrapPanel.Styles>
                             <Style Selector="Button">
                                 <Setter Property="Margin" Value="3"/>
-                                <Setter Property="FontSize" Value="20"/>
+                                <Setter Property="Width" Value="36"/>
+                                <Setter Property="Height" Value="36"/>
+                                <Setter Property="FontSize" Value="15"/>
                                 <Setter Property="ToolTip.Placement" Value="Bottom"/>
                                 <Setter Property="ToolTip.VerticalOffset" Value="5"/>
                             </Style>
                         </WrapPanel.Styles>
-                        <Button Theme="{StaticResource UserSettingsButton}"
-                                Click="OpenApplicationFolder" 
-                                ToolTip.Tip="Open App Folder"
-                                i:Attached.Icon="fa-solid fa-folder-open" />
-                        <Button Theme="{StaticResource UserSettingsButton}"
-                                Click="OpenCoversFolder" 
-                                ToolTip.Tip="Open Covers Folder"
-                                i:Attached.Icon="fa-solid fa-image"/>
-                        <Button Theme="{StaticResource UserSettingsButton}"
-                                Click="OpenScreenshotsFolder" 
-                                ToolTip.Tip="Open Screenshots Folder"
-                                i:Attached.Icon="fa-solid fa-camera-retro"/>
-                        <Button Theme="{StaticResource UserSettingsButton}"
-                                Click="OpenThemesFolder" 
-                                ToolTip.Tip="Open Themes Folder"
-                                i:Attached.Icon="fa-solid fa-swatchbook"/>
-                        <Button Theme="{StaticResource UserSettingsButton}"
-                                Click="ReportBug"
-                                ToolTip.Tip="Report Bug/Issue"
-                                i:Attached.Icon="fa-solid fa-bug"/>
-                        <Button x:Name="ExportToSpreadSheetButton"
-                                Theme="{StaticResource UserSettingsButton}"
-                                Click="ExportToSpreadSheetAsync"
-                                ToolTip.Tip="Export to CSV"
-                                i:Attached.Icon="fa-solid fa-file-csv"/>
-                        <Button Theme="{StaticResource UserSettingsButton}"
-                                Click="OpenCoolorsSite"
-                                ToolTip.Tip="Open Coolors Website"
-                                i:Attached.Icon="fa-solid fa-palette"/>
-                        <Button Theme="{StaticResource UserSettingsButton}"
-                                Click="JoinDiscord"
-                                ToolTip.Tip="Join Discord"
-                                i:Attached.Icon="fa-brands fa-discord"/>
+                        <Button Theme="{StaticResource MenuButton}" Click="OpenApplicationFolder" ToolTip.Tip="App Folder" i:Attached.Icon="fa-solid fa-folder-open"/>
+                        <Button Theme="{StaticResource MenuButton}" Click="OpenCoversFolder" ToolTip.Tip="Covers Folder" i:Attached.Icon="fa-solid fa-image"/>
+                        <Button Theme="{StaticResource MenuButton}" Click="OpenScreenshotsFolder" ToolTip.Tip="Screenshots" i:Attached.Icon="fa-solid fa-camera-retro"/>
+                        <Button Theme="{StaticResource MenuButton}" Click="OpenThemesFolder" ToolTip.Tip="Themes Folder" i:Attached.Icon="fa-solid fa-swatchbook"/>
+                        <Button Theme="{StaticResource MenuButton}" Click="ReportBug" ToolTip.Tip="Report Bug" i:Attached.Icon="fa-solid fa-bug"/>
+                        <Button x:Name="ExportToSpreadSheetButton" Theme="{StaticResource MenuButton}" Click="ExportToSpreadSheetAsync" ToolTip.Tip="Export CSV" i:Attached.Icon="fa-solid fa-file-csv"/>
+                        <Button Theme="{StaticResource MenuButton}" Click="OpenCoolorsSite" ToolTip.Tip="Coolors" i:Attached.Icon="fa-solid fa-palette"/>
+                        <Button Theme="{StaticResource MenuButton}" Click="JoinDiscord" ToolTip.Tip="Discord" i:Attached.Icon="fa-brands fa-discord"/>
                     </WrapPanel>
                 </StackPanel>
-				<StackPanel Spacing="5">
-                    <TextBlock Text="Controls" TextDecorations="Underline" FontSize="20" FontWeight="Bold" Classes="Menu"/>
-                    <TextBlock FontSize="15" FontWeight="DemiBold" Classes="Menu">
-                        <Run Text="Copy Title →"/>
-                        <Run Text="Click Title on Series Card" FontWeight="Bold"/>
-                    </TextBlock>
-                    <TextBlock FontSize="15" FontWeight="DemiBold" Classes="Menu">
-                        <Run Text="Open Series Page →"/>
-                        <Run Text="Click Series Image" FontWeight="Bold"/>
-                    </TextBlock>
-                    <TextBlock FontSize="15" FontWeight="DemiBold" Classes="Menu">
-                        <Run Text="Toggle Fullscreen →"/>
-                        <Run Text="F11" FontWeight="Bold"/>
-                    </TextBlock>
-                    <TextBlock FontSize="15" FontWeight="DemiBold" Classes="Menu">
-                        <Run Text="Advanced Search →"/>
-                        <Run Text="CTRL+F" FontWeight="Bold"/>
-                    </TextBlock>
-                    <TextBlock FontSize="15" FontWeight="DemiBold" Classes="Menu">
-                        <Run Text="Screenshot Collection →"/>
-                        <Run Text="CTRL+P" FontWeight="Bold"/>
-                    </TextBlock>
-                    <TextBlock FontSize="15" FontWeight="DemiBold" Classes="Menu">
-                        <Run Text="Reload Filter/Sort on Collection →"/>
-                        <Run Text="SHIFT+R" FontWeight="Bold"/>
-                    </TextBlock>
-                    <TextBlock FontSize="15" FontWeight="DemiBold" Classes="Menu">
-                        <Run Text="Save Collection (Auto Saves on Close) →"/>
-                        <Run Text="CTRL+S" FontWeight="Bold"/>
-                    </TextBlock>
+
+                <!-- Controls (collapsible) -->
+                <Border BorderThickness="0,2,0,0" BorderBrush="{DynamicResource TsundokuDividerColor}" Opacity="0.3"/>
+                <StackPanel Margin="20,14,20,14" Spacing="4">
+                    <Button Theme="{StaticResource MenuButton}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Padding="10,6" Click="ToggleControlsSection">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Text="CONTROLS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}" LetterSpacing="1" VerticalAlignment="Center"/>
+                            <i:Icon Grid.Column="1" Value="fa-solid fa-chevron-down" FontSize="11" Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}" VerticalAlignment="Center" Name="ControlsChevron"/>
+                        </Grid>
+                    </Button>
+                    <StackPanel Name="ControlsContent" IsVisible="False" Spacing="4" Margin="0,6,0,0">
+                        <Grid ColumnDefinitions="*,Auto" Margin="0,2">
+                            <TextBlock Text="Copy Title on Series Card" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource TsundokuMenuTextColor}"/>
+                            <Border Grid.Column="1" Background="{DynamicResource TsundokuMenuButtonBGColor}" BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}" BorderThickness="2" CornerRadius="5" Padding="6,2">
+                                <TextBlock Text="Click Title" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
+                            </Border>
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto" Margin="0,2">
+                            <TextBlock Text="Open Series Page" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource TsundokuMenuTextColor}"/>
+                            <Border Grid.Column="1" Background="{DynamicResource TsundokuMenuButtonBGColor}" BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}" BorderThickness="2" CornerRadius="5" Padding="6,2">
+                                <TextBlock Text="Click Image" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
+                            </Border>
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto" Margin="0,2">
+                            <TextBlock Text="Toggle Fullscreen" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource TsundokuMenuTextColor}"/>
+                            <Border Grid.Column="1" Background="{DynamicResource TsundokuMenuButtonBGColor}" BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}" BorderThickness="2" CornerRadius="5" Padding="6,2">
+                                <TextBlock Text="F11" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
+                            </Border>
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto" Margin="0,2">
+                            <TextBlock Text="Advanced Search" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource TsundokuMenuTextColor}"/>
+                            <Border Grid.Column="1" Background="{DynamicResource TsundokuMenuButtonBGColor}" BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}" BorderThickness="2" CornerRadius="5" Padding="6,2">
+                                <TextBlock Text="CTRL + F" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
+                            </Border>
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto" Margin="0,2">
+                            <TextBlock Text="Screenshot Collection" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource TsundokuMenuTextColor}"/>
+                            <Border Grid.Column="1" Background="{DynamicResource TsundokuMenuButtonBGColor}" BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}" BorderThickness="2" CornerRadius="5" Padding="6,2">
+                                <TextBlock Text="CTRL + P" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
+                            </Border>
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto" Margin="0,2">
+                            <TextBlock Text="Reload Filter/Sort" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource TsundokuMenuTextColor}"/>
+                            <Border Grid.Column="1" Background="{DynamicResource TsundokuMenuButtonBGColor}" BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}" BorderThickness="2" CornerRadius="5" Padding="6,2">
+                                <TextBlock Text="SHIFT + R" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
+                            </Border>
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto" Margin="0,2">
+                            <TextBlock Text="Save Collection" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource TsundokuMenuTextColor}"/>
+                            <Border Grid.Column="1" Background="{DynamicResource TsundokuMenuButtonBGColor}" BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}" BorderThickness="2" CornerRadius="5" Padding="6,2">
+                                <TextBlock Text="CTRL + S" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
+                            </Border>
+                        </Grid>
+                    </StackPanel>
                 </StackPanel>
-                <StackPanel Spacing="5">
-                    <TextBlock Text="Youtubers" TextDecorations="Underline" FontSize="20" FontWeight="Bold" Classes="Menu"/>
-                    <WrapPanel Width="450" Margin="-5,0,0,0">
-                        <Button Theme="{StaticResource UserSettingsButton}"
-                                Click="OpenYoutuberSite"
-                                x:Name="EastCoastManga"
-                                Content="EastCoastManga"/>
-                        <Button Theme="{StaticResource UserSettingsButton}"
-                                Click="OpenYoutuberSite" 
-                                x:Name="PlasmsManga"
-                                Content="Plasm's Manga"/>
-                        <Button Theme="{StaticResource UserSettingsButton}"
-                                Click="OpenYoutuberSite" 
-                                x:Name="hvlmanga"
-                                Content="hvlmanga"/>
-                        <Button Theme="{StaticResource UserSettingsButton}"
-                                Click="OpenYoutuberSite" 
-                                x:Name="JakeThePog"
-                                Content="Jake The Pog"/>
-                        <Button Theme="{StaticResource UserSettingsButton}"
-                                Click="OpenYoutuberSite" 
-                                x:Name="DanielPeppers"
-                                Content="Daniel Peppers"/>
-                        <Button Theme="{StaticResource UserSettingsButton}"
-                                Click="OpenYoutuberSite" 
-                                x:Name="Ararawgi"
-                                Content="Ararawgi"/>
-                        <Button Theme="{StaticResource UserSettingsButton}"
-                                Click="OpenYoutuberSite" 
-                                x:Name="TheMangaSloth"
-                                Content="TheMangaSloth"/>
-                        <Button Theme="{StaticResource UserSettingsButton}"
-                                Click="OpenYoutuberSite" 
-                                x:Name="mangageekdom"
-                                Content="MANGA GEEKDOM"/>
-                        <Button Theme="{StaticResource UserSettingsButton}"
-                                Click="OpenYoutuberSite" 
-                                x:Name="meettheweebfamily"
-                                Content="Meet the Weeb Family"/>
-                    </WrapPanel>
-                </StackPanel>
-                <StackPanel Spacing="5">
-                    <TextBlock Text="{CompiledBinding Source={x:Static vm:ViewModelBase.CUR_TSUNDOKU_VERSION}, StringFormat='© v{0}'}"
-                               Cursor="Hand"
-                               PointerPressed="OpenReleasesPage"
-                               TextDecorations="Underline"
-                               FontSize="20"
-                               FontWeight="Bold"
-                               Classes="Menu"/>
-                    <WrapPanel Width="450" Margin="-5,0,0,0">
+
+                <!-- Youtubers (collapsible) -->
+                <Border BorderThickness="0,2,0,0" BorderBrush="{DynamicResource TsundokuDividerColor}" Opacity="0.3"/>
+                <StackPanel Margin="20,14,20,14" Spacing="10">
+                    <Button Theme="{StaticResource MenuButton}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Padding="10,6" Click="ToggleYoutubersSection">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Text="YOUTUBERS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}" LetterSpacing="1" VerticalAlignment="Center"/>
+                            <i:Icon Grid.Column="1" Value="fa-solid fa-chevron-down" FontSize="11" Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}" VerticalAlignment="Center" Name="YoutubersChevron"/>
+                        </Grid>
+                    </Button>
+                    <WrapPanel Name="YoutubersContent" IsVisible="False">
                         <WrapPanel.Styles>
                             <Style Selector="Button">
-                                <Setter Property="Margin" Value="5"/>
+                                <Setter Property="Margin" Value="3"/>
                             </Style>
                         </WrapPanel.Styles>
-                        <Button Theme="{StaticResource UserSettingsButton}"
-                                Click="OpenAniListLink"
-                                HorizontalAlignment="Center"
-                                x:Name="AniListCredit"
-                                Content="AniList"/>
-                        <Button Theme="{StaticResource UserSettingsButton}"
-                                Click="OpenMangadexLink" 
-                                HorizontalAlignment="Center"
-                                x:Name="MangadexCredit"
-                                Content="Mangadex"/>
-                        <Button Theme="{StaticResource UserSettingsButton}"
-                                Click="RefreshAllCoversAsync"
-                                HorizontalAlignment="Center"
-                                Content="Refresh Series"/>
-                        <Button Theme="{StaticResource UserSettingsButton}"
-                                Click="ImportUserDataAsync"
-                                HorizontalAlignment="Center"
-                                x:Name="ImportUserData"
-                                Content="Json Import"/>
-						<Button Theme="{StaticResource UserSettingsButton}"
-                                Click="ImportLibibDataAsync"
-                                HorizontalAlignment="Center"
-                                x:Name="ImportLibibData"
-                                Content="Libib Import"/>
-                        <Button Theme="{StaticResource UserSettingsButton}"
-                                Click="ImportGoodreadsDataAsync"
-                                HorizontalAlignment="Center"
-                                x:Name="ImportGoodreadsData"
-                                Content="Goodreads Import"/>
+                        <Button Theme="{StaticResource MenuButton}" Click="OpenYoutuberSite" x:Name="EastCoastManga" Content="EastCoastManga" Padding="10,6" FontSize="12"/>
+                        <Button Theme="{StaticResource MenuButton}" Click="OpenYoutuberSite" x:Name="PlasmsManga" Content="Plasm's Manga" Padding="10,6" FontSize="12"/>
+                        <Button Theme="{StaticResource MenuButton}" Click="OpenYoutuberSite" x:Name="hvlmanga" Content="hvlmanga" Padding="10,6" FontSize="12"/>
+                        <Button Theme="{StaticResource MenuButton}" Click="OpenYoutuberSite" x:Name="JakeThePog" Content="Jake The Pog" Padding="10,6" FontSize="12"/>
+                        <Button Theme="{StaticResource MenuButton}" Click="OpenYoutuberSite" x:Name="DanielPeppers" Content="Daniel Peppers" Padding="10,6" FontSize="12"/>
+                        <Button Theme="{StaticResource MenuButton}" Click="OpenYoutuberSite" x:Name="Ararawgi" Content="Ararawgi" Padding="10,6" FontSize="12"/>
+                        <Button Theme="{StaticResource MenuButton}" Click="OpenYoutuberSite" x:Name="TheMangaSloth" Content="TheMangaSloth" Padding="10,6" FontSize="12"/>
+                        <Button Theme="{StaticResource MenuButton}" Click="OpenYoutuberSite" x:Name="mangageekdom" Content="MANGA GEEKDOM" Padding="10,6" FontSize="12"/>
+                        <Button Theme="{StaticResource MenuButton}" Click="OpenYoutuberSite" x:Name="meettheweebfamily" Content="Meet the Weeb Family" Padding="10,6" FontSize="12"/>
                     </WrapPanel>
                 </StackPanel>
+
+                <!-- Data / Version -->
+                <Border BorderThickness="0,2,0,0" BorderBrush="{DynamicResource TsundokuDividerColor}" Opacity="0.3"/>
+                <StackPanel Margin="20,14,20,14" Spacing="10">
+                    <TextBlock Text="DATA" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuSeriesCardPublisherColor}" LetterSpacing="1" Opacity="0.8"/>
+                    <WrapPanel>
+                        <WrapPanel.Styles>
+                            <Style Selector="Button">
+                                <Setter Property="Margin" Value="3"/>
+                            </Style>
+                        </WrapPanel.Styles>
+                        <Button Theme="{StaticResource MenuButton}" Click="OpenAniListLink" x:Name="AniListCredit" Content="AniList" Padding="10,6" FontSize="12"/>
+                        <Button Theme="{StaticResource MenuButton}" Click="OpenMangadexLink" x:Name="MangadexCredit" Content="Mangadex" Padding="10,6" FontSize="12"/>
+                        <Button Theme="{StaticResource MenuButton}" Click="RefreshAllCoversAsync" Content="Refresh Series" Padding="10,6" FontSize="12"/>
+                        <Button Theme="{StaticResource MenuButton}" Click="ImportUserDataAsync" x:Name="ImportUserData" Content="Json Import" Padding="10,6" FontSize="12"/>
+                        <Button Theme="{StaticResource MenuButton}" Click="ImportLibibDataAsync" x:Name="ImportLibibData" Content="Libib Import" Padding="10,6" FontSize="12"/>
+                        <Button Theme="{StaticResource MenuButton}" Click="ImportGoodreadsDataAsync" x:Name="ImportGoodreadsData" Content="Goodreads Import" Padding="10,6" FontSize="12"/>
+                    </WrapPanel>
+                </StackPanel>
+
+                <!-- Version -->
+                <TextBlock Text="{CompiledBinding Source={x:Static vm:ViewModelBase.CUR_TSUNDOKU_VERSION}, StringFormat='v{0}'}"
+                           HorizontalAlignment="Center"
+                           FontSize="12"
+                           FontWeight="Medium"
+                           Foreground="{DynamicResource TsundokuSeriesCardStaffColor}"
+                           Opacity="0.5"
+                           Margin="0,0,0,12"
+                           Cursor="Hand"
+                           PointerPressed="OpenReleasesPage"/>
             </StackPanel>
         </ScrollViewer>
+        </Grid>
     </Border>
 </Window>

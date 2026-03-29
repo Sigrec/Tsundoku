@@ -1,5 +1,6 @@
 using System.Collections.Specialized;
 using System.Globalization;
+using System.Reactive.Disposables.Fluent;
 using System.Reactive.Linq;
 using Avalonia.Collections;
 using ReactiveUI;
@@ -10,7 +11,10 @@ using static Tsundoku.Models.Enums.SeriesGenreModel;
 
 namespace Tsundoku.ViewModels;
 
-public sealed partial class EditSeriesInfoViewModel : ViewModelBase
+/// <summary>
+/// View model for the Edit Series Info dialog, managing demographic, genre, and value editing for a single series.
+/// </summary>
+public sealed partial class EditSeriesInfoViewModel : ViewModelBase, IDisposable
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
     public Series Series { get; }
@@ -27,7 +31,8 @@ public sealed partial class EditSeriesInfoViewModel : ViewModelBase
         this.WhenAnyValue(x => x.Series.Demographic)
             .DistinctUntilChanged()
             .ObserveOn(RxSchedulers.TaskpoolScheduler)
-            .Subscribe(x => DemographicIndex = SERIES_DEMOGRAPHICS_DICT[x]);
+            .Subscribe(x => DemographicIndex = SERIES_DEMOGRAPHICS_DICT[x])
+            .DisposeWith(_disposables);
 
         this.WhenAnyValue(x => x.CurrentUser.Currency)
             .DistinctUntilChanged()
@@ -43,7 +48,8 @@ public sealed partial class EditSeriesInfoViewModel : ViewModelBase
                 {
                     SeriesValueMaskedText = $"0000000000000000.00{currency}";
                 }
-            });
+            })
+            .DisposeWith(_disposables);
 
         this.WhenAnyValue(x => x.CurrentUser.Currency, x => x.Series.Value)
             .ObserveOn(RxSchedulers.TaskpoolScheduler)
@@ -59,7 +65,8 @@ public sealed partial class EditSeriesInfoViewModel : ViewModelBase
                 {
                     SeriesValueText = $"{value}{currency}";
                 }
-            });
+            })
+            .DisposeWith(_disposables);
 
         SelectedGenres.CollectionChanged += SeriesGenresChanged;
     }
@@ -103,5 +110,12 @@ public sealed partial class EditSeriesInfoViewModel : ViewModelBase
             }
         }
         return newGenres;
+    }
+
+    public void Dispose()
+    {
+        SelectedGenres.CollectionChanged -= SeriesGenresChanged;
+        _disposables.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

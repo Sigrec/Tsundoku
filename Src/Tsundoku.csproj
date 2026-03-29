@@ -62,6 +62,7 @@
 		<None Remove="Assets\Example.jpg" />
 		<None Remove="Assets\Icons\TsundokuLogo.ico" />
 		<AvaloniaResource Include="Assets\Icons\TsundokuLogo.ico" />
+		<AvaloniaResource Include="Assets\Fonts\**\*.ttf" />
 		<EmbeddedResource Include="Assets\changelog.json" />
 		<AvaloniaResource Include="Styles/**" />
 		<None Include="Models\Enums\SeriesGenres.cs" />

@@ -20,7 +20,7 @@ public sealed class ValueStat : TemplatedControl
         set => SetValue(TitleProperty, value);
     }
 
-    public static readonly StyledProperty<string> IconProperty = AvaloniaProperty.Register<ValueStat, string>(nameof(Title));
+    public static readonly StyledProperty<string> IconProperty = AvaloniaProperty.Register<ValueStat, string>(nameof(Icon));
 
     public string Icon
     {

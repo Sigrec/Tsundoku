@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tsundoku - Theme Settings Dialog</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: var(--menu-bg); }
+  ::-webkit-scrollbar-thumb { background: var(--divider); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--btn-text); }
+
+  body {
+    font-family: 'Geist', sans-serif;
+    background: var(--menu-bg);
+    margin: 0;
+  }
+
+  :root {
+    --menu-bg: #12293d; --username: #f1d2b6; --user-icon-border: #7b6b43;
+    --search-bg: #473633; --search-border: #7b6b43; --search-text: #f1d2b6;
+    --divider: #7b6b43; --btn-bg: #473633; --btn-bg-hover: #3e2a35;
+    --btn-border: #7b6b43; --btn-border-hover: #7b6b43;
+    --btn-text: #f1d2b6; --btn-text-hover: #12293d;
+    --card-desc: #f9eae1; --card-publisher: #f1d2b6; --card-title: #7b6b43;
+    --collection-bg: #3e2a35; --progress-bar: #f1d2b6;
+  }
+
+  .dialog {
+    background: var(--menu-bg);
+    border: none;
+    border-radius: 0;
+    width: 100%;
+    overflow-y: auto;
+  }
+  .dialog::-webkit-scrollbar-track { background: var(--menu-bg); }
+
+  .dialog-header {
+    padding: 16px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 2px solid var(--divider);
+    position: sticky; top: 0; background: var(--menu-bg); z-index: 2;
+  }
+  .dialog-title {
+    font-size: 18px; font-weight: 800; color: var(--username);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .dialog-title i { font-size: 16px; color: var(--card-publisher); }
+  .dialog-close {
+    width: 32px; height: 32px; border-radius: 8px;
+    border: 2px solid var(--btn-border); background: var(--btn-bg);
+    color: var(--btn-text); cursor: pointer; font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .dialog-close:hover {
+    background: var(--btn-bg-hover); border-color: var(--btn-border-hover); color: var(--btn-text-hover);
+  }
+
+  .section { padding: 16px 24px; }
+  .section + .section { border-top: 2px solid var(--divider); }
+
+  .section-title {
+    font-size: 13px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1px; color: var(--card-publisher); margin-bottom: 12px;
+  }
+
+  /* Color Grid */
+  .color-grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+  }
+
+  .color-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 8px; border-radius: 8px;
+    background: var(--collection-bg);
+    border: 2px solid var(--divider);
+  }
+  .color-swatch {
+    width: 28px; height: 28px; border-radius: 6px;
+    border: 2px solid rgba(255,255,255,0.15);
+    cursor: pointer; flex-shrink: 0;
+    position: relative;
+  }
+  .color-swatch input[type="color"] {
+    position: absolute; inset: -4px;
+    width: calc(100% + 8px); height: calc(100% + 8px);
+    opacity: 0; cursor: pointer; border: none;
+  }
+  .color-label {
+    font-size: 10px; font-weight: 600; color: var(--card-desc);
+    line-height: 1.2; overflow: hidden;
+  }
+
+  /* Theme Management */
+  .theme-actions {
+    display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  }
+
+  .btn {
+    padding: 8px 16px; border-radius: 8px;
+    border: 2px solid var(--btn-border); background: var(--btn-bg);
+    color: var(--btn-text); font-size: 13px; font-weight: 600;
+    cursor: pointer; font-family: inherit; transition: all 0.15s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .btn:hover {
+    background: var(--btn-bg-hover); border-color: var(--btn-border-hover); color: var(--btn-text-hover);
+  }
+
+  .text-input {
+    background: var(--search-bg); border: 2px solid var(--search-border);
+    border-radius: 8px; padding: 8px 12px; color: var(--search-text);
+    font-size: 13px; font-weight: 500; font-family: inherit; outline: none;
+    transition: border-color 0.15s; flex: 1;
+  }
+  .text-input:focus { border-color: var(--btn-border-hover); }
+  .text-input::placeholder { color: var(--search-text); opacity: 0.35; }
+
+  .select-input {
+    background: var(--btn-bg); border: 2px solid var(--btn-border);
+    border-radius: 8px; padding: 8px 12px; color: var(--btn-text);
+    font-size: 13px; font-weight: 500; font-family: inherit; outline: none;
+    cursor: pointer; appearance: none; flex: 1;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 28px;
+  }
+
+  .icon-btn {
+    width: 36px; height: 36px; border-radius: 8px;
+    border: 2px solid var(--btn-border); background: var(--btn-bg);
+    color: var(--btn-text); cursor: pointer; font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s; flex-shrink: 0;
+  }
+  .icon-btn:hover {
+    background: var(--btn-bg-hover); border-color: var(--btn-border-hover); color: var(--btn-text-hover);
+  }
+
+  /* Generate Section */
+  .gen-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+    margin-bottom: 12px;
+  }
+  .gen-field { display: flex; flex-direction: column; gap: 3px; }
+  .gen-label {
+    font-size: 10px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.5px; color: var(--card-title);
+  }
+  .gen-input {
+    background: var(--search-bg); border: 2px solid var(--search-border);
+    border-radius: 8px; padding: 6px 10px; color: var(--search-text);
+    font-size: 13px; font-weight: 600; font-family: 'Geist Mono', monospace;
+    outline: none; width: 100%; transition: border-color 0.15s;
+  }
+  .gen-input:focus { border-color: var(--btn-border-hover); }
+
+  .gen-actions { display: flex; gap: 8px; }
+</style>
+</head>
+<body>
+<div class="dialog">
+  <div class="dialog-header">
+    <span class="dialog-title"><i class="fa-solid fa-swatchbook"></i> Theme Settings</span>
+    <button class="dialog-close"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Menu / Nav Bar</div>
+    <div class="color-grid">
+      <div class="color-item"><div class="color-swatch" style="background:#12293d"><input type="color" value="#12293d"></div><div class="color-label">Menu BG</div></div>
+      <div class="color-item"><div class="color-swatch" style="background:#f1d2b6"><input type="color" value="#f1d2b6"></div><div class="color-label">Username</div></div>
+      <div class="color-item"><div class="color-swatch" style="background:#7b6b43"><input type="color" value="#7b6b43"></div><div class="color-label">Icon Border</div></div>
+      <div class="color-item"><div class="color-swatch" style="background:#f1d2b6"><input type="color" value="#f1d2b6"></div><div class="color-label">Menu Text</div></div>
+      <div class="color-item"><div class="color-swatch" style="background:#473633"><input type="color" value="#473633"></div><div class="color-label">Search BG</div></div>
+      <div class="color-item"><div class="color-swatch" style="background:#7b6b43"><input type="color" value="#7b6b43"></div><div class="color-label">Search Border</div></div>
+      <div class="color-item"><div class="color-swatch" style="background:#f1d2b6"><input type="color" value="#f1d2b6"></div><div class="color-label">Search Text</div></div>
+      <div class="color-item"><div class="color-swatch" style="background:#7b6b43"><input type="color" value="#7b6b43"></div><div class="color-label">Divider</div></div>
+      <div class="color-item"><div class="color-swatch" style="background:#473633"><input type="color" value="#473633"></div><div class="color-label">Button BG</div></div>
+      <div class="color-item"><div class="color-swatch" style="background:#3e2a35"><input type="color" value="#3e2a35"></div><div class="color-label">Button Hover</div></div>
+      <div class="color-item"><div class="color-swatch" style="background:#7b6b43"><input type="color" value="#7b6b43"></div><div class="color-label">Btn Border</div></div>
+      <div class="color-item"><div class="color-swatch" style="background:#7b6b43"><input type="color" value="#7b6b43"></div><div class="color-label">Btn Border Hover</div></div>
+      <div class="color-item"><div class="color-swatch" style="background:#f1d2b6"><input type="color" value="#f1d2b6"></div><div class="color-label">Btn Text</div></div>
+      <div class="color-item"><div class="color-swatch" style="background:#12293d"><input type="color" value="#12293d"></div><div class="color-label">Btn Text Hover</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Collection</div>
+    <div class="color-grid">
+      <div class="color-item"><div class="color-swatch" style="background:#3e2a35"><input type="color" value="#3e2a35"></div><div class="color-label">Collection BG</div></div>
+      <div class="color-item"><div class="color-swatch" style="background:#12293d"><input type="color" value="#12293d"></div><div class="color-label">Card BG</div></div>
+      <div class="color-item"><div class="color-swatch" style="background:#7b6b43"><input type="color" value="#7b6b43"></div><div class="color-label">Card Title</div></div>
+      <div class="color-item"><div class="color-swatch" style="background:#f1d2b6"><input type="color" value="#f1d2b6"></div><div class="color-label">Publisher</div></div>
+      <div class="color-item"><div class="color-swatch" style="background:#f1d2b6"><input type="color" value="#f1d2b6"></div><div class="color-label">Staff</div></div>
+      <div class="color-item"><div class="color-swatch" style="background:#f9eae1"><input type="color" value="#f9eae1"></div><div class="color-label">Description</div></div>
+      <div class="color-item"><div class="color-swatch" style="background:#473633"><input type="color" value="#473633"></div><div class="color-label">Status BG</div></div>
+      <div class="color-item"><div class="color-swatch" style="background:#f9eae1"><input type="color" value="#f9eae1"></div><div class="color-label">Status Text</div></div>
+      <div class="color-item"><div class="color-swatch" style="background:#473633"><input type="color" value="#473633"></div><div class="color-label">Progress BG</div></div>
+      <div class="color-item"><div class="color-swatch" style="background:#f1d2b6"><input type="color" value="#f1d2b6"></div><div class="color-label">Progress Bar</div></div>
+      <div class="color-item"><div class="color-swatch" style="background:#12293d"><input type="color" value="#12293d"></div><div class="color-label">Progress Track</div></div>
+      <div class="color-item"><div class="color-swatch" style="background:#f9eae1"><input type="color" value="#f9eae1"></div><div class="color-label">Progress Border</div></div>
+      <div class="color-item"><div class="color-swatch" style="background:#7b6b43"><input type="color" value="#7b6b43"></div><div class="color-label">Progress Text</div></div>
+      <div class="color-item"><div class="color-swatch" style="background:#12293d"><input type="color" value="#12293d"></div><div class="color-label">Progress Btn Hover</div></div>
+      <div class="color-item"><div class="color-swatch" style="background:#473633"><input type="color" value="#473633"></div><div class="color-label">Status BG Hover</div></div>
+      <div class="color-item"><div class="color-swatch" style="background:#473633"><input type="color" value="#473633"></div><div class="color-label">Status Text Hover</div></div>
+      <div class="color-item"><div class="color-swatch" style="background:#f9eae1"><input type="color" value="#f9eae1"></div><div class="color-label">Series Btn Icon</div></div>
+      <div class="color-item"><div class="color-swatch" style="background:#12293d"><input type="color" value="#12293d"></div><div class="color-label">Series Btn Hover</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Edit Pane</div>
+    <div class="color-grid">
+      <div class="color-item"><div class="color-swatch" style="background:#12293d"><input type="color" value="#12293d"></div><div class="color-label">Edit Pane BG</div></div>
+      <div class="color-item"><div class="color-swatch" style="background:#473633"><input type="color" value="#473633"></div><div class="color-label">Notes BG</div></div>
+      <div class="color-item"><div class="color-swatch" style="background:#7b6b43"><input type="color" value="#7b6b43"></div><div class="color-label">Notes Border</div></div>
+      <div class="color-item"><div class="color-swatch" style="background:#f9eae1"><input type="color" value="#f9eae1"></div><div class="color-label">Notes Text</div></div>
+      <div class="color-item"><div class="color-swatch" style="background:#3e2a35"><input type="color" value="#3e2a35"></div><div class="color-label">Edit Btn BG</div></div>
+      <div class="color-item"><div class="color-swatch" style="background:#ffc7a8"><input type="color" value="#ffc7a8"></div><div class="color-label">Edit Btn Hover</div></div>
+      <div class="color-item"><div class="color-swatch" style="background:#7b6b43"><input type="color" value="#7b6b43"></div><div class="color-label">Edit Btn Border</div></div>
+      <div class="color-item"><div class="color-swatch" style="background:#7b6b43"><input type="color" value="#7b6b43"></div><div class="color-label">Edit Border Hover</div></div>
+      <div class="color-item"><div class="color-swatch" style="background:#f9eae1"><input type="color" value="#f9eae1"></div><div class="color-label">Edit Btn Icon</div></div>
+      <div class="color-item"><div class="color-swatch" style="background:#12293d"><input type="color" value="#12293d"></div><div class="color-label">Edit Icon Hover</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Theme Management</div>
+    <div class="theme-actions" style="margin-bottom:12px">
+      <button class="btn"><i class="fa-solid fa-file-export"></i> Export</button>
+      <button class="btn"><i class="fa-solid fa-file-import"></i> Import</button>
+    </div>
+    <div class="theme-actions" style="margin-bottom:12px">
+      <input type="text" class="text-input" placeholder="New theme name...">
+      <button class="btn"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+    </div>
+    <div class="theme-actions">
+      <select class="select-input">
+        <option>Classy</option><option>Apothecary Diaries</option><option>BECK</option>
+        <option>Electric Rose</option><option>Frieren</option><option>Kingdom</option>
+        <option>Nature</option><option>RahXephon</option><option>Stem Rose</option>
+      </select>
+      <button class="icon-btn" title="Delete"><i class="fa-solid fa-trash"></i></button>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Generate Theme</div>
+    <div class="gen-grid">
+      <div class="gen-field"><span class="gen-label">Main Color 1</span><input class="gen-input" placeholder="#000000"></div>
+      <div class="gen-field"><span class="gen-label">Main Color 2</span><input class="gen-input" placeholder="#000000"></div>
+      <div class="gen-field"><span class="gen-label">Text Color 1</span><input class="gen-input" placeholder="#000000"></div>
+      <div class="gen-field"><span class="gen-label">Text Color 2</span><input class="gen-input" placeholder="#000000"></div>
+      <div class="gen-field"><span class="gen-label">Accent Color 1</span><input class="gen-input" placeholder="#000000"></div>
+      <div class="gen-field"><span class="gen-label">Accent Color 2</span><input class="gen-input" placeholder="#000000"></div>
+    </div>
+    <div class="gen-actions">
+      <button class="btn"><i class="fa-solid fa-eraser"></i> Clear</button>
+      <button class="btn"><i class="fa-solid fa-wand-magic-sparkles"></i> Generate 1</button>
+      <button class="btn"><i class="fa-solid fa-wand-magic-sparkles"></i> Generate 2</button>
+    </div>
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.color-swatch input[type="color"]').forEach(input => {
+  input.addEventListener('input', e => { e.target.parentElement.style.background = e.target.value; });
+});
+document.querySelector('.dialog-close').addEventListener('click', () => {
+  window.parent.postMessage('close-dialog', '*');
+});
+window.addEventListener('load', () => {
+  const dialog = document.querySelector('.dialog');
+  dialog.style.overflowY = 'visible';
+  const h = dialog.offsetHeight;
+  dialog.style.overflowY = '';
+  window.parent.postMessage({ type: 'dialog-height', height: h }, '*');
+});
+</script>
+</body>
+</html>

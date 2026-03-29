@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using ReactiveUI.Avalonia;
+using Tsundoku.Services;
 
 namespace Tsundoku.Helpers;
 
@@ -36,6 +37,7 @@ public static class WindowHelper
 
             if (!windowInstance.IsVisible)
             {
+                GlassmorphismService.ApplyToWindow(windowInstance, GlassmorphismService.IsEnabled);
                 windowInstance.Show(parentWindow);
             }
             else

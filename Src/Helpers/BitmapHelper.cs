@@ -2,12 +2,18 @@ using Avalonia.Media.Imaging;
 
 namespace Tsundoku.Helpers;
 
+/// <summary>
+/// Provides helper methods for loading, scaling, downloading, and converting Avalonia bitmaps for cover images.
+/// </summary>
 public sealed class BitmapHelper
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
-    private readonly IHttpClientFactory _httpClientFactory; // New: To be injected
+    private readonly IHttpClientFactory _httpClientFactory;
 
-    // Constructor for Dependency Injection
+    /// <summary>
+    /// Initializes a new instance of <see cref="BitmapHelper"/> with the specified HTTP client factory.
+    /// </summary>
+    /// <param name="httpClientFactory">The factory used to create HTTP clients for image downloads.</param>
     public BitmapHelper(IHttpClientFactory httpClientFactory)
     {
         _httpClientFactory = httpClientFactory;
@@ -146,7 +152,11 @@ public sealed class BitmapHelper
             else
             {
                 LOGGER.Debug("Bitmap already at target size for {Source}. No scaling needed.", sourceIdentifier);
-                scaledBitmap = originalBitmap; // Use original if no scaling needed
+                // Create a copy so the caller owns a distinct instance that won't be
+                // disposed when the original bitmap's using block ends.
+                scaledBitmap = originalBitmap.CreateScaledBitmap(
+                    originalBitmap.PixelSize,
+                    BitmapInterpolationMode.HighQuality);
             }
 
             // Ensure the directory exists

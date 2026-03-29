@@ -1,8 +1,7 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
 					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-					xmlns:vm="clr-namespace:Tsundoku.ViewModels"
 					xmlns:collections="using:Avalonia.Collections"
-					x:DataType="vm:PriceAnalysisViewModel">
+					>
 
 	<ControlTheme x:Key="DataGridCellTextBlockTheme" TargetType="TextBlock">
 		<Setter Property="Margin" Value="12,0,12,0" />
@@ -86,8 +85,8 @@
 	</ControlTheme>
 
 	<ControlTheme x:Key="{x:Type DataGridColumnHeader}" TargetType="DataGridColumnHeader">
-		<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}"/>
-		<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor}"/>
+		<Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGHoverColor}"/>
+		<Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconHoverColor}"/>
 		<Setter Property="HorizontalContentAlignment" Value="Stretch" />
 		<Setter Property="VerticalContentAlignment" Value="Center" />
 		<Setter Property="SeparatorBrush" Value="{DynamicResource DataGridGridLinesBrush}" />
@@ -264,24 +263,24 @@
 		</Style>
 
 		<Style Selector="^:pointerover /template/ Rectangle">
-			<Setter Property="Fill" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}" />
+			<Setter Property="Fill" Value="{DynamicResource TsundokuMenuButtonBGHoverColor}" />
 		</Style>
 
 		<Style Selector="^:selected">
 			<Style Selector="^ /template/ Rectangle#BackgroundRectangle">
-				<Setter Property="Fill" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}" />
+				<Setter Property="Fill" Value="{DynamicResource TsundokuMenuButtonBGHoverColor}" />
 				<Setter Property="Opacity" Value="{DynamicResource DataGridRowSelectedUnfocusedBackgroundOpacity}" />
 			</Style>
 			<Style Selector="^:pointerover /template/ Rectangle#BackgroundRectangle">
-				<Setter Property="Fill" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}" />
+				<Setter Property="Fill" Value="{DynamicResource TsundokuMenuButtonBGHoverColor}" />
 				<Setter Property="Opacity" Value="{DynamicResource DataGridRowSelectedHoveredUnfocusedBackgroundOpacity}" />
 			</Style>
 			<Style Selector="^:focus /template/ Rectangle#BackgroundRectangle">
-				<Setter Property="Fill" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}" />
+				<Setter Property="Fill" Value="{DynamicResource TsundokuMenuButtonBGHoverColor}" />
 				<Setter Property="Opacity" Value="{DynamicResource DataGridRowSelectedBackgroundOpacity}" />
 			</Style>
 			<Style Selector="^:pointerover:focus /template/ Rectangle#BackgroundRectangle">
-				<Setter Property="Fill" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}" />
+				<Setter Property="Fill" Value="{DynamicResource TsundokuMenuButtonBGHoverColor}" />
 				<Setter Property="Opacity" Value="{DynamicResource DataGridRowSelectedHoveredBackgroundOpacity}" />
 			</Style>
 		</Style>
@@ -310,9 +309,9 @@
 
 	<ControlTheme x:Key="{x:Type DataGrid}" TargetType="DataGrid">
 		<Setter Property="RowBackground" Value="Transparent" />
-		<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor}"/>
-		<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGColor}"/>
-		<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource TsundokuMenuButtonBorderColor}"/>
+		<Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGColor}"/>
+		<Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
 		<Setter Property="HeadersVisibility" Value="Column" />
 		<Setter Property="HorizontalScrollBarVisibility" Value="Disabled" />
 		<Setter Property="VerticalScrollBarVisibility" Value="Auto" />

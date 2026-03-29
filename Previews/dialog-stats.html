@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tsundoku - Stats Dialog</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: var(--menu-bg); }
+  ::-webkit-scrollbar-thumb { background: var(--divider); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--btn-text); }
+
+  body {
+    font-family: 'Geist', sans-serif;
+    background: var(--menu-bg);
+    margin: 0;
+  }
+
+  :root {
+    --menu-bg: #12293d; --username: #f1d2b6; --user-icon-border: #7b6b43;
+    --search-bg: #473633; --search-border: #7b6b43; --search-text: #f1d2b6;
+    --divider: #7b6b43; --btn-bg: #473633; --btn-bg-hover: #3e2a35;
+    --btn-border: #7b6b43; --btn-border-hover: #7b6b43;
+    --btn-text: #f1d2b6; --btn-text-hover: #12293d;
+    --card-desc: #f9eae1; --card-publisher: #f1d2b6; --card-title: #7b6b43;
+    --collection-bg: #3e2a35; --progress-bar: #f1d2b6;
+  }
+
+  .dialog {
+    background: var(--menu-bg);
+    border: none;
+    border-radius: 0;
+    width: 100%;
+    overflow-y: auto;
+  }
+  .dialog::-webkit-scrollbar-track { background: var(--menu-bg); }
+
+  .dialog-header {
+    padding: 16px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 2px solid var(--divider);
+    position: sticky; top: 0; background: var(--menu-bg); z-index: 2;
+  }
+  .dialog-title {
+    font-size: 18px; font-weight: 800; color: var(--username);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .dialog-title i { font-size: 16px; color: var(--card-publisher); }
+  .dialog-close {
+    width: 32px; height: 32px; border-radius: 8px;
+    border: 2px solid var(--btn-border); background: var(--btn-bg);
+    color: var(--btn-text); cursor: pointer; font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .dialog-close:hover {
+    background: var(--btn-bg-hover); border-color: var(--btn-border-hover); color: var(--btn-text-hover);
+  }
+
+  /* Stats Cards */
+  .stats-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+    padding: 20px 24px;
+  }
+
+  .stat-card {
+    background: var(--btn-bg);
+    border: 2px solid var(--btn-border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .stat-card:hover {
+    background: var(--btn-bg-hover); border-color: var(--btn-border-hover);
+  }
+  .stat-value {
+    font-size: 24px; font-weight: 800; color: var(--username);
+    font-variant-numeric: tabular-nums;
+  }
+  .stat-label {
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.8px; color: var(--card-title); margin-top: 2px;
+  }
+
+  /* Charts Section */
+  .charts-section {
+    padding: 0 24px 20px;
+  }
+  .section-title {
+    font-size: 13px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1px; color: var(--card-publisher);
+    margin-bottom: 12px; padding-top: 16px;
+    border-top: 2px solid var(--divider);
+  }
+
+  .pie-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+  }
+
+  .chart-card {
+    background: var(--collection-bg);
+    border: 2px solid var(--divider);
+    border-radius: 12px;
+    padding: 18px;
+  }
+  .chart-title {
+    font-size: 15px; font-weight: 700; color: var(--username);
+    margin-bottom: 14px; text-align: center;
+  }
+
+  /* Pie Chart */
+  .pie-wrap { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .pie {
+    width: 150px; height: 150px; border-radius: 50%;
+    position: relative;
+    box-shadow: 0 0 0 3px var(--collection-bg), 0 0 0 5px var(--divider);
+  }
+  .pie-demo { background: conic-gradient(
+    #e8b84b 0% 52%,
+    #7ca3c4 52% 85%,
+    #c47c8a 85% 93%,
+    #8bc49a 93% 98%,
+    #a0a0a0 98% 100%
+  ); }
+  .pie-status { background: conic-gradient(
+    #7ca3c4 0% 54%,
+    #e8b84b 54% 96%,
+    #c47c8a 96% 100%
+  ); }
+  .pie-format { background: conic-gradient(
+    #e8b84b 0% 91%,
+    #7ca3c4 91% 93%,
+    #c47c8a 93% 95%,
+    #8bc49a 95% 97%,
+    #a0a0a0 97% 100%
+  ); }
+
+  .legend { width: 100%; margin-top: 2px; }
+  .legend-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 3px 0; font-size: 12px; font-weight: 600; color: var(--card-desc);
+  }
+  .legend-dot {
+    width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0;
+  }
+  .legend-pct {
+    margin-left: auto; font-variant-numeric: tabular-nums;
+    font-weight: 700; color: var(--username); font-size: 12px;
+  }
+
+  /* Bar Chart */
+  .bar-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+    margin-top: 14px;
+  }
+  .bar-grid .chart-card.full-width {
+    grid-column: 1 / -1;
+  }
+
+  .genre-chart-grid {
+    display: flex; gap: 16px;
+  }
+  .genre-col {
+    flex: 1; display: flex; flex-direction: column; gap: 6px;
+  }
+  .genre-col .bar-row {
+    grid-template-columns: 85px 1fr 32px;
+  }
+  .genre-divider {
+    width: 2px; background: var(--divider); flex-shrink: 0;
+  }
+  .bar-chart .bar-row {
+    grid-template-columns: 35px 1fr 28px;
+  }
+  .bar-chart .bar-label {
+    text-align: center;
+  }
+  .bar-chart { display: flex; flex-direction: column; gap: 6px; }
+  .bar-row {
+    display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 8px;
+  }
+  .bar-label {
+    font-size: 12px; font-weight: 600; color: var(--card-desc);
+    text-align: right; white-space: nowrap;
+  }
+  .bar-track {
+    height: 24px; background: var(--btn-bg);
+    border-radius: 5px; overflow: hidden; border: 2px solid var(--divider);
+  }
+  .bar-fill {
+    height: 100%; background: var(--progress-bar); border-radius: 3px;
+  }
+  .bar-val {
+    font-size: 12px; font-weight: 700; color: var(--username);
+    font-variant-numeric: tabular-nums;
+    min-width: 28px; text-align: right;
+  }
+</style>
+</head>
+<body>
+<div class="dialog">
+  <div class="dialog-header">
+    <span class="dialog-title"><i class="fa-solid fa-chart-simple"></i> Collection Stats</span>
+    <button class="dialog-close"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-value">8.94</div><div class="stat-label">Mean Rating</div></div>
+    <div class="stat-card"><div class="stat-value">964</div><div class="stat-label">Volumes Read</div></div>
+    <div class="stat-card"><div class="stat-value">67</div><div class="stat-label">Series Count</div></div>
+    <div class="stat-card"><div class="stat-value">2,060</div><div class="stat-label">Volumes Collected</div></div>
+    <div class="stat-card"><div class="stat-value">979</div><div class="stat-label">To Be Collected</div></div>
+    <div class="stat-card"><div class="stat-value">¥1,105,510</div><div class="stat-label">Collection Value</div></div>
+  </div>
+
+  <div class="charts-section">
+    <div class="section-title">Distribution</div>
+    <div class="pie-grid">
+      <div class="chart-card">
+        <div class="chart-title">Demographic</div>
+        <div class="pie-wrap">
+          <div class="pie pie-demo"></div>
+          <div class="legend">
+            <div class="legend-item"><div class="legend-dot" style="background:#e8b84b"></div>Shounen<span class="legend-pct">51.5%</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:#7ca3c4"></div>Seinen<span class="legend-pct">32.8%</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:#c47c8a"></div>Shoujo<span class="legend-pct">7.5%</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:#8bc49a"></div>Josei<span class="legend-pct">4.5%</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:#a0a0a0"></div>Unknown<span class="legend-pct">3.7%</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Status</div>
+        <div class="pie-wrap">
+          <div class="pie pie-status"></div>
+          <div class="legend">
+            <div class="legend-item"><div class="legend-dot" style="background:#7ca3c4"></div>Finished<span class="legend-pct">53.7%</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:#e8b84b"></div>Ongoing<span class="legend-pct">42.4%</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:#c47c8a"></div>Hiatus<span class="legend-pct">3.9%</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Format</div>
+        <div class="pie-wrap">
+          <div class="pie pie-format"></div>
+          <div class="legend">
+            <div class="legend-item"><div class="legend-dot" style="background:#e8b84b"></div>Manga<span class="legend-pct">91.0%</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:#7ca3c4"></div>Manhwa<span class="legend-pct">3.0%</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:#c47c8a"></div>Novel<span class="legend-pct">3.0%</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:#8bc49a"></div>Comic<span class="legend-pct">1.5%</span></div>
+            <div class="legend-item"><div class="legend-dot" style="background:#a0a0a0"></div>Manhua<span class="legend-pct">1.5%</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title" style="margin-top:20px">Charts</div>
+    <div class="bar-grid">
+      <div class="chart-card full-width">
+        <div class="chart-title">Genres</div>
+        <div class="genre-chart-grid">
+          <div class="genre-col">
+            <div class="bar-row"><span class="bar-label">Action</span><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div><span class="bar-val">179</span></div>
+            <div class="bar-row"><span class="bar-label">Comedy</span><div class="bar-track"><div class="bar-fill" style="width:62%"></div></div><span class="bar-val">111</span></div>
+            <div class="bar-row"><span class="bar-label">Romance</span><div class="bar-track"><div class="bar-fill" style="width:52%"></div></div><span class="bar-val">94</span></div>
+            <div class="bar-row"><span class="bar-label">Drama</span><div class="bar-track"><div class="bar-fill" style="width:50%"></div></div><span class="bar-val">90</span></div>
+            <div class="bar-row"><span class="bar-label">Supernatural</span><div class="bar-track"><div class="bar-fill" style="width:45%"></div></div><span class="bar-val">81</span></div>
+            <div class="bar-row"><span class="bar-label">Adventure</span><div class="bar-track"><div class="bar-fill" style="width:42%"></div></div><span class="bar-val">76</span></div>
+            <div class="bar-row"><span class="bar-label">Fantasy</span><div class="bar-track"><div class="bar-fill" style="width:38%"></div></div><span class="bar-val">68</span></div>
+            <div class="bar-row"><span class="bar-label">Sci-Fi</span><div class="bar-track"><div class="bar-fill" style="width:22%"></div></div><span class="bar-val">40</span></div>
+            <div class="bar-row"><span class="bar-label">Psychological</span><div class="bar-track"><div class="bar-fill" style="width:18%"></div></div><span class="bar-val">32</span></div>
+          </div>
+          <div class="genre-divider"></div>
+          <div class="genre-col">
+            <div class="bar-row"><span class="bar-label">Thriller</span><div class="bar-track"><div class="bar-fill" style="width:15%"></div></div><span class="bar-val">27</span></div>
+            <div class="bar-row"><span class="bar-label">Mystery</span><div class="bar-track"><div class="bar-fill" style="width:14%"></div></div><span class="bar-val">25</span></div>
+            <div class="bar-row"><span class="bar-label">Slice of Life</span><div class="bar-track"><div class="bar-fill" style="width:13%"></div></div><span class="bar-val">24</span></div>
+            <div class="bar-row"><span class="bar-label">Horror</span><div class="bar-track"><div class="bar-fill" style="width:11%"></div></div><span class="bar-val">20</span></div>
+            <div class="bar-row"><span class="bar-label">Ecchi</span><div class="bar-track"><div class="bar-fill" style="width:8%"></div></div><span class="bar-val">15</span></div>
+            <div class="bar-row"><span class="bar-label">Sports</span><div class="bar-track"><div class="bar-fill" style="width:6%"></div></div><span class="bar-val">10</span></div>
+            <div class="bar-row"><span class="bar-label">Mecha</span><div class="bar-track"><div class="bar-fill" style="width:5%"></div></div><span class="bar-val">9</span></div>
+            <div class="bar-row"><span class="bar-label">Music</span><div class="bar-track"><div class="bar-fill" style="width:4%"></div></div><span class="bar-val">8</span></div>
+            <div class="bar-row"><span class="bar-label">Mahou Shoujo</span><div class="bar-track"><div class="bar-fill" style="width:3%"></div></div><span class="bar-val">5</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Rating Distribution</div>
+        <div class="bar-chart">
+          <div class="bar-row"><span class="bar-label">10</span><div class="bar-track"><div class="bar-fill" style="width:26%"></div></div><span class="bar-val">5</span></div>
+          <div class="bar-row"><span class="bar-label">9</span><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div><span class="bar-val">19</span></div>
+          <div class="bar-row"><span class="bar-label">8</span><div class="bar-track"><div class="bar-fill" style="width:63%"></div></div><span class="bar-val">12</span></div>
+          <div class="bar-row"><span class="bar-label">7</span><div class="bar-track"><div class="bar-fill" style="width:26%"></div></div><span class="bar-val">5</span></div>
+          <div class="bar-row"><span class="bar-label">6</span><div class="bar-track"><div class="bar-fill" style="width:10%"></div></div><span class="bar-val">2</span></div>
+          <div class="bar-row"><span class="bar-label">5</span><div class="bar-track"><div class="bar-fill" style="width:5%"></div></div><span class="bar-val">1</span></div>
+          <div class="bar-row"><span class="bar-label">N/A</span><div class="bar-track"><div class="bar-fill" style="width:58%"></div></div><span class="bar-val">11</span></div>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Volume Counts</div>
+        <div class="bar-chart">
+          <div class="bar-row"><span class="bar-label">1–10</span><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div><span class="bar-val">24</span></div>
+          <div class="bar-row"><span class="bar-label">11–20</span><div class="bar-track"><div class="bar-fill" style="width:50%"></div></div><span class="bar-val">12</span></div>
+          <div class="bar-row"><span class="bar-label">21–30</span><div class="bar-track"><div class="bar-fill" style="width:33%"></div></div><span class="bar-val">8</span></div>
+          <div class="bar-row"><span class="bar-label">31–40</span><div class="bar-track"><div class="bar-fill" style="width:25%"></div></div><span class="bar-val">6</span></div>
+          <div class="bar-row"><span class="bar-label">41–50</span><div class="bar-track"><div class="bar-fill" style="width:12%"></div></div><span class="bar-val">3</span></div>
+          <div class="bar-row"><span class="bar-label">51+</span><div class="bar-track"><div class="bar-fill" style="width:16%"></div></div><span class="bar-val">4</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.querySelector('.dialog-close').addEventListener('click', () => {
+  window.parent.postMessage('close-dialog', '*');
+});
+window.addEventListener('load', () => {
+  const dialog = document.querySelector('.dialog');
+  dialog.style.overflowY = 'visible';
+  const h = dialog.offsetHeight;
+  dialog.style.overflowY = '';
+  window.parent.postMessage({ type: 'dialog-height', height: h }, '*');
+});
+</script>
+</body>
+</html>

@@ -3,17 +3,15 @@ using System.Reactive.Disposables;
 using System.Reactive.Disposables.Fluent;
 
 using System.Reactive.Linq;
-using System.Text.RegularExpressions;
 using Avalonia.Media.Imaging;
-using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
 using ReactiveUI.SourceGenerators;
 using Tsundoku.Clients;
 using Tsundoku.Helpers;
 using Tsundoku.Models;
-using Tsundoku.Views;
 using static Tsundoku.Models.Enums.TsundokuFilterModel;
 using static Tsundoku.Models.Enums.TsundokuLanguageModel;
+using static Tsundoku.Models.Enums.TsundokuSortModel;
 
 namespace Tsundoku.ViewModels;
 
@@ -23,56 +21,38 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
 
     // --- Injected Dependencies (Readonly Fields) ---
     private readonly ISharedSeriesCollectionProvider _sharedSeriesProvider;
-    private readonly IServiceProvider _serviceProvider;
     private readonly BitmapHelper _bitmapHelper;
     private readonly MangaDex _mangaDex;
     private readonly AniList _aniList;
-
-    // --- Window Instances (Private Fields & Public Readonly Properties) ---
-    private AddNewSeriesWindow _newSeriesWindow;
-    private UserSettingsWindow _userSettingsWindow;
-    private CollectionThemeWindow _themeSettingsWindow;
-    private PriceAnalysisWindow _priceAnalysisWindow;
-    private CollectionStatsWindow _collectionStatsWindow;
-    private UserNotesWindow _userNotesWindow;
     private bool disposedValue;
-
-    public AddNewSeriesWindow NewSeriesWindow => _newSeriesWindow;
-    public UserSettingsWindow UserSettingsWindow => _userSettingsWindow;
-    public CollectionThemeWindow ThemeSettingsWindow => _themeSettingsWindow;
-    public PriceAnalysisWindow PriceAnalysisWindow => _priceAnalysisWindow;
-    public CollectionStatsWindow CollectionStatsWindow => _collectionStatsWindow;
-    public UserNotesWindow UserNotesWindow => _userNotesWindow;
 
     // --- Reactive Properties (Public) ---
     [Reactive] public partial string AdvancedSearchQuery { get; set; } = string.Empty;
     [Reactive] public partial string SeriesFilterText { get; set; }
     [Reactive] public partial TsundokuFilter SelectedFilter { get; set; } = TsundokuFilter.None;
     [Reactive] public partial int SelectedFilterIndex { get; set; } = 0;
+    [Reactive] public partial TsundokuSort SelectedSort { get; set; } = TsundokuSort.TitleAZ;
+    [Reactive] public partial int SelectedSortIndex { get; set; } = 0;
     [Reactive] public partial int SelectedLangIndex { get; set; }
     [Reactive] public partial string NotificationText { get; set; }
     [Reactive] public partial string AdvancedSearchQueryErrorMessage { get; set; }
     [Reactive] public partial TsundokuLanguage SelectedLanguage { get; set; }
 
     public ReadOnlyObservableCollection<Series> UserCollection { get; }
-    public static readonly List<Series> CoverChangedSeriesList = [];
+    public ReadOnlyObservableCollection<TsundokuTheme> SavedThemes => _userService.SavedThemes;
+    public FilterBuilderViewModel FilterBuilder { get; } = new();
 
     public Interaction<EditSeriesInfoViewModel, MainWindowViewModel?> EditSeriesInfoDialog { get; } = new Interaction<EditSeriesInfoViewModel, MainWindowViewModel?>();
 
-    [GeneratedRegex(@"(\w+)(==|<=|>=)(\d+|\w+|(?:'|"")(?:.*?)(?:'|""))")] public static partial Regex AdvancedQueryRegex();
-
-    public MainWindowViewModel(IUserService userService, ISharedSeriesCollectionProvider sharedSeriesProvider, BitmapHelper bitmapHelper, MangaDex mangaDex, AniList aniList, IServiceProvider serviceProvider) : base(userService)
+    public MainWindowViewModel(IUserService userService, ISharedSeriesCollectionProvider sharedSeriesProvider, BitmapHelper bitmapHelper, MangaDex mangaDex, AniList aniList) : base(userService)
     {
         _sharedSeriesProvider = sharedSeriesProvider ?? throw new ArgumentNullException(nameof(sharedSeriesProvider));
         _bitmapHelper = bitmapHelper ?? throw new ArgumentNullException(nameof(bitmapHelper));
         _mangaDex = mangaDex ?? throw new ArgumentNullException(nameof(mangaDex));
         _aniList = aniList ?? throw new ArgumentNullException(nameof(aniList));
-        _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
 
         // 1. Bind the UI-facing collection to the one provided by the shared service.
         UserCollection = _sharedSeriesProvider.DynamicUserCollection;
-
-        ConfigureWindows();
 
         // 2. Link the ViewModel's filter properties to the shared provider's properties.
         this.WhenAnyValue(x => x.SeriesFilterText)
@@ -93,8 +73,23 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
             })
             .DisposeWith(_disposables);
 
-        this.WhenAnyValue(x => x.AdvancedSearchQuery)
-            .Subscribe(query => _sharedSeriesProvider.AdvancedSearchQuery = query)
+        this.WhenAnyValue(x => x.SelectedSort)
+            .DistinctUntilChanged()
+            .ObserveOn(RxSchedulers.MainThreadScheduler)
+            .Subscribe(sort =>
+            {
+                SelectedSortIndex = TSUNDOKU_SORT_DICT[sort];
+                _sharedSeriesProvider.SelectedSort = sort;
+            })
+            .DisposeWith(_disposables);
+
+        // Wire FilterBuilder's synthesized query into the shared provider
+        FilterBuilder.WhenAnyValue(x => x.SynthesizedQuery)
+            .Subscribe(query =>
+            {
+                AdvancedSearchQuery = query;
+                _sharedSeriesProvider.AdvancedSearchQuery = query;
+            })
             .DisposeWith(_disposables);
 
         this.WhenAnyValue(x => x.AdvancedSearchQueryErrorMessage)
@@ -140,20 +135,6 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
     {
         _userService.UpdateUserIcon(filePath);
     }
-    private void ConfigureWindows()
-    {
-        LOGGER.Info("Configuring Windows...");
-
-        _newSeriesWindow = _serviceProvider.GetRequiredService<AddNewSeriesWindow>();
-        _userSettingsWindow = _serviceProvider.GetRequiredService<UserSettingsWindow>();
-        _themeSettingsWindow = _serviceProvider.GetRequiredService<CollectionThemeWindow>();
-        _priceAnalysisWindow = _serviceProvider.GetRequiredService<PriceAnalysisWindow>();
-        _collectionStatsWindow = _serviceProvider.GetRequiredService<CollectionStatsWindow>();
-        _userNotesWindow = _serviceProvider.GetRequiredService<UserNotesWindow>();
-
-        LOGGER.Info("Finished Configuring Windows!");
-    }
-
     public void UpdateUserLanguage(TsundokuLanguage newLang)
     {
         _userService.UpdateUser(user => user.Language = newLang);
@@ -220,6 +201,7 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
             if (disposing)
             {
                 _disposables.Dispose();
+                FilterBuilder.Dispose();
             }
             disposedValue = true;
         }

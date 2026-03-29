@@ -30,17 +30,28 @@ public sealed partial class CollectionStatsWindow : ReactiveWindow<CollectionSta
             if (IsOpen)
             {
                 this.Hide();
-                IsOpen ^= true;
+                IsOpen = false;
                 Topmost = false;
+                e.Cancel = true;
             }
-            e.Cancel = true;
         };
     }
 
     private async void CopyTextAsync(object sender, PointerPressedEventArgs args)
     {
-        string curText = $"{(sender as Controls.ValueStat).Text} {(sender as Controls.ValueStat).Title}";
-        LOGGER.Info("Copying {Text} to Clipboard", curText);
-        await TextCopy.ClipboardService.SetTextAsync(curText);
+        try
+        {
+            if (sender is not Controls.ValueStat valueStat)
+            {
+                return;
+            }
+            string curText = $"{valueStat.Text} {valueStat.Title}";
+            LOGGER.Info("Copying {Text} to Clipboard", curText);
+            await TextCopy.ClipboardService.SetTextAsync(curText);
+        }
+        catch (Exception ex)
+        {
+            LOGGER.Error(ex, "Failed to copy text to clipboard");
+        }
     }
 }

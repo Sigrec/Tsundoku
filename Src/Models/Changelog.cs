@@ -3,10 +3,14 @@ using System.Reflection;
 
 namespace Tsundoku.Models;
 
+/// <summary>
+/// Provides access to embedded changelog entries and version-based display logic.
+/// </summary>
 public static class Changelog
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
 
+    /// <summary>Gets the loaded changelog entries keyed by version string.</summary>
     public static readonly FrozenDictionary<string, string[]> Entries = LoadEntries();
 
     private static FrozenDictionary<string, string[]> LoadEntries()
@@ -14,12 +18,12 @@ public static class Changelog
         try
         {
             Assembly assembly = Assembly.GetExecutingAssembly();
-            string resourceName = assembly.GetManifestResourceNames()
+            string resourceName = assembly.GetManifestResourceNames().AsValueEnumerable()
                 .First(n => n.EndsWith("changelog.json", StringComparison.Ordinal));
 
             using Stream stream = assembly.GetManifestResourceStream(resourceName)!;
             Dictionary<string, string[]>? data = JsonSerializer.Deserialize<Dictionary<string, string[]>>(stream);
-            return data?.ToFrozenDictionary(StringComparer.Ordinal)
+            return data?.AsValueEnumerable().ToFrozenDictionary(StringComparer.Ordinal)
                 ?? FrozenDictionary<string, string[]>.Empty;
         }
         catch (Exception ex)

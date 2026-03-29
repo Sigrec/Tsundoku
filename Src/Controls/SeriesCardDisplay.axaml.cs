@@ -1,13 +1,14 @@
 using Avalonia.Controls;
+using Avalonia.Interactivity;
+using Avalonia.Media;
 using Microsoft.Extensions.DependencyInjection;
-using ReactiveUI.Avalonia;
 using Tsundoku.Models;
 using Tsundoku.ViewModels;
 using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 
 namespace Tsundoku.Controls;
 
-public sealed partial class SeriesCardDisplay : ReactiveUserControl<SeriesCardDisplay>
+public sealed partial class SeriesCardDisplay : UserControl
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
 
@@ -18,15 +19,6 @@ public sealed partial class SeriesCardDisplay : ReactiveUserControl<SeriesCardDi
     {
         get => GetValue(SeriesProperty);
         set => SetValue(SeriesProperty, value);
-    }
-
-    public static readonly StyledProperty<TsundokuTheme> CardThemeProperty =
-        AvaloniaProperty.Register<SeriesCardDisplay, TsundokuTheme>(nameof(CardTheme));
-
-    public TsundokuTheme CardTheme
-    {
-        get => GetValue(CardThemeProperty);
-        set => SetValue(CardThemeProperty, value);
     }
 
     // ‣ 3) (Optional) If you also need CurrentUser.Language, expose that here too:
@@ -71,34 +63,35 @@ public sealed partial class SeriesCardDisplay : ReactiveUserControl<SeriesCardDi
 
     private async void CopySeriesTitleAsync(object? sender, PointerPressedEventArgs e)
     {
-        if (Language is not null)
+        if (Language is not null && Series?.Titles is not null)
         {
-            string title = Series.Titles[Language.Value];
+            string title = Series.Titles.TryGetValue(Language.Value, out string? langTitle)
+                ? langTitle
+                : Series.Titles[TsundokuLanguage.Romaji];
             LOGGER.Debug("Copying {title} to Clipboard", title);
             await TextCopy.ClipboardService.SetTextAsync(title);
         }
     }
 
-    private void SubtractVolume(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private void SubtractVolume(object? sender, RoutedEventArgs e)
     {
         Series?.DecrementCurVolumeCount();
     }
 
-    private void AddVolume(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private void AddVolume(object? sender, RoutedEventArgs e)
     {
         Series?.IncrementCurVolumeCount();
     }
 
-    private async void OpenEditSeriesInfoWindow(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private async void OpenEditSeriesInfoWindow(object? sender, RoutedEventArgs e)
     {
-        if (_mainWindowViewModel is null || Series is null)
+        if (_mainWindowViewModel is null || Series is null || sender is not Button seriesButton)
         {
             return;
         }
 
-        Button seriesButton = (Button)sender;
-        seriesButton.Foreground = CardTheme.SeriesButtonIconHoverColor;
+        seriesButton.Foreground = (SolidColorBrush)this.FindResource(ThemeResourceKeys.SeriesButtonIconHoverColor)!;
         await _mainWindowViewModel.CreateEditSeriesDialog(Series);
-        seriesButton.Foreground = CardTheme.SeriesButtonIconColor;
+        seriesButton.Foreground = (SolidColorBrush)this.FindResource(ThemeResourceKeys.SeriesButtonIconColor)!;
     }
 }

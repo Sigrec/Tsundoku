@@ -4,17 +4,14 @@ using Tsundoku.Views;
 
 namespace Tsundoku.Services;
 
-public interface ILoadingDialogService
-{
-    Task ShowAsync(string message, Func<LoadingDialogViewModel, Task> work, Window owner);
-    Task ShowCancellableAsync(string message, Func<LoadingDialogViewModel, CancellationToken, Task> work, Window owner);
-    void Show(string message, Action<LoadingDialogViewModel> work, Window owner);
-}
-
+/// <summary>
+/// Displays loading dialogs during long-running operations using the <see cref="LoadingDialog"/> window.
+/// </summary>
 public sealed class LoadingDialogService(LoadingDialogViewModel viewModel) : ILoadingDialogService
 {
     private readonly LoadingDialogViewModel _viewModel = viewModel;
 
+    /// <inheritdoc />
     public async Task ShowAsync(
         string message,
         Func<LoadingDialogViewModel, Task> work,
@@ -39,6 +36,7 @@ public sealed class LoadingDialogService(LoadingDialogViewModel viewModel) : ILo
         }
     }
 
+    /// <inheritdoc />
     public async Task ShowCancellableAsync(
         string message,
         Func<LoadingDialogViewModel, CancellationToken, Task> work,
@@ -63,6 +61,7 @@ public sealed class LoadingDialogService(LoadingDialogViewModel viewModel) : ILo
         }
     }
 
+    /// <inheritdoc />
     public void Show(
         string message,
         Action<LoadingDialogViewModel> work,

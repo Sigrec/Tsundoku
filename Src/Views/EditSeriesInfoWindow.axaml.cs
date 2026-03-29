@@ -27,7 +27,9 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
 
         Opened += (s, e) =>
         {
-            string curTitle = ViewModel.Series.Titles[ViewModel.CurrentUser.Language];
+            string curTitle = ViewModel.Series.Titles.TryGetValue(ViewModel.CurrentUser.Language, out string? title)
+                ? title
+                : ViewModel.Series.Titles[TsundokuLanguage.Romaji];
 
             DiscordRP.SetPresence(
                 state: $"Editing {curTitle} {ViewModel.Series.Format}",
@@ -71,18 +73,27 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
     {
         ChangeCoverButtonIcon.Value = "fa-solid fa-arrow-rotate-right";
         ChangeCoverButtonIcon.Animation = IconAnimation.Spin;
-        string customImageUrl = CoverImageUrlTextBox.Text.Trim();
-        string fullCoverPath = AppFileHelper.GetFullCoverPath(ViewModel.Series.Cover);
-        Bitmap? newCover = await _bitmapHelper.UpdateCoverFromUrlAsync(customImageUrl, fullCoverPath);
-
-        if (newCover is not null)
+        try
         {
-            GenerateNewBitmap(newCover, customImageUrl);
-            CoverImageUrlTextBox.Clear();
-        }
+            string customImageUrl = CoverImageUrlTextBox.Text.Trim();
+            string fullCoverPath = AppFileHelper.GetFullCoverPath(ViewModel.Series.Cover);
+            Bitmap? newCover = await _bitmapHelper.UpdateCoverFromUrlAsync(customImageUrl, fullCoverPath);
 
-        ChangeCoverButtonIcon.Animation = IconAnimation.None;
-        ChangeCoverButtonIcon.Value = "fa-solid fa-circle-down";
+            if (newCover is not null)
+            {
+                GenerateNewBitmap(newCover, customImageUrl);
+                CoverImageUrlTextBox.Clear();
+            }
+        }
+        catch (Exception ex)
+        {
+            LOGGER.Error(ex, "Failed to change cover from link");
+        }
+        finally
+        {
+            ChangeCoverButtonIcon.Animation = IconAnimation.None;
+            ChangeCoverButtonIcon.Value = "fa-solid fa-circle-down";
+        }
     }
 
     private async void ChangeSeriesCoverFromFileAsync(object sender, RoutedEventArgs args)
@@ -256,7 +267,14 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
 
     private async void RefreshSeriesAsync(object sender, RoutedEventArgs args)
     {
-        await _mainWindowViewModel.RefreshSeries(ViewModel.Series);
+        try
+        {
+            await _mainWindowViewModel.RefreshSeries(ViewModel.Series);
+        }
+        catch (Exception ex)
+        {
+            LOGGER.Error(ex, "Failed to refresh series {Title}", ViewModel.Series.Titles[TsundokuLanguage.Romaji]);
+        }
     }
 
     private void RemoveSeries(object sender, RoutedEventArgs args)
@@ -299,7 +317,6 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
         else if (hasCur) // Only “current” was provided:
         {
             ViewModel.Series.UpdateCurVolumeCount(newCur, CurVolumeMaskedTextBox.Clear);
-            CurVolumeMaskedTextBox.Clear();
         }
         // Only “max” was provided:
         else if (hasMax)

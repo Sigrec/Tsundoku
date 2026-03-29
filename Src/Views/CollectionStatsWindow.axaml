@@ -22,7 +22,7 @@
 		<StyleInclude Source="/Controls/ValueStat.axaml"/>
 	</Window.Styles>
 
-	<Border Classes="Menu" BorderThickness="3" CornerRadius="0,0,8,8" ClipToBounds="True">
+	<Border Classes="Menu" BorderThickness="2" CornerRadius="0,0,8,8" ClipToBounds="True">
 		<ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Theme="{StaticResource ReverseCollectionScroll}"> 
 			<Grid RowDefinitions="Auto,Auto,Auto,20,Auto,20,Auto" ColumnDefinitions="*" Margin="20" VerticalAlignment="Center" HorizontalAlignment="Center">
 				<Border Name="StatsBG" Grid.Row="0" Grid.RowSpan="3" Grid.Column="0" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" Height="230" BoxShadow="0 0 10 3 #B3000000" HorizontalAlignment="Center" Background="{CompiledBinding PaneBackgroundColor}">
@@ -44,17 +44,17 @@
                 <Border Name="DistBGOne" Grid.Row="4" Grid.Column="0" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" HorizontalAlignment="Center" Background="{CompiledBinding PaneBackgroundColor}">
                     <WrapPanel Margin="10">
                         <!-- Demographic Pie chart -->
-                        <Border Background="{CompiledBinding CurrentTheme.CollectionBGColor}" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" Width="570" Height="300" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10">
+                        <Border Background="{DynamicResource TsundokuCollectionBGColor}" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" Width="570" Height="300" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10">
                             <Border CornerRadius="8" ClipToBounds="True">
                                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="3">
                                     <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="10" Margin="0,0,20,0">
                                         <TextBlock  Grid.Row="0" Grid.Column="0" Text="Demographic" FontSize="23" FontWeight="Bold" Classes="Menu" HorizontalAlignment="Center" Margin="0,0,0,2"/>
-                                        <Grid RowDefinitions="*,3,*,3,*,3,*,3,*" ColumnDefinitions="Auto,3,Auto" HorizontalAlignment="Center" VerticalAlignment="Center" ShowGridLines="false">
-                                            <Border Grid.Row="0" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="24" Height="24">
-                                                <Rectangle Fill="{CompiledBinding CurrentTheme.MenuBGColor}" ClipToBounds="True" Width="18" Height="18"/>
+                                        <Grid RowDefinitions="*,3,*,3,*,3,*,3,*" ColumnDefinitions="Auto,3,Auto" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                            <Border Grid.Row="0" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{DynamicResource TsundokuDividerColor}" ClipToBounds="True" Width="24" Height="24">
+                                                <Rectangle Fill="{DynamicResource TsundokuMenuBGColor}" ClipToBounds="True" Width="18" Height="18"/>
                                             </Border>
-                                            <Border Grid.Row="0" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="165" Height="24" OpacityMask="White">
-                                                <TextBlock Background="{CompiledBinding CurrentTheme.MenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" FontSize="14" HorizontalAlignment="Stretch">
+                                            <Border Grid.Row="0" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{DynamicResource TsundokuDividerColor}" ClipToBounds="True" Width="165" Height="24" OpacityMask="White">
+                                                <TextBlock Background="{DynamicResource TsundokuMenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" FontSize="14" HorizontalAlignment="Stretch">
                                                     <TextBlock.Text>
                                                         <MultiBinding StringFormat="Shounen {0}% ({1})" Mode="OneWay">
                                                             <Binding Path="ShounenPercentage"/>
@@ -63,11 +63,11 @@
                                                     </TextBlock.Text>
                                                 </TextBlock>
                                             </Border>
-                                            <Border Grid.Row="2" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="24" Height="24">
-                                                <Rectangle Fill="{CompiledBinding CurrentTheme.MenuTextColor}" ClipToBounds="True" Width="18" Height="18"/>
+                                            <Border Grid.Row="2" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{DynamicResource TsundokuDividerColor}" ClipToBounds="True" Width="24" Height="24">
+                                                <Rectangle Fill="{DynamicResource TsundokuMenuTextColor}" ClipToBounds="True" Width="18" Height="18"/>
                                             </Border>
-                                            <Border Grid.Row="2" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="165" Height="24">
-                                                <TextBlock Background="{CompiledBinding CurrentTheme.MenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" FontSize="14" HorizontalAlignment="Stretch">
+                                            <Border Grid.Row="2" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{DynamicResource TsundokuDividerColor}" ClipToBounds="True" Width="165" Height="24">
+                                                <TextBlock Background="{DynamicResource TsundokuMenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" FontSize="14" HorizontalAlignment="Stretch">
                                                     <TextBlock.Text>
                                                         <MultiBinding StringFormat="Shoujo {0}% ({1})" Mode="OneWay">
                                                             <Binding Path="ShoujoPercentage"/>
@@ -76,11 +76,11 @@
                                                     </TextBlock.Text>
                                                 </TextBlock>
                                             </Border>
-                                            <Border Grid.Row="4" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="24" Height="24">
-                                                <Rectangle Fill="{CompiledBinding CurrentTheme.MenuButtonBGColor}" ClipToBounds="True" Width="18" Height="18"/>
+                                            <Border Grid.Row="4" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{DynamicResource TsundokuDividerColor}" ClipToBounds="True" Width="24" Height="24">
+                                                <Rectangle Fill="{DynamicResource TsundokuMenuButtonBGColor}" ClipToBounds="True" Width="18" Height="18"/>
                                             </Border>
-                                            <Border Grid.Row="4" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="165" Height="24">
-                                                <TextBlock Background="{CompiledBinding CurrentTheme.MenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" FontSize="14" HorizontalAlignment="Stretch">
+                                            <Border Grid.Row="4" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{DynamicResource TsundokuDividerColor}" ClipToBounds="True" Width="165" Height="24">
+                                                <TextBlock Background="{DynamicResource TsundokuMenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" FontSize="14" HorizontalAlignment="Stretch">
                                                     <TextBlock.Text>
                                                         <MultiBinding StringFormat="Seinen {0}% ({1})" Mode="OneWay">
                                                             <Binding Path="SeinenPercentage"/>
@@ -89,11 +89,11 @@
                                                     </TextBlock.Text>
                                                 </TextBlock>
                                             </Border>
-                                            <Border Grid.Row="6" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="24" Height="24">
-                                                <Rectangle Fill="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="18" Height="18"/>
+                                            <Border Grid.Row="6" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{DynamicResource TsundokuDividerColor}" ClipToBounds="True" Width="24" Height="24">
+                                                <Rectangle Fill="{DynamicResource TsundokuDividerColor}" ClipToBounds="True" Width="18" Height="18"/>
                                             </Border>
-                                            <Border Grid.Row="6" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="165" Height="24">
-                                                <TextBlock Background="{CompiledBinding CurrentTheme.MenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" HorizontalAlignment="Stretch" FontSize="14">
+                                            <Border Grid.Row="6" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{DynamicResource TsundokuDividerColor}" ClipToBounds="True" Width="165" Height="24">
+                                                <TextBlock Background="{DynamicResource TsundokuMenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" HorizontalAlignment="Stretch" FontSize="14">
                                                 <TextBlock.Text>
                                                         <MultiBinding StringFormat="Josei {0}% ({1})" Mode="OneWay">
                                                             <Binding Path="JoseiPercentage"/>
@@ -102,11 +102,11 @@
                                                     </TextBlock.Text>
                                                 </TextBlock>
                                             </Border>
-                                            <Border Grid.Row="8" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="24" Height="24">
+                                            <Border Grid.Row="8" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{DynamicResource TsundokuDividerColor}" ClipToBounds="True" Width="24" Height="24">
                                                 <Rectangle Name="UnknownRectangle" ClipToBounds="True" Width="18" Height="18" Fill="{CompiledBinding UnknownRectangleColor}"/>
                                             </Border>
-                                            <Border Grid.Row="8" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="165" Height="24">
-                                                <TextBlock Background="{CompiledBinding CurrentTheme.MenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
+                                            <Border Grid.Row="8" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{DynamicResource TsundokuDividerColor}" ClipToBounds="True" Width="165" Height="24">
+                                                <TextBlock Background="{DynamicResource TsundokuMenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
                                                 <TextBlock.Text>
                                                         <MultiBinding StringFormat="Unknown {0}% ({1})" Mode="OneWay">
                                                             <Binding Path="UnknownPercentage"/>
@@ -123,17 +123,17 @@
                         </Border>
 
                         <!-- Status Pie Chart -->
-                        <Border Background="{CompiledBinding CurrentTheme.CollectionBGColor}" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" Width="570" Height="300"  HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10">
+                        <Border Background="{DynamicResource TsundokuCollectionBGColor}" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" Width="570" Height="300"  HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10">
                             <Border CornerRadius="8" ClipToBounds="True">
                                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="3">
                                     <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="10" Margin="0,0,20,0">
                                         <TextBlock Text="Status" FontSize="23" FontWeight="Bold" Classes="Menu" HorizontalAlignment="Center" Margin="0,0,0,2"/>
-                                        <Grid RowDefinitions="*,3,*,3,*,3,*" ColumnDefinitions="Auto,3,Auto" HorizontalAlignment="Center" VerticalAlignment="Center" ShowGridLines="false">
-                                            <Border Grid.Row="0" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="24" Height="24">
-                                                <Rectangle Fill="{CompiledBinding CurrentTheme.MenuButtonBGColor}" ClipToBounds="True" Width="18" Height="18"/>
+                                        <Grid RowDefinitions="*,3,*,3,*,3,*" ColumnDefinitions="Auto,3,Auto" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                            <Border Grid.Row="0" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{DynamicResource TsundokuDividerColor}" ClipToBounds="True" Width="24" Height="24">
+                                                <Rectangle Fill="{DynamicResource TsundokuMenuButtonBGColor}" ClipToBounds="True" Width="18" Height="18"/>
                                             </Border>
-                                            <Border Grid.Row="0" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="165" Height="24">
-                                                <TextBlock Background="{CompiledBinding CurrentTheme.MenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
+                                            <Border Grid.Row="0" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{DynamicResource TsundokuDividerColor}" ClipToBounds="True" Width="165" Height="24">
+                                                <TextBlock Background="{DynamicResource TsundokuMenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
                                                     <TextBlock.Text>
                                                         <MultiBinding StringFormat="Finished {0}% ({1})" Mode="OneWay">
                                                             <Binding Path="FinishedPercentage"/>
@@ -142,11 +142,11 @@
                                                     </TextBlock.Text>
                                                 </TextBlock>
                                             </Border>
-                                            <Border Grid.Row="2" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="24" Height="24">
-                                                <Rectangle Fill="{CompiledBinding CurrentTheme.MenuBGColor}" ClipToBounds="True" Width="18" Height="18"/>
+                                            <Border Grid.Row="2" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{DynamicResource TsundokuDividerColor}" ClipToBounds="True" Width="24" Height="24">
+                                                <Rectangle Fill="{DynamicResource TsundokuMenuBGColor}" ClipToBounds="True" Width="18" Height="18"/>
                                             </Border>
-                                            <Border Grid.Row="2" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="165" Height="24">
-                                                <TextBlock Background="{CompiledBinding CurrentTheme.MenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
+                                            <Border Grid.Row="2" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{DynamicResource TsundokuDividerColor}" ClipToBounds="True" Width="165" Height="24">
+                                                <TextBlock Background="{DynamicResource TsundokuMenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
                                                 <TextBlock.Text>
                                                         <MultiBinding StringFormat="Ongoing {0}% ({1})" Mode="OneWay">
                                                             <Binding Path="OngoingPercentage"/>
@@ -155,11 +155,11 @@
                                                     </TextBlock.Text>
                                                 </TextBlock>
                                             </Border>
-                                            <Border Grid.Row="4" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="24" Height="24">
-                                                <Rectangle Fill="{CompiledBinding CurrentTheme.MenuTextColor}" ClipToBounds="True" Width="18" Height="18"/>
+                                            <Border Grid.Row="4" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{DynamicResource TsundokuDividerColor}" ClipToBounds="True" Width="24" Height="24">
+                                                <Rectangle Fill="{DynamicResource TsundokuMenuTextColor}" ClipToBounds="True" Width="18" Height="18"/>
                                             </Border>
-                                            <Border Grid.Row="4" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="165" Height="24">
-                                                <TextBlock Background="{CompiledBinding CurrentTheme.MenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
+                                            <Border Grid.Row="4" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{DynamicResource TsundokuDividerColor}" ClipToBounds="True" Width="165" Height="24">
+                                                <TextBlock Background="{DynamicResource TsundokuMenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
                                                 <TextBlock.Text>
                                                         <MultiBinding StringFormat="Hiatus {0}% ({1})" Mode="OneWay">
                                                             <Binding Path="HiatusPercentage"/>
@@ -168,11 +168,11 @@
                                                     </TextBlock.Text>
                                                 </TextBlock>
                                             </Border>
-                                            <Border Grid.Row="6" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="24" Height="24">
-                                                <Rectangle Fill="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="18" Height="18"/>
+                                            <Border Grid.Row="6" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{DynamicResource TsundokuDividerColor}" ClipToBounds="True" Width="24" Height="24">
+                                                <Rectangle Fill="{DynamicResource TsundokuDividerColor}" ClipToBounds="True" Width="18" Height="18"/>
                                             </Border>
-                                            <Border Grid.Row="6" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="165" Height="24">
-                                                <TextBlock Background="{CompiledBinding CurrentTheme.MenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
+                                            <Border Grid.Row="6" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{DynamicResource TsundokuDividerColor}" ClipToBounds="True" Width="165" Height="24">
+                                                <TextBlock Background="{DynamicResource TsundokuMenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
                                                 <TextBlock.Text>
                                                         <MultiBinding StringFormat="Cancelled {0}% ({1})" Mode="OneWay">
                                                             <Binding Path="CancelledPercentage"/>
@@ -189,17 +189,17 @@
                         </Border>
 
                         <!-- Format Pie Chart -->
-                        <Border Background="{CompiledBinding CurrentTheme.CollectionBGColor}" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" Width="570" Height="300"  HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10">
+                        <Border Background="{DynamicResource TsundokuCollectionBGColor}" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" Width="570" Height="300"  HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10">
                             <Border CornerRadius="8" ClipToBounds="True">
                                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="3">
                                     <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="10" Margin="0,0,20,0">
                                         <TextBlock Text="Format" FontSize="23" FontWeight="Bold" Classes="Menu" HorizontalAlignment="Center" Margin="0,0,0,2"/>
-                                        <Grid RowDefinitions="*,3,*,3,*,3,*,3,*,3,*" ColumnDefinitions="Auto,3,Auto" HorizontalAlignment="Center" VerticalAlignment="Center" ShowGridLines="false">
-                                            <Border Grid.Row="0" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="24" Height="24">
-                                                <Rectangle Fill="{CompiledBinding CurrentTheme.MenuButtonBGColor}" ClipToBounds="True" Width="18" Height="18"/>
+                                        <Grid RowDefinitions="*,3,*,3,*,3,*,3,*,3,*" ColumnDefinitions="Auto,3,Auto" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                            <Border Grid.Row="0" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{DynamicResource TsundokuDividerColor}" ClipToBounds="True" Width="24" Height="24">
+                                                <Rectangle Fill="{DynamicResource TsundokuMenuButtonBGColor}" ClipToBounds="True" Width="18" Height="18"/>
                                             </Border>
-                                            <Border Grid.Row="0" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="165" Height="24" OpacityMask="White">
-                                                <TextBlock Background="{CompiledBinding CurrentTheme.MenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
+                                            <Border Grid.Row="0" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{DynamicResource TsundokuDividerColor}" ClipToBounds="True" Width="165" Height="24" OpacityMask="White">
+                                                <TextBlock Background="{DynamicResource TsundokuMenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
                                                     <TextBlock.Text>
                                                         <MultiBinding StringFormat="Manga {0}% ({1})" Mode="OneWay">
                                                             <Binding Path="MangaPercentage"/>
@@ -208,11 +208,11 @@
                                                     </TextBlock.Text>
                                                 </TextBlock>
                                             </Border>
-                                            <Border Grid.Row="2" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="24" Height="24">
-                                                <Rectangle Fill="{CompiledBinding CurrentTheme.MenuBGColor}" ClipToBounds="True" Width="18" Height="18"/>
+                                            <Border Grid.Row="2" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{DynamicResource TsundokuDividerColor}" ClipToBounds="True" Width="24" Height="24">
+                                                <Rectangle Fill="{DynamicResource TsundokuMenuBGColor}" ClipToBounds="True" Width="18" Height="18"/>
                                             </Border>
-                                            <Border Grid.Row="2" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="165" Height="24">
-                                                <TextBlock Background="{CompiledBinding CurrentTheme.MenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
+                                            <Border Grid.Row="2" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{DynamicResource TsundokuDividerColor}" ClipToBounds="True" Width="165" Height="24">
+                                                <TextBlock Background="{DynamicResource TsundokuMenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
                                                     <TextBlock.Text>
                                                         <MultiBinding StringFormat="Manhwa {0}% ({1})" Mode="OneWay">
                                                             <Binding Path="ManhwaPercentage"/>
@@ -221,11 +221,11 @@
                                                     </TextBlock.Text>
                                                 </TextBlock>
                                             </Border>
-                                            <Border Grid.Row="4" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="24" Height="24">
-                                                <Rectangle Fill="{CompiledBinding CurrentTheme.MenuTextColor}" ClipToBounds="True" Width="18" Height="18"/>
+                                            <Border Grid.Row="4" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{DynamicResource TsundokuDividerColor}" ClipToBounds="True" Width="24" Height="24">
+                                                <Rectangle Fill="{DynamicResource TsundokuMenuTextColor}" ClipToBounds="True" Width="18" Height="18"/>
                                             </Border>
-                                            <Border Grid.Row="4" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="165" Height="24">
-                                                <TextBlock Background="{CompiledBinding CurrentTheme.MenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
+                                            <Border Grid.Row="4" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{DynamicResource TsundokuDividerColor}" ClipToBounds="True" Width="165" Height="24">
+                                                <TextBlock Background="{DynamicResource TsundokuMenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
                                                 <TextBlock.Text>
                                                         <MultiBinding StringFormat="Novel {0}% ({1})" Mode="OneWay">
                                                             <Binding Path="NovelPercentage"/>
@@ -234,11 +234,11 @@
                                                     </TextBlock.Text>
                                                 </TextBlock>
                                             </Border>
-                                            <Border Grid.Row="6" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="24" Height="24">
-                                                <Rectangle Name="ComicRectangle" ClipToBounds="True" Width="18" Height="18" Fill="{CompiledBinding CurrentTheme.DividerColor}"/>
+                                            <Border Grid.Row="6" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{DynamicResource TsundokuDividerColor}" ClipToBounds="True" Width="24" Height="24">
+                                                <Rectangle Name="ComicRectangle" ClipToBounds="True" Width="18" Height="18" Fill="{DynamicResource TsundokuDividerColor}"/>
                                             </Border>
-                                            <Border Grid.Row="6" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="165" Height="24">
-                                                <TextBlock Background="{CompiledBinding CurrentTheme.MenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
+                                            <Border Grid.Row="6" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{DynamicResource TsundokuDividerColor}" ClipToBounds="True" Width="165" Height="24">
+                                                <TextBlock Background="{DynamicResource TsundokuMenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
                                                 <TextBlock.Text>
                                                         <MultiBinding StringFormat="Comic {0}% ({1})" Mode="OneWay">
                                                             <Binding Path="ComicPercentage"/>
@@ -247,11 +247,11 @@
                                                     </TextBlock.Text>
                                                 </TextBlock>
                                             </Border>
-                                            <Border Grid.Row="8" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="24" Height="24">
+                                            <Border Grid.Row="8" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{DynamicResource TsundokuDividerColor}" ClipToBounds="True" Width="24" Height="24">
                                                 <Rectangle Fill="{CompiledBinding ManhuaRectangleColor}" ClipToBounds="True" Width="18" Height="18"/>
                                             </Border>
-                                            <Border Grid.Row="8" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="165" Height="24">
-                                                <TextBlock Background="{CompiledBinding CurrentTheme.MenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
+                                            <Border Grid.Row="8" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{DynamicResource TsundokuDividerColor}" ClipToBounds="True" Width="165" Height="24">
+                                                <TextBlock Background="{DynamicResource TsundokuMenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
                                                     <TextBlock.Text>
                                                         <MultiBinding StringFormat="Manhua {0}% ({1})" Mode="OneWay">
                                                             <Binding Path="ManhuaPercentage"/>
@@ -260,11 +260,11 @@
                                                     </TextBlock.Text>
                                                 </TextBlock>
                                             </Border>
-                                            <Border Grid.Row="10" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="24" Height="24">
+                                            <Border Grid.Row="10" Grid.Column="0" CornerRadius="0" BorderThickness="2" BorderBrush="{DynamicResource TsundokuDividerColor}" ClipToBounds="True" Width="24" Height="24">
                                                 <Rectangle Name="ManfraRectangle" ClipToBounds="True" Width="18" Height="18" Fill="{CompiledBinding ManfraRectangleColor}"/>
                                             </Border>
-                                            <Border Grid.Row="10" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{CompiledBinding CurrentTheme.DividerColor}" ClipToBounds="True" Width="165" Height="24">
-                                                <TextBlock Background="{CompiledBinding CurrentTheme.MenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
+                                            <Border Grid.Row="10" Grid.Column="2" CornerRadius="0" BorderThickness="2" BorderBrush="{DynamicResource TsundokuDividerColor}" ClipToBounds="True" Width="165" Height="24">
+                                                <TextBlock Background="{DynamicResource TsundokuMenuBGColor}" Classes="Menu" FontWeight="Bold" TextAlignment="Center" FontSize="14">
                                                 <TextBlock.Text>
                                                         <MultiBinding StringFormat="Manfra {0}% ({1})" Mode="OneWay">
                                                             <Binding Path="ManfraPercentage"/>
@@ -286,7 +286,7 @@
                 <Border Name="DistBGTwo" Grid.Row="6" Grid.Column="0" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" HorizontalAlignment="Center" Background="{CompiledBinding PaneBackgroundColor}">
                     <WrapPanel Margin="10">
                         <!-- Rating Bar Chart -->
-                        <Border Background="{CompiledBinding CurrentTheme.CollectionBGColor}" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" Width="570" Height="550" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10">
+                        <Border Background="{DynamicResource TsundokuCollectionBGColor}" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" Width="570" Height="550" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10">
                             <Border CornerRadius="8" ClipToBounds="True">
                                 <Grid Width="570" Height="510" HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <Grid.RowDefinitions>
@@ -317,7 +317,7 @@
                         </Border>
 
                         <!-- Volume Count Bar Chart -->
-                        <Border Background="{CompiledBinding CurrentTheme.CollectionBGColor}" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" Width="570" Height="550" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10">
+                        <Border Background="{DynamicResource TsundokuCollectionBGColor}" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" Width="570" Height="550" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10">
                             <Border CornerRadius="8" ClipToBounds="True">
                                 <Grid Width="570" Height="510">
                                     <Grid.RowDefinitions>
@@ -349,7 +349,7 @@
                         </Border>
 
                         <!-- Genre Distribution Bar Chart -->
-                        <Border Background="{CompiledBinding CurrentTheme.CollectionBGColor}" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" Width="570" Height="550" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10">
+                        <Border Background="{DynamicResource TsundokuCollectionBGColor}" BorderBrush="Transparent" BorderThickness="0" CornerRadius="8" BoxShadow="0 0 10 3 #B3000000" Width="570" Height="550" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10">
                             <Border CornerRadius="8" ClipToBounds="True">
                                 <Grid Width="570" Height="510" HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <Grid.RowDefinitions>

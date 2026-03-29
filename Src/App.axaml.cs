@@ -7,9 +7,12 @@ using NLog.Targets;
 using NLog.Targets.Wrappers;
 using System.Net;
 using System.Net.Http.Headers;
+using System.Text.Json;
 using Tsundoku.Clients;
+using System.Reactive.Linq;
 using Tsundoku.Helpers;
 using Tsundoku.Models;
+using Tsundoku.Services;
 using Tsundoku.ViewModels;
 using Tsundoku.Views;
 
@@ -54,24 +57,45 @@ public sealed partial class App : Application
         {
             LOGGER.Info("Application starting up.");
 
-            ServiceCollection services = new();
-            ConfigureServices(services);
-            ServiceProvider = services.BuildServiceProvider();
-
-            DiscordRP.Initialize();
-
-            IUserService userService = ServiceProvider.GetRequiredService<IUserService>();
-
+            // Pre-load theme before splash so it uses correct colors
             try
             {
-                userService.LoadUserData();
+                string userDataPath = AppFileHelper.GetFilePath("UserData.json");
+                if (File.Exists(userDataPath))
+                {
+                    string json = File.ReadAllText(userDataPath);
+                    using JsonDocument doc = JsonDocument.Parse(json);
+                    if (doc.RootElement.TryGetProperty("MainTheme", out JsonElement mainThemeEl))
+                    {
+                        string? mainTheme = mainThemeEl.GetString();
+                        if (mainTheme is not null && doc.RootElement.TryGetProperty("SavedThemes", out JsonElement themesArray))
+                        {
+                            foreach (JsonElement themeEl in themesArray.EnumerateArray())
+                            {
+                                if (themeEl.TryGetProperty("ThemeName", out JsonElement nameEl) && nameEl.GetString() == mainTheme)
+                                {
+                                    TsundokuTheme? theme = JsonSerializer.Deserialize<TsundokuTheme>(themeEl.GetRawText());
+                                    if (theme is not null)
+                                    {
+                                        ThemeResourceService svc = new();
+                                        svc.ApplyTheme(theme);
+                                        LOGGER.Info("Pre-loaded theme '{Theme}' for splash screen", mainTheme);
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
-                LOGGER.Fatal(ex, "FATAL ERROR: Failed to load essential user data on startup. Shutting down.");
-                desktop.Shutdown(1); // Shutdown on critical failure
-                return;
+                LOGGER.Warn(ex, "Could not pre-load theme for splash screen, using defaults");
             }
+
+            // Show splash screen
+            SplashWindow splash = new();
+            desktop.MainWindow = splash;
 
             desktop.Exit += (_, _) =>
             {
@@ -90,25 +114,95 @@ public sealed partial class App : Application
                 Mutex = null;
             };
 
-            // Get the MainWindowViewModel from the DI container
-            MainWindowViewModel mainViewModel = ServiceProvider.GetRequiredService<MainWindowViewModel>();
-            MainWindow mainWindow = new MainWindow(mainViewModel);
-            desktop.MainWindow = mainWindow;
-
-            mainWindow.Opened += async (_, _) =>
+            // Load everything after the splash is visible
+            splash.Opened += async (_, _) =>
             {
-                if (mainViewModel.ShouldShowChangelog())
+                try
                 {
-                    // Delay briefly so the main window finishes rendering and gains focus
+                    // Let the splash window fully render before starting heavy work
                     await Task.Delay(500);
-                    mainWindow.Activate();
 
-                    ChangelogWindow changelog = new() { DataContext = mainViewModel };
-                    changelog.SetVersion(ViewModelBase.CUR_TSUNDOKU_VERSION);
-                    await changelog.ShowDialog(mainWindow);
-                    mainViewModel.MarkChangelogSeen();
+                    splash.UpdateStatus("Initializing services...");
+                    ServiceCollection services = new();
+                    ConfigureServices(services);
+                    ServiceProvider = services.BuildServiceProvider();
+
+                    splash.UpdateStatus("Connecting to Discord...");
+                    DiscordRP.Initialize();
+
+                    splash.UpdateStatus("Loading user data...");
+                    IUserService userService = ServiceProvider.GetRequiredService<IUserService>();
+
+                    try
+                    {
+                        userService.LoadUserData();
+                    }
+                    catch (Exception ex)
+                    {
+                        LOGGER.Fatal(ex, "FATAL ERROR: Failed to load essential user data on startup. Shutting down.");
+                        desktop.Shutdown(1);
+                        return;
+                    }
+
+                    splash.UpdateStatus("Applying theme...");
+                    IThemeResourceService themeResourceService = ServiceProvider.GetRequiredService<IThemeResourceService>();
+                    TsundokuTheme? initialTheme = userService.GetCurrentThemeSnapshot();
+                    if (initialTheme is not null)
+                    {
+                        themeResourceService.ApplyTheme(initialTheme);
+                    }
+
+                    IDisposable themeSubscription = userService.CurrentTheme
+                        .Where(t => t is not null)
+                        .Subscribe(theme => themeResourceService.ApplyTheme(theme!));
+
+                    desktop.Exit += (_, _) => themeSubscription.Dispose();
+
+                    // Apply glassmorphism if user has it enabled
+                    if (userService.GetCurrentUserSnapshot()?.GlassmorphismEnabled == true)
+                    {
+                        GlassmorphismService.Apply(true);
+                    }
+
+                    splash.UpdateStatus("Building UI...");
+                    MainWindowViewModel mainViewModel = ServiceProvider.GetRequiredService<MainWindowViewModel>();
+                    MainWindow mainWindow = new MainWindow(
+                        mainViewModel,
+                        userService,
+                        ServiceProvider.GetRequiredService<AddNewSeriesWindow>(),
+                        ServiceProvider.GetRequiredService<UserSettingsWindow>(),
+                        ServiceProvider.GetRequiredService<CollectionThemeWindow>(),
+                        ServiceProvider.GetRequiredService<PriceAnalysisWindow>(),
+                        ServiceProvider.GetRequiredService<CollectionStatsWindow>(),
+                        ServiceProvider.GetRequiredService<UserNotesWindow>());
+
+                    mainWindow.Opened += async (_, _) =>
+                    {
+                        if (mainViewModel.ShouldShowChangelog())
+                        {
+                            await Task.Delay(500);
+                            mainWindow.Activate();
+
+                            ChangelogWindow changelog = new() { DataContext = mainViewModel };
+                            changelog.SetVersion(ViewModelBase.CUR_TSUNDOKU_VERSION);
+                            await changelog.ShowDialog(mainWindow);
+                            mainViewModel.MarkChangelogSeen();
+                        }
+                    };
+
+                    // Swap splash for main window
+                    desktop.MainWindow = mainWindow;
+                    GlassmorphismService.ApplyToWindow(mainWindow, GlassmorphismService.IsEnabled);
+                    mainWindow.Show();
+                    splash.Close();
+                }
+                catch (Exception ex)
+                {
+                    LOGGER.Fatal(ex, "Failed during startup");
+                    desktop.Shutdown(1);
                 }
             };
+            splash.Show();
         }
         base.OnFrameworkInitializationCompleted();
     }
@@ -128,6 +222,14 @@ public sealed partial class App : Application
             client.Timeout = TimeSpan.FromSeconds(60);
         }).SetHandlerLifetime(TimeSpan.FromMinutes(5));
 
+        services.AddHttpClient("ColorApiClient", client =>
+        {
+            client.BaseAddress = new Uri("https://www.thecolorapi.com/");
+            client.Timeout = TimeSpan.FromSeconds(15);
+        }).SetHandlerLifetime(TimeSpan.FromMinutes(10));
+
+        services.AddSingleton<ColorApi>();
+
         services.AddHttpClient("MangaDexClient", client =>
         {
             client.BaseAddress = new Uri("https://api.mangadex.org/");
@@ -145,7 +247,7 @@ public sealed partial class App : Application
         {
             client.BaseAddress = new Uri("https://graphql.anilist.co");
             client.Timeout = TimeSpan.FromMinutes(2);
-            client.DefaultRequestVersion = HttpVersion.Version30;
+            client.DefaultRequestVersion = HttpVersion.Version20;
             client.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrLower;
 
             client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("Tsundoku", ViewModelBase.CUR_TSUNDOKU_VERSION));
@@ -189,6 +291,8 @@ public sealed partial class App : Application
 
         services.AddTransient<PopupDialogViewModel>();
         services.AddTransient<IPopupDialogService, PopupDialogService>();
+
+        services.AddSingleton<IThemeResourceService, ThemeResourceService>();
     }
 
     public static void ConfigureNLog()
@@ -265,9 +369,12 @@ public sealed partial class App : Application
         // --- Namespace-specific filtering for MangaAndLightNovelWebScrape.* ---
 
         // Null target to swallow low levels
-        var blackHole = config.FindTargetByName<NLog.Targets.NullTarget>("BlackHole") 
-                        ?? new NLog.Targets.NullTarget("BlackHole");
-        if (blackHole.Name == null) config.AddTarget(blackHole); // defensive; Name is set above
+        NLog.Targets.NullTarget? blackHole = config.FindTargetByName<NLog.Targets.NullTarget>("BlackHole");
+        if (blackHole is null)
+        {
+            blackHole = new NLog.Targets.NullTarget("BlackHole");
+            config.AddTarget(blackHole);
+        }
 
         // 1) Drop Trace..Info for that namespace, and stop processing
         var dropLowLevels = new LoggingRule("MangaAndLightNovelWebScrape.*", LogLevel.Trace, LogLevel.Info, blackHole)

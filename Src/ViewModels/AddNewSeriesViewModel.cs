@@ -17,7 +17,10 @@ using System.Reactive.Disposables.Fluent;
 
 namespace Tsundoku.ViewModels;
 
-public sealed partial class AddNewSeriesViewModel : ViewModelBase
+/// <summary>
+/// View model for the Add New Series dialog, handling title lookup, suggestions, and series creation.
+/// </summary>
+public sealed partial class AddNewSeriesViewModel : ViewModelBase, IDisposable
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
     private readonly BitmapHelper _bitmapHelper;
@@ -40,7 +43,7 @@ public sealed partial class AddNewSeriesViewModel : ViewModelBase
     [Reactive] public partial AniListPickerSuggestion? SelectedSuggestion { get; set; }
     [Reactive] public partial bool IsSuggestionsOpen { get; set; }
 
-    private static readonly StringBuilder CurLanguages = new();
+    private readonly StringBuilder _curLanguages = new();
 
     public AddNewSeriesViewModel(IUserService userService, BitmapHelper bitmapHelper, MangaDex mangaDex, AniList aniList) : base(userService)
     {
@@ -52,7 +55,7 @@ public sealed partial class AddNewSeriesViewModel : ViewModelBase
 
         this.WhenAnyValue(x => x.CurrentUser.Currency)
             .DistinctUntilChanged()
-            .ObserveOn(RxSchedulers.TaskpoolScheduler)
+            .ObserveOn(RxSchedulers.MainThreadScheduler)
             .Subscribe(currency =>
             {
                 CultureInfo cultureInfo = CultureInfo.GetCultureInfo(AVAILABLE_CURRENCY_WITH_CULTURE[currency].Culture);
@@ -116,6 +119,9 @@ public sealed partial class AddNewSeriesViewModel : ViewModelBase
             .DisposeWith(_disposables);
     }
 
+    /// <summary>
+    /// Clears the current suggestions list and resets the selected suggestion.
+    /// </summary>
     public void ClearSuggestions()
     {
         SelectedSuggestion = null;
@@ -126,26 +132,18 @@ public sealed partial class AddNewSeriesViewModel : ViewModelBase
     // TODO - When user is looking for a additional lang but MangaDex doesn't have it show a popup that lets them enter the title in?
     private void AdditionalLanguagesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        switch (e.Action)
+        if (SelectedAdditionalLanguages is not null && SelectedAdditionalLanguages.Count != 0)
         {
-            case NotifyCollectionChangedAction.Add:
-            case NotifyCollectionChangedAction.Remove:
-                if (SelectedAdditionalLanguages is not null && SelectedAdditionalLanguages.Count != 0)
-                {
-                    foreach (TsundokuLanguage lang in SelectedAdditionalLanguages.AsValueEnumerable().OrderBy(lang => lang))
-                    {
-                        CurLanguages.AppendLine(lang.ToString());
-                    }
-                    AdditionalLanguagesToolTipText = CurLanguages.ToString().Trim();
-                }
-                else
-                {
-                    AdditionalLanguagesToolTipText = string.Empty;
-                }
-                CurLanguages.Clear();
-                return;
-            default:
-                throw new ArgumentOutOfRangeException();
+            _curLanguages.Clear();
+            foreach (TsundokuLanguage lang in SelectedAdditionalLanguages.AsValueEnumerable().OrderBy(lang => lang))
+            {
+                _curLanguages.AppendLine(lang.ToString());
+            }
+            AdditionalLanguagesToolTipText = _curLanguages.ToString().Trim();
+        }
+        else
+        {
+            AdditionalLanguagesToolTipText = string.Empty;
         }
     }
     
@@ -201,10 +199,24 @@ public sealed partial class AddNewSeriesViewModel : ViewModelBase
         return new KeyValuePair<bool, string>(successfulAdd, returnMsg);
     }
 
+    /// <summary>
+    /// Converts the selected additional languages list to an array.
+    /// </summary>
+    /// <returns>An array of the selected additional languages.</returns>
     public TsundokuLanguage[] ConvertSelectedLangList()
     {
         return SelectedAdditionalLanguages
             .AsValueEnumerable()
             .ToArray();
+    }
+
+    /// <summary>
+    /// Releases resources and unsubscribes from collection change events.
+    /// </summary>
+    public void Dispose()
+    {
+        SelectedAdditionalLanguages.CollectionChanged -= AdditionalLanguagesCollectionChanged;
+        _disposables.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

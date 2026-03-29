@@ -16,26 +16,27 @@
         TransparencyLevelHint="Transparent"
         x:DataType="vm:ViewModelBase">
 
-    <Border Background="{CompiledBinding CurrentTheme.MenuBGColor}"
-            BorderBrush="{CompiledBinding CurrentTheme.DividerColor}"
-            BorderThickness="3"
-            CornerRadius="8"
-            ClipToBounds="True">
+    <Border Background="{DynamicResource TsundokuMenuBGColor}"
+            BorderBrush="{DynamicResource TsundokuDividerColor}"
+            BorderThickness="2"
+            CornerRadius="14"
+            ClipToBounds="True"
+            BoxShadow="0 8 32 0 #4D000000">
         <StackPanel Margin="24,20,24,24" Spacing="16">
             <!-- Header -->
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
                 <i:Icon Value="fa-solid fa-bolt" FontSize="22"
-                        Foreground="{CompiledBinding CurrentTheme.DividerColor}"/>
+                        Foreground="{DynamicResource TsundokuDividerColor}"/>
                 <TextBlock x:Name="VersionHeader"
                            FontSize="22"
                            FontWeight="Bold"
                            VerticalAlignment="Center"
-                           Foreground="{CompiledBinding CurrentTheme.MenuTextColor}"/>
+                           Foreground="{DynamicResource TsundokuMenuTextColor}"/>
             </StackPanel>
 
             <!-- Divider -->
             <Border Height="2"
-                    Background="{CompiledBinding CurrentTheme.DividerColor}"
+                    Background="{DynamicResource TsundokuDividerColor}"
                     CornerRadius="1"
                     Opacity="0.6"/>
 
@@ -50,7 +51,7 @@
                                        FontWeight="Bold"
                                        VerticalAlignment="Top"
                                        Margin="0,0,10,0"
-                                       Foreground="{CompiledBinding $parent[Window].((vm:ViewModelBase)DataContext).CurrentTheme.DividerColor}"/>
+                                       Foreground="{DynamicResource TsundokuDividerColor}"/>
                             <TextBlock Grid.Column="1"
                                        Text="{CompiledBinding}"
                                        FontSize="14"
@@ -58,7 +59,7 @@
                                        TextWrapping="Wrap"
                                        LineHeight="22"
                                        VerticalAlignment="Top"
-                                       Foreground="{CompiledBinding $parent[Window].((vm:ViewModelBase)DataContext).CurrentTheme.MenuTextColor}"/>
+                                       Foreground="{DynamicResource TsundokuMenuTextColor}"/>
                         </Grid>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
@@ -70,7 +71,7 @@
                     FontWeight="Bold"
                     HorizontalAlignment="Center"
                     Padding="32,8"
-                    CornerRadius="4"
+                    CornerRadius="9"
                     BorderThickness="2"
                     Cursor="Hand"
                     Theme="{StaticResource MenuButton}"

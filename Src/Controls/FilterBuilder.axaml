@@ -1,0 +1,279 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Tsundoku.ViewModels"
+             xmlns:i="https://github.com/projektanker/icons.avalonia"
+             x:Class="Tsundoku.Controls.FilterBuilder"
+             x:DataType="vm:FilterBuilderViewModel"
+             x:Name="Root">
+
+  <UserControl.Styles>
+    <!-- Chip container -->
+    <Style Selector="Border.filter-chip">
+      <Setter Property="Background" Value="{DynamicResource TsundokuSearchBarBGColor}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource TsundokuSearchBarBorderColor}"/>
+      <Setter Property="BorderThickness" Value="1.5"/>
+      <Setter Property="CornerRadius" Value="6"/>
+      <Setter Property="Height" Value="30"/>
+    </Style>
+    <Style Selector="Border.filter-chip:pointerover">
+      <Setter Property="BorderBrush" Value="{DynamicResource TsundokuDividerColor}"/>
+    </Style>
+
+    <!-- Chip inner ComboBox — strip chrome -->
+    <Style Selector="Border.filter-chip ComboBox">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="CornerRadius" Value="0"/>
+      <Setter Property="Padding" Value="6,0"/>
+      <Setter Property="FontSize" Value="12"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
+      <Setter Property="Height" Value="28"/>
+      <Setter Property="MinHeight" Value="28"/>
+      <Setter Property="VerticalContentAlignment" Value="Center"/>
+      <Setter Property="Cursor" Value="Hand"/>
+    </Style>
+    <Style Selector="Border.filter-chip ComboBox /template/ Border">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+    <Style Selector="Border.filter-chip ComboBox:pointerover /template/ Border">
+      <Setter Property="Background" Value="Transparent"/>
+    </Style>
+    <Style Selector="Border.filter-chip ComboBox:focus /template/ Border">
+      <Setter Property="Background" Value="Transparent"/>
+    </Style>
+    <!-- ComboBox popup styling -->
+    <Style Selector="Border.filter-chip ComboBox Popup Border">
+      <Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGColor}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource TsundokuMenuButtonBorderColor}"/>
+      <Setter Property="BorderThickness" Value="2"/>
+      <Setter Property="CornerRadius" Value="8"/>
+    </Style>
+    <Style Selector="Border.filter-chip ComboBoxItem">
+      <Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
+      <Setter Property="FontSize" Value="12"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+    </Style>
+    <Style Selector="Border.filter-chip ComboBoxItem:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGHoverColor}"/>
+      <Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconHoverColor}"/>
+    </Style>
+    <Style Selector="Border.filter-chip ComboBoxItem:selected /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGHoverColor}"/>
+      <Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconHoverColor}"/>
+    </Style>
+
+    <!-- Chip inner TextBox — strip chrome -->
+    <Style Selector="Border.filter-chip TextBox">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="FontSize" Value="12"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="Foreground" Value="{DynamicResource TsundokuSearchBarTextColor}"/>
+      <Setter Property="CaretBrush" Value="{DynamicResource TsundokuSearchBarTextColor}"/>
+      <Setter Property="Padding" Value="6,0"/>
+      <Setter Property="VerticalContentAlignment" Value="Center"/>
+      <Setter Property="MinWidth" Value="40"/>
+      <Setter Property="MaxWidth" Value="100"/>
+      <Setter Property="Height" Value="28"/>
+      <Setter Property="MinHeight" Value="28"/>
+    </Style>
+    <Style Selector="Border.filter-chip TextBox /template/ Border#PART_BorderElement">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+    <Style Selector="Border.filter-chip TextBox:pointerover /template/ Border#PART_BorderElement">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+    <Style Selector="Border.filter-chip TextBox:focus /template/ Border#PART_BorderElement">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+    <Style Selector="Border.filter-chip TextBox /template/ TextBlock#PART_Watermark">
+      <Setter Property="Foreground" Value="{DynamicResource TsundokuSearchBarTextColor}"/>
+      <Setter Property="Opacity" Value="0.3"/>
+    </Style>
+
+    <!-- Chip remove button -->
+    <Style Selector="Button.chip-remove">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="Padding" Value="4,0"/>
+      <Setter Property="Width" Value="22"/>
+      <Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
+      <Setter Property="Opacity" Value="0.3"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="CornerRadius" Value="0"/>
+      <Setter Property="VerticalAlignment" Value="Stretch"/>
+    </Style>
+    <Style Selector="Button.chip-remove:pointerover">
+      <Setter Property="Opacity" Value="1"/>
+      <Setter Property="Foreground" Value="#c45050"/>
+    </Style>
+    <Style Selector="Button.chip-remove /template/ ContentPresenter">
+      <Setter Property="Background" Value="Transparent"/>
+    </Style>
+    <Style Selector="Button.chip-remove:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="Transparent"/>
+    </Style>
+
+    <!-- Connector pill base -->
+    <Style Selector="Button.conn-pill">
+      <Setter Property="FontSize" Value="10"/>
+      <Setter Property="FontWeight" Value="ExtraBold"/>
+      <Setter Property="FontFamily" Value="Cascadia Mono, Consolas, monospace"/>
+      <Setter Property="Padding" Value="8,3"/>
+      <Setter Property="CornerRadius" Value="4"/>
+      <Setter Property="BorderThickness" Value="1.5"/>
+      <Setter Property="Height" Value="24"/>
+      <Setter Property="MinWidth" Value="0"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+    <Style Selector="Button.conn-pill /template/ ContentPresenter">
+      <Setter Property="Background" Value="{TemplateBinding Background}"/>
+      <Setter Property="CornerRadius" Value="4"/>
+    </Style>
+    <Style Selector="Button.conn-pill:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="{TemplateBinding Background}"/>
+      <Setter Property="Opacity" Value="0.7"/>
+      <Setter Property="CornerRadius" Value="4"/>
+    </Style>
+    <!-- AND styling -->
+    <Style Selector="Button.conn-and">
+      <Setter Property="Background" Value="#336bae6b"/>
+      <Setter Property="Foreground" Value="#6bae6b"/>
+      <Setter Property="BorderBrush" Value="#806bae6b"/>
+    </Style>
+    <Style Selector="Button.conn-and /template/ ContentPresenter">
+      <Setter Property="Background" Value="#336bae6b"/>
+      <Setter Property="CornerRadius" Value="4"/>
+    </Style>
+    <Style Selector="Button.conn-and:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#4D6bae6b"/>
+      <Setter Property="CornerRadius" Value="4"/>
+    </Style>
+    <!-- OR styling -->
+    <Style Selector="Button.conn-or">
+      <Setter Property="Background" Value="#33d4a44a"/>
+      <Setter Property="Foreground" Value="#d4a44a"/>
+      <Setter Property="BorderBrush" Value="#80d4a44a"/>
+    </Style>
+    <Style Selector="Button.conn-or /template/ ContentPresenter">
+      <Setter Property="Background" Value="#33d4a44a"/>
+      <Setter Property="CornerRadius" Value="4"/>
+    </Style>
+    <Style Selector="Button.conn-or:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#4Dd4a44a"/>
+      <Setter Property="CornerRadius" Value="4"/>
+    </Style>
+
+    <!-- Add/clear filter buttons -->
+    <Style Selector="Button.add-filter">
+      <Setter Property="Width" Value="28"/>
+      <Setter Property="Height" Value="28"/>
+      <Setter Property="CornerRadius" Value="6"/>
+      <Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGColor}"/>
+      <Setter Property="BorderThickness" Value="1.5"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource TsundokuMenuButtonBorderColor}"/>
+      <Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Padding" Value="0"/>
+    </Style>
+    <Style Selector="Button.add-filter:pointerover">
+      <Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGHoverColor}"/>
+      <Setter Property="BorderBrush" Value="{DynamicResource TsundokuDividerColor}"/>
+      <Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconHoverColor}"/>
+    </Style>
+    <Style Selector="Button.add-filter /template/ ContentPresenter">
+      <Setter Property="Background" Value="{TemplateBinding Background}"/>
+      <Setter Property="CornerRadius" Value="6"/>
+    </Style>
+    <Style Selector="Button.add-filter:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGHoverColor}"/>
+      <Setter Property="CornerRadius" Value="6"/>
+    </Style>
+
+    <!-- Chip internal divider -->
+    <Style Selector="Rectangle.chip-div">
+      <Setter Property="Width" Value="1"/>
+      <Setter Property="Fill" Value="{DynamicResource TsundokuSearchBarBorderColor}"/>
+      <Setter Property="VerticalAlignment" Value="Stretch"/>
+      <Setter Property="Margin" Value="0,5"/>
+    </Style>
+  </UserControl.Styles>
+
+  <StackPanel Spacing="6">
+    <!-- Header row -->
+    <DockPanel>
+      <TextBlock DockPanel.Dock="Left"
+                 Text="FILTERS"
+                 FontSize="12" FontWeight="Bold" LetterSpacing="1"
+                 VerticalAlignment="Center"
+                 Foreground="{DynamicResource TsundokuDividerColor}"/>
+      <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="4" HorizontalAlignment="Right">
+        <Button Classes="add-filter" Click="OnAddChip" ToolTip.Tip="Add filter">
+          <i:Icon Value="fa-solid fa-plus" FontSize="11"/>
+        </Button>
+        <Button Classes="add-filter" Click="OnClearAll" ToolTip.Tip="Clear all">
+          <i:Icon Value="fa-solid fa-xmark" FontSize="11"/>
+        </Button>
+      </StackPanel>
+    </DockPanel>
+
+    <!-- Chip flow -->
+    <Border Background="{DynamicResource TsundokuMenuButtonBGColor}"
+            BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}"
+            BorderThickness="2"
+            CornerRadius="10"
+            Padding="8,6"
+            MinHeight="42">
+      <ItemsControl ItemsSource="{CompiledBinding Chips}">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <WrapPanel Orientation="Horizontal" />
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="vm:FilterChipViewModel">
+            <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,2,6,2">
+              <!-- Chip -->
+              <Border Classes="filter-chip">
+                <StackPanel Orientation="Horizontal">
+                  <ComboBox ItemsSource="{x:Static vm:FilterChipViewModel.AllFields}"
+                            SelectedItem="{CompiledBinding SelectedField}"/>
+                  <Rectangle Classes="chip-div"/>
+                  <ComboBox ItemsSource="{CompiledBinding AvailableOperators}"
+                            SelectedItem="{CompiledBinding SelectedOperator}"
+                            MinWidth="44"/>
+                  <Rectangle Classes="chip-div"/>
+                  <TextBox Text="{CompiledBinding Value, Mode=TwoWay}"
+                           Watermark="value"
+                           IsVisible="{CompiledBinding IsValueFreeText}"/>
+                  <ComboBox ItemsSource="{CompiledBinding AvailableValues}"
+                            SelectedItem="{CompiledBinding Value}"
+                            IsVisible="{CompiledBinding !IsValueFreeText}"/>
+                  <Rectangle Classes="chip-div"/>
+                  <Button Classes="chip-remove" Click="OnRemoveChip">
+                    <i:Icon Value="fa-solid fa-xmark" FontSize="9"/>
+                  </Button>
+                </StackPanel>
+              </Border>
+
+              <!-- Connector pill -->
+              <Button Classes="conn-pill"
+                      Classes.conn-and="{CompiledBinding !IsConnectorOr}"
+                      Classes.conn-or="{CompiledBinding IsConnectorOr}"
+                      IsVisible="{CompiledBinding ShowConnector}"
+                      Click="OnToggleConnector"
+                      Content="{CompiledBinding IsConnectorOr, Converter={StaticResource ConnectorTextConverter}}"/>
+            </StackPanel>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </Border>
+
+  </StackPanel>
+</UserControl>
