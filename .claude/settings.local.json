@@ -63,7 +63,11 @@
       "Bash(grep -r \"TsundokuStatusAndBookTypeBGHoverColor\\\\|TsundokuStatusAndBookTypeTextHoverColor\" /c/Tsundoku/Src --include=*.xaml)",
       "Bash(grep -r 'DynamicResource Tsundoku' /c/Tsundoku/Src --include=*.axaml --include=*.xaml)",
       "Bash(grep -rho 'DynamicResource Tsundoku[A-Za-z0-9]*' /c/Tsundoku/Src --include=*.axaml --include=*.xaml)",
-      "Bash(grep -r \"TsundokuSeriesEditPane\\\\|TsundokuSeriesEditPaneButtons\" /c/Tsundoku/Src --include=*.axaml --include=*.xaml)"
+      "Bash(grep -r \"TsundokuSeriesEditPane\\\\|TsundokuSeriesEditPaneButtons\" /c/Tsundoku/Src --include=*.axaml --include=*.xaml)",
+      "Bash(find /c/Tsundoku -path */LiveChartsCore/Themes/ColorPalletes* -o -path */livecharts*)",
+      "Bash(grep -r \"LiveChartsCore\" /c/Tsundoku/Src/*.csproj)",
+      "Bash(dotnet tool:*)",
+      "Bash(find ~/.nuget/packages/livechartscore/2.0.0-rc5.4 -name *.xml)"
     ]
   }
 }

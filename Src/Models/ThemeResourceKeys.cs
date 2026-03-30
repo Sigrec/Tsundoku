@@ -37,6 +37,9 @@ public static class ThemeResourceKeys
     public const string SeriesCardDividerColor = "TsundokuSeriesCardDividerColor";
     public const string SeriesCoverBGColor = "TsundokuSeriesCoverBGColor";
     public const string SeriesCardButtonBGColor = "TsundokuSeriesCardButtonBGColor";
+    public const string SeriesCardButtonBGHoverColor = "TsundokuSeriesCardButtonBGHoverColor";
+    public const string SeriesCardButtonBorderColor = "TsundokuSeriesCardButtonBorderColor";
+    public const string SeriesCardButtonBorderHoverColor = "TsundokuSeriesCardButtonBorderHoverColor";
 
     public static readonly FrozenDictionary<string, Func<TsundokuTheme, SolidColorBrush>> PropertyMap =
         new Dictionary<string, Func<TsundokuTheme, SolidColorBrush>>
@@ -73,5 +76,8 @@ public static class ThemeResourceKeys
             [SeriesCardDividerColor] = t => t.SeriesCardDividerColor,
             [SeriesCoverBGColor] = t => t.SeriesCoverBGColor,
             [SeriesCardButtonBGColor] = t => t.SeriesCardButtonBGColor,
+            [SeriesCardButtonBGHoverColor] = t => t.SeriesCardButtonBGHoverColor,
+            [SeriesCardButtonBorderColor] = t => t.SeriesCardButtonBorderColor,
+            [SeriesCardButtonBorderHoverColor] = t => t.SeriesCardButtonBorderHoverColor,
         }.ToFrozenDictionary();
 }

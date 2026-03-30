@@ -70,14 +70,6 @@ public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsView
         await ViewModel.ExportToSpreadSheetAsync(this);
     }
 
-    private void CurrencyChanged(object sender, SelectionChangedEventArgs e)
-    {
-        if (CurrencyComboBox.SelectedItem is string selectedCurrency)
-        {
-            ViewModel.UpdateUserCurrency(selectedCurrency);
-            LOGGER.Info("Currency Changed To {Currency}", selectedCurrency);
-        }
-    }
 
     private void ToggleControlsSection(object? sender, RoutedEventArgs e)
     {

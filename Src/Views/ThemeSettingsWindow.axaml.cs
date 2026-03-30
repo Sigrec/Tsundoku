@@ -140,6 +140,9 @@ public sealed partial class CollectionThemeWindow : ReactiveWindow<ThemeSettings
         BackupCurrentTheme.StatusAndBookTypeBorderColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
         BackupCurrentTheme.SeriesCoverBGColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
         BackupCurrentTheme.SeriesCardButtonBGColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
+        BackupCurrentTheme.SeriesCardButtonBGHoverColor = BackupCurrentTheme.MenuButtonBGHoverColor;
+        BackupCurrentTheme.SeriesCardButtonBorderColor = BackupCurrentTheme.MenuButtonBorderColor;
+        BackupCurrentTheme.SeriesCardButtonBorderHoverColor = BackupCurrentTheme.MenuButtonBorderHoverColor;
         BackupCurrentTheme.SeriesCardDividerColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
 
         // Save a clone so BackupCurrentTheme stays independent for further editing
@@ -191,6 +194,9 @@ public sealed partial class CollectionThemeWindow : ReactiveWindow<ThemeSettings
         BackupCurrentTheme.StatusAndBookTypeBorderColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
         BackupCurrentTheme.SeriesCoverBGColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
         BackupCurrentTheme.SeriesCardButtonBGColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
+        BackupCurrentTheme.SeriesCardButtonBGHoverColor = BackupCurrentTheme.MenuButtonBGHoverColor;
+        BackupCurrentTheme.SeriesCardButtonBorderColor = BackupCurrentTheme.MenuButtonBorderColor;
+        BackupCurrentTheme.SeriesCardButtonBorderHoverColor = BackupCurrentTheme.MenuButtonBorderHoverColor;
         BackupCurrentTheme.SeriesCardDividerColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
 
         // Save a clone so BackupCurrentTheme stays independent for further editing

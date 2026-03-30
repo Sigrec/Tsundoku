@@ -14,7 +14,7 @@
         CanResize="false">
 
     <Border Classes="Menu" BorderThickness="2" CornerRadius="0,0,8,8" ClipToBounds="True">
-        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Theme="{StaticResource ReverseCollectionScroll}"> 
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden" Theme="{StaticResource ReverseCollectionScroll}">
             <Grid
                 RowDefinitions="Auto,20,Auto,Auto,20,Auto,Auto,2,Auto,20,Auto"
                 ColumnDefinitions="*,15,*,15,*"

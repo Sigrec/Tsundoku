@@ -254,35 +254,11 @@
                   <Border Grid.Row="1" BorderThickness="0,2,0,0" BorderBrush="{DynamicResource TsundokuSeriesCardDividerColor}" Margin="8,0,8,0" Padding="0,6,0,6">
                   <Grid
                       ColumnDefinitions="Auto,Auto,*,Auto">
-                    <Grid.Styles>
-                      <Style Selector="Button.vol-btn">
-                        <Setter Property="Width" Value="28"/>
-                        <Setter Property="Height" Value="28"/>
-                        <Setter Property="FontSize" Value="18"/>
-                        <Setter Property="Padding" Value="0,0,0,2"/>
-                        <Setter Property="CornerRadius" Value="8"/>
-                        <Setter Property="Background" Value="{DynamicResource TsundokuSeriesCardButtonBGColor}"/>
-                        <Setter Property="Foreground" Value="{DynamicResource TsundokuSeriesButtonIconColor}"/>
-                        <Setter Property="BorderBrush" Value="{DynamicResource TsundokuSeriesProgressBarBorderColor}"/>
-                        <Setter Property="BorderThickness" Value="2"/>
-                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                        <Setter Property="VerticalContentAlignment" Value="Center"/>
-                        <Setter Property="Cursor" Value="Hand"/>
-                      </Style>
-                      <Style Selector="Button.vol-btn:pointerover">
-                        <Setter Property="Foreground" Value="{DynamicResource TsundokuSeriesButtonIconHoverColor}"/>
-                      </Style>
-                      <Style Selector="Button.vol-btn:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-                        <Setter Property="Background" Value="{DynamicResource TsundokuSeriesCardButtonBGColor}"/>
-                        <Setter Property="Foreground" Value="{DynamicResource TsundokuSeriesButtonIconHoverColor}"/>
-                      </Style>
-                    </Grid.Styles>
-
                     <!-- - Button -->
-                    <Button Grid.Column="0" Classes="vol-btn" Content="&#x2212;" Margin="0,0,4,0" Click="SubtractVolume"/>
+                    <Button Grid.Column="0" Theme="{StaticResource SeriesCardButton}" Content="&#x2212;" Margin="0,0,4,0" Click="SubtractVolume"/>
 
                     <!-- + Button -->
-                    <Button Grid.Column="1" Classes="vol-btn" Content="+" Margin="0,0,8,0" Click="AddVolume"/>
+                    <Button Grid.Column="1" Theme="{StaticResource SeriesCardButton}" Content="+" Margin="0,0,8,0" Click="AddVolume"/>
 
                     <!-- Progress Bar with overlay text -->
                     <Panel Grid.Column="2">
@@ -316,7 +292,7 @@
                     <!-- Edit Button -->
                     <Button
                         Grid.Column="3"
-                        Classes="vol-btn"
+                        Theme="{StaticResource SeriesCardButton}"
                         Margin="8,0,0,0"
                         i:Attached.Icon="fa-solid fa-pen"
                         FontSize="14"

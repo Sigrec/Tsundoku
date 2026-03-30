@@ -48,6 +48,9 @@ public interface IUserService : IDisposable
     /// <summary>Persists the current user data to disk.</summary>
     void SaveUserData();
 
+    /// <summary>Persists a backup copy of the current user data to UserData_Backup.json.</summary>
+    void SaveBackupUserData();
+
     /// <summary>Imports user data from an external JSON file, backing up the current data first.</summary>
     /// <param name="filePath">The path to the JSON file to import.</param>
     void ImportUserDataFromJson(string filePath);
@@ -695,6 +698,28 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
     public void SaveUserData()
     {
         SaveUserData(GetCurrentUserSnapshot());
+    }
+
+    [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "<Pending>")]
+    public void SaveBackupUserData()
+    {
+        User? user = GetCurrentUserSnapshot();
+        if (user is null) return;
+
+        string backupPath = AppFileHelper.GetFilePath("UserData_Backup.json");
+        LOGGER.Info("Saving backup of \"{UserName}'s\" Collection Data to {Path}", user.UserName, backupPath);
+
+        try
+        {
+            using FileStream createStream = File.Create(backupPath);
+            JsonSerializer.Serialize(createStream, user, User.JSON_SERIALIZATION_OPTIONS);
+            createStream.Flush();
+            LOGGER.Debug("Successfully saved backup user data to: {Path}", backupPath);
+        }
+        catch (Exception ex)
+        {
+            LOGGER.Error(ex, "Failed to save backup user data to {Path}.", backupPath);
+        }
     }
 
     public bool DoesDuplicateExist(Series series)

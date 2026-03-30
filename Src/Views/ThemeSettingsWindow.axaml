@@ -15,7 +15,7 @@
         MinWidth="420"
         MaxWidth="790"
         MinHeight="700"
-        MaxHeight="900"
+        MaxHeight="950"
         Classes="Menu"
         WindowStartupLocation="CenterOwner"
         CanResize="True"
@@ -41,7 +41,7 @@
 				</StackPanel>
 			</Border>
 
-		<ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Theme="{StaticResource ReverseCollectionScroll}">
+		<ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden" Theme="{StaticResource ReverseCollectionScroll}">
 			<StackPanel Spacing="0">
                 <!-- Menu / Nav Bar -->
                 <StackPanel Margin="20,14,20,14">
@@ -75,6 +75,9 @@
                             <controls:ColorPickerItem Title="Button Icon Hover" ColorBrush="{Binding CurrentTheme.SeriesButtonIconHoverColor, Mode=TwoWay}"/>
                             <controls:ColorPickerItem Title="Card Border" ColorBrush="{Binding CurrentTheme.SeriesCardBorderColor, Mode=TwoWay}"/>
                             <controls:ColorPickerItem Title="Card Button BG" ColorBrush="{Binding CurrentTheme.SeriesCardButtonBGColor, Mode=TwoWay}"/>
+                            <controls:ColorPickerItem Title="Card Button BG Hover" ColorBrush="{Binding CurrentTheme.SeriesCardButtonBGHoverColor, Mode=TwoWay}"/>
+                            <controls:ColorPickerItem Title="Card Button Border" ColorBrush="{Binding CurrentTheme.SeriesCardButtonBorderColor, Mode=TwoWay}"/>
+                            <controls:ColorPickerItem Title="Card Button Border Hover" ColorBrush="{Binding CurrentTheme.SeriesCardButtonBorderHoverColor, Mode=TwoWay}"/>
                             <controls:ColorPickerItem Title="Card Divider" ColorBrush="{Binding CurrentTheme.SeriesCardDividerColor, Mode=TwoWay}"/>
                             <controls:ColorPickerItem Title="Collection BG" ColorBrush="{Binding CurrentTheme.CollectionBGColor, Mode=TwoWay}"/>
                             <controls:ColorPickerItem Title="Cover BG" ColorBrush="{Binding CurrentTheme.SeriesCoverBGColor, Mode=TwoWay}"/>

@@ -44,7 +44,10 @@
 			<SolidColorBrush x:Key="TsundokuSeriesButtonIconHoverColor" Color="#ffdfd59e"/>
 			<SolidColorBrush x:Key="TsundokuStatusAndBookTypeBorderColor" Color="#ffdfd59e"/>
 			<SolidColorBrush x:Key="TsundokuSeriesCoverBGColor" Color="#ff626460"/>
-			<SolidColorBrush x:Key="TsundokuSeriesCardButtonBGColor" Color="#ff20232d"/>
+			<SolidColorBrush x:Key="TsundokuSeriesCardButtonBGColor" Color="#ff626460"/>
+			<SolidColorBrush x:Key="TsundokuSeriesCardButtonBGHoverColor" Color="#ff2c2d42"/>
+			<SolidColorBrush x:Key="TsundokuSeriesCardButtonBorderColor" Color="#ff626460"/>
+			<SolidColorBrush x:Key="TsundokuSeriesCardButtonBorderHoverColor" Color="#ffdfd59e"/>
 			<SolidColorBrush x:Key="TsundokuSeriesCardDividerColor" Color="#ffdfd59e"/>
 		</ResourceDictionary>
 	</Application.Resources>

@@ -219,6 +219,50 @@
 		</Style>
 	</ControlTheme>
 
+	<ControlTheme x:Key="SeriesCardButton" TargetType="Button">
+		<Setter Property="HorizontalContentAlignment" Value="Center"/>
+		<Setter Property="VerticalContentAlignment" Value="Center"/>
+		<Setter Property="CornerRadius" Value="8"/>
+		<Setter Property="FontSize" Value="18"/>
+		<Setter Property="FontWeight" Value="Bold"/>
+		<Setter Property="BorderThickness" Value="2"/>
+		<Setter Property="Padding" Value="0,0,0,2"/>
+		<Setter Property="Cursor" Value="Hand"/>
+		<Setter Property="Width" Value="28"/>
+		<Setter Property="Height" Value="28"/>
+		<Setter Property="Background" Value="{DynamicResource TsundokuSeriesCardButtonBGColor}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource TsundokuSeriesCardButtonBorderColor}"/>
+		<Setter Property="Foreground" Value="{DynamicResource TsundokuSeriesButtonIconColor}"/>
+
+		<Setter Property="Template">
+			<ControlTemplate>
+				<ContentPresenter x:Name="PART_ContentPresenter"
+								Background="{TemplateBinding Background}"
+								BorderBrush="{TemplateBinding BorderBrush}"
+								BorderThickness="{TemplateBinding BorderThickness}"
+								CornerRadius="{TemplateBinding CornerRadius}"
+								Content="{TemplateBinding Content}"
+								ContentTemplate="{TemplateBinding ContentTemplate}"
+								Padding="{TemplateBinding Padding}"
+								RecognizesAccessKey="True"
+								HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+								VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+			</ControlTemplate>
+		</Setter>
+
+		<Style Selector="^:pointerover">
+			<Setter Property="Background" Value="{DynamicResource TsundokuSeriesCardButtonBGHoverColor}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource TsundokuSeriesCardButtonBorderHoverColor}"/>
+			<Setter Property="Foreground" Value="{DynamicResource TsundokuSeriesButtonIconHoverColor}"/>
+		</Style>
+
+		<Style Selector="^:pressed">
+			<Setter Property="Background" Value="{DynamicResource TsundokuSeriesCardButtonBGHoverColor}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource TsundokuSeriesCardButtonBorderHoverColor}"/>
+			<Setter Property="Foreground" Value="{DynamicResource TsundokuSeriesButtonIconHoverColor}"/>
+		</Style>
+	</ControlTheme>
+
 	<ControlTheme x:Key="MenuToggleButton" TargetType="ToggleButton">
         <Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGColor}"/>
 		<Setter Property="BorderBrush" Value="{DynamicResource TsundokuMenuButtonBorderColor}"/>

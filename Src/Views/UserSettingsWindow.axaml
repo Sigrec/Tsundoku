@@ -87,7 +87,7 @@
                 </StackPanel>
             </Border>
 
-            <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Theme="{StaticResource ReverseCollectionScroll}">
+            <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden" Theme="{StaticResource ReverseCollectionScroll}">
             <StackPanel>
                 <!-- Profile -->
                 <StackPanel Margin="20,16,20,14" Spacing="10">
@@ -146,11 +146,10 @@
                         <TextBlock Text="Currency" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="{DynamicResource TsundokuMenuTextColor}"/>
                         <ComboBox x:Name="CurrencyComboBox"
                                   Grid.Column="1"
-                                  SelectionChanged="CurrencyChanged"
                                   ItemsSource="{x:Static models:Constants.AVAILABLE_CURRENCIES}"
                                   Theme="{StaticResource MenuComboBox}"
                                   HorizontalAlignment="Right"
-                                  SelectedIndex="{CompiledBinding SelectedCurrencyIndex}"
+                                  SelectedItem="{CompiledBinding SelectedCurrency}"
                                   ItemContainerTheme="{StaticResource MenuComboBoxItem}"
                                   Width="80" Height="34"
                                   AutoScrollToSelectedItem="True">

@@ -91,7 +91,11 @@ public sealed partial class SeriesCardDisplay : UserControl
         }
 
         seriesButton.Foreground = (SolidColorBrush)this.FindResource(ThemeResourceKeys.SeriesButtonIconHoverColor)!;
+        seriesButton.Background = (SolidColorBrush)this.FindResource(ThemeResourceKeys.SeriesCardButtonBGHoverColor)!;
+        seriesButton.BorderBrush = (SolidColorBrush)this.FindResource(ThemeResourceKeys.SeriesCardButtonBorderHoverColor)!;
         await _mainWindowViewModel.CreateEditSeriesDialog(Series);
         seriesButton.Foreground = (SolidColorBrush)this.FindResource(ThemeResourceKeys.SeriesButtonIconColor)!;
+        seriesButton.Background = (SolidColorBrush)this.FindResource(ThemeResourceKeys.SeriesCardButtonBGColor)!;
+        seriesButton.BorderBrush = (SolidColorBrush)this.FindResource(ThemeResourceKeys.SeriesCardButtonBorderColor)!;
     }
 }

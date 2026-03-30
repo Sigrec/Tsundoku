@@ -44,7 +44,7 @@
 					<Popup
 						IsOpen="{CompiledBinding IsSuggestionsOpen}"
 						PlacementTarget="{Binding #Root}"
-						PlacementMode="Left"
+						Placement="Left"
 						HorizontalOffset="-10" VerticalOffset="-15"
 						ToolTip.Tip="Search via Romaji">
 						<Border Padding="10"

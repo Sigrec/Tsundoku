@@ -25,7 +25,7 @@ public sealed partial class UserSettingsViewModel : ViewModelBase
     [Reactive] public partial bool KinokuniyaUSAMember { get; set; }
     [Reactive] public partial bool RefreshCovers { get; set; }
     [Reactive] public partial bool GlassmorphismEnabled { get; set; }
-    [Reactive] public partial int SelectedCurrencyIndex { get; set; } = 0;
+    [Reactive] public partial string SelectedCurrency { get; set; } = "$";
 
     private readonly AddNewSeriesViewModel _addNewSeriesViewModel;
     private readonly ILoadingDialogService _loadingDialogService;
@@ -41,16 +41,23 @@ public sealed partial class UserSettingsViewModel : ViewModelBase
         _mangaDex = mangaDex;
         _aniList = aniList;
 
+        // Sync SelectedCurrency from user data
         this.WhenAnyValue(x => x.CurrentUser)
             .Select(user => user?.Currency)
             .DistinctUntilChanged()
-            .Where(currency =>
-                !string.IsNullOrWhiteSpace(currency) &&
-                AVAILABLE_CURRENCY_WITH_CULTURE.ContainsKey(currency))
-            .ObserveOn(RxSchedulers.MainThreadScheduler)
+            .Where(currency => !string.IsNullOrWhiteSpace(currency))
+            .Subscribe(currency => SelectedCurrency = currency!)
+            .DisposeWith(_disposables);
+
+        // Write back to user when SelectedCurrency changes (skip initial)
+        this.WhenAnyValue(x => x.SelectedCurrency)
+            .Skip(1)
+            .DistinctUntilChanged()
+            .Where(currency => !string.IsNullOrWhiteSpace(currency))
             .Subscribe(currency =>
             {
-                SelectedCurrencyIndex = AVAILABLE_CURRENCY_WITH_CULTURE[currency].Index;
+                UpdateUserCurrency(currency);
+                LOGGER.Info("Currency Changed To {Currency}", currency);
             })
             .DisposeWith(_disposables);
 

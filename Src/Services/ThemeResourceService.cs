@@ -31,10 +31,11 @@ public sealed class ThemeResourceService : IThemeResourceService
     {
         if (Application.Current?.Resources is not Avalonia.Controls.ResourceDictionary resources) return;
 
-        // Batch all 41 updates via SetItems for a single resource-changed notification
+        // Batch updates via SetItems for a single resource-changed notification, skip null values
         resources.SetItems(
-            ThemeResourceKeys.PropertyMap.Select(kvp =>
-                new KeyValuePair<object, object?>(kvp.Key, kvp.Value(theme))));
+            ThemeResourceKeys.PropertyMap
+                .Where(kvp => kvp.Value(theme) is not null)
+                .Select(kvp => new KeyValuePair<object, object?>(kvp.Key, kvp.Value(theme))));
     }
 
     public IDisposable ObserveAndApply(TsundokuTheme theme)

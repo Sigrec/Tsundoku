@@ -191,7 +191,11 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
     public void SaveOnClose()
     {
         LOGGER.Info("Closing Tsundoku");
-        if (!isReloading) _userService.SaveUserData();
+        if (!isReloading)
+        {
+            _userService.SaveUserData();
+            _userService.SaveBackupUserData();
+        }
     }
 
     private void Dispose(bool disposing)

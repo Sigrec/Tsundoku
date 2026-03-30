@@ -89,39 +89,38 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
                 .DisposeWith(disposables);
         });
 
-        // Staggered card appear animation (initial load only)
-        Transitions animTransitions = [
-            new DoubleTransition { Property = OpacityProperty, Duration = TimeSpan.FromMilliseconds(600), Easing = new Avalonia.Animation.Easings.CubicEaseOut() },
-            new TransformOperationsTransition { Property = RenderTransformProperty, Duration = TimeSpan.FromMilliseconds(600), Easing = new Avalonia.Animation.Easings.CubicEaseOut() }
-        ];
+        // Staggered card appear animation (initial load only) — slide up from below
         int _animIndex = 0;
         bool _shouldAnimate = true;
+        TransformOperations _slideFrom = TransformOperations.Parse("translate(0px, 20px)");
+        TransformOperations _slideTo = TransformOperations.Parse("translate(0px, 0px)");
         CollectionItems.ElementPrepared += (s, e) =>
         {
             Control element = e.Element;
             if (!_shouldAnimate)
             {
-                element.Opacity = 1;
                 element.RenderTransform = null;
                 element.Transitions = null;
                 return;
             }
 
             int index = _animIndex++;
-            int delay = Math.Min(index * 60, 1200);
+            int delayMs = Math.Min(50 + (index * 40), 800);
 
             element.Transitions = null;
-            element.Opacity = 0;
-            element.RenderTransform = TransformOperations.Parse("scale(0.95, 0.95)");
+            element.RenderTransform = _slideFrom;
 
-            Dispatcher.UIThread.Post(async () =>
+            DispatcherTimer timer = new DispatcherTimer(DispatcherPriority.Render) { Interval = TimeSpan.FromMilliseconds(delayMs) };
+            timer.Tick += (_, _) =>
             {
-                await Task.Delay(delay);
-                element.Transitions = animTransitions;
-                element.Opacity = 1;
-                element.RenderTransform = TransformOperations.Parse("scale(1, 1)");
-                if (delay >= 1200) _shouldAnimate = false;
-            }, DispatcherPriority.Render);
+                timer.Stop();
+                element.Transitions = [
+                    new TransformOperationsTransition { Property = RenderTransformProperty, Duration = TimeSpan.FromMilliseconds(500), Easing = new Avalonia.Animation.Easings.CubicEaseOut() }
+                ];
+                element.RenderTransform = _slideTo;
+                if (delayMs >= 800) _shouldAnimate = false;
+            };
+            timer.Start();
         };
 
         KeyDown += async (s, e) =>

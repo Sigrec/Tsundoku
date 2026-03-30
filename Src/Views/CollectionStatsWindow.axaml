@@ -13,13 +13,14 @@
         Title="Stats"
         Classes="Menu"
 		WindowStartupLocation="CenterOwner"
+		SizeToContent="Height"
         MinWidth="700"
-		MaxWidth="1100"
-		MaxHeight="1700"
+		MaxWidth="1050"
 		CanResize="true">
 
 	<Window.Styles>
 		<StyleInclude Source="/Controls/ValueStat.axaml"/>
+		<StyleInclude Source="/Controls/ChartLegendItem.axaml"/>
 	</Window.Styles>
 
 	<Border Classes="Menu" BorderThickness="2" CornerRadius="0,0,8,8" ClipToBounds="True">
@@ -32,271 +33,149 @@
 				</StackPanel>
 			</Border>
 
-		<ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Theme="{StaticResource ReverseCollectionScroll}">
-			<StackPanel Spacing="0" Margin="16,14,16,16">
+		<ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden" Theme="{StaticResource ReverseCollectionScroll}">
+			<StackPanel Spacing="0" Margin="16,14,16,16" HorizontalAlignment="Center" VerticalAlignment="Center">
 
 				<!-- OVERVIEW STATS (3 per row) -->
-				<TextBlock Text="OVERVIEW" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuSeriesCardPublisherColor}" LetterSpacing="1" Opacity="0.8" Margin="0,0,0,8"/>
-				<UniformGrid Columns="3">
-					<controls:ValueStat Text="{CompiledBinding CurrentUser.MeanRating}" Title="Mean Rating" PointerPressed="CopyTextAsync"/>
-					<controls:ValueStat Text="{CompiledBinding CurrentUser.VolumesRead}" Title="Volumes Read" PointerPressed="CopyTextAsync"/>
-					<controls:ValueStat Text="{CompiledBinding SeriesCount}" Title="Series Count" PointerPressed="CopyTextAsync"/>
-					<controls:ValueStat Text="{CompiledBinding CurrentUser.NumVolumesCollected}" Title="Volumes Collected" PointerPressed="CopyTextAsync"/>
-					<controls:ValueStat Text="{CompiledBinding CurrentUser.NumVolumesToBeCollected}" Title="Volumes To Be Collected" PointerPressed="CopyTextAsync"/>
-					<controls:ValueStat Text="{CompiledBinding CurrentUser.CollectionValue}" Title="Collection Value" PointerPressed="CopyTextAsync"/>
-				</UniformGrid>
+				<TextBlock Text="OVERVIEW" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuSeriesCardPublisherColor}" LetterSpacing="1" Opacity="0.8" Margin="4,0,0,8"/>
+				<WrapPanel HorizontalAlignment="Center">
+					<controls:ValueStat Text="{Binding CurrentUser.MeanRating}" Title="Mean Rating" PointerPressed="CopyTextAsync"/>
+					<controls:ValueStat Text="{Binding CurrentUser.VolumesRead, StringFormat='{}{0:N0}'}" Title="Volumes Read" PointerPressed="CopyTextAsync"/>
+					<controls:ValueStat Text="{Binding SeriesCount, StringFormat='{}{0:N0}'}" Title="Series Count" PointerPressed="CopyTextAsync"/>
+					<controls:ValueStat Text="{Binding CurrentUser.NumVolumesCollected, StringFormat='{}{0:N0}'}" Title="Volumes Collected" PointerPressed="CopyTextAsync"/>
+					<controls:ValueStat Text="{Binding CurrentUser.NumVolumesToBeCollected, StringFormat='{}{0:N0}'}" Title="Volumes To Be Collected" PointerPressed="CopyTextAsync"/>
+					<controls:ValueStat Text="{Binding FavoriteCount, StringFormat='{}{0:N0}'}" Title="Favorites" PointerPressed="CopyTextAsync"/>
+					<controls:ValueStat Text="{Binding FullyCollectedCount, StringFormat='{}{0:N0}'}" Title="Fully Collected" PointerPressed="CopyTextAsync"/>
+					<controls:ValueStat Text="{Binding CompletionRate}" Title="Completion Rate" PointerPressed="CopyTextAsync"/>
+				</WrapPanel>
+				<controls:ValueStat Text="{Binding CurrentUser.CollectionValue}" Title="Collection Value" Width="NaN" MinWidth="480" MaxWidth="976" HorizontalAlignment="Center" Margin="4,4,4,0" PointerPressed="CopyTextAsync"/>
 
 				<!-- DISTRIBUTIONS (3 pie charts in a row, legend below each chart) -->
 				<Border BorderThickness="0,2,0,0" BorderBrush="{DynamicResource TsundokuDividerColor}" Opacity="0.3" Margin="0,12,0,0"/>
-				<TextBlock Text="DISTRIBUTIONS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuSeriesCardPublisherColor}" LetterSpacing="1" Opacity="0.8" Margin="0,12,0,8"/>
-				<UniformGrid Columns="3">
+				<TextBlock Text="DISTRIBUTIONS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuSeriesCardPublisherColor}" LetterSpacing="1" Opacity="0.8" Margin="4,12,0,8"/>
+				<WrapPanel HorizontalAlignment="Center">
 					<!-- Demographic -->
 					<Border Background="{DynamicResource TsundokuMenuButtonBGColor}"
 							BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}"
-							BorderThickness="2" CornerRadius="10" Margin="4" Padding="6,4">
+							BorderThickness="2" CornerRadius="10" Margin="4" Padding="12" Width="317">
 						<StackPanel Spacing="0" HorizontalAlignment="Center">
-							<TextBlock Text="Demographic" FontSize="14" FontWeight="ExtraBold" Foreground="{DynamicResource TsundokuUsernameColor}" HorizontalAlignment="Center" Margin="0,2,0,0"/>
-							<lvc:PieChart Series="{CompiledBinding Demographics}" Width="200" Height="200" TooltipPosition="Hidden" Margin="0,-4"/>
-							<WrapPanel HorizontalAlignment="Center">
-								<StackPanel Orientation="Horizontal" Spacing="4" Margin="4,2">
-									<Border CornerRadius="3" Width="16" Height="16" Background="{DynamicResource TsundokuMenuBGColor}" BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}" BorderThickness="1.5"/>
-									<TextBlock FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TsundokuMenuTextColor}" VerticalAlignment="Center">
-										<TextBlock.Text>
-											<MultiBinding StringFormat="Shounen {0}%" Mode="OneWay">
-												<Binding Path="ShounenPercentage"/>
-											</MultiBinding>
-										</TextBlock.Text>
-									</TextBlock>
-								</StackPanel>
-								<StackPanel Orientation="Horizontal" Spacing="4" Margin="4,2">
-									<Border CornerRadius="3" Width="16" Height="16" Background="{DynamicResource TsundokuMenuTextColor}" BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}" BorderThickness="1.5"/>
-									<TextBlock FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TsundokuMenuTextColor}" VerticalAlignment="Center">
-										<TextBlock.Text>
-											<MultiBinding StringFormat="Shoujo {0}%" Mode="OneWay">
-												<Binding Path="ShoujoPercentage"/>
-											</MultiBinding>
-										</TextBlock.Text>
-									</TextBlock>
-								</StackPanel>
-								<StackPanel Orientation="Horizontal" Spacing="4" Margin="4,2">
-									<Border CornerRadius="3" Width="16" Height="16" Background="{DynamicResource TsundokuMenuButtonBGColor}" BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}" BorderThickness="1.5"/>
-									<TextBlock FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TsundokuMenuTextColor}" VerticalAlignment="Center">
-										<TextBlock.Text>
-											<MultiBinding StringFormat="Seinen {0}%" Mode="OneWay">
-												<Binding Path="SeinenPercentage"/>
-											</MultiBinding>
-										</TextBlock.Text>
-									</TextBlock>
-								</StackPanel>
-								<StackPanel Orientation="Horizontal" Spacing="4" Margin="4,2">
-									<Border CornerRadius="3" Width="16" Height="16" Background="{DynamicResource TsundokuDividerColor}" BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}" BorderThickness="1.5"/>
-									<TextBlock FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TsundokuMenuTextColor}" VerticalAlignment="Center">
-										<TextBlock.Text>
-											<MultiBinding StringFormat="Josei {0}%" Mode="OneWay">
-												<Binding Path="JoseiPercentage"/>
-											</MultiBinding>
-										</TextBlock.Text>
-									</TextBlock>
-								</StackPanel>
-								<StackPanel Orientation="Horizontal" Spacing="4" Margin="4,2">
-									<Border CornerRadius="3" Width="16" Height="16" Background="{CompiledBinding UnknownRectangleColor}" BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}" BorderThickness="1.5"/>
-									<TextBlock FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TsundokuMenuTextColor}" VerticalAlignment="Center">
-										<TextBlock.Text>
-											<MultiBinding StringFormat="Unknown {0}%" Mode="OneWay">
-												<Binding Path="UnknownPercentage"/>
-											</MultiBinding>
-										</TextBlock.Text>
-									</TextBlock>
-								</StackPanel>
-							</WrapPanel>
+							<TextBlock Text="Demographic" FontSize="14" FontWeight="ExtraBold" Foreground="{DynamicResource TsundokuUsernameColor}" HorizontalAlignment="Center" Margin="0,2,0,5"/>
+							<Border BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}" BorderThickness="1.5" CornerRadius="100" Padding="4" Margin="0,4">
+								<lvc:PieChart Series="{CompiledBinding Demographics}" Width="190" Height="190" TooltipPosition="Hidden"/>
+							</Border>
+							<StackPanel Spacing="0" HorizontalAlignment="Stretch" Margin="2,0">
+								<controls:ChartLegendItem Label="Shounen" Percentage="{CompiledBinding ShounenPercentage}" Color="{CompiledBinding ShounenLegendColor}"/>
+								<controls:ChartLegendItem Label="Seinen" Percentage="{CompiledBinding SeinenPercentage}" Color="{CompiledBinding SeinenLegendColor}"/>
+								<controls:ChartLegendItem Label="Shoujo" Percentage="{CompiledBinding ShoujoPercentage}" Color="{CompiledBinding ShoujoLegendColor}"/>
+								<controls:ChartLegendItem Label="Josei" Percentage="{CompiledBinding JoseiPercentage}" Color="{CompiledBinding JoseiLegendColor}"/>
+								<controls:ChartLegendItem Label="Unknown" Percentage="{CompiledBinding UnknownPercentage}" Color="{CompiledBinding UnknownLegendColor}"/>
+							</StackPanel>
 						</StackPanel>
 					</Border>
 
 					<!-- Status -->
 					<Border Background="{DynamicResource TsundokuMenuButtonBGColor}"
 							BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}"
-							BorderThickness="2" CornerRadius="10" Margin="4" Padding="6,4">
+							BorderThickness="2" CornerRadius="10" Margin="4" Padding="12" Width="317">
 						<StackPanel Spacing="0" HorizontalAlignment="Center">
-							<TextBlock Text="Status" FontSize="14" FontWeight="ExtraBold" Foreground="{DynamicResource TsundokuUsernameColor}" HorizontalAlignment="Center" Margin="0,2,0,0"/>
-							<lvc:PieChart Series="{CompiledBinding StatusDistribution}" Width="200" Height="200" TooltipPosition="Hidden" Margin="0,-4"/>
-							<WrapPanel HorizontalAlignment="Center">
-								<StackPanel Orientation="Horizontal" Spacing="4" Margin="4,2">
-									<Border CornerRadius="3" Width="16" Height="16" Background="{DynamicResource TsundokuMenuButtonBGColor}" BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}" BorderThickness="1.5"/>
-									<TextBlock FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TsundokuMenuTextColor}" VerticalAlignment="Center">
-										<TextBlock.Text>
-											<MultiBinding StringFormat="Finished {0}%" Mode="OneWay">
-												<Binding Path="FinishedPercentage"/>
-											</MultiBinding>
-										</TextBlock.Text>
-									</TextBlock>
-								</StackPanel>
-								<StackPanel Orientation="Horizontal" Spacing="4" Margin="4,2">
-									<Border CornerRadius="3" Width="16" Height="16" Background="{DynamicResource TsundokuMenuBGColor}" BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}" BorderThickness="1.5"/>
-									<TextBlock FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TsundokuMenuTextColor}" VerticalAlignment="Center">
-										<TextBlock.Text>
-											<MultiBinding StringFormat="Ongoing {0}%" Mode="OneWay">
-												<Binding Path="OngoingPercentage"/>
-											</MultiBinding>
-										</TextBlock.Text>
-									</TextBlock>
-								</StackPanel>
-								<StackPanel Orientation="Horizontal" Spacing="4" Margin="4,2">
-									<Border CornerRadius="3" Width="16" Height="16" Background="{DynamicResource TsundokuMenuTextColor}" BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}" BorderThickness="1.5"/>
-									<TextBlock FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TsundokuMenuTextColor}" VerticalAlignment="Center">
-										<TextBlock.Text>
-											<MultiBinding StringFormat="Hiatus {0}%" Mode="OneWay">
-												<Binding Path="HiatusPercentage"/>
-											</MultiBinding>
-										</TextBlock.Text>
-									</TextBlock>
-								</StackPanel>
-								<StackPanel Orientation="Horizontal" Spacing="4" Margin="4,2">
-									<Border CornerRadius="3" Width="16" Height="16" Background="{DynamicResource TsundokuDividerColor}" BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}" BorderThickness="1.5"/>
-									<TextBlock FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TsundokuMenuTextColor}" VerticalAlignment="Center">
-										<TextBlock.Text>
-											<MultiBinding StringFormat="Cancelled {0}%" Mode="OneWay">
-												<Binding Path="CancelledPercentage"/>
-											</MultiBinding>
-										</TextBlock.Text>
-									</TextBlock>
-								</StackPanel>
-							</WrapPanel>
+							<TextBlock Text="Status" FontSize="14" FontWeight="ExtraBold" Foreground="{DynamicResource TsundokuUsernameColor}" HorizontalAlignment="Center" Margin="0,2,0,5"/>
+							<Border BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}" BorderThickness="1.5" CornerRadius="100" Padding="4" Margin="0,4">
+								<lvc:PieChart Series="{CompiledBinding StatusDistribution}" Width="190" Height="190" TooltipPosition="Hidden"/>
+							</Border>
+							<StackPanel Spacing="0" HorizontalAlignment="Stretch" Margin="2,0">
+								<controls:ChartLegendItem Label="Finished" Percentage="{CompiledBinding FinishedPercentage}" Color="{CompiledBinding FinishedLegendColor}"/>
+								<controls:ChartLegendItem Label="Ongoing" Percentage="{CompiledBinding OngoingPercentage}" Color="{CompiledBinding OngoingLegendColor}"/>
+								<controls:ChartLegendItem Label="Hiatus" Percentage="{CompiledBinding HiatusPercentage}" Color="{CompiledBinding HiatusLegendColor}"/>
+								<controls:ChartLegendItem Label="Cancelled" Percentage="{CompiledBinding CancelledPercentage}" Color="{CompiledBinding CancelledLegendColor}"/>
+							</StackPanel>
 						</StackPanel>
 					</Border>
 
 					<!-- Format -->
 					<Border Background="{DynamicResource TsundokuMenuButtonBGColor}"
 							BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}"
-							BorderThickness="2" CornerRadius="10" Margin="4" Padding="6,4">
+							BorderThickness="2" CornerRadius="10" Margin="4" Padding="12" Width="317">
 						<StackPanel Spacing="0" HorizontalAlignment="Center">
-							<TextBlock Text="Format" FontSize="14" FontWeight="ExtraBold" Foreground="{DynamicResource TsundokuUsernameColor}" HorizontalAlignment="Center" Margin="0,2,0,0"/>
-							<lvc:PieChart Series="{CompiledBinding Formats}" Width="200" Height="200" TooltipPosition="Hidden" Margin="0,-4"/>
-							<WrapPanel HorizontalAlignment="Center">
-								<StackPanel Orientation="Horizontal" Spacing="4" Margin="4,2">
-									<Border CornerRadius="3" Width="16" Height="16" Background="{DynamicResource TsundokuMenuButtonBGColor}" BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}" BorderThickness="1.5"/>
-									<TextBlock FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TsundokuMenuTextColor}" VerticalAlignment="Center">
-										<TextBlock.Text>
-											<MultiBinding StringFormat="Manga {0}%" Mode="OneWay">
-												<Binding Path="MangaPercentage"/>
-											</MultiBinding>
-										</TextBlock.Text>
-									</TextBlock>
-								</StackPanel>
-								<StackPanel Orientation="Horizontal" Spacing="4" Margin="4,2">
-									<Border CornerRadius="3" Width="16" Height="16" Background="{DynamicResource TsundokuMenuBGColor}" BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}" BorderThickness="1.5"/>
-									<TextBlock FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TsundokuMenuTextColor}" VerticalAlignment="Center">
-										<TextBlock.Text>
-											<MultiBinding StringFormat="Manhwa {0}%" Mode="OneWay">
-												<Binding Path="ManhwaPercentage"/>
-											</MultiBinding>
-										</TextBlock.Text>
-									</TextBlock>
-								</StackPanel>
-								<StackPanel Orientation="Horizontal" Spacing="4" Margin="4,2">
-									<Border CornerRadius="3" Width="16" Height="16" Background="{DynamicResource TsundokuMenuTextColor}" BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}" BorderThickness="1.5"/>
-									<TextBlock FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TsundokuMenuTextColor}" VerticalAlignment="Center">
-										<TextBlock.Text>
-											<MultiBinding StringFormat="Novel {0}%" Mode="OneWay">
-												<Binding Path="NovelPercentage"/>
-											</MultiBinding>
-										</TextBlock.Text>
-									</TextBlock>
-								</StackPanel>
-								<StackPanel Orientation="Horizontal" Spacing="4" Margin="4,2">
-									<Border CornerRadius="3" Width="16" Height="16" Background="{DynamicResource TsundokuDividerColor}" BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}" BorderThickness="1.5"/>
-									<TextBlock FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TsundokuMenuTextColor}" VerticalAlignment="Center">
-										<TextBlock.Text>
-											<MultiBinding StringFormat="Comic {0}%" Mode="OneWay">
-												<Binding Path="ComicPercentage"/>
-											</MultiBinding>
-										</TextBlock.Text>
-									</TextBlock>
-								</StackPanel>
-								<StackPanel Orientation="Horizontal" Spacing="4" Margin="4,2">
-									<Border CornerRadius="3" Width="16" Height="16" Background="{CompiledBinding ManhuaRectangleColor}" BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}" BorderThickness="1.5"/>
-									<TextBlock FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TsundokuMenuTextColor}" VerticalAlignment="Center">
-										<TextBlock.Text>
-											<MultiBinding StringFormat="Manhua {0}%" Mode="OneWay">
-												<Binding Path="ManhuaPercentage"/>
-											</MultiBinding>
-										</TextBlock.Text>
-									</TextBlock>
-								</StackPanel>
-								<StackPanel Orientation="Horizontal" Spacing="4" Margin="4,2">
-									<Border CornerRadius="3" Width="16" Height="16" Background="{CompiledBinding ManfraRectangleColor}" BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}" BorderThickness="1.5"/>
-									<TextBlock FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TsundokuMenuTextColor}" VerticalAlignment="Center">
-										<TextBlock.Text>
-											<MultiBinding StringFormat="Manfra {0}%" Mode="OneWay">
-												<Binding Path="ManfraPercentage"/>
-											</MultiBinding>
-										</TextBlock.Text>
-									</TextBlock>
-								</StackPanel>
-							</WrapPanel>
+							<TextBlock Text="Format" FontSize="14" FontWeight="ExtraBold" Foreground="{DynamicResource TsundokuUsernameColor}" HorizontalAlignment="Center" Margin="0,2,0,5"/>
+							<Border BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}" BorderThickness="1.5" CornerRadius="100" Padding="4" Margin="0,4">
+								<lvc:PieChart Series="{CompiledBinding Formats}" Width="190" Height="190" TooltipPosition="Hidden"/>
+							</Border>
+							<StackPanel Spacing="0" HorizontalAlignment="Stretch" Margin="2,0">
+								<controls:ChartLegendItem Label="Manga" Percentage="{CompiledBinding MangaPercentage}" Color="{CompiledBinding MangaLegendColor}"/>
+								<controls:ChartLegendItem Label="Manhwa" Percentage="{CompiledBinding ManhwaPercentage}" Color="{CompiledBinding ManhwaLegendColor}"/>
+								<controls:ChartLegendItem Label="Novel" Percentage="{CompiledBinding NovelPercentage}" Color="{CompiledBinding NovelLegendColor}"/>
+								<controls:ChartLegendItem Label="Comic" Percentage="{CompiledBinding ComicPercentage}" Color="{CompiledBinding ComicLegendColor}"/>
+								<controls:ChartLegendItem Label="Manhua" Percentage="{CompiledBinding ManhuaPercentage}" Color="{CompiledBinding ManhuaLegendColor}"/>
+								<controls:ChartLegendItem Label="Manfra" Percentage="{CompiledBinding ManfraPercentage}" Color="{CompiledBinding ManfraLegendColor}"/>
+							</StackPanel>
 						</StackPanel>
 					</Border>
-				</UniformGrid>
+				</WrapPanel>
 
 				<!-- BAR CHARTS (2 per row) -->
 				<Border BorderThickness="0,2,0,0" BorderBrush="{DynamicResource TsundokuDividerColor}" Opacity="0.3" Margin="0,12,0,0"/>
-				<TextBlock Text="CHARTS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuSeriesCardPublisherColor}" LetterSpacing="1" Opacity="0.8" Margin="0,12,0,8"/>
-				<UniformGrid Columns="2">
+				<TextBlock Text="CHARTS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuSeriesCardPublisherColor}" LetterSpacing="1" Opacity="0.8" Margin="4,12,0,8"/>
+				<WrapPanel HorizontalAlignment="Center">
 					<!-- Rating Bar Chart -->
 					<Border Background="{DynamicResource TsundokuMenuButtonBGColor}"
 							BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}"
-							BorderThickness="2" CornerRadius="10" Margin="4" Padding="10">
+							BorderThickness="2" CornerRadius="10" Margin="4" Padding="10" Width="480">
 						<StackPanel>
 							<TextBlock Text="Ratings" FontSize="14" FontWeight="ExtraBold" Foreground="{DynamicResource TsundokuUsernameColor}" Margin="0,0,0,4"/>
 							<lvc:CartesianChart
+								ZoomMode="None"
 								Series="{CompiledBinding RatingDistribution}"
 								XAxes="{CompiledBinding RatingXAxes}"
 								YAxes="{CompiledBinding RatingYAxes}"
-								Height="240"/>
+								Height="290"/>
 						</StackPanel>
 					</Border>
 
 					<!-- Volume Count Bar Chart -->
 					<Border Background="{DynamicResource TsundokuMenuButtonBGColor}"
 							BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}"
-							BorderThickness="2" CornerRadius="10" Margin="4" Padding="10">
+							BorderThickness="2" CornerRadius="10" Margin="4" Padding="10" Width="480">
 						<StackPanel>
 							<TextBlock Text="Volume Counts" FontSize="14" FontWeight="ExtraBold" Foreground="{DynamicResource TsundokuUsernameColor}" Margin="0,0,0,4"/>
 							<lvc:CartesianChart
+								ZoomMode="None"
 								Series="{CompiledBinding VolumeCountDistribution}"
 								XAxes="{CompiledBinding VolumeCountXAxes}"
 								YAxes="{CompiledBinding VolumeCountYAxes}"
-								Height="240"/>
+								Height="290"/>
 						</StackPanel>
 					</Border>
 
 					<!-- Genre Bar Chart (Left Half) -->
 					<Border Background="{DynamicResource TsundokuMenuButtonBGColor}"
 							BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}"
-							BorderThickness="2" CornerRadius="10" Margin="4" Padding="10">
+							BorderThickness="2" CornerRadius="10" Margin="4" Padding="10" Width="480">
 						<StackPanel>
 							<TextBlock Text="Genres (1/2)" FontSize="14" FontWeight="ExtraBold" Foreground="{DynamicResource TsundokuUsernameColor}" Margin="0,0,0,4"/>
 							<lvc:CartesianChart
+								ZoomMode="None"
 								Series="{CompiledBinding GenreDistribution1}"
 								XAxes="{CompiledBinding GenreXAxes1}"
 								YAxes="{CompiledBinding GenreYAxes1}"
-								Height="240"/>
+								Height="290"/>
 						</StackPanel>
 					</Border>
 
 					<!-- Genre Bar Chart (Right Half) -->
 					<Border Background="{DynamicResource TsundokuMenuButtonBGColor}"
 							BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}"
-							BorderThickness="2" CornerRadius="10" Margin="4" Padding="10">
+							BorderThickness="2" CornerRadius="10" Margin="4" Padding="10" Width="480">
 						<StackPanel>
 							<TextBlock Text="Genres (2/2)" FontSize="14" FontWeight="ExtraBold" Foreground="{DynamicResource TsundokuUsernameColor}" Margin="0,0,0,4"/>
 							<lvc:CartesianChart
+								ZoomMode="None"
 								Series="{CompiledBinding GenreDistribution2}"
 								XAxes="{CompiledBinding GenreXAxes2}"
 								YAxes="{CompiledBinding GenreYAxes2}"
-								Height="240"/>
+								Height="290"/>
 						</StackPanel>
 					</Border>
-				</UniformGrid>
+				</WrapPanel>
 			</StackPanel>
 		</ScrollViewer>
 		</Grid>

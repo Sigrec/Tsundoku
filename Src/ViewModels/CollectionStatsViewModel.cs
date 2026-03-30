@@ -39,6 +39,11 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
     [Reactive] public partial decimal ShoujoPercentage { get; set; }
     [Reactive] public partial decimal JoseiPercentage { get; set; }
     [Reactive] public partial decimal UnknownPercentage { get; set; }
+    [Reactive] public partial SolidColorBrush ShounenLegendColor { get; set; }
+    [Reactive] public partial SolidColorBrush SeinenLegendColor { get; set; }
+    [Reactive] public partial SolidColorBrush ShoujoLegendColor { get; set; }
+    [Reactive] public partial SolidColorBrush JoseiLegendColor { get; set; }
+    [Reactive] public partial SolidColorBrush UnknownLegendColor { get; set; }
 
     public ObservableCollection<ISeries> StatusDistribution { get; set; } = [];
     public ObservableValue OngoingCount { get; } = new ObservableValue(0);
@@ -49,6 +54,10 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
     [Reactive] public partial decimal OngoingPercentage { get; set; }
     [Reactive] public partial decimal CancelledPercentage { get; set; }
     [Reactive] public partial decimal HiatusPercentage { get; set; }
+    [Reactive] public partial SolidColorBrush FinishedLegendColor { get; set; }
+    [Reactive] public partial SolidColorBrush OngoingLegendColor { get; set; }
+    [Reactive] public partial SolidColorBrush CancelledLegendColor { get; set; }
+    [Reactive] public partial SolidColorBrush HiatusLegendColor { get; set; }
 
     public ObservableCollection<ISeries> Formats { get; set; } = [];
     public ObservableValue MangaCount { get; } = new ObservableValue(0);
@@ -63,6 +72,12 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
     [Reactive] public partial decimal ManfraPercentage { get; set; }
     [Reactive] public partial decimal ComicPercentage { get; set; }
     [Reactive] public partial decimal NovelPercentage { get; set; }
+    [Reactive] public partial SolidColorBrush MangaLegendColor { get; set; }
+    [Reactive] public partial SolidColorBrush ManhwaLegendColor { get; set; }
+    [Reactive] public partial SolidColorBrush ManhuaLegendColor { get; set; }
+    [Reactive] public partial SolidColorBrush ManfraLegendColor { get; set; }
+    [Reactive] public partial SolidColorBrush ComicLegendColor { get; set; }
+    [Reactive] public partial SolidColorBrush NovelLegendColor { get; set; }
 
     public ObservableCollection<ISeries> RatingDistribution { get; set; } = [];
     public ObservableCollection<Axis> RatingXAxes { get; } = [];
@@ -130,11 +145,10 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
 
     [Reactive] public partial int SeriesCount { get; set; }
     [Reactive] public partial int FavoriteCount { get; set; }
+    [Reactive] public partial string CompletionRate { get; set; }
+    [Reactive] public partial int FullyCollectedCount { get; set; }
 
     [Reactive] public partial SolidColorBrush PaneBackgroundColor { get; set; }
-    [Reactive] public partial SolidColorBrush UnknownRectangleColor { get; set; }
-    [Reactive] public partial SolidColorBrush ManhuaRectangleColor { get; set; }
-    [Reactive] public partial SolidColorBrush ManfraRectangleColor { get; set; }
     [Reactive] public partial string CollectionValueText { get; set; }
 
     public ReadOnlyObservableCollection<Series> UserCollection { get; }
@@ -165,22 +179,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
             UpdateRatingBarChartColors();
             UpdateVolumeDistributionBarChartColors();
             UpdateGenreBarChartColors();
-            UpdatePieChartColors();
             UpdateBackgroundColors();
-            UpdateUnknownRectangleColor();
-            UpdateManhuaRectangleColor();
-        })
-        .DisposeWith(_disposables);
-
-        this.WhenAnyValue(
-            x => x.CurrentTheme.SeriesCardDescColor,
-            x => x.CurrentTheme.SeriesCardTitleColor)
-        .DistinctUntilChanged()
-        .Subscribe(_ =>
-        {
-            UpdatePieChartColors();
-            UpdateManhuaRectangleColor();
-            UpdateManfraRectangleColor();
         })
         .DisposeWith(_disposables);
 
@@ -190,17 +189,6 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
         .Subscribe(_ =>
         {
             UpdateBackgroundColors();
-            UpdateUnknownRectangleColor();
-        })
-        .DisposeWith(_disposables);
-        
-        this.WhenAnyValue(
-            x => x.CurrentTheme.SeriesCardStaffColor,
-            x => x.CurrentTheme.SeriesButtonIconColor)
-        .DistinctUntilChanged()
-        .Subscribe(_ =>
-        {
-            UpdateManfraRectangleColor();
         })
         .DisposeWith(_disposables);
     }
@@ -210,40 +198,6 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
         PaneBackgroundColor = CurrentTheme.SeriesCardBGColor.Equals(CurrentTheme.MenuBGColor)
             ? CurrentTheme.MenuButtonBGColor
             : CurrentTheme.SeriesCardBGColor;
-    }
-
-    private SolidColorBrush GetUnknownColor()
-    {
-        return  CurrentTheme.SeriesCardDescColor.Color == CurrentTheme.MenuTextColor.Color
-            ? CurrentTheme.SeriesCardTitleColor
-            : CurrentTheme.SeriesCardDescColor;
-    }
-    private void UpdateUnknownRectangleColor()
-    {
-        UnknownRectangleColor = GetUnknownColor();
-    }
-
-    private SolidColorBrush GetManhwaColor()
-    {
-        return CurrentTheme.SeriesCardDescColor.Color == CurrentTheme.MenuTextColor.Color
-            ? CurrentTheme.SeriesCardTitleColor
-            : CurrentTheme.SeriesCardDescColor;
-    }
-
-    private void UpdateManhuaRectangleColor()
-    {
-        ManhuaRectangleColor = GetManhwaColor();
-    }
-
-    private SolidColorBrush GetManfraColor()
-    {
-        return CurrentTheme.SeriesCardStaffColor.Color == CurrentTheme.SeriesCardTitleColor.Color
-            ? CurrentTheme.SeriesButtonIconColor
-            : CurrentTheme.SeriesCardStaffColor;
-    }
-    private void UpdateManfraRectangleColor()
-    {
-        ManfraRectangleColor = GetManfraColor();
     }
 
 #region Stats
@@ -300,13 +254,14 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
         .Subscribe(result =>
         {
             CultureInfo cultureInfo = CultureInfo.GetCultureInfo(AVAILABLE_CURRENCY_WITH_CULTURE[result.Currency].Culture);
+            string formattedValue = result.Value.ToString("N2", cultureInfo);
             if (cultureInfo.NumberFormat.CurrencyPositivePattern is 0 or 2) // 0 = "$n", 2 = "$ n"
             {
-                CollectionValueText = $"{result.Currency}{result.Value}";
+                CollectionValueText = $"{result.Currency}{formattedValue}";
             }
             else
             {
-                CollectionValueText = $"{result.Value}{result.Currency}";
+                CollectionValueText = $"{formattedValue}{result.Currency}";
             }
 
             _userService.UpdateUser(user =>
@@ -346,17 +301,28 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
             .Select(seriesList =>
             {
                 uint totalCurVolumes = 0;
-                uint totalVolumesToBeCollected = 0;
+                uint totalMaxVolumes = 0;
+                int fullyCollected = 0;
 
                 foreach (Series series in seriesList)
                 {
                     totalCurVolumes += series.CurVolumeCount;
-                    totalVolumesToBeCollected += series.MaxVolumeCount - series.CurVolumeCount;
+                    totalMaxVolumes += series.MaxVolumeCount;
+                    if (series.CurVolumeCount == series.MaxVolumeCount)
+                    {
+                        fullyCollected++;
+                    }
                 }
-                return (totalCurVolumes, totalVolumesToBeCollected);
+                uint totalVolumesToBeCollected = totalMaxVolumes - totalCurVolumes;
+                decimal completionRate = totalMaxVolumes > 0
+                    ? decimal.Round(totalCurVolumes / (decimal)totalMaxVolumes * 100m, 1)
+                    : 0m;
+                return (totalCurVolumes, totalVolumesToBeCollected, completionRate, fullyCollected);
             })
             .Subscribe(tuple =>
             {
+                CompletionRate = $"{tuple.completionRate}%";
+                FullyCollectedCount = tuple.fullyCollected;
                 _userService.UpdateUser(user =>
                 {
                     user.NumVolumesCollected = tuple.totalCurVolumes;
@@ -935,24 +901,66 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
         SetupDemographicPieChart(initialUserCollectionCount);
         SetupStatusPieChart(initialUserCollectionCount);
         SetupFormatPieChart(initialUserCollectionCount);
+        InitializeLegendColors();
     }
 
-    private static PieSeries<ObservableValue> CreatePieSeries(ObservableValue countValue, string name)
+    private static readonly SKColor[] s_pieChartPalette =
+    [
+        new SKColor(0xD4, 0xA8, 0x4B), // warm amber
+        new SKColor(0x7E, 0x9E, 0xC2), // periwinkle
+        new SKColor(0xC4, 0x7D, 0x94), // muted rose
+        new SKColor(0x7D, 0xB8, 0x7D), // sage green
+        new SKColor(0xD4, 0x90, 0x70), // soft coral
+        new SKColor(0x8A, 0xAE, 0xA6), // sage teal
+    ];
+
+    private void InitializeLegendColors()
+    {
+        // Demographic (5 series, indices 0-4)
+        ShounenLegendColor = SKColorToBrush(s_pieChartPalette[0]);
+        SeinenLegendColor = SKColorToBrush(s_pieChartPalette[1]);
+        ShoujoLegendColor = SKColorToBrush(s_pieChartPalette[2]);
+        JoseiLegendColor = SKColorToBrush(s_pieChartPalette[3]);
+        UnknownLegendColor = SKColorToBrush(s_pieChartPalette[4]);
+
+        // Status (4 series, indices 0-3)
+        OngoingLegendColor = SKColorToBrush(s_pieChartPalette[0]);
+        FinishedLegendColor = SKColorToBrush(s_pieChartPalette[1]);
+        CancelledLegendColor = SKColorToBrush(s_pieChartPalette[2]);
+        HiatusLegendColor = SKColorToBrush(s_pieChartPalette[3]);
+
+        // Format (6 series, indices 0-5)
+        MangaLegendColor = SKColorToBrush(s_pieChartPalette[0]);
+        ManhwaLegendColor = SKColorToBrush(s_pieChartPalette[1]);
+        NovelLegendColor = SKColorToBrush(s_pieChartPalette[2]);
+        ComicLegendColor = SKColorToBrush(s_pieChartPalette[3]);
+        ManhuaLegendColor = SKColorToBrush(s_pieChartPalette[4]);
+        ManfraLegendColor = SKColorToBrush(s_pieChartPalette[5]);
+    }
+
+    private static SolidColorBrush SKColorToBrush(SKColor color)
+    {
+        return new SolidColorBrush(new Avalonia.Media.Color(color.Alpha, color.Red, color.Green, color.Blue));
+    }
+
+    private static PieSeries<ObservableValue> CreatePieSeries(ObservableValue countValue, string name, SKColor fill)
     {
         return new PieSeries<ObservableValue>
         {
             Values = new ObservableCollection<ObservableValue> { countValue },
             Name = name,
+            Fill = new SolidColorPaint(fill),
+            HoverPushout = 0,
         };
     }
 
     private void SetupDemographicPieChart(int initialUserCollectionCount)
     {
-        Demographics.Add(CreatePieSeries(ShounenCount, "Shounen"));
-        Demographics.Add(CreatePieSeries(SeinenCount, "Seinen"));
-        Demographics.Add(CreatePieSeries(ShoujoCount, "Shoujo"));
-        Demographics.Add(CreatePieSeries(JoseiCount, "Josei"));
-        Demographics.Add(CreatePieSeries(UnknownCount, "Unknown"));
+        Demographics.Add(CreatePieSeries(ShounenCount, "Shounen", s_pieChartPalette[0]));
+        Demographics.Add(CreatePieSeries(SeinenCount, "Seinen", s_pieChartPalette[1]));
+        Demographics.Add(CreatePieSeries(ShoujoCount, "Shoujo", s_pieChartPalette[2]));
+        Demographics.Add(CreatePieSeries(JoseiCount, "Josei", s_pieChartPalette[3]));
+        Demographics.Add(CreatePieSeries(UnknownCount, "Unknown", s_pieChartPalette[4]));
 
         _userService.UserCollectionChanges
             .Where(series => series is not null)
@@ -1010,10 +1018,10 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
 
     private void SetupStatusPieChart(int initialUserCollectionCount)
     {
-        StatusDistribution.Add(CreatePieSeries(OngoingCount, "Ongoing"));
-        StatusDistribution.Add(CreatePieSeries(FinishedCount, "Finished"));
-        StatusDistribution.Add(CreatePieSeries(CancelledCount, "Cancelled"));
-        StatusDistribution.Add(CreatePieSeries(HiatusCount, "Josei"));
+        StatusDistribution.Add(CreatePieSeries(OngoingCount, "Ongoing", s_pieChartPalette[0]));
+        StatusDistribution.Add(CreatePieSeries(FinishedCount, "Finished", s_pieChartPalette[1]));
+        StatusDistribution.Add(CreatePieSeries(CancelledCount, "Cancelled", s_pieChartPalette[2]));
+        StatusDistribution.Add(CreatePieSeries(HiatusCount, "Hiatus", s_pieChartPalette[3]));
 
         _userService.UserCollectionChanges
             .AutoRefresh(x => x.Status)
@@ -1064,12 +1072,12 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
     }
     private void SetupFormatPieChart(int initialUserCollectionCount)
     {
-        Formats.Add(CreatePieSeries(MangaCount, "Manga"));
-        Formats.Add(CreatePieSeries(ManhwaCount, "Manhwa"));
-        Formats.Add(CreatePieSeries(NovelCount, "Novel"));
-        Formats.Add(CreatePieSeries(ComicCount, "Comic"));
-        Formats.Add(CreatePieSeries(ManhuaCount, "Manhua"));
-        Formats.Add(CreatePieSeries(ManfraCount, "Manfra"));
+        Formats.Add(CreatePieSeries(MangaCount, "Manga", s_pieChartPalette[0]));
+        Formats.Add(CreatePieSeries(ManhwaCount, "Manhwa", s_pieChartPalette[1]));
+        Formats.Add(CreatePieSeries(NovelCount, "Novel", s_pieChartPalette[2]));
+        Formats.Add(CreatePieSeries(ComicCount, "Comic", s_pieChartPalette[3]));
+        Formats.Add(CreatePieSeries(ManhuaCount, "Manhua", s_pieChartPalette[4]));
+        Formats.Add(CreatePieSeries(ManfraCount, "Manfra", s_pieChartPalette[5]));
 
         _userService.UserCollectionChanges
             .AutoRefresh(x => x.Format)
@@ -1129,89 +1137,6 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
         NovelPercentage = CalculatePercentage(NovelCount.Value, initialUserCollectionCount);
     }
 
-    private void UpdatePieChartColors()
-    {
-        // --- Update Demographic Pie Chart Series ---
-        if (Demographics.Count > 0 && Demographics[0] is PieSeries<ObservableValue> shounen)
-        {
-            shounen.Fill = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.MenuBGColor));
-            shounen.Stroke = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
-        }
-        if (Demographics.Count > 1 && Demographics[1] is PieSeries<ObservableValue> seinen)
-        {
-            seinen.Fill = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.MenuButtonBGColor));
-            seinen.Stroke = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
-        }
-        if (Demographics.Count > 2 && Demographics[2] is PieSeries<ObservableValue> shoujo)
-        {
-            shoujo.Fill = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.MenuTextColor));
-            shoujo.Stroke = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
-        }
-        if (Demographics.Count > 3 && Demographics[3] is PieSeries<ObservableValue> josei)
-        {
-            josei.Fill = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
-            josei.Stroke = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
-        }
-        if (Demographics.Count > 4 && Demographics[4] is PieSeries<ObservableValue> unknown)
-        {
-            unknown.Fill = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(GetUnknownColor())); // Use helper
-            unknown.Stroke = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
-        }
-
-        // --- Update Status Pie Chart Series ---
-        if (StatusDistribution.Count > 0 && StatusDistribution[0] is PieSeries<ObservableValue> ongoing)
-        {
-            ongoing.Fill = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.MenuBGColor));
-            ongoing.Stroke = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
-        }
-        if (StatusDistribution.Count > 1 && StatusDistribution[1] is PieSeries<ObservableValue> finished)
-        {
-            finished.Fill = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.MenuButtonBGColor));
-            finished.Stroke = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
-        }
-        if (StatusDistribution.Count > 2 && StatusDistribution[2] is PieSeries<ObservableValue> cancelled)
-        {
-            cancelled.Fill = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
-            cancelled.Stroke = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
-        }
-        if (StatusDistribution.Count > 3 && StatusDistribution[3] is PieSeries<ObservableValue> hiatus)
-        {
-            hiatus.Fill = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.MenuTextColor));
-            hiatus.Stroke = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
-        }
-
-        // --- Update Format Pie Chart Series ---
-        if (Formats.Count > 0 && Formats[0] is PieSeries<ObservableValue> manga)
-        {
-            manga.Fill = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.MenuButtonBGColor));
-            manga.Stroke = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
-        }
-        if (Formats.Count > 1 && Formats[1] is PieSeries<ObservableValue> manhwa)
-        {
-            manhwa.Fill = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.MenuBGColor));
-            manhwa.Stroke = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
-        }
-        if (Formats.Count > 2 && Formats[2] is PieSeries<ObservableValue> novel)
-        {
-            novel.Fill = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.MenuTextColor));
-            novel.Stroke = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
-        }
-        if (Formats.Count > 3 && Formats[3] is PieSeries<ObservableValue> comic)
-        {
-            comic.Fill = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
-            comic.Stroke = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
-        }
-        if (Formats.Count > 4 && Formats[4] is PieSeries<ObservableValue> manhua)
-        {
-            manhua.Fill = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(GetManhwaColor()));
-            manhua.Stroke = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
-        }
-        if (Formats.Count > 5 && Formats[5] is PieSeries<ObservableValue> manfra)
-        {
-            manfra.Fill = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(GetManfraColor()));
-            manfra.Stroke = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
-        }
-    }
 #endregion
 
     private static decimal CalculatePercentage(double? count, decimal total)
