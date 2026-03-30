@@ -22,15 +22,22 @@ Entries are stored in `Src/Assets/changelog.json`. This JSON file is an embedded
 
 ```json
 {
-  "2.0.0": [
-    "Entry one",
-    "Entry two"
-  ],
-  "2.1.0": [
-    "Entry one"
-  ]
+  "2.0.0": {
+    "changes": [
+      "Feature or fix description",
+      "Another change"
+    ],
+    "actions": [
+      "Refresh existing series to get higher quality covers",
+      "Re-upload custom covers for sharper display"
+    ]
+  }
 }
 ```
+
+Each version has two arrays:
+- `changes` — what changed (features, fixes, improvements)
+- `actions` — what the user should do (refresh, re-upload, change settings, etc.)
 
 ## Workflow
 
@@ -64,15 +71,19 @@ Entries are stored in `Src/Assets/changelog.json`. This JSON file is an embedded
    - **If the diff is small (<8000 chars):** read it directly from the bash output.
    - Focus on behavioral changes, not implementation details.
 
-4. **Write user-facing changelog notes.** These are NOT commit messages — they describe what the user experiences differently. Rules:
+4. **Write user-facing changelog notes** in two separate sections:
+
+   **`changes` array** — what's new or fixed:
    - Each entry is one short sentence, imperative mood (e.g., "Cover images are now stored at 2x resolution")
    - Group related commits into single entries
    - Skip internal refactors, CI changes, and code cleanup unless they affect the user
    - Keep to 3-8 entries — concise, not exhaustive
-   - **User action items are REQUIRED.** If any change means the user should do something (refresh series, re-upload covers, re-download data, change a setting, etc.), add a dedicated entry that starts with an action verb telling them exactly what to do. For example:
-     - "Refresh existing series via the edit dialog to get higher quality cover images"
-     - "Re-upload custom covers for sharper display on high-DPI screens"
-   - These action entries should come AFTER the feature entries that explain what changed and why
+
+   **`actions` array** — what the user should do:
+   - Only include if changes require user action (refresh series, re-upload covers, change a setting, etc.)
+   - Each entry starts with an action verb telling the user exactly what to do
+   - Examples: "Refresh existing series to get higher quality covers", "Re-upload custom covers for sharper display"
+   - Can be empty `[]` if no actions are needed
 
 5. **Write to `Src/Assets/changelog.json`.** Read the existing file, add the new version entry, and write it back. Preserve all existing entries. The new version key should be added at the END of the JSON object so entries are in chronological order.
 

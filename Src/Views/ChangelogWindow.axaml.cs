@@ -15,9 +15,15 @@ public sealed partial class ChangelogWindow : ReactiveWindow<ViewModelBase>
     public void SetVersion(string version)
     {
         VersionHeader.Text = $"What's New in v{version}";
-        if (Changelog.Entries.TryGetValue(version, out string[]? notes))
+        if (Changelog.Entries.TryGetValue(version, out ChangelogEntry? entry))
         {
-            ChangelogItems.ItemsSource = notes;
+            ChangesItems.ItemsSource = entry.Changes;
+
+            if (entry.Actions.Length > 0)
+            {
+                ActionsItems.ItemsSource = entry.Actions;
+                ActionsSection.IsVisible = true;
+            }
         }
     }
 

@@ -15,4 +15,9 @@ public interface IPopupDialogService
     /// <param name="info">The informational message body of the popup.</param>
     /// <param name="owner">The parent window that owns the dialog.</param>
     Task ShowAsync(string title, string icon, string info, Window owner);
+
+    /// <summary>
+    /// Displays a confirmation dialog and returns true if confirmed, false if cancelled.
+    /// </summary>
+    Task<bool> ConfirmAsync(string title, string icon, string info, Window owner);
 }

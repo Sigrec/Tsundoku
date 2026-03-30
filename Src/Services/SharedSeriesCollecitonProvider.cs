@@ -77,7 +77,7 @@ public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISh
         // 1. Define the text search filter predicate
         IObservable<Func<Series, bool>> textFilter = this.WhenAnyValue(x => x.SeriesFilterText)
             .DistinctUntilChanged()
-            .Throttle(TimeSpan.FromMilliseconds(250))
+            .Throttle(TimeSpan.FromMilliseconds(400))
             .Select(searchText =>
             {
                 if (string.IsNullOrWhiteSpace(searchText))

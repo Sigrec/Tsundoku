@@ -12,8 +12,8 @@
 		<Setter Property="RenderTransform" Value="none"/>
 
 		<Style Selector="TextBlock.mouseover">
-            <Setter Property="Background" Value="{DynamicResource TsundokuStatusAndBookTypeBGHoverColor}"/>
-            <Setter Property="Foreground" Value="{DynamicResource TsundokuStatusAndBookTypeTextHoverColor}"/>
+            <Setter Property="Background" Value="{DynamicResource TsundokuStatusAndBookTypeBGColor}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TsundokuStatusAndBookTypeTextColor}"/>
         </Style>
         <Style Selector="TextBlock.nomouseover">
             <Setter Property="Background" Value="{DynamicResource TsundokuStatusAndBookTypeBGColor}"/>

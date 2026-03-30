@@ -10,28 +10,33 @@
         <cv:BrushToColorConverter x:Key="BrushToColorConverter"/>
     </UserControl.Resources>
 
-    <StackPanel Spacing="5" VerticalAlignment="Center" Margin="7">
-        <TextBlock Text="{CompiledBinding Title, ElementName=Root}"
-                   FontSize="12"
-                   FontWeight="Bold"
-                   Classes="Menu"
-                   IsHitTestVisible="False"/>
-        <Border Classes="Menu" BorderThickness="2">
-            <Border Classes="Menu" BorderThickness="2" Margin="2">
-                <Button Background="{CompiledBinding ColorBrush, ElementName=Root}"
-                        Margin="2"
-                        Cursor="Hand"
-                        HorizontalAlignment="Left"
-                        Height="20"
-                        Width="210"
-                        CornerRadius="0">
-                    <Button.Flyout>
-                        <Flyout Placement="Bottom">
-                            <ColorView Color="{CompiledBinding ColorBrush, ElementName=Root, Converter={StaticResource BrushToColorConverter}, Mode=TwoWay}"/>
-                        </Flyout>
-                    </Button.Flyout>
-                </Button>
-            </Border>
-        </Border>
-    </StackPanel>
+    <Border Background="{DynamicResource TsundokuCollectionBGColor}"
+            BorderBrush="{DynamicResource TsundokuDividerColor}"
+            BorderThickness="2"
+            CornerRadius="8"
+            Padding="6"
+            Margin="3"
+            MinWidth="180">
+        <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button Background="{CompiledBinding ColorBrush, ElementName=Root}"
+                    Width="28" Height="28"
+                    CornerRadius="6"
+                    BorderBrush="{DynamicResource TsundokuDividerColor}"
+                    BorderThickness="2"
+                    Padding="0"
+                    Cursor="Hand">
+                <Button.Flyout>
+                    <Flyout Placement="Bottom">
+                        <ColorView Color="{CompiledBinding ColorBrush, ElementName=Root, Converter={StaticResource BrushToColorConverter}, Mode=TwoWay}"/>
+                    </Flyout>
+                </Button.Flyout>
+            </Button>
+            <TextBlock Text="{CompiledBinding Title, ElementName=Root}"
+                       FontSize="10"
+                       FontWeight="SemiBold"
+                       Foreground="{DynamicResource TsundokuMenuTextColor}"
+                       VerticalAlignment="Center"
+                       IsHitTestVisible="False"/>
+        </StackPanel>
+    </Border>
 </UserControl>

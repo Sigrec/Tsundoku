@@ -48,7 +48,7 @@
                     <Grid.Styles>
                         <Style Selector="Button">
                             <Style Selector="^:pointerover /template/ ContentPresenter">
-                                <Setter Property="TextBlock.Foreground" Value="{DynamicResource TsundokuSeriesProgressButtonsHoverColor}"/>
+                                <Setter Property="TextBlock.Foreground" Value="{DynamicResource TsundokuSeriesButtonIconHoverColor}"/>
                                 <Setter Property="Background" Value="Transparent"/>
                             </Style>
                         </Style>
@@ -110,11 +110,11 @@
                     Click="BackToTop_Click"/>
         </Border>
 
-        <!-- Theme Selector (floating bottom-right) -->
+        <!-- Theme Selector (floating bottom-right, extra right margin for scrollbar) -->
         <StackPanel ZIndex="1"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Bottom"
-                    Margin="0,0,16,16"
+                    Margin="0,0,32,16"
                     Spacing="8">
             <!-- Theme List Popup -->
             <Border Name="ThemeGrid"
@@ -223,6 +223,8 @@
             <Border Name="Navigation"
                     DockPanel.Dock="Top"
                     Classes="Menu"
+                    Background="{DynamicResource TsundokuMenuBGColor}"
+                    BorderBrush="{DynamicResource TsundokuDividerColor}"
                     BorderThickness="0,0,0,2"
                     Padding="24,12">
                 <Grid RowDefinitions="Auto,8,Auto">
@@ -244,7 +246,7 @@
                                        Opacity="0.5"/>
 
                             <!-- User -->
-                            <Border BorderThickness="2" BorderBrush="{DynamicResource TsundokuUserIconBorderColor}" CornerRadius="16" ClipToBounds="True" Height="32" Width="32">
+                            <Border BorderThickness="2" BorderBrush="{DynamicResource TsundokuDividerColor}" CornerRadius="16" ClipToBounds="True" Height="32" Width="32">
                                 <Image Height="32" Width="32"
                                        Source="{CompiledBinding CurrentUser.UserIcon}"
                                        Cursor="Hand"
@@ -377,7 +379,7 @@
                         </StackPanel>
 
                         <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right" VerticalAlignment="Center">
-                            <TextBlock Text="LANGUAGE" FontSize="11" FontWeight="SemiBold" Opacity="0.5" VerticalAlignment="Center" Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
+                            <TextBlock Text="LANGUAGE" FontSize="11" FontWeight="SemiBold" Opacity="0.5" VerticalAlignment="Center" Foreground="{DynamicResource TsundokuMenuTextColor}"/>
                             <ComboBox Name="LanguageSelector"
                                     ItemsSource="{x:Static enums:TsundokuLanguageModel.LANGUAGES}"
                                     SelectionChanged="LanguageChanged"
@@ -396,7 +398,7 @@
 
                             <Rectangle Width="1" Height="18" Fill="{DynamicResource TsundokuDividerColor}" Opacity="0.4" Margin="4,0"/>
 
-                            <TextBlock Text="SORT" FontSize="11" FontWeight="SemiBold" Opacity="0.5" VerticalAlignment="Center" Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
+                            <TextBlock Text="SORT" FontSize="11" FontWeight="SemiBold" Opacity="0.5" VerticalAlignment="Center" Foreground="{DynamicResource TsundokuMenuTextColor}"/>
                             <ComboBox Name="SortSelector"
                                     ItemsSource="{x:Static enums:TsundokuSortModel.TSUNDOKU_SORT_LIST}"
                                     SelectionChanged="SortChanged"
@@ -409,7 +411,7 @@
 
                             <Rectangle Width="1" Height="18" Fill="{DynamicResource TsundokuDividerColor}" Opacity="0.4" Margin="4,0"/>
 
-                            <TextBlock Text="FILTER" FontSize="11" FontWeight="SemiBold" Opacity="0.5" VerticalAlignment="Center" Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
+                            <TextBlock Text="FILTER" FontSize="11" FontWeight="SemiBold" Opacity="0.5" VerticalAlignment="Center" Foreground="{DynamicResource TsundokuMenuTextColor}"/>
                             <ComboBox Name="CollectionFilterSelector"
                                     SelectionChanged="CollectionFilterChanged"
                                     ItemsSource="{x:Static enums:TsundokuFilterModel.TSUNDOKU_FILTER_LIST}"
@@ -425,7 +427,7 @@
             </Border>
 
             <!-- Collection -->
-            <ScrollViewer Name="CollectionPane" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" IsScrollInertiaEnabled="True" DockPanel.Dock="Bottom" Theme="{StaticResource CollectionScroll}">
+            <ScrollViewer Name="CollectionPane" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" IsScrollInertiaEnabled="True" DockPanel.Dock="Bottom" Theme="{StaticResource CollectionScroll}" Background="{DynamicResource TsundokuCollectionBGColor}">
                 <ItemsRepeater Name="CollectionItems" Margin="20,30,20,30" ItemsSource="{CompiledBinding UserCollection}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                     <ItemsRepeater.Layout>
                         <UniformGridLayout

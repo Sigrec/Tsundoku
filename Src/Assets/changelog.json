@@ -1,13 +1,18 @@
 {
-  "2.0.0": [
-    "Upgraded to .NET 10 with Central Package Management for all NuGet dependencies",
-    "Migrated from Avalonia.ReactiveUI to ReactiveUI.Avalonia with source generators replacing Fody IL weaving",
-    "Cover images are now stored at 3x resolution for sharper display on high-DPI screens",
-    "Added version changelog popup that shows once per update with what's new",
-    "Added Refresh Series button in settings to mass refresh series data and covers with a searchable picker",
-    "Added Refresh Covers toggle in Preferences to re-download covers when refreshing individual series",
-    "AniList API now retries on server errors (HTTP 500) instead of silently failing",
-    "App version is now read automatically from the project file — no more hardcoded version strings",
-    "Refresh existing series to get higher quality cover images, or re-upload custom covers"
-  ]
+  "2.0.0": {
+    "changes": [
+      "Upgraded to .NET 10 with Central Package Management for all NuGet dependencies",
+      "Migrated from Avalonia.ReactiveUI to ReactiveUI.Avalonia with source generators replacing Fody IL weaving",
+      "Cover images are now stored at 3x resolution for sharper display on high-DPI screens",
+      "Added version changelog popup that shows once per update with what's new",
+      "Added Refresh Series button in settings to mass refresh series data and covers with a searchable picker",
+      "Added Refresh Covers toggle in Preferences to re-download covers when refreshing individual series",
+      "AniList API now retries on server errors (HTTP 500) instead of silently failing",
+      "App version is now read automatically from the project file"
+    ],
+    "actions": [
+      "Refresh existing series via settings to get higher quality cover images",
+      "Re-upload custom covers for sharper display on high-DPI screens"
+    ]
+  }
 }

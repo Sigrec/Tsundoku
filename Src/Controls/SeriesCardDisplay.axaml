@@ -42,7 +42,7 @@
             Margin="12"
             CornerRadius="14"
             BorderThickness="2"
-            BorderBrush="{DynamicResource TsundokuDividerColor}"
+            BorderBrush="{DynamicResource TsundokuSeriesCardBorderColor}"
             BoxShadow="0 0 15 6 #B3000000"
             Width="{CompiledBinding Source={x:Static m:Constants.CARD_WIDTH}}"
             Height="{CompiledBinding Source={x:Static m:Constants.CARD_HEIGHT}}"
@@ -79,7 +79,7 @@
                   Width="{CompiledBinding Source={x:Static m:Constants.LEFT_SIDE_CARD_WIDTH}}"
                   PointerPressed="OpenSiteLink"
                   Cursor="Hand"
-                  Background="{DynamicResource TsundokuMenuButtonBGColor}">
+                  Background="{DynamicResource TsundokuSeriesCoverBGColor}">
 
                 <!-- Cover Image (full height) -->
                 <Image
@@ -100,7 +100,7 @@
                   <PathIcon
                       Data="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"
                       Width="48" Height="48"
-                      Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}"
+                      Foreground="{DynamicResource TsundokuStatusAndBookTypeTextColor}"
                       Opacity="0.3"/>
                   <TextBlock
                       TextAlignment="Center"
@@ -108,7 +108,7 @@
                       TextTrimming="CharacterEllipsis"
                       FontWeight="Bold"
                       FontSize="13"
-                      Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}"
+                      Foreground="{DynamicResource TsundokuStatusAndBookTypeTextColor}"
                       Opacity="0.5"
                       Width="{CompiledBinding Source={x:Static m:Constants.LEFT_SIDE_CARD_WIDTH}}"
                       Padding="8,0">
@@ -127,7 +127,7 @@
                     HorizontalAlignment="Center"
                     Margin="0,0,0,8"
                     Background="{DynamicResource TsundokuStatusAndBookTypeBGColor}"
-                    BorderBrush="{DynamicResource TsundokuDividerColor}"
+                    BorderBrush="{DynamicResource TsundokuStatusAndBookTypeBorderColor}"
                     BorderThickness="2"
                     CornerRadius="8"
                     Padding="10,4"
@@ -251,7 +251,7 @@
                   </Grid>
 
                   <!-- Progress Footer -->
-                  <Border Grid.Row="1" BorderThickness="0,2,0,0" BorderBrush="{DynamicResource TsundokuDividerColor}" Margin="8,0,8,0" Padding="0,6,0,6">
+                  <Border Grid.Row="1" BorderThickness="0,2,0,0" BorderBrush="{DynamicResource TsundokuSeriesCardDividerColor}" Margin="8,0,8,0" Padding="0,6,0,6">
                   <Grid
                       ColumnDefinitions="Auto,Auto,*,Auto">
                     <Grid.Styles>
@@ -261,8 +261,20 @@
                         <Setter Property="FontSize" Value="18"/>
                         <Setter Property="Padding" Value="0,0,0,2"/>
                         <Setter Property="CornerRadius" Value="8"/>
-                        <Setter Property="Theme" Value="{StaticResource MenuButton}"/>
+                        <Setter Property="Background" Value="{DynamicResource TsundokuSeriesCardButtonBGColor}"/>
+                        <Setter Property="Foreground" Value="{DynamicResource TsundokuSeriesButtonIconColor}"/>
+                        <Setter Property="BorderBrush" Value="{DynamicResource TsundokuSeriesProgressBarBorderColor}"/>
+                        <Setter Property="BorderThickness" Value="2"/>
+                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                        <Setter Property="VerticalContentAlignment" Value="Center"/>
                         <Setter Property="Cursor" Value="Hand"/>
+                      </Style>
+                      <Style Selector="Button.vol-btn:pointerover">
+                        <Setter Property="Foreground" Value="{DynamicResource TsundokuSeriesButtonIconHoverColor}"/>
+                      </Style>
+                      <Style Selector="Button.vol-btn:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                        <Setter Property="Background" Value="{DynamicResource TsundokuSeriesCardButtonBGColor}"/>
+                        <Setter Property="Foreground" Value="{DynamicResource TsundokuSeriesButtonIconHoverColor}"/>
                       </Style>
                     </Grid.Styles>
 
@@ -304,12 +316,10 @@
                     <!-- Edit Button -->
                     <Button
                         Grid.Column="3"
-                        Width="28" Height="28"
+                        Classes="vol-btn"
                         Margin="8,0,0,0"
-                        Theme="{StaticResource MenuButton}"
                         i:Attached.Icon="fa-solid fa-pen"
                         FontSize="14"
-                        Cursor="Hand"
                         Click="OpenEditSeriesInfoWindow"/>
                   </Grid>
                   </Border>

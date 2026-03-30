@@ -46,7 +46,24 @@
       "Bash(unzip -o NotoSansJP.zip -d NotoSansJP_tmp)",
       "Bash(FONTS_DIR=\"Src/Assets/Fonts\" echo \"Downloading Geist...\" curl -sL \"https://github.com/vercel/geist-font/releases/download/1.4.01/Geist-v1.4.01.zip\" -o /tmp/geist.zip unzip -o /tmp/geist.zip -d /tmp/geist_tmp)",
       "Bash(xxd)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Read(//tmp/**)",
+      "Bash(grep -r 'DynamicResource TsundokuSeriesProgressBGColor' /c/Tsundoku/Src --include=*.axaml)",
+      "Bash(grep -r 'DynamicResource TsundokuSeriesButtonIconColor' /c/Tsundoku/Src --include=*.axaml)",
+      "Bash(grep -r 'DynamicResource TsundokuSeriesButtonIconHoverColor' /c/Tsundoku/Src --include=*.axaml)",
+      "Bash(grep -r TsundokuSeriesProgressBGColor /c/Tsundoku/Src --include=*.axaml)",
+      "Bash(grep -r TsundokuSeriesProgressButtonsHoverColor /c/Tsundoku/Src --include=*.axaml)",
+      "Bash(grep -r TsundokuSeriesButtonIconColor /c/Tsundoku/Src --include=*.axaml)",
+      "Bash(grep -r TsundokuSeriesButtonIconHoverColor /c/Tsundoku/Src --include=*.axaml)",
+      "Bash(grep -r TsundokuStatusAndBookTypeBGHoverColor /c/Tsundoku/Src --include=*.axaml)",
+      "Bash(grep -r TsundokuStatusAndBookTypeTextHoverColor /c/Tsundoku/Src --include=*.axaml)",
+      "Bash(grep -r TsundokuStatusAndBookTypeBGColor /c/Tsundoku/Src --include=*.axaml)",
+      "Bash(grep -r TsundokuStatusAndBookTypeTextColor /c/Tsundoku/Src --include=*.axaml)",
+      "Bash(grep -r \"TsundokuStatusAndBookTypeBGHoverColor\\\\|TsundokuStatusAndBookTypeTextHoverColor\" /c/Tsundoku/Src --include=*.xaml)",
+      "Bash(grep -r 'DynamicResource Tsundoku' /c/Tsundoku/Src --include=*.axaml --include=*.xaml)",
+      "Bash(grep -rho 'DynamicResource Tsundoku[A-Za-z0-9]*' /c/Tsundoku/Src --include=*.axaml --include=*.xaml)",
+      "Bash(grep -r \"TsundokuSeriesEditPane\\\\|TsundokuSeriesEditPaneButtons\" /c/Tsundoku/Src --include=*.axaml --include=*.xaml)"
     ]
   }
 }

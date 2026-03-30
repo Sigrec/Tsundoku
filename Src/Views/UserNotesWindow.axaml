@@ -27,15 +27,15 @@
 
             <!-- Notes Area -->
             <Grid Grid.Row="1" RowDefinitions="*,Auto" Margin="16">
-                <Border Background="{DynamicResource TsundokuSeriesNotesBGColor}"
-                        BorderBrush="{DynamicResource TsundokuSeriesNotesBorderColor}"
+                <Border Background="{DynamicResource TsundokuSeriesCardBGColor}"
+                        BorderBrush="{DynamicResource TsundokuSeriesCardBorderColor}"
                         BorderThickness="2"
                         CornerRadius="10">
                     <TextBox Name="UserNotes"
                              Background="Transparent"
                              BorderThickness="0"
-                             Foreground="{DynamicResource TsundokuSeriesNotesTextColor}"
-                             CaretBrush="{DynamicResource TsundokuSeriesNotesTextColor}"
+                             Foreground="{DynamicResource TsundokuSeriesCardDescColor}"
+                             CaretBrush="{DynamicResource TsundokuSeriesCardDescColor}"
                              FontWeight="SemiBold"
                              FontSize="{CompiledBinding NotesFontSize}"
                              TextWrapping="Wrap"
@@ -59,7 +59,7 @@
                                 <Setter Property="BorderThickness" Value="0"/>
                             </Style>
                             <Style Selector="TextBox /template/ TextBlock#PART_Watermark">
-                                <Setter Property="Foreground" Value="{DynamicResource TsundokuSeriesNotesTextColor}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource TsundokuSeriesCardDescColor}"/>
                                 <Setter Property="Opacity" Value="0.3"/>
                             </Style>
                         </TextBox.Styles>

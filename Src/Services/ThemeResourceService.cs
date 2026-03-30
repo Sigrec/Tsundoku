@@ -39,19 +39,14 @@ public sealed class ThemeResourceService : IThemeResourceService
 
     public IDisposable ObserveAndApply(TsundokuTheme theme)
     {
-        var disposable = new CompositeDisposable();
+        CompositeDisposable disposable = new();
 
-        // Subscribe to INotifyPropertyChanged which fires reliably for all property changes
-        // including those from TwoWay bindings through converters
         void OnPropertyChanged(object? sender, PropertyChangedEventArgs args)
         {
             string? propName = args.PropertyName;
-            if (propName is not null && _propertyToResource.TryGetValue(propName, out var entry))
+            if (propName is not null && _propertyToResource.TryGetValue(propName, out _))
             {
-                if (Application.Current is { Resources: { } resources })
-                {
-                    resources[entry.Key] = entry.Getter(theme);
-                }
+                ApplyTheme(theme);
             }
         }
 

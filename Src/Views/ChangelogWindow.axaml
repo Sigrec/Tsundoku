@@ -4,7 +4,6 @@
         xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
         x:Class="Tsundoku.Views.ChangelogWindow"
         Icon="\Assets\Icons\TsundokuLogo.ico"
-        FontFamily="Segoe UI"
         WindowStartupLocation="CenterOwner"
         SizeToContent="Height"
         Width="480"
@@ -40,30 +39,81 @@
                     CornerRadius="1"
                     Opacity="0.6"/>
 
-            <!-- Changelog entries -->
-            <ItemsControl x:Name="ChangelogItems">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate x:DataType="x:String">
-                        <Grid ColumnDefinitions="Auto,*" Margin="0,4">
-                            <TextBlock Grid.Column="0"
-                                       Text="&#x2022;"
-                                       FontSize="16"
-                                       FontWeight="Bold"
-                                       VerticalAlignment="Top"
-                                       Margin="0,0,10,0"
-                                       Foreground="{DynamicResource TsundokuDividerColor}"/>
-                            <TextBlock Grid.Column="1"
-                                       Text="{CompiledBinding}"
-                                       FontSize="14"
-                                       FontWeight="SemiBold"
-                                       TextWrapping="Wrap"
-                                       LineHeight="22"
-                                       VerticalAlignment="Top"
-                                       Foreground="{DynamicResource TsundokuMenuTextColor}"/>
-                        </Grid>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+            <!-- Changes section -->
+            <StackPanel Spacing="6">
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                    <i:Icon Value="fa-solid fa-star" FontSize="11"
+                            Foreground="{DynamicResource TsundokuDividerColor}"/>
+                    <TextBlock Text="CHANGES"
+                               FontSize="11"
+                               FontWeight="Bold"
+                               LetterSpacing="1"
+                               Foreground="{DynamicResource TsundokuDividerColor}"/>
+                </StackPanel>
+                <ItemsControl x:Name="ChangesItems">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="x:String">
+                            <Grid ColumnDefinitions="Auto,*" Margin="0,3">
+                                <TextBlock Grid.Column="0"
+                                           Text="&#x2022;"
+                                           FontSize="16"
+                                           FontWeight="Bold"
+                                           VerticalAlignment="Top"
+                                           Margin="0,0,10,0"
+                                           Foreground="{DynamicResource TsundokuDividerColor}"/>
+                                <TextBlock Grid.Column="1"
+                                           Text="{CompiledBinding}"
+                                           FontSize="13"
+                                           FontWeight="SemiBold"
+                                           TextWrapping="Wrap"
+                                           LineHeight="20"
+                                           VerticalAlignment="Top"
+                                           Foreground="{DynamicResource TsundokuMenuTextColor}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+
+            <!-- Actions section (only visible when there are actions) -->
+            <StackPanel x:Name="ActionsSection" Spacing="6" IsVisible="False">
+                <Border Height="1"
+                        Background="{DynamicResource TsundokuDividerColor}"
+                        CornerRadius="1"
+                        Opacity="0.3"
+                        Margin="0,4,0,0"/>
+                <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,4,0,0">
+                    <i:Icon Value="fa-solid fa-circle-exclamation" FontSize="11"
+                            Foreground="{DynamicResource TsundokuSeriesProgressBarColor}"/>
+                    <TextBlock Text="RECOMMENDED ACTIONS"
+                               FontSize="11"
+                               FontWeight="Bold"
+                               LetterSpacing="1"
+                               Foreground="{DynamicResource TsundokuSeriesProgressBarColor}"/>
+                </StackPanel>
+                <ItemsControl x:Name="ActionsItems">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="x:String">
+                            <Grid ColumnDefinitions="Auto,*" Margin="0,3">
+                                <i:Icon Grid.Column="0"
+                                        Value="fa-solid fa-arrow-right"
+                                        FontSize="10"
+                                        VerticalAlignment="Top"
+                                        Margin="0,4,10,0"
+                                        Foreground="{DynamicResource TsundokuSeriesProgressBarColor}"/>
+                                <TextBlock Grid.Column="1"
+                                           Text="{CompiledBinding}"
+                                           FontSize="13"
+                                           FontWeight="SemiBold"
+                                           TextWrapping="Wrap"
+                                           LineHeight="20"
+                                           VerticalAlignment="Top"
+                                           Foreground="{DynamicResource TsundokuMenuTextColor}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
 
             <!-- Dismiss button -->
             <Button Content="Got it!"

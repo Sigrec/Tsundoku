@@ -17,9 +17,6 @@ public sealed partial class TsundokuTheme : ReactiveObject, ICloneable, ICompara
     [Reactive] public partial SolidColorBrush UsernameColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public partial SolidColorBrush UserIconBorderColor { get; set; }
-
-    [JsonConverter(typeof(SolidColorBrushJsonConverter))]
     [Reactive] public partial SolidColorBrush MenuTextColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
@@ -59,13 +56,7 @@ public sealed partial class TsundokuTheme : ReactiveObject, ICloneable, ICompara
     [Reactive] public partial SolidColorBrush StatusAndBookTypeBGColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public partial SolidColorBrush StatusAndBookTypeBGHoverColor { get; set; }
-
-    [JsonConverter(typeof(SolidColorBrushJsonConverter))]
     [Reactive] public partial SolidColorBrush StatusAndBookTypeTextColor { get; set; }
-
-    [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public partial SolidColorBrush StatusAndBookTypeTextHoverColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
     [Reactive] public partial SolidColorBrush SeriesCardBGColor { get; set; }
@@ -83,7 +74,7 @@ public sealed partial class TsundokuTheme : ReactiveObject, ICloneable, ICompara
     [Reactive] public partial SolidColorBrush SeriesCardDescColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public partial SolidColorBrush SeriesProgressBGColor { get; set; }
+    [Reactive] public partial SolidColorBrush SeriesCardBorderColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
     [Reactive] public partial SolidColorBrush SeriesProgressBarColor { get; set; }
@@ -98,49 +89,27 @@ public sealed partial class TsundokuTheme : ReactiveObject, ICloneable, ICompara
     [Reactive] public partial SolidColorBrush SeriesProgressTextColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public partial SolidColorBrush SeriesProgressButtonsHoverColor { get; set; }
-
-    [JsonConverter(typeof(SolidColorBrushJsonConverter))]
     [Reactive] public partial SolidColorBrush SeriesButtonIconColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
     [Reactive] public partial SolidColorBrush SeriesButtonIconHoverColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public partial SolidColorBrush SeriesEditPaneBGColor { get; set; }
+    [Reactive] public partial SolidColorBrush StatusAndBookTypeBorderColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public partial SolidColorBrush SeriesNotesBGColor { get; set; }
+    [Reactive] public partial SolidColorBrush SeriesCoverBGColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public partial SolidColorBrush SeriesNotesBorderColor { get; set; }
+    [Reactive] public partial SolidColorBrush SeriesCardButtonBGColor { get; set; }
 
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public partial SolidColorBrush SeriesNotesTextColor { get; set; }
-
-    [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public partial SolidColorBrush SeriesEditPaneButtonsBGColor { get; set; }
-
-    [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public partial SolidColorBrush SeriesEditPaneButtonsBGHoverColor { get; set; }
-
-    [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public partial SolidColorBrush SeriesEditPaneButtonsBorderColor { get; set; }
-
-    [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public partial SolidColorBrush SeriesEditPaneButtonsBorderHoverColor { get; set; }
-
-    [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public partial SolidColorBrush SeriesEditPaneButtonsIconColor { get; set; }
-
-    [JsonConverter(typeof(SolidColorBrushJsonConverter))]
-    [Reactive] public partial SolidColorBrush SeriesEditPaneButtonsIconHoverColor { get; set; }
+    [Reactive] public partial SolidColorBrush SeriesCardDividerColor { get; set; }
 
     public static readonly TsundokuTheme DEFAULT_THEME = new(
         "Default",
         new SolidColorBrush(Color.Parse("#ff20232d")),
         new SolidColorBrush(Color.Parse("#ffb4bddb")),
-        new SolidColorBrush(Color.Parse("#ff626460")),
         new SolidColorBrush(Color.Parse("#ffb4bddb")),
         new SolidColorBrush(Color.Parse("#ff626460")),
         new SolidColorBrush(Color.Parse("#ffdfd59e")),
@@ -154,32 +123,23 @@ public sealed partial class TsundokuTheme : ReactiveObject, ICloneable, ICompara
         new SolidColorBrush(Color.Parse("#ff626460")),
         new SolidColorBrush(Color.Parse("#ff2c2d42")),
         new SolidColorBrush(Color.Parse("#ff626460")),
-        new SolidColorBrush(Color.Parse("#ffdfd59e")),
         new SolidColorBrush(Color.Parse("#ffececec")),
-        new SolidColorBrush(Color.Parse("#ff626460")),
         new SolidColorBrush(Color.Parse("#ff20232d")),
         new SolidColorBrush(Color.Parse("#ffdfd59e")),
         new SolidColorBrush(Color.Parse("#ffb4bddb")),
         new SolidColorBrush(Color.Parse("#ffb4bddb")),
         new SolidColorBrush(Color.Parse("#ffececec")),
-        new SolidColorBrush(Color.Parse("#ff626460")),
+        new SolidColorBrush(Color.Parse("#ffdfd59e")),
         new SolidColorBrush(Color.Parse("#ffdfd59e")),
         new SolidColorBrush(Color.Parse("#ff20232d")),
         new SolidColorBrush(Color.Parse("#ffececec")),
         new SolidColorBrush(Color.Parse("#ffececec")),
-        new SolidColorBrush(Color.Parse("#ff20232d")),
         new SolidColorBrush(Color.Parse("#ffececec")),
         new SolidColorBrush(Color.Parse("#ffdfd59e")),
+        new SolidColorBrush(Color.Parse("#ffdfd59e")),
+        new SolidColorBrush(Color.Parse("#ff626460")),
         new SolidColorBrush(Color.Parse("#ff20232d")),
-        new SolidColorBrush(Color.Parse("#ff626460")),
-        new SolidColorBrush(Color.Parse("#ffdfd59e")),
-        new SolidColorBrush(Color.Parse("#ffb4bddb")),
-        new SolidColorBrush(Color.Parse("#ff2c2d42")),
-        new SolidColorBrush(Color.Parse("#ff626460")),
-        new SolidColorBrush(Color.Parse("#ffdfd59e")),
-        new SolidColorBrush(Color.Parse("#ffdfd59e")),
-        new SolidColorBrush(Color.Parse("#ff626460")),
-        new SolidColorBrush(Color.Parse("#ffb4bddb"))
+        new SolidColorBrush(Color.Parse("#ffdfd59e"))
     );
 
     public TsundokuTheme()
@@ -193,11 +153,10 @@ public sealed partial class TsundokuTheme : ReactiveObject, ICloneable, ICompara
     }
 
     [JsonConstructor]
-    public TsundokuTheme(string themeName, SolidColorBrush menuBGColor, SolidColorBrush usernameColor, SolidColorBrush userIconBorderColor, SolidColorBrush menuTextColor, SolidColorBrush searchBarBGColor, SolidColorBrush searchBarBorderColor, SolidColorBrush searchBarTextColor, SolidColorBrush dividerColor, SolidColorBrush menuButtonBGColor, SolidColorBrush menuButtonBGHoverColor, SolidColorBrush menuButtonBorderColor, SolidColorBrush menuButtonBorderHoverColor, SolidColorBrush menuButtonTextAndIconColor, SolidColorBrush menuButtonTextAndIconHoverColor, SolidColorBrush collectionBGColor, SolidColorBrush statusAndBookTypeBGColor, SolidColorBrush statusAndBookTypeBGHoverColor, SolidColorBrush statusAndBookTypeTextColor, SolidColorBrush statusAndBookTypeTextHoverColor, SolidColorBrush seriesCardBGColor, SolidColorBrush seriesCardTitleColor, SolidColorBrush seriesCardPublisherColor, SolidColorBrush seriesCardStaffColor, SolidColorBrush seriesCardDescColor, SolidColorBrush seriesProgressBGColor, SolidColorBrush seriesProgressBarColor, SolidColorBrush seriesProgressBarBGColor, SolidColorBrush seriesProgressBarBorderColor, SolidColorBrush seriesProgressTextColor, SolidColorBrush seriesProgressButtonsHoverColor, SolidColorBrush seriesButtonIconColor, SolidColorBrush seriesButtonIconHoverColor, SolidColorBrush seriesEditPaneBGColor, SolidColorBrush seriesNotesBGColor, SolidColorBrush seriesNotesBorderColor, SolidColorBrush seriesNotesTextColor, SolidColorBrush seriesEditPaneButtonsBGColor, SolidColorBrush seriesEditPaneButtonsBGHoverColor, SolidColorBrush seriesEditPaneButtonsBorderColor, SolidColorBrush seriesEditPaneButtonsBorderHoverColor, SolidColorBrush seriesEditPaneButtonsIconColor, SolidColorBrush seriesEditPaneButtonsIconHoverColor) : this(themeName)
+    public TsundokuTheme(string themeName, SolidColorBrush menuBGColor, SolidColorBrush usernameColor, SolidColorBrush menuTextColor, SolidColorBrush searchBarBGColor, SolidColorBrush searchBarBorderColor, SolidColorBrush searchBarTextColor, SolidColorBrush dividerColor, SolidColorBrush menuButtonBGColor, SolidColorBrush menuButtonBGHoverColor, SolidColorBrush menuButtonBorderColor, SolidColorBrush menuButtonBorderHoverColor, SolidColorBrush menuButtonTextAndIconColor, SolidColorBrush menuButtonTextAndIconHoverColor, SolidColorBrush collectionBGColor, SolidColorBrush statusAndBookTypeBGColor, SolidColorBrush statusAndBookTypeTextColor, SolidColorBrush seriesCardBGColor, SolidColorBrush seriesCardTitleColor, SolidColorBrush seriesCardPublisherColor, SolidColorBrush seriesCardStaffColor, SolidColorBrush seriesCardDescColor, SolidColorBrush seriesCardBorderColor, SolidColorBrush seriesProgressBarColor, SolidColorBrush seriesProgressBarBGColor, SolidColorBrush seriesProgressBarBorderColor, SolidColorBrush seriesProgressTextColor, SolidColorBrush seriesButtonIconColor, SolidColorBrush seriesButtonIconHoverColor, SolidColorBrush statusAndBookTypeBorderColor, SolidColorBrush seriesCoverBGColor, SolidColorBrush seriesCardButtonBGColor, SolidColorBrush seriesCardDividerColor) : this(themeName)
     {
         MenuBGColor = menuBGColor;
         UsernameColor = usernameColor;
-        UserIconBorderColor = userIconBorderColor;
         MenuTextColor = menuTextColor;
         SearchBarBGColor = searchBarBGColor;
         SearchBarBorderColor = searchBarBorderColor;
@@ -211,32 +170,23 @@ public sealed partial class TsundokuTheme : ReactiveObject, ICloneable, ICompara
         MenuButtonTextAndIconHoverColor = menuButtonTextAndIconHoverColor;
         CollectionBGColor = collectionBGColor;
         StatusAndBookTypeBGColor = statusAndBookTypeBGColor;
-        StatusAndBookTypeBGHoverColor = statusAndBookTypeBGHoverColor;
         StatusAndBookTypeTextColor = statusAndBookTypeTextColor;
-        StatusAndBookTypeTextHoverColor = statusAndBookTypeTextHoverColor;
         SeriesCardBGColor = seriesCardBGColor;
         SeriesCardTitleColor = seriesCardTitleColor;
         SeriesCardPublisherColor = seriesCardPublisherColor;
         SeriesCardStaffColor = seriesCardStaffColor;
         SeriesCardDescColor = seriesCardDescColor;
-        SeriesProgressBGColor = seriesProgressBGColor;
+        SeriesCardBorderColor = seriesCardBorderColor;
         SeriesProgressBarColor = seriesProgressBarColor;
         SeriesProgressBarBGColor = seriesProgressBarBGColor;
         SeriesProgressBarBorderColor = seriesProgressBarBorderColor;
         SeriesProgressTextColor = seriesProgressTextColor;
-        SeriesProgressButtonsHoverColor = seriesProgressButtonsHoverColor;
         SeriesButtonIconColor = seriesButtonIconColor;
         SeriesButtonIconHoverColor = seriesButtonIconHoverColor;
-        SeriesEditPaneBGColor = seriesEditPaneBGColor;
-        SeriesNotesBGColor = seriesNotesBGColor;
-        SeriesNotesBorderColor = seriesNotesBorderColor;
-        SeriesNotesTextColor = seriesNotesTextColor;
-        SeriesEditPaneButtonsBGColor = seriesEditPaneButtonsBGColor;
-        SeriesEditPaneButtonsBGHoverColor = seriesEditPaneButtonsBGHoverColor;
-        SeriesEditPaneButtonsBorderColor = seriesEditPaneButtonsBorderColor;
-        SeriesEditPaneButtonsBorderHoverColor = seriesEditPaneButtonsBorderHoverColor;
-        SeriesEditPaneButtonsIconColor = seriesEditPaneButtonsIconColor;
-        SeriesEditPaneButtonsIconHoverColor = seriesEditPaneButtonsIconHoverColor;
+        StatusAndBookTypeBorderColor = statusAndBookTypeBorderColor;
+        SeriesCoverBGColor = seriesCoverBGColor;
+        SeriesCardButtonBGColor = seriesCardButtonBGColor;
+        SeriesCardDividerColor = seriesCardDividerColor;
     }
 
     public override int GetHashCode()
@@ -245,7 +195,6 @@ public sealed partial class TsundokuTheme : ReactiveObject, ICloneable, ICompara
         hash.Add(ThemeName);
         hash.Add(MenuBGColor.Color.ToUInt32());
         hash.Add(UsernameColor.Color.ToUInt32());
-        hash.Add(UserIconBorderColor.Color.ToUInt32());
         hash.Add(MenuTextColor.Color.ToUInt32());
         hash.Add(SearchBarBGColor.Color.ToUInt32());
         hash.Add(SearchBarBorderColor.Color.ToUInt32());
@@ -259,32 +208,23 @@ public sealed partial class TsundokuTheme : ReactiveObject, ICloneable, ICompara
         hash.Add(MenuButtonTextAndIconHoverColor.Color.ToUInt32());
         hash.Add(CollectionBGColor.Color.ToUInt32());
         hash.Add(StatusAndBookTypeBGColor.Color.ToUInt32());
-        hash.Add(StatusAndBookTypeBGHoverColor.Color.ToUInt32());
         hash.Add(StatusAndBookTypeTextColor.Color.ToUInt32());
-        hash.Add(StatusAndBookTypeTextHoverColor.Color.ToUInt32());
         hash.Add(SeriesCardBGColor.Color.ToUInt32());
         hash.Add(SeriesCardTitleColor.Color.ToUInt32());
         hash.Add(SeriesCardPublisherColor.Color.ToUInt32());
         hash.Add(SeriesCardStaffColor.Color.ToUInt32());
         hash.Add(SeriesCardDescColor.Color.ToUInt32());
-        hash.Add(SeriesProgressBGColor.Color.ToUInt32());
+        hash.Add(SeriesCardBorderColor.Color.ToUInt32());
         hash.Add(SeriesProgressBarColor.Color.ToUInt32());
         hash.Add(SeriesProgressBarBGColor.Color.ToUInt32());
         hash.Add(SeriesProgressBarBorderColor.Color.ToUInt32());
         hash.Add(SeriesProgressTextColor.Color.ToUInt32());
-        hash.Add(SeriesProgressButtonsHoverColor.Color.ToUInt32());
         hash.Add(SeriesButtonIconColor.Color.ToUInt32());
         hash.Add(SeriesButtonIconHoverColor.Color.ToUInt32());
-        hash.Add(SeriesEditPaneBGColor.Color.ToUInt32());
-        hash.Add(SeriesNotesBGColor.Color.ToUInt32());
-        hash.Add(SeriesNotesBorderColor.Color.ToUInt32());
-        hash.Add(SeriesNotesTextColor.Color.ToUInt32());
-        hash.Add(SeriesEditPaneButtonsBGColor.Color.ToUInt32());
-        hash.Add(SeriesEditPaneButtonsBGHoverColor.Color.ToUInt32());
-        hash.Add(SeriesEditPaneButtonsBorderColor.Color.ToUInt32());
-        hash.Add(SeriesEditPaneButtonsBorderHoverColor.Color.ToUInt32());
-        hash.Add(SeriesEditPaneButtonsIconColor.Color.ToUInt32());
-        hash.Add(SeriesEditPaneButtonsIconHoverColor.Color.ToUInt32());
+        hash.Add(StatusAndBookTypeBorderColor.Color.ToUInt32());
+        hash.Add(SeriesCoverBGColor.Color.ToUInt32());
+        hash.Add(SeriesCardButtonBGColor.Color.ToUInt32());
+        hash.Add(SeriesCardDividerColor.Color.ToUInt32());
         return hash.ToHashCode();
     }
 
@@ -300,7 +240,6 @@ public sealed partial class TsundokuTheme : ReactiveObject, ICloneable, ICompara
             ThemeName,
             CloneBrush(MenuBGColor),
             CloneBrush(UsernameColor),
-            CloneBrush(UserIconBorderColor),
             CloneBrush(MenuTextColor),
             CloneBrush(SearchBarBGColor),
             CloneBrush(SearchBarBorderColor),
@@ -314,32 +253,23 @@ public sealed partial class TsundokuTheme : ReactiveObject, ICloneable, ICompara
             CloneBrush(MenuButtonTextAndIconHoverColor),
             CloneBrush(CollectionBGColor),
             CloneBrush(StatusAndBookTypeBGColor),
-            CloneBrush(StatusAndBookTypeBGHoverColor),
             CloneBrush(StatusAndBookTypeTextColor),
-            CloneBrush(StatusAndBookTypeTextHoverColor),
             CloneBrush(SeriesCardBGColor),
             CloneBrush(SeriesCardTitleColor),
             CloneBrush(SeriesCardPublisherColor),
             CloneBrush(SeriesCardStaffColor),
             CloneBrush(SeriesCardDescColor),
-            CloneBrush(SeriesProgressBGColor),
+            CloneBrush(SeriesCardBorderColor),
             CloneBrush(SeriesProgressBarColor),
             CloneBrush(SeriesProgressBarBGColor),
             CloneBrush(SeriesProgressBarBorderColor),
             CloneBrush(SeriesProgressTextColor),
-            CloneBrush(SeriesProgressButtonsHoverColor),
             CloneBrush(SeriesButtonIconColor),
             CloneBrush(SeriesButtonIconHoverColor),
-            CloneBrush(SeriesEditPaneBGColor),
-            CloneBrush(SeriesNotesBGColor),
-            CloneBrush(SeriesNotesBorderColor),
-            CloneBrush(SeriesNotesTextColor),
-            CloneBrush(SeriesEditPaneButtonsBGColor),
-            CloneBrush(SeriesEditPaneButtonsBGHoverColor),
-            CloneBrush(SeriesEditPaneButtonsBorderColor),
-            CloneBrush(SeriesEditPaneButtonsBorderHoverColor),
-            CloneBrush(SeriesEditPaneButtonsIconColor),
-            CloneBrush(SeriesEditPaneButtonsIconHoverColor)
+            CloneBrush(StatusAndBookTypeBorderColor),
+            CloneBrush(SeriesCoverBGColor),
+            CloneBrush(SeriesCardButtonBGColor),
+            CloneBrush(SeriesCardDividerColor)
         );
     }
 
@@ -368,7 +298,6 @@ public sealed partial class TsundokuTheme : ReactiveObject, ICloneable, ICompara
         return string.Equals(ThemeName, other.ThemeName, StringComparison.OrdinalIgnoreCase) &&
         BrushEquals(MenuBGColor, other.MenuBGColor) &&
         BrushEquals(UsernameColor, other.UsernameColor) &&
-        BrushEquals(UserIconBorderColor, other.UserIconBorderColor) &&
         BrushEquals(MenuTextColor, other.MenuTextColor) &&
         BrushEquals(SearchBarBGColor, other.SearchBarBGColor) &&
         BrushEquals(SearchBarBorderColor, other.SearchBarBorderColor) &&
@@ -382,32 +311,23 @@ public sealed partial class TsundokuTheme : ReactiveObject, ICloneable, ICompara
         BrushEquals(MenuButtonTextAndIconHoverColor, other.MenuButtonTextAndIconHoverColor) &&
         BrushEquals(CollectionBGColor, other.CollectionBGColor) &&
         BrushEquals(StatusAndBookTypeBGColor, other.StatusAndBookTypeBGColor) &&
-        BrushEquals(StatusAndBookTypeBGHoverColor, other.StatusAndBookTypeBGHoverColor) &&
         BrushEquals(StatusAndBookTypeTextColor, other.StatusAndBookTypeTextColor) &&
-        BrushEquals(StatusAndBookTypeTextHoverColor, other.StatusAndBookTypeTextHoverColor) &&
         BrushEquals(SeriesCardBGColor, other.SeriesCardBGColor) &&
         BrushEquals(SeriesCardTitleColor, other.SeriesCardTitleColor) &&
         BrushEquals(SeriesCardPublisherColor, other.SeriesCardPublisherColor) &&
         BrushEquals(SeriesCardStaffColor, other.SeriesCardStaffColor) &&
         BrushEquals(SeriesCardDescColor, other.SeriesCardDescColor) &&
-        BrushEquals(SeriesProgressBGColor, other.SeriesProgressBGColor) &&
+        BrushEquals(SeriesCardBorderColor, other.SeriesCardBorderColor) &&
         BrushEquals(SeriesProgressBarColor, other.SeriesProgressBarColor) &&
         BrushEquals(SeriesProgressBarBGColor, other.SeriesProgressBarBGColor) &&
         BrushEquals(SeriesProgressBarBorderColor, other.SeriesProgressBarBorderColor) &&
         BrushEquals(SeriesProgressTextColor, other.SeriesProgressTextColor) &&
-        BrushEquals(SeriesProgressButtonsHoverColor, other.SeriesProgressButtonsHoverColor) &&
         BrushEquals(SeriesButtonIconColor, other.SeriesButtonIconColor) &&
         BrushEquals(SeriesButtonIconHoverColor, other.SeriesButtonIconHoverColor) &&
-        BrushEquals(SeriesEditPaneBGColor, other.SeriesEditPaneBGColor) &&
-        BrushEquals(SeriesNotesBGColor, other.SeriesNotesBGColor) &&
-        BrushEquals(SeriesNotesBorderColor, other.SeriesNotesBorderColor) &&
-        BrushEquals(SeriesNotesTextColor, other.SeriesNotesTextColor) &&
-        BrushEquals(SeriesEditPaneButtonsBGColor, other.SeriesEditPaneButtonsBGColor) &&
-        BrushEquals(SeriesEditPaneButtonsBGHoverColor, other.SeriesEditPaneButtonsBGHoverColor) &&
-        BrushEquals(SeriesEditPaneButtonsBorderColor, other.SeriesEditPaneButtonsBorderColor) &&
-        BrushEquals(SeriesEditPaneButtonsBorderHoverColor, other.SeriesEditPaneButtonsBorderHoverColor) &&
-        BrushEquals(SeriesEditPaneButtonsIconColor, other.SeriesEditPaneButtonsIconColor) &&
-        BrushEquals(SeriesEditPaneButtonsIconHoverColor, other.SeriesEditPaneButtonsIconHoverColor);
+        BrushEquals(StatusAndBookTypeBorderColor, other.StatusAndBookTypeBorderColor) &&
+        BrushEquals(SeriesCoverBGColor, other.SeriesCoverBGColor) &&
+        BrushEquals(SeriesCardButtonBGColor, other.SeriesCardButtonBGColor) &&
+        BrushEquals(SeriesCardDividerColor, other.SeriesCardDividerColor);
     }
 
     private static bool BrushEquals(SolidColorBrush? a, SolidColorBrush? b)

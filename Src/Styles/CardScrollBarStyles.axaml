@@ -10,31 +10,31 @@
             <Setter Property="Fill" Value="{DynamicResource TsundokuCollectionBGColor}" />
         </Style>
         <Style Selector="^ /template/ Thumb">
-            <Setter Property="Background" Value="{DynamicResource TsundokuDividerColor}" />
+            <Setter Property="Background" Value="{DynamicResource TsundokuSeriesCardDividerColor}" />
             <Style Selector="^:pointerover /template/ Border">
-                <Setter Property="Background" Value="{DynamicResource TsundokuDividerColor}" />
+                <Setter Property="Background" Value="{DynamicResource TsundokuSeriesCardDividerColor}" />
             </Style>
             <Style Selector="^:pressed /template/ Border">
-                <Setter Property="Background" Value="{DynamicResource TsundokuDividerColor}" />
+                <Setter Property="Background" Value="{DynamicResource TsundokuSeriesCardDividerColor}" />
             </Style>
         </Style>
         <Style Selector="^[IsExpanded=true]">
             <Style Selector="^ /template/ Thumb">
-                <Setter Property="Background" Value="{DynamicResource TsundokuDividerColor}" />
+                <Setter Property="Background" Value="{DynamicResource TsundokuSeriesCardDividerColor}" />
             </Style>
             <Style Selector="^ /template/ PathIcon">
-                <Setter Property="Foreground" Value="{DynamicResource TsundokuDividerColor}" />
+                <Setter Property="Foreground" Value="{DynamicResource TsundokuSeriesCardDividerColor}" />
             </Style>
             <Style Selector="^ /template/ Rectangle#TrackRect">
                 <Setter Property="Fill" Value="{DynamicResource TsundokuMenuBGColor}" />
             </Style>
         </Style>
         <Style Selector="^ /template/ RepeatButton#PART_LineUpButton, ^ /template/ RepeatButton#PART_LineDownButton">
-            <Setter Property="TextElement.Foreground" Value="{DynamicResource TsundokuDividerColor}" />
+            <Setter Property="TextElement.Foreground" Value="{DynamicResource TsundokuSeriesCardDividerColor}" />
             <Style Selector="^:pointerover">
                 <Setter Property="TextElement.Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconHoverColor}" />
                 <Style Selector="^ /template/ ContentPresenter">
-                    <Setter Property="Background" Value="{DynamicResource TsundokuDividerColor}" />
+                    <Setter Property="Background" Value="{DynamicResource TsundokuSeriesCardDividerColor}" />
                 </Style>
                 <Style Selector="^ PathIcon">
                     <Setter Property="Foreground" Value="{DynamicResource TsundokuCollectionBGColor}" />
@@ -43,7 +43,7 @@
             <Style Selector="^:pressed">
                 <Setter Property="TextElement.Foreground" Value="{DynamicResource TsundokuMenuBGColor}" />
                 <Style Selector="^ /template/ ContentPresenter">
-                    <Setter Property="Background" Value="{DynamicResource TsundokuDividerColor}" />
+                    <Setter Property="Background" Value="{DynamicResource TsundokuSeriesCardDividerColor}" />
                 </Style>
                 <Style Selector="^ PathIcon">
                     <Setter Property="Foreground" Value="{DynamicResource TsundokuCollectionBGColor}" />

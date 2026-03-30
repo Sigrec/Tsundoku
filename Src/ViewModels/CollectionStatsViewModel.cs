@@ -121,6 +121,13 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
     public Axis[] GenreXAxes { get; set; } = [];
     public Axis[] GenreYAxes { get; set; } = [];
 
+    public ObservableCollection<ISeries<KeyValuePair<string, int>>> GenreDistribution1 { get; set; } = [];
+    public ObservableCollection<ISeries<KeyValuePair<string, int>>> GenreDistribution2 { get; set; } = [];
+    public Axis[] GenreXAxes1 { get; set; } = [];
+    public Axis[] GenreXAxes2 { get; set; } = [];
+    public Axis[] GenreYAxes1 { get; set; } = [];
+    public Axis[] GenreYAxes2 { get; set; } = [];
+
     [Reactive] public partial int SeriesCount { get; set; }
     [Reactive] public partial int FavoriteCount { get; set; }
 
@@ -189,7 +196,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
         
         this.WhenAnyValue(
             x => x.CurrentTheme.SeriesCardStaffColor,
-            x => x.CurrentTheme.SeriesEditPaneButtonsIconColor)
+            x => x.CurrentTheme.SeriesButtonIconColor)
         .DistinctUntilChanged()
         .Subscribe(_ =>
         {
@@ -231,7 +238,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
     private SolidColorBrush GetManfraColor()
     {
         return CurrentTheme.SeriesCardStaffColor.Color == CurrentTheme.SeriesCardTitleColor.Color
-            ? CurrentTheme.SeriesEditPaneButtonsIconColor
+            ? CurrentTheme.SeriesButtonIconColor
             : CurrentTheme.SeriesCardStaffColor;
     }
     private void UpdateManfraRectangleColor()
@@ -730,45 +737,83 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
         }
     }
 
-    private void SetupGenreBarChart()
+    private static RowSeries<KeyValuePair<string, int>> CreateGenreRowSeries()
     {
-        if (GenreDistribution.Count == 0) // Prevent adding duplicates if called multiple times
+        return new RowSeries<KeyValuePair<string, int>>
         {
-            GenreDistribution.Add(
-                new RowSeries<KeyValuePair<string, int>> // Values will be KeyValuePair<string, int>
-                {
-                    Values = Array.Empty<KeyValuePair<string, int>>(), // Initialize empty
-                    IsHoverable = false,
-                    // Mapping is crucial here to tell LiveCharts how to draw from KeyValuePair
-                    Mapping = (dataPoint, index) => new(index, dataPoint.Value)
-                    // Styling will be handled by ApplyGenreChartTheme
-                }
-            );
+            Values = Array.Empty<KeyValuePair<string, int>>(),
+            IsHoverable = false,
+            Mapping = (dataPoint, index) => new(index, dataPoint.Value)
+        };
+    }
+
+    private static Axis CreateGenreXAxis()
+    {
+        return new Axis
+        {
+            SeparatorsPaint = new SolidColorPaint(new SKColor(220, 220, 220)),
+            MinLimit = 0,
+            MinStep = 1,
+            ForceStepToMin = false,
+        };
+    }
+
+    private static Axis CreateGenreYAxis()
+    {
+        return new Axis
+        {
+            Labels = Array.Empty<string>(),
+            ShowSeparatorLines = false,
+            ForceStepToMin = true,
+        };
+    }
+
+    private void UpdateSplitGenreCharts(KeyValuePair<string, int>[] orderedGenreData)
+    {
+        int midpoint = (orderedGenreData.Length + 1) / 2;
+        KeyValuePair<string, int>[] firstHalf = orderedGenreData[..midpoint];
+        KeyValuePair<string, int>[] secondHalf = orderedGenreData[midpoint..];
+
+        if (GenreDistribution1.Count > 0 && GenreDistribution1[0] is RowSeries<KeyValuePair<string, int>> series1)
+        {
+            series1.Values = firstHalf;
+        }
+        if (GenreYAxes1 is { Length: > 0 })
+        {
+            GenreYAxes1[0].Labels = firstHalf.AsValueEnumerable().Select(kvp => kvp.Key).ToArray();
         }
 
-        // 2. Chart Axes Setup
-        GenreXAxes =
-        [
-            new Axis
-            {
-                SeparatorsPaint = new SolidColorPaint(new SKColor(220, 220, 220)),
-                MinLimit = 0,
-                MinStep = 1,
-                ForceStepToMin = false,
-                // Styling will be handled by ApplyGenreChartTheme
-            }
-        ];
+        if (GenreDistribution2.Count > 0 && GenreDistribution2[0] is RowSeries<KeyValuePair<string, int>> series2)
+        {
+            series2.Values = secondHalf;
+        }
+        if (GenreYAxes2 is { Length: > 0 })
+        {
+            GenreYAxes2[0].Labels = secondHalf.AsValueEnumerable().Select(kvp => kvp.Key).ToArray();
+        }
+    }
 
-        GenreYAxes =
-        [
-            new Axis
-            {
-                Labels = Array.Empty<string>(), // Initialize empty, will be updated in UpdateGenreChart
-                ShowSeparatorLines = false,
-                ForceStepToMin = true,
-                // Styling will be handled by ApplyGenreChartTheme
-            }
-        ];
+    private void SetupGenreBarChart()
+    {
+        if (GenreDistribution.Count == 0)
+        {
+            GenreDistribution.Add(CreateGenreRowSeries());
+        }
+        if (GenreDistribution1.Count == 0)
+        {
+            GenreDistribution1.Add(CreateGenreRowSeries());
+        }
+        if (GenreDistribution2.Count == 0)
+        {
+            GenreDistribution2.Add(CreateGenreRowSeries());
+        }
+
+        GenreXAxes = [CreateGenreXAxis()];
+        GenreYAxes = [CreateGenreYAxis()];
+        GenreXAxes1 = [CreateGenreXAxis()];
+        GenreYAxes1 = [CreateGenreYAxis()];
+        GenreXAxes2 = [CreateGenreXAxis()];
+        GenreYAxes2 = [CreateGenreYAxis()];
 
         foreach (Series series in UserCollection)
         {
@@ -785,31 +830,28 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
             }
         }
 
-        // 2. Order genres by their count for consistent display
-        // Convert to Dictionary after ordering to maintain order (though Dictionary itself doesn't guarantee order)
-        // ToDictionary(x => x.Key, x => x.Value) ensures a new dictionary with the order.
         GenreData = GenreData.AsValueEnumerable().OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
 
-        // 3. Update the chart series values
-        // Access the first (and only) RowSeries in your distribution collection.
+        KeyValuePair<string, int>[] orderedData = GenreData.AsValueEnumerable().ToArray();
+
         if (GenreDistribution.Count > 0 && GenreDistribution[0] is RowSeries<KeyValuePair<string, int>> genreBarObject)
         {
-            genreBarObject.Values = GenreData.AsValueEnumerable().ToArray(); // Update the values of the existing series
+            genreBarObject.Values = orderedData;
+        }
+        if (GenreYAxes is { Length: > 0 })
+        {
+            GenreYAxes[0].Labels = [.. GenreData.Keys];
         }
 
-        // 4. Update the Y-axis labels
-        if (GenreYAxes is not null && GenreYAxes.Length > 0)
-        {
-            GenreYAxes[0].Labels = [.. GenreData.Keys]; // Update the labels of the existing axis
-        }
+        UpdateSplitGenreCharts(orderedData);
 
         _userService.UserCollectionChanges
             .AutoRefresh(x => x.Genres)
             .DistinctUntilChanged()
             .Throttle(TimeSpan.FromMilliseconds(500))
             .ObserveOn(RxSchedulers.MainThreadScheduler)
-            .QueryWhenChanged(query => query.Items) // Get the current snapshot of all Series
-            .Select(seriesList => // Perform the genre counting logic
+            .QueryWhenChanged(query => query.Items)
+            .Select(seriesList =>
             {
                 GenreData.Clear();
                 foreach (Series series in seriesList)
@@ -841,45 +883,48 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
                     genreBarObject.Values = calculatedGenreData;
                 }
 
-                if (GenreYAxes is not null && GenreYAxes.Length > 0)
+                if (GenreYAxes is { Length: > 0 })
                 {
                     GenreYAxes[0].Labels = calculatedGenreData.AsValueEnumerable().Select(kvp => kvp.Key).ToArray();
                 }
+
+                UpdateSplitGenreCharts(calculatedGenreData);
             })
             .DisposeWith(_disposables);
     }
 
+    private void ApplyGenreChartColorsToSeries(ObservableCollection<ISeries<KeyValuePair<string, int>>> distribution, Axis[] xAxes, Axis[] yAxes, SKColor fillColor, SKColor textColor, SKColor dividerColor)
+    {
+        if (distribution.Count > 0 && distribution[0] is RowSeries<KeyValuePair<string, int>> barObject)
+        {
+            barObject.Fill = new SolidColorPaint(fillColor);
+            barObject.DataLabelsPaint = new SolidColorPaint(textColor);
+            barObject.Stroke = new SolidColorPaint(dividerColor);
+        }
+
+        if (yAxes is { Length: > 0 })
+        {
+            yAxes[0].LabelsPaint = new SolidColorPaint(textColor);
+            yAxes[0].TicksPaint = new SolidColorPaint(textColor);
+        }
+
+        if (xAxes is { Length: > 0 })
+        {
+            xAxes[0].TicksPaint = new SolidColorPaint(textColor);
+            xAxes[0].LabelsPaint = new SolidColorPaint(textColor);
+            xAxes[0].SeparatorsPaint = new SolidColorPaint(dividerColor);
+        }
+    }
+
     private void UpdateGenreBarChartColors()
     {
-        // Get the relevant theme colors. Assuming CurrentTheme is accessible.
         SKColor menuBgColor = ConvertAvaloniaBrushToSKColor(CurrentTheme.MenuBGColor);
         SKColor menuTextColor = ConvertAvaloniaBrushToSKColor(CurrentTheme.MenuTextColor);
         SKColor dividerColor = ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor);
 
-        // Apply colors to the bar series
-        if (GenreDistribution.Count > 0 && GenreDistribution[0] is RowSeries<KeyValuePair<string, int>> genreBarObject)
-        {
-            genreBarObject.Fill = new SolidColorPaint(menuBgColor);
-            genreBarObject.DataLabelsPaint = new SolidColorPaint(menuTextColor);
-            genreBarObject.Stroke = new SolidColorPaint(dividerColor);
-        }
-
-        // Apply colors to the Y-axis (genre labels)
-        if (GenreYAxes is not null && GenreYAxes.Length > 0)
-        {
-            Axis genreYAxisObject = GenreYAxes[0];
-            genreYAxisObject.LabelsPaint = new SolidColorPaint(menuTextColor);
-            genreYAxisObject.TicksPaint = new SolidColorPaint(menuTextColor);
-        }
-
-        // Apply colors to the X-axis (counts)
-        if (GenreXAxes is not null && GenreXAxes.Length > 0)
-        {
-            Axis genreXAxisObject = GenreXAxes[0];
-            genreXAxisObject.TicksPaint = new SolidColorPaint(menuTextColor);
-            genreXAxisObject.LabelsPaint = new SolidColorPaint(menuTextColor);
-            genreXAxisObject.SeparatorsPaint = new SolidColorPaint(dividerColor);
-        }
+        ApplyGenreChartColorsToSeries(GenreDistribution, GenreXAxes, GenreYAxes, menuBgColor, menuTextColor, dividerColor);
+        ApplyGenreChartColorsToSeries(GenreDistribution1, GenreXAxes1, GenreYAxes1, menuBgColor, menuTextColor, dividerColor);
+        ApplyGenreChartColorsToSeries(GenreDistribution2, GenreXAxes2, GenreYAxes2, menuBgColor, menuTextColor, dividerColor);
     }
 #endregion
     

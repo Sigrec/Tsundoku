@@ -16,7 +16,6 @@
 			<!-- Tsundoku theme resources (defaults from DEFAULT_THEME, overwritten at runtime) -->
 			<SolidColorBrush x:Key="TsundokuMenuBGColor" Color="#ff20232d"/>
 			<SolidColorBrush x:Key="TsundokuUsernameColor" Color="#ffb4bddb"/>
-			<SolidColorBrush x:Key="TsundokuUserIconBorderColor" Color="#ff626460"/>
 			<SolidColorBrush x:Key="TsundokuMenuTextColor" Color="#ffb4bddb"/>
 			<SolidColorBrush x:Key="TsundokuSearchBarBGColor" Color="#ff626460"/>
 			<SolidColorBrush x:Key="TsundokuSearchBarBorderColor" Color="#ffdfd59e"/>
@@ -30,32 +29,23 @@
 			<SolidColorBrush x:Key="TsundokuMenuButtonTextAndIconHoverColor" Color="#ff626460"/>
 			<SolidColorBrush x:Key="TsundokuCollectionBGColor" Color="#ff2c2d42"/>
 			<SolidColorBrush x:Key="TsundokuStatusAndBookTypeBGColor" Color="#ff626460"/>
-			<SolidColorBrush x:Key="TsundokuStatusAndBookTypeBGHoverColor" Color="#ffdfd59e"/>
 			<SolidColorBrush x:Key="TsundokuStatusAndBookTypeTextColor" Color="#ffececec"/>
-			<SolidColorBrush x:Key="TsundokuStatusAndBookTypeTextHoverColor" Color="#ff626460"/>
 			<SolidColorBrush x:Key="TsundokuSeriesCardBGColor" Color="#ff20232d"/>
 			<SolidColorBrush x:Key="TsundokuSeriesCardTitleColor" Color="#ffdfd59e"/>
 			<SolidColorBrush x:Key="TsundokuSeriesCardPublisherColor" Color="#ffb4bddb"/>
 			<SolidColorBrush x:Key="TsundokuSeriesCardStaffColor" Color="#ffb4bddb"/>
 			<SolidColorBrush x:Key="TsundokuSeriesCardDescColor" Color="#ffececec"/>
-			<SolidColorBrush x:Key="TsundokuSeriesProgressBGColor" Color="#ff626460"/>
+			<SolidColorBrush x:Key="TsundokuSeriesCardBorderColor" Color="#ffdfd59e"/>
 			<SolidColorBrush x:Key="TsundokuSeriesProgressBarColor" Color="#ffdfd59e"/>
 			<SolidColorBrush x:Key="TsundokuSeriesProgressBarBGColor" Color="#ff20232d"/>
 			<SolidColorBrush x:Key="TsundokuSeriesProgressBarBorderColor" Color="#ffececec"/>
 			<SolidColorBrush x:Key="TsundokuSeriesProgressTextColor" Color="#ffececec"/>
-			<SolidColorBrush x:Key="TsundokuSeriesProgressButtonsHoverColor" Color="#ff20232d"/>
 			<SolidColorBrush x:Key="TsundokuSeriesButtonIconColor" Color="#ffececec"/>
 			<SolidColorBrush x:Key="TsundokuSeriesButtonIconHoverColor" Color="#ffdfd59e"/>
-			<SolidColorBrush x:Key="TsundokuSeriesEditPaneBGColor" Color="#ff20232d"/>
-			<SolidColorBrush x:Key="TsundokuSeriesNotesBGColor" Color="#ff626460"/>
-			<SolidColorBrush x:Key="TsundokuSeriesNotesBorderColor" Color="#ffdfd59e"/>
-			<SolidColorBrush x:Key="TsundokuSeriesNotesTextColor" Color="#ffb4bddb"/>
-			<SolidColorBrush x:Key="TsundokuSeriesEditPaneButtonsBGColor" Color="#ff2c2d42"/>
-			<SolidColorBrush x:Key="TsundokuSeriesEditPaneButtonsBGHoverColor" Color="#ff626460"/>
-			<SolidColorBrush x:Key="TsundokuSeriesEditPaneButtonsBorderColor" Color="#ffdfd59e"/>
-			<SolidColorBrush x:Key="TsundokuSeriesEditPaneButtonsBorderHoverColor" Color="#ffdfd59e"/>
-			<SolidColorBrush x:Key="TsundokuSeriesEditPaneButtonsIconColor" Color="#ff626460"/>
-			<SolidColorBrush x:Key="TsundokuSeriesEditPaneButtonsIconHoverColor" Color="#ffb4bddb"/>
+			<SolidColorBrush x:Key="TsundokuStatusAndBookTypeBorderColor" Color="#ffdfd59e"/>
+			<SolidColorBrush x:Key="TsundokuSeriesCoverBGColor" Color="#ff626460"/>
+			<SolidColorBrush x:Key="TsundokuSeriesCardButtonBGColor" Color="#ff20232d"/>
+			<SolidColorBrush x:Key="TsundokuSeriesCardDividerColor" Color="#ffdfd59e"/>
 		</ResourceDictionary>
 	</Application.Resources>
 

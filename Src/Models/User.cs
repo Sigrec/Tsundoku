@@ -389,6 +389,74 @@ public sealed partial class User : ReactiveObject
             userData[nameof(DataVersion)] = 6.1;
         }
 
+        if (curVersion < 6.2) // 6.2 Remove unused theme colors, add SeriesCardBorderColor and StatusAndBookTypeBorderColor
+        {
+            if (userData["SavedThemes"] is JsonArray v62ThemeArray)
+            {
+                string[] removedKeys = ["SeriesProgressBGColor", "SeriesEditPaneBGColor", "SeriesEditPaneButtonsBGColor", "SeriesEditPaneButtonsBGHoverColor", "SeriesEditPaneButtonsBorderColor", "SeriesEditPaneButtonsBorderHoverColor", "SeriesEditPaneButtonsIconColor", "SeriesEditPaneButtonsIconHoverColor"];
+                foreach (JsonNode? themeNode in v62ThemeArray)
+                {
+                    if (themeNode is not JsonObject themeObj) continue;
+
+                    // Get DividerColor as default for new border colors
+                    string dividerColor = themeObj["DividerColor"]?.GetValue<string>() ?? "#ffdfd59e";
+
+                    // Remove unused colors
+                    foreach (string key in removedKeys)
+                    {
+                        themeObj.Remove(key);
+                    }
+
+                    // Add new colors (default to DividerColor value)
+                    themeObj.TryAdd("SeriesCardBorderColor", dividerColor);
+                    themeObj.TryAdd("StatusAndBookTypeBorderColor", dividerColor);
+                }
+            }
+            userData[nameof(DataVersion)] = 6.2;
+            LOGGER.Info("Updated schema to v6.2: Removed unused edit pane colors, added SeriesCardBorderColor and StatusAndBookTypeBorderColor");
+        }
+
+        if (curVersion < 6.3) // 6.3 Remove 7 unused theme colors, add SeriesCoverBGColor and SeriesCardButtonBGColor
+        {
+            if (userData["SavedThemes"] is JsonArray v63ThemeArray)
+            {
+                string[] removedKeys = ["UserIconBorderColor", "StatusAndBookTypeBGHoverColor", "StatusAndBookTypeTextHoverColor", "SeriesProgressButtonsHoverColor", "SeriesNotesBGColor", "SeriesNotesBorderColor", "SeriesNotesTextColor"];
+                foreach (JsonNode? themeNode in v63ThemeArray)
+                {
+                    if (themeNode is not JsonObject themeObj) continue;
+
+                    string menuButtonBGColor = themeObj["MenuButtonBGColor"]?.GetValue<string>() ?? "#ff626460";
+                    string seriesProgressBarBGColor = themeObj["SeriesProgressBarBGColor"]?.GetValue<string>() ?? "#ff20232d";
+
+                    foreach (string key in removedKeys)
+                    {
+                        themeObj.Remove(key);
+                    }
+
+                    themeObj.TryAdd("SeriesCoverBGColor", menuButtonBGColor);
+                    themeObj.TryAdd("SeriesCardButtonBGColor", seriesProgressBarBGColor);
+                }
+            }
+            userData[nameof(DataVersion)] = 6.3;
+            LOGGER.Info("Updated schema to v6.3: Removed 7 unused theme colors, added SeriesCoverBGColor and SeriesCardButtonBGColor");
+        }
+
+        if (curVersion < 6.4) // 6.4 Add SeriesCardDividerColor
+        {
+            if (userData["SavedThemes"] is JsonArray v64ThemeArray)
+            {
+                foreach (JsonNode? themeNode in v64ThemeArray)
+                {
+                    if (themeNode is not JsonObject themeObj) continue;
+
+                    string dividerColor = themeObj["DividerColor"]?.GetValue<string>() ?? "#ffdfd59e";
+                    themeObj.TryAdd("SeriesCardDividerColor", dividerColor);
+                }
+            }
+            userData[nameof(DataVersion)] = 6.4;
+            LOGGER.Info("Updated schema to v6.4: Added SeriesCardDividerColor");
+        }
+
         if (!isImport)
         {
             AppFileHelper.WriteUserDataToFile(userData);

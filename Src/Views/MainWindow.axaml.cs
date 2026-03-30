@@ -76,15 +76,20 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
                 })
                 .DisposeWith(disposables);
 
-            // Reset scroll to top when the filtered collection resets (filter/search change)
+            // Reset scroll to top only on collection Reset (filter/sort change), not on individual item updates
             Observable.FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(
                 h => ((INotifyCollectionChanged)ViewModel.UserCollection).CollectionChanged += h,
                 h => ((INotifyCollectionChanged)ViewModel.UserCollection).CollectionChanged -= h)
-                .Subscribe(_ => Dispatcher.UIThread.Post(() => CollectionPane.ScrollToHome(), Avalonia.Threading.DispatcherPriority.Background))
+                .Where(e => e.EventArgs.Action == NotifyCollectionChangedAction.Reset)
+                .Subscribe(_ =>
+                {
+                    CollectionPane.Offset = new Avalonia.Vector(0, 0);
+                    Dispatcher.UIThread.Post(() => CollectionItems.InvalidateMeasure(), DispatcherPriority.Render);
+                })
                 .DisposeWith(disposables);
         });
 
-        // Staggered card appear animation (initial load + collection changes only, not scroll)
+        // Staggered card appear animation (initial load only)
         Transitions animTransitions = [
             new DoubleTransition { Property = OpacityProperty, Duration = TimeSpan.FromMilliseconds(600), Easing = new Avalonia.Animation.Easings.CubicEaseOut() },
             new TransformOperationsTransition { Property = RenderTransformProperty, Duration = TimeSpan.FromMilliseconds(600), Easing = new Avalonia.Animation.Easings.CubicEaseOut() }
@@ -93,9 +98,15 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
         bool _shouldAnimate = true;
         CollectionItems.ElementPrepared += (s, e) =>
         {
-            if (!_shouldAnimate) return;
-
             Control element = e.Element;
+            if (!_shouldAnimate)
+            {
+                element.Opacity = 1;
+                element.RenderTransform = null;
+                element.Transitions = null;
+                return;
+            }
+
             int index = _animIndex++;
             int delay = Math.Min(index * 60, 1200);
 
@@ -109,17 +120,8 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
                 element.Transitions = animTransitions;
                 element.Opacity = 1;
                 element.RenderTransform = TransformOperations.Parse("scale(1, 1)");
-
-                // Stop animating after all visible cards are done
                 if (delay >= 1200) _shouldAnimate = false;
             }, DispatcherPriority.Render);
-        };
-
-        // Re-enable animation when collection changes (filter/sort)
-        ((INotifyCollectionChanged)ViewModel.UserCollection).CollectionChanged += (s, e) =>
-        {
-            _animIndex = 0;
-            _shouldAnimate = true;
         };
 
         KeyDown += async (s, e) =>
@@ -311,24 +313,10 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
         }
     }
 
-    private async void BackToTop_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private void BackToTop_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
-        double startY = CollectionPane.Offset.Y;
-        if (startY <= 0) return;
-
-        const double durationMs = 350;
-        Stopwatch sw = Stopwatch.StartNew();
-
-        while (sw.ElapsedMilliseconds < durationMs)
-        {
-            double progress = sw.ElapsedMilliseconds / durationMs;
-            // Ease out cubic
-            double ease = 1 - (1 - progress) * (1 - progress) * (1 - progress);
-            CollectionPane.Offset = new Avalonia.Vector(CollectionPane.Offset.X, startY * (1 - ease));
-            await Task.Delay(16); // ~60fps
-        }
-
-        CollectionPane.Offset = new Avalonia.Vector(CollectionPane.Offset.X, 0);
+        if (CollectionPane.Offset.Y <= 0) return;
+        CollectionPane.Offset = new Avalonia.Vector(0, 0);
     }
 
     /// <summary>

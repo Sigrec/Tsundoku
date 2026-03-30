@@ -109,7 +109,6 @@ public sealed partial class CollectionThemeWindow : ReactiveWindow<ThemeSettings
         // Apply menu colors
         BackupCurrentTheme.MenuBGColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
         BackupCurrentTheme.UsernameColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
-        BackupCurrentTheme.UserIconBorderColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
         BackupCurrentTheme.MenuTextColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
         BackupCurrentTheme.SearchBarBGColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
         BackupCurrentTheme.SearchBarBorderColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
@@ -125,32 +124,23 @@ public sealed partial class CollectionThemeWindow : ReactiveWindow<ThemeSettings
         // Apply Colleciton Colors
         BackupCurrentTheme.CollectionBGColor = new SolidColorBrush(Color.Parse(MainColor2.Text));
         BackupCurrentTheme.StatusAndBookTypeBGColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
-        BackupCurrentTheme.StatusAndBookTypeBGHoverColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
         BackupCurrentTheme.StatusAndBookTypeTextColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
-        BackupCurrentTheme.StatusAndBookTypeTextHoverColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
         BackupCurrentTheme.SeriesCardBGColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
         BackupCurrentTheme.SeriesCardTitleColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
         BackupCurrentTheme.SeriesCardPublisherColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
         BackupCurrentTheme.SeriesCardStaffColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
         BackupCurrentTheme.SeriesCardDescColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
-        BackupCurrentTheme.SeriesProgressBGColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
         BackupCurrentTheme.SeriesProgressBarColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
         BackupCurrentTheme.SeriesProgressBarBGColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
         BackupCurrentTheme.SeriesProgressBarBorderColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
         BackupCurrentTheme.SeriesProgressTextColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
-        BackupCurrentTheme.SeriesProgressButtonsHoverColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
         BackupCurrentTheme.SeriesButtonIconColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
         BackupCurrentTheme.SeriesButtonIconHoverColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
-        BackupCurrentTheme.SeriesEditPaneBGColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
-        BackupCurrentTheme.SeriesNotesBGColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
-        BackupCurrentTheme.SeriesNotesBorderColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
-        BackupCurrentTheme.SeriesNotesTextColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
-        BackupCurrentTheme.SeriesEditPaneButtonsBGColor = new SolidColorBrush(Color.Parse(MainColor2.Text));
-        BackupCurrentTheme.SeriesEditPaneButtonsBGHoverColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
-        BackupCurrentTheme.SeriesEditPaneButtonsBorderColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
-        BackupCurrentTheme.SeriesEditPaneButtonsBorderHoverColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
-        BackupCurrentTheme.SeriesEditPaneButtonsIconColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
-        BackupCurrentTheme.SeriesEditPaneButtonsIconHoverColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
+        BackupCurrentTheme.SeriesCardBorderColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
+        BackupCurrentTheme.StatusAndBookTypeBorderColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
+        BackupCurrentTheme.SeriesCoverBGColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
+        BackupCurrentTheme.SeriesCardButtonBGColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
+        BackupCurrentTheme.SeriesCardDividerColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
 
         // Save a clone so BackupCurrentTheme stays independent for further editing
         TsundokuTheme themeToSave = BackupCurrentTheme.Cloning();
@@ -170,7 +160,6 @@ public sealed partial class CollectionThemeWindow : ReactiveWindow<ThemeSettings
         // Apply menu colors
         BackupCurrentTheme.MenuBGColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
         BackupCurrentTheme.UsernameColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
-        BackupCurrentTheme.UserIconBorderColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
         BackupCurrentTheme.MenuTextColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
         BackupCurrentTheme.SearchBarBGColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
         BackupCurrentTheme.SearchBarBorderColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
@@ -186,32 +175,23 @@ public sealed partial class CollectionThemeWindow : ReactiveWindow<ThemeSettings
         // Apply Colleciton Colors
         BackupCurrentTheme.CollectionBGColor = new SolidColorBrush(Color.Parse(MainColor2.Text));
         BackupCurrentTheme.StatusAndBookTypeBGColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
-        BackupCurrentTheme.StatusAndBookTypeBGHoverColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
         BackupCurrentTheme.StatusAndBookTypeTextColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
-        BackupCurrentTheme.StatusAndBookTypeTextHoverColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
         BackupCurrentTheme.SeriesCardBGColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
         BackupCurrentTheme.SeriesCardTitleColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
         BackupCurrentTheme.SeriesCardPublisherColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
         BackupCurrentTheme.SeriesCardStaffColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
         BackupCurrentTheme.SeriesCardDescColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
-        BackupCurrentTheme.SeriesProgressBGColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
         BackupCurrentTheme.SeriesProgressBarColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
         BackupCurrentTheme.SeriesProgressBarBGColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
         BackupCurrentTheme.SeriesProgressBarBorderColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
         BackupCurrentTheme.SeriesProgressTextColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
-        BackupCurrentTheme.SeriesProgressButtonsHoverColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
         BackupCurrentTheme.SeriesButtonIconColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
         BackupCurrentTheme.SeriesButtonIconHoverColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
-        BackupCurrentTheme.SeriesEditPaneBGColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
-        BackupCurrentTheme.SeriesNotesBGColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
-        BackupCurrentTheme.SeriesNotesBorderColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
-        BackupCurrentTheme.SeriesNotesTextColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
-        BackupCurrentTheme.SeriesEditPaneButtonsBGColor = new SolidColorBrush(Color.Parse(MainColor2.Text));
-        BackupCurrentTheme.SeriesEditPaneButtonsBGHoverColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
-        BackupCurrentTheme.SeriesEditPaneButtonsBorderColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
-        BackupCurrentTheme.SeriesEditPaneButtonsBorderHoverColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
-        BackupCurrentTheme.SeriesEditPaneButtonsIconColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
-        BackupCurrentTheme.SeriesEditPaneButtonsIconHoverColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
+        BackupCurrentTheme.SeriesCardBorderColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
+        BackupCurrentTheme.StatusAndBookTypeBorderColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
+        BackupCurrentTheme.SeriesCoverBGColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
+        BackupCurrentTheme.SeriesCardButtonBGColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
+        BackupCurrentTheme.SeriesCardDividerColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
 
         // Save a clone so BackupCurrentTheme stays independent for further editing
         TsundokuTheme themeToSave = BackupCurrentTheme.Cloning();
@@ -227,8 +207,22 @@ public sealed partial class CollectionThemeWindow : ReactiveWindow<ThemeSettings
     {
         try
         {
+            string themeName = NewThemeName.Text.Trim();
+            bool themeExists = ViewModel.SavedThemes.Any(t => t.ThemeName.Equals(themeName, StringComparison.OrdinalIgnoreCase));
+
+            if (themeExists)
+            {
+                bool confirmed = await _popupDialogService.ConfirmAsync(
+                    "Overwrite Theme",
+                    "fa-solid fa-triangle-exclamation",
+                    $"Theme \"{themeName}\" already exists.\nDo you want to overwrite it?",
+                    this);
+
+                if (!confirmed) return;
+            }
+
             TsundokuTheme themeToSave = BackupCurrentTheme.Cloning();
-            themeToSave.ThemeName = NewThemeName.Text.Trim();
+            themeToSave.ThemeName = themeName;
             ViewModel.SaveTheme(themeToSave);
         }
         catch (Exception ex)
