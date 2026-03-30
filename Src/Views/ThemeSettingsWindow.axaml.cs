@@ -100,13 +100,8 @@ public sealed partial class CollectionThemeWindow : ReactiveWindow<ThemeSettings
     /// <summary>
     /// Generates the Type1 theme
     /// </summary>
-    private void GenerateThemeType1(object sender, RoutedEventArgs args)
+    private void ApplyThemeColors(string menuButtonIconHoverHex, string progressBarHex, string buttonIconHoverHex)
     {
-        LOGGER.Info("Generating New Theme1");
-
-        BackupCurrentTheme.ThemeName = NewThemeName.Text;
-
-        // Apply menu colors
         BackupCurrentTheme.MenuBGColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
         BackupCurrentTheme.UsernameColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
         BackupCurrentTheme.MenuTextColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
@@ -119,9 +114,8 @@ public sealed partial class CollectionThemeWindow : ReactiveWindow<ThemeSettings
         BackupCurrentTheme.MenuButtonBorderColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
         BackupCurrentTheme.MenuButtonBorderHoverColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
         BackupCurrentTheme.MenuButtonTextAndIconColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
-        BackupCurrentTheme.MenuButtonTextAndIconHoverColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
+        BackupCurrentTheme.MenuButtonTextAndIconHoverColor = new SolidColorBrush(Color.Parse(menuButtonIconHoverHex));
 
-        // Apply Colleciton Colors
         BackupCurrentTheme.CollectionBGColor = new SolidColorBrush(Color.Parse(MainColor2.Text));
         BackupCurrentTheme.StatusAndBookTypeBGColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
         BackupCurrentTheme.StatusAndBookTypeTextColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
@@ -130,12 +124,12 @@ public sealed partial class CollectionThemeWindow : ReactiveWindow<ThemeSettings
         BackupCurrentTheme.SeriesCardPublisherColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
         BackupCurrentTheme.SeriesCardStaffColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
         BackupCurrentTheme.SeriesCardDescColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
-        BackupCurrentTheme.SeriesProgressBarColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
+        BackupCurrentTheme.SeriesProgressBarColor = new SolidColorBrush(Color.Parse(progressBarHex));
         BackupCurrentTheme.SeriesProgressBarBGColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
         BackupCurrentTheme.SeriesProgressBarBorderColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
         BackupCurrentTheme.SeriesProgressTextColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
         BackupCurrentTheme.SeriesButtonIconColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
-        BackupCurrentTheme.SeriesButtonIconHoverColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
+        BackupCurrentTheme.SeriesButtonIconHoverColor = new SolidColorBrush(Color.Parse(buttonIconHoverHex));
         BackupCurrentTheme.SeriesCardBorderColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
         BackupCurrentTheme.StatusAndBookTypeBorderColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
         BackupCurrentTheme.SeriesCoverBGColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
@@ -144,62 +138,25 @@ public sealed partial class CollectionThemeWindow : ReactiveWindow<ThemeSettings
         BackupCurrentTheme.SeriesCardButtonBorderColor = BackupCurrentTheme.MenuButtonBorderColor;
         BackupCurrentTheme.SeriesCardButtonBorderHoverColor = BackupCurrentTheme.MenuButtonBorderHoverColor;
         BackupCurrentTheme.SeriesCardDividerColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
+    }
 
-        // Save a clone so BackupCurrentTheme stays independent for further editing
+    private void GenerateThemeType1(object sender, RoutedEventArgs args)
+    {
+        LOGGER.Info("Generating New Theme1");
+        BackupCurrentTheme.ThemeName = NewThemeName.Text;
+        ApplyThemeColors(AccentColor2.Text, AccentColor1.Text, AccentColor1.Text);
+
         TsundokuTheme themeToSave = BackupCurrentTheme.Cloning();
         themeToSave.ThemeName = NewThemeName.Text.Trim();
         ViewModel.SaveTheme(themeToSave);
     }
 
-    /// <summary>
-    /// Generates the Type2 theme
-    /// </summary>
     private void GenerateThemeType2(object sender, RoutedEventArgs args)
     {
-       LOGGER.Info("Generating New Theme2");
-
+        LOGGER.Info("Generating New Theme2");
         BackupCurrentTheme.ThemeName = NewThemeName.Text;
+        ApplyThemeColors(MainColor1.Text, TextColor1.Text, MainColor1.Text);
 
-        // Apply menu colors
-        BackupCurrentTheme.MenuBGColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
-        BackupCurrentTheme.UsernameColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
-        BackupCurrentTheme.MenuTextColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
-        BackupCurrentTheme.SearchBarBGColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
-        BackupCurrentTheme.SearchBarBorderColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
-        BackupCurrentTheme.SearchBarTextColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
-        BackupCurrentTheme.DividerColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
-        BackupCurrentTheme.MenuButtonBGColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
-        BackupCurrentTheme.MenuButtonBGHoverColor = new SolidColorBrush(Color.Parse(MainColor2.Text));
-        BackupCurrentTheme.MenuButtonBorderColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
-        BackupCurrentTheme.MenuButtonBorderHoverColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
-        BackupCurrentTheme.MenuButtonTextAndIconColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
-        BackupCurrentTheme.MenuButtonTextAndIconHoverColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
-
-        // Apply Colleciton Colors
-        BackupCurrentTheme.CollectionBGColor = new SolidColorBrush(Color.Parse(MainColor2.Text));
-        BackupCurrentTheme.StatusAndBookTypeBGColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
-        BackupCurrentTheme.StatusAndBookTypeTextColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
-        BackupCurrentTheme.SeriesCardBGColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
-        BackupCurrentTheme.SeriesCardTitleColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
-        BackupCurrentTheme.SeriesCardPublisherColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
-        BackupCurrentTheme.SeriesCardStaffColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
-        BackupCurrentTheme.SeriesCardDescColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
-        BackupCurrentTheme.SeriesProgressBarColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
-        BackupCurrentTheme.SeriesProgressBarBGColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
-        BackupCurrentTheme.SeriesProgressBarBorderColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
-        BackupCurrentTheme.SeriesProgressTextColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
-        BackupCurrentTheme.SeriesButtonIconColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
-        BackupCurrentTheme.SeriesButtonIconHoverColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
-        BackupCurrentTheme.SeriesCardBorderColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
-        BackupCurrentTheme.StatusAndBookTypeBorderColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
-        BackupCurrentTheme.SeriesCoverBGColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
-        BackupCurrentTheme.SeriesCardButtonBGColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
-        BackupCurrentTheme.SeriesCardButtonBGHoverColor = BackupCurrentTheme.MenuButtonBGHoverColor;
-        BackupCurrentTheme.SeriesCardButtonBorderColor = BackupCurrentTheme.MenuButtonBorderColor;
-        BackupCurrentTheme.SeriesCardButtonBorderHoverColor = BackupCurrentTheme.MenuButtonBorderHoverColor;
-        BackupCurrentTheme.SeriesCardDividerColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
-
-        // Save a clone so BackupCurrentTheme stays independent for further editing
         TsundokuTheme themeToSave = BackupCurrentTheme.Cloning();
         themeToSave.ThemeName = NewThemeName.Text.Trim();
         ViewModel.SaveTheme(themeToSave);

@@ -9,6 +9,31 @@ public static class WindowHelper
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
 
     /// <summary>
+    /// Wires up standard Opened/Closing handlers for managed child windows that hide instead of close.
+    /// </summary>
+    public static void ConfigureHideOnClose<T>(this T window, Action? onOpened = null, Action? onClosing = null)
+        where T : Window, IManagedWindow
+    {
+        window.Opened += (s, e) =>
+        {
+            window.IsOpen = true;
+            onOpened?.Invoke();
+        };
+
+        window.Closing += (s, e) =>
+        {
+            if (window.IsOpen)
+            {
+                window.Hide();
+                window.Topmost = false;
+                window.IsOpen = false;
+                e.Cancel = true;
+                onClosing?.Invoke();
+            }
+        };
+    }
+
+    /// <summary>
     /// Opens or activates a managed ReactiveWindow in a non-blocking manner.
     /// </summary>
     /// <typeparam name="TWindow">The type of the ReactiveWindow to open/activate.</typeparam>

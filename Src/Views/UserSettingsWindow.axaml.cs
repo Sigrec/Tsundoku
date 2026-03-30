@@ -6,43 +6,30 @@ using System.Reactive.Disposables;
 using System.Reactive.Disposables.Fluent;
 using ReactiveUI;
 using Avalonia.Platform.Storage;
+using System.Reactive.Linq;
 using Tsundoku.Helpers;
+using Tsundoku.Services;
 using ReactiveUI.Avalonia;
 
 namespace Tsundoku.Views;
 
-public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsViewModel>
+public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsViewModel>, IManagedWindow
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
-    public bool IsOpen = false;
+    public bool IsOpen { get; set; }
     private readonly IPopupDialogService _popupDialogService;
+    private readonly IApiHealthCheckService _apiHealthCheckService;
 
-    public UserSettingsWindow(UserSettingsViewModel viewModel, IPopupDialogService popupDialogService)
+    public UserSettingsWindow(UserSettingsViewModel viewModel, IPopupDialogService popupDialogService, IApiHealthCheckService apiHealthCheckService)
     {
         _popupDialogService = popupDialogService;
+        _apiHealthCheckService = apiHealthCheckService;
         InitializeComponent();
 
         ViewModel = viewModel;
 
-        Opened += (s, e) =>
-        {
-            IsOpen = true;
-            if (Screens.Primary.WorkingArea.Height < 955)
-            {
-                this.Height = 550;
-            }
-        };
-
-        Closing += (s, e) =>
-        {
-            if (IsOpen)
-            {
-                this.Hide();
-                Topmost = false;
-                IsOpen = false;
-                e.Cancel = true;
-            }
-        };
+        this.ConfigureHideOnClose(
+            onOpened: () => { if (Screens.Primary.WorkingArea.Height < 955) this.Height = 550; });
 
         this.WhenActivated(disposables =>
         {
@@ -56,6 +43,16 @@ public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsView
 
             this.WhenAnyValue(x => x.UsernameChangeTextBox.Text, (newUsername) => !string.IsNullOrWhiteSpace(newUsername) && !newUsername.Equals(ViewModel.CurrentUser.UserName))
                 .Subscribe(x => ViewModel.IsChangeUsernameButtonEnabled = x)
+                .DisposeWith(disposables);
+
+            _apiHealthCheckService.IsAniListAvailable
+                .ObserveOn(RxSchedulers.MainThreadScheduler)
+                .Subscribe(isAvailable =>
+                {
+                    RefreshSeriesButton.IsEnabled = isAvailable;
+                    ImportLibibData.IsEnabled = isAvailable;
+                    ImportGoodreadsData.IsEnabled = isAvailable;
+                })
                 .DisposeWith(disposables);
         });
     }
@@ -88,29 +85,20 @@ public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsView
         await _popupDialogService.ShowAsync("Error", "fa-solid fa-circle-exclamation", info, this);
     }
 
-    /// <summary>
-    /// Allows user to import a new Json file to be used as their new data, it additionall creates a backup file of the users last save
-    /// </summary>
-    private async void ImportUserDataAsync(object sender, RoutedEventArgs args)
+    private async Task ImportFileAsync(bool allowMultiple, string fileTypeLabel, string pattern, Func<IReadOnlyList<IStorageFile>, Task> onFilesSelected)
     {
         try
         {
             IReadOnlyList<IStorageFile> files = await this.StorageProvider.OpenFilePickerAsync(
                 new FilePickerOpenOptions
                 {
-                    AllowMultiple = false,
-                    FileTypeFilter =
-                    [
-                        new FilePickerFileType("JSON File")
-                        {
-                            Patterns = [ "*.json" ]
-                        }
-                    ]
+                    AllowMultiple = allowMultiple,
+                    FileTypeFilter = [ new FilePickerFileType(fileTypeLabel) { Patterns = [ pattern ] } ]
                 }
             );
-            if (files.Count == 1)
+            if (files.Count > 0)
             {
-                ViewModel.ImportUserDataFromJson(files[0].Path.LocalPath, this);
+                await onFilesSelected(files);
             }
         }
         catch (IOException ex)
@@ -118,72 +106,31 @@ public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsView
             LOGGER.Error(ex);
             await ShowFileErrorDialog();
         }
+    }
+
+    private async void ImportUserDataAsync(object sender, RoutedEventArgs args)
+    {
+        await ImportFileAsync(false, "JSON File", "*.json", files =>
+        {
+            ViewModel.ImportUserDataFromJson(files[0].Path.LocalPath, this);
+            return Task.CompletedTask;
+        });
     }
 
     private async void ImportLibibDataAsync(object sender, RoutedEventArgs args)
     {
-        try
+        await ImportFileAsync(true, "CSV File", "*.csv", async files =>
         {
-            IReadOnlyList<IStorageFile> files = await this.StorageProvider.OpenFilePickerAsync(
-                new FilePickerOpenOptions
-                {
-                    AllowMultiple = true,
-                    FileTypeFilter =
-                    [
-                        new FilePickerFileType("JSON File")
-                    {
-                        Patterns = [ "*.csv" ]
-                    }
-                    ]
-                }
-            );
-            if (files.Count > 0)
-            {
-                await ViewModel.ImportLibibDataFromCsv([.. files.AsValueEnumerable().Select(f => f.Path.LocalPath)], this.Owner as Window);
-            }
-            else
-            {
-                LOGGER.Debug("User tried to import libib data but no files were selected");
-            }
-        }
-        catch (IOException ex)
-        {
-            LOGGER.Error(ex);
-            await ShowFileErrorDialog();
-        }
+            await ViewModel.ImportLibibDataFromCsv([.. files.AsValueEnumerable().Select(f => f.Path.LocalPath)], this.Owner as Window);
+        });
     }
 
     private async void ImportGoodreadsDataAsync(object sender, RoutedEventArgs args)
     {
-        try
+        await ImportFileAsync(true, "CSV File", "*.csv", async files =>
         {
-            IReadOnlyList<IStorageFile> files = await this.StorageProvider.OpenFilePickerAsync(
-                new FilePickerOpenOptions
-                {
-                    AllowMultiple = true,
-                    FileTypeFilter =
-                    [
-                        new FilePickerFileType("JSON File")
-                        {
-                            Patterns = [ "*.csv" ]
-                        }
-                    ]
-                }
-            );
-            if (files.Count > 0)
-            {
-                await ViewModel.ImportGoodreadsDataFromCsv([.. files.AsValueEnumerable().Select(f => f.Path.LocalPath)], this.Owner as Window);
-            }
-            else
-            {
-                LOGGER.Debug("User tried to import goodreads data but no files were selected");
-            }
-        }
-        catch (IOException ex)
-        {
-            LOGGER.Error(ex);
-            await ShowFileErrorDialog();
-        }
+            await ViewModel.ImportGoodreadsDataFromCsv([.. files.AsValueEnumerable().Select(f => f.Path.LocalPath)], this.Owner as Window);
+        });
     }
 
     private async void OpenReleasesPage(object sender, PointerPressedEventArgs args)

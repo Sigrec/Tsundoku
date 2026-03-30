@@ -36,6 +36,8 @@ public interface ISharedSeriesCollectionProvider
     TsundokuSort SelectedSort { get; set; }
     string AdvancedSearchQuery { get; set; }
     string AdvancedSearchQueryErrorMessage { get; set; }
+    string SelectedPublisher { get; set; }
+    ReadOnlyObservableCollection<string> AvailablePublishers { get; }
 }
 
 /// <summary>
@@ -60,6 +62,9 @@ public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISh
     [Reactive] public partial TsundokuSort SelectedSort { get; set; } = TsundokuSort.TitleAZ;
     [Reactive] public partial string AdvancedSearchQueryErrorMessage { get; set; }
     [Reactive] public partial string AdvancedSearchQuery { get; set; }
+    [Reactive] public partial string SelectedPublisher { get; set; } = string.Empty;
+    private ReadOnlyObservableCollection<string> _availablePublishers;
+    public ReadOnlyObservableCollection<string> AvailablePublishers => _availablePublishers;
 
     [GeneratedRegex(@"(?<FilterName>\w+)(?<Operator>==|>=|<=|>|<)(?<FilterValue>\"".*?\""|\w+)?", RegexOptions.ExplicitCapture)] public static partial Regex AdvancedQueryRegex();
 
@@ -186,14 +191,27 @@ public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISh
             })
             .StartWith(series => true);
 
-        // 3. Combine filter predicates into a single observable predicate
+        // 3. Publisher filter predicate
+        IObservable<Func<Series, bool>> publisherFilter = this.WhenAnyValue(x => x.SelectedPublisher)
+            .DistinctUntilChanged()
+            .Select(publisher =>
+            {
+                if (string.IsNullOrWhiteSpace(publisher))
+                    return (Func<Series, bool>)(series => true);
+
+                return (Func<Series, bool>)(series =>
+                    series.Publisher.Equals(publisher, StringComparison.OrdinalIgnoreCase));
+            });
+
+        // 4. Combine filter predicates into a single observable predicate
         IObservable<Func<Series, bool>> combinedFilter = Observable.CombineLatest(
-            textFilter, tsundokuFilter, advancedFilter,
-            (textSearchPred, tsundokuFilterPred, advancedSearchPred) =>
+            textFilter, tsundokuFilter, advancedFilter, publisherFilter,
+            (textSearchPred, tsundokuFilterPred, advancedSearchPred, publisherPred) =>
                 (Func<Series, bool>)(series =>
                     (textSearchPred is null || textSearchPred(series)) &&
                     (tsundokuFilterPred is null || tsundokuFilterPred(series)) &&
-                    (advancedSearchPred is null || advancedSearchPred(series))
+                    (advancedSearchPred is null || advancedSearchPred(series)) &&
+                    (publisherPred is null || publisherPred(series))
                 )
         );
 
@@ -216,6 +234,16 @@ public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISh
             .Filter(combinedFilter)
             .ObserveOn(RxSchedulers.MainThreadScheduler)
             .SortAndBind(out _dynamicUserCollection, seriesComparerChanged)
+            .Subscribe()
+            .DisposeWith(_disposables);
+
+        // 6. Build dynamic publisher list from collection
+        _userService.UserCollectionChanges
+            .Filter(series => series is not null)
+            .DistinctValues(series => series.Publisher)
+            .Sort(StringComparer.OrdinalIgnoreCase)
+            .ObserveOn(RxSchedulers.MainThreadScheduler)
+            .Bind(out _availablePublishers)
             .Subscribe()
             .DisposeWith(_disposables);
     }

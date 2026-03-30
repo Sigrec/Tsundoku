@@ -34,69 +34,64 @@
 	<Border Classes="Menu" BorderThickness="2" CornerRadius="0,0,8,8" ClipToBounds="True">
 		<Grid RowDefinitions="Auto,*">
 			<!-- Header -->
-			<Border Grid.Row="0" BorderThickness="0,0,0,2" BorderBrush="{DynamicResource TsundokuDividerColor}" Padding="16,12">
-				<StackPanel Orientation="Horizontal" Spacing="8">
-					<i:Icon Value="fa-solid fa-swatchbook" FontSize="16" Foreground="{DynamicResource TsundokuDividerColor}"/>
-					<TextBlock Text="Theme Settings" FontSize="18" FontWeight="ExtraBold" Foreground="{DynamicResource TsundokuUsernameColor}" VerticalAlignment="Center"/>
-				</StackPanel>
-			</Border>
+			<controls:WindowHeader Grid.Row="0" Icon="fa-solid fa-swatchbook" Title="Theme Settings"/>
 
 		<ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden" Theme="{StaticResource ReverseCollectionScroll}">
 			<StackPanel Spacing="0">
                 <!-- Menu / Nav Bar -->
                 <StackPanel Margin="20,14,20,14">
-                    <TextBlock Text="MENU / NAV BAR" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuSeriesCardPublisherColor}" LetterSpacing="1" Opacity="0.8" Margin="0,0,0,10"/>
+                    <TextBlock Text="MENU / NAV BAR" Classes="section-title" Margin="0,0,0,10"/>
                         <WrapPanel>
-                            <controls:ColorPickerItem Title="Divider" ColorBrush="{Binding CurrentTheme.DividerColor, Mode=TwoWay}"/>
-                            <controls:ColorPickerItem Title="Menu BG" ColorBrush="{Binding CurrentTheme.MenuBGColor, Mode=TwoWay}"/>
-                            <controls:ColorPickerItem Title="Menu Button BG" ColorBrush="{Binding CurrentTheme.MenuButtonBGColor, Mode=TwoWay}"/>
-                            <controls:ColorPickerItem Title="Menu Button BG Hover" ColorBrush="{Binding CurrentTheme.MenuButtonBGHoverColor, Mode=TwoWay}"/>
-                            <controls:ColorPickerItem Title="Menu Button Border" ColorBrush="{Binding CurrentTheme.MenuButtonBorderColor, Mode=TwoWay}"/>
-                            <controls:ColorPickerItem Title="Menu Button Border Hover" ColorBrush="{Binding CurrentTheme.MenuButtonBorderHoverColor, Mode=TwoWay}"/>
-                            <controls:ColorPickerItem Title="Menu Button Icon" ColorBrush="{Binding CurrentTheme.MenuButtonTextAndIconColor, Mode=TwoWay}"/>
-                            <controls:ColorPickerItem Title="Menu Button Icon Hover" ColorBrush="{Binding CurrentTheme.MenuButtonTextAndIconHoverColor, Mode=TwoWay}"/>
-                            <controls:ColorPickerItem Title="Menu Text" ColorBrush="{Binding CurrentTheme.MenuTextColor, Mode=TwoWay}"/>
-                            <controls:ColorPickerItem Title="Search Bar BG" ColorBrush="{Binding CurrentTheme.SearchBarBGColor, Mode=TwoWay}"/>
-                            <controls:ColorPickerItem Title="Search Bar Border" ColorBrush="{Binding CurrentTheme.SearchBarBorderColor, Mode=TwoWay}"/>
-                            <controls:ColorPickerItem Title="Search Bar Text" ColorBrush="{Binding CurrentTheme.SearchBarTextColor, Mode=TwoWay}"/>
-                            <controls:ColorPickerItem Title="Username" ColorBrush="{Binding CurrentTheme.UsernameColor, Mode=TwoWay}"/>
+                            <controls:ColorPickerItem Title="Divider" ColorBrush="{CompiledBinding CurrentTheme.DividerColor, Mode=TwoWay}"/>
+                            <controls:ColorPickerItem Title="Menu BG" ColorBrush="{CompiledBinding CurrentTheme.MenuBGColor, Mode=TwoWay}"/>
+                            <controls:ColorPickerItem Title="Menu Button BG" ColorBrush="{CompiledBinding CurrentTheme.MenuButtonBGColor, Mode=TwoWay}"/>
+                            <controls:ColorPickerItem Title="Menu Button BG Hover" ColorBrush="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor, Mode=TwoWay}"/>
+                            <controls:ColorPickerItem Title="Menu Button Border" ColorBrush="{CompiledBinding CurrentTheme.MenuButtonBorderColor, Mode=TwoWay}"/>
+                            <controls:ColorPickerItem Title="Menu Button Border Hover" ColorBrush="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor, Mode=TwoWay}"/>
+                            <controls:ColorPickerItem Title="Menu Button Icon" ColorBrush="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor, Mode=TwoWay}"/>
+                            <controls:ColorPickerItem Title="Menu Button Icon Hover" ColorBrush="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor, Mode=TwoWay}"/>
+                            <controls:ColorPickerItem Title="Menu Text" ColorBrush="{CompiledBinding CurrentTheme.MenuTextColor, Mode=TwoWay}"/>
+                            <controls:ColorPickerItem Title="Search Bar BG" ColorBrush="{CompiledBinding CurrentTheme.SearchBarBGColor, Mode=TwoWay}"/>
+                            <controls:ColorPickerItem Title="Search Bar Border" ColorBrush="{CompiledBinding CurrentTheme.SearchBarBorderColor, Mode=TwoWay}"/>
+                            <controls:ColorPickerItem Title="Search Bar Text" ColorBrush="{CompiledBinding CurrentTheme.SearchBarTextColor, Mode=TwoWay}"/>
+                            <controls:ColorPickerItem Title="Username" ColorBrush="{CompiledBinding CurrentTheme.UsernameColor, Mode=TwoWay}"/>
                         </WrapPanel>
                 </StackPanel>
 
                 <!-- Collection -->
-                <Border BorderThickness="0,2,0,0" BorderBrush="{DynamicResource TsundokuDividerColor}" Opacity="0.3"/>
+                <Border Classes="divider"/>
                 <StackPanel Margin="20,14,20,14">
-                    <TextBlock Text="COLLECTION" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuSeriesCardPublisherColor}" LetterSpacing="1" Opacity="0.8" Margin="0,0,0,10"/>
+                    <TextBlock Text="COLLECTION" Classes="section-title" Margin="0,0,0,10"/>
                         <WrapPanel>
-                            <controls:ColorPickerItem Title="Badge BG" ColorBrush="{Binding CurrentTheme.StatusAndBookTypeBGColor, Mode=TwoWay}"/>
-                            <controls:ColorPickerItem Title="Badge Border" ColorBrush="{Binding CurrentTheme.StatusAndBookTypeBorderColor, Mode=TwoWay}"/>
-                            <controls:ColorPickerItem Title="Badge Text" ColorBrush="{Binding CurrentTheme.StatusAndBookTypeTextColor, Mode=TwoWay}"/>
-                            <controls:ColorPickerItem Title="Button Icon" ColorBrush="{Binding CurrentTheme.SeriesButtonIconColor, Mode=TwoWay}"/>
-                            <controls:ColorPickerItem Title="Button Icon Hover" ColorBrush="{Binding CurrentTheme.SeriesButtonIconHoverColor, Mode=TwoWay}"/>
-                            <controls:ColorPickerItem Title="Card Border" ColorBrush="{Binding CurrentTheme.SeriesCardBorderColor, Mode=TwoWay}"/>
-                            <controls:ColorPickerItem Title="Card Button BG" ColorBrush="{Binding CurrentTheme.SeriesCardButtonBGColor, Mode=TwoWay}"/>
-                            <controls:ColorPickerItem Title="Card Button BG Hover" ColorBrush="{Binding CurrentTheme.SeriesCardButtonBGHoverColor, Mode=TwoWay}"/>
-                            <controls:ColorPickerItem Title="Card Button Border" ColorBrush="{Binding CurrentTheme.SeriesCardButtonBorderColor, Mode=TwoWay}"/>
-                            <controls:ColorPickerItem Title="Card Button Border Hover" ColorBrush="{Binding CurrentTheme.SeriesCardButtonBorderHoverColor, Mode=TwoWay}"/>
-                            <controls:ColorPickerItem Title="Card Divider" ColorBrush="{Binding CurrentTheme.SeriesCardDividerColor, Mode=TwoWay}"/>
-                            <controls:ColorPickerItem Title="Collection BG" ColorBrush="{Binding CurrentTheme.CollectionBGColor, Mode=TwoWay}"/>
-                            <controls:ColorPickerItem Title="Cover BG" ColorBrush="{Binding CurrentTheme.SeriesCoverBGColor, Mode=TwoWay}"/>
-                            <controls:ColorPickerItem Title="Progress Bar" ColorBrush="{Binding CurrentTheme.SeriesProgressBarColor, Mode=TwoWay}"/>
-                            <controls:ColorPickerItem Title="Progress Bar BG" ColorBrush="{Binding CurrentTheme.SeriesProgressBarBGColor, Mode=TwoWay}"/>
-                            <controls:ColorPickerItem Title="Progress Bar Border" ColorBrush="{Binding CurrentTheme.SeriesProgressBarBorderColor, Mode=TwoWay}"/>
-                            <controls:ColorPickerItem Title="Progress Text" ColorBrush="{Binding CurrentTheme.SeriesProgressTextColor, Mode=TwoWay}"/>
-                            <controls:ColorPickerItem Title="Series Card BG" ColorBrush="{Binding CurrentTheme.SeriesCardBGColor, Mode=TwoWay}"/>
-                            <controls:ColorPickerItem Title="Series Description" ColorBrush="{Binding CurrentTheme.SeriesCardDescColor, Mode=TwoWay}"/>
-                            <controls:ColorPickerItem Title="Series Publisher" ColorBrush="{Binding CurrentTheme.SeriesCardPublisherColor, Mode=TwoWay}"/>
-                            <controls:ColorPickerItem Title="Series Staff" ColorBrush="{Binding CurrentTheme.SeriesCardStaffColor, Mode=TwoWay}"/>
-                            <controls:ColorPickerItem Title="Series Title" ColorBrush="{Binding CurrentTheme.SeriesCardTitleColor, Mode=TwoWay}"/>
+                            <controls:ColorPickerItem Title="Badge BG" ColorBrush="{CompiledBinding CurrentTheme.StatusAndBookTypeBGColor, Mode=TwoWay}"/>
+                            <controls:ColorPickerItem Title="Badge Border" ColorBrush="{CompiledBinding CurrentTheme.StatusAndBookTypeBorderColor, Mode=TwoWay}"/>
+                            <controls:ColorPickerItem Title="Badge Text" ColorBrush="{CompiledBinding CurrentTheme.StatusAndBookTypeTextColor, Mode=TwoWay}"/>
+                            <controls:ColorPickerItem Title="Button Icon" ColorBrush="{CompiledBinding CurrentTheme.SeriesButtonIconColor, Mode=TwoWay}"/>
+                            <controls:ColorPickerItem Title="Button Icon Hover" ColorBrush="{CompiledBinding CurrentTheme.SeriesButtonIconHoverColor, Mode=TwoWay}"/>
+                            <controls:ColorPickerItem Title="Card Border" ColorBrush="{CompiledBinding CurrentTheme.SeriesCardBorderColor, Mode=TwoWay}"/>
+                            <controls:ColorPickerItem Title="Card Button BG" ColorBrush="{CompiledBinding CurrentTheme.SeriesCardButtonBGColor, Mode=TwoWay}"/>
+                            <controls:ColorPickerItem Title="Card Button BG Hover" ColorBrush="{CompiledBinding CurrentTheme.SeriesCardButtonBGHoverColor, Mode=TwoWay}"/>
+                            <controls:ColorPickerItem Title="Card Button Border" ColorBrush="{CompiledBinding CurrentTheme.SeriesCardButtonBorderColor, Mode=TwoWay}"/>
+                            <controls:ColorPickerItem Title="Card Button Border Hover" ColorBrush="{CompiledBinding CurrentTheme.SeriesCardButtonBorderHoverColor, Mode=TwoWay}"/>
+                            <controls:ColorPickerItem Title="Card Divider" ColorBrush="{CompiledBinding CurrentTheme.SeriesCardDividerColor, Mode=TwoWay}"/>
+                            <controls:ColorPickerItem Title="Collection BG" ColorBrush="{CompiledBinding CurrentTheme.CollectionBGColor, Mode=TwoWay}"/>
+                            <controls:ColorPickerItem Title="Cover BG" ColorBrush="{CompiledBinding CurrentTheme.SeriesCoverBGColor, Mode=TwoWay}"/>
+                            <controls:ColorPickerItem Title="Progress Bar" ColorBrush="{CompiledBinding CurrentTheme.SeriesProgressBarColor, Mode=TwoWay}"/>
+                            <controls:ColorPickerItem Title="Progress Bar BG" ColorBrush="{CompiledBinding CurrentTheme.SeriesProgressBarBGColor, Mode=TwoWay}"/>
+                            <controls:ColorPickerItem Title="Progress Bar Border" ColorBrush="{CompiledBinding CurrentTheme.SeriesProgressBarBorderColor, Mode=TwoWay}"/>
+                            <controls:ColorPickerItem Title="Progress Text" ColorBrush="{CompiledBinding CurrentTheme.SeriesProgressTextColor, Mode=TwoWay}"/>
+                            <controls:ColorPickerItem Title="Series Card BG" ColorBrush="{CompiledBinding CurrentTheme.SeriesCardBGColor, Mode=TwoWay}"/>
+                            <controls:ColorPickerItem Title="Series Description" ColorBrush="{CompiledBinding CurrentTheme.SeriesCardDescColor, Mode=TwoWay}"/>
+                            <controls:ColorPickerItem Title="Series Publisher" ColorBrush="{CompiledBinding CurrentTheme.SeriesCardPublisherColor, Mode=TwoWay}"/>
+                            <controls:ColorPickerItem Title="Series Staff" ColorBrush="{CompiledBinding CurrentTheme.SeriesCardStaffColor, Mode=TwoWay}"/>
+                            <controls:ColorPickerItem Title="Series Title" ColorBrush="{CompiledBinding CurrentTheme.SeriesCardTitleColor, Mode=TwoWay}"/>
                         </WrapPanel>
                 </StackPanel>
 
                 <!-- Theme Management -->
-                <Border BorderThickness="0,2,0,0" BorderBrush="{DynamicResource TsundokuDividerColor}" Opacity="0.3"/>
+                <Border Classes="divider"/>
                 <StackPanel Margin="20,14,20,14" Spacing="8">
-                    <TextBlock Text="THEME MANAGEMENT" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuSeriesCardPublisherColor}" LetterSpacing="1" Opacity="0.8"/>
+                    <TextBlock Text="THEME MANAGEMENT" Classes="section-title"/>
                     <Grid ColumnDefinitions="Auto,Auto,6,*,Auto">
                         <Button x:Name="ExportThemeButton" Content="Export" Height="34" Padding="14,0" FontSize="13" Margin="0,0,6,0"
                                 Theme="{StaticResource MenuButton}" Click="ExportThemeAsync" i:Attached.Icon="fa-solid fa-file-export"/>
@@ -121,9 +116,9 @@
                 </StackPanel>
 
                 <!-- Generate Theme -->
-                <Border BorderThickness="0,2,0,0" BorderBrush="{DynamicResource TsundokuDividerColor}" Opacity="0.3"/>
+                <Border Classes="divider"/>
                 <StackPanel Margin="20,14,20,14" Spacing="8">
-                    <TextBlock Text="GENERATE THEME" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuSeriesCardPublisherColor}" LetterSpacing="1" Opacity="0.8"/>
+                    <TextBlock Text="GENERATE THEME" Classes="section-title"/>
                     <WrapPanel>
                         <StackPanel Spacing="3" Margin="3">
                             <TextBlock Text="MAIN COLOR 1" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource TsundokuDividerColor}"/>

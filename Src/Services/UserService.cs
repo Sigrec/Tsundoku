@@ -617,7 +617,15 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
 
     public void UpdateSeriesCoverBitmap(Guid seriesId, Bitmap bitmap)
     {
-        _userCollectionSourceCache.Lookup(seriesId).IfHasValue(series => series.CoverBitMap = bitmap);
+        _userCollectionSourceCache.Lookup(seriesId).IfHasValue(series =>
+        {
+            Bitmap? oldBitmap = series.CoverBitMap;
+            series.CoverBitMap = bitmap;
+            if (oldBitmap is not null && !ReferenceEquals(oldBitmap, bitmap))
+            {
+                oldBitmap.Dispose();
+            }
+        });
     }
 
     public void UpdateUser(Action<User> updateAction)

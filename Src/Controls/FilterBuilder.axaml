@@ -209,7 +209,7 @@
     <!-- Header row -->
     <DockPanel>
       <TextBlock DockPanel.Dock="Left"
-                 Text="FILTERS"
+                 Text="FILTERS (CTRL+F to Exit)"
                  FontSize="12" FontWeight="Bold" LetterSpacing="1"
                  VerticalAlignment="Center"
                  Foreground="{DynamicResource TsundokuDividerColor}"/>

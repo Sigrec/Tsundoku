@@ -20,5 +20,7 @@ public static class TsundokuSortModel
         [EnumMember(Value = "Rating")] Rating,
         [EnumMember(Value = "Unread")] Unread,
         [EnumMember(Value = "Read")] Read,
+        [EnumMember(Value = "Value")] Value,
+        [EnumMember(Value = "Volume Count")] VolumeCount,
     }
 }

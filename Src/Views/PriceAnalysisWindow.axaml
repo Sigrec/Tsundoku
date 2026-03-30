@@ -3,20 +3,20 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:vm="using:Tsundoku.ViewModels"
+		xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+		xmlns:controls="clr-namespace:Tsundoku.Controls"
         x:Class="Tsundoku.Views.PriceAnalysisWindow"
         Icon="\Assets\Icons\TsundokuLogo.ico"
         Title="Price Analysis"
-		FontFamily="Segoe UI"
-        SizeToContent="Height"
         Classes="Menu"
 		CanResize="True"
 		MinWidth="680"
-		MaxWidth="680"
-        MaxHeight="680"
-        MinHeight="380"
-		WindowStartupLocation="2"
+		MaxWidth="780"
+        MinHeight="570"
+		MaxHeight="720"
+		WindowStartupLocation="CenterOwner"
 		KeyboardNavigation.TabNavigation="Cycle"
-		x:DataType="vm:PriceAnalysisViewModel">	
+		x:DataType="vm:PriceAnalysisViewModel">
 	<Window.Resources>
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
@@ -26,178 +26,185 @@
 	</Window.Resources>
 
 	<Border Classes="Menu" BorderThickness="2" CornerRadius="0,0,8,8" ClipToBounds="True">
-		<ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden" Theme="{StaticResource ReverseCollectionScroll}">
-			<Grid ColumnDefinitions="Auto,10,Auto,10,200" RowDefinitions="Auto,Auto,Auto,Auto,10,Auto" Margin="20,10,20,20" HorizontalAlignment="Center" ShowGridLines="false">
-				<StackPanel Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3">
-					<TextBlock Text="Enter Title" FontSize="20" FontWeight="Bold" Classes="Menu" Margin="0,0,0,3" ToolTip.Tip="{CompiledBinding #SearchTextBox.Text}"/>
-					<TextBox x:Name="SearchTextBox"
-							Watermark="Title..."
-							Classes="Menu"
-							Width="390"
-							FontSize="18"
-                            Height="38"
-							FontWeight="Bold"
-							TextWrapping="NoWrap"
-							VerticalAlignment="Center"
-							HorizontalAlignment="Center"
-							BorderThickness="2"/>
-				</StackPanel>
-				<StackPanel Grid.Column="2" Grid.Row="1">
-					<TextBlock Text="Select Browser" FontSize="20" FontWeight="Bold" Classes="Menu" Margin="0,0,0,3"/>
-					<ComboBox x:Name="BrowserSelector"
-							  Height="37"
-							  Width="182"
-                              SelectedIndex="0"
-							  AutoScrollToSelectedItem="True"
-							  HorizontalAlignment="Left"
-							  Theme="{StaticResource MenuComboBox}">
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Chrome</ComboBoxItem>
-						<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Edge</ComboBoxItem>
-					</ComboBox>
-				</StackPanel>
-				<StackPanel Grid.Column="0" Grid.Row="1">
-					<TextBlock Text="Select Book Type"
-						FontSize="20" 
-						FontWeight="Bold"
-                        Margin="0,0,0,3"
-						Classes="Menu"/>
-					<StackPanel Orientation="Horizontal" Width="180" Spacing="5" HorizontalAlignment="Left">
-						<ToggleButton x:Name="MangaButton"
-									  Checked="IsMangaButtonClicked"
-									  Width="87.5"
-									  Theme="{StaticResource MenuToggleButton}"
-									  Content="Manga"/>
-						<ToggleButton x:Name="NovelButton"
-									  Checked="IsNovelButtonClicked"
-									  Width="87.5"
-									  Theme="{StaticResource MenuToggleButton}"
-									  Content="Novel"/>
+		<Grid RowDefinitions="Auto,*">
+			<!-- Header -->
+			<controls:WindowHeader Grid.Row="0" Icon="fa-solid fa-magnifying-glass-dollar" Title="Price Analysis"/>
+
+		<Grid Grid.Row="1" ColumnDefinitions="240,12,*" Margin="16,14,16,16">
+				<!-- LEFT COLUMN: Inputs -->
+				<Grid Grid.Column="0" RowDefinitions="Auto,Auto,Auto,Auto,Auto,*,Auto">
+					<!-- Series Title -->
+					<StackPanel Grid.Row="0" Spacing="4" Margin="0,0,0,12">
+						<TextBlock Text="SERIES TITLE" Classes="section-title"/>
+						<TextBox x:Name="SearchTextBox"
+								Watermark="Title..."
+								Classes="Menu"
+								FontSize="13"
+                                Height="68"
+								FontWeight="Bold"
+								TextWrapping="Wrap"
+								AcceptsReturn="False"
+								BorderThickness="2"/>
 					</StackPanel>
-				</StackPanel>
-				<StackPanel Grid.Column="4" Grid.Row="0" Grid.RowSpan="4">
-					<TextBlock Text="Select Websites"
-                               FontSize="20"
-                               FontWeight="Bold"
-                               Classes="Menu"
-                               Margin="0,0,0,3"
-                               ToolTip.Tip="{CompiledBinding WebsitesToolTipText}" 
-                               ToolTip.IsEnabled="{CompiledBinding WebsitesToolTipText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
-					<ListBox x:Name="WebsiteSelector"
-                             Height="262"
-							 Theme="{StaticResource QueryListBox}"
-							 SelectionMode="Multiple,Toggle"
-                             SelectionChanged="WebsiteSelectionChanged"
-							 SelectedItems="{CompiledBinding SelectedWebsites}">
-						<ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Amazon USA" ToolTip.Tip="America"/>
-						<ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Books-A-Million" ToolTip.Tip="America"/>
-                        <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Crunchyroll" ToolTip.Tip="America"/>
-                        <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Forbidden Planet" ToolTip.Tip="Britain"/>
-						<ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="InStockTrades" ToolTip.Tip="America"/>
-						<ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Kinokuniya USA" ToolTip.Tip="America"/>
-                        <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="MangaMate" ToolTip.Tip="Australia"/>
-                        <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="MerryManga" ToolTip.Tip="America"/>
-						<ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="RobertsAnimeCornerStore" ToolTip.Tip="America"/>
-                        <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="SciFier" ToolTip.Tip="America | Britain | Canada | Europe | Australia"/>
-                        <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="SpeedyHen" ToolTip.Tip="Britain"/>
-                        <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="TravellingMan" ToolTip.Tip="Britain"/>
-                    </ListBox>
-				</StackPanel>
-                <StackPanel Grid.Column="0" Grid.Row="2">
-					<TextBlock Text="Select Region" FontSize="20" FontWeight="Bold" Classes="Menu" Margin="0,0,0,3"/>
-					<ComboBox x:Name="RegionComboBox"
-							  Height="37"
-							  Width="182"
-                              ItemsSource="{x:Static vm:PriceAnalysisViewModel.ANALYSIS_COUNTRY_OPTIONS}"
-							  SelectedIndex="{CompiledBinding CurRegionIndex}"
-							  AutoScrollToSelectedItem="True"
-							  HorizontalAlignment="Left"
-                              SelectionChanged="RegionChanged"
-                              ItemContainerTheme="{StaticResource MenuComboBoxItem}"
-							  Theme="{StaticResource MenuComboBox}">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding}" />
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-					</ComboBox>
-				</StackPanel>
-				<StackPanel Grid.Column="2" Grid.Row="2">
-					<TextBlock Text="Stock Status Filters" FontSize="20" FontWeight="Bold" Classes="Menu" Margin="0,0,0,3" ToolTip.Tip="OOS (Out of Stock) \n PO (Pre-Order) \n BO (Backorder)"/>
-					<ComboBox x:Name="StockFilterSelector"
-                              ItemsSource="{x:Static vm:PriceAnalysisViewModel.EXCLUDE_ANALYSIS_OPTIONS}"
-							  Height="37"
-							  Width="182"
-							  SelectedIndex="0"
-							  AutoScrollToSelectedItem="True"
-							  HorizontalAlignment="Left"
-                              ToolTip.Tip="OOS (Out of Stock)&#x0a;PO (Pre-Order)&#x0a;BO (Backorder)"
-                              ItemContainerTheme="{StaticResource MenuComboBoxItem}"
-							  Theme="{StaticResource MenuComboBox}">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding}" />
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-					</ComboBox>
-				</StackPanel>
-				<StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" HorizontalAlignment="Center">
-					<TextBlock Text="Start Scrape"
-						FontSize="20" 
-						HorizontalAlignment="Center"
-						FontWeight="Bold"
-                        Margin="0,0,0,3"
-						Classes="Menu"/>
-					<Button Classes="Menu"
-							BorderThickness="2"
-							FontWeight="Bold"
-							Width="182"
-							Height="37"
-							x:Name="StartScrapeButton"
-							FontSize="18"
-							Padding="-10,0,0,0"
-							IsEnabled="{CompiledBinding IsAnalyzeButtonEnabled}"
+
+					<!-- Book Type -->
+					<StackPanel Grid.Row="1" Spacing="4" Margin="0,0,0,12">
+						<TextBlock Text="BOOK TYPE" Classes="section-title"/>
+						<UniformGrid Columns="2">
+							<ToggleButton x:Name="MangaButton"
+										  Checked="IsMangaButtonClicked"
+										  Theme="{StaticResource MenuToggleButton}"
+										  Height="34" Padding="14,0" FontSize="13"
+										  HorizontalAlignment="Stretch" Margin="0,0,3,0"
+										  Content="Manga"/>
+							<ToggleButton x:Name="NovelButton"
+										  Checked="IsNovelButtonClicked"
+										  Theme="{StaticResource MenuToggleButton}"
+										  Height="34" Padding="14,0" FontSize="13"
+										  HorizontalAlignment="Stretch" Margin="3,0,0,0"
+										  Content="Novel"/>
+						</UniformGrid>
+					</StackPanel>
+
+					<!-- Browser & Region on same line -->
+					<Grid Grid.Row="2" ColumnDefinitions="*,6,*" Margin="0,0,0,12">
+						<StackPanel Grid.Column="0" Spacing="4">
+							<TextBlock Text="BROWSER" Classes="section-title"/>
+							<ComboBox x:Name="BrowserSelector"
+									  Height="34"
+                                      SelectedIndex="0"
+									  AutoScrollToSelectedItem="True"
+									  HorizontalAlignment="Stretch"
+									  Theme="{StaticResource MenuComboBox}">
+								<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Chrome</ComboBoxItem>
+								<ComboBoxItem Theme="{StaticResource MenuComboBoxItem}">Edge</ComboBoxItem>
+							</ComboBox>
+						</StackPanel>
+						<StackPanel Grid.Column="2" Spacing="4">
+							<TextBlock Text="REGION" Classes="section-title"/>
+							<ComboBox x:Name="RegionComboBox"
+									  Height="34"
+                                      ItemsSource="{x:Static vm:PriceAnalysisViewModel.ANALYSIS_COUNTRY_OPTIONS}"
+									  SelectedIndex="{CompiledBinding CurRegionIndex}"
+									  AutoScrollToSelectedItem="True"
+									  HorizontalAlignment="Stretch"
+                                      SelectionChanged="RegionChanged"
+                                      ItemContainerTheme="{StaticResource MenuComboBoxItem}"
+									  Theme="{StaticResource MenuComboBox}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+							</ComboBox>
+						</StackPanel>
+					</Grid>
+
+					<!-- Stock Filter -->
+					<StackPanel Grid.Row="3" Spacing="4" Margin="0,0,0,12">
+						<TextBlock Text="STOCK FILTER" Classes="section-title"
+								   ToolTip.Tip="OOS (Out of Stock)&#x0a;PO (Pre-Order)&#x0a;BO (Backorder)"/>
+						<ComboBox x:Name="StockFilterSelector"
+                                  ItemsSource="{x:Static vm:PriceAnalysisViewModel.EXCLUDE_ANALYSIS_OPTIONS}"
+								  Height="34"
+								  SelectedIndex="0"
+								  AutoScrollToSelectedItem="True"
+								  HorizontalAlignment="Stretch"
+                                  ItemContainerTheme="{StaticResource MenuComboBoxItem}"
+								  Theme="{StaticResource MenuComboBox}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+						</ComboBox>
+					</StackPanel>
+
+					<!-- Websites (fills remaining space) -->
+					<Grid Grid.Row="4" Grid.RowSpan="2" RowDefinitions="Auto,*" Margin="0,0,0,12">
+						<TextBlock Grid.Row="0" Text="WEBSITES" Classes="section-title" Margin="0,0,0,4"
+								   ToolTip.Tip="{CompiledBinding WebsitesToolTipText}"
+								   ToolTip.IsEnabled="{CompiledBinding WebsitesToolTipText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+						<ListBox x:Name="WebsiteSelector"
+								 Grid.Row="1"
+								 Theme="{StaticResource QueryListBox}"
+								 SelectionMode="Multiple,Toggle"
+                                 SelectionChanged="WebsiteSelectionChanged"
+								 SelectedItems="{CompiledBinding SelectedWebsites}">
+							<ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Amazon USA" ToolTip.Tip="America"/>
+							<ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Books-A-Million" ToolTip.Tip="America"/>
+                            <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Crunchyroll" ToolTip.Tip="America"/>
+                            <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Forbidden Planet" ToolTip.Tip="Britain"/>
+							<ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="InStockTrades" ToolTip.Tip="America"/>
+							<ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Kinokuniya USA" ToolTip.Tip="America"/>
+                            <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="MangaMate" ToolTip.Tip="Australia"/>
+                            <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="MerryManga" ToolTip.Tip="America"/>
+							<ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="RobertsAnimeCornerStore" ToolTip.Tip="America"/>
+                            <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="SciFier" ToolTip.Tip="America | Britain | Canada | Europe | Australia"/>
+                            <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="SpeedyHen" ToolTip.Tip="Britain"/>
+                            <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="TravellingMan" ToolTip.Tip="Britain"/>
+                        </ListBox>
+					</Grid>
+
+					<!-- Start Analysis Button -->
+					<Button x:Name="StartScrapeButton"
+							Grid.Row="6"
 							Theme="{StaticResource MenuButton}"
-							Click="PerformAnalysis"
-							Content="Analyze"/>
-				</StackPanel>
-				<DataGrid x:Name="AnalysisDataGrid"
-						  ItemsSource="{CompiledBinding AnalyzedList}"
-						  Classes="Menu"
-                          MaxWidth="635"
-						  MaxHeight="345"
-                          CornerRadius="0"
-                          BorderThickness="2"
-						  ClipToBounds="False"
-						  IsReadOnly="True"
-						  CanUserReorderColumns="False"
-						  CanUserSortColumns="False"
-						  AutoGenerateColumns="False"
-						  CanUserResizeColumns="False"
-						  AreRowGroupHeadersFrozen="False"
-						  FrozenColumnCount="4"
-						  AreRowDetailsFrozen="True"
-						  HorizontalAlignment="Left"
-						  VerticalAlignment="Center"
-						  GridLinesVisibility="All"
-						  Grid.ColumnSpan="5"
-						  Grid.Column="0"
-						  FontWeight="Bold"
-						  Grid.Row="5">
-					<DataGrid.Columns>
-						<DataGridTextColumn Width="*" Header="Entry" Binding="{Binding Entry}"/>
-						<DataGridTextColumn MinWidth="65" Width="SizeToCells" Header="Price" Binding="{Binding Price}"/>
-						<DataGridTextColumn MinWidth="65" Width="SizeToHeader" Header="Stock" Binding="{Binding StockStatus}"/>
-						<DataGridTemplateColumn MinWidth="100" Width="SizeToCells" Header="Website">
-							<DataGridTemplateColumn.CellTemplate>
-								<DataTemplate>
-									<TextBlock Cursor="Hand" Text="{Binding Website}" TextDecorations="Underline" VerticalAlignment="Center" HorizontalAlignment="Left" PointerPressed="OpenSiteLinkAsync" Padding="12,0,12,0"
-									/>
-								</DataTemplate>
-							</DataGridTemplateColumn.CellTemplate>
-						</DataGridTemplateColumn>
-					</DataGrid.Columns>
-				</DataGrid>
+							Height="34" Padding="14,0" FontSize="13"
+							HorizontalAlignment="Stretch"
+							IsEnabled="{CompiledBinding IsAnalyzeButtonEnabled}"
+							Click="PerformAnalysis">
+						<StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+							<i:Icon Value="fa-solid fa-magnifying-glass" FontSize="13"/>
+							<TextBlock x:Name="StartScrapeButtonText" Text="Start Analysis" VerticalAlignment="Center"/>
+						</StackPanel>
+					</Button>
+				</Grid>
+
+				<!-- RIGHT COLUMN: Results -->
+				<Border Grid.Column="2"
+						Background="{DynamicResource TsundokuMenuButtonBGColor}"
+						BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}"
+						BorderThickness="2" CornerRadius="10" Padding="0" ClipToBounds="True">
+					<Grid RowDefinitions="Auto,*">
+						<Border Grid.Row="0" Padding="12,10" BorderThickness="0,0,0,2" BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}">
+							<TextBlock Text="RESULTS" Classes="section-title"/>
+						</Border>
+						<DataGrid x:Name="AnalysisDataGrid"
+								  Grid.Row="1"
+								  ItemsSource="{CompiledBinding AnalyzedList}"
+								  Classes="Menu"
+								  CornerRadius="0,0,10,10"
+								  BorderThickness="0"
+								  ClipToBounds="True"
+								  IsReadOnly="True"
+								  CanUserReorderColumns="False"
+								  CanUserSortColumns="False"
+								  AutoGenerateColumns="False"
+								  CanUserResizeColumns="False"
+								  AreRowGroupHeadersFrozen="False"
+								  FrozenColumnCount="4"
+								  AreRowDetailsFrozen="True"
+								  GridLinesVisibility="Horizontal"
+								  FontWeight="SemiBold"
+								  FontSize="13"
+								  HeadersVisibility="Column">
+							<DataGrid.Columns>
+								<DataGridTextColumn Width="*" Header="Entry" Binding="{Binding Entry}"/>
+								<DataGridTextColumn MinWidth="65" Width="SizeToCells" Header="Price" Binding="{Binding Price}"/>
+								<DataGridTextColumn MinWidth="55" Width="SizeToHeader" Header="Stock" Binding="{Binding StockStatus}"/>
+								<DataGridTemplateColumn MinWidth="90" Width="SizeToCells" Header="Website">
+									<DataGridTemplateColumn.CellTemplate>
+										<DataTemplate>
+											<TextBlock Cursor="Hand" Text="{Binding Website}" TextDecorations="Underline" VerticalAlignment="Center" HorizontalAlignment="Left" PointerPressed="OpenSiteLinkAsync" Padding="12,0,12,0"/>
+										</DataTemplate>
+									</DataGridTemplateColumn.CellTemplate>
+								</DataGridTemplateColumn>
+							</DataGrid.Columns>
+						</DataGrid>
+					</Grid>
+				</Border>
 			</Grid>
-		</ScrollViewer>
+		</Grid>
 	</Border>
 </Window>

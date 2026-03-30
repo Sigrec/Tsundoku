@@ -26,33 +26,28 @@
 	<Border Classes="Menu" BorderThickness="2" CornerRadius="0,0,8,8" ClipToBounds="True">
 		<Grid RowDefinitions="Auto,*">
 			<!-- Header -->
-			<Border Grid.Row="0" BorderThickness="0,0,0,2" BorderBrush="{DynamicResource TsundokuDividerColor}" Padding="16,12">
-				<StackPanel Orientation="Horizontal" Spacing="8">
-					<i:Icon Value="fa-solid fa-chart-simple" FontSize="16" Foreground="{DynamicResource TsundokuDividerColor}"/>
-					<TextBlock Text="Collection Stats" FontSize="18" FontWeight="ExtraBold" Foreground="{DynamicResource TsundokuUsernameColor}" VerticalAlignment="Center"/>
-				</StackPanel>
-			</Border>
+			<controls:WindowHeader Grid.Row="0" Icon="fa-solid fa-chart-simple" Title="Collection Stats"/>
 
 		<ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden" Theme="{StaticResource ReverseCollectionScroll}">
 			<StackPanel Spacing="0" Margin="16,14,16,16" HorizontalAlignment="Center" VerticalAlignment="Center">
 
 				<!-- OVERVIEW STATS (3 per row) -->
-				<TextBlock Text="OVERVIEW" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuSeriesCardPublisherColor}" LetterSpacing="1" Opacity="0.8" Margin="4,0,0,8"/>
+				<TextBlock Text="OVERVIEW" Classes="section-title" Margin="4,0,0,8"/>
 				<WrapPanel HorizontalAlignment="Center">
-					<controls:ValueStat Text="{Binding CurrentUser.MeanRating}" Title="Mean Rating" PointerPressed="CopyTextAsync"/>
-					<controls:ValueStat Text="{Binding CurrentUser.VolumesRead, StringFormat='{}{0:N0}'}" Title="Volumes Read" PointerPressed="CopyTextAsync"/>
-					<controls:ValueStat Text="{Binding SeriesCount, StringFormat='{}{0:N0}'}" Title="Series Count" PointerPressed="CopyTextAsync"/>
-					<controls:ValueStat Text="{Binding CurrentUser.NumVolumesCollected, StringFormat='{}{0:N0}'}" Title="Volumes Collected" PointerPressed="CopyTextAsync"/>
-					<controls:ValueStat Text="{Binding CurrentUser.NumVolumesToBeCollected, StringFormat='{}{0:N0}'}" Title="Volumes To Be Collected" PointerPressed="CopyTextAsync"/>
-					<controls:ValueStat Text="{Binding FavoriteCount, StringFormat='{}{0:N0}'}" Title="Favorites" PointerPressed="CopyTextAsync"/>
-					<controls:ValueStat Text="{Binding FullyCollectedCount, StringFormat='{}{0:N0}'}" Title="Fully Collected" PointerPressed="CopyTextAsync"/>
-					<controls:ValueStat Text="{Binding CompletionRate}" Title="Completion Rate" PointerPressed="CopyTextAsync"/>
+					<controls:ValueStat Text="{CompiledBinding CurrentUser.MeanRating}" Title="Mean Rating" PointerPressed="CopyTextAsync"/>
+					<controls:ValueStat Text="{CompiledBinding CurrentUser.VolumesRead, StringFormat='{}{0:N0}'}" Title="Volumes Read" PointerPressed="CopyTextAsync"/>
+					<controls:ValueStat Text="{CompiledBinding SeriesCount, StringFormat='{}{0:N0}'}" Title="Series Count" PointerPressed="CopyTextAsync"/>
+					<controls:ValueStat Text="{CompiledBinding CurrentUser.NumVolumesCollected, StringFormat='{}{0:N0}'}" Title="Volumes Collected" PointerPressed="CopyTextAsync"/>
+					<controls:ValueStat Text="{CompiledBinding CurrentUser.NumVolumesToBeCollected, StringFormat='{}{0:N0}'}" Title="Volumes To Be Collected" PointerPressed="CopyTextAsync"/>
+					<controls:ValueStat Text="{CompiledBinding FavoriteCount, StringFormat='{}{0:N0}'}" Title="Favorites" PointerPressed="CopyTextAsync"/>
+					<controls:ValueStat Text="{CompiledBinding FullyCollectedCount, StringFormat='{}{0:N0}'}" Title="Fully Collected" PointerPressed="CopyTextAsync"/>
+					<controls:ValueStat Text="{CompiledBinding CompletionRate}" Title="Completion Rate" PointerPressed="CopyTextAsync"/>
 				</WrapPanel>
-				<controls:ValueStat Text="{Binding CurrentUser.CollectionValue}" Title="Collection Value" Width="NaN" MinWidth="480" MaxWidth="976" HorizontalAlignment="Center" Margin="4,4,4,0" PointerPressed="CopyTextAsync"/>
+				<controls:ValueStat Text="{CompiledBinding CurrentUser.CollectionValue}" Title="Collection Value" Width="NaN" MinWidth="480" MaxWidth="976" HorizontalAlignment="Center" Margin="4,4,4,0" PointerPressed="CopyTextAsync"/>
 
 				<!-- DISTRIBUTIONS (3 pie charts in a row, legend below each chart) -->
-				<Border BorderThickness="0,2,0,0" BorderBrush="{DynamicResource TsundokuDividerColor}" Opacity="0.3" Margin="0,12,0,0"/>
-				<TextBlock Text="DISTRIBUTIONS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuSeriesCardPublisherColor}" LetterSpacing="1" Opacity="0.8" Margin="4,12,0,8"/>
+				<Border Classes="divider" Margin="0,12,0,0"/>
+				<TextBlock Text="DISTRIBUTIONS" Classes="section-title" Margin="4,12,0,8"/>
 				<WrapPanel HorizontalAlignment="Center">
 					<!-- Demographic -->
 					<Border Background="{DynamicResource TsundokuMenuButtonBGColor}"
@@ -113,8 +108,8 @@
 				</WrapPanel>
 
 				<!-- BAR CHARTS (2 per row) -->
-				<Border BorderThickness="0,2,0,0" BorderBrush="{DynamicResource TsundokuDividerColor}" Opacity="0.3" Margin="0,12,0,0"/>
-				<TextBlock Text="CHARTS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuSeriesCardPublisherColor}" LetterSpacing="1" Opacity="0.8" Margin="4,12,0,8"/>
+				<Border Classes="divider" Margin="0,12,0,0"/>
+				<TextBlock Text="CHARTS" Classes="section-title" Margin="4,12,0,8"/>
 				<WrapPanel HorizontalAlignment="Center">
 					<!-- Rating Bar Chart -->
 					<Border Background="{DynamicResource TsundokuMenuButtonBGColor}"

@@ -110,4 +110,20 @@
 			<Setter Property="Theme" Value="{StaticResource ReverseCollectionScroll}"/>
 		</Style>
 	</Style>
+
+	<!-- Section title style (UPPERCASE labels) -->
+	<Style Selector="TextBlock.section-title">
+		<Setter Property="FontSize" Value="11"/>
+		<Setter Property="FontWeight" Value="Bold"/>
+		<Setter Property="Foreground" Value="{DynamicResource TsundokuSeriesCardPublisherColor}"/>
+		<Setter Property="LetterSpacing" Value="1"/>
+		<Setter Property="Opacity" Value="0.8"/>
+	</Style>
+
+	<!-- Section divider -->
+	<Style Selector="Border.divider">
+		<Setter Property="BorderThickness" Value="0,2,0,0"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource TsundokuDividerColor}"/>
+		<Setter Property="Opacity" Value="0.3"/>
+	</Style>
 </Styles>

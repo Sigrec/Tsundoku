@@ -4,16 +4,17 @@ using System.Reactive.Linq;
 using Avalonia.Interactivity;
 using ReactiveUI;
 using ReactiveUI.Avalonia;
+using Tsundoku.Helpers;
 using Tsundoku.ViewModels;
 using static Tsundoku.Models.Enums.SeriesDemographicModel;
 using static Tsundoku.Models.Enums.SeriesFormatModel;
 
 namespace Tsundoku.Views;
 
-public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesViewModel>
+public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesViewModel>, IManagedWindow
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
-    public bool IsOpen = false;
+    public bool IsOpen { get; set; }
     private readonly IPopupDialogService _popupDialogService;
 
     public AddNewSeriesWindow(AddNewSeriesViewModel viewModel, IPopupDialogService popupDialogService)
@@ -22,22 +23,7 @@ public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesView
         _popupDialogService = popupDialogService;
         InitializeComponent();
 
-        Opened += (s, e) =>
-        {
-            IsOpen = true;
-        };
-
-        Closing += (s, e) =>
-        {
-            if (IsOpen)
-            {
-                this.Hide();
-                IsOpen = false;
-                Topmost = false;
-                viewModel.ClearSuggestions();
-                e.Cancel = true;
-            }
-        };
+        this.ConfigureHideOnClose(onClosing: () => viewModel.ClearSuggestions());
 
         Deactivated += (s, e) =>
         {
@@ -171,8 +157,14 @@ public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesView
 
             if (validSeries.Key) // Boolean returns whether the series added succeeded
             {
+                string addedTitle = !string.IsNullOrWhiteSpace(validSeries.Value) ? validSeries.Value : SeriesInputTextBox.Text.Trim();
                 ClearFields();
                 ViewModel.ClearSuggestions();
+
+                if (Owner is MainWindow mainWindow)
+                {
+                    mainWindow.ShowNotification($"Added \"{addedTitle}\" to Collection");
+                }
             }
             else
             {

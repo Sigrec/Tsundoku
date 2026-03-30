@@ -4,7 +4,9 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
 using Projektanker.Icons.Avalonia;
 using ReactiveUI.Avalonia;
+using System.Reactive.Linq;
 using Tsundoku.Helpers;
+using Tsundoku.Services;
 using Tsundoku.ViewModels;
 using static Tsundoku.Models.Enums.SeriesDemographicModel;
 using static Tsundoku.Models.Enums.SeriesGenreModel;
@@ -17,12 +19,14 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
     private readonly BitmapHelper _bitmapHelper;
     private readonly MainWindowViewModel _mainWindowViewModel;
+    private readonly IApiHealthCheckService _apiHealthCheckService;
     private bool _IsInitialized = false;
 
-    public EditSeriesInfoWindow(MainWindowViewModel mainWindowViewModel, BitmapHelper bitmapHelper)
+    public EditSeriesInfoWindow(MainWindowViewModel mainWindowViewModel, BitmapHelper bitmapHelper, IApiHealthCheckService apiHealthCheckService)
     {
         _bitmapHelper = bitmapHelper;
         _mainWindowViewModel = mainWindowViewModel;
+        _apiHealthCheckService = apiHealthCheckService;
         InitializeComponent();
 
         Opened += (s, e) =>
@@ -38,10 +42,13 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
                 
             this.Title = $"{curTitle}";
 
-            VolumesReadTextBlock.Text = $"{ViewModel.Series.VolumesRead} Vol{(ViewModel.Series.VolumesRead > 1 ? "s" : string.Empty)} Read";
-
             UpdateSelectedGenres();
             _IsInitialized = true;
+
+            // Disable refresh if AniList is down
+            System.ObservableExtensions.Subscribe(
+                _apiHealthCheckService.IsAniListAvailable.ObserveOn(AvaloniaScheduler.Instance),
+                isAvailable => ChangeSeriesVolumeCountButton.IsEnabled = isAvailable);
         };
 
         Closed += (s, e) =>
@@ -132,7 +139,6 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
             uint oldVolumesRead = ViewModel.Series.VolumesRead;
 
             ViewModel.Series.VolumesRead = newVolumesRead;
-            VolumesReadTextBlock.Text = $"{newVolumesRead} Vol{(newVolumesRead == 1 ? string.Empty : "s")} Read";
             VolumesReadMaskedTextBox.Clear();
 
             LOGGER.Info(
@@ -159,7 +165,6 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
                     {
                         ratingVal = decimal.Round(ratingVal, 1);
                         ViewModel.Series.Rating = ratingVal;
-                        RatingTextBlock.Text = $"Rating {ratingVal}/10.0";
                         RatingMaskedTextBox.Clear();
 
                         LOGGER.Info(

@@ -8,378 +8,220 @@
         x:Class="Tsundoku.Views.EditSeriesInfoWindow"
         x:DataType="vm:EditSeriesInfoViewModel"
         Classes="Menu"
-        FontFamily="Segoe UI"
         WindowStartupLocation="CenterScreen"
         SizeToContent="WidthAndHeight"
         CanResize="false">
 
     <Border Classes="Menu" BorderThickness="2" CornerRadius="0,0,8,8" ClipToBounds="True">
-        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden" Theme="{StaticResource ReverseCollectionScroll}">
-            <Grid
-                RowDefinitions="Auto,20,Auto,Auto,20,Auto,Auto,2,Auto,20,Auto"
-                ColumnDefinitions="*,15,*,15,*"
-                Margin="20,20,20,20"
-               >
-                <StackPanel
-                    Grid.Column="0"
-                    Grid.ColumnSpan="3"
-                    Grid.Row="0"
-                    Width="540"
-                    Spacing="7"
-                    Orientation="Horizontal"
-                    Height="200">
-                    <TextBox
-                        x:Name="SeriesNotesTextBox"
-                        Width="476"
-                        Height="200"
-                        HorizontalAlignment="Left"
-                        Text="{CompiledBinding Series.SeriesNotes, Mode=TwoWay}"
-                        AcceptsReturn="True" 
-                        TextWrapping="Wrap"
-                        BorderThickness="2"
-                        Watermark="Notes..."
-                        ScrollViewer.IsScrollChainingEnabled="false"
-                        FontWeight="Bold"
-                        FontSize="16"
-                        Classes="Menu"/>
-                    <StackPanel
-                        Spacing="10"
-                        Height="200"
-                        Width="55"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Center">
-                        <Button
+        <Grid RowDefinitions="Auto,*">
+            <!-- Header -->
+            <Border Grid.Row="0" BorderThickness="0,0,0,2" BorderBrush="{DynamicResource TsundokuDividerColor}" Padding="16,12">
+                <Grid ColumnDefinitions="*,Auto">
+                    <StackPanel Orientation="Horizontal" Spacing="8" ClipToBounds="True">
+                        <i:Icon Value="fa-solid fa-pen-to-square" FontSize="16" Foreground="{DynamicResource TsundokuDividerColor}"/>
+                        <TextBlock FontSize="18" FontWeight="ExtraBold" Foreground="{DynamicResource TsundokuUsernameColor}" VerticalAlignment="Center"
+                                   TextTrimming="CharacterEllipsis">
+                            <TextBlock.Text>
+                                <MultiBinding StringFormat="Edit Series — {0}">
+                                    <Binding Path="Title" RelativeSource="{RelativeSource AncestorType=Window}"/>
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
+                    </StackPanel>
+                    <Button Grid.Column="1"
                             x:Name="DeleteSeriesButton"
-                            BorderThickness="2"
-                            i:Attached.Icon="fa-trash-can"
-                            Cursor="Hand"
-                            FontSize="28" 
-                            Height="45"
-                            Padding="0,0,1,0"
+                            i:Attached.Icon="fa-solid fa-trash-can"
+                            FontSize="14" Width="34" Height="34"
+                            Theme="{StaticResource MenuButton}"
                             ToolTip.Tip="Delete Series"
-                            Theme="{StaticResource MenuButton}"
                             Click="RemoveSeries"/>
-                        <MaskedTextBox
-                            x:Name="CurVolumeMaskedTextBox"
-                            HorizontalContentAlignment="Center"
-                            VerticalContentAlignment="Center"
-                            Padding="1,0,0,0"
-                            BorderThickness="2"
-                            FontWeight="Bold"
-                            FontSize="18"
-                            MinWidth="55"
-                            MinHeight="40"
-                            TextAlignment="Center"
-                            MaxLength="3"
-                            ToolTip.Tip="Cur"
-                            Classes="Menu"
-                            Mask="###"/>
-                        <MaskedTextBox 
-                            x:Name="MaxVolumeMaskedTextBox"
-                            HorizontalContentAlignment="Center"
-                            VerticalContentAlignment="Center"
-                            Padding="1,0,0,0"
-                            BorderThickness="2"
-                            FontWeight="Bold"
-                            FontSize="18"
-                            MinWidth="55"
-                            MinHeight="40"
-                            TextAlignment="Center"
-                            MaxLength="3"
-                            ToolTip.Tip="Max"
-                            Classes="Menu"
-                            Mask="###"/>
-                        <Button
-                            x:Name="ChangeSeriesVolumeCountButton"
-                            BorderThickness="2" 
-                            i:Attached.Icon="fa-repeat"
-                            Cursor="Hand"
-                            FontSize="28" 
-                            Height="45"
-                            Padding="0,0,1,0"
-                            Theme="{StaticResource MenuButton}"
-                            ToolTip.Tip="Update Volume Count"
-                            Click="ChangeSeriesVolumeCounts"/>
+                </Grid>
+            </Border>
+
+        <Grid Grid.Row="1" ColumnDefinitions="*,12,200" Margin="16,14,16,16">
+                <!-- LEFT COLUMN -->
+                <StackPanel Grid.Column="0" Spacing="12">
+                    <!-- Series Notes -->
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="SERIES NOTES" Classes="section-title"/>
+                        <TextBox x:Name="SeriesNotesTextBox"
+                                 Height="160"
+                                 Width="460"
+                                 Text="{CompiledBinding Series.SeriesNotes, Mode=TwoWay}"
+                                 AcceptsReturn="True"
+                                 TextWrapping="Wrap"
+                                 BorderThickness="2"
+                                 Watermark="Notes..."
+                                 ScrollViewer.IsScrollChainingEnabled="false"
+                                 FontWeight="Bold"
+                                 FontSize="13"
+                                 Classes="Menu"/>
+                    </StackPanel>
+
+                    <!-- Current Vols / Max Vols / Volumes Read / Rating -->
+                    <Grid ColumnDefinitions="*,6,*,6,*,6,*" RowDefinitions="Auto,Auto" MinWidth="460">
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="CURRENT VOLS" Classes="section-title" Margin="0,0,0,4"/>
+                        <MaskedTextBox x:Name="CurVolumeMaskedTextBox"
+                                       Grid.Row="1" Grid.Column="0"
+                                       Height="34" HorizontalAlignment="Stretch"
+                                       HorizontalContentAlignment="Center"
+                                       VerticalContentAlignment="Center"
+                                       BorderThickness="2" FontWeight="Bold" FontSize="13"
+                                       TextAlignment="Center" MaxLength="3"
+                                       ToolTip.Tip="Current Volumes"
+                                       Classes="Menu" Mask="###"/>
+
+                        <TextBlock Grid.Row="0" Grid.Column="2" Text="MAX VOLS" Classes="section-title" Margin="0,0,0,4"/>
+                        <MaskedTextBox x:Name="MaxVolumeMaskedTextBox"
+                                       Grid.Row="1" Grid.Column="2"
+                                       Height="34" HorizontalAlignment="Stretch"
+                                       HorizontalContentAlignment="Center"
+                                       VerticalContentAlignment="Center"
+                                       BorderThickness="2" FontWeight="Bold" FontSize="13"
+                                       TextAlignment="Center" MaxLength="3"
+                                       ToolTip.Tip="Max Volumes"
+                                       Classes="Menu" Mask="###"/>
+
+                        <TextBlock Grid.Row="0" Grid.Column="4" Text="VOLUMES READ" Classes="section-title" Margin="0,0,0,4"/>
+                        <MaskedTextBox x:Name="VolumesReadMaskedTextBox"
+                                       Grid.Row="1" Grid.Column="4"
+                                       Height="34" HorizontalAlignment="Stretch"
+                                       HorizontalContentAlignment="Center"
+                                       VerticalContentAlignment="Center"
+                                       BorderThickness="2" FontWeight="Bold" FontSize="13"
+                                       TextAlignment="Center" MaxLength="3"
+                                       Classes="Menu" Mask="000"/>
+
+                        <TextBlock Grid.Row="0" Grid.Column="6" Text="RATING" Classes="section-title" Margin="0,0,0,4"/>
+                        <MaskedTextBox x:Name="RatingMaskedTextBox"
+                                       Grid.Row="1" Grid.Column="6"
+                                       Height="34" HorizontalAlignment="Stretch"
+                                       HorizontalContentAlignment="Center"
+                                       VerticalContentAlignment="Center"
+                                       BorderThickness="2" FontWeight="Bold" FontSize="13"
+                                       TextAlignment="Center" AcceptsReturn="False"
+                                       HidePromptOnLeave="True"
+                                       Classes="Menu" Mask="90.0\/\1\0.\0"/>
+                    </Grid>
+
+                    <!-- Cover Image URL -->
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="COVER IMAGE URL" Classes="section-title"
+                                   ToolTip.Tip="{CompiledBinding CoverImageUrl}"/>
+                        <Grid ColumnDefinitions="*,6,Auto,6,Auto">
+                            <TextBox x:Name="CoverImageUrlTextBox"
+                                     Grid.Column="0"
+                                     FontSize="13" Height="34"
+                                     FontWeight="Bold"
+                                     Text="{CompiledBinding CoverImageUrl}"
+                                     Classes="Menu" BorderThickness="2"
+                                     Watermark="Image URL..."/>
+                            <Button x:Name="ChangeCoverLinkButton"
+                                    Grid.Column="2"
+                                    FontSize="14" Width="34" Height="34"
+                                    Theme="{StaticResource MenuButton}"
+                                    ToolTip.Tip="Change Cover From Link"
+                                    Click="ChangeCoverFromLinkAsync">
+                                <i:Icon x:Name="ChangeCoverButtonIcon" Value="fa-solid fa-circle-down" FontSize="14"/>
+                            </Button>
+                            <Button x:Name="ChangeCoverFileButton"
+                                    Grid.Column="4"
+                                    i:Attached.Icon="fa-solid fa-image"
+                                    FontSize="14" Width="34" Height="34"
+                                    Theme="{StaticResource MenuButton}"
+                                    ToolTip.Tip="Change Cover From File"
+                                    Click="ChangeSeriesCoverFromFileAsync"/>
+                        </Grid>
+                    </StackPanel>
+
+                    <!-- Publisher / Value / Demographic -->
+                    <Grid ColumnDefinitions="*,6,*,6,*" RowDefinitions="Auto,Auto" MinWidth="460">
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="PUBLISHER" Classes="section-title" Margin="0,0,0,4"
+                                   ToolTip.Tip="{CompiledBinding Series.Publisher}"/>
+                        <TextBox x:Name="PublisherTextBox"
+                                 Grid.Row="1" Grid.Column="0"
+                                 Height="34" HorizontalAlignment="Stretch"
+                                 Classes="Menu" BorderThickness="2"
+                                 FontWeight="Bold" FontSize="13"
+                                 AcceptsReturn="False"
+                                 Text="{CompiledBinding Series.Publisher, Mode=OneTime}"/>
+
+                        <TextBlock Grid.Row="0" Grid.Column="2" Text="{CompiledBinding SeriesValueText}" Classes="section-title" Margin="0,0,0,4"/>
+                        <MaskedTextBox x:Name="ValueMaskedTextBox"
+                                       Grid.Row="1" Grid.Column="2"
+                                       Height="34" HorizontalAlignment="Stretch"
+                                       HorizontalContentAlignment="Center"
+                                       VerticalContentAlignment="Center"
+                                       BorderThickness="2" FontWeight="Bold" FontSize="13"
+                                       TextAlignment="Center" AcceptsReturn="False"
+                                       Mask="{CompiledBinding SeriesValueMaskedText}"
+                                       Classes="Menu"/>
+
+                        <TextBlock Grid.Row="0" Grid.Column="4" Text="DEMOGRAPHIC" Classes="section-title" Margin="0,0,0,4"/>
+                        <ComboBox x:Name="DemographicComboBox"
+                                  Grid.Row="1" Grid.Column="4"
+                                  ItemsSource="{x:Static enums:SeriesDemographicModel.SERIES_DEMOGRAPHIC_SET}"
+                                  SelectionChanged="DemographicChanged"
+                                  Height="34" FontWeight="Bold" FontSize="13"
+                                  HorizontalAlignment="Stretch"
+                                  SelectedIndex="{CompiledBinding DemographicIndex}"
+                                  BorderThickness="2"
+                                  Cursor="Hand"
+                                  Theme="{StaticResource MenuComboBox}"
+                                  ItemContainerTheme="{StaticResource MenuComboBoxItem}"
+                                  AutoScrollToSelectedItem="True">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </Grid>
+
+                    <!-- Action Buttons -->
+                    <Border Classes="divider"/>
+                    <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
+                        <Button x:Name="ChangeSeriesVolumeCountButton"
+                                Theme="{StaticResource MenuButton}"
+                                Height="34" Padding="14,0" FontSize="13"
+                                ToolTip.Tip="Update Volume Count"
+                                Click="ChangeSeriesVolumeCounts">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <i:Icon Value="fa-solid fa-arrows-rotate" FontSize="13"/>
+                                <TextBlock Text="Refresh" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Theme="{StaticResource MenuButton}"
+                                Height="34" Padding="14,0" FontSize="13"
+                                ToolTip.Tip="Save Stats"
+                                Click="SaveStats">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <i:Icon Value="fa-solid fa-floppy-disk" FontSize="13"/>
+                                <TextBlock Text="Save" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <ToggleButton x:Name="FavoriteButton"
+                                      IsChecked="{CompiledBinding Series.IsFavorite, Mode=TwoWay}"
+                                      Theme="{StaticResource MenuToggleButton}"
+                                      Height="34" Width="34" FontSize="14"
+                                      ToolTip.Tip="Favorite"
+                                      i:Attached.Icon="fa-solid fa-heart"/>
                     </StackPanel>
                 </StackPanel>
-                <Line Grid.ColumnSpan="3" Grid.Column="0" Grid.Row="1" StartPoint="0,10" EndPoint="550,10" VerticalAlignment="Center" HorizontalAlignment="Center" Stroke="{DynamicResource TsundokuDividerColor}" StrokeThickness="3"/>
-                <TextBlock
-                    x:Name="CoverImageTextBlock"
-                    Text="Cover Image"
-                    Grid.Row="2"
-                    Grid.Column="0"
-                    Grid.ColumnSpan="3"
-                    FontSize="20"
-                    FontWeight="Bold"
-                    Classes="Menu"
-                    TextDecorations="Underline"
-                    Margin="2,0,0,3"
-                    HorizontalAlignment="Left"
-                    ToolTip.Tip="{CompiledBinding CoverImageUrl}"/>
-                <StackPanel Orientation="Horizontal" Spacing="5" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3">
-                    <TextBox 
-                        x:Name="CoverImageUrlTextBox"
-                        FontSize="18"
-                        Width="450"
-                        FontWeight="Bold"
-                        Height="38"
-                        Text="{CompiledBinding CoverImageUrl}"
-                        Classes="Menu"
-                        BorderThickness="2"
-                        ToolTip.Tip="Optional"
-                        Watermark="Image Url (Hover Title to see Full Text)"/>
-                    <Button 
-                        x:Name="ChangeCoverLinkButton"
-                        FontSize="20"
-                        Theme="{StaticResource MenuButton}"
-                        ToolTip.Tip="Change Cover From Link"
-                        VerticalContentAlignment="Center"
-                        HorizontalContentAlignment="Center"
-                        Click="ChangeCoverFromLinkAsync">
-                        <i:Icon 
-                            x:Name="ChangeCoverButtonIcon"
-                            Value="fa-solid fa-circle-down" 
-                            FontSize="20" />
-                    </Button>
-                    <Button 
-                        x:Name="ChangeCoverFileButton"
-                        i:Attached.Icon="fa-solid fa-image"
-                        FontSize="20"
-                        Click="ChangeSeriesCoverFromFileAsync"
-                        VerticalContentAlignment="Center"
-                        HorizontalContentAlignment="Center"
-                        ToolTip.Tip="Change Cover From File"
-                        Theme="{StaticResource MenuButton}"/>
-                </StackPanel>
-                <Line Grid.ColumnSpan="3" Grid.Column="0" Grid.Row="4" StartPoint="0,10" EndPoint="550,10" VerticalAlignment="Center" HorizontalAlignment="Center" Stroke="{DynamicResource TsundokuDividerColor}" StrokeThickness="3"/>
-                <TextBlock
-                    x:Name="PublisherTextBlock"
-                    Grid.Row="5"
-                    Grid.Column="0"
-                    Classes="Menu"
-                    FontWeight="Bold"
-                    Text="Publisher"
-                    TextDecorations="Underline" 
-                    HorizontalAlignment="Center"
-                    ToolTip.Tip="{CompiledBinding Series.Publisher}"
-                    Margin="0,0,0,3"
-                    FontSize="20"/>
-                <TextBox
-                    x:Name="PublisherTextBox"
-                    Grid.Row="6"
-                    Grid.Column="0"
-                    Height="38"
-                    Width="262"
-                    Classes="Menu"
-                    BorderThickness="2"
-                    FontWeight="Bold"
-                    FontSize="17"
-                    TextAlignment="Center"
-                    AcceptsReturn="False"
-                    Text="{CompiledBinding Series.Publisher, Mode=OneTime}"
-                    HorizontalContentAlignment="Center"/>
-                <TextBlock
-                    x:Name="ValueTextBlock"
-                    Grid.Row="5"
-                    Grid.Column="2"
-                    Classes="Menu"
-                    FontWeight="Bold"
-                    TextDecorations="Underline" 
-                    HorizontalAlignment="Center"
-                    Margin="0,0,0,3"
-                    Text="{CompiledBinding SeriesValueText}"
-                    FontSize="20">
-                </TextBlock>
-                <MaskedTextBox
-                    x:Name="ValueMaskedTextBox"
-                    Grid.Row="6"
-                    Grid.Column="2"
-                    Height="38"
-                    Width="262"
-                    AcceptsReturn="False"
-                    BorderThickness="2"
-                    FontWeight="Bold"
-                    FontSize="17"
-                    TextAlignment="Center"
-                    HorizontalContentAlignment="Center"
-                    Mask="{CompiledBinding SeriesValueMaskedText}"
-                    VerticalContentAlignment="Center"
-                    Classes="Menu"/>
-                <Grid 
-                    Grid.RowDefinitions="Auto,Auto"
-                    Grid.ColumnDefinitions="*,15,*,15,*"
-                    Grid.Column="0"
-                    Grid.ColumnSpan="3"
-                    Grid.Row="8">
-                    <TextBlock
-                        Grid.Row="0"
-                        Grid.Column="0"
-                        x:Name="RatingTextBlock"
-                        Text="{CompiledBinding Series.Rating, StringFormat='{}Rating {0}/10.0'}"
-                        TextDecorations="Underline" 
-                        FontWeight="Bold"
-                        Classes="Menu"
-                        HorizontalAlignment="Center"
-                        Margin="0,0,0,3"
-                        FontSize="20"/>
-                    <MaskedTextBox
-                        Grid.Row="1"
-                        Grid.Column="0"
-                        x:Name="RatingMaskedTextBox"
-                        Height="38"
-                        Width="170"
-                        AcceptsReturn="False"
-                        BorderThickness="2"
-                        FontWeight="Bold"
-                        FontSize="17"
-                        TextAlignment="Left"
-                        Classes="Menu"
-                        HorizontalContentAlignment="Center"
-                        HidePromptOnLeave="True"
-                        Mask="90.0/1\0.\0"/>
-                    <TextBlock
-                        Grid.Row="0"
-                        Grid.Column="2"
-                        Text="Demographic"
-                        TextDecorations="Underline"
-						Classes="Menu"
-                        FontWeight="Bold"
-                        HorizontalAlignment="Center"
-                        Margin="0,0,0,3"
-                        FontSize="20"/>
-                    <ComboBox
-                        x:Name="DemographicComboBox"
-                        ItemsSource="{x:Static enums:SeriesDemographicModel.SERIES_DEMOGRAPHIC_SET}"
-                        SelectionChanged="DemographicChanged"
-                        Grid.Row="1"
-                        Grid.Column="2"
-                        Theme="{StaticResource MenuComboBox}"
-                        Height="38"
-                        FontWeight="Bold"
-                        FontSize="17"
-                        Width="170"
-                        SelectedIndex="{CompiledBinding DemographicIndex}"
-                        BorderThickness="2"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Center"
-                        Cursor="Hand"
-                        ItemContainerTheme="{StaticResource MenuComboBoxItem}"
-                        AutoScrollToSelectedItem="True">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding}" />
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
-                    <TextBlock
-                        Grid.Row="0"
-                        Grid.Column="4"
-                        x:Name="VolumesReadTextBlock"
-                        FontWeight="Bold"
-                        ToolTip.Tip="Volumes Read"
-                        HorizontalAlignment="Center"
-                        TextDecorations="Underline"
-                        Classes="Menu"
-                        Margin="0,0,0,3"
-                        FontSize="20"/>
-                    <MaskedTextBox
-                        Grid.Row="1"
-                        Grid.Column="4"
-                        x:Name="VolumesReadMaskedTextBox"
-                        Height="38"
-                        Width="170"
-                        ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                        AcceptsReturn="False"
-                        TextWrapping="NoWrap"
-                        AcceptsTab="False"
-                        BorderThickness="2"
-                        FontWeight="Bold"
-                        FontSize="17"
-                        TextAlignment="Left"
-                        HorizontalContentAlignment="Center"
-                        Classes="Menu"
-                        Mask="000"/>
-                </Grid>
-                <StackPanel
-                    Grid.Column="0"
-                    Grid.ColumnSpan="5"
-                    Grid.Row="10"
-                    Orientation="Horizontal"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
-                    Spacing="10">
-                    <Button 
-                        FontSize="17"
-                        VerticalContentAlignment="Center"
-                        HorizontalContentAlignment="Center"
-                        ToolTip.Tip="Refresth Series Info"
-                        Click="RefreshSeriesAsync"
-                        Theme="{StaticResource MenuButton}">
-                        <Button.Content>
-                            <StackPanel Orientation="Horizontal" Spacing="3">
-                                <i:Icon Value="fa-solid fa-arrow-rotate-right" FontSize="20" Animation="Spin" />
-                                <TextBlock Text="Refresh"/>
-                            </StackPanel>
-                        </Button.Content>
-                    </Button>
-                    <Button
-                        FontSize="17"
-                        VerticalContentAlignment="Center"
-                        HorizontalContentAlignment="Center"
-                        ToolTip.Tip="Save Stats"
-                        Click="SaveStats"
-                        Theme="{StaticResource MenuButton}">
-                        <Button.Content>
-                            <StackPanel Orientation="Horizontal" Spacing="3">
-                                <i:Icon Value="fa-solid fa-floppy-disk" FontSize="20" />
-                                <TextBlock Text="Save" />
-                            </StackPanel>
-                        </Button.Content>
-                    </Button>
-                    <ToggleButton
-                        x:Name="FavoriteButton"
-                        IsChecked="{CompiledBinding Series.IsFavorite, Mode=TwoWay}"
-                        FontSize="17"
-                        VerticalContentAlignment="Center"
-                        HorizontalContentAlignment="Center"
-                        Theme="{StaticResource MenuToggleButton}">
-                        <Button.Content>
-                            <StackPanel Orientation="Horizontal" Spacing="3">
-                                <i:Icon Value="fa-solid fa-star" FontSize="20" />
-                                <TextBlock Text="Favorite"/>
-                            </StackPanel>
-                        </Button.Content>
-                    </ToggleButton>
-                </StackPanel>
-                <StackPanel
-                    Orientation="Vertical"
-                    Spacing="3"
-                    Margin="0,-8,0,0"
-                    Grid.Row="0"
-                    Grid.RowSpan="10"
-                    Grid.Column="4">
-                    <TextBlock
-                        x:Name="GenresTextBlock"
-                        HorizontalAlignment="Center"  
-                        Text="Genres" 
-                        FontSize="20" 
-                        FontWeight="Bold" 
-                        Classes="Menu" 
-                        Margin="2,0,0,0"
-                        TextDecorations="Underline"
-                        ToolTip.Tip="{CompiledBinding GenresToolTipText}" 
-                        ToolTip.IsEnabled="{CompiledBinding GenresToolTipText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
-                    <ListBox
-                        x:Name="GenreSelector"
-                        ItemsSource="{x:Static enums:SeriesGenreModel.SERIES_GENRES}"
-                        SelectedItems="{CompiledBinding SelectedGenres}"
-                        SelectionMode="Multiple,Toggle"
-                        Height="424" 
-                        Width="186"
-                        VerticalAlignment="Top"
-                        SelectionChanged="GenreSelectionChanged"
-                        ItemContainerTheme="{StaticResource QueryListBoxItem}"
-                        Theme="{StaticResource QueryListBox}">
+
+                <!-- RIGHT COLUMN: Genres -->
+                <StackPanel Grid.Column="2" Spacing="4">
+                    <TextBlock Text="GENRES" Classes="section-title"
+                               ToolTip.Tip="{CompiledBinding GenresToolTipText}"
+                               ToolTip.IsEnabled="{CompiledBinding GenresToolTipText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+                    <ListBox x:Name="GenreSelector"
+                             Height="417"
+                             ItemsSource="{x:Static enums:SeriesGenreModel.SERIES_GENRES}"
+                             SelectedItems="{CompiledBinding SelectedGenres}"
+                             SelectionMode="Multiple,Toggle"
+                             SelectionChanged="GenreSelectionChanged"
+                             ItemContainerTheme="{StaticResource QueryListBoxItem}"
+                             Theme="{StaticResource QueryListBox}">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding}" />
@@ -388,6 +230,6 @@
                     </ListBox>
                 </StackPanel>
             </Grid>
-        </ScrollViewer>
+        </Grid>
     </Border>
 </Window>

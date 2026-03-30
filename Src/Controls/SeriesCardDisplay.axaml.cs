@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Microsoft.Extensions.DependencyInjection;
+using Tsundoku.Helpers;
 using Tsundoku.Models;
 using Tsundoku.ViewModels;
 using static Tsundoku.Models.Enums.TsundokuLanguageModel;
@@ -68,8 +69,7 @@ public sealed partial class SeriesCardDisplay : UserControl
             string title = Series.Titles.TryGetValue(Language.Value, out string? langTitle)
                 ? langTitle
                 : Series.Titles[TsundokuLanguage.Romaji];
-            LOGGER.Debug("Copying {title} to Clipboard", title);
-            await TextCopy.ClipboardService.SetTextAsync(title);
+            await ClipboardHelper.CopyToClipboardAsync(title);
         }
     }
 

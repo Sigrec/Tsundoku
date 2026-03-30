@@ -30,15 +30,17 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
     [Reactive] public partial string AdvancedSearchQuery { get; set; } = string.Empty;
     [Reactive] public partial string SeriesFilterText { get; set; }
     [Reactive] public partial TsundokuFilter SelectedFilter { get; set; } = TsundokuFilter.None;
-    [Reactive] public partial int SelectedFilterIndex { get; set; } = 0;
+    [Reactive] public partial int SelectedFilterIndex { get; set; } = -1;
     [Reactive] public partial TsundokuSort SelectedSort { get; set; } = TsundokuSort.TitleAZ;
     [Reactive] public partial int SelectedSortIndex { get; set; } = 0;
     [Reactive] public partial int SelectedLangIndex { get; set; }
     [Reactive] public partial string NotificationText { get; set; }
     [Reactive] public partial string AdvancedSearchQueryErrorMessage { get; set; }
     [Reactive] public partial TsundokuLanguage SelectedLanguage { get; set; }
+    [Reactive] public partial string SelectedPublisher { get; set; } = string.Empty;
 
     public ReadOnlyObservableCollection<Series> UserCollection { get; }
+    public ReadOnlyObservableCollection<string> AvailablePublishers => _sharedSeriesProvider.AvailablePublishers;
     public ReadOnlyObservableCollection<TsundokuTheme> SavedThemes => _userService.SavedThemes;
     public FilterBuilderViewModel FilterBuilder { get; } = new();
 
@@ -66,7 +68,7 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
             .Subscribe(filter =>
             {
                 // First action: update the local index
-                SelectedFilterIndex = TSUNDOKU_FILTER_DICT[filter];
+                SelectedFilterIndex = TSUNDOKU_FILTER_DICT.TryGetValue(filter, out int index) ? index : -1;
 
                 // Second action: update the shared provider
                 _sharedSeriesProvider.SelectedFilter = filter;
@@ -81,6 +83,11 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
                 SelectedSortIndex = TSUNDOKU_SORT_DICT[sort];
                 _sharedSeriesProvider.SelectedSort = sort;
             })
+            .DisposeWith(_disposables);
+
+        this.WhenAnyValue(x => x.SelectedPublisher)
+            .DistinctUntilChanged()
+            .Subscribe(publisher => _sharedSeriesProvider.SelectedPublisher = publisher)
             .DisposeWith(_disposables);
 
         // Wire FilterBuilder's synthesized query into the shared provider

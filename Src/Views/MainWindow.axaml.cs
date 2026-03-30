@@ -15,10 +15,13 @@ using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 using static Tsundoku.Models.Enums.TsundokuFilterModel;
 using static Tsundoku.Models.Enums.TsundokuSortModel;
 using ReactiveUI.Avalonia;
+using System.Reactive.Disposables;
 using System.Reactive.Disposables.Fluent;
 using System.Collections.Specialized;
+using Tsundoku.Services;
 using Avalonia.Animation;
 using Avalonia.Media.Transformation;
+using Avalonia.Styling;
 
 namespace Tsundoku.Views;
 
@@ -26,6 +29,8 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
     private readonly IUserService _userService;
+    private readonly IApiHealthCheckService _apiHealthCheckService;
+    private readonly IPopupDialogService _popupDialogService;
     private readonly AddNewSeriesWindow _newSeriesWindow;
     private readonly UserSettingsWindow _userSettingsWindow;
     private readonly CollectionThemeWindow _themeSettingsWindow;
@@ -35,10 +40,14 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
     private WindowState previousWindowState;
     private CancellationTokenSource? _notificationCts;
     private bool _isShuttingDown;
+    private bool _aniListDown;
+    private bool _mangaDexDown;
 
     public MainWindow(
         MainWindowViewModel viewModel,
         IUserService userService,
+        IApiHealthCheckService apiHealthCheckService,
+        IPopupDialogService popupDialogService,
         AddNewSeriesWindow newSeriesWindow,
         UserSettingsWindow userSettingsWindow,
         CollectionThemeWindow themeSettingsWindow,
@@ -47,6 +56,8 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
         UserNotesWindow userNotesWindow)
     {
         _userService = userService;
+        _apiHealthCheckService = apiHealthCheckService;
+        _popupDialogService = popupDialogService;
         _newSeriesWindow = newSeriesWindow;
         _userSettingsWindow = userSettingsWindow;
         _themeSettingsWindow = themeSettingsWindow;
@@ -87,40 +98,114 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
                     Dispatcher.UIThread.Post(() => CollectionItems.InvalidateMeasure(), DispatcherPriority.Render);
                 })
                 .DisposeWith(disposables);
+
+            // API health check — combine both statuses and show modal on transitions
+            Observable.CombineLatest(
+                    _apiHealthCheckService.IsAniListAvailable,
+                    _apiHealthCheckService.IsMangaDexAvailable,
+                    (aniList, mangaDex) => (AniList: aniList, MangaDex: mangaDex))
+                .ObserveOn(RxSchedulers.MainThreadScheduler)
+                .Subscribe(async status =>
+                {
+                    bool aniListChanged = status.AniList == _aniListDown;
+                    bool mangaDexChanged = status.MangaDex == _mangaDexDown;
+
+                    if (!aniListChanged && !mangaDexChanged) return;
+
+                    bool wasAniListDown = _aniListDown;
+                    bool wasMangaDexDown = _mangaDexDown;
+                    _aniListDown = !status.AniList;
+                    _mangaDexDown = !status.MangaDex;
+
+                    // Disable add series button based on AniList status
+                    AddNewSeriesButton.IsEnabled = status.AniList;
+
+                    // Build message for newly down services
+                    if (_aniListDown && !wasAniListDown && _mangaDexDown && !wasMangaDexDown)
+                    {
+                        await _popupDialogService.ShowAsync(
+                            "API Outage",
+                            "fa-solid fa-triangle-exclamation",
+                            "AniList and MangaDex APIs are currently unavailable. Adding new series, refreshing series, and importing from Libib or Goodreads have been disabled until AniList is back online.",
+                            this);
+                    }
+                    else if (_aniListDown && !wasAniListDown)
+                    {
+                        await _popupDialogService.ShowAsync(
+                            "API Outage",
+                            "fa-solid fa-triangle-exclamation",
+                            "AniList API is currently unavailable. Adding new series, refreshing series, and importing from Libib or Goodreads have been disabled until it is back online.",
+                            this);
+                    }
+                    else if (_mangaDexDown && !wasMangaDexDown)
+                    {
+                        await _popupDialogService.ShowAsync(
+                            "API Outage",
+                            "fa-solid fa-triangle-exclamation",
+                            "MangaDex API is currently unavailable. You can still add and refresh series using AniList.",
+                            this);
+                    }
+
+                    // Notify when services come back online
+                    if (!_aniListDown && wasAniListDown && !_mangaDexDown && wasMangaDexDown)
+                    {
+                        await _popupDialogService.ShowAsync(
+                            "APIs Restored",
+                            "fa-solid fa-circle-check",
+                            "AniList and MangaDex APIs are back online. All features have been re-enabled.",
+                            this);
+                    }
+                    else if (!_aniListDown && wasAniListDown)
+                    {
+                        await _popupDialogService.ShowAsync(
+                            "API Restored",
+                            "fa-solid fa-circle-check",
+                            "AniList API is back online. All features have been re-enabled.",
+                            this);
+                    }
+                    else if (!_mangaDexDown && wasMangaDexDown)
+                    {
+                        await _popupDialogService.ShowAsync(
+                            "API Restored",
+                            "fa-solid fa-circle-check",
+                            "MangaDex API is back online.",
+                            this);
+                    }
+                })
+                .DisposeWith(disposables);
+
+            _apiHealthCheckService.Start();
+            Disposable.Create(() => _apiHealthCheckService.Stop())
+                .DisposeWith(disposables);
         });
 
-        // Staggered card appear animation (initial load only) — slide up from below
-        int _animIndex = 0;
-        bool _shouldAnimate = true;
-        TransformOperations _slideFrom = TransformOperations.Parse("translate(0px, 20px)");
-        TransformOperations _slideTo = TransformOperations.Parse("translate(0px, 0px)");
+        // Fade in the cards once first realized (collection background stays visible)
+        CollectionItems.Opacity = 0;
+        bool _hasAnimated = false;
         CollectionItems.ElementPrepared += (s, e) =>
         {
-            Control element = e.Element;
-            if (!_shouldAnimate)
+            if (_hasAnimated) return;
+            _hasAnimated = true;
+
+            // Wait for layout + render to fully complete before starting fade
+            Dispatcher.UIThread.Post(async () =>
             {
-                element.RenderTransform = null;
-                element.Transitions = null;
-                return;
-            }
+                // Allow multiple layout passes to complete so all visible cards are rendered
+                await Task.Delay(100);
 
-            int index = _animIndex++;
-            int delayMs = Math.Min(50 + (index * 40), 800);
-
-            element.Transitions = null;
-            element.RenderTransform = _slideFrom;
-
-            DispatcherTimer timer = new DispatcherTimer(DispatcherPriority.Render) { Interval = TimeSpan.FromMilliseconds(delayMs) };
-            timer.Tick += (_, _) =>
-            {
-                timer.Stop();
-                element.Transitions = [
-                    new TransformOperationsTransition { Property = RenderTransformProperty, Duration = TimeSpan.FromMilliseconds(500), Easing = new Avalonia.Animation.Easings.CubicEaseOut() }
-                ];
-                element.RenderTransform = _slideTo;
-                if (delayMs >= 800) _shouldAnimate = false;
-            };
-            timer.Start();
+                Animation animation = new Animation
+                {
+                    Duration = TimeSpan.FromMilliseconds(600),
+                    Easing = new Avalonia.Animation.Easings.SineEaseInOut(),
+                    FillMode = FillMode.Forward,
+                    Children =
+                    {
+                        new KeyFrame { Cue = new Cue(0), Setters = { new Setter(OpacityProperty, 0.0) } },
+                        new KeyFrame { Cue = new Cue(1), Setters = { new Setter(OpacityProperty, 1.0) } }
+                    }
+                };
+                await animation.RunAsync(CollectionItems);
+            }, DispatcherPriority.Background);
         };
 
         KeyDown += async (s, e) =>
@@ -222,6 +307,8 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
 
         interaction.SetOutput(resultFromDialog);
     }
+
+    public async void ShowNotification(string notiText) => await ToggleNotificationPopup(notiText);
 
     private async Task ToggleNotificationPopup(string notiText)
     {
@@ -359,9 +446,40 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
     {
         if (CollectionFilterSelector.SelectedItem is string selectedItem)
         {
-            LOGGER.Debug("Changing Filter to {filter}", selectedItem);
-            ViewModel.SelectedFilter = selectedItem.GetEnumValueFromMemberValue(TsundokuFilter.None);
+            TsundokuFilter filter = selectedItem.GetEnumValueFromMemberValue(TsundokuFilter.None);
+            LOGGER.Debug("Changing Filter to {filter}", filter);
+            ViewModel.SelectedFilter = filter;
+            ClearFilterButton.IsVisible = filter != TsundokuFilter.None;
         }
+    }
+
+    private void ClearFilterClicked(object sender, RoutedEventArgs e)
+    {
+        CollectionFilterSelector.SelectedIndex = -1;
+        ViewModel.SelectedFilter = TsundokuFilter.None;
+        ViewModel.SelectedFilterIndex = -1;
+        ClearFilterButton.IsVisible = false;
+        LOGGER.Debug("Cleared Filter");
+    }
+
+    private void PublisherFilterChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (PublisherFilterSelector.SelectedItem is string selectedPublisher)
+        {
+            LOGGER.Debug("Changing Publisher Filter to {publisher}", selectedPublisher);
+            ViewModel.SelectedPublisher = selectedPublisher;
+        }
+        else
+        {
+            ViewModel.SelectedPublisher = string.Empty;
+        }
+    }
+
+    private void ClearPublisherFilterClicked(object sender, RoutedEventArgs e)
+    {
+        PublisherFilterSelector.SelectedItem = null;
+        ViewModel.SelectedPublisher = string.Empty;
+        LOGGER.Debug("Cleared Publisher Filter");
     }
 
     /// <summary>
@@ -417,9 +535,7 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
     /// </summary>
     private async void CopySeriesTitleAsync(object sender, PointerPressedEventArgs args)
     {
-        string title = ((TextBlock)sender).Text;
-        LOGGER.Info("Copying {} to Clipboard", title);
-        await TextCopy.ClipboardService.SetTextAsync(title);
+        await ClipboardHelper.CopyToClipboardAsync(((TextBlock)sender).Text);
     }
 
     /// <summary>

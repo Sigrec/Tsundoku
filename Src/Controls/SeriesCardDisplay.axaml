@@ -46,13 +46,14 @@
             BoxShadow="0 0 15 6 #B3000000"
             Width="{CompiledBinding Source={x:Static m:Constants.CARD_WIDTH}}"
             Height="{CompiledBinding Source={x:Static m:Constants.CARD_HEIGHT}}"
+            UseLayoutRounding="True"
             Classes="card-hover">
           <Border.Styles>
             <Style Selector="Border.card-hover">
               <Setter Property="RenderTransform" Value="translate(0px, 0px)"/>
             </Style>
             <Style Selector="Border.card-hover:pointerover">
-              <Setter Property="RenderTransform" Value="translate(0px, -3px)"/>
+              <Setter Property="RenderTransform" Value="translate(0px, -4px)"/>
             </Style>
           </Border.Styles>
           <Border.Transitions>
@@ -151,6 +152,7 @@
               <!-- ── Right Side: Info + Progress ── -->
               <Grid
                   Grid.Column="1"
+                  UseLayoutRounding="True"
                   Background="{DynamicResource TsundokuSeriesCardBGColor}">
                 <Grid RowDefinitions="*,Auto">
 
@@ -158,7 +160,7 @@
                   <Grid
                       Grid.Row="0"
                       RowDefinitions="Auto,Auto,Auto,*"
-                      Margin="10,8,10,0">
+                      Margin="10,4,10,0">
 
                     <!-- Publisher -->
                     <TextBlock
@@ -169,7 +171,7 @@
                         FontSize="12"
                         Text="{CompiledBinding Publisher}"
                         IsHitTestVisible="False"
-                        Padding="0,0,0,1"/>
+                        Padding="0"/>
 
                     <!-- Series Title -->
                     <TextBlock
@@ -179,7 +181,7 @@
                         Foreground="{DynamicResource TsundokuSeriesCardTitleColor}"
                         FontWeight="Bold"
                         FontSize="22"
-                        LineHeight="26"
+                        LineHeight="24"
                         PointerPressed="CopySeriesTitleAsync"
                         Cursor="Hand"
                         TextAlignment="Left"
@@ -214,7 +216,7 @@
                         MaxLines="1"
                         TextTrimming="CharacterEllipsis"
                         FontSize="13"
-                        Padding="0,1,4,4">
+                        Padding="0,0,4,4">
                       <TextBlock.Text>
                         <MultiBinding Converter="{StaticResource ConvertStaff}" Mode="OneWay">
                           <Binding Path="Staff"/>
@@ -246,7 +248,7 @@
                           Foreground="{DynamicResource TsundokuSeriesCardDescColor}"
                           Opacity="0.9"
                           Text="{CompiledBinding Description}"
-                          Padding="0,0,10,4"/>
+                          Padding="0,0,10,0"/>
                     </ScrollViewer>
                   </Grid>
 
@@ -276,6 +278,7 @@
                       <TextBlock
                           HorizontalAlignment="Center"
                           VerticalAlignment="Center"
+                          Margin="0,1,0,0"
                           FontSize="13"
                           FontWeight="Bold"
                           Foreground="{DynamicResource TsundokuSeriesProgressTextColor}"

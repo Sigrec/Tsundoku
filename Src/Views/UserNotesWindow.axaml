@@ -3,6 +3,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="using:Tsundoku.ViewModels"
         xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+        xmlns:controls="clr-namespace:Tsundoku.Controls"
         x:Class="Tsundoku.Views.UserNotesWindow"
         Title="Notes"
         Icon="\Assets\Icons\TsundokuLogo.ico"
@@ -18,53 +19,21 @@
     <Border Classes="Menu" BorderThickness="2" CornerRadius="0,0,8,8" ClipToBounds="True">
         <Grid RowDefinitions="Auto,*">
             <!-- Header -->
-            <Border Grid.Row="0" BorderThickness="0,0,0,2" BorderBrush="{DynamicResource TsundokuDividerColor}" Padding="16,12">
-                <StackPanel Orientation="Horizontal" Spacing="8">
-                    <i:Icon Value="fa-solid fa-note-sticky" FontSize="16" Foreground="{DynamicResource TsundokuDividerColor}"/>
-                    <TextBlock Text="Notes" FontSize="18" FontWeight="ExtraBold" Foreground="{DynamicResource TsundokuUsernameColor}" VerticalAlignment="Center"/>
-                </StackPanel>
-            </Border>
+            <controls:WindowHeader Grid.Row="0" Icon="fa-solid fa-note-sticky" Title="Notes"/>
 
             <!-- Notes Area -->
             <Grid Grid.Row="1" RowDefinitions="*,Auto" Margin="16">
-                <Border Background="{DynamicResource TsundokuSeriesCardBGColor}"
-                        BorderBrush="{DynamicResource TsundokuSeriesCardBorderColor}"
-                        BorderThickness="2"
-                        CornerRadius="10">
-                    <TextBox Name="UserNotes"
-                             Background="Transparent"
-                             BorderThickness="0"
-                             Foreground="{DynamicResource TsundokuSeriesCardDescColor}"
-                             CaretBrush="{DynamicResource TsundokuSeriesCardDescColor}"
-                             FontWeight="SemiBold"
-                             FontSize="{CompiledBinding NotesFontSize}"
-                             TextWrapping="Wrap"
-                             Watermark="Notes..."
-                             Text="{CompiledBinding Notes}"
-                             AcceptsReturn="True"
-                             AcceptsTab="True"
-                             Padding="14"
-                             VerticalContentAlignment="Top">
-                        <TextBox.Styles>
-                            <Style Selector="TextBox /template/ Border#PART_BorderElement">
-                                <Setter Property="Background" Value="Transparent"/>
-                                <Setter Property="BorderThickness" Value="0"/>
-                            </Style>
-                            <Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
-                                <Setter Property="Background" Value="Transparent"/>
-                                <Setter Property="BorderThickness" Value="0"/>
-                            </Style>
-                            <Style Selector="TextBox:pointerover /template/ Border#PART_BorderElement">
-                                <Setter Property="Background" Value="Transparent"/>
-                                <Setter Property="BorderThickness" Value="0"/>
-                            </Style>
-                            <Style Selector="TextBox /template/ TextBlock#PART_Watermark">
-                                <Setter Property="Foreground" Value="{DynamicResource TsundokuSeriesCardDescColor}"/>
-                                <Setter Property="Opacity" Value="0.3"/>
-                            </Style>
-                        </TextBox.Styles>
-                    </TextBox>
-                </Border>
+                <TextBox Name="UserNotes"
+                         Classes="Menu"
+                         FontWeight="SemiBold"
+                         FontSize="{CompiledBinding NotesFontSize}"
+                         TextWrapping="Wrap"
+                         Watermark="Notes..."
+                         Text="{CompiledBinding Notes}"
+                         AcceptsReturn="True"
+                         AcceptsTab="True"
+                         Padding="14"
+                         VerticalContentAlignment="Top"/>
 
                 <!-- Font Size Slider (horizontal, bottom) -->
                 <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8" Margin="0,8,0,0" HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -79,7 +48,25 @@
                             IsSnapToTickEnabled="True"
                             SmallChange="0.5"
                             LargeChange="2"
-                            Foreground="{DynamicResource TsundokuDividerColor}"/>
+                            Foreground="{DynamicResource TsundokuDividerColor}">
+                        <Slider.Styles>
+                            <Style Selector="Slider /template/ Thumb">
+                                <Setter Property="Background" Value="{DynamicResource TsundokuDividerColor}"/>
+                            </Style>
+                            <Style Selector="Slider /template/ Thumb:pointerover">
+                                <Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBorderHoverColor}"/>
+                            </Style>
+                            <Style Selector="Slider /template/ Thumb:pressed">
+                                <Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBorderHoverColor}"/>
+                            </Style>
+                            <Style Selector="Slider /template/ RepeatButton#PART_DecreaseButton">
+                                <Setter Property="Background" Value="{DynamicResource TsundokuDividerColor}"/>
+                            </Style>
+                            <Style Selector="Slider /template/ RepeatButton#PART_IncreaseButton">
+                                <Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGColor}"/>
+                            </Style>
+                        </Slider.Styles>
+                    </Slider>
                     <TextBlock Text="A" FontSize="16" FontWeight="Bold"
                                Foreground="{DynamicResource TsundokuDividerColor}"
                                VerticalAlignment="Center"/>

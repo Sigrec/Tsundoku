@@ -291,7 +291,7 @@
                                          Watermark="Search collection..."
                                          FontSize="13"
                                          VerticalAlignment="Center"
-                                         Padding="8,0,10,0"
+                                         Padding="8,2,10,0"
                                          VerticalContentAlignment="Center">
                                     <TextBox.Styles>
                                         <Style Selector="TextBox /template/ Border#PART_BorderElement">
@@ -309,6 +309,14 @@
                                         <Style Selector="TextBox /template/ TextBlock#PART_Watermark">
                                             <Setter Property="Foreground" Value="{DynamicResource TsundokuSearchBarTextColor}"/>
                                             <Setter Property="Opacity" Value="0.4"/>
+                                            <Setter Property="VerticalAlignment" Value="Center"/>
+                                            <Setter Property="Margin" Value="0"/>
+                                            <Setter Property="Padding" Value="0"/>
+                                        </Style>
+                                        <Style Selector="TextBox /template/ DockPanel">
+                                            <Setter Property="VerticalAlignment" Value="Center"/>
+                                        </Style>
+                                        <Style Selector="TextBox /template/ ScrollViewer#PART_ScrollViewer">
                                             <Setter Property="VerticalAlignment" Value="Center"/>
                                         </Style>
                                     </TextBox.Styles>
@@ -388,11 +396,12 @@
                                     SelectedIndex="{CompiledBinding SelectedLangIndex}"
                                     AutoScrollToSelectedItem="True"
                                     Cursor="Hand"
+                                    VerticalContentAlignment="Center"
                                     ItemContainerTheme="{StaticResource MenuComboBoxItem}"
                                     Theme="{StaticResource MenuComboBox}">
                                     <ComboBox.ItemTemplate>
                                         <DataTemplate>
-                                            <TextBlock Text="{Binding}" />
+                                            <TextBlock Text="{Binding}" VerticalAlignment="Center"/>
                                         </DataTemplate>
                                     </ComboBox.ItemTemplate>
                             </ComboBox>
@@ -407,6 +416,7 @@
                                     SelectedIndex="{CompiledBinding SelectedSortIndex}"
                                     AutoScrollToSelectedItem="True"
                                     Cursor="Hand"
+                                    VerticalContentAlignment="Center"
                                     ItemContainerTheme="{StaticResource MenuComboBoxItem}"
                                     Theme="{StaticResource MenuComboBox}"/>
 
@@ -418,9 +428,43 @@
                                     ItemsSource="{x:Static enums:TsundokuFilterModel.TSUNDOKU_FILTER_LIST}"
                                     Height="34"
                                     SelectedIndex="{CompiledBinding SelectedFilterIndex}"
+                                    PlaceholderText="All"
                                     Cursor="Hand"
+                                    VerticalContentAlignment="Center"
                                     ItemContainerTheme="{StaticResource MenuComboBoxItem}"
                                     Theme="{StaticResource MenuComboBox}"/>
+                            <Button Name="ClearFilterButton"
+                                    Theme="{StaticResource MenuButton}"
+                                    i:Attached.Icon="fa-solid fa-xmark"
+                                    Width="24" Height="24" FontSize="11"
+                                    VerticalAlignment="Center"
+                                    Cursor="Hand"
+                                    Click="ClearFilterClicked"
+                                    ToolTip.Tip="Clear Filter"
+                                    IsVisible="False"/>
+
+                            <Rectangle Width="1" Height="18" Fill="{DynamicResource TsundokuDividerColor}" Opacity="0.4" Margin="4,0"/>
+
+                            <TextBlock Text="PUBLISHER" FontSize="11" FontWeight="SemiBold" Opacity="0.5" VerticalAlignment="Center" Foreground="{DynamicResource TsundokuMenuTextColor}"/>
+                            <ComboBox Name="PublisherFilterSelector"
+                                    SelectionChanged="PublisherFilterChanged"
+                                    ItemsSource="{CompiledBinding AvailablePublishers}"
+                                    Height="34"
+                                    SelectedItem="{CompiledBinding SelectedPublisher}"
+                                    PlaceholderText="All"
+                                    Cursor="Hand"
+                                    VerticalContentAlignment="Center"
+                                    ItemContainerTheme="{StaticResource MenuComboBoxItem}"
+                                    Theme="{StaticResource MenuComboBox}"/>
+                            <Button Name="ClearPublisherFilter"
+                                    Theme="{StaticResource MenuButton}"
+                                    i:Attached.Icon="fa-solid fa-xmark"
+                                    Width="24" Height="24" FontSize="11"
+                                    VerticalAlignment="Center"
+                                    Cursor="Hand"
+                                    Click="ClearPublisherFilterClicked"
+                                    ToolTip.Tip="Clear Publisher"
+                                    IsVisible="{CompiledBinding SelectedPublisher, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
 
                         </StackPanel>
                     </Grid>

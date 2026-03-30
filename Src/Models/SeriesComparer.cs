@@ -22,6 +22,8 @@ public sealed class SeriesComparer(TsundokuLanguage curLang, TsundokuSort sort =
             TsundokuSort.Rating => CompareByRating(x, y),
             TsundokuSort.Unread => CompareByUnread(x, y),
             TsundokuSort.Read => CompareByRead(x, y),
+            TsundokuSort.Value => CompareByValue(x, y),
+            TsundokuSort.VolumeCount => CompareByVolumeCount(x, y),
             _ => CompareByTitle(x, y),
         };
 
@@ -52,5 +54,15 @@ public sealed class SeriesComparer(TsundokuLanguage curLang, TsundokuSort sort =
     private static int CompareByRead(Series x, Series y)
     {
         return y.VolumesRead.CompareTo(x.VolumesRead);
+    }
+
+    private static int CompareByValue(Series x, Series y)
+    {
+        return y.Value.CompareTo(x.Value);
+    }
+
+    private static int CompareByVolumeCount(Series x, Series y)
+    {
+        return y.CurVolumeCount.CompareTo(x.CurVolumeCount);
     }
 }

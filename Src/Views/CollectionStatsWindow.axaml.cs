@@ -1,12 +1,13 @@
+using Tsundoku.Helpers;
 using Tsundoku.ViewModels;
 using ReactiveUI.Avalonia;
 
 namespace Tsundoku.Views;
 
-public sealed partial class CollectionStatsWindow : ReactiveWindow<CollectionStatsViewModel>
+public sealed partial class CollectionStatsWindow : ReactiveWindow<CollectionStatsViewModel>, IManagedWindow
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
-    public bool IsOpen = false;
+    public bool IsOpen { get; set; }
     public bool CanUpdate = true; // On First Update
 
     public CollectionStatsWindow(CollectionStatsViewModel viewModel)
@@ -14,44 +15,19 @@ public sealed partial class CollectionStatsWindow : ReactiveWindow<CollectionSta
         ViewModel = viewModel;
         InitializeComponent();
 
-        Opened += (s, e) =>
-        {
-            CanUpdate = false;
-            IsOpen ^= true;
-
-            if (Screens.Primary.WorkingArea.Height < 1250)
+        this.ConfigureHideOnClose(
+            onOpened: () =>
             {
-                this.Height = 550;
-            }
-        };
-
-        Closing += (s, e) =>
-        {
-            if (IsOpen)
-            {
-                this.Hide();
-                IsOpen = false;
-                Topmost = false;
-                e.Cancel = true;
-            }
-        };
+                CanUpdate = false;
+                if (Screens.Primary.WorkingArea.Height < 1250) this.Height = 550;
+            });
     }
 
     private async void CopyTextAsync(object sender, PointerPressedEventArgs args)
     {
-        try
+        if (sender is Controls.ValueStat valueStat)
         {
-            if (sender is not Controls.ValueStat valueStat)
-            {
-                return;
-            }
-            string curText = $"{valueStat.Text} {valueStat.Title}";
-            LOGGER.Info("Copying {Text} to Clipboard", curText);
-            await TextCopy.ClipboardService.SetTextAsync(curText);
-        }
-        catch (Exception ex)
-        {
-            LOGGER.Error(ex, "Failed to copy text to clipboard");
+            await ClipboardHelper.CopyToClipboardAsync($"{valueStat.Text} {valueStat.Title}");
         }
     }
 }

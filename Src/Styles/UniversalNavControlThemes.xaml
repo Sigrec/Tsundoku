@@ -57,6 +57,7 @@
 										ContentTemplate="{TemplateBinding ItemTemplate}"
 										Grid.Column="0"
 										Margin="{TemplateBinding Padding}"
+										VerticalAlignment="Center"
 										HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
 										VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
 
@@ -93,13 +94,12 @@
                                     BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}"
                                     BorderThickness="2"
                                     CornerRadius="10"
-                                    ClipToBounds="True"
                                     Margin="0,4,0,0">
                                 <ScrollViewer HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
                                             VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}"
                                             Theme="{StaticResource ReverseCollectionScroll}">
                                 <ItemsPresenter Name="PART_ItemsPresenter"
-                                                Margin="{DynamicResource ComboBoxDropdownContentMargin}"
+                                                Margin="2,4"
                                                 ItemsPanel="{TemplateBinding ItemsPanel}" />
                                 </ScrollViewer>
                             </Border>
@@ -126,7 +126,9 @@
 
 	<ControlTheme x:Key="MenuComboBoxItem" TargetType="ComboBoxItem">
 		<Setter Property="Padding" Value="{DynamicResource ComboBoxItemThemePadding}" />
+		<Setter Property="Margin" Value="4,2" />
 		<Setter Property="HorizontalContentAlignment" Value="Stretch" />
+		<Setter Property="VerticalContentAlignment" Value="Center" />
 		<Setter Property="Background" Value="Transparent"/>
 		<Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
 
@@ -137,7 +139,7 @@
 								Background="{TemplateBinding Background}"
 								BorderBrush="{TemplateBinding BorderBrush}"
 								BorderThickness="{TemplateBinding BorderThickness}"
-								CornerRadius="0"
+								CornerRadius="6"
 								ContentTemplate="{TemplateBinding ContentTemplate}"
 								Content="{TemplateBinding Content}"
 								HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
@@ -213,9 +215,8 @@
 		</Style>
 
 		<Style Selector="^:disabled">
-			<Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGHoverColor}"/>
-			<Setter Property="BorderBrush" Value="{DynamicResource TsundokuMenuButtonBorderHoverColor}"/>
-			<Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconHoverColor}"/>
+			<Setter Property="Opacity" Value="0.4"/>
+			<Setter Property="Cursor" Value="Arrow"/>
 		</Style>
 	</ControlTheme>
 
@@ -319,6 +320,11 @@
 				<Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconHoverColor}"/>
 			</Style>
 		</Style>
+
+		<Style Selector="^:disabled">
+			<Setter Property="Opacity" Value="0.4"/>
+			<Setter Property="Cursor" Value="Arrow"/>
+		</Style>
     </ControlTheme>
     
     <ControlTheme x:Key="QueryListBox" TargetType="ListBox">
@@ -333,16 +339,17 @@
         <Setter Property="FontSize" Value="15" />
         <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="CornerRadius" Value="9" />
+        <Setter Property="ClipToBounds" Value="True" />
         <Setter Property="Cursor" Value="Hand"/>
 
         <Setter Property="Template">
             <ControlTemplate>
                 <Border Name="border"
-                        ClipToBounds="{TemplateBinding ClipToBounds}"
                         Background="{TemplateBinding Background}"
                         BorderBrush="{TemplateBinding BorderBrush}"
                         BorderThickness="{TemplateBinding BorderThickness}"
                         CornerRadius="{TemplateBinding CornerRadius}">
+                  <Border CornerRadius="7" ClipToBounds="True">
                     <ScrollViewer Name="PART_ScrollViewer"
                                     VerticalSnapPointsType="{TemplateBinding (ScrollViewer.VerticalSnapPointsType)}"
                                     HorizontalSnapPointsType="{TemplateBinding (ScrollViewer.HorizontalSnapPointsType)}"
@@ -358,36 +365,51 @@
                                         ItemsPanel="{TemplateBinding ItemsPanel}"
                                         Margin="{TemplateBinding Padding}"/>
                     </ScrollViewer>
+                  </Border>
                 </Border>
             </ControlTemplate>
         </Setter>
 	</ControlTheme>
-    
+
     <!-- <Thickness x:Key="ListBoxItemPadding">12,9,12,12</Thickness> -->
     <ControlTheme x:Key="QueryListBoxItem" TargetType="ListBoxItem">
         <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="Padding" Value="12,9,12,12" />
-        <Setter Property="BorderThickness" Value="0,1,0,1" />
+        <Setter Property="Padding" Value="8,3" />
+        <Setter Property="BorderThickness" Value="0" />
         <Setter Property="BorderBrush" Value="{DynamicResource TsundokuMenuButtonBorderColor}"/>
         <Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
-        <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-        
+
         <Setter Property="Template">
             <ControlTemplate>
-                <ContentPresenter Name="PART_ContentPresenter"
-                                  Foreground="{TemplateBinding Foreground}"
-                                  Background="{TemplateBinding Background}"
-                                  BorderBrush="{TemplateBinding BorderBrush}"
-                                  BorderThickness="{TemplateBinding BorderThickness}"
-                                  CornerRadius="{TemplateBinding CornerRadius}"
-                                  ContentTemplate="{TemplateBinding ContentTemplate}"
-                                  Content="{TemplateBinding Content}"
-                                  FontWeight="Bold"
-                                  FontSize="15"
-                                  Padding="{TemplateBinding Padding}"
-                                  VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-                                  HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" />
+                <Border Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        Padding="{TemplateBinding Padding}">
+                    <Grid ColumnDefinitions="Auto,8,*">
+                        <Border Grid.Column="0" Width="18" Height="18" CornerRadius="4"
+                                BorderThickness="2" VerticalAlignment="Center"
+                                BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}"
+                                Background="{DynamicResource TsundokuMenuButtonBGColor}">
+                            <PathIcon Width="10" Height="10"
+                                      HorizontalAlignment="Center" VerticalAlignment="Center"
+                                      Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}"
+                                      IsVisible="{TemplateBinding IsSelected}"
+                                      Data="M1 4.5L3.5 7L7 1"/>
+                        </Border>
+                        <ContentPresenter Name="PART_ContentPresenter"
+                                          Grid.Column="2"
+                                          Foreground="{TemplateBinding Foreground}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                          Content="{TemplateBinding Content}"
+                                          FontWeight="SemiBold"
+                                          FontSize="12"
+                                          VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" />
+                    </Grid>
+                </Border>
             </ControlTemplate>
         </Setter>
 

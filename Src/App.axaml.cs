@@ -169,6 +169,8 @@ public sealed partial class App : Application
                     MainWindow mainWindow = new MainWindow(
                         mainViewModel,
                         userService,
+                        ServiceProvider.GetRequiredService<IApiHealthCheckService>(),
+                        ServiceProvider.GetRequiredService<IPopupDialogService>(),
                         ServiceProvider.GetRequiredService<AddNewSeriesWindow>(),
                         ServiceProvider.GetRequiredService<UserSettingsWindow>(),
                         ServiceProvider.GetRequiredService<CollectionThemeWindow>(),
@@ -265,6 +267,7 @@ public sealed partial class App : Application
 
         services.AddSingleton<IUserService, UserService>();
         services.AddSingleton<ISharedSeriesCollectionProvider, SharedSeriesCollectionProvider>();
+        services.AddSingleton<IApiHealthCheckService, ApiHealthCheckService>();
 
         services.AddTransient<LoadingDialogViewModel>();
         services.AddTransient<ILoadingDialogService, LoadingDialogService>();

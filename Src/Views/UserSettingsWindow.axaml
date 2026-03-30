@@ -5,6 +5,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+        xmlns:controls="clr-namespace:Tsundoku.Controls"
         x:Class="Tsundoku.Views.UserSettingsWindow"
         x:DataType="vm:UserSettingsViewModel"
         Icon="\Assets\Icons\TsundokuLogo.ico"
@@ -12,6 +13,7 @@
         MaxWidth="491"
         MinWidth="491"
         SizeToContent="Height"
+        CanResize="False"
         WindowStartupLocation="CenterOwner"
         KeyboardNavigation.TabNavigation="None">
     
@@ -80,18 +82,13 @@
     <Border Classes="Menu" BorderThickness="2" CornerRadius="0,0,8,8" ClipToBounds="True">
         <Grid RowDefinitions="Auto,*">
             <!-- Header -->
-            <Border Grid.Row="0" BorderThickness="0,0,0,2" BorderBrush="{DynamicResource TsundokuDividerColor}" Padding="16,12">
-                <StackPanel Orientation="Horizontal" Spacing="8">
-                    <i:Icon Value="fa-solid fa-gear" FontSize="16" Foreground="{DynamicResource TsundokuDividerColor}"/>
-                    <TextBlock Text="Settings" FontSize="18" FontWeight="ExtraBold" Foreground="{DynamicResource TsundokuUsernameColor}" VerticalAlignment="Center"/>
-                </StackPanel>
-            </Border>
+            <controls:WindowHeader Grid.Row="0" Icon="fa-solid fa-gear" Title="Settings"/>
 
             <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden" Theme="{StaticResource ReverseCollectionScroll}">
             <StackPanel>
                 <!-- Profile -->
                 <StackPanel Margin="20,16,20,14" Spacing="10">
-                    <TextBlock Text="PROFILE" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuSeriesCardPublisherColor}" LetterSpacing="1" Opacity="0.8"/>
+                    <TextBlock Text="PROFILE" Classes="section-title"/>
                     <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,0">
                         <TextBlock Text="Username" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="{DynamicResource TsundokuMenuTextColor}" Width="80"/>
                         <TextBox x:Name="UsernameChangeTextBox"
@@ -117,9 +114,9 @@
                 </StackPanel>
 
                 <!-- Memberships -->
-                <Border BorderThickness="0,2,0,0" BorderBrush="{DynamicResource TsundokuDividerColor}" Opacity="0.3"/>
+                <Border Classes="divider"/>
                 <StackPanel Margin="20,14,20,14" Spacing="6">
-                    <TextBlock Text="MEMBERSHIPS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuSeriesCardPublisherColor}" LetterSpacing="1" Opacity="0.8" Margin="0,0,0,4"/>
+                    <TextBlock Text="MEMBERSHIPS" Classes="section-title" Margin="0,0,0,4"/>
                     <Grid ColumnDefinitions="*,Auto">
                         <TextBlock Text="Books-A-Million" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="{DynamicResource TsundokuMenuTextColor}"/>
                         <ToggleButton x:Name="BooksAMillionButton" Grid.Column="1" IsChecked="{CompiledBinding BooksAMillionMember}" Classes="toggle-switch" VerticalAlignment="Center"/>
@@ -131,9 +128,9 @@
                 </StackPanel>
 
                 <!-- Preferences -->
-                <Border BorderThickness="0,2,0,0" BorderBrush="{DynamicResource TsundokuDividerColor}" Opacity="0.3"/>
+                <Border Classes="divider"/>
                 <StackPanel Margin="20,14,20,14" Spacing="6">
-                    <TextBlock Text="PREFERENCES" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuSeriesCardPublisherColor}" LetterSpacing="1" Opacity="0.8" Margin="0,0,0,4"/>
+                    <TextBlock Text="PREFERENCES" Classes="section-title" Margin="0,0,0,4"/>
                     <Grid ColumnDefinitions="*,Auto">
                         <TextBlock Text="Refresh Covers on Startup" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="{DynamicResource TsundokuMenuTextColor}"/>
                         <ToggleButton x:Name="RefreshCoversButton" Grid.Column="1" IsChecked="{CompiledBinding RefreshCovers}" Classes="toggle-switch" VerticalAlignment="Center" ToolTip.Tip="Re-download cover images when refreshing a series"/>
@@ -151,7 +148,7 @@
                                   HorizontalAlignment="Right"
                                   SelectedItem="{CompiledBinding SelectedCurrency}"
                                   ItemContainerTheme="{StaticResource MenuComboBoxItem}"
-                                  Width="80" Height="34"
+                                  Width="80" Height="28"
                                   AutoScrollToSelectedItem="True">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
@@ -170,9 +167,9 @@
                 </StackPanel>
 
                 <!-- Quick Actions -->
-                <Border BorderThickness="0,2,0,0" BorderBrush="{DynamicResource TsundokuDividerColor}" Opacity="0.3"/>
+                <Border Classes="divider"/>
                 <StackPanel Margin="20,14,20,14" Spacing="10">
-                    <TextBlock Text="QUICK ACTIONS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuSeriesCardPublisherColor}" LetterSpacing="1" Opacity="0.8"/>
+                    <TextBlock Text="QUICK ACTIONS" Classes="section-title"/>
                     <WrapPanel>
                         <WrapPanel.Styles>
                             <Style Selector="Button">
@@ -196,7 +193,7 @@
                 </StackPanel>
 
                 <!-- Controls (collapsible) -->
-                <Border BorderThickness="0,2,0,0" BorderBrush="{DynamicResource TsundokuDividerColor}" Opacity="0.3"/>
+                <Border Classes="divider"/>
                 <StackPanel Margin="20,14,20,14" Spacing="4">
                     <Button Theme="{StaticResource MenuButton}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Padding="10,6" Click="ToggleControlsSection">
                         <Grid ColumnDefinitions="*,Auto">
@@ -251,7 +248,7 @@
                 </StackPanel>
 
                 <!-- Youtubers (collapsible) -->
-                <Border BorderThickness="0,2,0,0" BorderBrush="{DynamicResource TsundokuDividerColor}" Opacity="0.3"/>
+                <Border Classes="divider"/>
                 <StackPanel Margin="20,14,20,14" Spacing="10">
                     <Button Theme="{StaticResource MenuButton}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Padding="10,6" Click="ToggleYoutubersSection">
                         <Grid ColumnDefinitions="*,Auto">
@@ -278,9 +275,9 @@
                 </StackPanel>
 
                 <!-- Data / Version -->
-                <Border BorderThickness="0,2,0,0" BorderBrush="{DynamicResource TsundokuDividerColor}" Opacity="0.3"/>
+                <Border Classes="divider"/>
                 <StackPanel Margin="20,14,20,14" Spacing="10">
-                    <TextBlock Text="DATA" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuSeriesCardPublisherColor}" LetterSpacing="1" Opacity="0.8"/>
+                    <TextBlock Text="DATA" Classes="section-title"/>
                     <WrapPanel>
                         <WrapPanel.Styles>
                             <Style Selector="Button">
@@ -289,7 +286,7 @@
                         </WrapPanel.Styles>
                         <Button Theme="{StaticResource MenuButton}" Click="OpenAniListLink" x:Name="AniListCredit" Content="AniList" Padding="10,6" FontSize="12"/>
                         <Button Theme="{StaticResource MenuButton}" Click="OpenMangadexLink" x:Name="MangadexCredit" Content="Mangadex" Padding="10,6" FontSize="12"/>
-                        <Button Theme="{StaticResource MenuButton}" Click="RefreshAllCoversAsync" Content="Refresh Series" Padding="10,6" FontSize="12"/>
+                        <Button Theme="{StaticResource MenuButton}" Click="RefreshAllCoversAsync" x:Name="RefreshSeriesButton" Content="Refresh Series" Padding="10,6" FontSize="12"/>
                         <Button Theme="{StaticResource MenuButton}" Click="ImportUserDataAsync" x:Name="ImportUserData" Content="Json Import" Padding="10,6" FontSize="12"/>
                         <Button Theme="{StaticResource MenuButton}" Click="ImportLibibDataAsync" x:Name="ImportLibibData" Content="Libib Import" Padding="10,6" FontSize="12"/>
                         <Button Theme="{StaticResource MenuButton}" Click="ImportGoodreadsDataAsync" x:Name="ImportGoodreadsData" Content="Goodreads Import" Padding="10,6" FontSize="12"/>

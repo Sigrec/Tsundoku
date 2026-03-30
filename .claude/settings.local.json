@@ -67,7 +67,29 @@
       "Bash(find /c/Tsundoku -path */LiveChartsCore/Themes/ColorPalletes* -o -path */livecharts*)",
       "Bash(grep -r \"LiveChartsCore\" /c/Tsundoku/Src/*.csproj)",
       "Bash(dotnet tool:*)",
-      "Bash(find ~/.nuget/packages/livechartscore/2.0.0-rc5.4 -name *.xml)"
+      "Bash(find ~/.nuget/packages/livechartscore/2.0.0-rc5.4 -name *.xml)",
+      "Bash(curl:*)",
+      "Bash(find /c/Tsundoku/Src -name *.g.cs -o -name *.generated.cs)",
+      "Bash(grep -rn RxSchedulers /c/Tsundoku/Src/obj/ --include=*.cs)",
+      "Bash(grep -rn RxSchedulers /c/Tsundoku/Src/obj/Debug/net10.0-windows10.0.26100.0/ --include=*.cs)",
+      "Bash(xargs grep:*)",
+      "Bash(grep -rn RxSchedulers /c/Tsundoku/ --include=*.cs --include=*.csproj --include=*.props)",
+      "Bash(grep -rn RxSchedulers /c/Users/Sean/.nuget/packages/reactiveui*/*/analyzers/)",
+      "Bash(grep -rn RxSchedulers /c/Users/Sean/.nuget/packages/reactiveui*/*/buildTransitive/)",
+      "Bash(find /c/Users/Sean/.nuget/packages/reactiveui.sourcegenerators -name *.cs)",
+      "Bash(find /c/Tsundoku/Src/obj -name *.cs)",
+      "Bash(find /c/Tsundoku/Src/obj/Debug/net10.0-windows10.0.26100.0 -name *.g.cs -o -name *.generated.cs)",
+      "Bash(grep -n \"Height=\"\"34\"\"\\\\|Padding=\"\"14,0\"\"\\\\|FontSize=\"\"13\"\"\" /c/Tsundoku/Src/Views/*.axaml)",
+      "Bash(grep:*)",
+      "Bash(sort -t: -k2 -rn)",
+      "Bash(find /c/Tsundoku -path */worktrees/*/Tests/*.cs -newer /c/Tsundoku/Tests/SeriesModelTests.cs)",
+      "Bash(git:*)",
+      "Bash(for wt:*)",
+      "Bash(do)",
+      "Bash(echo -n \"$wt: \")",
+      "Bash(xxd /c/Tsundoku/Src/Helpers/ExtensionMethods.cs)",
+      "Bash(# SeriesComparer + SeriesValueComparer tests\ncp \"/c/Tsundoku/.claude/worktrees/agent-a147f4a6/Tests/Models/SeriesComparerTests.cs\" \"/c/Tsundoku/Tests/Models/SeriesComparerTests.cs\"\ncp \"/c/Tsundoku/.claude/worktrees/agent-a147f4a6/Tests/Models/SeriesValueComparerTests.cs\" \"/c/Tsundoku/Tests/Models/SeriesValueComparerTests.cs\"\n\n# ExtensionMethod + ParserHelper tests\ncp \"/c/Tsundoku/.claude/worktrees/agent-a3d6ff91/Tests/Extensions/ExtensionMethodTests.cs\" \"/c/Tsundoku/Tests/Extensions/ExtensionMethodTests.cs\"\ncp \"/c/Tsundoku/.claude/worktrees/agent-a3d6ff91/Tests/Extensions/ParserHelperTests.cs\" \"/c/Tsundoku/Tests/Extensions/ParserHelperTests.cs\"\n\n# Schema migration tests\ncp \"/c/Tsundoku/.claude/worktrees/agent-af8d1f5b/Tests/Models/UserSchemaTests.cs\" \"/c/Tsundoku/Tests/Models/UserSchemaTests.cs\"\n\n# Theme tests\ncp \"/c/Tsundoku/.claude/worktrees/agent-ae65a615/Tests/Models/TsundokuThemeTests.cs\" \"/c/Tsundoku/Tests/Models/TsundokuThemeTests.cs\"\ncp \"/c/Tsundoku/.claude/worktrees/agent-ae65a615/Tests/Models/ThemeResourceKeysTests.cs\" \"/c/Tsundoku/Tests/Models/ThemeResourceKeysTests.cs\"\n\necho \"Done copying\"\nls -la /c/Tsundoku/Tests/Models/*Comparer* /c/Tsundoku/Tests/Models/*Schema* /c/Tsundoku/Tests/Models/*Theme* /c/Tsundoku/Tests/Extensions/Extension* /c/Tsundoku/Tests/Extensions/Parser*)",
+      "Bash(find /c/Tsundoku/TsundokuPackage -type f -name *)"
     ]
   }
 }

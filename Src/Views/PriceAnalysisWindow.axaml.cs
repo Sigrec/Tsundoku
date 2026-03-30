@@ -10,38 +10,24 @@ using MangaAndLightNovelWebScrape.Models;
 using System.Linq.Dynamic.Core;
 using MangaAndLightNovelWebScrape.Websites;
 using ReactiveUI.Avalonia;
+using Tsundoku.Helpers;
 
 namespace Tsundoku.Views;
 
-public sealed partial class PriceAnalysisWindow : ReactiveWindow<PriceAnalysisViewModel>
+public sealed partial class PriceAnalysisWindow : ReactiveWindow<PriceAnalysisViewModel>, IManagedWindow
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
-    public bool IsOpen = false, Manga;
+    public bool IsOpen { get; set; }
+    public bool Manga;
     public readonly MasterScrape _scrape = new(StockStatusFilter.EXCLUDE_NONE_FILTER);
     private Region CurRegion;
-
 
     public PriceAnalysisWindow(PriceAnalysisViewModel viewModel)
     {
         InitializeComponent();
         ViewModel = viewModel;
 
-        Opened += (s, e) =>
-        {
-            IsOpen ^= true;
-        };
-
-        Closing += (s, e) =>
-        {
-            if (IsOpen)
-            {
-                this.Hide();
-                SearchTextBox.Text = string.Empty;
-                Topmost = false;
-                IsOpen = false;
-                e.Cancel = true;
-            }
-        };
+        this.ConfigureHideOnClose(onClosing: () => SearchTextBox.Text = string.Empty);
 
         this.WhenActivated(disposables =>
         {
@@ -89,7 +75,7 @@ public sealed partial class PriceAnalysisWindow : ReactiveWindow<PriceAnalysisVi
             scrapeScenario = $"\"{SearchTextBox.Text}\" on {_scrape.Browser} Browser w/ Region = \"{_scrape.Region}\" & \"{StockFilterSelector.SelectedItem as string} Filter\" & Websites = [{string.Join(", ", websiteList)}] & Memberships = ({string.Join(" & ", ViewModel.CurrentUser.Memberships)})";
 
             ToggleControlEnablement();
-            StartScrapeButton.Content = "Analyzing...";
+            StartScrapeButtonText.Text = "Analyzing...";
 
             _scrape.Browser = MangaAndLightNovelWebScrape.Helpers.GetBrowserFromString((BrowserSelector.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? string.Empty);
             _scrape.Region = ViewModel.CurrentUser.Region;
@@ -117,7 +103,7 @@ public sealed partial class PriceAnalysisWindow : ReactiveWindow<PriceAnalysisVi
         {
             ToggleControlEnablement();
             StartScrapeButton.IsEnabled = ViewModel.IsAnalyzeButtonEnabled;
-            StartScrapeButton.Content = "Analyze";
+            StartScrapeButtonText.Text = "Start Analysis";
         }
     }
 
