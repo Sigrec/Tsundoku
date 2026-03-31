@@ -19,15 +19,15 @@ jobs:
       MSIX_OUTPUT_SUBDIR: AppPackages
 
     steps:
-    - name: 🛎️ Checkout Code
+    - name: Checkout Code
       uses: actions/checkout@v4
 
-    - name: 🛠️ Setup .NET SDK
+    - name: Setup .NET SDK
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: '10.0.x'
 
-    - name: 📋 Extract Version from csproj
+    - name: Extract Version from csproj
       id: version
       run: |
         $content = Get-Content $env:AVALONIA_PROJECT_PATH -Raw
@@ -41,47 +41,47 @@ jobs:
         echo "tag=v$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
       shell: pwsh
 
-    - name: 📦 Sync Package.appxmanifest Version
+    - name: Sync Package.appxmanifest Version
       run: |
         $version = "${{ steps.version.outputs.version }}.0"
         $manifestPath = "./TsundokuPackage/Package.appxmanifest"
         $content = Get-Content $manifestPath -Raw
         $content = $content -replace '(?<=<Identity[^>]+Version=")[^"]+', $version
         Set-Content $manifestPath -Value $content -NoNewline
-        Write-Host "✅ Updated Package.appxmanifest Version to $version"
+        Write-Host "Updated Package.appxmanifest Version to $version"
       shell: pwsh
 
-    - name: 🔧 Build Main Project (for tests)
+    - name: Build Main Project (for tests)
       run: dotnet build ${{ env.AVALONIA_PROJECT_PATH }} --configuration Release
       shell: pwsh
 
-    - name: 🧪 Run Tests
+    - name: Run Tests
       if: ${{ github.event.inputs.skip_tests != 'true' }}
       run: dotnet test ./Tests/Tsundoku.Tests.csproj --configuration Release --no-build --logger trx
       shell: pwsh
 
-    - name: 🔒 Restore Signing Certificate (Mandatory)
+    - name: Restore Signing Certificate
       run: |
-        $env:PFX_TEMP_PATH = "$env:TEMP\code-signing-cert.pfx"
+        $pfxPath = "$env:TEMP\code-signing-cert.pfx"
 
         if ("${{ secrets.PFX_BASE64 }}" -ne "" -and "${{ secrets.PFX_PASSWORD }}" -ne "") {
-            Write-Host "✅ PFX secrets found. Restoring certificate..."
-            [System.IO.File]::WriteAllBytes($env:PFX_TEMP_PATH, [System.Convert]::FromBase64String("${{ secrets.PFX_BASE64 }}"))
-            Write-Host "📄 Certificate restored to: $env:PFX_TEMP_PATH"
+            Write-Host "PFX secrets found. Restoring certificate..."
+            [System.IO.File]::WriteAllBytes($pfxPath, [System.Convert]::FromBase64String("${{ secrets.PFX_BASE64 }}"))
+            Write-Host "Certificate restored to: $pfxPath"
 
-            "PACKAGE_CERT_KEY_FILE=$env:PFX_TEMP_PATH" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+            "PACKAGE_CERT_KEY_FILE=$pfxPath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
             "PACKAGE_CERT_PASSWORD=${{ secrets.PFX_PASSWORD }}" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
         } else {
-            Write-Error "❌ ERROR: PFX_BASE64 or PFX_PASSWORD secrets are missing or empty."
+            Write-Error "PFX_BASE64 or PFX_PASSWORD secrets are missing or empty."
             exit 1
         }
       shell: pwsh
 
-    - name: 🧰 Install MSIX/WAP workload
+    - name: Install MSIX/WAP workload
       run: dotnet workload install windowsapp
       shell: pwsh
 
-    - name: 🔧 Build and Package MSIX Bundle
+    - name: Build and Package MSIX Bundle
       id: build_msix
       run: |
           $buildCommand = "dotnet build $env:WAP_PROJECT_PATH --configuration Release"
@@ -125,7 +125,7 @@ jobs:
           echo "msix_packages_dir=$MSIX_PACKAGES_DIR" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
       shell: pwsh
 
-    - name: 📝 Update AppInstaller File With Tag Version
+    - name: Update AppInstaller File With Tag Version
       run: |
         $VERSION = "${{ steps.version.outputs.tag }}".TrimStart("v")
         $MSIX_BUNDLE_FILENAME = "${{ steps.build_msix.outputs.msix_bundle_filename }}"
@@ -143,7 +143,7 @@ jobs:
         Get-Content "./TsundokuPackage/Package.appinstaller"
       shell: pwsh
 
-    - name: 🚀 Create GitHub Release and Upload Assets
+    - name: Create GitHub Release and Upload Assets
       uses: softprops/action-gh-release@v2
       with:
         tag_name: ${{ steps.version.outputs.tag }}
