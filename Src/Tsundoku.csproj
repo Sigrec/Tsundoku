@@ -41,7 +41,7 @@
 
     <PropertyGroup>
         <!-- Suppress trimming warnings for ReactiveUI reflection usage -->
-        <NoWarn>$(NoWarn);IL2026;IL3050</NoWarn>
+        <NoWarn>$(NoWarn);IL2026;IL3050;AVLN3001</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>

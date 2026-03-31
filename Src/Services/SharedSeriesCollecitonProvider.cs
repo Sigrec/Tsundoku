@@ -241,9 +241,8 @@ public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISh
         _userService.UserCollectionChanges
             .Filter(series => series is not null)
             .DistinctValues(series => series.Publisher)
-            .Sort(StringComparer.OrdinalIgnoreCase)
             .ObserveOn(RxSchedulers.MainThreadScheduler)
-            .Bind(out _availablePublishers)
+            .SortAndBind(out _availablePublishers, StringComparer.OrdinalIgnoreCase)
             .Subscribe()
             .DisposeWith(_disposables);
     }
