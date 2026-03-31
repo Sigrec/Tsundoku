@@ -1,17 +1,50 @@
-Add New Series Window:
-- Allow for getting a series via a title, AniList ID, or MangaDex ID
-- Publisher is a optional field by default it will be "Unknown"
-- Cur Volumes & Max Volumes are mandatory fields and the max values are 999 for each
-- Select Book Type is mandatory Field
-- Demographic is optional by default it is "Unknown"
-- Volumes Read is optional and max is 999
-- Rating is optional and by default it is -1, and if it's -1 it is not used in your rating data calculation
-- Value is optional and max is "999999999999999999.99" of any currency
-- Cover Image is optional, by default it will just use the image of the series from the site it gets series data from
-- Allow Duplicate button is disabled by default, but it allows you to add the same series multiple times
-- "Additional Languages" allows you to select additional languages to add for a series, if you hover over the title name it will show you a list of all the additional languages you have selected. By default "Romaji", "English", & "Japanese" are selected.
+Tsundoku is a desktop manga and light novel collection manager built for collectors who want a beautiful, organized way to track their library.
 
-User Settings Window:
-- You can change your Username to anything as long as it's 1-20 characters long including emoji's, emoji's are maxed out at 10 though as 1 eomji takes up 2 characters
-- "Memberships" are used in the "Price Analysis Window" to add membership discounts to calculations, currently supported site with memberships are "Kinokuniya USA", "Indigo", & "Books-A-Million"
-- Under "Settings" if you hover over the buttons they will tell you what they all do.
+FEATURES
+
+Collection Management
+- Add series from AniList or MangaDex by title or ID with automatic metadata, covers, and staff info
+- Track volumes collected, volumes read, ratings, value, publisher, and format
+- Support for Manga, Manhwa, Manhua, Manfra, Comic, and Novel formats
+- Import collections from Libib CSV, Goodreads CSV, or JSON backup files
+- Export your collection to CSV spreadsheet
+
+Search, Filter, and Sort
+- Search by title, staff, or publisher with real-time filtering
+- Advanced filter builder with chip-based UI for combining multiple criteria
+- Filter by status, format, demographic, genre, completion, favorites, read/unread, and publisher
+- Sort by title, rating, unread, read, value, or volume count
+- Dynamic publisher filter populated from your collection
+
+Themes and Customization
+- Full theme editor with 30+ customizable color properties
+- Two theme generation presets for quick setup
+- Import and export themes as JSON
+- Glassmorphism transparent blur effect toggle
+- 30+ currency options with locale-aware formatting
+
+Collection Stats
+- Pie charts for format, demographic, and status distributions
+- Track mean rating, total value, volumes collected, volumes read, and completion rate
+- Copy any stat to clipboard with a click
+
+Price Analysis
+- Compare prices across multiple retailers for any series in your collection
+- Membership discount support for Kinokuniya USA and Books-A-Million
+- Region-aware pricing for America and Canada
+
+Series Cards
+- High-resolution cover images stored at 3x for sharp display on high-DPI screens
+- Hover effects with smooth animations
+- Quick volume increment/decrement buttons
+- Edit series info, refresh metadata, and change covers from URL or file
+- Copy series title to clipboard
+
+Additional Features
+- Multilingual font support for Japanese, Korean, Chinese, Arabic, Thai, and more
+- API health monitoring with automatic notifications when AniList or MangaDex are unavailable
+- Automatic backup of user data on close
+- Discord Rich Presence integration
+- Splash screen with loading progress
+- Keyboard shortcuts for save, screenshot, fullscreen, and advanced search
+- In-app changelog popup on updates with a "What's New" button in settings
