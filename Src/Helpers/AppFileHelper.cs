@@ -377,10 +377,10 @@ public static class AppFileHelper
 
         try
         {
-            FileAttributes attributes = File.GetAttributes(filePath);
-            if ((attributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
+            System.IO.FileAttributes attributes = File.GetAttributes(filePath);
+            if ((attributes & System.IO.FileAttributes.ReadOnly) == System.IO.FileAttributes.ReadOnly)
             {
-                File.SetAttributes(filePath, attributes & ~FileAttributes.ReadOnly);
+                File.SetAttributes(filePath, attributes & ~System.IO.FileAttributes.ReadOnly);
                 LOGGER.Trace("Removed ReadOnly attribute from: {FilePath}", filePath);
             }
 
