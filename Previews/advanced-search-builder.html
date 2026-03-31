@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tsundoku - Advanced Search Builder</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #12293d; --surface: #0d1f2d;
+    --divider: #7b6b43; --text: #f9eae1; --text-muted: #f1d2b6;
+    --and-color: #6bae6b; --or-color: #d4a44a;
+    --btn-bg: #473633; --btn-bg-hover: #5a4745;
+    --btn-border: #7b6b43; --btn-text: #f1d2b6;
+    --chip-bg: #1e3a52; --chip-border: #2e5573;
+    --remove-color: #c45050;
+    --sel-bg: #0d1f2d; --sel-border: #2a4a5e;
+  }
+
+  body {
+    font-family: 'Geist', sans-serif;
+    background: var(--bg); color: var(--text);
+    padding: 20px; max-width: 620px; margin: 0 auto;
+  }
+
+  /* ── Toolbar ── */
+  .toolbar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .toolbar-title {
+    font-size: 13px; font-weight: 700;
+    color: var(--text-muted); opacity: 0.6;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .toolbar-title i { color: var(--divider); font-size: 12px; }
+  .toolbar-actions { display: flex; gap: 6px; }
+  .btn {
+    font-family: 'Geist', sans-serif;
+    font-size: 11px; font-weight: 700;
+    padding: 4px 10px; border-radius: 6px;
+    border: 1.5px solid var(--btn-border);
+    background: var(--btn-bg); color: var(--btn-text);
+    cursor: pointer; transition: all 0.15s;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .btn:hover { background: var(--btn-bg-hover); }
+  .btn-ghost { background: transparent; border-color: transparent; opacity: 0.4; }
+  .btn-ghost:hover { opacity: 1; }
+
+  /* ── Filter chips (inline flow) ── */
+  .filter-flow {
+    display: flex; flex-wrap: wrap;
+    align-items: center; gap: 6px;
+    padding: 10px 12px;
+    background: var(--surface);
+    border: 1.5px solid var(--sel-border);
+    border-radius: 10px;
+    min-height: 44px;
+  }
+
+  /* Single filter chip */
+  .chip {
+    display: inline-flex; align-items: center;
+    background: var(--chip-bg);
+    border: 1.5px solid var(--chip-border);
+    border-radius: 6px;
+    overflow: hidden;
+    height: 30px;
+    transition: border-color 0.15s;
+  }
+  .chip:hover { border-color: var(--divider); }
+
+  .chip select, .chip input {
+    font-family: 'Geist', sans-serif;
+    font-size: 12px; font-weight: 600;
+    background: transparent; border: none;
+    color: var(--text); outline: none;
+    height: 100%; padding: 0 8px;
+    appearance: none; cursor: pointer;
+  }
+  .chip select option { background: var(--sel-bg); color: var(--text); }
+
+  .chip .field {
+    color: var(--text-muted);
+    border-right: 1px solid var(--chip-border);
+    min-width: 80px;
+    padding-right: 20px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%237b6b43' d='M2 3l3 4 3-4'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 6px center;
+  }
+  .chip .op {
+    font-family: 'Geist Mono', monospace;
+    color: var(--divider); font-weight: 700;
+    min-width: 36px; text-align: center;
+    border-right: 1px solid var(--chip-border);
+    padding-right: 18px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%237b6b43' d='M2 3l3 4 3-4'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 4px center;
+  }
+  .chip .val {
+    min-width: 50px; max-width: 100px;
+  }
+  .chip .val-enum {
+    min-width: 70px;
+    padding-right: 18px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%237b6b43' d='M2 3l3 4 3-4'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 4px center;
+  }
+  .chip input::placeholder { color: var(--text-muted); opacity: 0.3; }
+
+  .chip .remove {
+    width: 24px; height: 100%;
+    background: transparent; border: none;
+    border-left: 1px solid var(--chip-border);
+    color: var(--text-muted); opacity: 0.3;
+    cursor: pointer; font-size: 10px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .chip .remove:hover {
+    opacity: 1; color: var(--remove-color);
+    background: rgba(196,80,80,0.1);
+  }
+
+  /* Connector pill between chips */
+  .conn-pill {
+    font-family: 'Geist Mono', monospace;
+    font-size: 10px; font-weight: 800;
+    padding: 3px 8px; border-radius: 4px;
+    cursor: pointer; user-select: none;
+    transition: all 0.15s;
+    border: 1px solid transparent;
+    flex-shrink: 0;
+  }
+  .conn-pill.and {
+    background: rgba(107,174,107,0.12);
+    color: var(--and-color);
+    border-color: rgba(107,174,107,0.25);
+  }
+  .conn-pill.or {
+    background: rgba(212,164,74,0.12);
+    color: var(--or-color);
+    border-color: rgba(212,164,74,0.25);
+  }
+  .conn-pill:hover { opacity: 0.7; }
+
+  /* Add button inline */
+  .add-inline {
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    border: 1.5px dashed var(--sel-border);
+    background: transparent;
+    color: var(--text-muted); opacity: 0.3;
+    cursor: pointer; font-size: 12px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+  .add-inline:hover {
+    opacity: 1; border-color: var(--divider);
+    color: var(--divider);
+  }
+
+  /* ── Results footer ── */
+  .results-bar {
+    margin-top: 10px;
+    padding: 8px 12px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .results-count {
+    font-size: 12px; font-weight: 600;
+    color: var(--text-muted); opacity: 0.5;
+  }
+  .results-count strong { color: var(--divider); font-size: 14px; opacity: 1; }
+  .query-preview {
+    font-family: 'Geist Mono', monospace;
+    font-size: 10px; color: var(--text-muted); opacity: 0.35;
+    max-width: 320px; overflow: hidden;
+    text-overflow: ellipsis; white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <span class="toolbar-title"><i class="fa-solid fa-filter"></i> Filters</span>
+  <div class="toolbar-actions">
+    <button class="btn btn-ghost" onclick="clearAll()"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+</div>
+
+<div class="filter-flow" id="filterFlow">
+
+  <!-- Chip 1: Rating >= 8 -->
+  <div class="chip">
+    <select class="field" onchange="onFieldChange(this)">
+      <option value="Rating" selected>Rating</option>
+      <option value="Value">Value</option>
+      <option value="Read">Read</option>
+      <option value="CurVolumes">CurVol</option>
+      <option value="MaxVolumes">MaxVol</option>
+      <option value="Format">Format</option>
+      <option value="Status">Status</option>
+      <option value="Demographic">Demo</option>
+      <option value="Series">Series</option>
+      <option value="Favorite">Fav</option>
+      <option value="Genre">Genre</option>
+      <option value="Notes">Notes</option>
+      <option value="Publisher">Publisher</option>
+    </select>
+    <select class="op">
+      <option value=">=" selected>>=</option>
+      <option value="==">=</option>
+      <option value="<="><=</option>
+    </select>
+    <input class="val" type="text" value="8" placeholder="#" />
+    <button class="remove" onclick="removeChip(this)"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+
+  <!-- Connector: AND (click to toggle) -->
+  <span class="conn-pill and" onclick="toggleConn(this)">AND</span>
+
+  <!-- Chip 2: Format == Manga -->
+  <div class="chip">
+    <select class="field" onchange="onFieldChange(this)">
+      <option value="Rating">Rating</option>
+      <option value="Value">Value</option>
+      <option value="Read">Read</option>
+      <option value="CurVolumes">CurVol</option>
+      <option value="MaxVolumes">MaxVol</option>
+      <option value="Format" selected>Format</option>
+      <option value="Status">Status</option>
+      <option value="Demographic">Demo</option>
+      <option value="Series">Series</option>
+      <option value="Favorite">Fav</option>
+      <option value="Genre">Genre</option>
+      <option value="Notes">Notes</option>
+      <option value="Publisher">Publisher</option>
+    </select>
+    <select class="op">
+      <option value="==" selected>=</option>
+    </select>
+    <select class="val-enum">
+      <option value="Manga" selected>Manga</option>
+      <option value="Novel">Novel</option>
+      <option value="Manhwa">Manhwa</option>
+      <option value="Manhua">Manhua</option>
+      <option value="Manfra">Manfra</option>
+      <option value="Comic">Comic</option>
+    </select>
+    <button class="remove" onclick="removeChip(this)"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+
+  <!-- Connector: OR -->
+  <span class="conn-pill or" onclick="toggleConn(this)">OR</span>
+
+  <!-- Chip 3: Genre == Romance -->
+  <div class="chip">
+    <select class="field" onchange="onFieldChange(this)">
+      <option value="Rating">Rating</option>
+      <option value="Value">Value</option>
+      <option value="Read">Read</option>
+      <option value="CurVolumes">CurVol</option>
+      <option value="MaxVolumes">MaxVol</option>
+      <option value="Format">Format</option>
+      <option value="Status">Status</option>
+      <option value="Demographic">Demo</option>
+      <option value="Series">Series</option>
+      <option value="Favorite">Fav</option>
+      <option value="Genre" selected>Genre</option>
+      <option value="Notes">Notes</option>
+      <option value="Publisher">Publisher</option>
+    </select>
+    <select class="op">
+      <option value="==" selected>=</option>
+    </select>
+    <select class="val-enum">
+      <option value="Action">Action</option>
+      <option value="Adventure">Adventure</option>
+      <option value="Comedy">Comedy</option>
+      <option value="Drama">Drama</option>
+      <option value="Fantasy">Fantasy</option>
+      <option value="Horror">Horror</option>
+      <option value="Mystery">Mystery</option>
+      <option value="Romance" selected>Romance</option>
+      <option value="SciFi">Sci-Fi</option>
+      <option value="SliceOfLife">Slice of Life</option>
+      <option value="Sports">Sports</option>
+      <option value="Supernatural">Supernatural</option>
+      <option value="Thriller">Thriller</option>
+    </select>
+    <button class="remove" onclick="removeChip(this)"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+
+  <!-- Add button -->
+  <button class="add-inline" onclick="addChip()" title="Add filter"><i class="fa-solid fa-plus"></i></button>
+
+</div>
+
+<div class="results-bar">
+  <span class="results-count"><strong>23</strong> series</span>
+  <span class="query-preview" id="preview">Rating>=8 & Format==Manga | Genre==Romance</span>
+</div>
+
+<script>
+function toggleConn(pill) {
+  if (pill.classList.contains('and')) {
+    pill.classList.remove('and');
+    pill.classList.add('or');
+    pill.textContent = 'OR';
+  } else {
+    pill.classList.remove('or');
+    pill.classList.add('and');
+    pill.textContent = 'AND';
+  }
+  updatePreview();
+}
+
+function removeChip(btn) {
+  const chip = btn.closest('.chip');
+  const prev = chip.previousElementSibling;
+  const next = chip.nextElementSibling;
+  // Remove adjacent connector
+  if (prev && prev.classList.contains('conn-pill')) prev.remove();
+  else if (next && next.classList.contains('conn-pill')) next.remove();
+  chip.remove();
+  updatePreview();
+}
+
+function addChip() {
+  const flow = document.getElementById('filterFlow');
+  const addBtn = flow.querySelector('.add-inline');
+
+  // Insert connector before add button
+  const conn = document.createElement('span');
+  conn.className = 'conn-pill and';
+  conn.textContent = 'AND';
+  conn.onclick = function() { toggleConn(this); };
+  flow.insertBefore(conn, addBtn);
+
+  // Insert chip before add button
+  const chip = document.createElement('div');
+  chip.className = 'chip';
+  chip.innerHTML = `
+    <select class="field" onchange="onFieldChange(this)">
+      <option value="Rating" selected>Rating</option>
+      <option value="Value">Value</option>
+      <option value="Read">Read</option>
+      <option value="CurVolumes">CurVol</option>
+      <option value="MaxVolumes">MaxVol</option>
+      <option value="Format">Format</option>
+      <option value="Status">Status</option>
+      <option value="Demographic">Demo</option>
+      <option value="Series">Series</option>
+      <option value="Favorite">Fav</option>
+      <option value="Genre">Genre</option>
+      <option value="Notes">Notes</option>
+      <option value="Publisher">Publisher</option>
+    </select>
+    <select class="op">
+      <option value="==">=</option>
+      <option value=">=" selected>>=</option>
+      <option value="<="><=</option>
+    </select>
+    <input class="val" type="text" placeholder="#" />
+    <button class="remove" onclick="removeChip(this)"><i class="fa-solid fa-xmark"></i></button>
+  `;
+  flow.insertBefore(chip, addBtn);
+  updatePreview();
+}
+
+function onFieldChange(sel) {
+  // stub - in Avalonia, this would swap value control
+}
+
+function clearAll() {
+  const flow = document.getElementById('filterFlow');
+  flow.querySelectorAll('.chip, .conn-pill').forEach(el => el.remove());
+  updatePreview();
+}
+
+function updatePreview() {
+  const flow = document.getElementById('filterFlow');
+  let parts = [];
+  for (const el of flow.children) {
+    if (el.classList.contains('chip')) {
+      const f = el.querySelector('.field')?.value || '?';
+      const o = el.querySelector('.op')?.value || '==';
+      const vi = el.querySelector('.val');
+      const ve = el.querySelector('.val-enum');
+      const v = ve ? ve.value : (vi ? vi.value : '?');
+      parts.push(`${f}${o}${v}`);
+    } else if (el.classList.contains('conn-pill')) {
+      parts.push(el.classList.contains('or') ? ' | ' : ' & ');
+    }
+  }
+  document.getElementById('preview').textContent = parts.join('');
+}
+</script>
+
+</body>
+</html>

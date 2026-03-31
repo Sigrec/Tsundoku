@@ -2,53 +2,64 @@ using Avalonia.Interactivity;
 using Tsundoku.ViewModels;
 using Avalonia.Controls;
 using System.Diagnostics;
+using System.Reactive.Disposables;
+using System.Reactive.Disposables.Fluent;
 using ReactiveUI;
 using Avalonia.Platform.Storage;
+using System.Reactive.Linq;
 using Tsundoku.Helpers;
-using Avalonia.ReactiveUI;
+using Tsundoku.Services;
+using ReactiveUI.Avalonia;
 
 namespace Tsundoku.Views;
 
-public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsViewModel>
+public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsViewModel>, IManagedWindow
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
-    public bool IsOpen = false;
-    public int currencyLength = 0;
+    public bool IsOpen { get; set; }
     private readonly IPopupDialogService _popupDialogService;
+    private readonly IApiHealthCheckService _apiHealthCheckService;
 
-    public UserSettingsWindow(UserSettingsViewModel viewModel, IPopupDialogService popupDialogService)
+    public UserSettingsWindow(UserSettingsViewModel viewModel, IPopupDialogService popupDialogService, IApiHealthCheckService apiHealthCheckService)
     {
         _popupDialogService = popupDialogService;
+        _apiHealthCheckService = apiHealthCheckService;
         InitializeComponent();
 
         ViewModel = viewModel;
 
-        Opened += (s, e) =>
+        this.ConfigureHideOnClose(
+            onOpened: () => { if (Screens.Primary.WorkingArea.Height < 955) this.Height = 550; });
+
+        this.WhenActivated(disposables =>
         {
-            IsOpen ^= true;
-            if (Screens.Primary.WorkingArea.Height < 955)
-            {
-                this.Height = 550;
-            }
-        };
+            this.WhenAnyValue(x => x.BooksAMillionButton.IsChecked, (member) => member is not null && member == true)
+                .Subscribe(x => ViewModel.BooksAMillionMember = x)
+                .DisposeWith(disposables);
 
-        Closing += (s, e) =>
-        {
-            if (IsOpen)
-            {
-                this.Hide();
-                Topmost = false;
-                IsOpen ^= true;
-            }
-            e.Cancel = true;
-        };
+            this.WhenAnyValue(x => x.KinokuniyaUSAButton.IsChecked, (member) => member is not null && member == true)
+                .Subscribe(x => ViewModel.KinokuniyaUSAMember = x)
+                .DisposeWith(disposables);
 
-        this.WhenAnyValue(x => x.BooksAMillionButton.IsChecked, (member) => member is not null && member == true).Subscribe(x => ViewModel.BooksAMillionMember = x);
+            this.WhenAnyValue(x => x.UsernameChangeTextBox.Text, (newUsername) => !string.IsNullOrWhiteSpace(newUsername) && !newUsername.Equals(ViewModel.CurrentUser.UserName))
+                .Subscribe(x => ViewModel.IsChangeUsernameButtonEnabled = x)
+                .DisposeWith(disposables);
 
-        this.WhenAnyValue(x => x.KinokuniyaUSAButton.IsChecked, (member) => member is not null && member == true).Subscribe(x => ViewModel.KinokuniyaUSAMember = x);
+            _apiHealthCheckService.IsAniListAvailable
+                .ObserveOn(RxSchedulers.MainThreadScheduler)
+                .Subscribe(isAvailable =>
+                {
+                    RefreshSeriesButton.IsEnabled = isAvailable;
+                    ImportLibibData.IsEnabled = isAvailable;
+                    ImportGoodreadsData.IsEnabled = isAvailable;
+                })
+                .DisposeWith(disposables);
+        });
+    }
 
-        this.WhenAnyValue(x => x.UsernameChangeTextBox.Text, (newUsername) => !string.IsNullOrWhiteSpace(newUsername) && !newUsername.Equals(ViewModel.CurrentUser.UserName))
-            .Subscribe(x => ViewModel.IsChangeUsernameButtonEnabled = x);
+    private async void RefreshAllCoversAsync(object sender, RoutedEventArgs args)
+    {
+        await ViewModel.RefreshAllCoversAsync(this.Owner as Window ?? this);
     }
 
     private async void ExportToSpreadSheetAsync(object sender, RoutedEventArgs e)
@@ -56,13 +67,17 @@ public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsView
         await ViewModel.ExportToSpreadSheetAsync(this);
     }
 
-    private void CurrencyChanged(object sender, SelectionChangedEventArgs e)
+
+    private void ToggleControlsSection(object? sender, RoutedEventArgs e)
     {
-        if (CurrencyComboBox.SelectedItem is string selectedCurrency)
-        {
-            ViewModel.UpdateUserCurrency(selectedCurrency);
-            LOGGER.Info($"Currency Changed To {selectedCurrency}");
-        }
+        ControlsContent.IsVisible = !ControlsContent.IsVisible;
+        ControlsChevron.Value = ControlsContent.IsVisible ? "fa-solid fa-chevron-up" : "fa-solid fa-chevron-down";
+    }
+
+    private void ToggleYoutubersSection(object? sender, RoutedEventArgs e)
+    {
+        YoutubersContent.IsVisible = !YoutubersContent.IsVisible;
+        YoutubersChevron.Value = YoutubersContent.IsVisible ? "fa-solid fa-chevron-up" : "fa-solid fa-chevron-down";
     }
 
     private async Task ShowFileErrorDialog(string info = "Unable to Open File\nCheck if it is being used by another app")
@@ -70,29 +85,20 @@ public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsView
         await _popupDialogService.ShowAsync("Error", "fa-solid fa-circle-exclamation", info, this);
     }
 
-    /// <summary>
-    /// Allows user to import a new Json file to be used as their new data, it additionall creates a backup file of the users last save
-    /// </summary>
-    private async void ImportUserDataAsync(object sender, RoutedEventArgs args)
+    private async Task ImportFileAsync(bool allowMultiple, string fileTypeLabel, string pattern, Func<IReadOnlyList<IStorageFile>, Task> onFilesSelected)
     {
         try
         {
             IReadOnlyList<IStorageFile> files = await this.StorageProvider.OpenFilePickerAsync(
                 new FilePickerOpenOptions
                 {
-                    AllowMultiple = false,
-                    FileTypeFilter =
-                    [
-                        new FilePickerFileType("JSON File")
-                        {
-                            Patterns = [ "*.json" ]
-                        }
-                    ]
+                    AllowMultiple = allowMultiple,
+                    FileTypeFilter = [ new FilePickerFileType(fileTypeLabel) { Patterns = [ pattern ] } ]
                 }
             );
-            if (files.Count == 1)
+            if (files.Count > 0)
             {
-                ViewModel.ImportUserDataFromJson(files[0].Path.LocalPath, this);
+                await onFilesSelected(files);
             }
         }
         catch (IOException ex)
@@ -100,77 +106,48 @@ public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsView
             LOGGER.Error(ex);
             await ShowFileErrorDialog();
         }
+    }
+
+    private async void ImportUserDataAsync(object sender, RoutedEventArgs args)
+    {
+        await ImportFileAsync(false, "JSON File", "*.json", files =>
+        {
+            ViewModel.ImportUserDataFromJson(files[0].Path.LocalPath, this);
+            return Task.CompletedTask;
+        });
     }
 
     private async void ImportLibibDataAsync(object sender, RoutedEventArgs args)
     {
-        try
+        await ImportFileAsync(true, "CSV File", "*.csv", async files =>
         {
-            IReadOnlyList<IStorageFile> files = await this.StorageProvider.OpenFilePickerAsync(
-                new FilePickerOpenOptions
-                {
-                    AllowMultiple = true,
-                    FileTypeFilter =
-                    [
-                        new FilePickerFileType("JSON File")
-                    {
-                        Patterns = [ "*.csv" ]
-                    }
-                    ]
-                }
-            );
-            if (files.Count > 0)
-            {
-                await ViewModel.ImportLibibDataFromCsv([.. files.Select(f => f.Path.LocalPath)], this.Owner as Window);
-            }
-            else
-            {
-                LOGGER.Debug("User tried to import libib data but no files were selected");
-            }
-        }
-        catch (IOException ex)
-        {
-            LOGGER.Error(ex);
-            await ShowFileErrorDialog();
-        }
+            await ViewModel.ImportLibibDataFromCsv([.. files.AsValueEnumerable().Select(f => f.Path.LocalPath)], this.Owner as Window);
+        });
     }
 
     private async void ImportGoodreadsDataAsync(object sender, RoutedEventArgs args)
     {
-        try
+        await ImportFileAsync(true, "CSV File", "*.csv", async files =>
         {
-            IReadOnlyList<IStorageFile> files = await this.StorageProvider.OpenFilePickerAsync(
-                new FilePickerOpenOptions
-                {
-                    AllowMultiple = true,
-                    FileTypeFilter =
-                    [
-                        new FilePickerFileType("JSON File")
-                        {
-                            Patterns = [ "*.csv" ]
-                        }
-                    ]
-                }
-            );
-            if (files.Count > 0)
-            {
-                await ViewModel.ImportGoodreadsDataFromCsv([.. files.Select(f => f.Path.LocalPath)], this.Owner as Window);
-            }
-            else
-            {
-                LOGGER.Debug("User tried to import goodreads data but no files were selected");
-            }
-        }
-        catch (IOException ex)
-        {
-            LOGGER.Error(ex);
-            await ShowFileErrorDialog();
-        }
+            await ViewModel.ImportGoodreadsDataFromCsv([.. files.AsValueEnumerable().Select(f => f.Path.LocalPath)], this.Owner as Window);
+        });
     }
 
     private async void OpenReleasesPage(object sender, PointerPressedEventArgs args)
     {
         await ViewModelBase.OpenSiteLink(@"https://github.com/Sigrec/Tsundoku/releases");
+    }
+
+    private async void ShowChangelogAsync(object sender, RoutedEventArgs args)
+    {
+        if (Owner is MainWindow mainWindow)
+        {
+            this.Hide();
+            IsOpen = false;
+            ChangelogWindow changelog = new() { DataContext = ViewModel };
+            changelog.SetVersion(ViewModelBase.CUR_TSUNDOKU_VERSION);
+            await changelog.ShowDialog(mainWindow);
+        }
     }
 
     public async void OpenAniListLink(object sender, RoutedEventArgs args)
@@ -183,135 +160,27 @@ public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsView
         await ViewModelBase.OpenSiteLink(@"https://mangadex.org/");
     }
     
-    public async void OpenApplicationFolder(object sender, RoutedEventArgs args)
-    {
-        await Task.Run(() =>
-        {
-            // Get the full path to the base "Tsundoku" application data folder.
-            // Passing an empty string to GetFolderPath returns the base folder.
-            string tsundokuAppFolderPath = AppFileHelper.GetFolderPath("");
-            try
-            {
-                // Use ProcessStartInfo with UseShellExecute = true for robustness
-                Process.Start(new ProcessStartInfo(tsundokuAppFolderPath)
-                {
-                    UseShellExecute = true, // Essential for letting the OS shell handle opening the folder
-                    Verb = "open"           // Explicitly ask the shell to "open" the target
-                });
-                LOGGER.Debug($"Opened Tsundoku application data folder: {tsundokuAppFolderPath}");
-            }
-            catch (System.ComponentModel.Win32Exception ex)
-            {
-                // This exception occurs if the shell (explorer.exe) cannot find the path,
-                // or if there's a permissions issue, which can happen in MSIX sandbox.
-                LOGGER.Error(ex, $"Win32Exception: Failed to open Tsundoku application data folder at: {tsundokuAppFolderPath}");
-                // Optional: Fallback to direct explorer.exe launch if shell execute fails
-                try
-                {
-                    Process.Start("explorer.exe", tsundokuAppFolderPath);
-                }
-                catch (Exception directEx)
-                {
-                    LOGGER.Error(directEx, $"Fallback: Direct explorer.exe launch also failed for Tsundoku application data folder: {tsundokuAppFolderPath}");
-                }
-            }
-            catch (Exception ex)
-            {
-                LOGGER.Error(ex, $"An unexpected error occurred while trying to open the Tsundoku application data folder: {tsundokuAppFolderPath}");
-            }
-        });
-    }
+    public void OpenApplicationFolder(object sender, RoutedEventArgs args) => OpenFolder(AppFileHelper.GetFolderPath(string.Empty));
+    public void OpenCoversFolder(object sender, RoutedEventArgs args) => OpenFolder(AppFileHelper.GetCoversFolderPath());
+    public void OpenScreenshotsFolder(object sender, RoutedEventArgs args) => OpenFolder(AppFileHelper.GetScreenshotsFolderPath());
+    public void OpenThemesFolder(object sender, RoutedEventArgs args) => OpenFolder(AppFileHelper.GetThemesFolderPath());
 
-    public async void OpenCoversFolder(object sender, RoutedEventArgs args)
+    private static void OpenFolder(string folderPath)
     {
-        await Task.Run(() =>
+        try
         {
-            string coversPath = AppFileHelper.GetCoversFolderPath();
-            try
-            {
-                // Use ProcessStartInfo with UseShellExecute = true for robustness
-                Process.Start(new ProcessStartInfo(coversPath)
-                {
-                    UseShellExecute = true, // Essential for letting the OS shell handle opening the folder
-                    Verb = "open"           // Explicitly ask the shell to "open" the target
-                });
-                LOGGER.Debug($"Opened Covers folder: {coversPath}");
-            }
-            catch (System.ComponentModel.Win32Exception ex)
-            {
-                // This exception occurs if the shell (explorer.exe) cannot find the path,
-                // or if there's a permissions issue, which can happen in MSIX sandbox.
-                LOGGER.Error(ex, $"Win32Exception: Failed to open Covers folder at: {coversPath}");
-                // Optional: Fallback to direct explorer.exe launch if shell execute fails,
-                // though UseShellExecute is usually more reliable.
-                try
-                {
-                    Process.Start("explorer.exe", coversPath);
-                }
-                catch (Exception directEx)
-                {
-                    LOGGER.Error(directEx, $"Fallback: Direct explorer.exe launch also failed for Covers folder: {coversPath}");
-                }
-            }
-            catch (Exception ex)
-            {
-                LOGGER.Error(ex, $"An unexpected error occurred while trying to open the Covers folder: {coversPath}");
-            }
-        });
-    }
-
-    public async void OpenScreenshotsFolder(object sender, RoutedEventArgs args)
-    {
-        await Task.Run(() =>
+            Process.Start(new ProcessStartInfo(folderPath) { UseShellExecute = true, Verb = "open" });
+            LOGGER.Debug("Opened folder: {FolderPath}", folderPath);
+        }
+        catch (System.ComponentModel.Win32Exception)
         {
-            string screenshotsPath = AppFileHelper.GetScreenshotsFolderPath();
-            try
-            {
-                Process.Start(new ProcessStartInfo(screenshotsPath)
-                {
-                    UseShellExecute = true,
-                    Verb = "open"
-                });
-                LOGGER.Debug($"Opened Screenshots folder: {screenshotsPath}");
-            }
-            catch (System.ComponentModel.Win32Exception ex)
-            {
-                LOGGER.Error(ex, $"Win32Exception: Failed to open Screenshots folder at: {screenshotsPath}");
-                try { Process.Start("explorer.exe", screenshotsPath); }
-                catch (Exception directEx) { LOGGER.Error(directEx, $"Fallback: Direct explorer.exe launch also failed for Screenshots folder: {screenshotsPath}"); }
-            }
-            catch (Exception ex)
-            {
-                LOGGER.Error(ex, $"An unexpected error occurred while trying to open the Screenshots folder: {screenshotsPath}");
-            }
-        });
-    }
-
-    public async void OpenThemesFolder(object sender, RoutedEventArgs args)
-    {
-        await Task.Run(() =>
+            try { Process.Start("explorer.exe", folderPath); }
+            catch (Exception ex) { LOGGER.Error(ex, "Failed to open folder: {FolderPath}", folderPath); }
+        }
+        catch (Exception ex)
         {
-            string themesPath = AppFileHelper.GetThemesFolderPath();
-            try
-            {
-                Process.Start(new ProcessStartInfo(themesPath)
-                {
-                    UseShellExecute = true,
-                    Verb = "open"
-                });
-                LOGGER.Debug($"Opened Themes folder: {themesPath}");
-            }
-            catch (System.ComponentModel.Win32Exception ex)
-            {
-                LOGGER.Error(ex, $"Win32Exception: Failed to open Themes folder at: {themesPath}");
-                try { Process.Start("explorer.exe", themesPath); }
-                catch (Exception directEx) { LOGGER.Error(directEx, $"Fallback: Direct explorer.exe launch also failed for Themes folder: {themesPath}"); }
-            }
-            catch (Exception ex)
-            {
-                LOGGER.Error(ex, $"An unexpected error occurred while trying to open the Themes folder: {themesPath}");
-            }
-        });
+            LOGGER.Error(ex, "Failed to open folder: {FolderPath}", folderPath);
+        }
     }
 
     public void ChangeUsername(object sender, RoutedEventArgs args)
@@ -320,13 +189,16 @@ public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsView
         if (!string.IsNullOrWhiteSpace(newUsername))
         {
             ViewModel.UpdateUserName(newUsername);
-            LOGGER.Info("Username Changed to {Username");
+            LOGGER.Info("Username Changed to {Username}", newUsername);
         }
     }
 
     public async void OpenYoutuberSite(object sender, RoutedEventArgs args)
     {
-        await ViewModelBase.OpenSiteLink(@$"https://www.youtube.com/@{(sender as Button).Name}");
+        if (sender is Button button)
+        {
+            await ViewModelBase.OpenSiteLink(@$"https://www.youtube.com/@{button.Name}");
+        }
     }
 
     public async void OpenCoolorsSite(object sender, RoutedEventArgs args)

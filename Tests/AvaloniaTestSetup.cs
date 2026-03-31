@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Headless;
 using Projektanker.Icons.Avalonia;
 using Projektanker.Icons.Avalonia.FontAwesome;
+using ReactiveUI.Avalonia;
 using Tsundoku.Tests;
 
 [assembly: AvaloniaTestApplication(typeof(AvaloniaTestSetup))]
@@ -15,6 +16,7 @@ public class AvaloniaTestSetup
             .Register<FontAwesomeIconProvider>();
 
         return AppBuilder.Configure<App>()
-        .UseHeadless(new AvaloniaHeadlessPlatformOptions());
+        .UseHeadless(new AvaloniaHeadlessPlatformOptions())
+        .UseReactiveUI(_ => { });
     }
 }

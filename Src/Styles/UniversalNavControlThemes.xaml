@@ -1,29 +1,28 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
 					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-					xmlns:vm="clr-namespace:Tsundoku.ViewModels"
                     xmlns:sys="using:System"
-					x:DataType="vm:ViewModelBase">
+					>
                     
 	<ControlTheme x:Key="MenuComboBox" TargetType="ComboBox">
-		<Setter Property="Padding" Value="{DynamicResource ComboBoxPadding}" />
+		<Setter Property="Padding" Value="8,0" />
 		<Setter Property="FocusAdorner" Value="{x:Null}" />
 		<Setter Property="MaxDropDownHeight" Value="504" />
 		<Setter Property="BorderThickness" Value="2" />
-		<Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
+		<Setter Property="CornerRadius" Value="10" />
 		<Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
 		<Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
 		<Setter Property="HorizontalContentAlignment" Value="Stretch" />
 		<Setter Property="VerticalContentAlignment" Value="Center" />
 		<Setter Property="HorizontalAlignment" Value="Center" />
 		<Setter Property="VerticalAlignment" Value="Center" />
-		<Setter Property="FontSize" Value="15" />
+		<Setter Property="FontSize" Value="13" />
 		<Setter Property="FontWeight" Value="Bold"/>
 		<Setter Property="AutoScrollToSelectedItem" Value="True"/>
         <Setter Property="Cursor" Value="Hand"/>
 		<!-- <Setter Property="PlaceholderForeground" Value="Aqua" /> -->
-		<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGColor}"/>
-		<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor}"/>
-		<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor}"/>
+		<Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGColor}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource TsundokuMenuButtonBorderColor}"/>
+		<Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
 
 		<Setter Property="Template">
 			<ControlTemplate>
@@ -58,6 +57,7 @@
 										ContentTemplate="{TemplateBinding ItemTemplate}"
 										Grid.Column="0"
 										Margin="{TemplateBinding Padding}"
+										VerticalAlignment="Center"
 										HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
 										VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
 
@@ -78,7 +78,7 @@
 								Margin="0,0,10,0"
 								HorizontalAlignment="Right"
 								VerticalAlignment="Center"
-								Foreground="{CompiledBinding CurrentTheme.MenuButtonBorderColor}"
+								Foreground="{DynamicResource TsundokuMenuButtonBorderColor}"
 								Data="M1939 486L2029 576L1024 1581L19 576L109 486L1024 1401L1939 486Z"/>
 
 						<Popup Name="PART_Popup"
@@ -90,15 +90,16 @@
 							IsLightDismissEnabled="True"
 							InheritsTransform="True">
                             <Border x:Name="PopupBorder"
-                                    Background="{CompiledBinding CurrentTheme.MenuButtonBGColor}"
-                                    BorderBrush="{CompiledBinding CurrentTheme.MenuButtonBorderColor}"
+                                    Background="{DynamicResource TsundokuMenuButtonBGColor}"
+                                    BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}"
                                     BorderThickness="2"
-                                    CornerRadius="2">
+                                    CornerRadius="10"
+                                    Margin="0,4,0,0">
                                 <ScrollViewer HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
                                             VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}"
                                             Theme="{StaticResource ReverseCollectionScroll}">
                                 <ItemsPresenter Name="PART_ItemsPresenter"
-                                                Margin="{DynamicResource ComboBoxDropdownContentMargin}"
+                                                Margin="2,4"
                                                 ItemsPanel="{TemplateBinding ItemsPanel}" />
                                 </ScrollViewer>
                             </Border>
@@ -109,25 +110,27 @@
 		</Setter>
 
 		<Style Selector="^:pointerover /template/ Border#Background">
-			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}"/>
-			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor}"/>
+			<Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGHoverColor}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource TsundokuMenuButtonBorderHoverColor}"/>
 		</Style>
 
 		<Style Selector="^:pressed /template/ Border#Background">
-			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}"/>
-			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor}"/>
+			<Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGHoverColor}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource TsundokuMenuButtonBorderHoverColor}"/>
 		</Style>
 
 		<Style Selector="^:pointerover /template/ PathIcon#DropDownGlyph">
-			<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor}"/>
+			<Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconHoverColor}"/>
 		</Style>
 	</ControlTheme>
 
 	<ControlTheme x:Key="MenuComboBoxItem" TargetType="ComboBoxItem">
 		<Setter Property="Padding" Value="{DynamicResource ComboBoxItemThemePadding}" />
+		<Setter Property="Margin" Value="4,2" />
 		<Setter Property="HorizontalContentAlignment" Value="Stretch" />
+		<Setter Property="VerticalContentAlignment" Value="Center" />
 		<Setter Property="Background" Value="Transparent"/>
-		<Setter Property="Foreground" Value="{Binding $parent[ComboBox].DataContext.CurrentTheme.MenuButtonTextAndIconColor}"/>
+		<Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
 
 		<Setter Property="Template">
 			<ControlTemplate>
@@ -136,7 +139,7 @@
 								Background="{TemplateBinding Background}"
 								BorderBrush="{TemplateBinding BorderBrush}"
 								BorderThickness="{TemplateBinding BorderThickness}"
-								CornerRadius="0"
+								CornerRadius="6"
 								ContentTemplate="{TemplateBinding ContentTemplate}"
 								Content="{TemplateBinding Content}"
 								HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
@@ -146,19 +149,19 @@
 		</Setter>
 
 		<Style Selector="^:pressed">
-			<Setter Property="Background" Value="{Binding $parent[ComboBox].DataContext.CurrentTheme.MenuButtonBGHoverColor}"/>
-			<Setter Property="Foreground" Value="{Binding $parent[ComboBox].DataContext.CurrentTheme.MenuButtonTextAndIconHoverColor}"/>
+			<Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGHoverColor}"/>
+			<Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconHoverColor}"/>
 		</Style>
 
 		<Style Selector="^:pointerover">
-			<Setter Property="Background" Value="{Binding $parent[ComboBox].DataContext.CurrentTheme.MenuButtonBGHoverColor}"/>
-			<Setter Property="Foreground" Value="{Binding $parent[ComboBox].DataContext.CurrentTheme.MenuButtonTextAndIconHoverColor}"/>
+			<Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGHoverColor}"/>
+			<Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconHoverColor}"/>
 		</Style>
 
 		<Style Selector="^:selected">
 			<Style Selector="^">
-				<Setter Property="Background" Value="{Binding $parent[ComboBox].DataContext.CurrentTheme.MenuButtonBGHoverColor}"/>
-				<Setter Property="Foreground" Value="{Binding $parent[ComboBox].DataContext.CurrentTheme.MenuButtonTextAndIconHoverColor}"/>
+				<Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGHoverColor}"/>
+				<Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconHoverColor}"/>
 			</Style>
 		</Style>
 	</ControlTheme>
@@ -166,21 +169,21 @@
 	<ControlTheme x:Key="MenuButton" TargetType="Button">
 		<Setter Property="HorizontalContentAlignment" Value="Center"/>
 		<Setter Property="VerticalContentAlignment" Value="Center"/>
-		<Setter Property="CornerRadius" Value="2"/>
+		<Setter Property="CornerRadius" Value="9"/>
 		<Setter Property="FontWeight" Value="Bold"/>
 		<Setter Property="FontSize" Value="15"/>
 		<Setter Property="BorderThickness" Value="2"/>
 		<Setter Property="RenderTransform" Value="none"/>
         <Setter Property="Cursor" Value="Hand"/>
-		<Setter Property="Padding" Value="{DynamicResource ButtonPadding}"/>
+		<Setter Property="Padding" Value="0"/>
 		<Setter Property="Transitions">
 			<Transitions>
 				<TransformOperationsTransition Property="RenderTransform" Duration="0:0:.075" />
 			</Transitions>
 		</Setter>
-		<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGColor}"/>
-		<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor}"/>
-		<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor}"/>
+		<Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGColor}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource TsundokuMenuButtonBorderColor}"/>
+		<Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
 
 		<Setter Property="Template">
 			<ControlTemplate>
@@ -199,32 +202,75 @@
 		</Setter>
 
 		<Style Selector="^:pointerover">
-			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}"/>
-			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor}"/>
-			<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor}"/>
+			<Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGHoverColor}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource TsundokuMenuButtonBorderHoverColor}"/>
+			<Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconHoverColor}"/>
 		</Style>
 	
 		<Style Selector="^:pressed">
-			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}"/>
-			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor}"/>
-			<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor}"/>
+			<Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGHoverColor}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource TsundokuMenuButtonBorderHoverColor}"/>
+			<Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconHoverColor}"/>
 			<Setter Property="RenderTransform" Value="scale(0.98)" />
 		</Style>
 
 		<Style Selector="^:disabled">
-			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}"/>
-			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor}"/>
-			<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor}"/>
+			<Setter Property="Opacity" Value="0.4"/>
+			<Setter Property="Cursor" Value="Arrow"/>
+		</Style>
+	</ControlTheme>
+
+	<ControlTheme x:Key="SeriesCardButton" TargetType="Button">
+		<Setter Property="HorizontalContentAlignment" Value="Center"/>
+		<Setter Property="VerticalContentAlignment" Value="Center"/>
+		<Setter Property="CornerRadius" Value="8"/>
+		<Setter Property="FontSize" Value="18"/>
+		<Setter Property="FontWeight" Value="Bold"/>
+		<Setter Property="BorderThickness" Value="2"/>
+		<Setter Property="Padding" Value="0,0,0,2"/>
+		<Setter Property="Cursor" Value="Hand"/>
+		<Setter Property="Width" Value="28"/>
+		<Setter Property="Height" Value="28"/>
+		<Setter Property="Background" Value="{DynamicResource TsundokuSeriesCardButtonBGColor}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource TsundokuSeriesCardButtonBorderColor}"/>
+		<Setter Property="Foreground" Value="{DynamicResource TsundokuSeriesButtonIconColor}"/>
+
+		<Setter Property="Template">
+			<ControlTemplate>
+				<ContentPresenter x:Name="PART_ContentPresenter"
+								Background="{TemplateBinding Background}"
+								BorderBrush="{TemplateBinding BorderBrush}"
+								BorderThickness="{TemplateBinding BorderThickness}"
+								CornerRadius="{TemplateBinding CornerRadius}"
+								Content="{TemplateBinding Content}"
+								ContentTemplate="{TemplateBinding ContentTemplate}"
+								Padding="{TemplateBinding Padding}"
+								RecognizesAccessKey="True"
+								HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+								VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+			</ControlTemplate>
+		</Setter>
+
+		<Style Selector="^:pointerover">
+			<Setter Property="Background" Value="{DynamicResource TsundokuSeriesCardButtonBGHoverColor}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource TsundokuSeriesCardButtonBorderHoverColor}"/>
+			<Setter Property="Foreground" Value="{DynamicResource TsundokuSeriesButtonIconHoverColor}"/>
+		</Style>
+
+		<Style Selector="^:pressed">
+			<Setter Property="Background" Value="{DynamicResource TsundokuSeriesCardButtonBGHoverColor}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource TsundokuSeriesCardButtonBorderHoverColor}"/>
+			<Setter Property="Foreground" Value="{DynamicResource TsundokuSeriesButtonIconHoverColor}"/>
 		</Style>
 	</ControlTheme>
 
 	<ControlTheme x:Key="MenuToggleButton" TargetType="ToggleButton">
-        <Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGColor}"/>
-		<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor}"/>
-		<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor}"/>
+        <Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGColor}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource TsundokuMenuButtonBorderColor}"/>
+		<Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
         <Setter Property="BorderThickness" Value="2" />
-        <Setter Property="CornerRadius" Value="2" />
-        <Setter Property="Padding" Value="{DynamicResource ButtonPadding}" />
+        <Setter Property="CornerRadius" Value="9" />
+        <Setter Property="Padding" Value="0" />
         <Setter Property="HorizontalAlignment" Value="Center" />
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
@@ -232,7 +278,6 @@
         <Setter Property="FontSize" Value="15" />
         <Setter Property="FontWeight" Value="Bold" />
         <Setter Property="RenderTransform" Value="none" />
-        <Setter Property="Height" Value="37" />
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Transitions">
         <Transitions>
@@ -257,30 +302,35 @@
         </Setter>
 	
 		<Style Selector="^:pointerover">
-			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}"/>
-			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor}"/>
-			<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor}"/>
+			<Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGHoverColor}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource TsundokuMenuButtonBorderHoverColor}"/>
+			<Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconHoverColor}"/>
 		</Style>
 
 		<Style Selector="^:pressed">
-			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}"/>
-			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor}"/>
-			<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor}"/>
+			<Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGHoverColor}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource TsundokuMenuButtonBorderHoverColor}"/>
+			<Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconHoverColor}"/>
 		</Style>
 
 		<Style Selector="^:checked">
 			<Style Selector="^">
-				<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}"/>
-				<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor}"/>
-				<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor}"/>
+				<Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGHoverColor}"/>
+				<Setter Property="BorderBrush" Value="{DynamicResource TsundokuMenuButtonBorderHoverColor}"/>
+				<Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconHoverColor}"/>
 			</Style>
+		</Style>
+
+		<Style Selector="^:disabled">
+			<Setter Property="Opacity" Value="0.4"/>
+			<Setter Property="Cursor" Value="Arrow"/>
 		</Style>
     </ControlTheme>
     
     <ControlTheme x:Key="QueryListBox" TargetType="ListBox">
-		<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGColor}"/>
-		<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor}"/>
-        <Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor}"/>
+		<Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGColor}"/>
+		<Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconHoverColor}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource TsundokuMenuButtonBorderColor}"/>
         <Setter Property="BorderThickness" Value="2" />
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
         <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
@@ -288,17 +338,18 @@
         <Setter Property="ScrollViewer.IsScrollInertiaEnabled" Value="True" />
         <Setter Property="FontSize" Value="15" />
         <Setter Property="FontWeight" Value="Bold" />
-        <Setter Property="CornerRadius" Value="2" />
+        <Setter Property="CornerRadius" Value="9" />
+        <Setter Property="ClipToBounds" Value="True" />
         <Setter Property="Cursor" Value="Hand"/>
 
         <Setter Property="Template">
             <ControlTemplate>
                 <Border Name="border"
-                        ClipToBounds="{TemplateBinding ClipToBounds}"
                         Background="{TemplateBinding Background}"
                         BorderBrush="{TemplateBinding BorderBrush}"
                         BorderThickness="{TemplateBinding BorderThickness}"
                         CornerRadius="{TemplateBinding CornerRadius}">
+                  <Border CornerRadius="7" ClipToBounds="True">
                     <ScrollViewer Name="PART_ScrollViewer"
                                     VerticalSnapPointsType="{TemplateBinding (ScrollViewer.VerticalSnapPointsType)}"
                                     HorizontalSnapPointsType="{TemplateBinding (ScrollViewer.HorizontalSnapPointsType)}"
@@ -314,68 +365,83 @@
                                         ItemsPanel="{TemplateBinding ItemsPanel}"
                                         Margin="{TemplateBinding Padding}"/>
                     </ScrollViewer>
+                  </Border>
                 </Border>
             </ControlTemplate>
         </Setter>
 	</ControlTheme>
-    
+
     <!-- <Thickness x:Key="ListBoxItemPadding">12,9,12,12</Thickness> -->
     <ControlTheme x:Key="QueryListBoxItem" TargetType="ListBoxItem">
         <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="Padding" Value="12,9,12,12" />
-        <Setter Property="BorderThickness" Value="0,1,0,1" />
-        <Setter Property="BorderBrush" Value="{Binding DataContext.CurrentTheme.MenuButtonBorderColor, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
-        <Setter Property="Foreground" Value="{Binding DataContext.CurrentTheme.MenuButtonTextAndIconColor, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
-        <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+        <Setter Property="Padding" Value="8,3" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="BorderBrush" Value="{DynamicResource TsundokuMenuButtonBorderColor}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-        
+
         <Setter Property="Template">
             <ControlTemplate>
-                <ContentPresenter Name="PART_ContentPresenter"
-                                  Foreground="{TemplateBinding Foreground}"
-                                  Background="{TemplateBinding Background}"
-                                  BorderBrush="{TemplateBinding BorderBrush}"
-                                  BorderThickness="{TemplateBinding BorderThickness}"
-                                  CornerRadius="{TemplateBinding CornerRadius}"
-                                  ContentTemplate="{TemplateBinding ContentTemplate}"
-                                  Content="{TemplateBinding Content}"
-                                  FontWeight="Bold"
-                                  FontSize="15"
-                                  Padding="{TemplateBinding Padding}"
-                                  VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-                                  HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" />
+                <Border Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        Padding="{TemplateBinding Padding}">
+                    <Grid ColumnDefinitions="Auto,8,*">
+                        <Border Grid.Column="0" Width="18" Height="18" CornerRadius="4"
+                                BorderThickness="2" VerticalAlignment="Center"
+                                BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}"
+                                Background="{DynamicResource TsundokuMenuButtonBGColor}">
+                            <PathIcon Width="10" Height="10"
+                                      HorizontalAlignment="Center" VerticalAlignment="Center"
+                                      Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}"
+                                      IsVisible="{TemplateBinding IsSelected}"
+                                      Data="M1 4.5L3.5 7L7 1"/>
+                        </Border>
+                        <ContentPresenter Name="PART_ContentPresenter"
+                                          Grid.Column="2"
+                                          Foreground="{TemplateBinding Foreground}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                          Content="{TemplateBinding Content}"
+                                          FontWeight="SemiBold"
+                                          FontSize="12"
+                                          VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" />
+                    </Grid>
+                </Border>
             </ControlTemplate>
         </Setter>
 
         <Style Selector="^:pointerover">
-			<Setter Property="Background" Value="{Binding DataContext.CurrentTheme.MenuButtonBGHoverColor, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
-			<Setter Property="BorderBrush" Value="{Binding DataContext.CurrentTheme.MenuButtonBorderHoverColor, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
+			<Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGHoverColor}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource TsundokuMenuButtonBorderHoverColor}"/>
 		</Style>
 
         <Style Selector="^:pressed">
-			<Setter Property="Background" Value="{Binding DataContext.CurrentTheme.MenuButtonBGHoverColor, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
-			<Setter Property="BorderBrush" Value="{Binding DataContext.CurrentTheme.MenuButtonBorderHoverColor, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
+			<Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGHoverColor}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource TsundokuMenuButtonBorderHoverColor}"/>
 		</Style>
 
 		<Style Selector="^:selected">
 			<Style Selector="^">
-				<Setter Property="Background" Value="{Binding DataContext.CurrentTheme.MenuButtonBGHoverColor, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
-				<Setter Property="BorderBrush" Value="{Binding DataContext.CurrentTheme.MenuButtonBorderHoverColor, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
+				<Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGHoverColor}"/>
+				<Setter Property="BorderBrush" Value="{DynamicResource TsundokuMenuButtonBorderHoverColor}"/>
 			</Style>
 
             <Style Selector="^:not(:focus)">
-				<Setter Property="Background" Value="{Binding DataContext.CurrentTheme.MenuButtonBGHoverColor, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
-				<Setter Property="BorderBrush" Value="{Binding DataContext.CurrentTheme.MenuButtonBorderHoverColor, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
+				<Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGHoverColor}"/>
+				<Setter Property="BorderBrush" Value="{DynamicResource TsundokuMenuButtonBorderHoverColor}"/>
 			</Style>
 
 			<!-- <Style Selector="^:pointerover">
-				<Setter Property="Background" Value="{Binding DataContext.CurrentTheme.MenuButtonBGColor, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
-				<Setter Property="BorderBrush" Value="{Binding DataContext.CurrentTheme.MenuButtonBorderColor, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
+				<Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGColor}"/>
+				<Setter Property="BorderBrush" Value="{DynamicResource TsundokuMenuButtonBorderColor}"/>
 			</Style> -->
 
             <Style Selector="^:pressed">
-				<Setter Property="Background" Value="{Binding DataContext.CurrentTheme.MenuButtonBGColor, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
-				<Setter Property="BorderBrush" Value="{Binding DataContext.CurrentTheme.MenuButtonBorderColor, RelativeSource={RelativeSource AncestorType=ListBox}}"/>
+				<Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGColor}"/>
+				<Setter Property="BorderBrush" Value="{DynamicResource TsundokuMenuButtonBorderColor}"/>
 			</Style>
 		</Style>
     </ControlTheme>
@@ -383,9 +449,9 @@
     <sys:Double x:Key="ToolTipContentMaxWidth">320</sys:Double>
     <ControlTheme x:Key="{x:Type ToolTip}" TargetType="ToolTip">
         <Setter Property="FontWeight" Value="Bold" />
-        <Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuBGColor}"/>
-		<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor}"/>
-		<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor}"/>
+        <Setter Property="Background" Value="{DynamicResource TsundokuMenuBGColor}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource TsundokuMenuButtonBorderColor}"/>
+		<Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
         <Setter Property="BorderThickness" Value="2" />
         <Setter Property="FontSize" Value="{DynamicResource ToolTipContentThemeFontSize}" />
         <Setter Property="Padding" Value="{DynamicResource ToolTipBorderThemePadding}" />
@@ -420,7 +486,7 @@
     </ControlTheme>
 
     <ControlTheme x:Key="FluentScrollBarThumb" TargetType="Thumb">
-        <Setter Property="Background" Value="{CompiledBinding CurrentTheme.DividerColor}"/>
+        <Setter Property="Background" Value="{DynamicResource TsundokuDividerColor}"/>
         <Setter Property="Template">
             <Setter.Value>
             <ControlTemplate>
@@ -437,19 +503,19 @@
         </Setter>
 
         <Style Selector="^:pointerover /template/ Border">
-            <Setter Property="Background" Value="{CompiledBinding CurrentTheme.DividerColor}" />
+            <Setter Property="Background" Value="{DynamicResource TsundokuDividerColor}" />
         </Style>
         <Style Selector="^:pressed  /template/ Border">
-            <Setter Property="Background" Value="{CompiledBinding CurrentTheme.DividerColor}" />
+            <Setter Property="Background" Value="{DynamicResource TsundokuDividerColor}" />
         </Style>
     </ControlTheme>
 
     <ControlTheme x:Key="ReverseFluentScrollBarLineButton" TargetType="RepeatButton">
         <Setter Property="Opacity" Value="0" />
-        <Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentTheme.DividerColor}"/>
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource TsundokuDividerColor}"/>
         <Setter Property="Template">
             <ControlTemplate>
-            <ContentPresenter Background="{CompiledBinding CurrentTheme.CollectionBGColor}"
+            <ContentPresenter Background="{DynamicResource TsundokuCollectionBGColor}"
                             BorderBrush="{DynamicResource ScrollBarButtonBorderBrush}"
                             Content="{TemplateBinding Content}"/>
             </ControlTemplate>
@@ -461,26 +527,26 @@
         </Setter>
 
         <Style Selector="^:pointerover">
-            <Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor}"/>
+            <Setter Property="TextElement.Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconHoverColor}"/>
 
             <Style Selector="^ /template/ ContentPresenter" >
-                <Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}"/>
-                <Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor}"/>
+                <Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGHoverColor}"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource TsundokuMenuButtonBorderHoverColor}"/>
             </Style>
         </Style>
 
         <!-- <Style Selector="^:pressed">
-            <Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentTheme.MenuBGColor}"/>
+            <Setter Property="TextElement.Foreground" Value="{DynamicResource TsundokuMenuBGColor}"/>
             <Style Selector="^ /template/ ContentPresenter" >
-            <Setter Property="Background" Value="{CompiledBinding CurrentTheme.DividerColor}" />
-            <Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor}" />
+            <Setter Property="Background" Value="{DynamicResource TsundokuDividerColor}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource TsundokuMenuButtonBorderColor}" />
             </Style>
         </Style>
 
         <Style Selector="^:pointerover">
-            <Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor}"/>
-            <Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}"/>
-            <Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor}"/>
+            <Setter Property="TextElement.Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconHoverColor}"/>
+            <Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGHoverColor}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource TsundokuMenuButtonBorderHoverColor}"/>
         </Style> -->
     </ControlTheme>
 
@@ -497,7 +563,7 @@
                             BorderBrush="{TemplateBinding BorderBrush}">
                         <Grid RowDefinitions="Auto,*,Auto">
                         <Rectangle x:Name="TrackRect"
-                                    Fill="{CompiledBinding CurrentTheme.CollectionBGColor}"
+                                    Fill="{DynamicResource TsundokuCollectionBGColor}"
                                     Stroke="{DynamicResource ScrollBarTrackStroke}"
                                     StrokeThickness="{DynamicResource ScrollBarTrackBorderThemeThickness}"
                                     Opacity="0"
@@ -570,7 +636,7 @@
                 <Setter Property="Background" Value="{DynamicResource ScrollBarBackgroundPointerOver}" />
             </Style>
             <Style Selector="^ /template/ Rectangle#TrackRect">
-                <Setter Property="Fill" Value="{CompiledBinding CurrentTheme.MenuBGColor}" />
+                <Setter Property="Fill" Value="{DynamicResource TsundokuMenuBGColor}" />
                 <Setter Property="Stroke" Value="{DynamicResource ScrollBarTrackStrokePointerOver}" />
                 <Setter Property="Opacity" Value="1" />
             </Style>
@@ -581,30 +647,30 @@
                 <Setter Property="Opacity" Value="1" />
             </Style>
             <Style Selector="^ /template/ PathIcon">
-                <Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.DividerColor}" />
+                <Setter Property="Foreground" Value="{DynamicResource TsundokuDividerColor}" />
             </Style>
         </Style>
 
         <Style Selector="^ /template/ RepeatButton#PART_LineUpButton, ^ /template/ RepeatButton#PART_LineDownButton">
-            <Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentTheme.DividerColor}"/>
+            <Setter Property="TextElement.Foreground" Value="{DynamicResource TsundokuDividerColor}"/>
             <Style Selector="^:pointerover">
-                <Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentTheme.CollectionBGColor}"/>
+                <Setter Property="TextElement.Foreground" Value="{DynamicResource TsundokuCollectionBGColor}"/>
 
                 <Style Selector="^ /template/ ContentPresenter" >
-                    <Setter Property="Background" Value="{CompiledBinding CurrentTheme.DividerColor}"/>
+                    <Setter Property="Background" Value="{DynamicResource TsundokuDividerColor}"/>
                 </Style>
                 <Style Selector="^ PathIcon">
-                    <Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.CollectionBGColor}" />
+                    <Setter Property="Foreground" Value="{DynamicResource TsundokuCollectionBGColor}" />
                 </Style>
             </Style>
 
             <Style Selector="^:pressed">
-                <Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentTheme.MenuBGColor}"/>
+                <Setter Property="TextElement.Foreground" Value="{DynamicResource TsundokuMenuBGColor}"/>
                 <Style Selector="^ /template/ ContentPresenter" >
-                    <Setter Property="Background" Value="{CompiledBinding CurrentTheme.DividerColor}" />
+                    <Setter Property="Background" Value="{DynamicResource TsundokuDividerColor}" />
                 </Style>
                 <Style Selector="^ PathIcon">
-                    <Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.CollectionBGColor}" />
+                    <Setter Property="Foreground" Value="{DynamicResource TsundokuCollectionBGColor}" />
                 </Style>
             </Style>
         </Style>

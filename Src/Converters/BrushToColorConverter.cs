@@ -2,7 +2,6 @@ using System.Globalization;
 using System.Runtime.CompilerServices;
 using Avalonia.Data.Converters;
 using Avalonia.Media;
-using Avalonia.Media.Immutable;
 
 namespace Tsundoku.Converters;
 
@@ -21,15 +20,13 @@ public sealed class BrushToColorConverter : IValueConverter
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        // Zero-alloc if already a brush
-        if (value is ISolidColorBrush solid) return solid;
+        if (value is SolidColorBrush brush) return brush;
 
         if (value is Color color)
         {
-            // New immutable brush; safe under theme changes (no stale cache)
-            return new ImmutableSolidColorBrush(color);
+            return new SolidColorBrush(color);
         }
 
-        return new ImmutableSolidColorBrush(Colors.Transparent);
+        return new SolidColorBrush(Colors.Transparent);
     }
 }

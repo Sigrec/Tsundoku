@@ -1,8 +1,10 @@
-using System.Globalization;
 using Avalonia.Media.Imaging;
 
 namespace Tsundoku.Helpers;
 
+/// <summary>
+/// Provides extension methods and utility functions for string manipulation, bitmap cloning, and collection comparison.
+/// </summary>
 public static class ExtensionMethods
 {
     /// <summary>
@@ -72,11 +74,19 @@ public static class ExtensionMethods
         return new Bitmap(ms);     // Decode into new Bitmap
     }
     
+    /// <summary>
+    /// Computes the Levenshtein edit distance between two strings, returning -1 if it exceeds the maximum allowed distance.
+    /// </summary>
+    /// <param name="s">The first string to compare.</param>
+    /// <param name="t">The second string to compare.</param>
+    /// <param name="maxDistance">The maximum edit distance threshold; results beyond this return -1.</param>
+    /// <returns>The edit distance if within the threshold; otherwise, -1.</returns>
     public static int Similar(string? s, string? t, int maxDistance)
     {
         if (string.IsNullOrWhiteSpace(s))
         {
-            return string.IsNullOrEmpty(t) || t.Length <= maxDistance ? t.Length : -1;
+            if (string.IsNullOrEmpty(t)) return 0;
+            return t.Length <= maxDistance ? t.Length : -1;
         }
 
         if (string.IsNullOrWhiteSpace(t))
@@ -166,6 +176,11 @@ public static class ExtensionMethods
         }
     }
 
+    /// <summary>
+    /// Removes all Unicode whitespace characters from the input string in a single pass.
+    /// </summary>
+    /// <param name="input">The string to strip whitespace from.</param>
+    /// <returns>A new string with all whitespace characters removed.</returns>
     public static string RemoveInPlaceCharArray(string input)
     {
         int len = input.Length;
@@ -210,47 +225,6 @@ public static class ExtensionMethods
         return new string(src, 0, dstIdx);
     }
 
-    public static void PrintCultures()
-    {
-        List<string> list = [];
-        foreach (CultureInfo ci in CultureInfo.GetCultures(CultureTypes.AllCultures))
-        {
-            string specName = "(none)";
-            try
-            {
-                specName = CultureInfo.CreateSpecificCulture(ci.Name).Name;
-            }
-            catch { }
-            list.Add(string.Format("{0,-12}{1,-12}{2}", ci.Name, specName, ci.EnglishName));
-        }
-
-        list.Sort();  // sort by name
-
-        using (StreamWriter outputFile = new StreamWriter(@"CurrentCultures.txt"))
-        {
-            // write to file
-            outputFile.WriteLine("CULTURE   SPEC.CULTURE  ENGLISH NAME");
-            outputFile.WriteLine("--------------------------------------------------------------");
-            foreach (string str in list)
-            {
-                outputFile.WriteLine(str);
-            }
-        }
-    }
-
-    public static void PrintCurrencySymbols()
-    {
-        string[] symbols = CultureInfo.GetCultures(CultureTypes.SpecificCultures).Select(ci => ci.Name).Distinct().Select(id => new RegionInfo(id)).Select(r => r.CurrencySymbol).Distinct().ToArray();
-        using (StreamWriter outputFile = new StreamWriter(@"CurrencySymbols.txt"))
-        {
-            // write to file
-            foreach (string str in symbols)
-            {
-                outputFile.WriteLine(str);
-            }
-        }
-    }
-    
     /// <summary>
     /// Returns true if both dictionaries are null, or both non-null with identical key sets 
     /// and equal values for each key.

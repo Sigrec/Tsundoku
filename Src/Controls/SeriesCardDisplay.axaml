@@ -10,6 +10,28 @@
     x:Name="Root"
     x:DataType="controls:SeriesCardDisplay">
 
+  <UserControl.Styles>
+    <StyleInclude Source="avares://Tsundoku/Styles/CardScrollBarStyles.axaml"/>
+    <Style Selector="Image.cover-img">
+      <Setter Property="RenderTransform" Value="scale(1, 1)"/>
+      <Setter Property="Transitions">
+        <Transitions>
+          <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.2"/>
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Border.card-hover:pointerover Image.cover-img">
+      <Setter Property="RenderTransform" Value="scale(1.05, 1.05)"/>
+    </Style>
+    <!-- Glassmorphism: reduce solid BG opacity and show acrylic when GlassEnabled is true -->
+    <Style Selector="controls|SeriesCardDisplay[GlassEnabled=True] Border#CardSolidBG">
+      <Setter Property="Opacity" Value="0.3"/>
+    </Style>
+    <Style Selector="controls|SeriesCardDisplay[GlassEnabled=True] ExperimentalAcrylicBorder#CardAcrylicBorder">
+      <Setter Property="IsVisible" Value="True"/>
+    </Style>
+  </UserControl.Styles>
+
   <UserControl.Resources>
     <ResourceDictionary>
       <cv:TitleLangConverter x:Key="ConvertTitle"/>
@@ -23,429 +45,284 @@
       <DataTemplate x:DataType="m:Series">
 
         <Border
-            Background="Transparent"
-            Margin="20"
-            BorderBrush="Transparent"
-            BorderThickness="0"
-            CornerRadius="8"
+            Name="CardBorder"
+            Margin="12"
+            CornerRadius="14"
+            BorderThickness="2"
+            BorderBrush="{DynamicResource TsundokuSeriesCardBorderColor}"
             BoxShadow="0 0 15 6 #B3000000"
-            Width="{CompiledBinding Source={x:Static m:Constants.CARD_WIDTH}}">
+            Width="{CompiledBinding Source={x:Static m:Constants.CARD_WIDTH}}"
+            Height="{CompiledBinding Source={x:Static m:Constants.CARD_HEIGHT}}"
+            UseLayoutRounding="True"
+            Classes="card-hover">
+          <Border.Styles>
+            <Style Selector="Border.card-hover">
+              <Setter Property="RenderTransform" Value="translate(0px, 0px)"/>
+            </Style>
+            <Style Selector="Border.card-hover:pointerover">
+              <Setter Property="RenderTransform" Value="translate(0px, -4px)"/>
+            </Style>
+          </Border.Styles>
+          <Border.Transitions>
+            <Transitions>
+              <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.3" Easing="CubicEaseOut"/>
+            </Transitions>
+          </Border.Transitions>
 
-          <Border
-              CornerRadius="8"
-              ClipToBounds="True"
-              Width="{CompiledBinding Source={x:Static m:Constants.CARD_WIDTH}}">
+          <Border CornerRadius="14" ClipToBounds="True" Name="CardInner">
+            <Grid ColumnDefinitions="Auto,*">
 
-            <Grid
-                Width="{CompiledBinding Source={x:Static m:Constants.CARD_WIDTH}}"
-                Grid.ColumnDefinitions="Auto,Auto"
-                ShowGridLines="False">
-
-              <!-- ── ToolTip Styles (theme from MainViewModel) ── -->
+              <!-- ── Hover + ToolTip Styles ── -->
               <Grid.Styles>
                 <Style Selector="ToolTip">
-                  <Setter
-                      Property="Background"
-                      Value="{Binding CardTheme.StatusAndBookTypeBGColor, ElementName=Root}" />
-                  <Setter
-                      Property="BorderBrush"
-                      Value="{Binding CardTheme.MenuButtonBorderColor, ElementName=Root}" />
-                  <Setter
-                      Property="Foreground"
-                      Value="{Binding CardTheme.MenuButtonTextAndIconColor, ElementName=Root}" />
+                  <Setter Property="Background" Value="{DynamicResource TsundokuStatusAndBookTypeBGColor}"/>
+                  <Setter Property="BorderBrush" Value="{DynamicResource TsundokuMenuButtonBorderColor}"/>
+                  <Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
                 </Style>
               </Grid.Styles>
 
-              <!-- ── Left Side Card ───────────────────────────────────────────── -->
-              <Canvas
+              <!-- ── Left Side: Cover ── -->
+              <Panel
                   Grid.Column="0"
+                  Width="{CompiledBinding Source={x:Static m:Constants.LEFT_SIDE_CARD_WIDTH}}"
                   PointerPressed="OpenSiteLink"
-                  OpacityMask="White"
                   Cursor="Hand"
-                  Width="{CompiledBinding Source={x:Static m:Constants.LEFT_SIDE_CARD_WIDTH}}">
+                  Background="{DynamicResource TsundokuSeriesCoverBGColor}">
 
-                <Canvas.Styles>
-                  <Style Selector="TextBlock.mouseover">
-                    <Setter
-                        Property="Background"
-                        Value="{Binding CardTheme.StatusAndBookTypeBGHoverColor, ElementName=Root}" />
-                    <Setter
-                        Property="Foreground"
-                        Value="{Binding CardTheme.StatusAndBookTypeTextHoverColor, ElementName=Root}" />
-                  </Style>
-                  <Style Selector="TextBlock.nomouseover">
-                    <Setter
-                        Property="Background"
-                        Value="{Binding CardTheme.StatusAndBookTypeBGColor, ElementName=Root}" />
-                    <Setter
-                        Property="Foreground"
-                        Value="{Binding CardTheme.StatusAndBookTypeTextColor, ElementName=Root}" />
-                  </Style>
-                </Canvas.Styles>
-
-                <!-- Top Left: Cover Image -->
+                <!-- Cover Image (full height) -->
                 <Image
+                    Classes="cover-img"
                     Height="{CompiledBinding Source={x:Static m:Constants.IMAGE_HEIGHT}}"
                     Width="{CompiledBinding Source={x:Static m:Constants.LEFT_SIDE_CARD_WIDTH}}"
                     Source="{CompiledBinding CoverBitMap}"
-                    ClipToBounds="True" />
+                    RenderOptions.BitmapInterpolationMode="LowQuality"
+                    Stretch="UniformToFill"
+                    IsVisible="{CompiledBinding CoverBitMap, Converter={x:Static ObjectConverters.IsNotNull}}"/>
 
-                <!-- Bottom Left: Status | Format -->
-                <TextBlock
-                    Canvas.Bottom="0"
-                    Classes.mouseover="{CompiledBinding $parent.IsPointerOver}"
-                    Classes.nomouseover="{CompiledBinding !$parent.IsPointerOver}"
-                    Width="{CompiledBinding Source={x:Static m:Constants.LEFT_SIDE_CARD_WIDTH}}"
-                    Height="{CompiledBinding Source={x:Static m:Constants.BOTTOM_SECTION_CARD_HEIGHT}}"
-                    FontWeight="Bold"
+                <!-- Missing Cover Fallback -->
+                <StackPanel
+                    IsVisible="{CompiledBinding CoverBitMap, Converter={x:Static ObjectConverters.IsNull}}"
+                    VerticalAlignment="Center"
                     HorizontalAlignment="Center"
-                    FontSize="17"
-                    TextAlignment="Center"
-                    Padding="0,8,0,0">
-                  <TextBlock.Text>
-                    <MultiBinding StringFormat="{}{0} | {1}" Mode="OneWay">
-                      <Binding Path="Status" />
-                      <Binding Path="Format" />
-                    </MultiBinding>
-                  </TextBlock.Text>
-                </TextBlock>
-              </Canvas>
-
-              <!-- ── Right Side Series Card ───────────────────────────────────── -->
-              <Grid
-                  Grid.Row="0"
-                  Grid.Column="1"
-                  Width="{CompiledBinding Source={x:Static m:Constants.RIGHT_SIDE_CARD_WIDTH}}"
-                  RowDefinitions="Auto,40"
-                  ShowGridLines="False">
-
-                <Grid.Styles>
-                  <Style Selector="ScrollViewer">
-                    <Setter Property="IsScrollChainingEnabled" Value="False" />
-                  </Style>
-                  <Style Selector="ScrollBar:vertical">
-                    <Style Selector="^ /template/ Rectangle#TrackRect">
-                      <Setter
-                          Property="Fill"
-                          Value="{Binding CardTheme.CollectionBGColor, ElementName=Root}" />
-                    </Style>
-                    <Style Selector="^ /template/ Thumb">
-                      <Setter
-                          Property="Background"
-                          Value="{Binding CardTheme.DividerColor, ElementName=Root}" />
-                      <Style Selector="^:pointerover /template/ Border">
-                        <Setter
-                            Property="Background"
-                            Value="{Binding CardTheme.DividerColor, ElementName=Root}" />
-                      </Style>
-                      <Style Selector="^:pressed /template/ Border">
-                        <Setter
-                            Property="Background"
-                            Value="{Binding CardTheme.DividerColor, ElementName=Root}" />
-                      </Style>
-                    </Style>
-                    <Style Selector="^[IsExpanded=true]">
-                      <Style Selector="^ /template/ Thumb">
-                        <Setter
-                            Property="Background"
-                            Value="{Binding CardTheme.DividerColor, ElementName=Root}" />
-                      </Style>
-                      <Style Selector="^ /template/ PathIcon">
-                        <Setter
-                            Property="Foreground"
-                            Value="{Binding CardTheme.DividerColor, ElementName=Root}" />
-                      </Style>
-                      <Style Selector="^ /template/ Rectangle#TrackRect">
-                        <Setter
-                            Property="Fill"
-                            Value="{Binding CardTheme.MenuBGColor, ElementName=Root}" />
-                      </Style>
-                    </Style>
-                    <Style Selector="^ /template/ RepeatButton#PART_LineUpButton, ^ /template/ RepeatButton#PART_LineDownButton">
-                      <Setter
-                          Property="TextElement.Foreground"
-                          Value="{Binding CardTheme.DividerColor, ElementName=Root}" />
-                      <Style Selector="^:pointerover">
-                        <Setter
-                            Property="TextElement.Foreground"
-                            Value="{Binding CardTheme.MenuButtonTextAndIconHoverColor, ElementName=Root}" />
-                        <Style Selector="^ /template/ ContentPresenter">
-                          <Setter
-                              Property="Background"
-                              Value="{Binding CardTheme.DividerColor, ElementName=Root}" />
-                        </Style>
-                        <Style Selector="^ PathIcon">
-                          <Setter
-                              Property="Foreground"
-                              Value="{Binding CardTheme.CollectionBGColor, ElementName=Root}" />
-                        </Style>
-                      </Style>
-                      <Style Selector="^:pressed">
-                        <Setter
-                            Property="TextElement.Foreground"
-                            Value="{Binding CardTheme.MenuBGColor, ElementName=Root}" />
-                        <Style Selector="^ /template/ ContentPresenter">
-                          <Setter
-                              Property="Background"
-                              Value="{Binding CardTheme.DividerColor, ElementName=Root}" />
-                        </Style>
-                        <Style Selector="^ PathIcon">
-                          <Setter
-                              Property="Foreground"
-                              Value="{Binding CardTheme.CollectionBGColor, ElementName=Root}" />
-                        </Style>
-                      </Style>
-                    </Style>
-                  </Style>
-                </Grid.Styles>
-
-                <!-- Top Right Section -->
-                <Grid
-                    Height="{CompiledBinding Source={x:Static m:Constants.TOP_SECTION_CARD_HEIGHT}}"
-                    Grid.Row="0"
-                    Width="{CompiledBinding Source={x:Static m:Constants.RIGHT_SIDE_CARD_WIDTH}}"
-                    Grid.RowDefinitions="Auto,Auto,Auto,*"
-                    Background="{Binding CardTheme.SeriesCardBGColor, ElementName=Root}"
-                    ShowGridLines="False">
-
-                  <Grid.Styles>
-                    <Style Selector="ScrollBar:vertical">
-                      <Style Selector="^[IsExpanded=true]">
-                        <Style Selector="^ /template/ Rectangle#TrackRect">
-                          <Setter
-                              Property="Fill"
-                              Value="{Binding CardTheme.CollectionBGColor, ElementName=Root}" />
-                        </Style>
-                      </Style>
-                    </Style>
-                  </Grid.Styles>
-
-                  <!-- Publisher -->
+                    Spacing="10">
+                  <PathIcon
+                      Data="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"
+                      Width="48" Height="48"
+                      Foreground="{DynamicResource TsundokuStatusAndBookTypeTextColor}"
+                      Opacity="0.3"/>
                   <TextBlock
-                      Grid.Row="0"
-                      Foreground="{Binding CardTheme.SeriesCardPublisherColor, ElementName=Root}"
-                      MaxLines="1"
+                      TextAlignment="Center"
+                      MaxLines="4"
+                      TextTrimming="CharacterEllipsis"
                       FontWeight="Bold"
-                      FontSize="15"
-                      Text="{CompiledBinding Publisher}"
-                      Padding="9,2,4,-1" />
-
-                  <!-- Series Title -->
-                  <TextBlock
-                      Grid.Row="1"
-                      x:Name="SeriesTitleTextBlock"
-                      TextWrapping="Wrap"
-                      Foreground="{Binding CardTheme.SeriesCardTitleColor, ElementName=Root}"
-                      FontWeight="Bold"
-                      FontSize="23"
-                      MaxHeight="{CompiledBinding Source={x:Static m:Constants.TOP_SECTION_CARD_HEIGHT}}"
-                      PointerPressed="CopySeriesTitleAsync"
-                      Padding="8,0,7,2"
-                      Cursor="Hand"
-                      TextAlignment="Left"
-                      TextTrimming="WordEllipsis"
-                      MaxLines="3"
-                      Width="{CompiledBinding Source={x:Static m:Constants.RIGHT_SIDE_CARD_WIDTH}}"
-                      LineHeight="25">
+                      FontSize="13"
+                      Foreground="{DynamicResource TsundokuStatusAndBookTypeTextColor}"
+                      Opacity="0.5"
+                      Width="{CompiledBinding Source={x:Static m:Constants.LEFT_SIDE_CARD_WIDTH}}"
+                      Padding="8,0">
                     <TextBlock.Text>
                       <MultiBinding Converter="{StaticResource ConvertTitle}" Mode="OneWay">
-                        <Binding Path="Titles" />
+                        <Binding Path="Titles"/>
                         <Binding Path="Language" ElementName="Root"/>
                       </MultiBinding>
                     </TextBlock.Text>
-                    <ToolTip.Tip>
-                      <TextBlock
-                          FontWeight="Bold"
-                          TextWrapping="Wrap"
-                          FontSize="18"
-                          TextTrimming="None"
-                          MaxLines="100"
-                          LineHeight="25">
-                        <TextBlock.Text>
-                          <MultiBinding Converter="{StaticResource ConvertTitle}" Mode="OneWay">
-                            <Binding Path="Titles" />
-                            <Binding Path="Language" ElementName="Root"/>
-                            <Binding Path="DuplicateIndex"/>
-                          </MultiBinding>
-                        </TextBlock.Text>
-                      </TextBlock>
-                    </ToolTip.Tip>
                   </TextBlock>
+                </StackPanel>
 
-                  <!-- Staff -->
+                <!-- Status/Format Badge Overlay (glassmorphic) -->
+                <Border
+                    VerticalAlignment="Bottom"
+                    HorizontalAlignment="Center"
+                    Margin="0,0,0,8"
+                    Background="{DynamicResource TsundokuStatusAndBookTypeBGColor}"
+                    BorderBrush="{DynamicResource TsundokuStatusAndBookTypeBorderColor}"
+                    BorderThickness="2"
+                    CornerRadius="8"
+                    Padding="10,4"
+                    Opacity="0.92"
+                    BoxShadow="0 2 8 0 #40000000">
                   <TextBlock
-                      TextWrapping="Wrap"
-                      Grid.Row="2"
+                      FontSize="11"
                       FontWeight="Bold"
-                      Foreground="{Binding CardTheme.SeriesCardStaffColor, ElementName=Root}"
-                      MaxLines="2"
-                      TextTrimming="WordEllipsis"
-                      FontSize="15"
-                      Padding="9,0,4,3">
+                      Foreground="{DynamicResource TsundokuStatusAndBookTypeTextColor}"
+                      TextAlignment="Center">
                     <TextBlock.Text>
-                      <MultiBinding Converter="{StaticResource ConvertStaff}" Mode="OneWay">
-                        <Binding Path="Staff" />
-                        <Binding Path="#Root.Language"/>
+                      <MultiBinding StringFormat="{}{0} · {1}" Mode="OneWay">
+                        <Binding Path="Status"/>
+                        <Binding Path="Format"/>
                       </MultiBinding>
                     </TextBlock.Text>
-                    <ToolTip.Tip>
-                      <TextBlock
-                          TextWrapping="Wrap"
-                          FontWeight="Bold"
-                          TextTrimming="None"
-                          MaxLines="100">
-                        <TextBlock.Text>
-                          <MultiBinding Converter="{StaticResource ConvertStaff}" Mode="OneWay">
-                            <Binding Path="Staff" />
-                            <Binding Path="#Root.Language"/>
-                          </MultiBinding>
-                        </TextBlock.Text>
-                      </TextBlock>
-                    </ToolTip.Tip>
                   </TextBlock>
+                </Border>
+              </Panel>
 
-                  <!-- Description ScrollViewer -->
-                  <ScrollViewer
-                      VerticalScrollBarVisibility="Auto"
-                      HorizontalScrollBarVisibility="Disabled"
-                      Grid.Row="3">
+              <!-- ── Right Side: Info + Progress ── -->
+              <Panel Grid.Column="1" UseLayoutRounding="True">
+                <!-- Solid fallback background -->
+                <Border Name="CardSolidBG" Background="{DynamicResource TsundokuSeriesCardBGColor}"/>
+                <!-- Glassmorphism acrylic overlay -->
+                <ExperimentalAcrylicBorder
+                    Name="CardAcrylicBorder"
+                    IsVisible="False">
+                  <ExperimentalAcrylicBorder.Material>
+                    <ExperimentalAcrylicMaterial
+                        BackgroundSource="Digger"
+                        TintColor="#1A1A2E"
+                        TintOpacity="0.75"
+                        MaterialOpacity="0.6"/>
+                  </ExperimentalAcrylicBorder.Material>
+                </ExperimentalAcrylicBorder>
+                <Grid>
+                <Grid RowDefinitions="*,Auto">
+
+                  <!-- Info Section -->
+                  <Grid
+                      Grid.Row="0"
+                      RowDefinitions="Auto,Auto,Auto,*"
+                      Margin="10,4,10,0">
+
+                    <!-- Publisher -->
                     <TextBlock
+                        Grid.Row="0"
+                        Foreground="{DynamicResource TsundokuSeriesCardPublisherColor}"
+                        MaxLines="1"
+                        FontWeight="SemiBold"
+                        FontSize="12"
+                        Text="{CompiledBinding Publisher}"
+                        IsHitTestVisible="False"
+                        Padding="0"/>
+
+                    <!-- Series Title -->
+                    <TextBlock
+                        Grid.Row="1"
+                        x:Name="SeriesTitleTextBlock"
+                        TextWrapping="Wrap"
+                        Foreground="{DynamicResource TsundokuSeriesCardTitleColor}"
+                        FontWeight="Bold"
+                        FontSize="22"
+                        PointerPressed="CopySeriesTitleAsync"
+                        Cursor="Hand"
+                        TextAlignment="Left"
+                        TextTrimming="CharacterEllipsis"
+                        MaxLines="2"
+                        Padding="0,0,4,0">
+                      <TextBlock.Text>
+                        <MultiBinding Converter="{StaticResource ConvertTitle}" Mode="OneWay">
+                          <Binding Path="Titles"/>
+                          <Binding Path="Language" ElementName="Root"/>
+                        </MultiBinding>
+                      </TextBlock.Text>
+                      <ToolTip.Tip>
+                        <TextBlock FontWeight="Bold" TextWrapping="Wrap" FontSize="18" TextTrimming="None" MaxLines="100" LineSpacing="2">
+                          <TextBlock.Text>
+                            <MultiBinding Converter="{StaticResource ConvertTitle}" Mode="OneWay">
+                              <Binding Path="Titles"/>
+                              <Binding Path="Language" ElementName="Root"/>
+                              <Binding Path="DuplicateIndex"/>
+                            </MultiBinding>
+                          </TextBlock.Text>
+                        </TextBlock>
+                      </ToolTip.Tip>
+                    </TextBlock>
+
+                    <!-- Staff -->
+                    <TextBlock
+                        Grid.Row="2"
                         TextWrapping="Wrap"
                         FontWeight="Bold"
-                        Foreground="{Binding CardTheme.SeriesCardDescColor, ElementName=Root}"
-                        Opacity="0.9"
-                        Text="{CompiledBinding Description}"
-                        Padding="10,-2,20,5" />
-                  </ScrollViewer>
-                </Grid>
+                        Foreground="{DynamicResource TsundokuSeriesCardStaffColor}"
+                        MaxLines="1"
+                        TextTrimming="CharacterEllipsis"
+                        FontSize="13"
+                        Padding="0,0,4,4">
+                      <TextBlock.Text>
+                        <MultiBinding Converter="{StaticResource ConvertStaff}" Mode="OneWay">
+                          <Binding Path="Staff"/>
+                          <Binding Path="#Root.Language"/>
+                        </MultiBinding>
+                      </TextBlock.Text>
+                      <ToolTip.Tip>
+                        <TextBlock TextWrapping="Wrap" FontWeight="Bold" TextTrimming="None" MaxLines="100">
+                          <TextBlock.Text>
+                            <MultiBinding Converter="{StaticResource ConvertStaff}" Mode="OneWay">
+                              <Binding Path="Staff"/>
+                              <Binding Path="#Root.Language"/>
+                            </MultiBinding>
+                          </TextBlock.Text>
+                        </TextBlock>
+                      </ToolTip.Tip>
+                    </TextBlock>
 
-                <!-- Bottom Right Side (Progress + Buttons) -->
-                <Grid
-                    Height="{CompiledBinding Source={x:Static m:Constants.BOTTOM_SECTION_CARD_HEIGHT}}"
-                    Background="{Binding CardTheme.SeriesProgressBGColor, ElementName=Root}"
-                    Width="{CompiledBinding Source={x:Static m:Constants.RIGHT_SIDE_CARD_WIDTH}}"
-                    Grid.Row="1"
-                    ColumnDefinitions="Auto,Auto">
-
-                  <Grid.Styles>
-                    <Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-                      <Setter Property="Background" Value="Transparent"/>
-                      <Setter
-                          Property="TextBlock.Foreground"
-                          Value="{Binding CardTheme.SeriesButtonIconHoverColor, ElementName=Root}" />
-                    </Style>
-                  </Grid.Styles>
-
-                  <Grid
-                      ColumnDefinitions="Auto"
-                      RowDefinitions="40"
-                      HorizontalAlignment="Center"
-                      Grid.Column="0"
-                      Grid.ColumnSpan="1">
-
-                    <Grid.Styles>
-                      <Style Selector="Button">
-                        <Style Selector="^:pointerover /template/ ContentPresenter">
-                          <Setter
-                              Property="TextBlock.Foreground"
-                              Value="{Binding CardTheme.SeriesProgressButtonsHoverColor, ElementName=Root}" />
-                          <Setter Property="Background" Value="Transparent"/>
-                        </Style>
-                      </Style>
-                    </Grid.Styles>
-
-                    <!-- ProgressBar -->
-                    <ProgressBar
-                        Height="30"
-                        Width="298"
-                        Margin="10,0,0,0"
-                        Grid.Row="0"
-                        Grid.Column="0"
-                        Value="{CompiledBinding CurVolumeCount}"
-                        Background="{Binding CardTheme.SeriesProgressBarBGColor, ElementName=Root}"
-                        Foreground="{Binding CardTheme.SeriesProgressBarColor, ElementName=Root}"
-                        BorderBrush="{Binding CardTheme.SeriesProgressBarBorderColor, ElementName=Root}"
-                        BorderThickness="1.5"
-                        Orientation="Horizontal"
-                        Padding="2"
-                        FontWeight="Bold"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Center"
-                        FontSize="15"
-                        Minimum="0"
-                        Maximum="{CompiledBinding MaxVolumeCount}" />
-
-                    <!-- “–” Button, Count Text, “+” Button -->
-                    <StackPanel
-                        Orientation="Horizontal"
-                        Grid.Column="0"
-                        Grid.Row="0"
-                        HorizontalAlignment="Center"
-                        Margin="10,0,0,0">
-                      <Button
-                          Background="Transparent"
-                          Foreground="{Binding CardTheme.SeriesProgressTextColor, ElementName=Root}"
-                          FontWeight="Bold"
-                          Height="15"
-                          Width="32"
-                          FontSize="31"
-                          Margin="0,0,-17,0"
-                          Padding="-2,-17,0,0"
-                          Cursor="Hand"
-                          Click="SubtractVolume"
-                          VerticalAlignment="Center"
-                          HorizontalAlignment="Center"
-                          Content="-" />
-
+                    <!-- Description -->
+                    <ScrollViewer
+                        Classes="card-desc"
+                        VerticalScrollBarVisibility="Auto"
+                        HorizontalScrollBarVisibility="Disabled"
+                        Grid.Row="3">
                       <TextBlock
-                          TextAlignment="Center"
-                          FontSize="16"
+                          TextWrapping="Wrap"
+                          FontSize="12"
+                          FontWeight="SemiBold"
+                          Foreground="{DynamicResource TsundokuSeriesCardDescColor}"
+                          Opacity="0.9"
+                          Text="{CompiledBinding Description}"
+                          Padding="0,0,10,0"/>
+                    </ScrollViewer>
+                  </Grid>
+
+                  <!-- Progress Footer -->
+                  <Border Grid.Row="1" BorderThickness="0,2,0,0" BorderBrush="{DynamicResource TsundokuSeriesCardDividerColor}" Margin="8,0,8,0" Padding="0,6,0,6">
+                  <Grid
+                      ColumnDefinitions="Auto,Auto,*,Auto">
+                    <!-- - Button -->
+                    <Button Grid.Column="0" Theme="{StaticResource SeriesCardButton}" Content="&#x2212;" Margin="0,0,4,0" Click="SubtractVolume"/>
+
+                    <!-- + Button -->
+                    <Button Grid.Column="1" Theme="{StaticResource SeriesCardButton}" Content="+" Margin="0,0,8,0" Click="AddVolume"/>
+
+                    <!-- Progress Bar with overlay text -->
+                    <Panel Grid.Column="2">
+                      <ProgressBar
+                          Height="28"
+                          Value="{CompiledBinding CurVolumeCount}"
+                          Background="{DynamicResource TsundokuSeriesProgressBarBGColor}"
+                          Foreground="{DynamicResource TsundokuSeriesProgressBarColor}"
+                          BorderBrush="{DynamicResource TsundokuSeriesProgressBarBorderColor}"
+                          BorderThickness="2"
+                          CornerRadius="6"
+                          Padding="3"
+                          Minimum="0"
+                          Maximum="{CompiledBinding MaxVolumeCount}"/>
+                      <TextBlock
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center"
+                          Margin="0,1,0,0"
+                          FontSize="13"
                           FontWeight="Bold"
-                          Foreground="{Binding CardTheme.SeriesProgressTextColor, ElementName=Root}"
-                          Margin="0,7.5,0,0">
+                          Foreground="{DynamicResource TsundokuSeriesProgressTextColor}"
+                          IsHitTestVisible="False">
                         <TextBlock.Text>
-                          <MultiBinding StringFormat="{}{0}/{1}" Mode="OneWay">
-                            <Binding Path="CurVolumeCount" />
-                            <Binding Path="MaxVolumeCount" />
+                          <MultiBinding StringFormat="{}{0} / {1}" Mode="OneWay">
+                            <Binding Path="CurVolumeCount"/>
+                            <Binding Path="MaxVolumeCount"/>
                           </MultiBinding>
                         </TextBlock.Text>
                       </TextBlock>
+                    </Panel>
 
-                      <Button
-                          Background="Transparent"
-                          Foreground="{Binding CardTheme.SeriesProgressTextColor, ElementName=Root}"
-                          FontWeight="Bold"
-                          Height="20"
-                          Width="21"
-                          FontSize="24"
-                          Cursor="Hand"
-                          Click="AddVolume"
-                          Padding="-6,-9.5,0,0"
-                          VerticalAlignment="Center"
-                          HorizontalAlignment="Center"
-                          VerticalContentAlignment="Center"
-                          HorizontalContentAlignment="Center"
-                          Content="+" />
-                    </StackPanel>
+                    <!-- Edit Button -->
+                    <Button
+                        Grid.Column="3"
+                        Theme="{StaticResource SeriesCardButton}"
+                        Margin="8,0,0,0"
+                        i:Attached.Icon="fa-solid fa-pen"
+                        FontSize="14"
+                        Click="OpenEditSeriesInfoWindow"/>
                   </Grid>
-
-                  <!-- Edit Series Info Button (icon) -->
-                  <Button
-                      Grid.Column="1"
-                      Background="{Binding CardTheme.SeriesProgressBGColor, ElementName=Root}"
-                      FontSize="30"
-                      Margin="0,0,3,0"
-                      BorderThickness="0"
-                      HorizontalAlignment="Left"
-                      HorizontalContentAlignment="Center"
-                      BorderBrush="{Binding CardTheme.SeriesButtonIconColor, ElementName=Root}"
-                      Height="{CompiledBinding Source={x:Static m:Constants.BOTTOM_SECTION_CARD_HEIGHT}}"
-                      Foreground="{Binding CardTheme.SeriesButtonIconColor, ElementName=Root}"
-                      i:Attached.Icon="fa-solid fa-square-pen"
-                      Cursor="Hand"
-                      Click="OpenEditSeriesInfoWindow" />
+                  </Border>
                 </Grid>
               </Grid>
+              </Panel>
             </Grid>
           </Border>
         </Border>

@@ -1,13 +1,12 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
 					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-					xmlns:vm="clr-namespace:Tsundoku.ViewModels"
                     xmlns:local="clr-namespace:Tsundoku.Models"
-					x:DataType="vm:ViewModelBase">
+					>
 
     <ControlTheme x:Key="QueryListBox" TargetType="ListBox">
-		<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGColor}"/>
-		<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor}"/>
-        <Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor}"/>
+		<Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGColor}"/>
+		<Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconHoverColor}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource TsundokuMenuButtonBorderColor}"/>
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
         <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
@@ -15,7 +14,7 @@
         <Setter Property="ScrollViewer.IsScrollInertiaEnabled" Value="True" />
         <Setter Property="FontSize" Value="15" />
         <Setter Property="FontWeight" Value="Bold" />
-        <Setter Property="CornerRadius" Value="2" />
+        <Setter Property="CornerRadius" Value="10" />
         <Setter Property="Cursor" Value="Hand"/>
 
         <Setter Property="Template">
@@ -46,92 +45,12 @@
         </Setter>
 	</ControlTheme>
 
-    <ControlTheme x:Key="QuerySearchBox" TargetType="AutoCompleteBox">
-        <Setter Property="VerticalAlignment" Value="Center" />
-        <Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGColor}"/>
-		<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor}"/>
-        <Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor}"/>
-        <Setter Property="BorderThickness" Value="2" />
-        <Setter Property="Width" Value="500" />
-        <Setter Property="FontWeight" Value="Bold" />
-        <Setter Property="FontSize" Value="15" />
-        <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
-        <Setter Property="Padding" Value="{DynamicResource TextControlThemePadding}" />
-        <Setter Property="MaxDropDownHeight" Value="{DynamicResource AutoCompleteListMaxHeight}" />
-        <Setter Property="Template">
-            <ControlTemplate>
-                <Grid x:Name="PART_LayoutRoot">
-                    <TextBox x:Name="PART_TextBox"
-                            Watermark="{TemplateBinding Watermark}"
-                            Classes="Menu"
-                            Width="{TemplateBinding Width}"
-                            Foreground="{TemplateBinding Foreground}"
-                            Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="{TemplateBinding CornerRadius}"
-                            FontSize="{TemplateBinding FontSize}"
-                            FontFamily="{TemplateBinding FontFamily}"
-                            TextWrapping="Wrap"
-                            VerticalContentAlignment="Center"
-                            FontWeight="{TemplateBinding FontWeight}"
-                            Padding="{TemplateBinding Padding}"
-                            Margin="0"
-                            DataValidationErrors.Errors="{TemplateBinding (DataValidationErrors.Errors)}" />
-                    <Popup x:Name="PART_Popup" 
-                            WindowManagerAddShadowHint="False"
-                            MinWidth="{Binding Bounds.Width, RelativeSource={RelativeSource TemplatedParent}}"
-                            MaxHeight="{TemplateBinding MaxDropDownHeight}"
-                            IsLightDismissEnabled="True"
-                            PlacementTarget="{TemplateBinding}">
-                            <Border x:Name="PART_SuggestionsContainer"
-                                    Padding="{DynamicResource AutoCompleteListMargin}"
-                                    BorderThickness="2"
-                                    BorderBrush="{CompiledBinding CurrentTheme.MenuButtonBorderColor}"
-                                    Background="{CompiledBinding CurrentTheme.MenuButtonBGColor}"
-                                    Margin="0,5,0,0"
-                                    CornerRadius="{DynamicResource OverlayCornerRadius}">
-                                <ListBox x:Name="PART_SelectingItemsControl"
-                                        Classes="query"
-                                        Background="Transparent"
-                                        Foreground="{TemplateBinding Foreground}"
-                                        ItemTemplate="{TemplateBinding ItemTemplate}"
-                                        Theme="{StaticResource QueryListBox}"
-                                        Margin="{DynamicResource AutoCompleteListPadding}" />
-                        </Border>
-                    </Popup>
-                </Grid>
-            </ControlTemplate>
-        </Setter>
-
-        <!-- <Style Selector="^ /template/ ListBox#PART_SelectingItemsControl > ListBoxItem">
-            <Setter Property="Background" Value="Yellow"/>
-        </Style> -->
-        
-        <!-- <Style Selector="^:selected /template/ Border#PART_SuggestionsContainer">
-            <Style Selector="^:pointerover /template/ Border#PART_SuggestionsContainer, ^:selected /template/ Border#PART_SuggestionsContainer">
-                <Setter Property="Background" Value="Green"/>
-                <Setter Property="BorderBrush" Value="Aqua"/>
-            </Style>
-            <Style Selector="^:selected /template/ ListBox#PART_SelectingItemsControl, ^:pointerover /template/ ListBox#PART_SelectingItemsControl">
-                <Setter Property="Foreground" Value="Pink"/>
-            </Style>
-        </Style> -->
-        <!-- <Style Selector="^ /template/ Border#PART_SuggestionsContainer">
-            <Setter Property="Background" Value="Green"/>
-            <Setter Property="BorderBrush" Value="Aqua"/>
-        </Style>
-        <Style Selector="^ /template/ ListBox#PART_SelectingItemsControl">
-            <Setter Property="Foreground" Value="Pink"/>
-        </Style> -->
-    </ControlTheme>
-
 	<ControlTheme x:Key="FluentScrollBarLineButton" TargetType="RepeatButton">
 		<Setter Property="Opacity" Value="0" />
-		<Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentTheme.DividerColor}"/>
+		<Setter Property="TextElement.Foreground" Value="{DynamicResource TsundokuDividerColor}"/>
 		<Setter Property="Template">
 			<ControlTemplate>
-			<ContentPresenter Background="{CompiledBinding CurrentTheme.MenuBGColor}"
+			<ContentPresenter Background="{DynamicResource TsundokuMenuBGColor}"
 							  BorderBrush="{DynamicResource ScrollBarButtonBorderBrush}"
 							  Content="{TemplateBinding Content}"/>
 			</ControlTemplate>
@@ -143,19 +62,19 @@
 		</Setter>
 
 		<Style Selector="^:pointerover">
-			<Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor}"/>
+			<Setter Property="TextElement.Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconHoverColor}"/>
 
 			<Style Selector="^ /template/ ContentPresenter" >
-				<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}"/>
-				<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor}"/>
+				<Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGHoverColor}"/>
+				<Setter Property="BorderBrush" Value="{DynamicResource TsundokuMenuButtonBorderHoverColor}"/>
 			</Style>
 		</Style>
 
 		<Style Selector="^:pressed">
-			<Setter Property="TextElement.Foreground" Value="{CompiledBinding CurrentTheme.MenuBGColor}"/>
+			<Setter Property="TextElement.Foreground" Value="{DynamicResource TsundokuMenuBGColor}"/>
 			<Style Selector="^ /template/ ContentPresenter" >
-			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.DividerColor}" />
-			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor}" />
+			<Setter Property="Background" Value="{DynamicResource TsundokuDividerColor}" />
+			<Setter Property="BorderBrush" Value="{DynamicResource TsundokuMenuButtonBorderColor}" />
 			</Style>
 		</Style>
 	</ControlTheme>
@@ -176,7 +95,7 @@
 						BorderBrush="{TemplateBinding BorderBrush}">
 					<Grid RowDefinitions="Auto,*,Auto">
 					<Rectangle x:Name="TrackRect"
-								Fill="{CompiledBinding CurrentTheme.MenuBGColor}"
+								Fill="{DynamicResource TsundokuMenuBGColor}"
 								Stroke="{DynamicResource ScrollBarTrackStroke}"
 								StrokeThickness="{DynamicResource ScrollBarTrackBorderThemeThickness}"
 								Opacity="0"
@@ -249,12 +168,12 @@
 				<Setter Property="Background" Value="{DynamicResource ScrollBarBackgroundPointerOver}" />
 			</Style>
 			<Style Selector="^ /template/ Rectangle#TrackRect">
-				<Setter Property="Fill" Value="{CompiledBinding CurrentTheme.MenuBGColor}" />
+				<Setter Property="Fill" Value="{DynamicResource TsundokuMenuBGColor}" />
 				<Setter Property="Stroke" Value="{DynamicResource ScrollBarTrackStrokePointerOver}" />
 				<Setter Property="Opacity" Value="1" />
 			</Style>
 			<Style Selector="^ /template/ Thumb">
-				<Setter Property="Background" Value="{CompiledBinding CurrentTheme.DividerColor}" />
+				<Setter Property="Background" Value="{DynamicResource TsundokuDividerColor}" />
 				<Setter Property="RenderTransform" Value="none" />
 			</Style>
 			<Style Selector="^ /template/ RepeatButton">
@@ -264,7 +183,7 @@
 	</ControlTheme>
 
     <ControlTheme x:Key="CollectionScroll" TargetType="ScrollViewer">
-        <Setter Property="Background" Value="{CompiledBinding CurrentTheme.CollectionBGColor}" />
+        <Setter Property="Background" Value="{DynamicResource TsundokuCollectionBGColor}" />
             <Setter Property="Template">
                 <ControlTemplate>
                     <Grid ColumnDefinitions="*,Auto" RowDefinitions="*,Auto">

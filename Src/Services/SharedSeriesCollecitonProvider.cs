@@ -1,19 +1,20 @@
+using System.Collections.Frozen;
 using System.Collections.ObjectModel;
-using System.Linq.Dynamic.Core;
-using System.Linq.Expressions;
 using System.Reactive.Disposables;
-
+using System.Reactive.Disposables.Fluent;
 using System.Reactive.Linq;
 using System.Text.RegularExpressions;
 using DynamicData;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+using ReactiveUI.SourceGenerators;
+using Tsundoku.Helpers;
 using Tsundoku.Models;
 using static Tsundoku.Models.Enums.SeriesDemographicModel;
 using static Tsundoku.Models.Enums.SeriesFormatModel;
 using static Tsundoku.Models.Enums.SeriesGenreModel;
 using static Tsundoku.Models.Enums.SeriesStatusModel;
 using static Tsundoku.Models.Enums.TsundokuFilterModel;
+using static Tsundoku.Models.Enums.TsundokuSortModel;
 
 namespace Tsundoku.Services;
 
@@ -32,8 +33,11 @@ public interface ISharedSeriesCollectionProvider
     // provider's public contract, allowing ViewModels to control the global filter criteria.
     string SeriesFilterText { get; set; }
     TsundokuFilter SelectedFilter { get; set; }
+    TsundokuSort SelectedSort { get; set; }
     string AdvancedSearchQuery { get; set; }
     string AdvancedSearchQueryErrorMessage { get; set; }
+    string SelectedPublisher { get; set; }
+    ReadOnlyObservableCollection<string> AvailablePublishers { get; }
 }
 
 /// <summary>
@@ -53,12 +57,16 @@ public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISh
 
     // These Reactive properties will now drive the global filtering.
     // ViewModels that want to control the global filter will bind to these properties.
-    [Reactive] public string SeriesFilterText { get; set; } = string.Empty;
-    [Reactive] public TsundokuFilter SelectedFilter { get; set; } = TsundokuFilter.None;
-    [Reactive] public string AdvancedSearchQueryErrorMessage { get; set; }
-    [Reactive] public string AdvancedSearchQuery { get; set; }
+    [Reactive] public partial string SeriesFilterText { get; set; } = string.Empty;
+    [Reactive] public partial TsundokuFilter SelectedFilter { get; set; } = TsundokuFilter.None;
+    [Reactive] public partial TsundokuSort SelectedSort { get; set; } = TsundokuSort.TitleAZ;
+    [Reactive] public partial string AdvancedSearchQueryErrorMessage { get; set; }
+    [Reactive] public partial string AdvancedSearchQuery { get; set; }
+    [Reactive] public partial string SelectedPublisher { get; set; } = string.Empty;
+    private ReadOnlyObservableCollection<string> _availablePublishers;
+    public ReadOnlyObservableCollection<string> AvailablePublishers => _availablePublishers;
 
-    [GeneratedRegex(@"(?<FilterName>\w+)(?<Operator>==|>=|<=|>|<)(?<FilterValue>\"".*?\""|\w+)?", RegexOptions.ExplicitCapture | RegexOptions.Compiled)] public static partial Regex AdvancedQueryRegex();
+    [GeneratedRegex(@"(?<FilterName>\w+)(?<Operator>==|>=|<=|>|<)(?<FilterValue>\"".*?\""|\w+)?", RegexOptions.ExplicitCapture)] public static partial Regex AdvancedQueryRegex();
 
     private readonly IUserService _userService; // Injected to get raw data and user language
 
@@ -74,7 +82,7 @@ public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISh
         // 1. Define the text search filter predicate
         IObservable<Func<Series, bool>> textFilter = this.WhenAnyValue(x => x.SeriesFilterText)
             .DistinctUntilChanged()
-            .Throttle(TimeSpan.FromMilliseconds(250))
+            .Throttle(TimeSpan.FromMilliseconds(400))
             .Select(searchText =>
             {
                 if (string.IsNullOrWhiteSpace(searchText))
@@ -84,8 +92,8 @@ public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISh
                 return (Func<Series, bool>)(series =>
                 {
                     return
-                        series.Titles.Any(t => t.Value.Contains(searchText, StringComparison.OrdinalIgnoreCase)) ||
-                        series.Staff.Any(t => t.Value.Contains(searchText, StringComparison.OrdinalIgnoreCase)) ||
+                        series.Titles.AsValueEnumerable().Any(t => t.Value.Contains(searchText, StringComparison.OrdinalIgnoreCase)) ||
+                        series.Staff.AsValueEnumerable().Any(t => t.Value.Contains(searchText, StringComparison.OrdinalIgnoreCase)) ||
                         series.Publisher.Contains(searchText, StringComparison.OrdinalIgnoreCase);
                 });
             });
@@ -161,60 +169,62 @@ public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISh
 
         IObservable<Func<Series, bool>> advancedFilter = this.WhenAnyValue(x => x.AdvancedSearchQuery)
             .DistinctUntilChanged()
-            .SelectMany(async query =>
+            .Select(query =>
             {
-                // Clear previous error message
                 AdvancedSearchQueryErrorMessage = string.Empty;
 
                 if (string.IsNullOrWhiteSpace(query))
                 {
-                    return series => true; // No advanced filter
+                    return (Func<Series, bool>)(series => true);
                 }
 
-                // Attempt to parse the query string and build the Dynamic LINQ expression
-                string dynamicLinqString = await GenerateDynamicLinqExpression(query);
-
-                if (string.IsNullOrWhiteSpace(dynamicLinqString))
+                Func<Series, bool>? predicate = BuildAdvancedPredicate(query);
+                if (predicate is null)
                 {
                     AdvancedSearchQueryErrorMessage = "Incorrectly formatted advanced search query.";
-                    LOGGER.Warn("Advanced search query parsing resulted in an empty/invalid LINQ expression for: {Query}", query);
+                    LOGGER.Warn("Advanced search query could not be parsed: {Query}", query);
                     return series => true;
                 }
 
-                try
-                {
-                    LambdaExpression predicate = DynamicExpressionParser.ParseLambda<Series, bool>(ParsingConfig.Default, true, dynamicLinqString);
-                    Func<Series, bool> compiledPredicate = (Func<Series, bool>)predicate.Compile();
-
-                    LOGGER.Info("Advanced Search Query => {query}", dynamicLinqString.Replace("it.", "series."));
-                    return compiledPredicate;
-                }
-                catch (Exception ex)
-                {
-                    AdvancedSearchQueryErrorMessage = "Invalid advanced search syntax.";
-                    LOGGER.Error(ex, "Error compiling dynamic LINQ expression for query: {Query}, Expression: {Expression}", query, dynamicLinqString);
-                    return series => true;
-                }
+                LOGGER.Info("Advanced Search Query applied: {Query}", query);
+                return predicate;
             })
-            .StartWith(s => true); // Start with no filter
+            .StartWith(series => true);
 
-        // 3. Combine filter predicates into a single observable predicate
+        // 3. Publisher filter predicate
+        IObservable<Func<Series, bool>> publisherFilter = this.WhenAnyValue(x => x.SelectedPublisher)
+            .DistinctUntilChanged()
+            .Select(publisher =>
+            {
+                if (string.IsNullOrWhiteSpace(publisher))
+                    return (Func<Series, bool>)(series => true);
+
+                return (Func<Series, bool>)(series =>
+                    series.Publisher.Equals(publisher, StringComparison.OrdinalIgnoreCase));
+            });
+
+        // 4. Combine filter predicates into a single observable predicate
         IObservable<Func<Series, bool>> combinedFilter = Observable.CombineLatest(
-            textFilter, tsundokuFilter, advancedFilter,
-            (textSearchPred, tsundokuFilterPred, advancedSearchPred) =>
+            textFilter, tsundokuFilter, advancedFilter, publisherFilter,
+            (textSearchPred, tsundokuFilterPred, advancedSearchPred, publisherPred) =>
                 (Func<Series, bool>)(series =>
                     (textSearchPred is null || textSearchPred(series)) &&
                     (tsundokuFilterPred is null || tsundokuFilterPred(series)) &&
-                    (advancedSearchPred is null || advancedSearchPred(series))
+                    (advancedSearchPred is null || advancedSearchPred(series)) &&
+                    (publisherPred is null || publisherPred(series))
                 )
         );
 
-        // 4. Define the series comparer (for sorting) based on the current user's language
-        IObservable<IComparer<Series>> seriesComparerChanged = _userService.CurrentUser
-            .Where(user => user is not null)
-            .Select(user => user.Language)
-            .DistinctUntilChanged()
-            .Select(curLang => (IComparer<Series>)new SeriesComparer(curLang))
+        // 4. Define the series comparer (for sorting) based on the current user's language and selected sort
+        IObservable<IComparer<Series>> seriesComparerChanged = Observable.CombineLatest(
+                _userService.CurrentUser
+                    .Where(user => user is not null)
+                    .Select(user => user.Language)
+                    .DistinctUntilChanged(),
+                this.WhenAnyValue(x => x.SelectedSort)
+                    .DistinctUntilChanged(),
+                (curLang, sort) => (IComparer<Series>)new SeriesComparer(curLang, sort)
+            )
             .Replay(1)
             .RefCount();
 
@@ -222,118 +232,170 @@ public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISh
         _userService.UserCollectionChanges
             .Filter(series => series is not null)
             .Filter(combinedFilter)
-            .ObserveOn(RxApp.MainThreadScheduler)
+            .ObserveOn(RxSchedulers.MainThreadScheduler)
             .SortAndBind(out _dynamicUserCollection, seriesComparerChanged)
+            .Subscribe()
+            .DisposeWith(_disposables);
+
+        // 6. Build dynamic publisher list from collection
+        _userService.UserCollectionChanges
+            .Filter(series => series is not null)
+            .DistinctValues(series => series.Publisher)
+            .Sort(StringComparer.OrdinalIgnoreCase)
+            .ObserveOn(RxSchedulers.MainThreadScheduler)
+            .Bind(out _availablePublishers)
             .Subscribe()
             .DisposeWith(_disposables);
     }
 
-    private static async Task<string> GenerateDynamicLinqExpression(string advancedSearchQuery)
-    {
-        // This method needs to be called from a context where it's safe to run parsing logic.
-        // Wrapping it in Task.Run to ensure it doesn't block the UI thread during parsing.
-        return await Task.Run(() =>
+    /// <summary>
+    /// Numeric property accessors keyed by user-facing filter name (case-insensitive).
+    /// </summary>
+    private static readonly FrozenDictionary<string, Func<Series, decimal>> NumericAccessors =
+        new Dictionary<string, Func<Series, decimal>>(StringComparer.OrdinalIgnoreCase)
         {
-            advancedSearchQuery = advancedSearchQuery.Trim();
-            MatchCollection advancedSearchMatches = AdvancedQueryRegex().Matches(advancedSearchQuery);
+            ["Rating"] = s => s.Rating,
+            ["Value"] = s => s.Value,
+            ["Read"] = s => s.VolumesRead,
+            ["CurVolumes"] = s => s.CurVolumeCount,
+            ["MaxVolumes"] = s => s.MaxVolumeCount,
+        }.ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
 
-            if (advancedSearchMatches.Count == 0)
+    /// <summary>
+    /// Parses the advanced search query and builds a composed predicate directly.
+    /// Supports <c>&amp;</c> (AND) and <c>|</c> (OR) connectors between filter tokens.
+    /// </summary>
+    private static Func<Series, bool>? BuildAdvancedPredicate(string query)
+    {
+        query = query.Trim();
+        MatchCollection matches = AdvancedQueryRegex().Matches(query);
+
+        if (matches.Count == 0)
+        {
+            return null;
+        }
+
+        Func<Series, bool>? result = null;
+
+        for (int i = 0; i < matches.Count; i++)
+        {
+            Match match = matches[i];
+            string filterName = match.Groups["FilterName"].Value;
+            string op = match.Groups["Operator"].Value;
+            string filterValue = match.Groups["FilterValue"].Success ? match.Groups["FilterValue"].Value : string.Empty;
+
+            Func<Series, bool>? predicate = BuildSinglePredicate(filterName, op, filterValue);
+            if (predicate is null)
             {
-                return string.Empty; // No valid filter parts
+                return null;
             }
 
-            StringBuilder advancedFilterExpression = new StringBuilder();
-
-            bool firstFilter = true;
-            foreach (Match searchFilter in advancedSearchMatches)
+            if (result is null)
             {
-                string filterName = searchFilter.Groups["FilterName"].Value;
-                string operatorType = searchFilter.Groups["Operator"].Value;
-                string filterValue = searchFilter.Groups["FilterValue"].Success ? searchFilter.Groups["FilterValue"].Value : string.Empty;
-
-                if (!firstFilter)
-                {
-                    advancedFilterExpression.Append(" && ");
-                }
-                firstFilter = false;
-
-                string parsedFilter = ParseAdvancedFilter(filterName, operatorType, filterValue);
-
-                if (string.IsNullOrWhiteSpace(parsedFilter))
-                {
-                    // If parsing failed for any part, return empty string to signal an error
-                    return string.Empty;
-                }
-
-                advancedFilterExpression.Append($"({parsedFilter})");
+                result = predicate;
             }
+            else
+            {
+                // Determine connector by inspecting text between previous and current match
+                int prevEnd = matches[i - 1].Index + matches[i - 1].Length;
+                string between = query[prevEnd..match.Index];
+                bool isOr = between.Contains('|');
 
-            return advancedFilterExpression.ToString();
-        });
+                Func<Series, bool> left = result;
+                Func<Series, bool> right = predicate;
+                result = isOr
+                    ? s => left(s) || right(s)
+                    : s => left(s) && right(s);
+            }
+        }
+
+        return result;
     }
 
-
-    // --- Your existing ParseAdvancedFilter method ---
-    private static string ParseAdvancedFilter(string filterName, string operatorType, string filterValue)
+    /// <summary>
+    /// Builds a single <c>Func&lt;Series, bool&gt;</c> predicate for one filter token.
+    /// </summary>
+    private static Func<Series, bool>? BuildSinglePredicate(string filterName, string op, string filterValue)
     {
-        operatorType = operatorType.Equals("=") ? "==" : operatorType;
-
-        static string BuildStringContainsExpression(string propertyName, string val)
+        // Numeric filters (Rating, Value, Read, CurVolumes, MaxVolumes)
+        if (NumericAccessors.TryGetValue(filterName, out Func<Series, decimal>? accessor))
         {
-            // Extract the actual search value, removing outer quotes if present.
-            // This logic correctly handles user input like "Notes=="My note""
-            string searchValue = val.StartsWith('"') && val.EndsWith('"') && val.Length > 1
-                                 ? val[1..^1]
-                                 : val;
-
-            // Escape the search value for safe inclusion in the C# string literal.
-            string escapedSearchValue = EscapeForCSharpStringLiteral(searchValue);
-
-            // Construct the dynamic LINQ expression.
-            // Use ToLowerInvariant() on both sides for case-insensitive comparison,
-            // as Dynamic LINQ does not directly support StringComparison.OrdinalIgnoreCase.
-            // The !string.IsNullOrWhiteSpace check ensures the property is not null/empty before ToLowerInvariant().
-            return $"!string.IsNullOrWhiteSpace(it.{propertyName}) && it.{propertyName}.ToLowerInvariant().Contains(\"{escapedSearchValue.ToLowerInvariant()}\")";
+            if (!decimal.TryParse(filterValue, out decimal target))
+            {
+                return null;
+            }
+            return op switch
+            {
+                "==" => s => accessor(s) == target,
+                ">=" => s => accessor(s) >= target,
+                "<=" => s => accessor(s) <= target,
+                ">" => s => accessor(s) > target,
+                "<" => s => accessor(s) < target,
+                _ => null,
+            };
         }
 
         return filterName.ToLowerInvariant() switch
         {
-            "rating" or "value" or "read" or "curvolumes" or "maxvolumes" =>
-                int.TryParse(filterValue, out _) ? $"it.{filterName} {operatorType} {filterValue}" : string.Empty,
+            "format" => TryParseEnum<SeriesFormat>(filterValue, out SeriesFormat fmt)
+                ? BuildEnumPredicate(s => s.Format, fmt, op)
+                : null,
 
-            "format" =>
-                $"(it.Format {operatorType} Format.{filterValue})",
+            "status" => TryParseEnum<SeriesStatus>(filterValue, out SeriesStatus status)
+                ? BuildEnumPredicate(s => s.Status, status, op)
+                : null,
 
-            "status" =>
-                $"(it.Status {operatorType} SeriesStatus.{filterValue})",
+            "demographic" => TryParseEnum<SeriesDemographic>(filterValue, out SeriesDemographic demo)
+                ? BuildEnumPredicate(s => s.Demographic, demo, op)
+                : null,
 
-            "demographic" =>
-                $"(it.Demographic {operatorType} Demographic.{filterValue})",
+            "series" => filterValue.Equals("Complete", StringComparison.OrdinalIgnoreCase)
+                    ? s => s.CurVolumeCount > 0 && s.CurVolumeCount == s.MaxVolumeCount
+                : filterValue.Equals("InComplete", StringComparison.OrdinalIgnoreCase)
+                    ? s => (s.MaxVolumeCount > 0 && s.CurVolumeCount < s.MaxVolumeCount) || s.MaxVolumeCount == 0
+                : null,
 
-            "series" =>
-                filterValue.Equals("Complete", StringComparison.OrdinalIgnoreCase) ? $"it.CurVolumeCount > 0 && it.CurVolumeCount == it.MaxVolumeCount" :
-                filterValue.Equals("InComplete", StringComparison.OrdinalIgnoreCase) ? $"it.MaxVolumeCount > 0 && it.CurVolumeCount < it.MaxVolumeCount || it.MaxVolumeCount == 0" :
-                string.Empty,
+            "favorite" => filterValue.Equals("True", StringComparison.OrdinalIgnoreCase)
+                ? s => s.IsFavorite
+                : s => !s.IsFavorite,
 
-            "favorite" => $"{(filterValue.Equals("True") ? '!' : "")}it.IsFavorite",
+            "notes" => BuildStringContainsPredicate(s => s.SeriesNotes, filterValue),
+            "publisher" => BuildStringContainsPredicate(s => s.Publisher, filterValue),
 
-            "notes" => BuildStringContainsExpression("SeriesNotes", filterValue),
-            "publisher" => BuildStringContainsExpression("Publisher", filterValue),
+            "genre" => filterValue.TryGetEnumValueFromMemberValue<SeriesGenre>(out SeriesGenre genre)
+                ? s => s.Genres is not null && s.Genres.Contains(genre)
+                : null,
 
-            "genre" =>
-                // Assuming Series.Genres is List<string> and filterValue is the actual genre string (e.g., "Action")
-                // If Genre is an enum in your project, change this to:
-                // `it.Genres is not null && it.Genres.Contains(YourProject.Models.GenreEnum.{filterValue})`
-                $"it.Genres is not null && it.Genres.Contains(Genre.{EscapeForCSharpStringLiteral(filterValue)}\")",
-
-            _ => string.Empty,
+            _ => null,
         };
     }
 
-    private static string EscapeForCSharpStringLiteral(string value)
+    private static bool TryParseEnum<TEnum>(string value, out TEnum result) where TEnum : struct, Enum
     {
-        // Replace backslashes first, then quotes
-        return value.Replace("\\", "\\\\").Replace("\"", "\\\"");
+        return Enum.TryParse(value, true, out result);
+    }
+
+    private static Func<Series, bool>? BuildEnumPredicate<TEnum>(Func<Series, TEnum> accessor, TEnum target, string op)
+        where TEnum : struct, Enum
+    {
+        return op switch
+        {
+            "==" => s => EqualityComparer<TEnum>.Default.Equals(accessor(s), target),
+            _ => null,
+        };
+    }
+
+    private static Func<Series, bool> BuildStringContainsPredicate(Func<Series, string?> accessor, string filterValue)
+    {
+        string searchValue = filterValue.StartsWith('"') && filterValue.EndsWith('"') && filterValue.Length > 1
+            ? filterValue[1..^1]
+            : filterValue;
+
+        return s =>
+        {
+            string? val = accessor(s);
+            return !string.IsNullOrWhiteSpace(val) && val.Contains(searchValue, StringComparison.OrdinalIgnoreCase);
+        };
     }
 
     /// <summary>

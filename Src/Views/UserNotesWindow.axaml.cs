@@ -1,30 +1,17 @@
-using Avalonia.ReactiveUI;
+using ReactiveUI.Avalonia;
+using Tsundoku.Helpers;
 using Tsundoku.ViewModels;
 
 namespace Tsundoku.Views;
 
-public sealed partial class UserNotesWindow : ReactiveWindow<UserNotesWindowViewModel>
+public sealed partial class UserNotesWindow : ReactiveWindow<UserNotesWindowViewModel>, IManagedWindow
 {
-    public bool IsOpen = false;
+    public bool IsOpen { get; set; }
 
     public UserNotesWindow(UserNotesWindowViewModel viewModel)
     {
         ViewModel = viewModel;
         InitializeComponent();
-        
-        Opened += (s, e) =>
-        {
-            IsOpen ^= true;
-        };
-
-        Closing += (s, e) =>
-        {
-            if (IsOpen) 
-            {
-                this.Hide();
-                IsOpen ^= true;
-            }
-            e.Cancel = true;
-        };
+        this.ConfigureHideOnClose();
     }
 }

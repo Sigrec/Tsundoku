@@ -2,12 +2,18 @@ using Avalonia.Media.Imaging;
 
 namespace Tsundoku.Helpers;
 
+/// <summary>
+/// Provides helper methods for loading, scaling, downloading, and converting Avalonia bitmaps for cover images.
+/// </summary>
 public sealed class BitmapHelper
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
-    private readonly IHttpClientFactory _httpClientFactory; // New: To be injected
+    private readonly IHttpClientFactory _httpClientFactory;
 
-    // Constructor for Dependency Injection
+    /// <summary>
+    /// Initializes a new instance of <see cref="BitmapHelper"/> with the specified HTTP client factory.
+    /// </summary>
+    /// <param name="httpClientFactory">The factory used to create HTTP clients for image downloads.</param>
     public BitmapHelper(IHttpClientFactory httpClientFactory)
     {
         _httpClientFactory = httpClientFactory;
@@ -22,9 +28,9 @@ public sealed class BitmapHelper
     /// <returns>The generated and scaled Avalonia Bitmap, or null if any operation fails.</returns>
     public static Bitmap? UpdateCoverFromFilePath(string sourceFilePath, string destinationCoverPath)
     {
-        if (string.IsNullOrWhiteSpace(sourceFilePath) || !File.Exists(sourceFilePath))
+        if (string.IsNullOrWhiteSpace(sourceFilePath))
         {
-            LOGGER.Error("Provided source file path is null/empty or does not exist: {SourceFilePath}", sourceFilePath);
+            LOGGER.Error("Provided source file path is null or empty: {SourceFilePath}", sourceFilePath);
             return null;
         }
 
@@ -38,6 +44,11 @@ public sealed class BitmapHelper
                 // ProcessAndSaveBitmap is synchronous, so it runs within this Task.Run context
                 return ProcessAndSaveBitmap(loadedBitmap, destinationCoverPath, sourceFilePath);
             }
+        }
+        catch (FileNotFoundException)
+        {
+            LOGGER.Error("Source file does not exist: {SourceFilePath}", sourceFilePath);
+            return null;
         }
         catch (ArgumentException argEx)
         {
@@ -123,23 +134,29 @@ public sealed class BitmapHelper
     private static Bitmap? ProcessAndSaveBitmap(Bitmap originalBitmap, string savePath, string sourceIdentifier)
     {
         Bitmap? scaledBitmap = null;
+        int targetWidth = LEFT_SIDE_CARD_WIDTH * BITMAP_SCALE;
+        int targetHeight = IMAGE_HEIGHT * BITMAP_SCALE;
         try
         {
-            if (originalBitmap.PixelSize.Width != LEFT_SIDE_CARD_WIDTH || originalBitmap.PixelSize.Height != IMAGE_HEIGHT)
+            if (originalBitmap.PixelSize.Width != targetWidth || originalBitmap.PixelSize.Height != targetHeight)
             {
                 LOGGER.Debug("Scaling bitmap from {Width}x{Height} to {TargetWidth}x{TargetHeight} for {Source}.",
                     originalBitmap.PixelSize.Width, originalBitmap.PixelSize.Height,
-                    LEFT_SIDE_CARD_WIDTH, IMAGE_HEIGHT,
+                    targetWidth, targetHeight,
                     sourceIdentifier);
 
                 scaledBitmap = originalBitmap.CreateScaledBitmap(
-                    new PixelSize(LEFT_SIDE_CARD_WIDTH, IMAGE_HEIGHT),
+                    new PixelSize(targetWidth, targetHeight),
                     BitmapInterpolationMode.HighQuality);
             }
             else
             {
                 LOGGER.Debug("Bitmap already at target size for {Source}. No scaling needed.", sourceIdentifier);
-                scaledBitmap = originalBitmap; // Use original if no scaling needed
+                // Create a copy so the caller owns a distinct instance that won't be
+                // disposed when the original bitmap's using block ends.
+                scaledBitmap = originalBitmap.CreateScaledBitmap(
+                    originalBitmap.PixelSize,
+                    BitmapInterpolationMode.HighQuality);
             }
 
             // Ensure the directory exists
@@ -187,7 +204,9 @@ public sealed class BitmapHelper
         // Offload the potentially long-running operation to a background thread.
         return await Task.Run(() =>
         {
-            using MemoryStream stream = new();
+            // Estimate capacity: 4 bytes per pixel (RGBA) is an upper bound for PNG
+            int estimatedCapacity = image.PixelSize.Width * image.PixelSize.Height * 4;
+            using MemoryStream stream = new(estimatedCapacity);
             try
             {
                 // 3. Core Logic (executed on a background thread): Save the Avalonia Bitmap.

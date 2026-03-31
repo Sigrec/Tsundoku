@@ -14,15 +14,8 @@ public static class EnumExtensions
     }
 
     public static TEnum GetEnumValueFromMemberValue<TEnum>(this string stringValue, bool ignoreCase = true)
-        where TEnum : struct, Enum // Constraint to ensure TEnum is an enum type
+        where TEnum : struct, Enum
     {
-        // Ensure TEnum is actually an enum
-        if (!typeof(TEnum).IsEnum)
-        {
-            throw new ArgumentException($"Type '{typeof(TEnum).Name}' is not an enum.");
-        }
-
-        // Get all enum members of the specified type
         foreach (TEnum enumValue in Enum.GetValues<TEnum>())
         {
             string memberValue = enumValue.GetEnumMemberValue(); // Use our existing extension method
@@ -40,11 +33,6 @@ public static class EnumExtensions
     public static TEnum GetEnumValueFromMemberValue<TEnum>(this string stringValue, TEnum defaultValue, bool ignoreCase = true)
         where TEnum : struct, Enum
     {
-        if (!typeof(TEnum).IsEnum)
-        {
-            throw new ArgumentException($"Type '{typeof(TEnum).Name}' is not an enum.");
-        }
-
         foreach (TEnum enumValue in Enum.GetValues<TEnum>())
         {
             string memberValue = enumValue.GetEnumMemberValue();
@@ -59,12 +47,6 @@ public static class EnumExtensions
     public static bool TryGetEnumValueFromMemberValue<TEnum>(this string stringValue, out TEnum result, bool ignoreCase = true)
         where TEnum : struct, Enum
     {
-        if (!typeof(TEnum).IsEnum)
-        {
-            result = default;
-            return false;
-        }
-
         foreach (TEnum enumValue in Enum.GetValues<TEnum>())
         {
             string memberValue = enumValue.GetEnumMemberValue();

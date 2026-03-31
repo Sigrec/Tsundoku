@@ -1,13 +1,15 @@
 using Avalonia.Controls;
+using Avalonia.Interactivity;
+using Avalonia.Media;
 using Microsoft.Extensions.DependencyInjection;
-using Avalonia.ReactiveUI;
+using Tsundoku.Helpers;
 using Tsundoku.Models;
 using Tsundoku.ViewModels;
 using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 
 namespace Tsundoku.Controls;
 
-public sealed partial class SeriesCardDisplay : ReactiveUserControl<SeriesCardDisplay>
+public sealed partial class SeriesCardDisplay : UserControl
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
 
@@ -20,15 +22,6 @@ public sealed partial class SeriesCardDisplay : ReactiveUserControl<SeriesCardDi
         set => SetValue(SeriesProperty, value);
     }
 
-    public static readonly StyledProperty<TsundokuTheme> CardThemeProperty =
-        AvaloniaProperty.Register<SeriesCardDisplay, TsundokuTheme>(nameof(CardTheme));
-
-    public TsundokuTheme CardTheme
-    {
-        get => GetValue(CardThemeProperty);
-        set => SetValue(CardThemeProperty, value);
-    }
-
     // ‣ 3) (Optional) If you also need CurrentUser.Language, expose that here too:
     public static readonly StyledProperty<TsundokuLanguage?> LanguageProperty =
         AvaloniaProperty.Register<SeriesCardDisplay, TsundokuLanguage?>(nameof(Language));
@@ -37,6 +30,15 @@ public sealed partial class SeriesCardDisplay : ReactiveUserControl<SeriesCardDi
     {
         get => GetValue(LanguageProperty);
         set => SetValue(LanguageProperty, value);
+    }
+
+    public static readonly StyledProperty<bool> GlassEnabledProperty =
+        AvaloniaProperty.Register<SeriesCardDisplay, bool>(nameof(GlassEnabled));
+
+    public bool GlassEnabled
+    {
+        get => GetValue(GlassEnabledProperty);
+        set => SetValue(GlassEnabledProperty, value);
     }
 
     private readonly MainWindowViewModel _mainWindowViewModel;
@@ -71,34 +73,38 @@ public sealed partial class SeriesCardDisplay : ReactiveUserControl<SeriesCardDi
 
     private async void CopySeriesTitleAsync(object? sender, PointerPressedEventArgs e)
     {
-        if (Language is not null)
+        if (Language is not null && Series?.Titles is not null)
         {
-            string title = Series.Titles[Language.Value];
-            LOGGER.Debug("Copying {title} to Clipboard", title);
-            await TextCopy.ClipboardService.SetTextAsync(title);
+            string title = Series.Titles.TryGetValue(Language.Value, out string? langTitle)
+                ? langTitle
+                : Series.Titles[TsundokuLanguage.Romaji];
+            await ClipboardHelper.CopyToClipboardAsync(title);
         }
     }
 
-    private void SubtractVolume(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private void SubtractVolume(object? sender, RoutedEventArgs e)
     {
         Series?.DecrementCurVolumeCount();
     }
 
-    private void AddVolume(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private void AddVolume(object? sender, RoutedEventArgs e)
     {
         Series?.IncrementCurVolumeCount();
     }
 
-    private async void OpenEditSeriesInfoWindow(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private async void OpenEditSeriesInfoWindow(object? sender, RoutedEventArgs e)
     {
-        if (_mainWindowViewModel is null || Series is null)
+        if (_mainWindowViewModel is null || Series is null || sender is not Button seriesButton)
         {
             return;
         }
 
-        Button seriesButton = (Button)sender;
-        seriesButton.Foreground = CardTheme.SeriesButtonIconHoverColor;
+        seriesButton.Foreground = (SolidColorBrush)this.FindResource(ThemeResourceKeys.SeriesButtonIconHoverColor)!;
+        seriesButton.Background = (SolidColorBrush)this.FindResource(ThemeResourceKeys.SeriesCardButtonBGHoverColor)!;
+        seriesButton.BorderBrush = (SolidColorBrush)this.FindResource(ThemeResourceKeys.SeriesCardButtonBorderHoverColor)!;
         await _mainWindowViewModel.CreateEditSeriesDialog(Series);
-        seriesButton.Foreground = CardTheme.SeriesButtonIconColor;
+        seriesButton.Foreground = (SolidColorBrush)this.FindResource(ThemeResourceKeys.SeriesButtonIconColor)!;
+        seriesButton.Background = (SolidColorBrush)this.FindResource(ThemeResourceKeys.SeriesCardButtonBGColor)!;
+        seriesButton.BorderBrush = (SolidColorBrush)this.FindResource(ThemeResourceKeys.SeriesCardButtonBorderColor)!;
     }
 }

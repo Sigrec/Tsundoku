@@ -1,24 +1,28 @@
 using System.Collections.Specialized;
 using System.Globalization;
+using System.Reactive.Disposables.Fluent;
 using System.Reactive.Linq;
 using Avalonia.Collections;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+using ReactiveUI.SourceGenerators;
 using Tsundoku.Models;
 using static Tsundoku.Models.Enums.SeriesDemographicModel;
 using static Tsundoku.Models.Enums.SeriesGenreModel;
 
 namespace Tsundoku.ViewModels;
 
-public sealed class EditSeriesInfoViewModel : ViewModelBase
+/// <summary>
+/// View model for the Edit Series Info dialog, managing demographic, genre, and value editing for a single series.
+/// </summary>
+public sealed partial class EditSeriesInfoViewModel : ViewModelBase, IDisposable
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
     public Series Series { get; }
-    [Reactive] public int DemographicIndex { get; set; }
-    [Reactive] public string CoverImageUrl { get; set; }
-    [Reactive] public string GenresToolTipText { get; set; }
-    [Reactive] public string SeriesValueText { get; set; }
-    [Reactive] public string SeriesValueMaskedText { get; set; }
+    [Reactive] public partial int DemographicIndex { get; set; }
+    [Reactive] public partial string CoverImageUrl { get; set; }
+    [Reactive] public partial string GenresToolTipText { get; set; }
+    [Reactive] public partial string SeriesValueText { get; set; }
+    [Reactive] public partial string SeriesValueMaskedText { get; set; }
     public AvaloniaList<string> SelectedGenres { get; set; } = [];
 
     public EditSeriesInfoViewModel(Series series, IUserService userService) : base(userService)
@@ -26,12 +30,13 @@ public sealed class EditSeriesInfoViewModel : ViewModelBase
         Series = series;
         this.WhenAnyValue(x => x.Series.Demographic)
             .DistinctUntilChanged()
-            .ObserveOn(RxApp.TaskpoolScheduler)
-            .Subscribe(x => DemographicIndex = SERIES_DEMOGRAPHICS_DICT[x]);
+            .ObserveOn(RxSchedulers.TaskpoolScheduler)
+            .Subscribe(x => DemographicIndex = SERIES_DEMOGRAPHICS_DICT[x])
+            .DisposeWith(_disposables);
 
         this.WhenAnyValue(x => x.CurrentUser.Currency)
             .DistinctUntilChanged()
-            .ObserveOn(RxApp.TaskpoolScheduler)
+            .ObserveOn(RxSchedulers.TaskpoolScheduler)
             .Subscribe(currency =>
             {
                 CultureInfo cultureInfo = CultureInfo.GetCultureInfo(AVAILABLE_CURRENCY_WITH_CULTURE[currency].Culture);
@@ -43,10 +48,11 @@ public sealed class EditSeriesInfoViewModel : ViewModelBase
                 {
                     SeriesValueMaskedText = $"0000000000000000.00{currency}";
                 }
-            });
+            })
+            .DisposeWith(_disposables);
 
         this.WhenAnyValue(x => x.CurrentUser.Currency, x => x.Series.Value)
-            .ObserveOn(RxApp.TaskpoolScheduler)
+            .ObserveOn(RxSchedulers.TaskpoolScheduler)
             .Subscribe(tuple =>
             {
                 var (currency, value) = tuple;
@@ -59,7 +65,8 @@ public sealed class EditSeriesInfoViewModel : ViewModelBase
                 {
                     SeriesValueText = $"{value}{currency}";
                 }
-            });
+            })
+            .DisposeWith(_disposables);
 
         SelectedGenres.CollectionChanged += SeriesGenresChanged;
     }
@@ -103,5 +110,12 @@ public sealed class EditSeriesInfoViewModel : ViewModelBase
             }
         }
         return newGenres;
+    }
+
+    public void Dispose()
+    {
+        SelectedGenres.CollectionChanged -= SeriesGenresChanged;
+        _disposables.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

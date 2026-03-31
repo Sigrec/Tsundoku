@@ -32,6 +32,7 @@ public static partial class LibibParser
         }
 
         Dictionary<(string Title, SeriesFormat Format, string Publisher), uint> result = new(new TitleFormatComparer());
+        List<(string Title, SeriesFormat Format)> seenTitles = [];
         await Task.Run(() =>
         {
             foreach (string path in csvFilePaths)
@@ -77,14 +78,14 @@ public static partial class LibibParser
                         ? SeriesFormat.Novel
                         : SeriesFormat.Manga;
 
-                    if (result.AsValueEnumerable().Any(k =>
-                        k.Key.Title.Contains(rawTitle, StringComparison.OrdinalIgnoreCase) &&
-                        k.Key.Format == format))
+                    if (seenTitles.AsValueEnumerable().Any(k =>
+                        k.Title.Contains(rawTitle, StringComparison.OrdinalIgnoreCase) &&
+                        k.Format == format))
                     {
                         continue;
                     }
 
-                    if (!publisher.Equals("Unknown"))
+                    if (!publisher.Equals("Unknown", StringComparison.Ordinal))
                     {
                         ReadOnlySpan<char> publisherSpan = publisher.AsSpan();
                         if (publisherSpan.Contains("Tokyopop", StringComparison.OrdinalIgnoreCase))
@@ -150,6 +151,7 @@ public static partial class LibibParser
                     else
                     {
                         result[entry] = 1;
+                        seenTitles.Add((entry.Title, entry.format));
                     }
                 }
             }

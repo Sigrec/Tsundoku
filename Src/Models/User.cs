@@ -4,7 +4,7 @@ using System.Text.Json.Nodes;
 using Tsundoku.Helpers;
 using Tsundoku.Converters;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
+using ReactiveUI.SourceGenerators;
 using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 using System.Text.Encodings.Web;
 using System.Diagnostics.CodeAnalysis;
@@ -13,33 +13,41 @@ using static Tsundoku.Models.Enums.SeriesDemographicModel;
 
 namespace Tsundoku.Models;
 
-public sealed class User : ReactiveObject
+/// <summary>
+/// Represents the application user, including preferences, collection data, and saved themes.
+/// </summary>
+public sealed partial class User : ReactiveObject
 {
-    public static readonly JsonSerializerOptions JSON_SERIALIZATION_OPTIONS = new JsonSerializerOptions(UserModelContext.Default.Options)
+    /// <summary>Shared JSON serialization options with relaxed encoding for user data persistence.</summary>
+    public static readonly JsonSerializerOptions JSON_SERIALIZATION_OPTIONS = new(UserModelContext.Default.Options)
     {
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
     };
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
 
-    [Reactive] public double DataVersion { get; set; } = ViewModelBase.SCHEMA_VERSION;
-    [Reactive] public string UserName { get; set; } = "UserName";
-    [Reactive] public TsundokuLanguage Language { get; set; } = TsundokuLanguage.Romaji;
-    [Reactive] public string Display { get; set; } = "Card";
-    [Reactive] public string MainTheme { get; set; } = "Default";
-    [Reactive] public string Currency { get; set; } = "$";
-    [Reactive] public string CollectionValue { get; set; }
-    [Reactive] public uint NumVolumesCollected { get; set; }
-    [Reactive] public uint NumVolumesToBeCollected { get; set; }
-    [Reactive] public decimal MeanRating { get; set; }
-    [Reactive] public uint VolumesRead { get; set; }
-    [Reactive] public Region Region { get; set; } = Region.America;
-    [Reactive] public Dictionary<string, bool> Memberships { get; set; }
-    [Reactive] public string Notes { get; set; }
+    [Reactive] public partial double DataVersion { get; set; } = ViewModelBase.SCHEMA_VERSION;
+    [Reactive] public partial string UserName { get; set; } = "UserName";
+    [Reactive] public partial TsundokuLanguage Language { get; set; } = TsundokuLanguage.Romaji;
+    [Reactive] public partial string Display { get; set; } = "Card";
+    [Reactive] public partial string MainTheme { get; set; } = "Default";
+    [Reactive] public partial string Currency { get; set; } = "$";
+    [Reactive] public partial string CollectionValue { get; set; }
+    [Reactive] public partial uint NumVolumesCollected { get; set; }
+    [Reactive] public partial uint NumVolumesToBeCollected { get; set; }
+    [Reactive] public partial decimal MeanRating { get; set; }
+    [Reactive] public partial uint VolumesRead { get; set; }
+    [Reactive] public partial Region Region { get; set; } = Region.America;
+    [Reactive] public partial Dictionary<string, bool> Memberships { get; set; }
+    [Reactive] public partial string Notes { get; set; }
+    [Reactive] public partial bool RefreshCovers { get; set; }
+    [Reactive] public partial bool GlassmorphismEnabled { get; set; }
+    [Reactive] public partial double NotesFontSize { get; set; } = 16;
+    public string LastSeenAppVersion { get; set; } = string.Empty;
     public List<TsundokuTheme> SavedThemes { get; set; }
     public List<Series> UserCollection { get; set; }
 
     [JsonConverter(typeof(UserIconBitmapJsonConverter))]
-    [Reactive] public Bitmap? UserIcon { get; set; }
+    [Reactive] public partial Bitmap? UserIcon { get; set; }
 
     public User(string UserName, TsundokuLanguage Language, string MainTheme, string Display, double DataVersion, string Currency, string CollectionValue, Region Region, Dictionary<string, bool> Memberships, List<TsundokuTheme> SavedThemes, List<Series> UserCollection)
     {
@@ -59,6 +67,10 @@ public sealed class User : ReactiveObject
         Notes = string.Empty;
     }
 
+    /// <summary>
+    /// Serializes this user instance to a JSON string using the shared serialization options.
+    /// </summary>
+    /// <returns>A JSON string representing the user data.</returns>
     [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "<Pending>")]
     public string Serialize()
     {
@@ -93,7 +105,7 @@ public sealed class User : ReactiveObject
             userData.AsObject().Add(nameof(Currency), "$");
             userData.AsObject().Add(nameof(MeanRating), 0);
             userData.AsObject().Add(nameof(VolumesRead), 0);
-            userData.AsObject().Add(nameof(CollectionValue), "");
+            userData.AsObject().Add(nameof(CollectionValue), string.Empty);
 
             if (userData[nameof(Language)].ToString().Equals("Native"))
             {
@@ -192,7 +204,8 @@ public sealed class User : ReactiveObject
                 coverPath = collectionJsonArray.ElementAt(x)["Cover"].ToString();
                 if (File.Exists(coverPath))
                 {
-                    Bitmap resizedBitMap = new Bitmap(coverPath).CreateScaledBitmap(new PixelSize(LEFT_SIDE_CARD_WIDTH, IMAGE_HEIGHT), BitmapInterpolationMode.HighQuality);
+                    using Bitmap originalBitmap = new Bitmap(coverPath);
+                    Bitmap resizedBitMap = originalBitmap.CreateScaledBitmap(new PixelSize(LEFT_SIDE_CARD_WIDTH * BITMAP_SCALE, IMAGE_HEIGHT * BITMAP_SCALE), BitmapInterpolationMode.HighQuality);
                     resizedBitMap.Save(coverPath, 100);
                 }
             }
@@ -209,11 +222,11 @@ public sealed class User : ReactiveObject
                 [KinokuniyaUSA.TITLE] = false
             };
 
-            userData.AsObject()[nameof(MeanRating)] = (decimal)userData["MeanScore"];
+            userData.AsObject()[nameof(MeanRating)] = decimal.TryParse(userData["MeanScore"]?.ToString(), out decimal meanScore) ? meanScore : 0m;
             for (int x = 0; x < collectionJsonArray.Count; x++)
             {
                 series = collectionJsonArray.ElementAt(x).AsObject();
-                series["Rating"] = decimal.Parse(series["Score"].ToString());
+                series["Rating"] = decimal.TryParse(series["Score"]?.ToString(), out decimal score) ? score : 0m;
             }
             userData.AsObject().Remove("MeanScore");
 
@@ -266,10 +279,10 @@ public sealed class User : ReactiveObject
             for (int x = 0; x < collectionJsonArray.Count; x++)
             {
                 series = collectionJsonArray.ElementAt(x).AsObject();
-                string[] coverFileName = series["Cover"].ToString().Split('_');
-                string format = series["Format"].ToString().ToUpper();
-                string oldCoverFileName = series["Cover"].ToString();
-                if (!coverFileName[1].StartsWith(format) && File.Exists(oldCoverFileName))
+                string[] coverFileName = series["Cover"]?.ToString().Split('_') ?? [];
+                string format = series["Format"]?.ToString() ?? string.Empty;
+                string oldCoverFileName = series["Cover"]?.ToString() ?? string.Empty;
+                if (coverFileName.Length > 1 && !coverFileName[1].StartsWith(format, StringComparison.OrdinalIgnoreCase) && File.Exists(oldCoverFileName))
                 {
                     series["Cover"] = $@"{coverFileName[0]}_{format}.{oldCoverFileName.Substring(oldCoverFileName.Length - 3)}";
                     File.Move(oldCoverFileName, series["Cover"].ToString());
@@ -288,7 +301,10 @@ public sealed class User : ReactiveObject
                 theme = themeJsonArray.ElementAt(x).AsObject();
                 foreach (System.Reflection.PropertyInfo property in typeof(TsundokuTheme).GetProperties().Skip(1))
                 {
-                    theme[property.Name] = Avalonia.Media.Color.FromUInt32(uint.Parse(theme[property.Name].ToString())).ToString();
+                    if (uint.TryParse(theme[property.Name]?.ToString(), out uint colorValue))
+                    {
+                        theme[property.Name] = Avalonia.Media.Color.FromUInt32(colorValue).ToString();
+                    }
                 }
             }
             userData[nameof(DataVersion)] = 3.0;
@@ -371,6 +387,50 @@ public sealed class User : ReactiveObject
             userData.AsObject()[nameof(CollectionValue)] = (string)userData["CollectionPrice"];
             userData.AsObject().Remove("CollectionPrice");
             userData[nameof(DataVersion)] = 6.1;
+        }
+
+        if (curVersion < 6.2) // 6.2 Overhaul theme colors: remove 15 unused, add 8 new
+        {
+            if (userData[nameof(SavedThemes)] is JsonArray v62ThemeArray)
+            {
+                string[] removedKeys =
+                [
+                    "SeriesProgressBGColor", "SeriesEditPaneBGColor",
+                    "SeriesEditPaneButtonsBGColor", "SeriesEditPaneButtonsBGHoverColor",
+                    "SeriesEditPaneButtonsBorderColor", "SeriesEditPaneButtonsBorderHoverColor",
+                    "SeriesEditPaneButtonsIconColor", "SeriesEditPaneButtonsIconHoverColor",
+                    "UserIconBorderColor", "StatusAndBookTypeBGHoverColor",
+                    "StatusAndBookTypeTextHoverColor", "SeriesProgressButtonsHoverColor",
+                    "SeriesNotesBGColor", "SeriesNotesBorderColor", "SeriesNotesTextColor"
+                ];
+
+                foreach (JsonNode? themeNode in v62ThemeArray)
+                {
+                    if (themeNode is not JsonObject themeObj) continue;
+
+                    string dividerColor = themeObj["DividerColor"]?.GetValue<string>() ?? "#ffdfd59e";
+                    string menuButtonBGColor = themeObj["MenuButtonBGColor"]?.GetValue<string>() ?? "#ff626460";
+                    string menuButtonBorderColor = themeObj["MenuButtonBorderColor"]?.GetValue<string>() ?? "#ff626460";
+                    string menuButtonBGHoverColor = themeObj["MenuButtonBGHoverColor"]?.GetValue<string>() ?? "#ff2c2d42";
+                    string menuButtonBorderHoverColor = themeObj["MenuButtonBorderHoverColor"]?.GetValue<string>() ?? "#ffdfd59e";
+
+                    foreach (string key in removedKeys)
+                    {
+                        themeObj.Remove(key);
+                    }
+
+                    themeObj["SeriesCardBorderColor"] = dividerColor;
+                    themeObj["StatusAndBookTypeBorderColor"] = dividerColor;
+                    themeObj["SeriesCoverBGColor"] = menuButtonBGColor;
+                    themeObj["SeriesCardButtonBGColor"] = menuButtonBGColor;
+                    themeObj["SeriesCardDividerColor"] = dividerColor;
+                    themeObj["SeriesCardButtonBGHoverColor"] = menuButtonBGHoverColor;
+                    themeObj["SeriesCardButtonBorderColor"] = menuButtonBorderColor;
+                    themeObj["SeriesCardButtonBorderHoverColor"] = menuButtonBorderHoverColor;
+                }
+            }
+            userData[nameof(DataVersion)] = 6.2;
+            LOGGER.Info("Updated schema to v6.2: Removed 15 unused theme colors, added 8 new theme colors");
         }
 
         if (!isImport)

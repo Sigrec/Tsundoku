@@ -1,7 +1,8 @@
 using Tsundoku.ViewModels;
 using Tsundoku.Models;
 using System.Text.Json.Nodes;
-using static Tsundoku.Models.Enums.SeriesFormatModel; // Assuming Tsundoku.Models contains User, Format, etc.
+using static Tsundoku.Models.Enums.SeriesFormatModel;
+using Microsoft.VisualBasic.FileIO; // Assuming Tsundoku.Models contains User, Format, etc.
 #if RELEASE
 using Windows.Storage;
 #endif
@@ -15,6 +16,13 @@ namespace Tsundoku.Helpers;
 public static class AppFileHelper
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
+
+    private const string CoversFolderName = "Covers";
+    private const string LogsFolderName = "Logs";
+    private const string ThemesFolderName = "Themes";
+    private const string ScreenshotsFolderName = "Screenshots";
+
+    /// <summary>Recognized image file extensions for cover images.</summary>
     public static readonly HashSet<string> VALID_IMAGE_EXTENSIONS = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
     {
         ".png", ".jpg", ".jpeg"
@@ -61,7 +69,7 @@ public static class AppFileHelper
     {
         string safeTitle = ExtensionMethods.RemoveInPlaceCharArray(string.Concat(title.Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries))).Replace(",", string.Empty);
 
-        string extension = Path.GetExtension(coverLink).ToLowerInvariant();
+        string extension = Path.GetExtension(coverLink);
 
         if (!VALID_IMAGE_EXTENSIONS.Contains(extension))
         {
@@ -69,7 +77,7 @@ public static class AppFileHelper
         }
         extension = ".png";
 
-        string baseFileName = $"{safeTitle}_{bookType.ToString().ToUpper()}";
+        string baseFileName = $"{safeTitle}_{bookType.ToString().ToUpperInvariant()}";
         bool isDuplicate = false;
         if (CheckCoverFileExists(baseFileName + extension) && allowDuplicate)
         {
@@ -122,7 +130,7 @@ public static class AppFileHelper
         }
         catch (Exception ex)
         {
-            LOGGER.Error(ex, $"Failed to create folder: {fullFolderPath}");
+            LOGGER.Error(ex, "Failed to create folder: {FolderPath}", fullFolderPath);
             throw;
         }
         return fullFolderPath;
@@ -134,17 +142,16 @@ public static class AppFileHelper
     /// <returns>The full path to the Covers folder.</returns>
     public static string GetCoversFolderPath()
     {
-        return GetFolderPath("Covers");
+        return GetFolderPath(CoversFolderName);
     }
 
     /// <summary>
-    /// Gets the full path for log files, specifically in the "Logs\" subfolder.
+    /// Gets the full path for the "Logs\" subfolder.
     /// </summary>
-    /// <param name="logFileName">The name of the log file (e.g., "AppLog.log").</param>
-    /// <returns>The full path to the log file in the Logs subfolder.</returns>
-    public static string GetLogFolderPath(string logFileName)
+    /// <returns>The full path to the Logs folder.</returns>
+    public static string GetLogFolderPath()
     {
-        return GetFolderPath("Logs");
+        return GetFolderPath(LogsFolderName);
     }
 
     /// <summary>
@@ -153,7 +160,7 @@ public static class AppFileHelper
     /// <returns>The full path to the Themes folder.</returns>
     public static string GetThemesFolderPath()
     {
-        return GetFolderPath("Themes");
+        return GetFolderPath(ThemesFolderName);
     }
 
     /// <summary>
@@ -162,7 +169,7 @@ public static class AppFileHelper
     /// <returns>The full path to the Screenshots folder.</returns>
     public static string GetScreenshotsFolderPath()
     {
-        return GetFolderPath("Screenshots");
+        return GetFolderPath(ScreenshotsFolderName);
     }
 
     /// <summary>
@@ -301,42 +308,23 @@ public static class AppFileHelper
     /// <summary>
     /// Gets the full path to an existing cover file if it has a valid image extension
     /// and exists in the "Covers" folder.
-    /// </summary>am>
+    /// </summary>
+    /// <param name="coverFileName">The file name of the cover image to look up.</param>
     /// <returns>The full path to the existing cover file if found, otherwise null.</returns>
     public static string GetFullCoverPath(string coverFileName)
     {
         string fullPath = Path.Combine(GetCoversFolderPath(), coverFileName);
-        string extension = Path.GetExtension(coverFileName).ToLowerInvariant();
+        string extension = Path.GetExtension(coverFileName);
 
         if (VALID_IMAGE_EXTENSIONS.Contains(extension))
         {
-            LOGGER.Trace("Cover file {FileName} has valid extension {extension}: {FullPath}", coverFileName, extension, fullPath);
-            return fullPath;
-        }
-
-        if (!VALID_IMAGE_EXTENSIONS.Contains(extension))
-        {
-            LOGGER.Warn("Provided file name {FileName} has an invalid or unrecognized extension '{Extension}'", coverFileName, extension);
+            LOGGER.Trace("Cover file {FileName} has valid extension {Extension}: {FullPath}", coverFileName, extension, fullPath);
         }
         else
         {
-            LOGGER.Warn("Cover file {FileName} with valid extension '{Extension}' not found at {FullPath}", coverFileName, extension, fullPath);
+            LOGGER.Warn("Provided file name {FileName} has an invalid or unrecognized extension '{Extension}'", coverFileName, extension);
         }
         return fullPath;
-    }
-
-    /// <summary>
-    /// Removes the extension from a given file name.
-    /// </summary>
-    /// <param name="fileNameWithExtension">The file name including its extension (e.g., "MyImage.png").</param>
-    /// <returns>The file name without its extension (e.g., "MyImage"). Returns an empty string if the input is null or empty.</returns>
-    public static string GetFileNameWithoutExtension(string fileNameWithExtension)
-    {
-        if (string.IsNullOrEmpty(fileNameWithExtension))
-        {
-            return string.Empty; // Return an empty string for null or empty input
-        }
-        return Path.GetFileNameWithoutExtension(fileNameWithExtension);
     }
 
     /// <summary>
@@ -348,7 +336,7 @@ public static class AppFileHelper
     public static string? FindExistingCoverByBaseName(string baseFileNameWithExtension)
     {
         string coversFolderPath = GetCoversFolderPath();
-        string baseFileNameWithoutExtension = GetFileNameWithoutExtension(baseFileNameWithExtension);
+        string baseFileNameWithoutExtension = Path.GetFileNameWithoutExtension(baseFileNameWithExtension);
 
         foreach (string ext in VALID_IMAGE_EXTENSIONS)
         {
@@ -364,42 +352,57 @@ public static class AppFileHelper
         return null; // No valid cover found with any known extension
     }
 
+    /// <summary>
+    /// Deletes the specified cover file from the covers folder, sending it to the Recycle Bin.
+    /// </summary>
+    /// <param name="coverName">The file name of the cover to delete.</param>
     public static void DeleteCoverFile(string coverName)
     {
         string filePath = GetFullCoverPath(coverName);
-        if (File.Exists(filePath))
+        RecycleFile(filePath);
+    }
+
+    /// <summary>
+    /// Sends a file to the Windows Recycle Bin instead of permanently deleting it.
+    /// Falls back to permanent deletion if the Recycle Bin API is unavailable.
+    /// </summary>
+    /// <param name="filePath">The full path of the file to recycle.</param>
+    public static void RecycleFile(string filePath)
+    {
+        if (!File.Exists(filePath))
         {
+            LOGGER.Warn("File not found, skipping deletion: {FilePath}", filePath);
+            return;
+        }
+
+        try
+        {
+            FileAttributes attributes = File.GetAttributes(filePath);
+            if ((attributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
+            {
+                File.SetAttributes(filePath, attributes & ~FileAttributes.ReadOnly);
+                LOGGER.Trace("Removed ReadOnly attribute from: {FilePath}", filePath);
+            }
+
+            FileSystem.DeleteFile(
+                filePath,
+                UIOption.OnlyErrorDialogs,
+                RecycleOption.SendToRecycleBin);
+
+            LOGGER.Info("Sent to Recycle Bin: {FilePath}", filePath);
+        }
+        catch (Exception ex)
+        {
+            LOGGER.Error(ex, "Failed to recycle file {FilePath}, attempting permanent delete", filePath);
             try
             {
-                System.IO.FileAttributes attributes = File.GetAttributes(filePath);
-                if ((attributes & System.IO.FileAttributes.ReadOnly) == System.IO.FileAttributes.ReadOnly)
-                {
-                    // Remove ONLY the ReadOnly attribute, leave others (Hidden, Archive, etc.) intact
-                    File.SetAttributes(filePath, attributes & ~System.IO.FileAttributes.ReadOnly);
-                    LOGGER.Trace("Removed ReadOnly attribute from: {filePath}", filePath);
-                }
-
                 File.Delete(filePath);
-                LOGGER.Info("Successfully deleted: {filePath}", filePath);
+                LOGGER.Info("Permanently deleted: {FilePath}", filePath);
             }
-            catch (UnauthorizedAccessException ex)
+            catch (Exception deleteEx)
             {
-                LOGGER.Error("Error deleting {filePath}: Access denied. (Details: {ex.Message})", filePath, ex.Message);
-                // This could still happen if permissions are truly insufficient beyond ReadOnly
-                // or if the file is in use by another process despite the error message.
+                LOGGER.Error(deleteEx, "Failed to delete file: {FilePath}", filePath);
             }
-            catch (IOException ex)
-            {
-                LOGGER.Info("Error deleting {filePath}: I/O error (e.g., file in use). (Details: {ex.Message})", filePath, ex.Message);
-            }
-            catch (Exception ex)
-            {
-                LOGGER.Info("An unexpected error occurred while deleting {filePath}: {ex.Message}", filePath, ex.Message);
-            }
-        }
-        else
-        {
-            LOGGER.Warn("File not found, skipping deletion: {filePath}", filePath);
         }
     }
 }

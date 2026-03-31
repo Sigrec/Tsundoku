@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using LiveChartsCore;
 using System.Reactive.Linq;
-using ReactiveUI.Fody.Helpers;
+using ReactiveUI.SourceGenerators;
 using LiveChartsCore.Defaults;
 using LiveChartsCore.SkiaSharpView;
 using Tsundoku.Models;
@@ -17,9 +17,13 @@ using static Tsundoku.Models.Enums.SeriesFormatModel;
 using static Tsundoku.Models.Enums.SeriesGenreModel;
 using System.Globalization;
 using System.Reactive.Disposables;
+using System.Reactive.Disposables.Fluent;
 
 namespace Tsundoku.ViewModels;
 
+/// <summary>
+/// View model for the collection statistics window, computing demographic, status, format, rating, genre, and volume distributions.
+/// </summary>
 public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposable
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
@@ -30,21 +34,30 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
     public ObservableValue ShoujoCount { get; } = new ObservableValue(0);
     public ObservableValue JoseiCount { get; } = new ObservableValue(0);
     public ObservableValue UnknownCount { get; } = new ObservableValue(0);
-    [Reactive] public decimal ShounenPercentage { get; set; }
-    [Reactive] public decimal SeinenPercentage { get; set; }
-    [Reactive] public decimal ShoujoPercentage { get; set; }
-    [Reactive] public decimal JoseiPercentage { get; set; }
-    [Reactive] public decimal UnknownPercentage { get; set; }
+    [Reactive] public partial decimal ShounenPercentage { get; set; }
+    [Reactive] public partial decimal SeinenPercentage { get; set; }
+    [Reactive] public partial decimal ShoujoPercentage { get; set; }
+    [Reactive] public partial decimal JoseiPercentage { get; set; }
+    [Reactive] public partial decimal UnknownPercentage { get; set; }
+    [Reactive] public partial SolidColorBrush ShounenLegendColor { get; set; }
+    [Reactive] public partial SolidColorBrush SeinenLegendColor { get; set; }
+    [Reactive] public partial SolidColorBrush ShoujoLegendColor { get; set; }
+    [Reactive] public partial SolidColorBrush JoseiLegendColor { get; set; }
+    [Reactive] public partial SolidColorBrush UnknownLegendColor { get; set; }
 
     public ObservableCollection<ISeries> StatusDistribution { get; set; } = [];
     public ObservableValue OngoingCount { get; } = new ObservableValue(0);
     public ObservableValue FinishedCount { get; } = new ObservableValue(0);
     public ObservableValue CancelledCount { get; } = new ObservableValue(0);
     public ObservableValue HiatusCount { get; } = new ObservableValue(0);
-    [Reactive] public decimal FinishedPercentage { get; set; }
-    [Reactive] public decimal OngoingPercentage { get; set; }
-    [Reactive] public decimal CancelledPercentage { get; set; }
-    [Reactive] public decimal HiatusPercentage { get; set; }
+    [Reactive] public partial decimal FinishedPercentage { get; set; }
+    [Reactive] public partial decimal OngoingPercentage { get; set; }
+    [Reactive] public partial decimal CancelledPercentage { get; set; }
+    [Reactive] public partial decimal HiatusPercentage { get; set; }
+    [Reactive] public partial SolidColorBrush FinishedLegendColor { get; set; }
+    [Reactive] public partial SolidColorBrush OngoingLegendColor { get; set; }
+    [Reactive] public partial SolidColorBrush CancelledLegendColor { get; set; }
+    [Reactive] public partial SolidColorBrush HiatusLegendColor { get; set; }
 
     public ObservableCollection<ISeries> Formats { get; set; } = [];
     public ObservableValue MangaCount { get; } = new ObservableValue(0);
@@ -53,12 +66,18 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
     public ObservableValue ManfraCount { get; } = new ObservableValue(0);
     public ObservableValue ComicCount { get; } = new ObservableValue(0);
     public ObservableValue NovelCount { get; } = new ObservableValue(0);
-    [Reactive] public decimal MangaPercentage { get; set; }
-    [Reactive] public decimal ManhwaPercentage { get; set; }
-    [Reactive] public decimal ManhuaPercentage { get; set; }
-    [Reactive] public decimal ManfraPercentage { get; set; }
-    [Reactive] public decimal ComicPercentage { get; set; }
-    [Reactive] public decimal NovelPercentage { get; set; }
+    [Reactive] public partial decimal MangaPercentage { get; set; }
+    [Reactive] public partial decimal ManhwaPercentage { get; set; }
+    [Reactive] public partial decimal ManhuaPercentage { get; set; }
+    [Reactive] public partial decimal ManfraPercentage { get; set; }
+    [Reactive] public partial decimal ComicPercentage { get; set; }
+    [Reactive] public partial decimal NovelPercentage { get; set; }
+    [Reactive] public partial SolidColorBrush MangaLegendColor { get; set; }
+    [Reactive] public partial SolidColorBrush ManhwaLegendColor { get; set; }
+    [Reactive] public partial SolidColorBrush ManhuaLegendColor { get; set; }
+    [Reactive] public partial SolidColorBrush ManfraLegendColor { get; set; }
+    [Reactive] public partial SolidColorBrush ComicLegendColor { get; set; }
+    [Reactive] public partial SolidColorBrush NovelLegendColor { get; set; }
 
     public ObservableCollection<ISeries> RatingDistribution { get; set; } = [];
     public ObservableCollection<Axis> RatingXAxes { get; } = [];
@@ -117,14 +136,20 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
     public Axis[] GenreXAxes { get; set; } = [];
     public Axis[] GenreYAxes { get; set; } = [];
 
-    [Reactive] public int SeriesCount { get; set; }
-    [Reactive] public int FavoriteCount { get; set; }
+    public ObservableCollection<ISeries<KeyValuePair<string, int>>> GenreDistribution1 { get; set; } = [];
+    public ObservableCollection<ISeries<KeyValuePair<string, int>>> GenreDistribution2 { get; set; } = [];
+    public Axis[] GenreXAxes1 { get; set; } = [];
+    public Axis[] GenreXAxes2 { get; set; } = [];
+    public Axis[] GenreYAxes1 { get; set; } = [];
+    public Axis[] GenreYAxes2 { get; set; } = [];
 
-    [Reactive] public SolidColorBrush PaneBackgroundColor { get; set; }
-    [Reactive] public SolidColorBrush UnknownRectangleColor { get; set; }
-    [Reactive] public SolidColorBrush ManhuaRectangleColor { get; set; }
-    [Reactive] public SolidColorBrush ManfraRectangleColor { get; set; }
-    [Reactive] public string CollectionValueText { get; set; }
+    [Reactive] public partial int SeriesCount { get; set; }
+    [Reactive] public partial int FavoriteCount { get; set; }
+    [Reactive] public partial string CompletionRate { get; set; }
+    [Reactive] public partial int FullyCollectedCount { get; set; }
+
+    [Reactive] public partial SolidColorBrush PaneBackgroundColor { get; set; }
+    [Reactive] public partial string CollectionValueText { get; set; }
 
     public ReadOnlyObservableCollection<Series> UserCollection { get; }
     private readonly ISharedSeriesCollectionProvider _sharedSeriesProvider;
@@ -154,22 +179,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
             UpdateRatingBarChartColors();
             UpdateVolumeDistributionBarChartColors();
             UpdateGenreBarChartColors();
-            UpdatePieChartColors();
             UpdateBackgroundColors();
-            UpdateUnknownRectangleColor();
-            UpdateManhuaRectangleColor();
-        })
-        .DisposeWith(_disposables);
-
-        this.WhenAnyValue(
-            x => x.CurrentTheme.SeriesCardDescColor,
-            x => x.CurrentTheme.SeriesCardTitleColor)
-        .DistinctUntilChanged()
-        .Subscribe(_ =>
-        {
-            UpdatePieChartColors();
-            UpdateManhuaRectangleColor();
-            UpdateManfraRectangleColor();
         })
         .DisposeWith(_disposables);
 
@@ -179,17 +189,6 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
         .Subscribe(_ =>
         {
             UpdateBackgroundColors();
-            UpdateUnknownRectangleColor();
-        })
-        .DisposeWith(_disposables);
-        
-        this.WhenAnyValue(
-            x => x.CurrentTheme.SeriesCardStaffColor,
-            x => x.CurrentTheme.SeriesEditPaneButtonsIconColor)
-        .DistinctUntilChanged()
-        .Subscribe(_ =>
-        {
-            UpdateManfraRectangleColor();
         })
         .DisposeWith(_disposables);
     }
@@ -201,40 +200,6 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
             : CurrentTheme.SeriesCardBGColor;
     }
 
-    private SolidColorBrush GetUnknownColor()
-    {
-        return  CurrentTheme.SeriesCardDescColor.Color == CurrentTheme.MenuTextColor.Color
-            ? CurrentTheme.SeriesCardTitleColor
-            : CurrentTheme.SeriesCardDescColor;
-    }
-    private void UpdateUnknownRectangleColor()
-    {
-        UnknownRectangleColor = GetUnknownColor();
-    }
-
-    private SolidColorBrush GetManhwaColor()
-    {
-        return CurrentTheme.SeriesCardDescColor.Color == CurrentTheme.MenuTextColor.Color
-            ? CurrentTheme.SeriesCardTitleColor
-            : CurrentTheme.SeriesCardDescColor;
-    }
-
-    private void UpdateManhuaRectangleColor()
-    {
-        ManhuaRectangleColor = GetManhwaColor();
-    }
-
-    private SolidColorBrush GetManfraColor()
-    {
-        return CurrentTheme.SeriesCardStaffColor.Color == CurrentTheme.SeriesCardTitleColor.Color
-            ? CurrentTheme.SeriesEditPaneButtonsIconColor
-            : CurrentTheme.SeriesCardStaffColor;
-    }
-    private void UpdateManfraRectangleColor()
-    {
-        ManfraRectangleColor = GetManfraColor();
-    }
-
 #region Stats
     private void SetupStats()
     {
@@ -242,7 +207,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
             .AutoRefresh(x => x.Rating)
             .DistinctUntilChanged()
             .Throttle(TimeSpan.FromMilliseconds(100))
-            .ObserveOn(RxApp.MainThreadScheduler)
+            .ObserveOn(RxSchedulers.MainThreadScheduler)
             .ToCollection()
             .Select(list =>
             {
@@ -258,95 +223,113 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
                 }
                 return seriesCount != 0 ? decimal.Round(decimal.Divide(total, seriesCount), 2) : 0.00m;
             })
-            .Subscribe(rating => _userService.UpdateUser(user => user.MeanRating = rating));
+            .Subscribe(rating => _userService.UpdateUser(user => user.MeanRating = rating))
+            .DisposeWith(_disposables);
 
         _userService.UserCollectionChanges
             .AutoRefresh(x => x.VolumesRead)
             .DistinctUntilChanged()
             .Throttle(TimeSpan.FromMilliseconds(100))
-            .ObserveOn(RxApp.MainThreadScheduler)
+            .ObserveOn(RxSchedulers.MainThreadScheduler)
             .ToCollection()
             .Select(seriesCollection => (uint)seriesCollection.Sum(item => item.VolumesRead))
             .Subscribe(volumesRead =>
             {
                 _userService.UpdateUser(user => user.VolumesRead = volumesRead);
-            });
+            })
+            .DisposeWith(_disposables);
 
         Observable.CombineLatest(
             _userService.UserCollectionChanges
                 .AutoRefresh(x => x.Value)
                 .DistinctUntilChanged()
                 .Throttle(TimeSpan.FromMilliseconds(100))
-                .ObserveOn(RxApp.MainThreadScheduler)
+                .ObserveOn(RxSchedulers.MainThreadScheduler)
                 .ToCollection()
                 .Select(seriesCollection => decimal.Round(seriesCollection.Sum(item => item.Value), 2)),
             this.WhenAnyValue(x => x.CurrentUser.Currency),
             (Value, Currency) => new { Value, Currency }
         )
-        .ObserveOn(RxApp.MainThreadScheduler)
+        .ObserveOn(RxSchedulers.MainThreadScheduler)
         .Subscribe(result =>
         {
             CultureInfo cultureInfo = CultureInfo.GetCultureInfo(AVAILABLE_CURRENCY_WITH_CULTURE[result.Currency].Culture);
+            string formattedValue = result.Value.ToString("N2", cultureInfo);
             if (cultureInfo.NumberFormat.CurrencyPositivePattern is 0 or 2) // 0 = "$n", 2 = "$ n"
             {
-                CollectionValueText = $"{result.Currency}{result.Value}";
+                CollectionValueText = $"{result.Currency}{formattedValue}";
             }
             else
             {
-                CollectionValueText = $"{result.Value}{result.Currency}";
+                CollectionValueText = $"{formattedValue}{result.Currency}";
             }
 
             _userService.UpdateUser(user =>
                 user.CollectionValue = CollectionValueText);
-        });
+        })
+        .DisposeWith(_disposables);
 
         _userService.UserCollectionChanges
             .DistinctUntilChanged()
-            .ObserveOn(RxApp.MainThreadScheduler)
+            .ObserveOn(RxSchedulers.MainThreadScheduler)
             .ToCollection()
             .Subscribe(seriesList =>
             {
                 SeriesCount = seriesList.Count;
-            });
+            })
+            .DisposeWith(_disposables);
 
         _userService.UserCollectionChanges
             .AutoRefresh(x => x.IsFavorite)
             .DistinctUntilChanged()
-            .ObserveOn(RxApp.MainThreadScheduler)
+            .ObserveOn(RxSchedulers.MainThreadScheduler)
             .ToCollection()
             .Select(seriesList => seriesList.Count(x => x.IsFavorite))
             .Subscribe(count =>
             {
                 FavoriteCount = count;
-            });
+            })
+            .DisposeWith(_disposables);
 
         _userService.UserCollectionChanges
             .AutoRefresh(x => x.CurVolumeCount)
             .AutoRefresh(x => x.MaxVolumeCount)
             .DistinctUntilChanged()
-            .ObserveOn(RxApp.MainThreadScheduler)
+            .ObserveOn(RxSchedulers.MainThreadScheduler)
             .Throttle(TimeSpan.FromMilliseconds(500))
             .ToCollection()
             .Select(seriesList =>
             {
                 uint totalCurVolumes = 0;
-                uint totalVolumesToBeCollected = 0;
+                uint totalMaxVolumes = 0;
+                int fullyCollected = 0;
 
                 foreach (Series series in seriesList)
                 {
                     totalCurVolumes += series.CurVolumeCount;
-                    totalVolumesToBeCollected += series.MaxVolumeCount - series.CurVolumeCount;
+                    totalMaxVolumes += series.MaxVolumeCount;
+                    if (series.CurVolumeCount == series.MaxVolumeCount)
+                    {
+                        fullyCollected++;
+                    }
                 }
-                return (totalCurVolumes, totalVolumesToBeCollected);
+                uint totalVolumesToBeCollected = totalMaxVolumes - totalCurVolumes;
+                decimal completionRate = totalMaxVolumes > 0
+                    ? decimal.Round(totalCurVolumes / (decimal)totalMaxVolumes * 100m, 1)
+                    : 0m;
+                return (totalCurVolumes, totalVolumesToBeCollected, completionRate, fullyCollected);
             })
             .Subscribe(tuple =>
             {
+                CompletionRate = $"{tuple.completionRate}%";
+                FullyCollectedCount = tuple.fullyCollected;
                 _userService.UpdateUser(user =>
                 {
                     user.NumVolumesCollected = tuple.totalCurVolumes;
                     user.NumVolumesToBeCollected = tuple.totalVolumesToBeCollected;
                 });
-            });
+            })
+            .DisposeWith(_disposables);
     }
 #endregion
 
@@ -426,7 +409,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
 
         _ = _userService.UserCollectionChanges
                 .AutoRefresh(x => x.Rating)
-                .ObserveOn(RxApp.MainThreadScheduler)
+                .ObserveOn(RxSchedulers.MainThreadScheduler)
                 .QueryWhenChanged(query => query.Items)
                 .Select(seriesList => // Perform all your counting logic on this snapshot
                 {
@@ -587,7 +570,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
 
         _userService.UserCollectionChanges
             .AutoRefresh(x => x.MaxVolumeCount)
-            .ObserveOn(RxApp.MainThreadScheduler)
+            .ObserveOn(RxSchedulers.MainThreadScheduler)
             .QueryWhenChanged(query => query.Items)
             .Select(seriesList =>
             {
@@ -720,45 +703,83 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
         }
     }
 
-    private void SetupGenreBarChart()
+    private static RowSeries<KeyValuePair<string, int>> CreateGenreRowSeries()
     {
-        if (GenreDistribution.Count == 0) // Prevent adding duplicates if called multiple times
+        return new RowSeries<KeyValuePair<string, int>>
         {
-            GenreDistribution.Add(
-                new RowSeries<KeyValuePair<string, int>> // Values will be KeyValuePair<string, int>
-                {
-                    Values = Array.Empty<KeyValuePair<string, int>>(), // Initialize empty
-                    IsHoverable = false,
-                    // Mapping is crucial here to tell LiveCharts how to draw from KeyValuePair
-                    Mapping = (dataPoint, index) => new(index, dataPoint.Value)
-                    // Styling will be handled by ApplyGenreChartTheme
-                }
-            );
+            Values = Array.Empty<KeyValuePair<string, int>>(),
+            IsHoverable = false,
+            Mapping = (dataPoint, index) => new(index, dataPoint.Value)
+        };
+    }
+
+    private static Axis CreateGenreXAxis()
+    {
+        return new Axis
+        {
+            SeparatorsPaint = new SolidColorPaint(new SKColor(220, 220, 220)),
+            MinLimit = 0,
+            MinStep = 1,
+            ForceStepToMin = false,
+        };
+    }
+
+    private static Axis CreateGenreYAxis()
+    {
+        return new Axis
+        {
+            Labels = Array.Empty<string>(),
+            ShowSeparatorLines = false,
+            ForceStepToMin = true,
+        };
+    }
+
+    private void UpdateSplitGenreCharts(KeyValuePair<string, int>[] orderedGenreData)
+    {
+        int midpoint = (orderedGenreData.Length + 1) / 2;
+        KeyValuePair<string, int>[] firstHalf = orderedGenreData[..midpoint];
+        KeyValuePair<string, int>[] secondHalf = orderedGenreData[midpoint..];
+
+        if (GenreDistribution1.Count > 0 && GenreDistribution1[0] is RowSeries<KeyValuePair<string, int>> series1)
+        {
+            series1.Values = firstHalf;
+        }
+        if (GenreYAxes1 is { Length: > 0 })
+        {
+            GenreYAxes1[0].Labels = firstHalf.AsValueEnumerable().Select(kvp => kvp.Key).ToArray();
         }
 
-        // 2. Chart Axes Setup
-        GenreXAxes =
-        [
-            new Axis
-            {
-                SeparatorsPaint = new SolidColorPaint(new SKColor(220, 220, 220)),
-                MinLimit = 0,
-                MinStep = 1,
-                ForceStepToMin = false,
-                // Styling will be handled by ApplyGenreChartTheme
-            }
-        ];
+        if (GenreDistribution2.Count > 0 && GenreDistribution2[0] is RowSeries<KeyValuePair<string, int>> series2)
+        {
+            series2.Values = secondHalf;
+        }
+        if (GenreYAxes2 is { Length: > 0 })
+        {
+            GenreYAxes2[0].Labels = secondHalf.AsValueEnumerable().Select(kvp => kvp.Key).ToArray();
+        }
+    }
 
-        GenreYAxes =
-        [
-            new Axis
-            {
-                Labels = Array.Empty<string>(), // Initialize empty, will be updated in UpdateGenreChart
-                ShowSeparatorLines = false,
-                ForceStepToMin = true,
-                // Styling will be handled by ApplyGenreChartTheme
-            }
-        ];
+    private void SetupGenreBarChart()
+    {
+        if (GenreDistribution.Count == 0)
+        {
+            GenreDistribution.Add(CreateGenreRowSeries());
+        }
+        if (GenreDistribution1.Count == 0)
+        {
+            GenreDistribution1.Add(CreateGenreRowSeries());
+        }
+        if (GenreDistribution2.Count == 0)
+        {
+            GenreDistribution2.Add(CreateGenreRowSeries());
+        }
+
+        GenreXAxes = [CreateGenreXAxis()];
+        GenreYAxes = [CreateGenreYAxis()];
+        GenreXAxes1 = [CreateGenreXAxis()];
+        GenreYAxes1 = [CreateGenreYAxis()];
+        GenreXAxes2 = [CreateGenreXAxis()];
+        GenreYAxes2 = [CreateGenreYAxis()];
 
         foreach (Series series in UserCollection)
         {
@@ -775,31 +796,28 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
             }
         }
 
-        // 2. Order genres by their count for consistent display
-        // Convert to Dictionary after ordering to maintain order (though Dictionary itself doesn't guarantee order)
-        // ToDictionary(x => x.Key, x => x.Value) ensures a new dictionary with the order.
-        GenreData = GenreData.OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
+        GenreData = GenreData.AsValueEnumerable().OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
 
-        // 3. Update the chart series values
-        // Access the first (and only) RowSeries in your distribution collection.
+        KeyValuePair<string, int>[] orderedData = GenreData.AsValueEnumerable().ToArray();
+
         if (GenreDistribution.Count > 0 && GenreDistribution[0] is RowSeries<KeyValuePair<string, int>> genreBarObject)
         {
-            genreBarObject.Values = GenreData.ToArray(); // Update the values of the existing series
+            genreBarObject.Values = orderedData;
+        }
+        if (GenreYAxes is { Length: > 0 })
+        {
+            GenreYAxes[0].Labels = [.. GenreData.Keys];
         }
 
-        // 4. Update the Y-axis labels
-        if (GenreYAxes is not null && GenreYAxes.Length > 0)
-        {
-            GenreYAxes[0].Labels = [.. GenreData.Keys]; // Update the labels of the existing axis
-        }
+        UpdateSplitGenreCharts(orderedData);
 
         _userService.UserCollectionChanges
             .AutoRefresh(x => x.Genres)
             .DistinctUntilChanged()
             .Throttle(TimeSpan.FromMilliseconds(500))
-            .ObserveOn(RxApp.MainThreadScheduler)
-            .QueryWhenChanged(query => query.Items) // Get the current snapshot of all Series
-            .Select(seriesList => // Perform the genre counting logic
+            .ObserveOn(RxSchedulers.MainThreadScheduler)
+            .QueryWhenChanged(query => query.Items)
+            .Select(seriesList =>
             {
                 GenreData.Clear();
                 foreach (Series series in seriesList)
@@ -822,7 +840,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
                     }
                 }
 
-                return GenreData.OrderBy(x => x.Value).ToArray();
+                return GenreData.AsValueEnumerable().OrderBy(x => x.Value).ToArray();
             })
             .Subscribe(calculatedGenreData =>
             {
@@ -831,45 +849,48 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
                     genreBarObject.Values = calculatedGenreData;
                 }
 
-                if (GenreYAxes is not null && GenreYAxes.Length > 0)
+                if (GenreYAxes is { Length: > 0 })
                 {
-                    GenreYAxes[0].Labels = calculatedGenreData.Select(kvp => kvp.Key).ToArray();
+                    GenreYAxes[0].Labels = calculatedGenreData.AsValueEnumerable().Select(kvp => kvp.Key).ToArray();
                 }
+
+                UpdateSplitGenreCharts(calculatedGenreData);
             })
             .DisposeWith(_disposables);
     }
 
+    private void ApplyGenreChartColorsToSeries(ObservableCollection<ISeries<KeyValuePair<string, int>>> distribution, Axis[] xAxes, Axis[] yAxes, SKColor fillColor, SKColor textColor, SKColor dividerColor)
+    {
+        if (distribution.Count > 0 && distribution[0] is RowSeries<KeyValuePair<string, int>> barObject)
+        {
+            barObject.Fill = new SolidColorPaint(fillColor);
+            barObject.DataLabelsPaint = new SolidColorPaint(textColor);
+            barObject.Stroke = new SolidColorPaint(dividerColor);
+        }
+
+        if (yAxes is { Length: > 0 })
+        {
+            yAxes[0].LabelsPaint = new SolidColorPaint(textColor);
+            yAxes[0].TicksPaint = new SolidColorPaint(textColor);
+        }
+
+        if (xAxes is { Length: > 0 })
+        {
+            xAxes[0].TicksPaint = new SolidColorPaint(textColor);
+            xAxes[0].LabelsPaint = new SolidColorPaint(textColor);
+            xAxes[0].SeparatorsPaint = new SolidColorPaint(dividerColor);
+        }
+    }
+
     private void UpdateGenreBarChartColors()
     {
-        // Get the relevant theme colors. Assuming CurrentTheme is accessible.
         SKColor menuBgColor = ConvertAvaloniaBrushToSKColor(CurrentTheme.MenuBGColor);
         SKColor menuTextColor = ConvertAvaloniaBrushToSKColor(CurrentTheme.MenuTextColor);
         SKColor dividerColor = ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor);
 
-        // Apply colors to the bar series
-        if (GenreDistribution.Count > 0 && GenreDistribution[0] is RowSeries<KeyValuePair<string, int>> genreBarObject)
-        {
-            genreBarObject.Fill = new SolidColorPaint(menuBgColor);
-            genreBarObject.DataLabelsPaint = new SolidColorPaint(menuTextColor);
-            genreBarObject.Stroke = new SolidColorPaint(dividerColor);
-        }
-
-        // Apply colors to the Y-axis (genre labels)
-        if (GenreYAxes is not null && GenreYAxes.Length > 0)
-        {
-            Axis genreYAxisObject = GenreYAxes[0];
-            genreYAxisObject.LabelsPaint = new SolidColorPaint(menuTextColor);
-            genreYAxisObject.TicksPaint = new SolidColorPaint(menuTextColor);
-        }
-
-        // Apply colors to the X-axis (counts)
-        if (GenreXAxes is not null && GenreXAxes.Length > 0)
-        {
-            Axis genreXAxisObject = GenreXAxes[0];
-            genreXAxisObject.TicksPaint = new SolidColorPaint(menuTextColor);
-            genreXAxisObject.LabelsPaint = new SolidColorPaint(menuTextColor);
-            genreXAxisObject.SeparatorsPaint = new SolidColorPaint(dividerColor);
-        }
+        ApplyGenreChartColorsToSeries(GenreDistribution, GenreXAxes, GenreYAxes, menuBgColor, menuTextColor, dividerColor);
+        ApplyGenreChartColorsToSeries(GenreDistribution1, GenreXAxes1, GenreYAxes1, menuBgColor, menuTextColor, dividerColor);
+        ApplyGenreChartColorsToSeries(GenreDistribution2, GenreXAxes2, GenreYAxes2, menuBgColor, menuTextColor, dividerColor);
     }
 #endregion
     
@@ -880,24 +901,66 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
         SetupDemographicPieChart(initialUserCollectionCount);
         SetupStatusPieChart(initialUserCollectionCount);
         SetupFormatPieChart(initialUserCollectionCount);
+        InitializeLegendColors();
     }
 
-    private static PieSeries<ObservableValue> CreatePieSeries(ObservableValue countValue, string name)
+    private static readonly SKColor[] s_pieChartPalette =
+    [
+        new SKColor(0xD4, 0xA8, 0x4B), // warm amber
+        new SKColor(0x7E, 0x9E, 0xC2), // periwinkle
+        new SKColor(0xC4, 0x7D, 0x94), // muted rose
+        new SKColor(0x7D, 0xB8, 0x7D), // sage green
+        new SKColor(0xD4, 0x90, 0x70), // soft coral
+        new SKColor(0x8A, 0xAE, 0xA6), // sage teal
+    ];
+
+    private void InitializeLegendColors()
+    {
+        // Demographic (5 series, indices 0-4)
+        ShounenLegendColor = SKColorToBrush(s_pieChartPalette[0]);
+        SeinenLegendColor = SKColorToBrush(s_pieChartPalette[1]);
+        ShoujoLegendColor = SKColorToBrush(s_pieChartPalette[2]);
+        JoseiLegendColor = SKColorToBrush(s_pieChartPalette[3]);
+        UnknownLegendColor = SKColorToBrush(s_pieChartPalette[4]);
+
+        // Status (4 series, indices 0-3)
+        OngoingLegendColor = SKColorToBrush(s_pieChartPalette[0]);
+        FinishedLegendColor = SKColorToBrush(s_pieChartPalette[1]);
+        CancelledLegendColor = SKColorToBrush(s_pieChartPalette[2]);
+        HiatusLegendColor = SKColorToBrush(s_pieChartPalette[3]);
+
+        // Format (6 series, indices 0-5)
+        MangaLegendColor = SKColorToBrush(s_pieChartPalette[0]);
+        ManhwaLegendColor = SKColorToBrush(s_pieChartPalette[1]);
+        NovelLegendColor = SKColorToBrush(s_pieChartPalette[2]);
+        ComicLegendColor = SKColorToBrush(s_pieChartPalette[3]);
+        ManhuaLegendColor = SKColorToBrush(s_pieChartPalette[4]);
+        ManfraLegendColor = SKColorToBrush(s_pieChartPalette[5]);
+    }
+
+    private static SolidColorBrush SKColorToBrush(SKColor color)
+    {
+        return new SolidColorBrush(new Avalonia.Media.Color(color.Alpha, color.Red, color.Green, color.Blue));
+    }
+
+    private static PieSeries<ObservableValue> CreatePieSeries(ObservableValue countValue, string name, SKColor fill)
     {
         return new PieSeries<ObservableValue>
         {
             Values = new ObservableCollection<ObservableValue> { countValue },
             Name = name,
+            Fill = new SolidColorPaint(fill),
+            HoverPushout = 0,
         };
     }
 
     private void SetupDemographicPieChart(int initialUserCollectionCount)
     {
-        Demographics.Add(CreatePieSeries(ShounenCount, "Shounen"));
-        Demographics.Add(CreatePieSeries(SeinenCount, "Seinen"));
-        Demographics.Add(CreatePieSeries(ShoujoCount, "Shoujo"));
-        Demographics.Add(CreatePieSeries(JoseiCount, "Josei"));
-        Demographics.Add(CreatePieSeries(UnknownCount, "Unknown"));
+        Demographics.Add(CreatePieSeries(ShounenCount, "Shounen", s_pieChartPalette[0]));
+        Demographics.Add(CreatePieSeries(SeinenCount, "Seinen", s_pieChartPalette[1]));
+        Demographics.Add(CreatePieSeries(ShoujoCount, "Shoujo", s_pieChartPalette[2]));
+        Demographics.Add(CreatePieSeries(JoseiCount, "Josei", s_pieChartPalette[3]));
+        Demographics.Add(CreatePieSeries(UnknownCount, "Unknown", s_pieChartPalette[4]));
 
         _userService.UserCollectionChanges
             .Where(series => series is not null)
@@ -909,7 +972,6 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
                 {
                     IGroup<Series, Guid, SeriesDemographic> group = change.Current;
 
-                    // Subscribe to count changes in this group
                     group?.Cache.CountChanged
                         .StartWith(group.Cache.Count)
                         .Subscribe(count =>
@@ -941,9 +1003,11 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
                                     UnknownPercentage = percentage;
                                     break;
                             }
-                        });
+                        })
+                        .DisposeWith(_disposables);
                 }
-            });
+            })
+            .DisposeWith(_disposables);
 
         ShounenPercentage = CalculatePercentage(ShounenCount.Value, initialUserCollectionCount);
         SeinenPercentage = CalculatePercentage(SeinenCount.Value, initialUserCollectionCount);
@@ -954,13 +1018,13 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
 
     private void SetupStatusPieChart(int initialUserCollectionCount)
     {
-        StatusDistribution.Add(CreatePieSeries(OngoingCount, "Ongoing"));
-        StatusDistribution.Add(CreatePieSeries(FinishedCount, "Finished"));
-        StatusDistribution.Add(CreatePieSeries(CancelledCount, "Cancelled"));
-        StatusDistribution.Add(CreatePieSeries(HiatusCount, "Josei"));
+        StatusDistribution.Add(CreatePieSeries(OngoingCount, "Ongoing", s_pieChartPalette[0]));
+        StatusDistribution.Add(CreatePieSeries(FinishedCount, "Finished", s_pieChartPalette[1]));
+        StatusDistribution.Add(CreatePieSeries(CancelledCount, "Cancelled", s_pieChartPalette[2]));
+        StatusDistribution.Add(CreatePieSeries(HiatusCount, "Hiatus", s_pieChartPalette[3]));
 
         _userService.UserCollectionChanges
-            .AutoRefresh(x => x.Status) // detect property changes
+            .AutoRefresh(x => x.Status)
             .Group(user => user.Status)
             .Subscribe(groupChangeSet =>
             {
@@ -968,7 +1032,6 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
                 {
                     IGroup<Series, Guid, SeriesStatus> group = change.Current;
 
-                    // Subscribe to count changes in this group
                     group?.Cache.CountChanged
                         .StartWith(group.Cache.Count)
                         .Subscribe(count =>
@@ -996,9 +1059,11 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
                                     HiatusPercentage = percentage;
                                     break;
                             }
-                        });
+                        })
+                        .DisposeWith(_disposables);
                 }
-            });
+            })
+            .DisposeWith(_disposables);
             
         FinishedPercentage = CalculatePercentage(FinishedCount.Value, initialUserCollectionCount);
         OngoingPercentage = CalculatePercentage(OngoingCount.Value, initialUserCollectionCount);
@@ -1007,12 +1072,12 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
     }
     private void SetupFormatPieChart(int initialUserCollectionCount)
     {
-        Formats.Add(CreatePieSeries(MangaCount, "Manga"));
-        Formats.Add(CreatePieSeries(ManhwaCount, "Manhwa"));
-        Formats.Add(CreatePieSeries(NovelCount, "Novel"));
-        Formats.Add(CreatePieSeries(ComicCount, "Comic"));
-        Formats.Add(CreatePieSeries(ManhuaCount, "Manhua"));
-        Formats.Add(CreatePieSeries(ManfraCount, "Manfra"));
+        Formats.Add(CreatePieSeries(MangaCount, "Manga", s_pieChartPalette[0]));
+        Formats.Add(CreatePieSeries(ManhwaCount, "Manhwa", s_pieChartPalette[1]));
+        Formats.Add(CreatePieSeries(NovelCount, "Novel", s_pieChartPalette[2]));
+        Formats.Add(CreatePieSeries(ComicCount, "Comic", s_pieChartPalette[3]));
+        Formats.Add(CreatePieSeries(ManhuaCount, "Manhua", s_pieChartPalette[4]));
+        Formats.Add(CreatePieSeries(ManfraCount, "Manfra", s_pieChartPalette[5]));
 
         _userService.UserCollectionChanges
             .AutoRefresh(x => x.Format)
@@ -1023,7 +1088,6 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
                 {
                     IGroup<Series, Guid, SeriesFormat> group = change.Current;
 
-                    // Subscribe to count changes in this group
                     group?.Cache.CountChanged
                         .StartWith(group.Cache.Count)
                         .Subscribe(count =>
@@ -1059,9 +1123,11 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
                                     ComicPercentage = percentage;
                                     break;
                             }
-                        });
+                        })
+                        .DisposeWith(_disposables);
                 }
-            });
+            })
+            .DisposeWith(_disposables);
 
         MangaPercentage = CalculatePercentage(MangaCount.Value, initialUserCollectionCount);
         ManhwaPercentage = CalculatePercentage(ManhwaCount.Value, initialUserCollectionCount);
@@ -1071,89 +1137,6 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
         NovelPercentage = CalculatePercentage(NovelCount.Value, initialUserCollectionCount);
     }
 
-    private void UpdatePieChartColors()
-    {
-        // --- Update Demographic Pie Chart Series ---
-        if (Demographics.Count > 0 && Demographics[0] is PieSeries<ObservableValue> shounen)
-        {
-            shounen.Fill = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.MenuBGColor));
-            shounen.Stroke = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
-        }
-        if (Demographics.Count > 1 && Demographics[1] is PieSeries<ObservableValue> seinen)
-        {
-            seinen.Fill = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.MenuButtonBGColor));
-            seinen.Stroke = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
-        }
-        if (Demographics.Count > 2 && Demographics[2] is PieSeries<ObservableValue> shoujo)
-        {
-            shoujo.Fill = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.MenuTextColor));
-            shoujo.Stroke = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
-        }
-        if (Demographics.Count > 3 && Demographics[3] is PieSeries<ObservableValue> josei)
-        {
-            josei.Fill = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
-            josei.Stroke = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
-        }
-        if (Demographics.Count > 4 && Demographics[4] is PieSeries<ObservableValue> unknown)
-        {
-            unknown.Fill = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(GetUnknownColor())); // Use helper
-            unknown.Stroke = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
-        }
-
-        // --- Update Status Pie Chart Series ---
-        if (StatusDistribution.Count > 0 && StatusDistribution[0] is PieSeries<ObservableValue> ongoing)
-        {
-            ongoing.Fill = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.MenuBGColor));
-            ongoing.Stroke = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
-        }
-        if (StatusDistribution.Count > 1 && StatusDistribution[1] is PieSeries<ObservableValue> finished)
-        {
-            finished.Fill = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.MenuButtonBGColor));
-            finished.Stroke = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
-        }
-        if (StatusDistribution.Count > 2 && StatusDistribution[2] is PieSeries<ObservableValue> cancelled)
-        {
-            cancelled.Fill = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
-            cancelled.Stroke = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
-        }
-        if (StatusDistribution.Count > 3 && StatusDistribution[3] is PieSeries<ObservableValue> hiatus)
-        {
-            hiatus.Fill = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.MenuTextColor));
-            hiatus.Stroke = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
-        }
-
-        // --- Update Format Pie Chart Series ---
-        if (Formats.Count > 0 && Formats[0] is PieSeries<ObservableValue> manga)
-        {
-            manga.Fill = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.MenuButtonBGColor));
-            manga.Stroke = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
-        }
-        if (Formats.Count > 1 && Formats[1] is PieSeries<ObservableValue> manhwa)
-        {
-            manhwa.Fill = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.MenuBGColor));
-            manhwa.Stroke = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
-        }
-        if (Formats.Count > 2 && Formats[2] is PieSeries<ObservableValue> novel)
-        {
-            novel.Fill = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.MenuTextColor));
-            novel.Stroke = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
-        }
-        if (Formats.Count > 3 && Formats[3] is PieSeries<ObservableValue> comic)
-        {
-            comic.Fill = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
-            comic.Stroke = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
-        }
-        if (Formats.Count > 4 && Formats[4] is PieSeries<ObservableValue> manhua)
-        {
-            manhua.Fill = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(GetManhwaColor()));
-            manhua.Stroke = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
-        }
-        if (Formats.Count > 5 && Formats[5] is PieSeries<ObservableValue> manfra)
-        {
-            manfra.Fill = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(GetManfraColor()));
-            manfra.Stroke = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.DividerColor));
-        }
-    }
 #endregion
 
     private static decimal CalculatePercentage(double? count, decimal total)

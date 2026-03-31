@@ -1,11 +1,37 @@
 using Avalonia.Controls;
-using Avalonia.ReactiveUI;
+using ReactiveUI.Avalonia;
+using Tsundoku.Services;
 
 namespace Tsundoku.Helpers;
 
 public static class WindowHelper
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
+
+    /// <summary>
+    /// Wires up standard Opened/Closing handlers for managed child windows that hide instead of close.
+    /// </summary>
+    public static void ConfigureHideOnClose<T>(this T window, Action? onOpened = null, Action? onClosing = null)
+        where T : Window, IManagedWindow
+    {
+        window.Opened += (s, e) =>
+        {
+            window.IsOpen = true;
+            onOpened?.Invoke();
+        };
+
+        window.Closing += (s, e) =>
+        {
+            if (window.IsOpen)
+            {
+                window.Hide();
+                window.Topmost = false;
+                window.IsOpen = false;
+                e.Cancel = true;
+                onClosing?.Invoke();
+            }
+        };
+    }
 
     /// <summary>
     /// Opens or activates a managed ReactiveWindow in a non-blocking manner.
@@ -36,6 +62,7 @@ public static class WindowHelper
 
             if (!windowInstance.IsVisible)
             {
+                GlassmorphismService.ApplyToWindow(windowInstance, GlassmorphismService.IsEnabled);
                 windowInstance.Show(parentWindow);
             }
             else
@@ -81,11 +108,12 @@ public static class WindowHelper
             // Ensure the dialog is in a normal state before showing
             dialogInstance.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             dialogInstance.WindowState = WindowState.Normal;
+            GlassmorphismService.ApplyToWindow(dialogInstance, GlassmorphismService.IsEnabled);
             LOGGER.Debug("Opening {Window} as a modal dialog", windowNameForLogging);
-            
+
             // Await ShowDialog, passing the TResult type argument to get the dialog's return value
             TResult? result = await dialogInstance.ShowDialog<TResult?>(parentWindow);
-            LOGGER.Debug($"{windowNameForLogging} dialog closed with result: {result}");
+            LOGGER.Debug("{Window} dialog closed with result: {Result}", windowNameForLogging, result);
             return result;
         }
         catch (Exception ex)

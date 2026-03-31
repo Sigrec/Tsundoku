@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tsundoku - Edit Series Dialog</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: var(--menu-bg); }
+  ::-webkit-scrollbar-thumb { background: var(--divider); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--btn-text); }
+
+  body {
+    font-family: 'Geist', sans-serif;
+    background: var(--menu-bg);
+    margin: 0;
+  }
+
+  :root {
+    --menu-bg: #12293d; --username: #f1d2b6; --user-icon-border: #7b6b43;
+    --search-bg: #473633; --search-border: #7b6b43; --search-text: #f1d2b6;
+    --divider: #7b6b43; --btn-bg: #473633; --btn-bg-hover: #3e2a35;
+    --btn-border: #7b6b43; --btn-border-hover: #7b6b43;
+    --btn-text: #f1d2b6; --btn-text-hover: #12293d;
+    --card-desc: #f9eae1; --card-publisher: #f1d2b6; --card-title: #7b6b43;
+    --collection-bg: #3e2a35; --progress-bar: #f1d2b6;
+    --notes-bg: #473633; --notes-border: #7b6b43; --notes-text: #f9eae1;
+  }
+
+  .dialog {
+    background: var(--menu-bg);
+    border: none;
+    border-radius: 0;
+    width: 100%;
+    overflow-y: auto;
+  }
+
+  .dialog-header {
+    padding: 16px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 2px solid var(--divider);
+  }
+  .dialog-title {
+    font-size: 18px; font-weight: 800; color: var(--username);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .dialog-title i { font-size: 16px; color: var(--card-publisher); }
+  .dialog-close {
+    width: 32px; height: 32px; border-radius: 8px;
+    border: 2px solid var(--btn-border); background: var(--btn-bg);
+    color: var(--btn-text); cursor: pointer; font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .dialog-close:hover {
+    background: var(--btn-bg-hover); border-color: var(--btn-border-hover); color: var(--btn-text-hover);
+  }
+
+  .dialog-body {
+    display: flex; gap: 20px; padding: 20px 24px;
+    align-items: stretch;
+  }
+
+  .form-main { flex: 1; display: flex; flex-direction: column; gap: 14px; }
+
+  .form-group { display: flex; flex-direction: column; gap: 4px; }
+  .form-label {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.8px; color: var(--card-publisher);
+  }
+
+  .text-input {
+    background: var(--search-bg); border: 2px solid var(--search-border);
+    border-radius: 8px; padding: 8px 12px; color: var(--search-text);
+    font-size: 13px; font-weight: 500; font-family: inherit; outline: none;
+    width: 100%; transition: border-color 0.15s;
+  }
+  .text-input:focus { border-color: var(--btn-border-hover); }
+  .text-input::placeholder { color: var(--search-text); opacity: 0.35; }
+  .text-input.readonly {
+    opacity: 0.5; cursor: default; pointer-events: none;
+  }
+
+  .select-input {
+    background: var(--btn-bg); border: 2px solid var(--btn-border);
+    border-radius: 8px; padding: 8px 12px; color: var(--btn-text);
+    font-size: 13px; font-weight: 500; font-family: inherit; outline: none;
+    cursor: pointer; appearance: none; width: 100%;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 28px;
+  }
+
+  .notes-textarea {
+    width: 100%; height: 100px;
+    background: var(--notes-bg); border: 2px solid var(--notes-border);
+    border-radius: 8px; padding: 10px 12px; color: var(--notes-text);
+    font-size: 13px; font-weight: 500; font-family: inherit;
+    line-height: 1.5; resize: vertical; outline: none;
+    transition: border-color 0.15s;
+  }
+  .notes-textarea:focus { border-color: var(--btn-border-hover); }
+  .notes-textarea::placeholder { color: var(--notes-text); opacity: 0.3; }
+
+  .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+  .cover-row {
+    display: flex; gap: 8px; align-items: flex-end;
+  }
+  .cover-row .form-group { flex: 1; }
+
+  .icon-btn {
+    width: 36px; height: 36px; border-radius: 8px;
+    border: 2px solid var(--btn-border); background: var(--btn-bg);
+    color: var(--btn-text); cursor: pointer; font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s; flex-shrink: 0;
+  }
+  .icon-btn:hover {
+    background: var(--btn-bg-hover); border-color: var(--btn-border-hover); color: var(--btn-text-hover);
+  }
+
+  .action-bar {
+    display: flex; gap: 8px; justify-content: center;
+    margin-top: auto; padding-top: 6px;
+    border-top: 2px solid var(--divider);
+  }
+
+  .btn {
+    height: 36px;
+    padding: 0 16px; border-radius: 8px;
+    border: 2px solid var(--btn-border); background: var(--btn-bg);
+    color: var(--btn-text); font-size: 13px; font-weight: 600;
+    cursor: pointer; font-family: inherit; transition: all 0.15s;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .btn:hover {
+    background: var(--btn-bg-hover); border-color: var(--btn-border-hover); color: var(--btn-text-hover);
+  }
+  .btn-fav.active { color: #e74c3c; }
+
+  /* Genre Panel */
+  .genre-panel {
+    width: 180px; display: flex; flex-direction: column; gap: 4px; flex-shrink: 0;
+    min-height: 0; overflow: hidden;
+  }
+  .genre-title {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.8px; color: var(--card-publisher); margin-bottom: 4px;
+  }
+  .genre-list {
+    background: var(--search-bg); border: 2px solid var(--search-border);
+    border-radius: 10px; overflow-y: auto; padding: 4px;
+    max-height: 0;
+  }
+  .genre-list::-webkit-scrollbar-track { background: var(--search-bg); }
+
+  .genre-item {
+    padding: 6px 10px; border-radius: 6px; font-size: 12px; font-weight: 600;
+    color: var(--btn-text); cursor: pointer; transition: all 0.12s;
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 2px;
+  }
+  .genre-item:last-child { margin-bottom: 0; }
+  .genre-item:hover { background: var(--btn-bg-hover); }
+  .genre-item.selected { background: var(--btn-bg-hover); color: var(--btn-text-hover); }
+  .genre-item .check {
+    width: 14px; height: 14px; border-radius: 3px;
+    border: 2px solid var(--btn-border); display: flex;
+    align-items: center; justify-content: center; font-size: 8px; flex-shrink: 0;
+  }
+  .genre-item.selected .check { background: var(--progress-bar); border-color: var(--progress-bar); color: var(--menu-bg); }
+</style>
+</head>
+<body>
+<div class="dialog">
+  <div class="dialog-header">
+    <span class="dialog-title"><i class="fa-solid fa-pen-to-square"></i> Edit Series</span>
+    <button class="dialog-close"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <div class="dialog-body">
+    <div class="form-main">
+      <div class="form-group">
+        <span class="form-label">Series Notes</span>
+        <textarea class="notes-textarea" placeholder="Notes about this series...">2-in-1 Volumes</textarea>
+      </div>
+      <div class="row-3">
+        <div class="form-group">
+          <span class="form-label">Current Vols</span>
+          <input type="text" class="text-input" value="16">
+        </div>
+        <div class="form-group">
+          <span class="form-label">Max Vols</span>
+          <input type="text" class="text-input" value="16">
+        </div>
+        <div class="form-group">
+          <span class="form-label">Volumes Read</span>
+          <input type="text" class="text-input" value="0">
+        </div>
+      </div>
+      <div class="cover-row">
+        <div class="form-group">
+          <span class="form-label">Cover Image URL</span>
+          <input type="text" class="text-input" placeholder="Image URL...">
+        </div>
+        <button class="icon-btn" title="Change from Link"><i class="fa-solid fa-circle-down"></i></button>
+        <button class="icon-btn" title="Change from File"><i class="fa-solid fa-image"></i></button>
+      </div>
+      <div class="row-3">
+        <div class="form-group">
+          <span class="form-label">Publisher</span>
+          <input type="text" class="text-input readonly" value="Kodansha" readonly tabindex="-1">
+        </div>
+        <div class="form-group">
+          <span class="form-label">Value</span>
+          <input type="text" class="text-input" value="¥24,000">
+        </div>
+        <div class="form-group">
+          <span class="form-label">Rating</span>
+          <input type="text" class="text-input" value="N/A" placeholder="0.0 / 10.0">
+        </div>
+      </div>
+      <div class="row-2">
+        <div class="form-group">
+          <span class="form-label">Demographic</span>
+          <select class="select-input">
+            <option selected>Shounen</option><option>Shoujo</option>
+            <option>Seinen</option><option>Josei</option><option>Unknown</option>
+          </select>
+        </div>
+        <div class="form-group" style="justify-content:flex-end;">
+        </div>
+      </div>
+      <div class="action-bar">
+        <button class="btn"><i class="fa-solid fa-rotate"></i> Refresh</button>
+        <button class="btn"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+        <button class="btn btn-fav active"><i class="fa-solid fa-heart"></i></button>
+        <button class="btn" style="color:#e74c3c"><i class="fa-solid fa-trash"></i></button>
+      </div>
+    </div>
+    <div class="genre-panel">
+      <span class="genre-title">Genres</span>
+      <div class="genre-list">
+        <div class="genre-item selected"><span class="check"><i class="fa-solid fa-check"></i></span>Comedy</div>
+        <div class="genre-item selected"><span class="check"><i class="fa-solid fa-check"></i></span>Drama</div>
+        <div class="genre-item selected"><span class="check"><i class="fa-solid fa-check"></i></span>Music</div>
+        <div class="genre-item selected"><span class="check"><i class="fa-solid fa-check"></i></span>Romance</div>
+        <div class="genre-item selected"><span class="check"><i class="fa-solid fa-check"></i></span>Slice of Life</div>
+        <div class="genre-item"><span class="check"></span>Action</div>
+        <div class="genre-item"><span class="check"></span>Adventure</div>
+        <div class="genre-item"><span class="check"></span>Ecchi</div>
+        <div class="genre-item"><span class="check"></span>Fantasy</div>
+        <div class="genre-item"><span class="check"></span>Horror</div>
+        <div class="genre-item"><span class="check"></span>Mahou Shoujo</div>
+        <div class="genre-item"><span class="check"></span>Mecha</div>
+        <div class="genre-item"><span class="check"></span>Mystery</div>
+        <div class="genre-item"><span class="check"></span>Psychological</div>
+        <div class="genre-item"><span class="check"></span>Sci-Fi</div>
+        <div class="genre-item"><span class="check"></span>Sports</div>
+        <div class="genre-item"><span class="check"></span>Supernatural</div>
+        <div class="genre-item"><span class="check"></span>Thriller</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.genre-item').forEach(i => i.addEventListener('click', () => {
+  i.classList.toggle('selected');
+  const check = i.querySelector('.check');
+  check.innerHTML = i.classList.contains('selected') ? '<i class="fa-solid fa-check"></i>' : '';
+}));
+document.querySelector('.dialog-close').addEventListener('click', () => {
+  window.parent.postMessage('close-dialog', '*');
+});
+window.addEventListener('load', () => {
+  const header = document.querySelector('.dialog-header');
+  const form = document.querySelector('.form-main');
+  const body = document.querySelector('.dialog-body');
+  const genreTitle = document.querySelector('.genre-title');
+  const genreList = document.querySelector('.genre-list');
+
+  const bodyStyle = getComputedStyle(body);
+  const bodyPadding = parseFloat(bodyStyle.paddingTop) + parseFloat(bodyStyle.paddingBottom);
+  const formH = form.offsetHeight;
+  const totalH = formH + bodyPadding + header.offsetHeight;
+
+  const titleH = genreTitle.offsetHeight + parseFloat(getComputedStyle(genreTitle).marginBottom || 0);
+  genreList.style.maxHeight = (formH - titleH - 8) + 'px';
+
+  window.parent.postMessage({ type: 'dialog-height', height: totalH }, '*');
+});
+</script>
+</body>
+</html>

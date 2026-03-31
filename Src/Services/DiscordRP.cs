@@ -7,7 +7,7 @@ public static class DiscordRP
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
     private static DiscordRpcClient? client;
-    private static string UserName;
+    private static string UserName = string.Empty;
     private static PresenceState _presence = new();
 
     public static void Initialize()
@@ -21,11 +21,7 @@ public static class DiscordRP
         {
             client = new DiscordRpcClient("1050229234674696252")
             {
-#if DEBUG
-                Logger = new ConsoleLogger(DiscordRPC.Logging.LogLevel.Warning)
-#else
-                Logger = null  // Disable logging in Release builds
-#endif
+                Logger = new ConsoleLogger(DiscordRPC.Logging.LogLevel.Error)
             };
 
             client.OnError += (_, e) => LOGGER.Error("DiscordRPC error {0}: {1}", e.Code, e.Message);
@@ -91,7 +87,10 @@ public static class DiscordRP
             _presence.Timestamps = Timestamps.Now;
         }
 
-        _presence.Buttons.RemoveRange(1, _presence.Buttons.Count - 1);
+        if (_presence.Buttons.Count > 1)
+        {
+            _presence.Buttons.RemoveRange(1, _presence.Buttons.Count - 1);
+        }
         if (additionalButton is not null)
         {
             LOGGER.Debug("Adding additional button");
@@ -103,6 +102,11 @@ public static class DiscordRP
 
     private static void ResetPresence()
     {
+        if (client is null || !client.IsInitialized || client.IsDisposed)
+        {
+            return;
+        }
+
         client.SetPresence(new RichPresence
         {
             Details = _presence.Details,
@@ -112,9 +116,7 @@ public static class DiscordRP
             Assets = new Assets
             {
                 LargeImageKey = "rp_large_icon",
-                LargeImageText = "Tsundoku",
-                SmallImageKey = string.Empty,
-                SmallImageUrl = string.Empty
+                LargeImageText = "Tsundoku"
             }
         });
     }

@@ -1,7 +1,6 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
 					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-					xmlns:vm="clr-namespace:Tsundoku.ViewModels"
-					x:DataType="vm:UserSettingsViewModel">
+					>
 
     <ControlTheme x:Key="UserSettingsButton" TargetType="Button">
 		<Setter Property="HorizontalContentAlignment" Value="Center"/>
@@ -20,9 +19,9 @@
 				<TransformOperationsTransition Property="RenderTransform" Duration="0:0:.075" />
 			</Transitions>
 		</Setter>
-        <Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGColor}"/>
-        <Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderColor}"/>
-        <Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconColor}"/>
+        <Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGColor}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource TsundokuMenuButtonBorderColor}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
 
         <Setter Property="Template">
 			<ControlTemplate>
@@ -41,22 +40,22 @@
 		</Setter>
 
         <Style Selector="^:pointerover">
-			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}"/>
-			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor}"/>
-			<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor}"/>
+			<Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGHoverColor}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource TsundokuMenuButtonBorderHoverColor}"/>
+			<Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconHoverColor}"/>
 		</Style>
 	
 		<Style Selector="^:pressed">
-			<Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}"/>
-			<Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor}"/>
-			<Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor}"/>
+			<Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGHoverColor}"/>
+			<Setter Property="BorderBrush" Value="{DynamicResource TsundokuMenuButtonBorderHoverColor}"/>
+			<Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconHoverColor}"/>
             <Setter Property="RenderTransform" Value="scale(0.98)" />
 		</Style>
 
         <Style Selector="^:disabled /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="Background" Value="{CompiledBinding CurrentTheme.MenuButtonBGHoverColor}"/>
-            <Setter Property="BorderBrush" Value="{CompiledBinding CurrentTheme.MenuButtonBorderHoverColor}"/>
-            <Setter Property="Foreground" Value="{CompiledBinding CurrentTheme.MenuButtonTextAndIconHoverColor}"/>
+            <Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGHoverColor}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource TsundokuMenuButtonBorderHoverColor}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconHoverColor}"/>
         </Style>
 	</ControlTheme>
 </ResourceDictionary>

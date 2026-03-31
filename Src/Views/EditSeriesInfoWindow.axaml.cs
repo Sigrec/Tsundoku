@@ -3,8 +3,10 @@ using Avalonia.Interactivity;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
 using Projektanker.Icons.Avalonia;
-using Avalonia.ReactiveUI;
+using ReactiveUI.Avalonia;
+using System.Reactive.Linq;
 using Tsundoku.Helpers;
+using Tsundoku.Services;
 using Tsundoku.ViewModels;
 using static Tsundoku.Models.Enums.SeriesDemographicModel;
 using static Tsundoku.Models.Enums.SeriesGenreModel;
@@ -17,17 +19,21 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
     private readonly BitmapHelper _bitmapHelper;
     private readonly MainWindowViewModel _mainWindowViewModel;
+    private readonly IApiHealthCheckService _apiHealthCheckService;
     private bool _IsInitialized = false;
 
-    public EditSeriesInfoWindow(MainWindowViewModel mainWindowViewModel, BitmapHelper bitmapHelper)
+    public EditSeriesInfoWindow(MainWindowViewModel mainWindowViewModel, BitmapHelper bitmapHelper, IApiHealthCheckService apiHealthCheckService)
     {
         _bitmapHelper = bitmapHelper;
         _mainWindowViewModel = mainWindowViewModel;
+        _apiHealthCheckService = apiHealthCheckService;
         InitializeComponent();
 
         Opened += (s, e) =>
         {
-            string curTitle = ViewModel.Series.Titles[ViewModel.CurrentUser.Language];
+            string curTitle = ViewModel.Series.Titles.TryGetValue(ViewModel.CurrentUser.Language, out string? title)
+                ? title
+                : ViewModel.Series.Titles[TsundokuLanguage.Romaji];
 
             DiscordRP.SetPresence(
                 state: $"Editing {curTitle} {ViewModel.Series.Format}",
@@ -36,10 +42,13 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
                 
             this.Title = $"{curTitle}";
 
-            VolumesReadTextBlock.Text = $"{ViewModel.Series.VolumesRead} Vol{(ViewModel.Series.VolumesRead > 1 ? "s" : string.Empty)} Read";
-
             UpdateSelectedGenres();
             _IsInitialized = true;
+
+            // Disable refresh if AniList is down
+            System.ObservableExtensions.Subscribe(
+                _apiHealthCheckService.IsAniListAvailable.ObserveOn(AvaloniaScheduler.Instance),
+                isAvailable => ChangeSeriesVolumeCountButton.IsEnabled = isAvailable);
         };
 
         Closed += (s, e) =>
@@ -52,7 +61,7 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
     {
         if (newCover is not null)
         {
-            if (!ViewModel.Series.Cover.EndsWith(".png"))
+            if (!ViewModel.Series.Cover.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
             {
                 ViewModel.Series.DeleteCover();
                 ViewModel.Series.Cover = Path.ChangeExtension(ViewModel.Series.Cover, ".png");
@@ -71,18 +80,27 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
     {
         ChangeCoverButtonIcon.Value = "fa-solid fa-arrow-rotate-right";
         ChangeCoverButtonIcon.Animation = IconAnimation.Spin;
-        string customImageUrl = CoverImageUrlTextBox.Text.Trim();
-        string fullCoverPath = AppFileHelper.GetFullCoverPath(ViewModel.Series.Cover);
-        Bitmap? newCover = await _bitmapHelper.UpdateCoverFromUrlAsync(customImageUrl, fullCoverPath);
-
-        if (newCover is not null)
+        try
         {
-            GenerateNewBitmap(newCover, customImageUrl);
-            CoverImageUrlTextBox.Clear();
-        }
+            string customImageUrl = CoverImageUrlTextBox.Text.Trim();
+            string fullCoverPath = AppFileHelper.GetFullCoverPath(ViewModel.Series.Cover);
+            Bitmap? newCover = await _bitmapHelper.UpdateCoverFromUrlAsync(customImageUrl, fullCoverPath);
 
-        ChangeCoverButtonIcon.Animation = IconAnimation.None;
-        ChangeCoverButtonIcon.Value = "fa-solid fa-circle-down";
+            if (newCover is not null)
+            {
+                GenerateNewBitmap(newCover, customImageUrl);
+                CoverImageUrlTextBox.Clear();
+            }
+        }
+        catch (Exception ex)
+        {
+            LOGGER.Error(ex, "Failed to change cover from link");
+        }
+        finally
+        {
+            ChangeCoverButtonIcon.Animation = IconAnimation.None;
+            ChangeCoverButtonIcon.Value = "fa-solid fa-circle-down";
+        }
     }
 
     private async void ChangeSeriesCoverFromFileAsync(object sender, RoutedEventArgs args)
@@ -121,7 +139,6 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
             uint oldVolumesRead = ViewModel.Series.VolumesRead;
 
             ViewModel.Series.VolumesRead = newVolumesRead;
-            VolumesReadTextBlock.Text = $"{newVolumesRead} Vol{(newVolumesRead == 1 ? string.Empty : "s")} Read";
             VolumesReadMaskedTextBox.Clear();
 
             LOGGER.Info(
@@ -136,7 +153,7 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
             LOGGER.Warn("Volumes Read Input {VolumesReadText} is invalid or unchanged.", volumesReadText);
         }
 
-        if (!RatingMaskedTextBox.Text.StartsWith("__._"))
+        if (!RatingMaskedTextBox.Text.StartsWith("__._", StringComparison.Ordinal))
         {
             string rawInput = RatingMaskedTextBox.Text[..4].Trim().Replace("_", "0");
             if (decimal.TryParse(rawInput, out decimal ratingVal))
@@ -148,7 +165,6 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
                     {
                         ratingVal = decimal.Round(ratingVal, 1);
                         ViewModel.Series.Rating = ratingVal;
-                        RatingTextBlock.Text = $"Rating {ratingVal}/10.0";
                         RatingMaskedTextBox.Clear();
 
                         LOGGER.Info(
@@ -256,7 +272,14 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
 
     private async void RefreshSeriesAsync(object sender, RoutedEventArgs args)
     {
-        await _mainWindowViewModel.RefreshSeries(ViewModel.Series);
+        try
+        {
+            await _mainWindowViewModel.RefreshSeries(ViewModel.Series);
+        }
+        catch (Exception ex)
+        {
+            LOGGER.Error(ex, "Failed to refresh series {Title}", ViewModel.Series.Titles[TsundokuLanguage.Romaji]);
+        }
     }
 
     private void RemoveSeries(object sender, RoutedEventArgs args)
@@ -299,7 +322,6 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
         else if (hasCur) // Only “current” was provided:
         {
             ViewModel.Series.UpdateCurVolumeCount(newCur, CurVolumeMaskedTextBox.Clear);
-            CurVolumeMaskedTextBox.Clear();
         }
         // Only “max” was provided:
         else if (hasMax)

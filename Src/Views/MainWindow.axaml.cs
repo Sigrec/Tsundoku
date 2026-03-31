@@ -1,32 +1,69 @@
 using Avalonia.Controls;
-using Microsoft.Extensions.DependencyInjection;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
+using Avalonia.Threading;
+using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Drawing;
+using Avalonia.Media.Imaging;
 using System.Reactive.Linq;
 using Tsundoku.Helpers;
 using Tsundoku.Models;
 using Tsundoku.ViewModels;
 using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 using static Tsundoku.Models.Enums.TsundokuFilterModel;
-using Avalonia.ReactiveUI;
+using static Tsundoku.Models.Enums.TsundokuSortModel;
+using ReactiveUI.Avalonia;
 using System.Reactive.Disposables;
+using System.Reactive.Disposables.Fluent;
+using System.Collections.Specialized;
+using Tsundoku.Services;
+using Avalonia.Animation;
+using Avalonia.Media.Transformation;
+using Avalonia.Styling;
 
 namespace Tsundoku.Views;
 
 public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
-    WindowState previousWindowState;
-    private static readonly StringBuilder newSearchText = new();
-    private static string itemString;
-    private static readonly TimeSpan AdvancedSearchPopulateDelay = new(TimeSpan.TicksPerSecond / 4);
+    private readonly IUserService _userService;
+    private readonly IApiHealthCheckService _apiHealthCheckService;
+    private readonly IPopupDialogService _popupDialogService;
+    private readonly AddNewSeriesWindow _newSeriesWindow;
+    private readonly UserSettingsWindow _userSettingsWindow;
+    private readonly CollectionThemeWindow _themeSettingsWindow;
+    private readonly PriceAnalysisWindow _priceAnalysisWindow;
+    private readonly CollectionStatsWindow _collectionStatsWindow;
+    private readonly UserNotesWindow _userNotesWindow;
+    private WindowState previousWindowState;
+    private CancellationTokenSource? _notificationCts;
+    private bool _isShuttingDown;
+    private bool _aniListDown;
+    private bool _mangaDexDown;
 
-    public MainWindow(MainWindowViewModel viewModel)
+    public MainWindow(
+        MainWindowViewModel viewModel,
+        IUserService userService,
+        IApiHealthCheckService apiHealthCheckService,
+        IPopupDialogService popupDialogService,
+        AddNewSeriesWindow newSeriesWindow,
+        UserSettingsWindow userSettingsWindow,
+        CollectionThemeWindow themeSettingsWindow,
+        PriceAnalysisWindow priceAnalysisWindow,
+        CollectionStatsWindow collectionStatsWindow,
+        UserNotesWindow userNotesWindow)
     {
+        _userService = userService;
+        _apiHealthCheckService = apiHealthCheckService;
+        _popupDialogService = popupDialogService;
+        _newSeriesWindow = newSeriesWindow;
+        _userSettingsWindow = userSettingsWindow;
+        _themeSettingsWindow = themeSettingsWindow;
+        _priceAnalysisWindow = priceAnalysisWindow;
+        _collectionStatsWindow = collectionStatsWindow;
+        _userNotesWindow = userNotesWindow;
         InitializeComponent();
         ViewModel = viewModel;
         DataContext = viewModel;
@@ -39,11 +76,139 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
             ViewModel!.EditSeriesInfoDialog
                 .RegisterHandler(DoShowEditSeriesInfoDialogAsync)
                 .DisposeWith(disposables);
+
+            // Back to top button visibility based on scroll offset
+            CollectionPane.GetObservable(ScrollViewer.OffsetProperty)
+                .Subscribe(offset =>
+                {
+                    bool show = offset.Y > 300;
+                    BackToTopButton.Opacity = show ? 1 : 0;
+                    BackToTopButton.IsVisible = offset.Y > 50;
+                })
+                .DisposeWith(disposables);
+
+            // Reset scroll to top only on collection Reset (filter/sort change), not on individual item updates
+            Observable.FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(
+                h => ((INotifyCollectionChanged)ViewModel.UserCollection).CollectionChanged += h,
+                h => ((INotifyCollectionChanged)ViewModel.UserCollection).CollectionChanged -= h)
+                .Where(e => e.EventArgs.Action == NotifyCollectionChangedAction.Reset)
+                .Subscribe(_ =>
+                {
+                    CollectionPane.Offset = new Avalonia.Vector(0, 0);
+                    Dispatcher.UIThread.Post(() => CollectionItems.InvalidateMeasure(), DispatcherPriority.Render);
+                })
+                .DisposeWith(disposables);
+
+            // API health check — combine both statuses and show modal on transitions
+            Observable.CombineLatest(
+                    _apiHealthCheckService.IsAniListAvailable,
+                    _apiHealthCheckService.IsMangaDexAvailable,
+                    (aniList, mangaDex) => (AniList: aniList, MangaDex: mangaDex))
+                .ObserveOn(RxSchedulers.MainThreadScheduler)
+                .Subscribe(async status =>
+                {
+                    bool aniListChanged = status.AniList == _aniListDown;
+                    bool mangaDexChanged = status.MangaDex == _mangaDexDown;
+
+                    if (!aniListChanged && !mangaDexChanged) return;
+
+                    bool wasAniListDown = _aniListDown;
+                    bool wasMangaDexDown = _mangaDexDown;
+                    _aniListDown = !status.AniList;
+                    _mangaDexDown = !status.MangaDex;
+
+                    // Disable add series button based on AniList status
+                    AddNewSeriesButton.IsEnabled = status.AniList;
+
+                    // Build message for newly down services
+                    if (_aniListDown && !wasAniListDown && _mangaDexDown && !wasMangaDexDown)
+                    {
+                        await _popupDialogService.ShowAsync(
+                            "API Outage",
+                            "fa-solid fa-triangle-exclamation",
+                            "AniList and MangaDex APIs are currently unavailable. Adding new series, refreshing series, and importing from Libib or Goodreads have been disabled until AniList is back online.",
+                            this);
+                    }
+                    else if (_aniListDown && !wasAniListDown)
+                    {
+                        await _popupDialogService.ShowAsync(
+                            "API Outage",
+                            "fa-solid fa-triangle-exclamation",
+                            "AniList API is currently unavailable. Adding new series, refreshing series, and importing from Libib or Goodreads have been disabled until it is back online.",
+                            this);
+                    }
+                    else if (_mangaDexDown && !wasMangaDexDown)
+                    {
+                        await _popupDialogService.ShowAsync(
+                            "API Outage",
+                            "fa-solid fa-triangle-exclamation",
+                            "MangaDex API is currently unavailable. You can still add and refresh series using AniList.",
+                            this);
+                    }
+
+                    // Notify when services come back online
+                    if (!_aniListDown && wasAniListDown && !_mangaDexDown && wasMangaDexDown)
+                    {
+                        await _popupDialogService.ShowAsync(
+                            "APIs Restored",
+                            "fa-solid fa-circle-check",
+                            "AniList and MangaDex APIs are back online. All features have been re-enabled.",
+                            this);
+                    }
+                    else if (!_aniListDown && wasAniListDown)
+                    {
+                        await _popupDialogService.ShowAsync(
+                            "API Restored",
+                            "fa-solid fa-circle-check",
+                            "AniList API is back online. All features have been re-enabled.",
+                            this);
+                    }
+                    else if (!_mangaDexDown && wasMangaDexDown)
+                    {
+                        await _popupDialogService.ShowAsync(
+                            "API Restored",
+                            "fa-solid fa-circle-check",
+                            "MangaDex API is back online.",
+                            this);
+                    }
+                })
+                .DisposeWith(disposables);
+
+            _apiHealthCheckService.Start();
+            Disposable.Create(() => _apiHealthCheckService.Stop())
+                .DisposeWith(disposables);
         });
 
-        SetupAdvancedSearchBar(" & ");
+        // Fade in the cards once first realized (collection background stays visible)
+        CollectionItems.Opacity = 0;
+        bool _hasAnimated = false;
+        CollectionItems.ElementPrepared += (s, e) =>
+        {
+            if (_hasAnimated) return;
+            _hasAnimated = true;
 
-        KeyDown += async (s, e) => 
+            // Wait for layout + render to fully complete before starting fade
+            Dispatcher.UIThread.Post(async () =>
+            {
+                // Allow multiple layout passes to complete so all visible cards are rendered
+                await Task.Delay(100);
+
+                Animation animation = new Animation
+                {
+                    Duration = TimeSpan.FromMilliseconds(600),
+                    Easing = new Avalonia.Animation.Easings.SineEaseInOut(),
+                    FillMode = FillMode.Forward,
+                    Children =
+                    {
+                        new KeyFrame { Cue = new Cue(0), Setters = { new Setter(OpacityProperty, 0.0) } },
+                        new KeyFrame { Cue = new Cue(1), Setters = { new Setter(OpacityProperty, 1.0) } }
+                    }
+                };
+                await animation.RunAsync(CollectionItems);
+            }, DispatcherPriority.Background);
+        };
+
+        KeyDown += async (s, e) =>
         {
             if (e.Key == Key.F11) // Fullscreen
             {
@@ -60,7 +225,7 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
             }
             else if (e.KeyModifiers == KeyModifiers.Control && e.Key == Key.P) // Take Screenshot
             {
-                LOGGER.Info($"Saving Screenshot of Collection for \"{ViewModel.CurrentTheme.ThemeName} Theme\"");
+                LOGGER.Info("Saving Screenshot of Collection for \"{ThemeName} Theme\"", ViewModel.CurrentTheme.ThemeName);
                 await ScreenCaptureWindows();
             }
             else if (e.KeyModifiers == KeyModifiers.Control && e.Key == Key.S) // Save User Data
@@ -70,15 +235,9 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
             }
             else if (e.KeyModifiers == KeyModifiers.Control && e.Key == Key.F)
             {
+                AdvancedSearchPopup.IsVisible = !AdvancedSearchPopup.IsVisible;
                 if (AdvancedSearchPopup.IsVisible)
                 {
-                    AdvancedSearchBar.MinimumPopulateDelay = TimeSpan.Zero;
-                    AdvancedSearchBar.Text = string.Empty;
-                    AdvancedSearchPopup.IsVisible ^= true;
-                }
-                else
-                {
-                    AdvancedSearchPopup.IsVisible ^= true;
                     await ToggleNotificationPopup($"To Exit Advanced Search Press CTRL+F or Click Anywhere");
                 }
             }
@@ -86,13 +245,29 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
 
         Closing += (s, e) =>
         {
+            if (_isShuttingDown) return;
+            _isShuttingDown = true;
+
             ViewModel.SaveOnClose();
+
+            // Hide all children so their Closing handlers won't cancel
+            foreach (Window child in (Window[])[_newSeriesWindow, _userSettingsWindow, _themeSettingsWindow, _priceAnalysisWindow, _collectionStatsWindow, _userNotesWindow])
+            {
+                if (child.IsVisible)
+                {
+                    child.Hide();
+                }
+            }
+
+            if (Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop)
+            {
+                desktop.Shutdown();
+            }
         };
     }
 
     private async Task ScreenCaptureWindows()
     {
-        // Construct the base filename parts
         string userName = ViewModel.CurrentUser.UserName;
         string themeName = ViewModel.CurrentTheme.ThemeName;
         TsundokuLanguage language = ViewModel.CurrentUser.Language;
@@ -100,24 +275,15 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
             ? $"-{ViewModel.SelectedFilter.GetEnumMemberValue()}"
             : string.Empty;
 
-        // Create the full base filename without extension
         string baseFileNameWithoutExtension = $"{userName}-Collection-Screenshot-{themeName}-{language}{filterSegment}";
-
-        // Get a unique path for the screenshot
         string finalScreenshotPath = AppFileHelper.CreateUniqueScreenshotPath(baseFileNameWithoutExtension, ".png");
 
         try
         {
-            // The rest of your screenshot capture logic remains the same
-            using (System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap((int)this.Width, (int)this.Height))
-            {
-                using (Graphics g = Graphics.FromImage(bitmap))
-                {
-                    // Adjust point to use the screen coordinates of the window
-                    g.CopyFromScreen(new System.Drawing.Point((int)this.Bounds.Left, (int)this.Bounds.Top), System.Drawing.Point.Empty, new System.Drawing.Size((int)this.Width, (int)this.Height));
-                }
-                bitmap.Save(finalScreenshotPath, System.Drawing.Imaging.ImageFormat.Png);
-            }
+            var pixelSize = new PixelSize((int)Bounds.Width, (int)Bounds.Height);
+            using var rtb = new RenderTargetBitmap(pixelSize, new Avalonia.Vector(96, 96));
+            rtb.Render(this);
+            rtb.Save(finalScreenshotPath);
 
             LOGGER.Info("Screenshot saved to: {Path}", finalScreenshotPath);
             await ToggleNotificationPopup($"Saved Screenshot for \"{baseFileNameWithoutExtension}\"");
@@ -142,186 +308,84 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
         interaction.SetOutput(resultFromDialog);
     }
 
+    public async void ShowNotification(string notiText) => await ToggleNotificationPopup(notiText);
+
     private async Task ToggleNotificationPopup(string notiText)
     {
+        _notificationCts?.Cancel();
+        _notificationCts = new CancellationTokenSource();
+        CancellationToken token = _notificationCts.Token;
+
         ViewModel.NotificationText = notiText;
         NotificationPopup.IsVisible = true;
-        await Task.Delay(TimeSpan.FromSeconds(3));
-        NotificationPopup.IsVisible = false;
+        try
+        {
+            await Task.Delay(TimeSpan.FromSeconds(3), token);
+            NotificationPopup.IsVisible = false;
+        }
+        catch (TaskCanceledException) { }
     }
 
     private void OpenAddSeriesDialog(object sender, RoutedEventArgs args)
     {
-        if (this.DataContext is MainWindowViewModel viewModel)
+        AddNewSeriesWindow? window = this.OpenManagedWindow<AddNewSeriesWindow, AddNewSeriesViewModel>(_newSeriesWindow, "Add New Series Window");
+        if (window is not null)
         {
-            AddNewSeriesWindow? window = this.OpenManagedWindow<AddNewSeriesWindow, AddNewSeriesViewModel>(viewModel.NewSeriesWindow, "Add New Series Window");
-
-            if (window is not null)
-            {
-                AddNewSeriesButton.IsChecked = true;
-                window.Closing += (s, e) => AddNewSeriesButton.IsChecked = false;
-            }
-        }
-        else
-        {
-            LOGGER.Error("MainWindow DataContext is null or not MainWindowViewModel. Cannot open Add New Series window.");
+            AddNewSeriesButton.IsChecked = true;
+            window.Closing += (s, e) => AddNewSeriesButton.IsChecked = false;
         }
     }
 
     private void OpenSettingsDialog(object sender, RoutedEventArgs args)
     {
-        if (this.DataContext is MainWindowViewModel viewModel)
+        UserSettingsWindow? window = this.OpenManagedWindow<UserSettingsWindow, UserSettingsViewModel>(_userSettingsWindow, "Settings Window");
+        if (window is not null)
         {
-            UserSettingsWindow? window = this.OpenManagedWindow<UserSettingsWindow, UserSettingsViewModel>(viewModel.UserSettingsWindow, "Settings Window");
-            if (window is not null)
-            {
-                SettingsButton.IsChecked = true;
-                window.Closing += (s, e) => SettingsButton.IsChecked = false;
-            }
-        }
-        else
-        {
-            LOGGER.Error("MainWindow DataContext is null or not MainWindowViewModel. Cannot open Settings window.");
+            SettingsButton.IsChecked = true;
+            window.Closing += (s, e) => SettingsButton.IsChecked = false;
         }
     }
 
     private void OpenCollectionStatsDialog(object sender, RoutedEventArgs args)
     {
-        if (this.DataContext is MainWindowViewModel viewModel)
+        CollectionStatsWindow? window = this.OpenManagedWindow<CollectionStatsWindow, CollectionStatsViewModel>(_collectionStatsWindow, "Collection Stats Window");
+        if (window is not null)
         {
-            CollectionStatsWindow? window = this.OpenManagedWindow<CollectionStatsWindow, CollectionStatsViewModel>(viewModel.CollectionStatsWindow, "Collection Stats Window");
-            if (window is not null)
-            {
-                StatsButton.IsChecked = true;
-                window.Closing += (s, e) => StatsButton.IsChecked = false;
-            }
-        }
-        else
-        {
-            LOGGER.Error("MainWindow DataContext is null or not MainWindowViewModel. Cannot open Collection Stats window.");
+            StatsButton.IsChecked = true;
+            window.Closing += (s, e) => StatsButton.IsChecked = false;
         }
     }
 
     private void OpenPriceAnalysisDialog(object sender, RoutedEventArgs args)
     {
-        if (this.DataContext is MainWindowViewModel viewModel)
+        PriceAnalysisWindow? window = this.OpenManagedWindow<PriceAnalysisWindow, PriceAnalysisViewModel>(_priceAnalysisWindow, "Price Analysis Window");
+        if (window is not null)
         {
-            PriceAnalysisWindow? window = this.OpenManagedWindow<PriceAnalysisWindow, PriceAnalysisViewModel>(viewModel.PriceAnalysisWindow, "Price Analysis Window");
-            if (window is not null)
-            {
-                AnalysisButton.IsChecked = true;
-                window.Closing += (s, e) => AnalysisButton.IsChecked = false;
-            }
-        }
-        else
-        {
-            LOGGER.Error("MainWindow DataContext is null or not MainWindowViewModel. Cannot open Price Analysis window.");
+            AnalysisButton.IsChecked = true;
+            window.Closing += (s, e) => AnalysisButton.IsChecked = false;
         }
     }
 
     private void OpenThemeSettingsDialog(object sender, RoutedEventArgs args)
     {
-        if (this.DataContext is MainWindowViewModel viewModel)
+        CollectionThemeWindow? window = this.OpenManagedWindow<CollectionThemeWindow, ThemeSettingsViewModel>(_themeSettingsWindow, "Theme Settings Window");
+        if (window is not null)
         {
-            CollectionThemeWindow? window = this.OpenManagedWindow<CollectionThemeWindow, ThemeSettingsViewModel>(viewModel.ThemeSettingsWindow, "Theme Settings Window");
-            if (window is not null)
-            {
-                ThemeButton.IsChecked = true;
-                window.Closing += (s, e) => ThemeButton.IsChecked = false;
-            }
-        }
-        else
-        {
-            LOGGER.Error("MainWindow DataContext is null or not MainWindowViewModel. Cannot open Theme Settings window.");
+            ThemeButton.IsChecked = true;
+            window.Closing += (s, e) => ThemeButton.IsChecked = false;
         }
     }
 
     private void OpenUserNotesDialog(object sender, RoutedEventArgs args)
     {
-        if (this.DataContext is MainWindowViewModel viewModel)
+        UserNotesWindow? window = this.OpenManagedWindow<UserNotesWindow, UserNotesWindowViewModel>(_userNotesWindow, "User Notes Window");
+        if (window is not null)
         {
-            UserNotesWindow? window = this.OpenManagedWindow<UserNotesWindow, UserNotesWindowViewModel>(viewModel.UserNotesWindow, "User Notes Window");
-            if (window is not null)
-            {
-                UserNotesButton.IsChecked = true;
-                window.Closing += (s, e) => UserNotesButton.IsChecked = false;
-            }
-        }
-        else
-        {
-            LOGGER.Error("MainWindow DataContext is null or not MainWindowViewModel. Cannot open User Notes window.");
+            UserNotesButton.IsChecked = true;
+            window.Closing += (s, e) => UserNotesButton.IsChecked = false;
         }
     }
 
-    private void StartAdvancedQuery(object sender, RoutedEventArgs args)
-    {
-        ViewModel.AdvancedSearchQuery = AdvancedSearchBar.Text;
-    }
-
-    public void SetupAdvancedSearchBar(string delimiter)
-    {
-        AdvancedSearchBar.MinimumPopulateDelay = AdvancedSearchPopulateDelay; // Might just remove this delay in the end
-        AdvancedSearchBar.AddHandler(PointerPressedEvent, (_, _) =>
-        {
-            if (string.IsNullOrWhiteSpace(AdvancedSearchBar.Text))
-            {
-                AdvancedSearchBar.IsDropDownOpen = true;
-            }
-        }, RoutingStrategies.Tunnel);
-        
-        AdvancedSearchBar.ItemSelector = (query, item) =>
-        {
-            newSearchText.Clear();
-            if (SharedSeriesCollectionProvider.AdvancedQueryRegex().IsMatch(query))
-            {
-                newSearchText.Append(query[..query.LastIndexOf(delimiter)]).Append(delimiter);
-            }
-            return !item.Equals("Notes==") ? newSearchText.Append(item).ToString() : newSearchText.Append(item).ToString();
-        };
-        AdvancedSearchBar.ItemFilter = (query, item) =>
-        {
-            itemString = item as string;
-
-            // Show all available filters when the query is empty
-            if (string.IsNullOrWhiteSpace(query))
-                return true;
-
-            if (!SharedSeriesCollectionProvider.AdvancedQueryRegex().IsMatch(query))
-            {
-                return itemString.StartsWith(query, StringComparison.OrdinalIgnoreCase);
-            }
-            else if (query.Contains(itemString) || itemString.Last() != '=' && query.Contains(itemString[..itemString.IndexOf("==")]))
-            {
-                return false;
-            }
-
-            string filterName = itemString[..^2];
-            if (itemString.Contains("==") && (query.Contains($"{filterName}<=") || query.Contains($"{filterName}>=")))
-            {
-                return false;
-            }
-            else if ((itemString.Contains('>') || itemString.Contains('<')) && query.Contains($"{filterName}=="))
-            {
-                return false;
-            }
-
-            return AdvancedSearchBar.IsVisible &&
-                itemString.StartsWith(query[(query.LastIndexOf(delimiter) + delimiter.Length)..], StringComparison.OrdinalIgnoreCase);
-        };
-    }
-    
-    private void UnShowAdvancedSearchPopup(object sender, PointerPressedEventArgs args)
-    {
-        AdvancedSearchPopup.IsVisible = false;
-    }
-
-    private void RemoveErrorMessage(object sender, KeyEventArgs args)
-    {
-        if (!string.IsNullOrWhiteSpace(ViewModel.AdvancedSearchQueryErrorMessage))
-        {
-            ViewModel.AdvancedSearchQueryErrorMessage = string.Empty;
-        }
-    }
 
     /// <summary>
     /// Changes the language for the users collection
@@ -335,6 +399,46 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
         }
     }
 
+    private void BackToTop_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (CollectionPane.Offset.Y <= 0) return;
+        CollectionPane.Offset = new Avalonia.Vector(0, 0);
+    }
+
+    /// <summary>
+    /// Changes the sort on the users collection
+    /// </summary>
+    private void SortChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (SortSelector.SelectedItem is string selectedItem)
+        {
+            LOGGER.Debug("Changing Sort to {sort}", selectedItem);
+            ViewModel.SelectedSort = selectedItem.GetEnumValueFromMemberValue(TsundokuSort.TitleAZ);
+        }
+    }
+
+    private void ToggleThemeSelector(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        ThemeGrid.IsVisible = !ThemeGrid.IsVisible;
+        if (ThemeGrid.IsVisible)
+        {
+            TsundokuTheme? current = _userService.GetMainTheme();
+            if (current is not null)
+            {
+                ThemeListItems.SelectedItem = current;
+            }
+        }
+    }
+
+    private void ThemeSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (ThemeListItems.SelectedItem is TsundokuTheme selectedTheme)
+        {
+            LOGGER.Debug("Changing Theme to {theme}", selectedTheme.ThemeName);
+            _userService.SetCurrentTheme(selectedTheme);
+        }
+    }
+
     /// <summary>
     /// Changes the filter on the users collection
     /// </summary>
@@ -342,9 +446,40 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
     {
         if (CollectionFilterSelector.SelectedItem is string selectedItem)
         {
-            LOGGER.Debug("Changing Filter to {filter}", selectedItem);
-            ViewModel.SelectedFilter = selectedItem.GetEnumValueFromMemberValue(TsundokuFilter.None);
+            TsundokuFilter filter = selectedItem.GetEnumValueFromMemberValue(TsundokuFilter.None);
+            LOGGER.Debug("Changing Filter to {filter}", filter);
+            ViewModel.SelectedFilter = filter;
+            ClearFilterButton.IsVisible = filter != TsundokuFilter.None;
         }
+    }
+
+    private void ClearFilterClicked(object sender, RoutedEventArgs e)
+    {
+        CollectionFilterSelector.SelectedIndex = -1;
+        ViewModel.SelectedFilter = TsundokuFilter.None;
+        ViewModel.SelectedFilterIndex = -1;
+        ClearFilterButton.IsVisible = false;
+        LOGGER.Debug("Cleared Filter");
+    }
+
+    private void PublisherFilterChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (PublisherFilterSelector.SelectedItem is string selectedPublisher)
+        {
+            LOGGER.Debug("Changing Publisher Filter to {publisher}", selectedPublisher);
+            ViewModel.SelectedPublisher = selectedPublisher;
+        }
+        else
+        {
+            ViewModel.SelectedPublisher = string.Empty;
+        }
+    }
+
+    private void ClearPublisherFilterClicked(object sender, RoutedEventArgs e)
+    {
+        PublisherFilterSelector.SelectedItem = null;
+        ViewModel.SelectedPublisher = string.Empty;
+        LOGGER.Debug("Cleared Publisher Filter");
     }
 
     /// <summary>
@@ -352,7 +487,10 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
     /// </summary>
     private async void OpenSiteLink(object sender, PointerPressedEventArgs args)
     {
-        await ViewModelBase.OpenSiteLink(((sender as Canvas).DataContext as Series).Link.ToString());
+        if (sender is Canvas { DataContext: Series series })
+        {
+            await ViewModelBase.OpenSiteLink(series.Link.ToString());
+        }
     }
 
     private async void ChangeUserIcon(object sender, PointerPressedEventArgs args)
@@ -364,11 +502,6 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
         });
         if (file.Count == 1)
         {
-            string path = file[0].Path.LocalPath;
-            if (Path.GetExtension(path).Equals(".png"))
-            {
-                Path.ChangeExtension(path, ".png");
-            }
             ViewModel.UpdateUserIcon(Path.ChangeExtension(file[0].Path.LocalPath, ".png"));
         }
         else
@@ -382,7 +515,7 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
     /// </summary>
     private void OpenDonationLink(object sender, RoutedEventArgs args)
     {
-        LOGGER.Info($"Opening PayPal Donation Lionk");
+        LOGGER.Info("Opening PayPal Donation Link");
         try
         {
             Process.Start(new ProcessStartInfo("https://www.paypal.com/donate/?business=JAYCVEJGDF4GY&no_recurring=0&item_name=Help+keep+Tsundoku+Supported+into+the+Future%21&currency_code=USD") { UseShellExecute = true });
@@ -402,9 +535,7 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
     /// </summary>
     private async void CopySeriesTitleAsync(object sender, PointerPressedEventArgs args)
     {
-        string title = ((TextBlock)sender).Text;
-        LOGGER.Info("Copying {} to Clipboard", title);
-        await TextCopy.ClipboardService.SetTextAsync(title);
+        await ClipboardHelper.CopyToClipboardAsync(((TextBlock)sender).Text);
     }
 
     /// <summary>
@@ -412,8 +543,7 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
     /// </summary>
     public void AddVolume(object sender, RoutedEventArgs args)
     {
-        Series curSeries = (Series)((Button)sender).DataContext;
-        if (curSeries.CurVolumeCount < curSeries.MaxVolumeCount)
+        if (sender is Button { DataContext: Series curSeries } && curSeries.CurVolumeCount < curSeries.MaxVolumeCount)
         {
             curSeries.CurVolumeCount += 1;
             LOGGER.Info("Added 1 Volume to {title}", curSeries.Titles[TsundokuLanguage.Romaji]);
@@ -421,12 +551,11 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
     }
 
     /// <summary>
-    /// Deccrements the series current volume count
+    /// Decrements the series current volume count
     /// </summary>
     public void SubtractVolume(object sender, RoutedEventArgs args)
     {
-        Series curSeries = (Series)((Button)sender).DataContext; //Get the current series data
-        if (curSeries.CurVolumeCount >= 1) //Only decrement if the user currently has 1 or more volumes
+        if (sender is Button { DataContext: Series curSeries } && curSeries.CurVolumeCount >= 1)
         {
             curSeries.CurVolumeCount -= 1;
             LOGGER.Info("Removed 1 Volume from {title}", curSeries.Titles[TsundokuLanguage.Romaji]);

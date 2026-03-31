@@ -84,9 +84,9 @@ public class TsundokuEnumTests
     }
 
     [Test]
-    public void MangaDexLangCodes_CaseInsensitive_Match()
+    public void MangaDexLangCodes_LowercaseKey_Match()
     {
-        bool hasMatch = MANGADEX_LANG_CODES.TryGetValue("EN", out TsundokuLanguage lang);
+        bool hasMatch = MANGADEX_LANG_CODES.TryGetValue("en", out TsundokuLanguage lang);
         using (Assert.EnterMultipleScope())
         {
             Assert.That(hasMatch, Is.True);
@@ -102,11 +102,18 @@ public class TsundokuEnumTests
     }
 
     [Test]
-    public void All_TsundokuFilterEnumMembers_AreIncludedInFrozenDictionary()
+    public void All_TsundokuFilterEnumMembers_ExceptNoneAndQuery_AreIncludedInFrozenDictionary()
     {
         foreach (TsundokuFilter filter in Enum.GetValues<TsundokuFilter>())
         {
-            Assert.That(TSUNDOKU_FILTER_DICT.ContainsKey(filter), Is.True, $"Missing frozen dictionary entry for filter: {filter}");
+            if (filter is TsundokuFilter.None or TsundokuFilter.Query)
+            {
+                Assert.That(TSUNDOKU_FILTER_DICT.ContainsKey(filter), Is.False, $"None/Query should be excluded: {filter}");
+            }
+            else
+            {
+                Assert.That(TSUNDOKU_FILTER_DICT.ContainsKey(filter), Is.True, $"Missing frozen dictionary entry for filter: {filter}");
+            }
         }
     }
 

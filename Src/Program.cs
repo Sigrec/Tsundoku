@@ -1,33 +1,53 @@
+using Avalonia.Rendering.Composition;
+using Avalonia.Skia;
 using Projektanker.Icons.Avalonia;
 using Projektanker.Icons.Avalonia.FontAwesome;
-using Avalonia.ReactiveUI;
-using System.Runtime.CompilerServices;
+using ReactiveUI.Avalonia;
+using static Tsundoku.Models.Constants;
 
 namespace Tsundoku;
 
 internal sealed class Program
 {
-    // This is your main entry point
+    /// <summary>
+    /// Estimated number of cover textures to keep in the GPU cache
+    /// (visible cards + virtualization buffer above and below the viewport).
+    /// </summary>
+    private const int EstimatedCachedCovers = 200;
+
+    /// <summary>Bytes per pixel for RGBA textures.</summary>
+    private const int BytesPerPixel = 4;
+
     [STAThread]
     public static void Main(string[] args)
     {
         BuildAvaloniaApp().StartWithClassicDesktopLifetime(args, Avalonia.Controls.ShutdownMode.OnMainWindowClose);
     }
 
-    // Avalonia configuration, don't remove; also used by visual designer.
     public static AppBuilder BuildAvaloniaApp()
     {
         IconProvider.Current
             .Register<FontAwesomeIconProvider>();
 
+        // Calculate GPU cache size from actual cover dimensions
+        long coverTextureBytes = (long)(LEFT_SIDE_CARD_WIDTH * BITMAP_SCALE)
+                               * (IMAGE_HEIGHT * BITMAP_SCALE)
+                               * BytesPerPixel;
+        long gpuCacheBytes = coverTextureBytes * EstimatedCachedCovers;
+
         return AppBuilder.Configure<App>()
             .UsePlatformDetect()
-            .UseSkia()
-            .With(LoaderOptimization.MultiDomainHost)
-            .With(LoadHint.Always)
+            .With(new SkiaOptions
+            {
+                MaxGpuResourceSizeBytes = gpuCacheBytes
+            })
+            .With(new CompositionOptions
+            {
+                UseRegionDirtyRectClipping = true
+            })
 #if DEBUG
             .LogToTrace()
 #endif
-            .UseReactiveUI();
+            .UseReactiveUI(_ => { });
     }
 }

@@ -1,0 +1,42 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:Tsundoku.Controls"
+             xmlns:cv="clr-namespace:Tsundoku.Converters"
+             x:Class="Tsundoku.Controls.ColorPickerItem"
+             x:Name="Root"
+             x:DataType="controls:ColorPickerItem">
+
+    <UserControl.Resources>
+        <cv:BrushToColorConverter x:Key="BrushToColorConverter"/>
+    </UserControl.Resources>
+
+    <Border Background="{DynamicResource TsundokuCollectionBGColor}"
+            BorderBrush="{DynamicResource TsundokuDividerColor}"
+            BorderThickness="2"
+            CornerRadius="8"
+            Padding="6"
+            Margin="3"
+            MinWidth="180">
+        <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button Background="{CompiledBinding ColorBrush, ElementName=Root}"
+                    Width="28" Height="28"
+                    CornerRadius="6"
+                    BorderBrush="{DynamicResource TsundokuDividerColor}"
+                    BorderThickness="2"
+                    Padding="0"
+                    Cursor="Hand">
+                <Button.Flyout>
+                    <Flyout Placement="Bottom">
+                        <ColorView Color="{CompiledBinding ColorBrush, ElementName=Root, Converter={StaticResource BrushToColorConverter}, Mode=TwoWay}"/>
+                    </Flyout>
+                </Button.Flyout>
+            </Button>
+            <TextBlock Text="{CompiledBinding Title, ElementName=Root}"
+                       FontSize="10"
+                       FontWeight="SemiBold"
+                       Foreground="{DynamicResource TsundokuMenuTextColor}"
+                       VerticalAlignment="Center"
+                       IsHitTestVisible="False"/>
+        </StackPanel>
+    </Border>
+</UserControl>

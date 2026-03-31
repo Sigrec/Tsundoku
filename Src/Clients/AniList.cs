@@ -1,6 +1,5 @@
 ﻿using GraphQL;
 using GraphQL.Client.Http;
-using GraphQL.Client.Serializer.SystemTextJson;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
@@ -10,21 +9,31 @@ using static Tsundoku.Models.Enums.SeriesGenreModel;
 
 namespace Tsundoku.Clients;
 
-public sealed class AniListGraphQLClient : GraphQLHttpClient
-{
-    public AniListGraphQLClient(HttpClient httpClient)
-        : base(new GraphQLHttpClientOptions
-        {
-            EndPoint = httpClient.BaseAddress!
-        }, new SystemTextJsonSerializer(), httpClient)
-    {
-    }
-}
-
+/// <summary>
+/// Client for querying the AniList GraphQL API for manga and light novel metadata.
+/// </summary>
 public sealed partial class AniList
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
     private readonly AniListGraphQLClient _aniListClient;
+
+    /// <summary>Extra seconds added to rate limit delays to avoid hitting the limit again immediately.</summary>
+    private const int RateLimitPaddingSeconds = 5;
+
+    /// <summary>Base multiplier for exponential backoff when a 429 response includes headers.</summary>
+    private const int BackoffBaseWithHeaders = 5;
+
+    /// <summary>Base multiplier for exponential backoff when a 429 response has no headers (longer fallback).</summary>
+    private const int BackoffBaseWithoutHeaders = 10;
+
+    /// <summary>Number of staff entries requested per page from the AniList API.</summary>
+    private const int StaffPerPage = 25;
+
+    /// <summary>Separator used between staff names in the formatted output.</summary>
+    private const string StaffSeparator = " | ";
+
+    /// <summary>Length of the staff separator, used when trimming trailing separators.</summary>
+    private static readonly int StaffSeparatorLength = StaffSeparator.Length;
 
     [GeneratedRegex(@"(?is)<i>Note[s]?:.*?</i>|<br\s*/?>|\(Source:.*?\)", RegexOptions.IgnoreCase)] private static partial Regex AniListDescRegex();
     [GeneratedRegex(@"(?:\s*\n)?(?:<br\s*/?>\s*){2,}(?:\n\s*)?", RegexOptions.IgnoreCase)] private static partial Regex AniListBreakRegex();
@@ -34,7 +43,10 @@ public sealed partial class AniList
 
     private static readonly string[] VALID_STAFF_ROLES = ["Story & Art", "Story", "Art", "Original Creator", "Character Design", "Cover Illustration", "Illustration", "Mechanical Design", "Original Story", "Original Character Design", "Original Story", "Supervisor"];
 
-    // Constructor for Dependency Injection
+    /// <summary>
+    /// Initializes a new instance of <see cref="AniList"/> with the specified GraphQL client.
+    /// </summary>
+    /// <param name="aniListClient">The AniList GraphQL HTTP client.</param>
     public AniList(AniListGraphQLClient aniListClient)
     {
         _aniListClient = aniListClient;
@@ -78,6 +90,12 @@ public sealed partial class AniList
         return await ExecuteAniListQueryAsync("Id", variables, $"SeriesId: {seriesId}");
     }
 
+    /// <summary>
+    /// Retrieves autocomplete suggestions for the AniList series title picker.
+    /// </summary>
+    /// <param name="search">The search text to query.</param>
+    /// <param name="cancellationToken">Token to cancel the operation.</param>
+    /// <returns>A read-only list of matching suggestions sorted by relevance.</returns>
     public async Task<IReadOnlyList<AniListPickerSuggestion>> GetPickerSuggestionsAsync(
         string search,
         CancellationToken cancellationToken = default)
@@ -125,17 +143,17 @@ public sealed partial class AniList
         {
             if (candidate.Equals(needle, StringComparison.OrdinalIgnoreCase))
             {
-                return 3;
+                return 3; // Exact match — highest quality
             }
             if (candidate.StartsWith(needle, StringComparison.OrdinalIgnoreCase))
             {
-                return 2;
+                return 2; // Prefix match — high quality
             }
             if (candidate.Contains(needle, StringComparison.OrdinalIgnoreCase))
             {
-                return 1;
+                return 1; // Substring match — partial quality
             }
-            return 0;
+            return 0; // No match
         }
 
         List<AniListPickerSuggestion> list = new(Math.Min(media.GetArrayLength(), perPage));
@@ -144,7 +162,6 @@ public sealed partial class AniList
         foreach (JsonElement m in media.EnumerateArray())
         {
             if (!m.TryGetProperty("id", out JsonElement idEl)) continue;
-            string id = idEl.GetInt32().ToString();
 
             string? romaji = m.GetProperty("title").GetProperty("romaji").GetString();
             if (romaji is null) continue;
@@ -161,28 +178,25 @@ public sealed partial class AniList
             bool inNative = isNativeNotEmpty && native.Contains(needle, StringComparison.OrdinalIgnoreCase);
             if (!inRomaji && !inEnglish && !inNative) continue;
 
-            List<string> candidates = new(3);
-            if (isRomajiNotEmpty) candidates.Add(romaji);
-            if (isEnglishNotEmpty) candidates.Add(english!);
-            if (isNativeNotEmpty) candidates.Add(native!);
-
+            // Find best matching title without allocating a list per iteration
             string chosen = romaji;
-            int best = 0;
-            foreach (string c in candidates)
+            int best = isRomajiNotEmpty ? MatchScore(romaji, needle) : 0;
+            if (best < 3 && isEnglishNotEmpty)
             {
-                int score = MatchScore(c, needle);
-                if (score > best)
-                {
-                    best = score;
-                    chosen = c;
-                    if (best == 3) break;
-                }
+                int score = MatchScore(english!, needle);
+                if (score > best) { best = score; chosen = english!; }
+            }
+            if (best < 3 && isNativeNotEmpty)
+            {
+                int score = MatchScore(native!, needle);
+                if (score > best) { chosen = native!; }
             }
 
-            string? format = m.TryGetProperty("format", out JsonElement f) && f.ValueKind == JsonValueKind.String ? f.GetString().Trim() : null;
+            string? format = m.TryGetProperty("format", out JsonElement f) && f.ValueKind == JsonValueKind.String ? f.GetString()!.Trim() : null;
+            int id = idEl.GetInt32();
             string display = $"{chosen} ({format ?? "MEDIA"}) [{id}]";
 
-            list.Add(new AniListPickerSuggestion(id, display, format));
+            list.Add(new AniListPickerSuggestion(id.ToString(), display, format));
         }
 
         return list;
@@ -233,7 +247,7 @@ public sealed partial class AniList
                             english
                             native
                         }}
-                        staff(sort: RELEVANCE, perPage: 25, page: $pageNum) {{
+                        staff(sort: RELEVANCE, perPage: {StaffPerPage}, page: $pageNum) {{
                             pageInfo {{
                                 hasNextPage
                             }}
@@ -321,12 +335,11 @@ public sealed partial class AniList
             {
                 attempts++;
                 TimeSpan delay;
-                const int paddingSeconds = 5;
 
                 // Access headers directly from graphqlEx.ResponseHeaders
                 if (ex.ResponseHeaders is not null)
                 {
-                    TimeSpan? headersDelay = GetRateLimitDelay(ex.ResponseHeaders, paddingSeconds);
+                    TimeSpan? headersDelay = GetRateLimitDelay(ex.ResponseHeaders, RateLimitPaddingSeconds);
                     if (headersDelay.HasValue)
                     {
                         delay = headersDelay.Value;
@@ -335,18 +348,25 @@ public sealed partial class AniList
                     else
                     {
                         // Fallback if Retry-After is unexpectedly missing from GraphQLHttpRequestException's response headers
-                        delay = TimeSpan.FromSeconds(Math.Pow(2, attempts) * 5 + paddingSeconds);
+                        delay = TimeSpan.FromSeconds(Math.Pow(2, attempts) * BackoffBaseWithHeaders + RateLimitPaddingSeconds);
                         LOGGER.Warn("HTTP 429 Too Many Requests (attempt {Attempt}/{Max}). 'Retry-After' header not found in GraphQLHttpRequestException.ResponseHeaders Retrying after fallback delay of {FallbackDelay}.", attempts, maxRetries, delay.TotalSeconds);
                     }
                 }
                 else
                 {
                     // Fallback if GraphQLHttpRequestException's ResponseHeaders are null (very unlikely for a 429 response)
-                    delay = TimeSpan.FromSeconds(Math.Pow(2, attempts) * 10 + paddingSeconds); // Longer fallback
+                    delay = TimeSpan.FromSeconds(Math.Pow(2, attempts) * BackoffBaseWithoutHeaders + RateLimitPaddingSeconds); // Longer fallback
                     LOGGER.Warn("HTTP 429 Too Many Requests (attempt {Attempt}/{Max}). GraphQLHttpRequestException did not contain ResponseHeaders. Retrying after fallback delay of {FallbackDelay}.", attempts, maxRetries, delay.TotalSeconds);
                 }
 
                 await Task.Delay(delay, cancellationToken);
+                continue;
+            }
+            catch (GraphQLHttpRequestException ex) when (ex.StatusCode == HttpStatusCode.InternalServerError)
+            {
+                attempts++;
+                LOGGER.Warn("AniList returned 500 for {Context} (attempt {Attempt}/{Max}). Retrying after {Seconds}s...", context, attempts, maxRetries, RateLimitPaddingSeconds);
+                await Task.Delay(TimeSpan.FromSeconds(RateLimitPaddingSeconds), cancellationToken);
                 continue;
             }
             catch (GraphQLHttpRequestException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
@@ -354,9 +374,9 @@ public sealed partial class AniList
                 LOGGER.Warn("{Series} not found", context);
                 return null;
             }
-            catch (TaskCanceledException ex)
+            catch (TaskCanceledException)
             {
-                LOGGER.Info(ex, "Request canceled during send or delay.");
+                LOGGER.Debug("Request canceled during send or delay.");
                 return null;
             }
             catch (Exception ex)
@@ -378,7 +398,7 @@ public sealed partial class AniList
     /// A <see cref="TimeSpan"/> representing the delay until the rate limit resets,
     /// or <c>null</c> if no delay is needed.
     /// </returns>
-    private static TimeSpan? GetRateLimitDelay(HttpResponseHeaders headers, int paddingSeconds = 5)
+    private static TimeSpan? GetRateLimitDelay(HttpResponseHeaders headers, int paddingSeconds = RateLimitPaddingSeconds)
     {
         if (headers.TryGetValues("X-RateLimit-Remaining", out var remainingValues) &&
             short.TryParse(remainingValues.FirstOrDefault(), out short remaining))
@@ -441,7 +461,7 @@ public sealed partial class AniList
         // 5. Normalize smart quotes
         cleaned = SmartQuotesRegex().Replace(cleaned, m => m.Value switch
         {
-            "“" or "”" => "\"",
+            """ or """ => "\"",
             "‘" or "’" => "'",
             _ => m.Value
         });
@@ -500,7 +520,7 @@ public sealed partial class AniList
             {
                 string englishTitle = englishElement.GetString();
                 newTitles["English"] = englishTitle;
-                LOGGER.Debug("Added AniList English title: {Title}, englishTitle");
+                LOGGER.Debug("Added AniList English title: {Title}", englishTitle);
             }
 
             if (titleElement.TryGetProperty("native", out JsonElement nativeElement) && nativeElement.ValueKind == JsonValueKind.String)
@@ -516,11 +536,14 @@ public sealed partial class AniList
         }
     }
 
-    public static bool SeriesHasNextPage(JsonElement staff)
-    {
-        return staff.GetProperty("staff").GetProperty("pageInfo").GetProperty("hasNextPage").GetBoolean();
-    }
-
+    /// <summary>
+    /// Extracts staff names from AniList series data, filtering by valid roles and deduplicating entries.
+    /// </summary>
+    /// <param name="seriesData">The JSON element containing AniList series data with a "staff" property.</param>
+    /// <param name="nativeStaff">Accumulates native staff names, separated by " | ".</param>
+    /// <param name="fullStaff">Accumulates full (romanized) staff names, separated by " | ".</param>
+    /// <param name="disallowIllustrationStaff">If <c>true</c>, excludes staff with illustration-only roles.</param>
+    /// <returns><c>true</c> if there are more staff pages to fetch; otherwise, <c>false</c>.</returns>
     public static bool ExtractStaffFromAniList(JsonElement seriesData, ref string nativeStaff, ref string fullStaff, bool disallowIllustrationStaff = true)
     {
         if (!seriesData.TryGetProperty("staff", out JsonElement staffData) ||
@@ -605,17 +628,17 @@ public sealed partial class AniList
 
             if (!string.IsNullOrWhiteSpace(native) && nativeSeen.Add(native))
             {
-                nativeBuilder.Append(native.Trim()).Append(" | ");
+                nativeBuilder.Append(native.Trim()).Append(StaffSeparator);
             }
 
             if (!string.IsNullOrWhiteSpace(full) && fullSeen.Add(full))
             {
-                fullBuilder.Append(full.Trim()).Append(" | ");
+                fullBuilder.Append(full.Trim()).Append(StaffSeparator);
             }
         }
 
-        nativeStaff = nativeBuilder.Length > 3 ? nativeBuilder.ToString(0, nativeBuilder.Length - 3) : string.Empty;
-        fullStaff = fullBuilder.Length > 3 ? fullBuilder.ToString(0, fullBuilder.Length - 3) : string.Empty;
+        nativeStaff = nativeBuilder.Length > StaffSeparatorLength ? nativeBuilder.ToString(0, nativeBuilder.Length - StaffSeparatorLength) : string.Empty;
+        fullStaff = fullBuilder.Length > StaffSeparatorLength ? fullBuilder.ToString(0, fullBuilder.Length - StaffSeparatorLength) : string.Empty;
 
         if (nativeStaff.Length == 0 && fullStaff.Length == 0)
         {

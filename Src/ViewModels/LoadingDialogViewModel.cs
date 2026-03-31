@@ -1,11 +1,11 @@
-using ReactiveUI.Fody.Helpers;
+using ReactiveUI.SourceGenerators;
 
 namespace Tsundoku.ViewModels;
 
-public sealed class LoadingDialogViewModel(IUserService userService) : ViewModelBase(userService)
+public sealed partial class LoadingDialogViewModel(IUserService userService) : ViewModelBase(userService)
 {
-    [Reactive] public string StatusText { get; set; } = "Loading, Please Wait";
-    [Reactive] public bool IsLoadingIndeterminate { get; set; } = false;
-    [Reactive] public uint ProgressValue { get; set; } = 0;
-    [Reactive] public int ProgressMaximum { get; set; } = 100;
+    [Reactive] public partial string StatusText { get; set; } = "Loading, Please Wait";
+    [Reactive] public partial bool IsLoadingIndeterminate { get; set; } = false;
+    [Reactive] public partial uint ProgressValue { get; set; } = 0;
+    [Reactive] public partial int ProgressMaximum { get; set; } = 100;
 }
