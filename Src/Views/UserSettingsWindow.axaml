@@ -132,8 +132,8 @@
                 <StackPanel Margin="20,14,20,14" Spacing="6">
                     <TextBlock Text="PREFERENCES" Classes="section-title" Margin="0,0,0,4"/>
                     <Grid ColumnDefinitions="*,Auto">
-                        <TextBlock Text="Refresh Covers on Startup" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="{DynamicResource TsundokuMenuTextColor}"/>
-                        <ToggleButton x:Name="RefreshCoversButton" Grid.Column="1" IsChecked="{CompiledBinding RefreshCovers}" Classes="toggle-switch" VerticalAlignment="Center" ToolTip.Tip="Re-download cover images when refreshing a series"/>
+                        <TextBlock Text="Refresh Covers on Series Refresh" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="{DynamicResource TsundokuMenuTextColor}"/>
+                        <ToggleButton x:Name="RefreshCoversButton" Grid.Column="1" IsChecked="{CompiledBinding RefreshCovers}" Classes="toggle-switch" VerticalAlignment="Center" ToolTip.Tip="Re-download cover images when refreshing an individual series"/>
                     </Grid>
                     <Grid ColumnDefinitions="*,Auto">
                         <TextBlock Text="Glass Effect" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="{DynamicResource TsundokuMenuTextColor}"/>

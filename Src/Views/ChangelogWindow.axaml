@@ -24,15 +24,35 @@
             BoxShadow="0 8 32 0 #4D000000">
         <Grid Margin="24,20,24,24" RowDefinitions="Auto,Auto,Auto,*,Auto,Auto,Auto">
             <!-- Row 0: Header -->
-            <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10" Margin="0,0,0,16">
-                <i:Icon Value="fa-solid fa-bolt" FontSize="22"
-                        Foreground="{DynamicResource TsundokuDividerColor}"/>
-                <TextBlock x:Name="VersionHeader"
-                           FontSize="22"
-                           FontWeight="Bold"
-                           VerticalAlignment="Center"
-                           Foreground="{DynamicResource TsundokuMenuTextColor}"/>
-            </StackPanel>
+            <Grid Grid.Row="0" ColumnDefinitions="28,*,28" Margin="0,0,0,16">
+                <Button x:Name="PrevVersionButton"
+                        Grid.Column="0"
+                        Theme="{StaticResource SeriesCardButton}"
+                        Click="OnPrevVersionClicked"
+                        Opacity="0"
+                        IsHitTestVisible="False"
+                        VerticalAlignment="Center">
+                    <i:Icon Value="fa-solid fa-chevron-left" FontSize="12"/>
+                </Button>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
+                    <i:Icon Value="fa-solid fa-bolt" FontSize="22"
+                            Foreground="{DynamicResource TsundokuDividerColor}"/>
+                    <TextBlock x:Name="VersionHeader"
+                               FontSize="22"
+                               FontWeight="Bold"
+                               VerticalAlignment="Center"
+                               Foreground="{DynamicResource TsundokuMenuTextColor}"/>
+                </StackPanel>
+                <Button x:Name="NextVersionButton"
+                        Grid.Column="2"
+                        Theme="{StaticResource SeriesCardButton}"
+                        Click="OnNextVersionClicked"
+                        Opacity="0"
+                        IsHitTestVisible="False"
+                        VerticalAlignment="Center">
+                    <i:Icon Value="fa-solid fa-chevron-right" FontSize="12"/>
+                </Button>
+            </Grid>
 
             <!-- Row 1: Divider -->
             <Border Grid.Row="1" Height="2"

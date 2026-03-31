@@ -27,5 +27,18 @@
       "Re-upload custom covers for sharper display on high-DPI screens",
       "Check settings to enable the glassmorphism blur effect if desired"
     ]
+  },
+  "2.0.1": {
+    "changes": [
+      "Fixed series refresh failing for AniList-sourced series whose URLs contain a title slug",
+      "Fixed MangaDex cover images not downloading when the API returns cover data as an array",
+      "Fixed What's New page showing double 'v' in the version and missing changelog content in MSIX builds",
+      "What's New dialog now opens over the settings window instead of closing it",
+      "Fixed misleading 'Refresh Covers on Startup' label to clarify it applies to individual series refreshes",
+      "What's New dialog now has navigation arrows to browse changelogs from previous versions"
+    ],
+    "actions": [
+      "Refresh all series via settings to fix any missing cover images"
+    ]
   }
 }
