@@ -22,9 +22,9 @@
             CornerRadius="14"
             ClipToBounds="True"
             BoxShadow="0 8 32 0 #4D000000">
-        <Grid Margin="24,20,24,24" RowDefinitions="Auto,Auto,Auto,*,Auto,Auto,Auto">
+        <Grid Margin="24,17,24,24" RowDefinitions="Auto,Auto,Auto,*,Auto,Auto,Auto">
             <!-- Row 0: Header -->
-            <Grid Grid.Row="0" ColumnDefinitions="28,*,28" Margin="0,0,0,16">
+            <Grid Grid.Row="0" ColumnDefinitions="28,*,28" Margin="0,0,0,10">
                 <Button x:Name="PrevVersionButton"
                         Grid.Column="0"
                         Theme="{StaticResource SeriesCardButton}"
@@ -59,7 +59,7 @@
                     Background="{DynamicResource TsundokuDividerColor}"
                     CornerRadius="1"
                     Opacity="0.6"
-                    Margin="0,0,0,8"/>
+                    Margin="0,0,0,5"/>
 
             <!-- Row 2: Changes label -->
             <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="6" Margin="0,0,0,6">
