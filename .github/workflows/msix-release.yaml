@@ -3,10 +3,6 @@ name: Build and Release MSIX (Avalonia)
 on:
   workflow_dispatch:
     inputs:
-      tag:
-        description: 'Tag to build and release (e.g. v7.1.0)'
-        required: true
-        default: 'v1.0.0'
       skip_tests:
         description: 'Skip running tests'
         required: false
@@ -30,6 +26,20 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: '10.0.x'
+
+    - name: 📋 Extract Version from csproj
+      id: version
+      run: |
+        $content = Get-Content $env:AVALONIA_PROJECT_PATH -Raw
+        $version = [regex]::Match($content, '(?<=<Version>)[^<]+').Value
+        if (-not $version) {
+            Write-Error "Could not find <Version> in $env:AVALONIA_PROJECT_PATH"
+            exit 1
+        }
+        Write-Host "Version: $version (tag: v$version)"
+        echo "version=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+        echo "tag=v$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+      shell: pwsh
 
     - name: 🔧 Build Main Project (for tests)
       run: dotnet build ${{ env.AVALONIA_PROJECT_PATH }} --configuration Release
@@ -57,38 +67,6 @@ jobs:
         }
       shell: pwsh
 
-    - name: ✅ Verify Csproj Version Matches Tag
-      run: |
-          $TAG_VERSION = "${{ github.event.inputs.tag }}".TrimStart("v")
-          Write-Host "Checking versions in $env:AVALONIA_PROJECT_PATH against tag version $TAG_VERSION"
-
-          $CSPROJ_CONTENT = Get-Content $env:AVALONIA_PROJECT_PATH -Raw
-          $CSPROJ_VERSION = [regex]::Match($CSPROJ_CONTENT, '(?<=<Version>)[^<]+').Value
-          $CSPROJ_FILE_VERSION = [regex]::Match($CSPROJ_CONTENT, '(?<=<FileVersion>)[^<]+').Value
-          $CSPROJ_ASSEMBLY_VERSION = [regex]::Match($CSPROJ_CONTENT, '(?<=<AssemblyVersion>)[^<]+').Value
-
-          Write-Host "Csproj versions: Version=$CSPROJ_VERSION, FileVersion=$CSPROJ_FILE_VERSION, AssemblyVersion=$CSPROJ_ASSEMBLY_VERSION"
-
-          $EXPECTED_ASSEMBLY_VERSION = "$TAG_VERSION.0"
-
-          if ($CSPROJ_VERSION -ne $TAG_VERSION) {
-          Write-Host "Error: Version tag (v$TAG_VERSION) does NOT match <Version> ($CSPROJ_VERSION)"
-          exit 1
-          }
-
-          if ($CSPROJ_FILE_VERSION -ne $TAG_VERSION) {
-          Write-Host "Error: Version tag (v$TAG_VERSION) does NOT match <FileVersion> ($CSPROJ_FILE_VERSION)"
-          exit 1
-          }
-
-          if ($CSPROJ_ASSEMBLY_VERSION -ne $EXPECTED_ASSEMBLY_VERSION) {
-          Write-Host "Error: Version tag (v$TAG_VERSION) does NOT match <AssemblyVersion> ($CSPROJ_ASSEMBLY_VERSION)"
-          exit 1
-          }
-
-          Write-Host "✅ Version check passed."
-      shell: pwsh
-
     - name: 🧰 Install MSIX/WAP workload
       run: dotnet workload install windowsapp
       shell: pwsh
@@ -109,7 +87,7 @@ jobs:
           $buildCommand += " /p:AppxPackageDir=`"$env:MSIX_OUTPUT_SUBDIR\`""
           $buildCommand += " /p:BuildProjectReferences=true"
           $buildCommand += " /p:GenerateTestArtifacts=false"
-          $buildCommand += " /p:InformationalVersion=`"${{ github.event.inputs.tag }}`""
+          $buildCommand += " /p:InformationalVersion=`"${{ steps.version.outputs.tag }}`""
           $buildCommand += " /p:ContinuousIntegrationBuild=true"
           $buildCommand += " /v:normal"
 
@@ -139,16 +117,16 @@ jobs:
 
     - name: 📝 Update AppInstaller File With Tag Version
       run: |
-        $VERSION = "${{ github.event.inputs.tag }}".TrimStart("v")
+        $VERSION = "${{ steps.version.outputs.tag }}".TrimStart("v")
         $MSIX_BUNDLE_FILENAME = "${{ steps.build_msix.outputs.msix_bundle_filename }}"
 
         Write-Host "Replacing version in TsundokuPackage/Package.appinstaller with $VERSION"
 
         $appinstallerContent = Get-Content "./TsundokuPackage/Package.appinstaller"
-        $appinstallerContent = $appinstallerContent -replace '(?<=<MainBundle.+Uri=")[^"]+', "https://github.com/Sigrec/Tsundoku/releases/download/${{ github.event.inputs.tag }}/$MSIX_BUNDLE_FILENAME"
+        $appinstallerContent = $appinstallerContent -replace '(?<=<MainBundle.+Uri=")[^"]+', "https://github.com/Sigrec/Tsundoku/releases/download/${{ steps.version.outputs.tag }}/$MSIX_BUNDLE_FILENAME"
         $appinstallerContent = $appinstallerContent -replace '(?<=<MainBundle.+Version=")[^"]+', $VERSION
         $appinstallerContent = $appinstallerContent -replace '(?<=<AppInstaller.+Version=")[^"]+', $VERSION
-        $appinstallerContent = $appinstallerContent -replace '(?<=<UpdateSettings.+Uri=")[^"]+', "https://github.com/Sigrec/Tsundoku/releases/download/${{ github.event.inputs.tag }}/Tsundoku.appinstaller"
+        $appinstallerContent = $appinstallerContent -replace '(?<=<UpdateSettings.+Uri=")[^"]+', "https://github.com/Sigrec/Tsundoku/releases/download/${{ steps.version.outputs.tag }}/Tsundoku.appinstaller"
         Set-Content "./TsundokuPackage/Package.appinstaller" -Value $appinstallerContent
 
         Write-Host "Updated .appinstaller content:"
@@ -158,8 +136,8 @@ jobs:
     - name: 🚀 Create GitHub Release and Upload Assets
       uses: softprops/action-gh-release@v2
       with:
-        tag_name: ${{ github.event.inputs.tag }}
-        name: Release ${{ github.event.inputs.tag }}
+        tag_name: ${{ steps.version.outputs.tag }}
+        name: Release ${{ steps.version.outputs.tag }}
         generate_release_notes: true
         draft: false
         prerelease: false
