@@ -114,18 +114,21 @@ jobs:
 
           & msbuild @msbuildArgs
 
-          $WAP_OUTPUT_DIR = Join-Path (Split-Path $env:WAP_PROJECT_PATH -Parent) "bin\Release"
-          $MSIX_PACKAGES_DIR = Join-Path $WAP_OUTPUT_DIR $env:MSIX_OUTPUT_SUBDIR
+          $wapDir = Split-Path $env:WAP_PROJECT_PATH -Parent
 
-          # StoreUpload mode produces .msixupload; fallback to .msixbundle
-          $MSIX_BUNDLE_PATH = (Get-ChildItem -Path $MSIX_PACKAGES_DIR -Filter "*.msixupload" | Sort-Object LastWriteTime -Descending | Select-Object -First 1).FullName
+          # Search for output files recursively since msbuild output path varies
+          Write-Host "Searching for MSIX output under: $wapDir"
+          Get-ChildItem -Path $wapDir -Recurse -Include "*.msixupload","*.msixbundle" | ForEach-Object { Write-Host "  Found: $($_.FullName)" }
+
+          $MSIX_BUNDLE_PATH = (Get-ChildItem -Path $wapDir -Recurse -Filter "*.msixupload" | Sort-Object LastWriteTime -Descending | Select-Object -First 1).FullName
           if (-not $MSIX_BUNDLE_PATH) {
-              $MSIX_BUNDLE_PATH = (Get-ChildItem -Path $MSIX_PACKAGES_DIR -Filter "*.msixbundle" | Sort-Object LastWriteTime -Descending | Select-Object -First 1).FullName
+              $MSIX_BUNDLE_PATH = (Get-ChildItem -Path $wapDir -Recurse -Filter "*.msixbundle" | Sort-Object LastWriteTime -Descending | Select-Object -First 1).FullName
           }
           if (-not $MSIX_BUNDLE_PATH) {
-              Write-Error "Could not find MSIX bundle or upload file in $MSIX_PACKAGES_DIR directory."
+              Write-Error "Could not find MSIX bundle or upload file under $wapDir"
               exit 1
           }
+          $MSIX_PACKAGES_DIR = Split-Path $MSIX_BUNDLE_PATH -Parent
           $MSIX_BUNDLE_FILENAME = Split-Path -Leaf $MSIX_BUNDLE_PATH
 
           Write-Host "Found MSIX Package: $MSIX_BUNDLE_FILENAME"
