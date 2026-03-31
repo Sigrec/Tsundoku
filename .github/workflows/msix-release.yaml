@@ -61,18 +61,19 @@ jobs:
       shell: pwsh
 
     - name: Restore Signing Certificate
+      env:
+        PFX_B64: ${{ secrets.PFX_BASE64 }}
+        PFX_PWD: ${{ secrets.PFX_PASSWORD }}
       run: |
-        $pfxPath = "$env:TEMP\code-signing-cert.pfx"
-
-        if ("${{ secrets.PFX_BASE64 }}" -ne "" -and "${{ secrets.PFX_PASSWORD }}" -ne "") {
-            Write-Host "PFX secrets found. Restoring certificate..."
-            [System.IO.File]::WriteAllBytes($pfxPath, [System.Convert]::FromBase64String("${{ secrets.PFX_BASE64 }}"))
+        $pfxPath = Join-Path $env:TEMP 'code-signing-cert.pfx'
+        if ($env:PFX_B64 -and $env:PFX_PWD) {
+            Write-Host 'PFX secrets found. Restoring certificate...'
+            [System.IO.File]::WriteAllBytes($pfxPath, [System.Convert]::FromBase64String($env:PFX_B64))
             Write-Host "Certificate restored to: $pfxPath"
-
             "PACKAGE_CERT_KEY_FILE=$pfxPath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-            "PACKAGE_CERT_PASSWORD=${{ secrets.PFX_PASSWORD }}" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+            "PACKAGE_CERT_PASSWORD=$env:PFX_PWD" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
         } else {
-            Write-Error "PFX_BASE64 or PFX_PASSWORD secrets are missing or empty."
+            Write-Error 'PFX_BASE64 or PFX_PASSWORD secrets are missing or empty.'
             exit 1
         }
       shell: pwsh
