@@ -91,7 +91,7 @@ jobs:
           $certFile = $env:PACKAGE_CERT_KEY_FILE
           $certPass = $env:PACKAGE_CERT_PASSWORD
           $outDir = $env:MSIX_OUTPUT_SUBDIR
-          $tag = '${{ steps.version.outputs.tag }}'
+          $version = '${{ steps.version.outputs.version }}'
 
           $msbuildArgs = @(
             $env:WAP_PROJECT_PATH,
@@ -106,7 +106,7 @@ jobs:
             "/p:AppxPackageDir=$outDir\",
             '/p:BuildProjectReferences=true',
             '/p:GenerateTestArtifacts=false',
-            "/p:InformationalVersion=$tag",
+            "/p:InformationalVersion=$version",
             '/p:ContinuousIntegrationBuild=true',
             '/v:normal'
           )

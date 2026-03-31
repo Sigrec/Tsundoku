@@ -64,7 +64,7 @@
 		<AvaloniaResource Include="Assets\Icons\TsundokuLogo.ico" />
 		<AvaloniaResource Include="Assets\Fonts\**\*.ttf" />
 		<EmbeddedResource Include="Assets\changelog.json" />
-		<AvaloniaResource Include="Styles/**" />
+		<AvaloniaResource Include="Styles/**" Exclude="Styles/**/*.axaml" />
 		<None Include="Models\Enums\SeriesGenres.cs" />
 		<Content Update="lib*.dll">
 			<CopyToOutputDirectory>Never</CopyToOutputDirectory>

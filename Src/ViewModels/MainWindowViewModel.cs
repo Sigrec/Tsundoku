@@ -176,7 +176,7 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
             _bitmapHelper,
             _mangaDex,
             _aniList,
-            originalSeries.Link.Segments.Last(),
+            originalSeries.GetLinkId(),
             originalSeries.Format,
             originalSeries.MaxVolumeCount,
             originalSeries.CurVolumeCount,

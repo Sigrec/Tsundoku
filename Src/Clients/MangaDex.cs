@@ -325,11 +325,32 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
             if (data.ValueKind == JsonValueKind.Array)
             {
                 JsonElement first = data.EnumerateArray().FirstOrDefault();
-                return first.ValueKind == JsonValueKind.Object
+                if (first.ValueKind == JsonValueKind.Object
                     && first.TryGetProperty("attributes", out JsonElement firstAttr)
-                    && firstAttr.TryGetProperty("fileName", out JsonElement firstFile)
-                    ? firstFile.GetString()
-                    : null;
+                    && firstAttr.TryGetProperty("fileName", out JsonElement firstFile))
+                {
+                    string? fileName = firstFile.GetString();
+                    if (fileName is null)
+                    {
+                        return null;
+                    }
+
+                    if (string.IsNullOrWhiteSpace(mangaDexId) && first.TryGetProperty("relationships", out JsonElement rels))
+                    {
+                        foreach (JsonElement rel in rels.EnumerateArray())
+                        {
+                            if (rel.TryGetProperty("type", out JsonElement relType) && relType.GetString() == "manga"
+                                && rel.TryGetProperty("id", out JsonElement relId))
+                            {
+                                mangaDexId = relId.GetString();
+                                break;
+                            }
+                        }
+                    }
+
+                    return @$"https://uploads.mangadex.org/covers/{mangaDexId}/{fileName}";
+                }
+                return null;
             }
 
             if (string.IsNullOrWhiteSpace(mangaDexId) && data.TryGetProperty("id", out JsonElement dataId))

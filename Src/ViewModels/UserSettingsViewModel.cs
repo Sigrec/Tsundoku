@@ -326,7 +326,7 @@ public sealed partial class UserSettingsViewModel : ViewModelBase
                         _bitmapHelper,
                         _mangaDex,
                         _aniList,
-                        series.Link.Segments.Last(),
+                        series.GetLinkId(),
                         series.Format,
                         series.MaxVolumeCount,
                         series.CurVolumeCount,

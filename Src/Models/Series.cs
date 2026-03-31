@@ -785,6 +785,29 @@ public sealed partial class Series(
         return JsonSerializer.Serialize(this, typeof(Series), SeriesJsonModel);
     }
 
+    /// <summary>
+    /// Extracts the series identifier (AniList numeric ID or MangaDex UUID) from the
+    /// stored <see cref="Link"/> URI.  AniList URLs may include a trailing slug
+    /// (e.g. <c>/manga/86635/Jujutsu-Kaisen</c>), so the last segment is not
+    /// always the ID.  This method finds the segment immediately after
+    /// <c>manga/</c> or <c>title/</c> and strips any trailing slash.
+    /// </summary>
+    public string GetLinkId()
+    {
+        string[] segments = Link.Segments;
+        for (int i = 0; i < segments.Length - 1; i++)
+        {
+            string seg = segments[i].TrimEnd('/');
+            if (seg.Equals("manga", StringComparison.OrdinalIgnoreCase) ||
+                seg.Equals("title", StringComparison.OrdinalIgnoreCase))
+            {
+                return segments[i + 1].TrimEnd('/');
+            }
+        }
+
+        return segments[^1].TrimEnd('/');
+    }
+
     public bool IsCoverImageEmpty()
     {
         return this.CoverBitMap is null || this.CoverBitMap.PixelSize.Width == 0 || this.CoverBitMap.PixelSize.Height == 0;
