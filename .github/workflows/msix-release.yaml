@@ -78,14 +78,17 @@ jobs:
         }
       shell: pwsh
 
-    - name: Install MSIX/WAP workload
-      run: dotnet workload install windowsapp
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Restore NuGet Packages
+      run: dotnet restore ${{ env.AVALONIA_PROJECT_PATH }}
       shell: pwsh
 
     - name: Build and Package MSIX Bundle
       id: build_msix
       run: |
-          $buildCommand = "dotnet build $env:WAP_PROJECT_PATH --configuration Release"
+          $buildCommand = "msbuild $env:WAP_PROJECT_PATH /p:Configuration=Release"
 
           $buildCommand += " /p:Platform=x64"
           $buildCommand += " /p:AppxPackageSigningEnabled=true"
