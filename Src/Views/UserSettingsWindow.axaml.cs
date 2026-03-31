@@ -140,14 +140,9 @@ public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsView
 
     private async void ShowChangelogAsync(object sender, RoutedEventArgs args)
     {
-        if (Owner is MainWindow mainWindow)
-        {
-            this.Hide();
-            IsOpen = false;
-            ChangelogWindow changelog = new() { DataContext = ViewModel };
-            changelog.SetVersion(ViewModelBase.CUR_TSUNDOKU_VERSION);
-            await changelog.ShowDialog(mainWindow);
-        }
+        ChangelogWindow changelog = new() { DataContext = ViewModel };
+        changelog.SetVersion(ViewModelBase.CUR_TSUNDOKU_VERSION);
+        await changelog.ShowDialog(this);
     }
 
     private async void CheckApiStatusAsync(object sender, RoutedEventArgs args)
