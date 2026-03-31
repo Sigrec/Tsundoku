@@ -88,25 +88,31 @@ jobs:
     - name: Build and Package MSIX Bundle
       id: build_msix
       run: |
-          $buildCommand = "msbuild $env:WAP_PROJECT_PATH /p:Configuration=Release"
+          $certFile = $env:PACKAGE_CERT_KEY_FILE
+          $certPass = $env:PACKAGE_CERT_PASSWORD
+          $outDir = $env:MSIX_OUTPUT_SUBDIR
+          $tag = '${{ steps.version.outputs.tag }}'
 
-          $buildCommand += " /p:Platform=x64"
-          $buildCommand += " /p:AppxPackageSigningEnabled=true"
-          $buildCommand += " /p:PackageCertificateKeyFile=`"$env:PACKAGE_CERT_KEY_FILE`""
-          $buildCommand += " /p:PackageCertificatePassword=`"$env:PACKAGE_CERT_PASSWORD`""
-          $buildCommand += " /p:AppxBundle=Always"
-          $buildCommand += " /p:AppxBundlePlatforms=`"x64`""
-          $buildCommand += " /p:UapAppxPackageBuildMode=StoreUpload"
-          $buildCommand += " /p:GenerateAppxPackageOnBuild=true"
-          $buildCommand += " /p:AppxPackageDir=`"$env:MSIX_OUTPUT_SUBDIR\`""
-          $buildCommand += " /p:BuildProjectReferences=true"
-          $buildCommand += " /p:GenerateTestArtifacts=false"
-          $buildCommand += " /p:InformationalVersion=`"${{ steps.version.outputs.tag }}`""
-          $buildCommand += " /p:ContinuousIntegrationBuild=true"
-          $buildCommand += " /v:normal"
+          $msbuildArgs = @(
+            $env:WAP_PROJECT_PATH,
+            '/p:Configuration=Release',
+            '/p:Platform=x64',
+            '/p:AppxPackageSigningEnabled=true',
+            "/p:PackageCertificateKeyFile=$certFile",
+            "/p:PackageCertificatePassword=$certPass",
+            '/p:AppxBundle=Always',
+            '/p:AppxBundlePlatforms=x64',
+            '/p:UapAppxPackageBuildMode=StoreUpload',
+            '/p:GenerateAppxPackageOnBuild=true',
+            "/p:AppxPackageDir=$outDir\",
+            '/p:BuildProjectReferences=true',
+            '/p:GenerateTestArtifacts=false',
+            "/p:InformationalVersion=$tag",
+            '/p:ContinuousIntegrationBuild=true',
+            '/v:normal'
+          )
 
-          Write-Host "Executing build command: $buildCommand"
-          Invoke-Expression $buildCommand
+          & msbuild @msbuildArgs
 
           $WAP_OUTPUT_DIR = Join-Path (Split-Path $env:WAP_PROJECT_PATH -Parent) "bin\Release"
           $MSIX_PACKAGES_DIR = Join-Path $WAP_OUTPUT_DIR $env:MSIX_OUTPUT_SUBDIR
