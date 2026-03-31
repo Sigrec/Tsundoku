@@ -17,11 +17,17 @@ public interface IApiHealthCheckService : IDisposable
     /// <summary>Observable that emits the current MangaDex API availability.</summary>
     IObservable<bool> IsMangaDexAvailable { get; }
 
+    /// <summary>Gets whether AniList is currently available.</summary>
+    bool IsAniListUp { get; }
+
     /// <summary>Starts the periodic health check timer.</summary>
     void Start();
 
     /// <summary>Stops the periodic health check timer.</summary>
     void Stop();
+
+    /// <summary>Runs a manual health check immediately and returns (AniList, MangaDex) availability.</summary>
+    Task<(bool AniList, bool MangaDex)> CheckNowAsync();
 }
 
 /// <summary>
@@ -42,6 +48,7 @@ public sealed class ApiHealthCheckService : IApiHealthCheckService
 
     public IObservable<bool> IsAniListAvailable => _aniListStatus.DistinctUntilChanged();
     public IObservable<bool> IsMangaDexAvailable => _mangaDexStatus.DistinctUntilChanged();
+    public bool IsAniListUp => _aniListStatus.Value;
 
     public ApiHealthCheckService(AniListGraphQLClient aniListClient, IHttpClientFactory httpClientFactory)
     {
@@ -54,6 +61,12 @@ public sealed class ApiHealthCheckService : IApiHealthCheckService
         // Run immediately then every 10 minutes
         _timer = new Timer(_ => _ = CheckAllSafeAsync(), null, TimeSpan.Zero, TimeSpan.FromMinutes(CheckIntervalMinutes));
         LOGGER.Info("API health check service started (interval: {Interval} minutes)", CheckIntervalMinutes);
+    }
+
+    public async Task<(bool AniList, bool MangaDex)> CheckNowAsync()
+    {
+        await CheckAllSafeAsync();
+        return (_aniListStatus.Value, _mangaDexStatus.Value);
     }
 
     private async Task CheckAllSafeAsync()

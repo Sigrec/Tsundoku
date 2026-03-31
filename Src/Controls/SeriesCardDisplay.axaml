@@ -278,7 +278,7 @@
                     <Button Grid.Column="0" Theme="{StaticResource SeriesCardButton}" Content="&#x2212;" Margin="0,0,4,0" Click="SubtractVolume"/>
 
                     <!-- + Button -->
-                    <Button Grid.Column="1" Theme="{StaticResource SeriesCardButton}" Content="+" Margin="0,0,8,0" Click="AddVolume"/>
+                    <Button Grid.Column="1" Theme="{StaticResource SeriesCardButton}" Content="+" Padding="1,0,0,2" Margin="0,0,8,0" Click="AddVolume"/>
 
                     <!-- Progress Bar with overlay text -->
                     <Panel Grid.Column="2">

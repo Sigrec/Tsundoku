@@ -41,6 +41,16 @@ jobs:
         echo "tag=v$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
       shell: pwsh
 
+    - name: 📦 Sync Package.appxmanifest Version
+      run: |
+        $version = "${{ steps.version.outputs.version }}.0"
+        $manifestPath = "./TsundokuPackage/Package.appxmanifest"
+        $content = Get-Content $manifestPath -Raw
+        $content = $content -replace '(?<=<Identity[^>]+Version=")[^"]+', $version
+        Set-Content $manifestPath -Value $content -NoNewline
+        Write-Host "✅ Updated Package.appxmanifest Version to $version"
+      shell: pwsh
+
     - name: 🔧 Build Main Project (for tests)
       run: dotnet build ${{ env.AVALONIA_PROJECT_PATH }} --configuration Release
       shell: pwsh

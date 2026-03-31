@@ -5,6 +5,7 @@ using Tsundoku.Helpers;
 using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 using Avalonia.Collections;
 using Tsundoku.Clients;
+using Tsundoku.Services;
 using static Tsundoku.Models.Enums.SeriesDemographicModel;
 using static Tsundoku.Models.Enums.SeriesFormatModel;
 using ReactiveUI;
@@ -45,11 +46,14 @@ public sealed partial class AddNewSeriesViewModel : ViewModelBase, IDisposable
 
     private readonly StringBuilder _curLanguages = new();
 
-    public AddNewSeriesViewModel(IUserService userService, BitmapHelper bitmapHelper, MangaDex mangaDex, AniList aniList) : base(userService)
+    private readonly IApiHealthCheckService _apiHealthCheckService;
+
+    public AddNewSeriesViewModel(IUserService userService, BitmapHelper bitmapHelper, MangaDex mangaDex, AniList aniList, IApiHealthCheckService apiHealthCheckService) : base(userService)
     {
         _bitmapHelper = bitmapHelper;
         _mangaDex = mangaDex;
         _aniList = aniList;
+        _apiHealthCheckService = apiHealthCheckService;
 
         SelectedAdditionalLanguages.CollectionChanged += AdditionalLanguagesCollectionChanged;
 
@@ -98,7 +102,7 @@ public sealed partial class AddNewSeriesViewModel : ViewModelBase, IDisposable
             .DistinctUntilChanged()
             .Select(x =>
             {
-                if (string.IsNullOrWhiteSpace(x) || x.Length < 2)
+                if (string.IsNullOrWhiteSpace(x) || x.Length < 2 || !_apiHealthCheckService.IsAniListUp)
                     return Observable.Return(Array.Empty<AniListPickerSuggestion>());
 
                 return Observable.FromAsync(async ct =>

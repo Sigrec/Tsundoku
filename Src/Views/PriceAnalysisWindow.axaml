@@ -187,8 +187,19 @@
 								  AreRowDetailsFrozen="True"
 								  GridLinesVisibility="Horizontal"
 								  FontWeight="SemiBold"
-								  FontSize="13"
+								  FontSize="7"
 								  HeadersVisibility="Column">
+							<DataGrid.Styles>
+								<Style Selector="DataGridRow">
+									<Setter Property="FontSize" Value="11"/>
+								</Style>
+								<Style Selector="DataGridCell TextBlock">
+									<Setter Property="FontSize" Value="11"/>
+								</Style>
+								<Style Selector="DataGridColumnHeader TextBlock">
+									<Setter Property="FontSize" Value="11"/>
+								</Style>
+							</DataGrid.Styles>
 							<DataGrid.Columns>
 								<DataGridTextColumn Width="*" Header="Entry" Binding="{Binding Entry}"/>
 								<DataGridTextColumn MinWidth="65" Width="SizeToCells" Header="Price" Binding="{Binding Price}"/>

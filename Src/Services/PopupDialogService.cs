@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Avalonia.Styling;
 using Projektanker.Icons.Avalonia;
 using Tsundoku.ViewModels;
 using Tsundoku.Views;
@@ -60,9 +61,10 @@ public sealed class PopupDialogService(PopupDialogViewModel viewModel) : IPopupD
         {
             BorderThickness = new Thickness(2),
             CornerRadius = new CornerRadius(0, 0, 8, 8),
-            ClipToBounds = true
+            ClipToBounds = true,
+            Background = (IBrush)Application.Current!.FindResource("TsundokuMenuBGColor")!,
+            BorderBrush = (IBrush)Application.Current.FindResource("TsundokuDividerColor")!
         };
-        border.Classes.Add("Menu");
 
         StackPanel content = new StackPanel
         {
@@ -70,18 +72,23 @@ public sealed class PopupDialogService(PopupDialogViewModel viewModel) : IPopupD
             Spacing = 12
         };
 
-        Icon iconControl = new Icon { Value = icon, FontSize = 25, FontWeight = FontWeight.Bold };
-        iconControl.Classes.Add("Menu");
+        Icon iconControl = new Icon
+        {
+            Value = icon,
+            FontSize = 25,
+            FontWeight = FontWeight.Bold,
+            Foreground = (IBrush)Application.Current!.FindResource("TsundokuDividerColor")!
+        };
 
         TextBlock messageText = new TextBlock
         {
             Text = info,
-            FontSize = 16,
+            FontSize = 14,
             TextAlignment = TextAlignment.Center,
             FontWeight = FontWeight.Bold,
-            TextWrapping = TextWrapping.Wrap
+            TextWrapping = TextWrapping.Wrap,
+            Foreground = (IBrush)Application.Current.FindResource("TsundokuMenuTextColor")!
         };
-        messageText.Classes.Add("Menu");
 
         StackPanel buttonPanel = new StackPanel
         {
@@ -90,6 +97,8 @@ public sealed class PopupDialogService(PopupDialogViewModel viewModel) : IPopupD
             Spacing = 10
         };
 
+        ControlTheme? menuButtonTheme = Application.Current.FindResource("MenuButton") as ControlTheme;
+
         Button confirmBtn = new Button
         {
             Content = "Confirm",
@@ -97,11 +106,7 @@ public sealed class PopupDialogService(PopupDialogViewModel viewModel) : IPopupD
             FontWeight = FontWeight.Bold,
             Padding = new Thickness(20, 6),
             Cursor = new Avalonia.Input.Cursor(Avalonia.Input.StandardCursorType.Hand),
-            Background = (IBrush)Application.Current!.FindResource("TsundokuMenuButtonBGColor")!,
-            Foreground = (IBrush)Application.Current.FindResource("TsundokuMenuButtonTextAndIconColor")!,
-            BorderBrush = (IBrush)Application.Current.FindResource("TsundokuMenuButtonBorderColor")!,
-            BorderThickness = new Thickness(2),
-            CornerRadius = new CornerRadius(9)
+            Theme = menuButtonTheme
         };
 
         Button cancelBtn = new Button
@@ -111,11 +116,7 @@ public sealed class PopupDialogService(PopupDialogViewModel viewModel) : IPopupD
             FontWeight = FontWeight.Bold,
             Padding = new Thickness(20, 6),
             Cursor = new Avalonia.Input.Cursor(Avalonia.Input.StandardCursorType.Hand),
-            Background = (IBrush)Application.Current!.FindResource("TsundokuMenuButtonBGColor")!,
-            Foreground = (IBrush)Application.Current.FindResource("TsundokuMenuButtonTextAndIconColor")!,
-            BorderBrush = (IBrush)Application.Current.FindResource("TsundokuMenuButtonBorderColor")!,
-            BorderThickness = new Thickness(2),
-            CornerRadius = new CornerRadius(9)
+            Theme = menuButtonTheme
         };
 
         confirmBtn.Click += (s, e) => { result = true; confirmDialog.Close(); };

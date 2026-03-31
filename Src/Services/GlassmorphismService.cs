@@ -131,7 +131,15 @@ public static class GlassmorphismService
 
     private static void ApplyBackgroundToNamedControl(Window window, string controlName, string resourceKey)
     {
-        Control? control = window.FindControl<Control>(controlName);
+        Control? control;
+        try
+        {
+            control = window.FindControl<Control>(controlName);
+        }
+        catch (InvalidOperationException)
+        {
+            return;
+        }
         if (control is null) return;
 
         if (Application.Current?.Resources.TryGetResource(resourceKey, null, out object? value) == true

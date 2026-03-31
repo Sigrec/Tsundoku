@@ -3,6 +3,26 @@ using DiscordRPC.Logging;
 
 namespace Tsundoku.Services;
 
+/// <summary>
+/// Custom Discord RPC logger that suppresses known noisy internal exceptions.
+/// </summary>
+internal sealed class FilteredDiscordLogger : DiscordRPC.Logging.ILogger
+{
+    public DiscordRPC.Logging.LogLevel Level { get; set; } = DiscordRPC.Logging.LogLevel.Error;
+
+    public void Trace(string message, params object[] args) { }
+    public void Info(string message, params object[] args) { }
+    public void Warning(string message, params object[] args) { }
+
+    public void Error(string message, params object[] args)
+    {
+        string formatted = args.Length > 0 ? string.Format(message, args) : message;
+        if (formatted.Contains("Assets.Merge", StringComparison.Ordinal)) return;
+        if (formatted.Contains("Object reference not set", StringComparison.Ordinal)) return;
+        LogManager.GetCurrentClassLogger().Error("DiscordRPC: {Message}", formatted);
+    }
+}
+
 public static class DiscordRP
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
@@ -21,7 +41,7 @@ public static class DiscordRP
         {
             client = new DiscordRpcClient("1050229234674696252")
             {
-                Logger = new ConsoleLogger(DiscordRPC.Logging.LogLevel.Error)
+                Logger = new FilteredDiscordLogger()
             };
 
             client.OnError += (_, e) => LOGGER.Error("DiscordRPC error {0}: {1}", e.Code, e.Message);

@@ -129,7 +129,20 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
                             "AniList and MangaDex APIs are currently unavailable. Adding new series, refreshing series, and importing from Libib or Goodreads have been disabled until AniList is back online.",
                             this);
                     }
-                    else if (_aniListDown && !wasAniListDown)
+                    else if (_aniListDown && !wasAniListDown && !_mangaDexDown)
+                    {
+                        bool enableAdd = await _popupDialogService.ConfirmAsync(
+                            "API Outage",
+                            "fa-solid fa-triangle-exclamation",
+                            "AniList API is currently unavailable. Refreshing series and importing from Libib or Goodreads have been disabled.\n\nMangaDex is online — would you like to enable adding new series via MangaDex?",
+                            this);
+
+                        if (enableAdd)
+                        {
+                            AddNewSeriesButton.IsEnabled = true;
+                        }
+                    }
+                    else if (_aniListDown && !wasAniListDown && _mangaDexDown)
                     {
                         await _popupDialogService.ShowAsync(
                             "API Outage",

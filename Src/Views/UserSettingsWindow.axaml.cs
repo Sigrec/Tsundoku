@@ -150,6 +150,47 @@ public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsView
         }
     }
 
+    private async void CheckApiStatusAsync(object sender, RoutedEventArgs args)
+    {
+        CheckApiStatusButton.IsEnabled = false;
+        CheckApiStatusButton.Content = "Checking...";
+        try
+        {
+            (bool aniList, bool mangaDex) = await _apiHealthCheckService.CheckNowAsync();
+
+            if (aniList && mangaDex)
+            {
+                await _popupDialogService.ShowAsync("API Status", "fa-solid fa-circle-check", "AniList and MangaDex are both online.", this);
+            }
+            else if (!aniList && !mangaDex)
+            {
+                await _popupDialogService.ShowAsync("API Status", "fa-solid fa-triangle-exclamation", "AniList and MangaDex are both unavailable. Adding new series, refreshing, and imports are disabled.", this);
+            }
+            else if (!aniList)
+            {
+                bool enableAdd = await _popupDialogService.ConfirmAsync(
+                    "API Status",
+                    "fa-solid fa-triangle-exclamation",
+                    "AniList is unavailable but MangaDex is online. Refreshing series and imports remain disabled.\n\nWould you like to enable adding new series via MangaDex?",
+                    this);
+
+                if (enableAdd && Owner is MainWindow mainWindow)
+                {
+                    mainWindow.AddNewSeriesButton.IsEnabled = true;
+                }
+            }
+            else
+            {
+                await _popupDialogService.ShowAsync("API Status", "fa-solid fa-triangle-exclamation", "MangaDex is unavailable. You can still add and refresh series using AniList.", this);
+            }
+        }
+        finally
+        {
+            CheckApiStatusButton.Content = "Check API Status";
+            CheckApiStatusButton.IsEnabled = true;
+        }
+    }
+
     public async void OpenAniListLink(object sender, RoutedEventArgs args)
     {
         await ViewModelBase.OpenSiteLink(@"https://anilist.co/");
