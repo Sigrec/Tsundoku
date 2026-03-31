@@ -1,6 +1,6 @@
 # [Tsundoku](https://en.wikipedia.org/wiki/Tsundoku) — Desktop Manga & Light Novel Collection App · [Follow me on AniList](https://anilist.co/user/Preminence/)
 
-> **[Windows Download (v2.0.0)](https://apps.microsoft.com/detail/9p85xxdqfhs2?hl=en-us&gl=US&ocid=pdpshare)**
+> **[Windows Download (v2.0.1)](https://apps.microsoft.com/detail/9p85xxdqfhs2?hl=en-us&gl=US&ocid=pdpshare)**
 
 **Important:** Your collection is stored in `UserData.json` with an automatic backup saved to `UserData_Backup.json` on every close. If you delete or lose both files, your library will be lost. The `Covers` folder is provided so you can replace cover images if you want—just keep the **exact** filename and extension (always `.png`).
 
