@@ -15,31 +15,23 @@ on:
 
 jobs:
   Build-And-Release:
-    # MSIX packaging requires Windows tools
     runs-on: windows-2022
 
     env:
-      # Define the path to your main Avalonia project for consistency
       AVALONIA_PROJECT_PATH: ./Src/Tsundoku.csproj
-      # Path to your Windows Application Packaging Project
       WAP_PROJECT_PATH: ./TsundokuPackage/TsundokuPackage.wapproj
-      # Directory where the MSIX packages will be generated, relative to the WAP project's output
       MSIX_OUTPUT_SUBDIR: AppPackages
-      # Define the temporary path for the PFX file
-      PFX_TEMP_PATH: "$env:TEMP\\your_certificate.pfx"
 
     steps:
     - name: 🛎️ Checkout Code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: 🛠️ Setup .NET SDK
-      uses: actions/setup-dotnet@v3
+      uses: actions/setup-dotnet@v4
       with:
         dotnet-version: '10.0.x'
 
     - name: 🔧 Build Main Project (for tests)
-      # Build your main Avalonia project first to create artifacts for testing.
-      # This step ensures that 'dotnet test --no-build' has something to run against.
       run: dotnet build ${{ env.AVALONIA_PROJECT_PATH }} --configuration Release
       shell: pwsh
 
@@ -49,21 +41,14 @@ jobs:
       shell: pwsh
 
     - name: 🔒 Restore Signing Certificate (Mandatory)
-      # This step will always run, but the PowerShell logic inside will check for secrets.
-      # If secrets are not found, it will stop the workflow.
       run: |
-        # Define the path to store the .pfx file
         $env:PFX_TEMP_PATH = "$env:TEMP\code-signing-cert.pfx"
 
         if ("${{ secrets.PFX_BASE64 }}" -ne "" -and "${{ secrets.PFX_PASSWORD }}" -ne "") {
             Write-Host "✅ PFX secrets found. Restoring certificate..."
-
-            # Decode and write the certificate file
             [System.IO.File]::WriteAllBytes($env:PFX_TEMP_PATH, [System.Convert]::FromBase64String("${{ secrets.PFX_BASE64 }}"))
-
             Write-Host "📄 Certificate restored to: $env:PFX_TEMP_PATH"
 
-            # Set environment variables for future steps
             "PACKAGE_CERT_KEY_FILE=$env:PFX_TEMP_PATH" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
             "PACKAGE_CERT_PASSWORD=${{ secrets.PFX_PASSWORD }}" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
         } else {
@@ -103,90 +88,60 @@ jobs:
 
           Write-Host "✅ Version check passed."
       shell: pwsh
-    
+
     - name: 🧰 Install MSIX/WAP workload
-      run: |
-        dotnet workload install windowsapp
+      run: dotnet workload install windowsapp
       shell: pwsh
 
     - name: 🔧 Build and Package MSIX Bundle
-      id: build_msix # Add an ID to this step to reference its outputs
-      # Building the WAP project directly handles packaging.
-      # The WAP project compiles the Avalonia app as part of its build process.
+      id: build_msix
       run: |
-          # Initialize the build command for your WAP project in Release configuration
           $buildCommand = "dotnet build $env:WAP_PROJECT_PATH --configuration Release"
 
-          # --- Essential MSIX Packaging & Signing Parameters ---
-
-          # Enable package signing, crucial for sideloading
+          $buildCommand += " /p:Platform=x64"
           $buildCommand += " /p:AppxPackageSigningEnabled=true"
-          # Path to your certificate key file (from GitHub Secrets)
           $buildCommand += " /p:PackageCertificateKeyFile=`"$env:PACKAGE_CERT_KEY_FILE`""
-          # Password for your certificate (from GitHub Secrets)
           $buildCommand += " /p:PackageCertificatePassword=`"$env:PACKAGE_CERT_PASSWORD`""
-
-          # Always generate an MSIX bundle (rather than just a single package)
           $buildCommand += " /p:AppxBundle=Always"
-          # Specify target platforms for the bundle
-          $buildCommand += " /p:AppxBundlePlatforms=`"x64|ARM64`""
-
-          # Generate the MSIX package as part of the build process
+          $buildCommand += " /p:AppxBundlePlatforms=`"x64`""
+          $buildCommand += " /p:UapAppxPackageBuildMode=StoreUpload"
           $buildCommand += " /p:GenerateAppxPackageOnBuild=true"
-          # Define the output directory for the MSIX package/bundle
-          $buildCommand += " /p:AppxPackageDir=`"$env:MSIX_OUTPUT_SUBDIR\`"" # Relative to the WAP project's output folder
-
-          # --- Build Logic & Versioning ---
-
-          # This guarantees the latest code is included in the package.
+          $buildCommand += " /p:AppxPackageDir=`"$env:MSIX_OUTPUT_SUBDIR\`""
           $buildCommand += " /p:BuildProjectReferences=true"
-
-          # Set the informational version using a GitHub tag input (good practice for releases)
+          $buildCommand += " /p:GenerateTestArtifacts=false"
           $buildCommand += " /p:InformationalVersion=`"${{ github.event.inputs.tag }}`""
-          # Flag for CI builds, ensures deterministic builds for reproducibility
           $buildCommand += " /p:ContinuousIntegrationBuild=true"
-
-          # --- Verbosity & Optimization Control ---
-
-          # Set build output verbosity to normal for a balanced log
           $buildCommand += " /v:normal"
-
-          # --- Execute Build Command ---
 
           Write-Host "Executing build command: $buildCommand"
           Invoke-Expression $buildCommand
 
-          # --- Output Handling for Subsequent Steps ---
-
-          # Determine the full path to the MSIX packages directory
           $WAP_OUTPUT_DIR = Join-Path (Split-Path $env:WAP_PROJECT_PATH -Parent) "bin\Release"
           $MSIX_PACKAGES_DIR = Join-Path $WAP_OUTPUT_DIR $env:MSIX_OUTPUT_SUBDIR
 
-          # Find the most recently generated MSIX bundle file
-          $MSIX_BUNDLE_PATH = (Get-ChildItem -Path $MSIX_PACKAGES_DIR -Filter "*.msixbundle" | Sort-Object LastWriteTime -Descending | Select-Object -First 1).FullName
+          # StoreUpload mode produces .msixupload; fallback to .msixbundle
+          $MSIX_BUNDLE_PATH = (Get-ChildItem -Path $MSIX_PACKAGES_DIR -Filter "*.msixupload" | Sort-Object LastWriteTime -Descending | Select-Object -First 1).FullName
           if (-not $MSIX_BUNDLE_PATH) {
-              Write-Error "Could not find the MSIX bundle file in $MSIX_PACKAGES_DIR directory."
+              $MSIX_BUNDLE_PATH = (Get-ChildItem -Path $MSIX_PACKAGES_DIR -Filter "*.msixbundle" | Sort-Object LastWriteTime -Descending | Select-Object -First 1).FullName
+          }
+          if (-not $MSIX_BUNDLE_PATH) {
+              Write-Error "Could not find MSIX bundle or upload file in $MSIX_PACKAGES_DIR directory."
               exit 1
           }
           $MSIX_BUNDLE_FILENAME = Split-Path -Leaf $MSIX_BUNDLE_PATH
 
-          Write-Host "Found MSIX Bundle: $MSIX_BUNDLE_FILENAME"
+          Write-Host "Found MSIX Package: $MSIX_BUNDLE_FILENAME"
           Write-Host "MSIX Packages Directory: $MSIX_PACKAGES_DIR"
 
-          # Output these values for subsequent steps in the workflow
           echo "msix_bundle_filename=$MSIX_BUNDLE_FILENAME" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
           echo "msix_packages_dir=$MSIX_PACKAGES_DIR" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
       shell: pwsh
 
     - name: 📝 Update AppInstaller File With Tag Version
       run: |
-        $VERSION = "${{ github.event.inputs.tag }}"
-        $VERSION = $VERSION.TrimStart("v")
-
+        $VERSION = "${{ github.event.inputs.tag }}".TrimStart("v")
         $MSIX_BUNDLE_FILENAME = "${{ steps.build_msix.outputs.msix_bundle_filename }}"
-        $MSIX_PACKAGES_DIR = "${{ steps.build_msix.outputs.msix_packages_dir }}"
 
-        Write-Host "Found MSIX Bundle: $MSIX_BUNDLE_FILENAME"
         Write-Host "Replacing version in TsundokuPackage/Package.appinstaller with $VERSION"
 
         $appinstallerContent = Get-Content "./TsundokuPackage/Package.appinstaller"
@@ -200,32 +155,16 @@ jobs:
         Get-Content "./TsundokuPackage/Package.appinstaller"
       shell: pwsh
 
-    - name: 🚀 Create GitHub Release
-      id: create_release
-      uses: actions/create-release@v1
+    - name: 🚀 Create GitHub Release and Upload Assets
+      uses: softprops/action-gh-release@v2
       with:
         tag_name: ${{ github.event.inputs.tag }}
-        release_name: Release ${{ github.event.inputs.tag }}
+        name: Release ${{ github.event.inputs.tag }}
         generate_release_notes: true
         draft: false
         prerelease: false
+        files: |
+          ${{ steps.build_msix.outputs.msix_packages_dir }}/${{ steps.build_msix.outputs.msix_bundle_filename }}
+          ./TsundokuPackage/Package.appinstaller
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: ⬆️ Upload MSIX Bundle
-      uses: actions/upload-release-asset@v1
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        # Use outputs from the build_msix step
-        asset_path: ${{ steps.build_msix.outputs.msix_packages_dir }}/${{ steps.build_msix.outputs.msix_bundle_filename }}
-        asset_name: ${{ steps.build_msix.outputs.msix_bundle_filename }}
-        asset_content_type: application/octet-stream
-
-    - name: ⬆️ Upload .AppInstaller File
-      uses: actions/upload-release-asset@v1
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./TsundokuPackage/Package.appinstaller
-        asset_name: Tsundoku.appinstaller
-        asset_content_type: application/xml
-
