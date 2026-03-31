@@ -66,8 +66,8 @@ jobs:
         PFX_PWD: ${{ secrets.PFX_PASSWORD }}
       run: |
         $pfxPath = Join-Path $env:TEMP 'code-signing-cert.pfx'
-        if ($env:PFX_B64 -and $env:PFX_PWD) {
-            Write-Host 'PFX secrets found. Restoring certificate...'
+        if ($env:PFX_B64) {
+            Write-Host 'PFX secret found. Restoring certificate...'
             [System.IO.File]::WriteAllBytes($pfxPath, [System.Convert]::FromBase64String($env:PFX_B64))
             Write-Host "Certificate restored to: $pfxPath"
             "PACKAGE_CERT_KEY_FILE=$pfxPath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
@@ -99,7 +99,6 @@ jobs:
             '/p:Platform=x64',
             '/p:AppxPackageSigningEnabled=true',
             "/p:PackageCertificateKeyFile=$certFile",
-            "/p:PackageCertificatePassword=$certPass",
             '/p:AppxBundle=Always',
             '/p:AppxBundlePlatforms=x64',
             '/p:UapAppxPackageBuildMode=StoreUpload',
@@ -111,6 +110,9 @@ jobs:
             '/p:ContinuousIntegrationBuild=true',
             '/v:normal'
           )
+          if ($certPass) {
+            $msbuildArgs += "/p:PackageCertificatePassword=$certPass"
+          }
 
           & msbuild @msbuildArgs
 
@@ -138,24 +140,6 @@ jobs:
           echo "msix_packages_dir=$MSIX_PACKAGES_DIR" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
       shell: pwsh
 
-    - name: Update AppInstaller File With Tag Version
-      run: |
-        $VERSION = "${{ steps.version.outputs.tag }}".TrimStart("v")
-        $MSIX_BUNDLE_FILENAME = "${{ steps.build_msix.outputs.msix_bundle_filename }}"
-
-        Write-Host "Replacing version in TsundokuPackage/Package.appinstaller with $VERSION"
-
-        $appinstallerContent = Get-Content "./TsundokuPackage/Package.appinstaller"
-        $appinstallerContent = $appinstallerContent -replace '(?<=<MainBundle.+Uri=")[^"]+', "https://github.com/Sigrec/Tsundoku/releases/download/${{ steps.version.outputs.tag }}/$MSIX_BUNDLE_FILENAME"
-        $appinstallerContent = $appinstallerContent -replace '(?<=<MainBundle.+Version=")[^"]+', $VERSION
-        $appinstallerContent = $appinstallerContent -replace '(?<=<AppInstaller.+Version=")[^"]+', $VERSION
-        $appinstallerContent = $appinstallerContent -replace '(?<=<UpdateSettings.+Uri=")[^"]+', "https://github.com/Sigrec/Tsundoku/releases/download/${{ steps.version.outputs.tag }}/Tsundoku.appinstaller"
-        Set-Content "./TsundokuPackage/Package.appinstaller" -Value $appinstallerContent
-
-        Write-Host "Updated .appinstaller content:"
-        Get-Content "./TsundokuPackage/Package.appinstaller"
-      shell: pwsh
-
     - name: Create GitHub Release and Upload Assets
       uses: softprops/action-gh-release@v2
       with:
@@ -166,6 +150,5 @@ jobs:
         prerelease: false
         files: |
           ${{ steps.build_msix.outputs.msix_packages_dir }}/${{ steps.build_msix.outputs.msix_bundle_filename }}
-          ./TsundokuPackage/Package.appinstaller
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
