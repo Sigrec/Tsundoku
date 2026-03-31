@@ -138,6 +138,18 @@ public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsView
         await ViewModelBase.OpenSiteLink(@"https://github.com/Sigrec/Tsundoku/releases");
     }
 
+    private async void ShowChangelogAsync(object sender, RoutedEventArgs args)
+    {
+        if (Owner is MainWindow mainWindow)
+        {
+            this.Hide();
+            IsOpen = false;
+            ChangelogWindow changelog = new() { DataContext = ViewModel };
+            changelog.SetVersion(ViewModelBase.CUR_TSUNDOKU_VERSION);
+            await changelog.ShowDialog(mainWindow);
+        }
+    }
+
     public async void OpenAniListLink(object sender, RoutedEventArgs args)
     {
         await ViewModelBase.OpenSiteLink(@"https://anilist.co/");

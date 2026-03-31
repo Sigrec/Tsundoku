@@ -23,6 +23,13 @@
     <Style Selector="Border.card-hover:pointerover Image.cover-img">
       <Setter Property="RenderTransform" Value="scale(1.05, 1.05)"/>
     </Style>
+    <!-- Glassmorphism: reduce solid BG opacity and show acrylic when GlassEnabled is true -->
+    <Style Selector="controls|SeriesCardDisplay[GlassEnabled=True] Border#CardSolidBG">
+      <Setter Property="Opacity" Value="0.3"/>
+    </Style>
+    <Style Selector="controls|SeriesCardDisplay[GlassEnabled=True] ExperimentalAcrylicBorder#CardAcrylicBorder">
+      <Setter Property="IsVisible" Value="True"/>
+    </Style>
   </UserControl.Styles>
 
   <UserControl.Resources>
@@ -150,10 +157,22 @@
               </Panel>
 
               <!-- ── Right Side: Info + Progress ── -->
-              <Grid
-                  Grid.Column="1"
-                  UseLayoutRounding="True"
-                  Background="{DynamicResource TsundokuSeriesCardBGColor}">
+              <Panel Grid.Column="1" UseLayoutRounding="True">
+                <!-- Solid fallback background -->
+                <Border Name="CardSolidBG" Background="{DynamicResource TsundokuSeriesCardBGColor}"/>
+                <!-- Glassmorphism acrylic overlay -->
+                <ExperimentalAcrylicBorder
+                    Name="CardAcrylicBorder"
+                    IsVisible="False">
+                  <ExperimentalAcrylicBorder.Material>
+                    <ExperimentalAcrylicMaterial
+                        BackgroundSource="Digger"
+                        TintColor="#1A1A2E"
+                        TintOpacity="0.75"
+                        MaterialOpacity="0.6"/>
+                  </ExperimentalAcrylicBorder.Material>
+                </ExperimentalAcrylicBorder>
+                <Grid>
                 <Grid RowDefinitions="*,Auto">
 
                   <!-- Info Section -->
@@ -181,7 +200,6 @@
                         Foreground="{DynamicResource TsundokuSeriesCardTitleColor}"
                         FontWeight="Bold"
                         FontSize="22"
-                        LineHeight="24"
                         PointerPressed="CopySeriesTitleAsync"
                         Cursor="Hand"
                         TextAlignment="Left"
@@ -304,6 +322,7 @@
                   </Border>
                 </Grid>
               </Grid>
+              </Panel>
             </Grid>
           </Border>
         </Border>

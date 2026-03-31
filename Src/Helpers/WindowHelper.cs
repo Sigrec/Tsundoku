@@ -108,8 +108,9 @@ public static class WindowHelper
             // Ensure the dialog is in a normal state before showing
             dialogInstance.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             dialogInstance.WindowState = WindowState.Normal;
+            GlassmorphismService.ApplyToWindow(dialogInstance, GlassmorphismService.IsEnabled);
             LOGGER.Debug("Opening {Window} as a modal dialog", windowNameForLogging);
-            
+
             // Await ShowDialog, passing the TResult type argument to get the dialog's return value
             TResult? result = await dialogInstance.ShowDialog<TResult?>(parentWindow);
             LOGGER.Debug("{Window} dialog closed with result: {Result}", windowNameForLogging, result);

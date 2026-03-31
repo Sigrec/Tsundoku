@@ -27,6 +27,7 @@ public sealed class PopupDialogService(PopupDialogViewModel viewModel) : IPopupD
         {
             ViewModel = _viewModel
         };
+        GlassmorphismService.ApplyToWindow(dialog, GlassmorphismService.IsEnabled);
 
         try
         {
@@ -128,6 +129,7 @@ public sealed class PopupDialogService(PopupDialogViewModel viewModel) : IPopupD
         content.Children.Add(buttonPanel);
         border.Child = content;
         confirmDialog.Content = border;
+        GlassmorphismService.ApplyToWindow(confirmDialog, GlassmorphismService.IsEnabled);
 
         await confirmDialog.ShowDialog(owner);
         return result;

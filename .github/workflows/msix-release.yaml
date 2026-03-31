@@ -7,6 +7,11 @@ on:
         description: 'Tag to build and release (e.g. v7.1.0)'
         required: true
         default: 'v1.0.0'
+      skip_tests:
+        description: 'Skip running tests'
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   Build-And-Release:
@@ -30,7 +35,7 @@ jobs:
     - name: 🛠️ Setup .NET SDK
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '9.0.x' # Ensure this matches your project's target .NET version
+        dotnet-version: '10.0.x'
 
     - name: 🔧 Build Main Project (for tests)
       # Build your main Avalonia project first to create artifacts for testing.
@@ -39,9 +44,8 @@ jobs:
       shell: pwsh
 
     - name: 🧪 Run Tests
-      # Run tests on the artifacts built in the previous step.
-      # Ensure the test project path is correct.
-      run: dotnet test ./Tests/Tests.csproj --configuration Release --no-build --logger trx
+      if: ${{ github.event.inputs.skip_tests != 'true' }}
+      run: dotnet test ./Tests/Tsundoku.Tests.csproj --configuration Release --no-build --logger trx
       shell: pwsh
 
     - name: 🔒 Restore Signing Certificate (Mandatory)
@@ -224,3 +228,4 @@ jobs:
         asset_path: ./TsundokuPackage/Package.appinstaller
         asset_name: Tsundoku.appinstaller
         asset_content_type: application/xml
+

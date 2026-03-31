@@ -196,6 +196,8 @@ public sealed partial class App : Application
                     desktop.MainWindow = mainWindow;
                     GlassmorphismService.ApplyToWindow(mainWindow, GlassmorphismService.IsEnabled);
                     mainWindow.Show();
+                    mainWindow.Activate();
+                    mainWindow.Focus();
                     splash.Close();
                 }
                 catch (Exception ex)

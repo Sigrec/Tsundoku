@@ -32,6 +32,15 @@ public sealed partial class SeriesCardDisplay : UserControl
         set => SetValue(LanguageProperty, value);
     }
 
+    public static readonly StyledProperty<bool> GlassEnabledProperty =
+        AvaloniaProperty.Register<SeriesCardDisplay, bool>(nameof(GlassEnabled));
+
+    public bool GlassEnabled
+    {
+        get => GetValue(GlassEnabledProperty);
+        set => SetValue(GlassEnabledProperty, value);
+    }
+
     private readonly MainWindowViewModel _mainWindowViewModel;
     public SeriesCardDisplay()
         : this(

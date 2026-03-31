@@ -290,6 +290,7 @@
                         <Button Theme="{StaticResource MenuButton}" Click="ImportUserDataAsync" x:Name="ImportUserData" Content="Json Import" Padding="10,6" FontSize="12"/>
                         <Button Theme="{StaticResource MenuButton}" Click="ImportLibibDataAsync" x:Name="ImportLibibData" Content="Libib Import" Padding="10,6" FontSize="12"/>
                         <Button Theme="{StaticResource MenuButton}" Click="ImportGoodreadsDataAsync" x:Name="ImportGoodreadsData" Content="Goodreads Import" Padding="10,6" FontSize="12"/>
+                        <Button Theme="{StaticResource MenuButton}" Click="ShowChangelogAsync" Content="What's New" Padding="10,6" FontSize="12"/>
                     </WrapPanel>
                 </StackPanel>
 
@@ -297,7 +298,7 @@
                 <TextBlock Text="{CompiledBinding Source={x:Static vm:ViewModelBase.CUR_TSUNDOKU_VERSION}, StringFormat='v{0}'}"
                            HorizontalAlignment="Center"
                            FontSize="12"
-                           FontWeight="Medium"
+                           FontWeight="Bold"
                            Foreground="{DynamicResource TsundokuSeriesCardStaffColor}"
                            Opacity="0.5"
                            Margin="0,0,0,12"

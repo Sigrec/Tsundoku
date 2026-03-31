@@ -36,6 +36,13 @@ public sealed class ThemeResourceService : IThemeResourceService
             ThemeResourceKeys.PropertyMap
                 .Where(kvp => kvp.Value(theme) is not null)
                 .Select(kvp => new KeyValuePair<object, object?>(kvp.Key, kvp.Value(theme))));
+
+        // Re-apply glassmorphism alpha adjustments if enabled, since theme apply overwrites them
+        if (GlassmorphismService.IsEnabled)
+        {
+            GlassmorphismService.UpdateOriginalColors();
+            GlassmorphismService.Apply(true);
+        }
     }
 
     public IDisposable ObserveAndApply(TsundokuTheme theme)

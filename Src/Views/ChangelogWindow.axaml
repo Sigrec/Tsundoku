@@ -6,6 +6,7 @@
         Icon="\Assets\Icons\TsundokuLogo.ico"
         WindowStartupLocation="CenterOwner"
         SizeToContent="Height"
+        MaxHeight="600"
         Width="480"
         CanResize="False"
         Topmost="True"
@@ -21,9 +22,9 @@
             CornerRadius="14"
             ClipToBounds="True"
             BoxShadow="0 8 32 0 #4D000000">
-        <StackPanel Margin="24,20,24,24" Spacing="16">
-            <!-- Header -->
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
+        <Grid Margin="24,20,24,24" RowDefinitions="Auto,Auto,Auto,*,Auto,Auto,Auto">
+            <!-- Row 0: Header -->
+            <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10" Margin="0,0,0,16">
                 <i:Icon Value="fa-solid fa-bolt" FontSize="22"
                         Foreground="{DynamicResource TsundokuDividerColor}"/>
                 <TextBlock x:Name="VersionHeader"
@@ -33,23 +34,26 @@
                            Foreground="{DynamicResource TsundokuMenuTextColor}"/>
             </StackPanel>
 
-            <!-- Divider -->
-            <Border Height="2"
+            <!-- Row 1: Divider -->
+            <Border Grid.Row="1" Height="2"
                     Background="{DynamicResource TsundokuDividerColor}"
                     CornerRadius="1"
-                    Opacity="0.6"/>
+                    Opacity="0.6"
+                    Margin="0,0,0,8"/>
 
-            <!-- Changes section -->
-            <StackPanel Spacing="6">
-                <StackPanel Orientation="Horizontal" Spacing="6">
-                    <i:Icon Value="fa-solid fa-star" FontSize="11"
-                            Foreground="{DynamicResource TsundokuDividerColor}"/>
-                    <TextBlock Text="CHANGES"
-                               FontSize="11"
-                               FontWeight="Bold"
-                               LetterSpacing="1"
-                               Foreground="{DynamicResource TsundokuDividerColor}"/>
-                </StackPanel>
+            <!-- Row 2: Changes label -->
+            <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="6" Margin="0,0,0,6">
+                <i:Icon Value="fa-solid fa-star" FontSize="11"
+                        Foreground="{DynamicResource TsundokuDividerColor}"/>
+                <TextBlock Text="CHANGES"
+                           FontSize="11"
+                           FontWeight="Bold"
+                           LetterSpacing="1"
+                           Foreground="{DynamicResource TsundokuDividerColor}"/>
+            </StackPanel>
+
+            <!-- Row 3: Scrollable changes list (fills available space) -->
+            <ScrollViewer Grid.Row="3" x:Name="ChangesScroll" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Disabled">
                 <ItemsControl x:Name="ChangesItems">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate x:DataType="x:String">
@@ -73,15 +77,25 @@
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
-            </StackPanel>
+            </ScrollViewer>
 
-            <!-- Actions section (only visible when there are actions) -->
-            <StackPanel x:Name="ActionsSection" Spacing="6" IsVisible="False">
+            <!-- Row 4: Scroll hint -->
+            <TextBlock Grid.Row="4" x:Name="ScrollHint"
+                       Text="Scroll for more changes"
+                       FontSize="11"
+                       FontWeight="SemiBold"
+                       HorizontalAlignment="Center"
+                       Opacity="0.4"
+                       Margin="0,6,0,0"
+                       IsVisible="False"
+                       Foreground="{DynamicResource TsundokuMenuTextColor}"/>
+
+            <!-- Row 5: Actions section (always visible when present) -->
+            <StackPanel Grid.Row="5" x:Name="ActionsSection" Spacing="6" IsVisible="False" Margin="0,12,0,0">
                 <Border Height="1"
                         Background="{DynamicResource TsundokuDividerColor}"
                         CornerRadius="1"
-                        Opacity="0.3"
-                        Margin="0,4,0,0"/>
+                        Opacity="0.3"/>
                 <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,4,0,0">
                     <i:Icon Value="fa-solid fa-circle-exclamation" FontSize="11"
                             Foreground="{DynamicResource TsundokuSeriesProgressBarColor}"/>
@@ -115,17 +129,19 @@
                 </ItemsControl>
             </StackPanel>
 
-            <!-- Dismiss button -->
-            <Button Content="Got it!"
+            <!-- Row 6: Dismiss button -->
+            <Button Grid.Row="6"
+                    Content="Got it!"
                     FontSize="15"
                     FontWeight="Bold"
                     HorizontalAlignment="Center"
                     Padding="32,8"
+                    Margin="0,16,0,0"
                     CornerRadius="9"
                     BorderThickness="2"
                     Cursor="Hand"
                     Theme="{StaticResource MenuButton}"
                     Click="OnDismissClicked"/>
-        </StackPanel>
+        </Grid>
     </Border>
 </Window>

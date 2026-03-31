@@ -14,21 +14,48 @@ public static class GlassmorphismService
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
     private static bool _isEnabled;
 
-    /// <summary>Alpha value for primary backgrounds when glass is enabled.</summary>
-    private const byte GlassAlpha = 0x99; // ~60% opaque
+    /// <summary>Alpha value for menu backgrounds when glass is enabled.</summary>
+    private const byte MenuGlassAlpha = 0x99; // ~60% opaque
 
-    /// <summary>Resource keys whose background alpha is reduced when glass is enabled.</summary>
-    private static readonly string[] GlassBackgroundKeys =
-    [
-        "TsundokuMenuBGColor",
-        "TsundokuCollectionBGColor",
-    ];
+    /// <summary>Alpha for toast/badge backgrounds when glass is enabled.</summary>
+    private const byte ToastGlassAlpha = 0x80; // ~50% opaque
+
+    /// <summary>Alpha for collection background when glass is enabled.</summary>
+    private const byte CollectionGlassAlpha = 0x33; // ~20% opaque
+
+    /// <summary>Resource keys and their glass alpha values.</summary>
+    private static readonly Dictionary<string, byte> GlassBackgroundKeys = new()
+    {
+        { "TsundokuMenuBGColor", MenuGlassAlpha },
+        { "TsundokuCollectionBGColor", CollectionGlassAlpha },
+        { "TsundokuStatusAndBookTypeBGColor", ToastGlassAlpha },
+    };
 
     /// <summary>Stores the original opaque colors so they can be restored when glass is disabled.</summary>
     private static readonly Dictionary<string, Color> _originalColors = [];
 
     /// <summary>Gets whether glassmorphism is currently enabled.</summary>
     public static bool IsEnabled => _isEnabled;
+
+    /// <summary>
+    /// Updates the stored original (opaque) colors from the current theme resources.
+    /// Call this after a theme change and before re-applying glass alpha.
+    /// </summary>
+    /// <summary>Resource keys to track original colors for.</summary>
+    private static readonly string[] AllTrackedColorKeys = [.. GlassBackgroundKeys.Keys];
+
+    public static void UpdateOriginalColors()
+    {
+        if (Application.Current?.Resources is not Avalonia.Controls.ResourceDictionary resources) return;
+
+        foreach (string key in AllTrackedColorKeys)
+        {
+            if (resources.TryGetResource(key, null, out object? value) && value is SolidColorBrush brush)
+            {
+                _originalColors[key] = brush.Color;
+            }
+        }
+    }
 
     /// <summary>
     /// Applies or removes glassmorphism on all open windows.
@@ -44,23 +71,22 @@ public static class GlassmorphismService
 
         if (enabled)
         {
-            foreach (string key in GlassBackgroundKeys)
+            foreach ((string key, byte alpha) in GlassBackgroundKeys)
             {
-                if (resources.TryGetResource(key, null, out object? value) && value is SolidColorBrush brush)
+                if (_originalColors.TryGetValue(key, out Color original))
                 {
-                    if (!_originalColors.ContainsKey(key))
-                    {
-                        _originalColors[key] = brush.Color;
-                    }
-
-                    Color original = _originalColors[key];
-                    resources[key] = new SolidColorBrush(Color.FromArgb(GlassAlpha, original.R, original.G, original.B));
+                    resources[key] = new SolidColorBrush(Color.FromArgb(alpha, original.R, original.G, original.B));
+                }
+                else if (resources.TryGetResource(key, null, out object? value) && value is SolidColorBrush brush)
+                {
+                    _originalColors[key] = brush.Color;
+                    resources[key] = new SolidColorBrush(Color.FromArgb(alpha, brush.Color.R, brush.Color.G, brush.Color.B));
                 }
             }
         }
         else
         {
-            foreach (string key in GlassBackgroundKeys)
+            foreach (string key in GlassBackgroundKeys.Keys)
             {
                 if (_originalColors.TryGetValue(key, out Color original))
                 {

@@ -27,7 +27,7 @@ public static class Changelog
                 .First(n => n.EndsWith("changelog.json", StringComparison.Ordinal));
 
             using Stream stream = assembly.GetManifestResourceStream(resourceName)!;
-            Dictionary<string, ChangelogEntry>? data = JsonSerializer.Deserialize<Dictionary<string, ChangelogEntry>>(stream);
+            Dictionary<string, ChangelogEntry>? data = JsonSerializer.Deserialize<Dictionary<string, ChangelogEntry>>(stream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             return data?.AsValueEnumerable().ToFrozenDictionary(StringComparer.Ordinal)
                 ?? FrozenDictionary<string, ChangelogEntry>.Empty;
         }

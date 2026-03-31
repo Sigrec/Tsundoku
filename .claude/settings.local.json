@@ -89,7 +89,8 @@
       "Bash(echo -n \"$wt: \")",
       "Bash(xxd /c/Tsundoku/Src/Helpers/ExtensionMethods.cs)",
       "Bash(# SeriesComparer + SeriesValueComparer tests\ncp \"/c/Tsundoku/.claude/worktrees/agent-a147f4a6/Tests/Models/SeriesComparerTests.cs\" \"/c/Tsundoku/Tests/Models/SeriesComparerTests.cs\"\ncp \"/c/Tsundoku/.claude/worktrees/agent-a147f4a6/Tests/Models/SeriesValueComparerTests.cs\" \"/c/Tsundoku/Tests/Models/SeriesValueComparerTests.cs\"\n\n# ExtensionMethod + ParserHelper tests\ncp \"/c/Tsundoku/.claude/worktrees/agent-a3d6ff91/Tests/Extensions/ExtensionMethodTests.cs\" \"/c/Tsundoku/Tests/Extensions/ExtensionMethodTests.cs\"\ncp \"/c/Tsundoku/.claude/worktrees/agent-a3d6ff91/Tests/Extensions/ParserHelperTests.cs\" \"/c/Tsundoku/Tests/Extensions/ParserHelperTests.cs\"\n\n# Schema migration tests\ncp \"/c/Tsundoku/.claude/worktrees/agent-af8d1f5b/Tests/Models/UserSchemaTests.cs\" \"/c/Tsundoku/Tests/Models/UserSchemaTests.cs\"\n\n# Theme tests\ncp \"/c/Tsundoku/.claude/worktrees/agent-ae65a615/Tests/Models/TsundokuThemeTests.cs\" \"/c/Tsundoku/Tests/Models/TsundokuThemeTests.cs\"\ncp \"/c/Tsundoku/.claude/worktrees/agent-ae65a615/Tests/Models/ThemeResourceKeysTests.cs\" \"/c/Tsundoku/Tests/Models/ThemeResourceKeysTests.cs\"\n\necho \"Done copying\"\nls -la /c/Tsundoku/Tests/Models/*Comparer* /c/Tsundoku/Tests/Models/*Schema* /c/Tsundoku/Tests/Models/*Theme* /c/Tsundoku/Tests/Extensions/Extension* /c/Tsundoku/Tests/Extensions/Parser*)",
-      "Bash(find /c/Tsundoku/TsundokuPackage -type f -name *)"
+      "Bash(find /c/Tsundoku/TsundokuPackage -type f -name *)",
+      "Bash(dotnet package:*)"
     ]
   }
 }
