@@ -1,0 +1,25 @@
+using ReactiveUI.SourceGenerators;
+
+namespace Tsundoku.ViewModels;
+
+public sealed partial class PopupDialogViewModel(IUserService userService) : ViewModelBase(userService)
+{
+    private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
+    [Reactive] public partial string Title { get; set; }
+    [Reactive] public partial string InfoText { get; set; }
+    [Reactive] public partial string Icon { get; set; }
+
+    public void SetPopupInfo(string title, string icon, string infoText)
+    {
+        Title = title;
+        Icon = icon;
+        InfoText = infoText;
+    }
+
+    public void ResetPopupInfo()
+    {
+        Title = string.Empty;
+        Icon = string.Empty;
+        InfoText = string.Empty;
+    }
+}

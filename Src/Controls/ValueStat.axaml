@@ -1,0 +1,34 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:icon="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+		xmlns:vm="using:Tsundoku.ViewModels"
+		x:DataType="vm:CollectionStatsViewModel"
+        xmlns:controls="using:Tsundoku.Controls">
+	<Style Selector="controls|ValueStat">
+		<Setter Property="Width" Value="244"/>
+		<Setter Property="Template">
+			<ControlTemplate>
+				<Border Background="{DynamicResource TsundokuMenuButtonBGColor}"
+						BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}"
+						BorderThickness="2"
+						CornerRadius="10"
+						Padding="14,10"
+						Margin="4"
+						Cursor="Hand">
+					<StackPanel Spacing="2">
+						<TextBlock Name="ValueText"
+								   Text="{TemplateBinding Text}"
+								   Foreground="{DynamicResource TsundokuUsernameColor}"
+								   FontSize="22"
+								   FontWeight="ExtraBold"/>
+						<TextBlock Text="{TemplateBinding Title}"
+								   Foreground="{DynamicResource TsundokuDividerColor}"
+								   FontSize="11"
+								   FontWeight="SemiBold"
+								   Opacity="0.8"/>
+					</StackPanel>
+				</Border>
+			</ControlTemplate>
+		</Setter>
+	</Style>
+</Styles>
