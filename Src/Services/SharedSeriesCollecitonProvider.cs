@@ -79,7 +79,7 @@ public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISh
     {
         _userService = userService ?? throw new ArgumentNullException(nameof(userService));
 
-        // 1. Define the text search filter predicate
+        // 1. Define the text search filter predicate (pre-lowercase for faster ordinal comparison)
         IObservable<Func<Series, bool>> textFilter = this.WhenAnyValue(x => x.SeriesFilterText)
             .DistinctUntilChanged()
             .Throttle(TimeSpan.FromMilliseconds(400))
@@ -88,13 +88,13 @@ public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISh
                 if (string.IsNullOrWhiteSpace(searchText))
                     return series => true; // No filter if search text is empty
 
-                // Create the predicate function
+                string lowerSearch = searchText.ToLowerInvariant();
                 return (Func<Series, bool>)(series =>
                 {
                     return
-                        series.Titles.AsValueEnumerable().Any(t => t.Value.Contains(searchText, StringComparison.OrdinalIgnoreCase)) ||
-                        series.Staff.AsValueEnumerable().Any(t => t.Value.Contains(searchText, StringComparison.OrdinalIgnoreCase)) ||
-                        series.Publisher.Contains(searchText, StringComparison.OrdinalIgnoreCase);
+                        series.Titles.AsValueEnumerable().Any(t => t.Value.Contains(lowerSearch, StringComparison.OrdinalIgnoreCase)) ||
+                        series.Staff.AsValueEnumerable().Any(t => t.Value.Contains(lowerSearch, StringComparison.OrdinalIgnoreCase)) ||
+                        series.Publisher.Contains(lowerSearch, StringComparison.OrdinalIgnoreCase);
                 });
             });
 
@@ -102,6 +102,7 @@ public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISh
         IObservable<Func<Series, bool>> tsundokuFilter = this.WhenAnyValue(x => x.SelectedFilter)
             .Where(filter => filter != TsundokuFilter.Query)
             .DistinctUntilChanged()
+            .Throttle(TimeSpan.FromMilliseconds(100))
             .Select(filterEnum =>
             {
                 // Return a predicate function (Func<Series, bool>)
@@ -169,6 +170,7 @@ public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISh
 
         IObservable<Func<Series, bool>> advancedFilter = this.WhenAnyValue(x => x.AdvancedSearchQuery)
             .DistinctUntilChanged()
+            .Throttle(TimeSpan.FromMilliseconds(200))
             .Select(query =>
             {
                 AdvancedSearchQueryErrorMessage = string.Empty;
@@ -194,6 +196,7 @@ public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISh
         // 3. Publisher filter predicate
         IObservable<Func<Series, bool>> publisherFilter = this.WhenAnyValue(x => x.SelectedPublisher)
             .DistinctUntilChanged()
+            .Throttle(TimeSpan.FromMilliseconds(100))
             .Select(publisher =>
             {
                 if (string.IsNullOrWhiteSpace(publisher))
@@ -237,10 +240,11 @@ public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISh
             .Subscribe()
             .DisposeWith(_disposables);
 
-        // 6. Build dynamic publisher list from collection
+        // 6. Build dynamic publisher list from collection (throttled to batch rapid changes)
         _userService.UserCollectionChanges
             .Filter(series => series is not null)
             .DistinctValues(series => series.Publisher)
+            .Throttle(TimeSpan.FromMilliseconds(300))
             .ObserveOn(RxSchedulers.MainThreadScheduler)
             .SortAndBind(out _availablePublishers, StringComparer.OrdinalIgnoreCase)
             .Subscribe()
@@ -263,6 +267,7 @@ public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISh
     /// <summary>
     /// Parses the advanced search query and builds a composed predicate directly.
     /// Supports <c>&amp;</c> (AND) and <c>|</c> (OR) connectors between filter tokens.
+    /// Uses a flat list of predicates and connectors to avoid chained closure allocations.
     /// </summary>
     private static Func<Series, bool>? BuildAdvancedPredicate(string query)
     {
@@ -274,7 +279,19 @@ public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISh
             return null;
         }
 
-        Func<Series, bool>? result = null;
+        if (matches.Count == 1)
+        {
+            Match singleMatch = matches[0];
+            return BuildSinglePredicate(
+                singleMatch.Groups["FilterName"].Value,
+                singleMatch.Groups["Operator"].Value,
+                singleMatch.Groups["FilterValue"].Success ? singleMatch.Groups["FilterValue"].Value : string.Empty
+            );
+        }
+
+        // Build flat arrays to avoid chained closure allocations
+        Func<Series, bool>[] predicates = new Func<Series, bool>[matches.Count];
+        bool[] isOrConnector = new bool[matches.Count]; // index i = connector BEFORE predicate i
 
         for (int i = 0; i < matches.Count; i++)
         {
@@ -289,26 +306,32 @@ public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISh
                 return null;
             }
 
-            if (result is null)
-            {
-                result = predicate;
-            }
-            else
-            {
-                // Determine connector by inspecting text between previous and current match
-                int prevEnd = matches[i - 1].Index + matches[i - 1].Length;
-                string between = query[prevEnd..match.Index];
-                bool isOr = between.Contains('|');
+            predicates[i] = predicate;
 
-                Func<Series, bool> left = result;
-                Func<Series, bool> right = predicate;
-                result = isOr
-                    ? s => left(s) || right(s)
-                    : s => left(s) && right(s);
+            if (i > 0)
+            {
+                int prevEnd = matches[i - 1].Index + matches[i - 1].Length;
+                ReadOnlySpan<char> between = query.AsSpan(prevEnd, match.Index - prevEnd);
+                isOrConnector[i] = between.Contains('|');
             }
         }
 
-        return result;
+        return series =>
+        {
+            bool result = predicates[0](series);
+            for (int i = 1; i < predicates.Length; i++)
+            {
+                if (isOrConnector[i])
+                {
+                    result = result || predicates[i](series);
+                }
+                else
+                {
+                    result = result && predicates[i](series);
+                }
+            }
+            return result;
+        };
     }
 
     /// <summary>

@@ -122,20 +122,20 @@ public sealed partial class App : Application
                     // Let the splash window fully render before starting heavy work
                     await Task.Delay(500);
 
-                    splash.UpdateStatus("Initializing services...");
+                    splash.UpdateStatus("Initializing services");
                     ServiceCollection services = new();
                     ConfigureServices(services);
                     ServiceProvider = services.BuildServiceProvider();
 
-                    splash.UpdateStatus("Connecting to Discord...");
+                    splash.UpdateStatus("Connecting to Discord");
                     DiscordRP.Initialize();
 
-                    splash.UpdateStatus("Loading user data...");
+                    splash.UpdateStatus("Loading user data");
                     IUserService userService = ServiceProvider.GetRequiredService<IUserService>();
 
                     try
                     {
-                        userService.LoadUserData();
+                        await userService.LoadUserDataAsync();
                     }
                     catch (Exception ex)
                     {
@@ -144,7 +144,7 @@ public sealed partial class App : Application
                         return;
                     }
 
-                    splash.UpdateStatus("Applying theme...");
+                    splash.UpdateStatus("Applying theme");
                     IThemeResourceService themeResourceService = ServiceProvider.GetRequiredService<IThemeResourceService>();
                     TsundokuTheme? initialTheme = userService.GetCurrentThemeSnapshot();
                     if (initialTheme is not null)
@@ -164,9 +164,9 @@ public sealed partial class App : Application
                         GlassmorphismService.Apply(true);
                     }
 
-                    splash.UpdateStatus("Building UI...");
+                    splash.UpdateStatus("Building UI");
                     MainWindowViewModel mainViewModel = ServiceProvider.GetRequiredService<MainWindowViewModel>();
-                    MainWindow mainWindow = new MainWindow(
+                    MainWindow mainWindow = new(
                         mainViewModel,
                         userService,
                         ServiceProvider.GetRequiredService<IApiHealthCheckService>(),

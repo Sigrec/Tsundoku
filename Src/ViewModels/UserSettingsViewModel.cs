@@ -165,7 +165,7 @@ public sealed partial class UserSettingsViewModel : ViewModelBase
                 vm.ProgressMaximum = result.Count - 1;
                 foreach (KeyValuePair<(string Title, SeriesFormat Format, string Publisher), uint> entry in result)
                 {
-                    KeyValuePair<bool, string> addSeriesResult = await _addNewSeriesViewModel.GetSeriesDataAsync(
+                    (bool success, string message, _) = await _addNewSeriesViewModel.GetSeriesDataAsync(
                         input: entry.Key.Title,
                         bookType: entry.Key.Format,
                         publisher: entry.Key.Publisher,
@@ -174,7 +174,7 @@ public sealed partial class UserSettingsViewModel : ViewModelBase
                     );
                     vm.ProgressValue++;
 
-                    if (addSeriesResult.Key)
+                    if (success)
                     {
                         LOGGER.Info("Successfully added series {Series} | {Format} | {Publisher} | {Count} from Libib", entry.Key.Title, entry.Key.Format, entry.Key.Publisher, entry.Value);
                     }
@@ -202,7 +202,7 @@ public sealed partial class UserSettingsViewModel : ViewModelBase
                 vm.ProgressMaximum = result.Count - 1;
                 foreach (KeyValuePair<(string Title, SeriesFormat Format, string Publisher, decimal Rating), uint> entry in result)
                 {
-                    KeyValuePair<bool, string> addSeriesResult = await _addNewSeriesViewModel.GetSeriesDataAsync(
+                    (bool success, string message, _) = await _addNewSeriesViewModel.GetSeriesDataAsync(
                         input: entry.Key.Title,
                         bookType: entry.Key.Format,
                         publisher: entry.Key.Publisher,
@@ -212,7 +212,7 @@ public sealed partial class UserSettingsViewModel : ViewModelBase
                     );
                     vm.ProgressValue++;
 
-                    if (addSeriesResult.Key)
+                    if (success)
                     {
                         LOGGER.Info("Successfully added series {Series} | {Format} | {Publisher} | {Count} from Goodreads", entry.Key.Title, entry.Key.Format, entry.Key.Publisher, entry.Value);
                     }

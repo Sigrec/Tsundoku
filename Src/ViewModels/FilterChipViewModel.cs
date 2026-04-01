@@ -34,6 +34,8 @@ public sealed partial class FilterChipViewModel : ReactiveObject
 
     private static readonly string[] NumericOperators = ["==", ">=", "<=", ">", "<"];
     private static readonly string[] EqualityOnlyOperator = ["=="];
+    private static readonly FrozenSet<string> NumericOperatorsSet = NumericOperators.ToFrozenSet(StringComparer.Ordinal);
+    private static readonly FrozenSet<string> EqualityOnlyOperatorSet = EqualityOnlyOperator.ToFrozenSet(StringComparer.Ordinal);
 
     [Reactive] public partial string SelectedField { get; set; }
     [Reactive] public partial string SelectedOperator { get; set; }
@@ -45,6 +47,8 @@ public sealed partial class FilterChipViewModel : ReactiveObject
     [Reactive] public partial string[] AvailableOperators { get; private set; }
     [Reactive] public partial string[] AvailableValues { get; private set; }
     [Reactive] public partial bool IsValueFreeText { get; private set; }
+    private FrozenSet<string> _availableOperatorsSet = NumericOperatorsSet;
+    private FrozenSet<string> _availableValuesSet = FrozenSet<string>.Empty;
 
     public FilterChipViewModel(string field = "Rating", string op = ">=", string value = "0")
     {
@@ -64,17 +68,19 @@ public sealed partial class FilterChipViewModel : ReactiveObject
     {
         bool isNumeric = NumericFields.Contains(field);
         AvailableOperators = isNumeric ? NumericOperators : EqualityOnlyOperator;
+        _availableOperatorsSet = isNumeric ? NumericOperatorsSet : EqualityOnlyOperatorSet;
         IsValueFreeText = isNumeric || field.Equals("Notes", StringComparison.OrdinalIgnoreCase) || field.Equals("Publisher", StringComparison.OrdinalIgnoreCase);
         AvailableValues = EnumValues.TryGetValue(field, out string[]? vals) ? vals : [];
+        _availableValuesSet = AvailableValues.Length > 0 ? AvailableValues.ToFrozenSet(StringComparer.OrdinalIgnoreCase) : FrozenSet<string>.Empty;
 
         // Reset operator to == if current isn't available
-        if (!AvailableOperators.Contains(SelectedOperator))
+        if (!_availableOperatorsSet.Contains(SelectedOperator))
         {
             SelectedOperator = "==";
         }
 
         // Reset value if switching between numeric/enum
-        if (!IsValueFreeText && AvailableValues.Length > 0 && !AvailableValues.Contains(Value))
+        if (!IsValueFreeText && AvailableValues.Length > 0 && !_availableValuesSet.Contains(Value))
         {
             Value = AvailableValues[0];
         }

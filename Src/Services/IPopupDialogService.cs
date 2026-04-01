@@ -20,4 +20,9 @@ public interface IPopupDialogService
     /// Displays a confirmation dialog and returns true if confirmed, false if cancelled.
     /// </summary>
     Task<bool> ConfirmAsync(string title, string icon, string info, Window owner);
+
+    /// <summary>
+    /// Displays an input dialog and returns the entered text, or null if cancelled.
+    /// </summary>
+    Task<string?> InputAsync(string title, string icon, string prompt, Window owner);
 }

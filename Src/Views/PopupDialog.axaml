@@ -19,7 +19,7 @@
     <Border Classes="Menu" BorderThickness="2" CornerRadius="0,0,8,8" ClipToBounds="True">
         <StackPanel Orientation="Vertical" Margin="16" Spacing="8">
             <i:Icon Value="{CompiledBinding Icon}" FontSize="25" FontWeight="Bold" Foreground="{DynamicResource TsundokuDividerColor}" Classes="Menu"/>
-            <TextBlock Text="{CompiledBinding InfoText}" FontSize="20" TextAlignment="Center" FontWeight="Bold" TextWrapping="Wrap" Classes="Menu"/>
+            <TextBlock Text="{CompiledBinding InfoText}" FontSize="14" TextAlignment="Center" FontWeight="Bold" TextWrapping="Wrap" Classes="Menu"/>
         </StackPanel>
     </Border>
 </Window>

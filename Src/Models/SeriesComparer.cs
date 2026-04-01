@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Globalization;
 using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 using static Tsundoku.Models.Enums.TsundokuSortModel;
@@ -6,9 +7,16 @@ namespace Tsundoku.Models;
 
 public sealed class SeriesComparer(TsundokuLanguage curLang, TsundokuSort sort = TsundokuSort.TitleAZ) : IComparer<Series>
 {
+    private static readonly ConcurrentDictionary<string, StringComparer> _comparerCache = new();
+
     private readonly TsundokuLanguage _curLang = curLang;
     private readonly TsundokuSort _sort = sort;
-    private readonly StringComparer _seriesTitleComparer = StringComparer.Create(new CultureInfo(CULTURE_LANG_CODES[curLang]), false);
+    private readonly StringComparer _seriesTitleComparer = GetOrCreateComparer(CULTURE_LANG_CODES[curLang]);
+
+    private static StringComparer GetOrCreateComparer(string cultureName)
+    {
+        return _comparerCache.GetOrAdd(cultureName, name => StringComparer.Create(new CultureInfo(name), false));
+    }
 
     public int Compare(Series? x, Series? y)
     {

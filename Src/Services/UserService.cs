@@ -39,7 +39,7 @@ public interface IUserService : IDisposable
     void UpdateUser(Action<User> updateAction);
 
     /// <summary>Loads user data from disk, creating a default user if none exists.</summary>
-    void LoadUserData();
+    Task LoadUserDataAsync();
 
     /// <summary>Persists the specified user data to disk.</summary>
     /// <param name="user">The user to save.</param>
@@ -247,7 +247,7 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
     }
     public ReadOnlyObservableCollection<TsundokuTheme> SavedThemes => _savedThemes;
 
-    public void LoadUserData()
+    public async Task LoadUserDataAsync()
     {
         LOGGER.Info("Attempting to load user data...");
         string userDataFilePath = AppFileHelper.GetUserDataJsonPath();
@@ -263,7 +263,7 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
         }
 
         User loadedUser;
-        string userFileData = File.ReadAllText(userDataFilePath);
+        string userFileData = await File.ReadAllTextAsync(userDataFilePath);
         if (string.IsNullOrWhiteSpace(userFileData))
         {
             LOGGER.Debug("Json is Empty Creating Default User");
@@ -387,7 +387,12 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
                     }
                 }
 
+                Bitmap? oldBitmap = curSeries.CoverBitMap;
                 curSeries.CoverBitMap = loadedBitmap;
+                if (oldBitmap is not null && !ReferenceEquals(oldBitmap, loadedBitmap))
+                {
+                    oldBitmap.Dispose();
+                }
             }
 
             HashSet<string> covers = [ ..innerCache.Items

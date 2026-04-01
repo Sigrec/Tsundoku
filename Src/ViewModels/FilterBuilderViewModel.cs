@@ -66,6 +66,9 @@ public sealed partial class FilterBuilderViewModel : ReactiveObject, IDisposable
         }
     }
 
+    private const string AndConnector = " & ";
+    private const string OrConnector = " | ";
+
     private void RebuildQuery()
     {
         if (Chips.Count == 0)
@@ -83,9 +86,9 @@ public sealed partial class FilterBuilderViewModel : ReactiveObject, IDisposable
                 continue; // Skip chips with empty free-text values
             }
 
-            if (sb.Length > 0)
+            if (sb.Length > 0 && i > 0)
             {
-                sb.Append(chip == Chips[0] ? string.Empty : (Chips[i - 1].IsConnectorOr ? " | " : " & "));
+                sb.Append(Chips[i - 1].IsConnectorOr ? OrConnector : AndConnector);
             }
 
             sb.Append(chip.ToQuerySegment());

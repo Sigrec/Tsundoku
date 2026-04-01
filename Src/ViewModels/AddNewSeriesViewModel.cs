@@ -55,6 +55,12 @@ public sealed partial class AddNewSeriesViewModel : ViewModelBase, IDisposable
         _aniList = aniList;
         _apiHealthCheckService = apiHealthCheckService;
 
+        User? user = userService.GetCurrentUserSnapshot();
+        if (user?.AdditionalLanguages is { Count: > 0 })
+        {
+            SelectedAdditionalLanguages.AddRange(user.AdditionalLanguages);
+        }
+
         SelectedAdditionalLanguages.CollectionChanged += AdditionalLanguagesCollectionChanged;
 
         this.WhenAnyValue(x => x.CurrentUser.Currency)
@@ -132,8 +138,6 @@ public sealed partial class AddNewSeriesViewModel : ViewModelBase, IDisposable
         _suggestionsSource.Clear();
     }
 
-    // TODO - Additional Languages selected should persist across app startups? I can traverse the list and and check what additional langs are used or store it in json
-    // TODO - When user is looking for a additional lang but MangaDex doesn't have it show a popup that lets them enter the title in?
     private void AdditionalLanguagesCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         if (SelectedAdditionalLanguages is not null && SelectedAdditionalLanguages.Count != 0)
@@ -149,6 +153,11 @@ public sealed partial class AddNewSeriesViewModel : ViewModelBase, IDisposable
         {
             AdditionalLanguagesToolTipText = string.Empty;
         }
+
+        _userService.UpdateUser(user =>
+        {
+            user.AdditionalLanguages = [.. SelectedAdditionalLanguages];
+        });
     }
     
     /// <summary>
@@ -160,7 +169,7 @@ public sealed partial class AddNewSeriesViewModel : ViewModelBase, IDisposable
     /// <param name="maxVolCount">The max # of volumes this series currently has</param>
     /// <param name="additionalLanguages">Additional languages to get more info for from Mangadex</param>
     /// <returns>Whether the series can be added to the users collection or not</returns>
-    public async Task<KeyValuePair<bool, string>> GetSeriesDataAsync(string input, SeriesFormat bookType, uint curVolCount = 0, uint maxVolCount = 1, TsundokuLanguage[]? additionalLanguages = null, string customImageUrl = "", string publisher = "Unknown", SeriesDemographic demographic = SeriesDemographic.Unknown, uint volumesRead = 0, decimal rating = -1, decimal value = 0, bool allowDuplicate = false)
+    public async Task<(bool Success, string Message, Series? AddedSeries)> GetSeriesDataAsync(string input, SeriesFormat bookType, uint curVolCount = 0, uint maxVolCount = 1, TsundokuLanguage[]? additionalLanguages = null, string customImageUrl = "", string publisher = "Unknown", SeriesDemographic demographic = SeriesDemographic.Unknown, uint volumesRead = 0, decimal rating = -1, decimal value = 0, bool allowDuplicate = false)
     {
         string returnMsg = string.Empty;
         Series? newSeries = await Series.CreateNewSeriesCardAsync(
@@ -198,9 +207,10 @@ public sealed partial class AddNewSeriesViewModel : ViewModelBase, IDisposable
                 LOGGER.Error(ex, "Error adding new Series to Collection");
                 newSeries?.Dispose();
                 returnMsg = ex.Message;
+                newSeries = null;
             }
         }
-        return new KeyValuePair<bool, string>(successfulAdd, returnMsg);
+        return (successfulAdd, returnMsg, successfulAdd ? newSeries : null);
     }
 
     /// <summary>
