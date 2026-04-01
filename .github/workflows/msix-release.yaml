@@ -3,6 +3,11 @@ name: Build and Release MSIX (Avalonia)
 on:
   workflow_dispatch:
     inputs:
+      revision:
+        description: 'Package revision number (4th digit, e.g. 0 = 2.0.1.0, 1 = 2.0.1.1). Reset to 0 when bumping the csproj Version.'
+        required: false
+        type: number
+        default: 0
       skip_tests:
         description: 'Skip running tests'
         required: false
@@ -36,14 +41,16 @@ jobs:
             Write-Error "Could not find <Version> in $env:AVALONIA_PROJECT_PATH"
             exit 1
         }
-        Write-Host "Version: $version (tag: v$version)"
+        $revision = ${{ inputs.revision || 0 }}
+        $tag = if ($revision -gt 0) { "v$version.$revision" } else { "v$version" }
+        Write-Host "Version: $version (revision: $revision, tag: $tag)"
         echo "version=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
-        echo "tag=v$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+        echo "tag=$tag" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
       shell: pwsh
 
     - name: Sync Package.appxmanifest Version
       run: |
-        $version = "${{ steps.version.outputs.version }}.0"
+        $version = "${{ steps.version.outputs.version }}.${{ inputs.revision || '0' }}"
         $manifestPath = "./TsundokuPackage/Package.appxmanifest"
         $content = Get-Content $manifestPath -Raw
         $content = $content -replace '(?<=<Identity[^>]+Version=")[^"]+', $version
