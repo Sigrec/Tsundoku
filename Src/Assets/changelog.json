@@ -40,5 +40,18 @@
     "actions": [
       "Refresh all series via settings to fix any missing cover images"
     ]
+  },
+  "2.0.2": {
+    "changes": [
+      "Additional language selections now persist across app restarts",
+      "When MangaDex is missing a title in a requested language, a popup lets you enter it manually",
+      "Add Series button now shows a spinning loading indicator with the series name while fetching data",
+      "Added series notification now displays the title in your preferred language instead of the AniList ID",
+      "User data loading is now async so the splash screen stays responsive during startup",
+      "Series card +/- and edit buttons now update correctly when switching themes",
+      "Improved collection filtering and sorting performance for large libraries",
+      "Reduced popup dialog text size for better readability"
+    ],
+    "actions": []
   }
 }
