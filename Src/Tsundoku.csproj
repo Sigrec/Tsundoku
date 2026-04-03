@@ -29,7 +29,7 @@
 		<JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
 
 		<!-- Metadata — only set Version; FileVersion and AssemblyVersion are derived automatically -->
-		<Version>2.0.2</Version>
+		<Version>2.1.0</Version>
 		<RepositoryUrl>https://github.com/Sigrec/Tsundoku</RepositoryUrl>
 		<Description>Desktop Manga and Light Novel Collection App</Description>
 		<ApplicationIcon>Assets\Icons\TsundokuLogo.ico</ApplicationIcon>
@@ -77,6 +77,7 @@
 		If you will publish your application in self-contained mode with p:PublishTrimmed=true and it will use Fluent theme Default theme will be trimmed from the output and vice versa.
 		https://github.com/AvaloniaUI/Avalonia/issues/5593 -->
 		<TrimmableAssembly Include="Avalonia.Themes.Default" />
+		<TrimmerRootAssembly Include="Avalonia.Themes.Fluent" />
 	</ItemGroup>
 
 	<ItemGroup>

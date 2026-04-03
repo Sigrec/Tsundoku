@@ -107,7 +107,8 @@ public sealed class PopupDialogService(PopupDialogViewModel viewModel) : IPopupD
             Spacing = 10
         };
 
-        ControlTheme? menuButtonTheme = Application.Current.FindResource("MenuButton") as ControlTheme;
+        Application.Current.Resources.TryGetResource("MenuButton", null, out object? themeObj);
+        ControlTheme? menuButtonTheme = themeObj as ControlTheme;
 
         Button confirmBtn = new Button
         {
@@ -204,7 +205,8 @@ public sealed class PopupDialogService(PopupDialogViewModel viewModel) : IPopupD
             Spacing = 10
         };
 
-        ControlTheme? menuButtonTheme = Application.Current.FindResource("MenuButton") as ControlTheme;
+        Application.Current.Resources.TryGetResource("MenuButton", null, out object? themeObj);
+        ControlTheme? menuButtonTheme = themeObj as ControlTheme;
 
         Button confirmBtn = new Button
         {

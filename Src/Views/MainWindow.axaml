@@ -477,7 +477,9 @@
                     <ItemsRepeater.Layout>
                         <UniformGridLayout
                             Orientation="Horizontal"
-                            ItemsJustification="Center"/>
+                            ItemsJustification="Center"
+                            MinItemWidth="{x:Static m:Constants.CARD_CELL_WIDTH}"
+                            MinItemHeight="{x:Static m:Constants.CARD_CELL_HEIGHT}"/>
                     </ItemsRepeater.Layout>
 
                     <ItemsRepeater.ItemTemplate>

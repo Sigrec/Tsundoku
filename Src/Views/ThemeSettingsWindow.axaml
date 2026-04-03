@@ -8,6 +8,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
         xmlns:controls="clr-namespace:Tsundoku.Controls"
+        xmlns:m="clr-namespace:Tsundoku.Models"
         x:Class="Tsundoku.Views.CollectionThemeWindow"
         Icon="\Assets\Icons\TsundokuLogo.ico"
         Title="Theme"
@@ -107,7 +108,7 @@
                                   ItemsSource="{CompiledBinding SavedThemes, Mode=OneWay}" SelectedIndex="{CompiledBinding SelectedThemeIndex, Mode=OneWay}"
                                   ItemContainerTheme="{StaticResource MenuComboBoxItem}" Theme="{StaticResource MenuComboBox}" HorizontalAlignment="Stretch">
                             <ComboBox.ItemTemplate>
-                                <DataTemplate><TextBlock Text="{Binding ThemeName}"/></DataTemplate>
+                                <DataTemplate x:DataType="m:TsundokuTheme"><TextBlock Text="{CompiledBinding ThemeName}"/></DataTemplate>
                             </ComboBox.ItemTemplate>
                         </ComboBox>
                         <Button Grid.Column="1" FontSize="14" Width="34" Height="34" Margin="6,0,0,0"
@@ -122,27 +123,27 @@
                     <WrapPanel>
                         <StackPanel Spacing="3" Margin="3">
                             <TextBlock Text="MAIN COLOR 1" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource TsundokuDividerColor}"/>
-                            <MaskedTextBox x:Name="MainColor1" FontSize="13" Classes="Menu" FontWeight="Bold" Mask="\#AAAAAA" BorderThickness="2" Height="34"/>
+                            <MaskedTextBox x:Name="MainColor1" FontSize="13" Classes="Menu" FontWeight="Bold" Mask="\#AAAAAA" BorderThickness="2" Height="34" MinWidth="100"/>
                         </StackPanel>
                         <StackPanel Spacing="3" Margin="3">
                             <TextBlock Text="MAIN COLOR 2" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource TsundokuDividerColor}"/>
-                            <MaskedTextBox x:Name="MainColor2" FontSize="13" Classes="Menu" FontWeight="Bold" Mask="\#AAAAAA" BorderThickness="2" Height="34"/>
+                            <MaskedTextBox x:Name="MainColor2" FontSize="13" Classes="Menu" FontWeight="Bold" Mask="\#AAAAAA" BorderThickness="2" Height="34" MinWidth="100"/>
                         </StackPanel>
                         <StackPanel Spacing="3" Margin="3">
                             <TextBlock Text="TEXT COLOR 1" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource TsundokuDividerColor}"/>
-                            <MaskedTextBox x:Name="TextColor1" FontSize="13" Classes="Menu" FontWeight="Bold" Mask="\#AAAAAA" BorderThickness="2" Height="34"/>
+                            <MaskedTextBox x:Name="TextColor1" FontSize="13" Classes="Menu" FontWeight="Bold" Mask="\#AAAAAA" BorderThickness="2" Height="34" MinWidth="100"/>
                         </StackPanel>
                         <StackPanel Spacing="3" Margin="3">
                             <TextBlock Text="TEXT COLOR 2" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource TsundokuDividerColor}"/>
-                            <MaskedTextBox x:Name="TextColor2" FontSize="13" Classes="Menu" FontWeight="Bold" Mask="\#AAAAAA" BorderThickness="2" Height="34"/>
+                            <MaskedTextBox x:Name="TextColor2" FontSize="13" Classes="Menu" FontWeight="Bold" Mask="\#AAAAAA" BorderThickness="2" Height="34" MinWidth="100"/>
                         </StackPanel>
                         <StackPanel Spacing="3" Margin="3">
                             <TextBlock Text="ACCENT COLOR 1" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource TsundokuDividerColor}"/>
-                            <MaskedTextBox x:Name="AccentColor1" FontSize="13" Classes="Menu" FontWeight="Bold" Mask="\#AAAAAA" BorderThickness="2" Height="34"/>
+                            <MaskedTextBox x:Name="AccentColor1" FontSize="13" Classes="Menu" FontWeight="Bold" Mask="\#AAAAAA" BorderThickness="2" Height="34" MinWidth="100"/>
                         </StackPanel>
                         <StackPanel Spacing="3" Margin="3">
                             <TextBlock Text="ACCENT COLOR 2" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource TsundokuDividerColor}"/>
-                            <MaskedTextBox x:Name="AccentColor2" FontSize="13" Classes="Menu" FontWeight="Bold" Mask="\#AAAAAA" BorderThickness="2" Height="34"/>
+                            <MaskedTextBox x:Name="AccentColor2" FontSize="13" Classes="Menu" FontWeight="Bold" Mask="\#AAAAAA" BorderThickness="2" Height="34" MinWidth="100"/>
                         </StackPanel>
                     </WrapPanel>
                     <StackPanel Orientation="Horizontal" Spacing="6">
@@ -150,10 +151,16 @@
                                 i:Attached.Icon="fa-solid fa-eraser" Content="Clear" Click="ClearThemeValues"/>
                         <Button Theme="{StaticResource MenuButton}" Height="34" Padding="14,0" FontSize="13"
                                 i:Attached.Icon="fa-solid fa-wand-magic-sparkles" Content="Generate 1"
+                                ToolTip.Tip="Classy style: main color for hover icons, text color for progress bar"
                                 IsEnabled="{CompiledBinding IsGenerateThemeButtonEnabled}" Click="GenerateThemeType1"/>
                         <Button Theme="{StaticResource MenuButton}" Height="34" Padding="14,0" FontSize="13"
                                 i:Attached.Icon="fa-solid fa-wand-magic-sparkles" Content="Generate 2"
+                                ToolTip.Tip="Electric Rose style: accent color for progress bar and hover icons"
                                 IsEnabled="{CompiledBinding IsGenerateThemeButtonEnabled}" Click="GenerateThemeType2"/>
+                        <Button x:Name="GenerateApiButton" Theme="{StaticResource MenuButton}" Height="34" Padding="14,0" FontSize="13"
+                                i:Attached.Icon="fa-solid fa-palette" Content="Auto Generate"
+                                ToolTip.Tip="Generate a full color palette from Main Color 1 using the Color API"
+                                Click="GenerateFromColorApiAsync"/>
                     </StackPanel>
                 </StackPanel>
 			</StackPanel>

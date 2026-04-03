@@ -251,8 +251,12 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
                 AdvancedSearchPopup.IsVisible = !AdvancedSearchPopup.IsVisible;
                 if (AdvancedSearchPopup.IsVisible)
                 {
-                    await ToggleNotificationPopup($"To Exit Advanced Search Press CTRL+F or Click Anywhere");
+                    await ToggleNotificationPopup($"To Exit Advanced Search Press CTRL+F, Esc, or Click Anywhere");
                 }
+            }
+            else if (e.Key == Key.Escape && AdvancedSearchPopup.IsVisible)
+            {
+                AdvancedSearchPopup.IsVisible = false;
             }
         };
 

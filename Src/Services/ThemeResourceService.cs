@@ -31,11 +31,15 @@ public sealed class ThemeResourceService : IThemeResourceService
     {
         if (Application.Current?.Resources is not Avalonia.Controls.ResourceDictionary resources) return;
 
-        // Batch updates via SetItems for a single resource-changed notification, skip null values
-        resources.SetItems(
-            ThemeResourceKeys.PropertyMap
-                .Where(kvp => kvp.Value(theme) is not null)
-                .Select(kvp => new KeyValuePair<object, object?>(kvp.Key, kvp.Value(theme))));
+        // Update each theme resource individually, skipping null values
+        foreach (KeyValuePair<string, Func<TsundokuTheme, SolidColorBrush>> kvp in ThemeResourceKeys.PropertyMap)
+        {
+            SolidColorBrush? brush = kvp.Value(theme);
+            if (brush is not null)
+            {
+                resources[kvp.Key] = brush;
+            }
+        }
 
         // Re-apply glassmorphism alpha adjustments if enabled, since theme apply overwrites them
         if (GlassmorphismService.IsEnabled)

@@ -20,13 +20,15 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
     private readonly BitmapHelper _bitmapHelper;
     private readonly MainWindowViewModel _mainWindowViewModel;
     private readonly IApiHealthCheckService _apiHealthCheckService;
+    private readonly IPopupDialogService _popupDialogService;
     private bool _IsInitialized = false;
 
-    public EditSeriesInfoWindow(MainWindowViewModel mainWindowViewModel, BitmapHelper bitmapHelper, IApiHealthCheckService apiHealthCheckService)
+    public EditSeriesInfoWindow(MainWindowViewModel mainWindowViewModel, BitmapHelper bitmapHelper, IApiHealthCheckService apiHealthCheckService, IPopupDialogService popupDialogService)
     {
         _bitmapHelper = bitmapHelper;
         _mainWindowViewModel = mainWindowViewModel;
         _apiHealthCheckService = apiHealthCheckService;
+        _popupDialogService = popupDialogService;
         InitializeComponent();
 
         Opened += (s, e) =>
@@ -78,11 +80,17 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
 
     private async void ChangeCoverFromLinkAsync(object sender, RoutedEventArgs args)
     {
+        string customImageUrl = CoverImageUrlTextBox.Text?.Trim() ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(customImageUrl))
+        {
+            await _popupDialogService.ShowAsync("No URL", "fa-solid fa-circle-info", "No image URL provided.", this);
+            return;
+        }
+
         ChangeCoverButtonIcon.Value = "fa-solid fa-arrow-rotate-right";
         ChangeCoverButtonIcon.Animation = IconAnimation.Spin;
         try
         {
-            string customImageUrl = CoverImageUrlTextBox.Text.Trim();
             string fullCoverPath = AppFileHelper.GetFullCoverPath(ViewModel.Series.Cover);
             Bitmap? newCover = await _bitmapHelper.UpdateCoverFromUrlAsync(customImageUrl, fullCoverPath);
 
@@ -90,11 +98,20 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
             {
                 GenerateNewBitmap(newCover, customImageUrl);
                 CoverImageUrlTextBox.Clear();
+                if (Owner is MainWindow mainWindow)
+                {
+                    mainWindow.ShowNotification("Cover image updated");
+                }
+            }
+            else
+            {
+                await _popupDialogService.ShowAsync("Error", "fa-solid fa-circle-exclamation", "Failed to load cover image from the provided URL.", this);
             }
         }
         catch (Exception ex)
         {
             LOGGER.Error(ex, "Failed to change cover from link");
+            await _popupDialogService.ShowAsync("Error", "fa-solid fa-circle-exclamation", "Failed to change cover image.", this);
         }
         finally
         {
@@ -126,10 +143,16 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
         }
     }
     
-    /// <summary>
-    /// Saves the stats for the series when the button is clicked
-    /// </summary>
     private void SaveStats(object sender, RoutedEventArgs args)
+    {
+        ChangeSeriesVolumeCounts();
+        ChangeSeriesVolumesRead();
+        ChangeSeriesRating();
+        ChangeSeriesValue();
+        ChangeSeriesPublisher();
+    }
+
+    private void ChangeSeriesVolumesRead()
     {
         string volumesReadText = VolumesReadMaskedTextBox.Text.Replace("_", string.Empty);
         if (!string.IsNullOrWhiteSpace(volumesReadText) &&
@@ -137,99 +160,51 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
             ViewModel.Series.VolumesRead != newVolumesRead)
         {
             uint oldVolumesRead = ViewModel.Series.VolumesRead;
-
             ViewModel.Series.VolumesRead = newVolumesRead;
             VolumesReadMaskedTextBox.Clear();
-
-            LOGGER.Info(
-                "Updated number of Volumes Read for {RomajiTitle} from {OldVolumesRead} to {NewVolumesRead}",
-                ViewModel.Series.Titles[TsundokuLanguage.Romaji],
-                oldVolumesRead,
-                newVolumesRead
-            );
+            LOGGER.Info("Updated Volumes Read for {Title} from {Old} to {New}", ViewModel.Series.Titles[TsundokuLanguage.Romaji], oldVolumesRead, newVolumesRead);
         }
-        else
+    }
+
+    private void ChangeSeriesRating()
+    {
+        if (RatingMaskedTextBox.Text.StartsWith("__._", StringComparison.Ordinal)) return;
+
+        string rawInput = RatingMaskedTextBox.Text[..4].Trim().Replace("_", "0");
+        if (decimal.TryParse(rawInput, out decimal ratingVal) && ratingVal <= 10.0m && ratingVal != ViewModel.Series.Rating)
         {
-            LOGGER.Warn("Volumes Read Input {VolumesReadText} is invalid or unchanged.", volumesReadText);
+            ratingVal = decimal.Round(ratingVal, 1);
+            ViewModel.Series.Rating = ratingVal;
+            RatingMaskedTextBox.Clear();
+            LOGGER.Info("Updated Rating for {Title} to {Rating}/10.0", ViewModel.Series.Titles[TsundokuLanguage.Romaji], ratingVal);
         }
+    }
 
-        if (!RatingMaskedTextBox.Text.StartsWith("__._", StringComparison.Ordinal))
-        {
-            string rawInput = RatingMaskedTextBox.Text[..4].Trim().Replace("_", "0");
-            if (decimal.TryParse(rawInput, out decimal ratingVal))
-            {
-                // Clamp to max value and avoid unnecessary assignment
-                if (ratingVal <= 10.0m)
-                {
-                    if (ratingVal != ViewModel.Series.Rating)
-                    {
-                        ratingVal = decimal.Round(ratingVal, 1);
-                        ViewModel.Series.Rating = ratingVal;
-                        RatingMaskedTextBox.Clear();
-
-                        LOGGER.Info(
-                            "Updating rating for {RomajiTitle} from {OldRating}/10.0 to {NewRating}/10.0",
-                            ViewModel.Series.Titles[TsundokuLanguage.Romaji],
-                            ViewModel.Series.Rating,
-                            ratingVal
-                        );
-                    }
-                }
-                else
-                {
-                    LOGGER.Warn("Rating Value {RatingVal} is cannot be larger than 10.0", ratingVal);
-                }
-            }
-            else
-            {
-                LOGGER.Warn("Invalid Rating Input: {RawInput}", rawInput);
-            }
-        }
-
+    private void ChangeSeriesValue()
+    {
         string valueTextRaw = ValueMaskedTextBox.Text;
-        if (!string.IsNullOrWhiteSpace(valueTextRaw) && valueTextRaw.Any(char.IsDigit))
+        if (string.IsNullOrWhiteSpace(valueTextRaw) || !valueTextRaw.Any(char.IsDigit)) return;
+
+        string valueText = valueTextRaw[1..].Replace("_", "0");
+        if (!valueText.Contains('_') && decimal.TryParse(valueText, out decimal newValue) &&
+            decimal.Compare(ViewModel.Series.Value, newValue) != 0)
         {
-            string valueText = valueTextRaw[1..].Replace("_", "0");
-            if (!valueText.Contains('_') && decimal.TryParse(valueText, out decimal newValue) &&
-                decimal.Compare(ViewModel.Series.Value, newValue) != 0)
-            {
-                string currency = ViewModel.CurrentUser.Currency;
-                decimal oldValue = ViewModel.Series.Value;
-
-                ViewModel.Series.Value = newValue;
-                ValueMaskedTextBox.Clear();
-
-                LOGGER.Info(
-                    "Updated Cost for {RomajiTitle} from {Currency}{OldValue} to {Currency}{NewValue}",
-                    ViewModel.Series.Titles[TsundokuLanguage.Romaji],
-                    currency,
-                    oldValue,
-                    currency,
-                    newValue
-                );
-            }
-            else
-            {
-                LOGGER.Warn(
-                    "Invalid or unchanged value input: {RawCostText}",
-                    valueTextRaw
-                );
-            }
+            decimal oldValue = ViewModel.Series.Value;
+            ViewModel.Series.Value = newValue;
+            ValueMaskedTextBox.Clear();
+            LOGGER.Info("Updated Value for {Title} from {Old} to {New}", ViewModel.Series.Titles[TsundokuLanguage.Romaji], oldValue, newValue);
         }
+    }
 
+    private void ChangeSeriesPublisher()
+    {
         string publisherText = PublisherTextBox.Text.Trim();
         if (!string.IsNullOrEmpty(publisherText) && !publisherText.Equals(ViewModel.Series.Publisher, StringComparison.Ordinal))
         {
             string oldPublisher = ViewModel.Series.Publisher;
             ViewModel.Series.Publisher = publisherText;
             PublisherTextBox.Clear();
-
-            LOGGER.Info(
-                "Updated Publisher for {RomajiTitle} from {OldPublisher} to {NewPublisher}",
-                ViewModel.Series.Titles[TsundokuLanguage.Romaji],
-                oldPublisher,
-                publisherText
-            );
+            LOGGER.Info("Updated Publisher for {Title} from {Old} to {New}", ViewModel.Series.Titles[TsundokuLanguage.Romaji], oldPublisher, publisherText);
         }
     }
 
@@ -272,23 +247,49 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
 
     private async void RefreshSeriesAsync(object sender, RoutedEventArgs args)
     {
+        if (sender is Button btn)
+        {
+            btn.IsEnabled = false;
+        }
         try
         {
             await _mainWindowViewModel.RefreshSeries(ViewModel.Series);
+            if (Owner is MainWindow mainWindow)
+            {
+                mainWindow.ShowNotification($"Refreshed \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\"");
+            }
         }
         catch (Exception ex)
         {
             LOGGER.Error(ex, "Failed to refresh series {Title}", ViewModel.Series.Titles[TsundokuLanguage.Romaji]);
+            await _popupDialogService.ShowAsync("Error", "fa-solid fa-circle-exclamation", $"Failed to refresh series.", this);
+        }
+        finally
+        {
+            if (sender is Button btn2)
+            {
+                btn2.IsEnabled = true;
+            }
         }
     }
 
-    private void RemoveSeries(object sender, RoutedEventArgs args)
+    private async void RemoveSeries(object sender, RoutedEventArgs args)
     {
-        _mainWindowViewModel.DeleteSeries(ViewModel.Series);
-        this.Close();
+        string title = ViewModel.Series.Titles.TryGetValue(TsundokuLanguage.Romaji, out string? t) ? t : "this series";
+        bool confirmed = await _popupDialogService.ConfirmAsync(
+            "Delete Series",
+            "fa-solid fa-triangle-exclamation",
+            $"Are you sure you want to delete \"{title}\" from your collection? This cannot be undone.",
+            this);
+
+        if (confirmed)
+        {
+            _mainWindowViewModel.DeleteSeries(ViewModel.Series);
+            this.Close();
+        }
     }
 
-    private void ChangeSeriesVolumeCounts(object sender, RoutedEventArgs args)
+    private void ChangeSeriesVolumeCounts()
     {
         string curText = CurVolumeMaskedTextBox.Text.Replace("_", string.Empty).Trim();
         string maxText = MaxVolumeMaskedTextBox.Text.Replace("_", string.Empty).Trim();

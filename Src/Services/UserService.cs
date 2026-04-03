@@ -41,6 +41,9 @@ public interface IUserService : IDisposable
     /// <summary>Loads user data from disk, creating a default user if none exists.</summary>
     Task LoadUserDataAsync();
 
+    /// <summary>Re-runs the schema migration on the current UserData.json and reloads.</summary>
+    Task RepairUserDataAsync();
+
     /// <summary>Persists the specified user data to disk.</summary>
     /// <param name="user">The user to save.</param>
     void SaveUserData(User user);
@@ -308,6 +311,39 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
         LOGGER.Info("Finished Loading \"{UserName}'s\" Data!", loadedUser.UserName);
     }
 
+    public async Task RepairUserDataAsync()
+    {
+        string userDataFilePath = AppFileHelper.GetUserDataJsonPath();
+        if (!File.Exists(userDataFilePath))
+        {
+            LOGGER.Warn("No UserData.json found to repair");
+            return;
+        }
+
+        try
+        {
+            string userFileData = await File.ReadAllTextAsync(userDataFilePath);
+            JsonNode? userData = JsonNode.Parse(userFileData);
+            if (userData is null)
+            {
+                LOGGER.Warn("UserData.json is malformed, cannot repair");
+                return;
+            }
+
+            // Force re-run of all migrations in the current major version (e.g., 6.0 → 6.x)
+            double currentMajor = Math.Floor(ViewModelBase.SCHEMA_VERSION);
+            userData[nameof(User.DataVersion)] = currentMajor - 0.1;
+            LOGGER.Info("Forcing re-run of all v{Major}.x schema migrations", currentMajor);
+
+            User.UpdateSchemaVersion(userData, false);
+            await LoadUserDataAsync();
+        }
+        catch (Exception ex)
+        {
+            LOGGER.Error(ex, "Failed to repair user data");
+        }
+    }
+
     public uint GetCurrentThemeIndex()
     {
         string currentName = GetCurrentThemeSnapshot().ThemeName;
@@ -424,7 +460,7 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
 
     private static Bitmap GenerateCoverBitmap(Series series, string fullCoverPath, bool isPngExtension)
     {
-        Bitmap loadedBitmap = new Bitmap(fullCoverPath);
+        Bitmap loadedBitmap = new(fullCoverPath);
         if (!isPngExtension)
         {
             fullCoverPath = Path.ChangeExtension(fullCoverPath, ".png");
@@ -950,7 +986,7 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
     {
         TsundokuTheme theme = _currentThemeSubject.Value;
         if (theme is null)
-            throw new ArgumentNullException(nameof(theme));
+            throw new ArgumentNullException(nameof(fileName));
 
         string themesFolderPath = AppFileHelper.GetThemesFolderPath();
         string themeFileName = $"{fileName}_Theme.json";

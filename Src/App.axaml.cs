@@ -1,4 +1,3 @@
-using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,12 +6,10 @@ using NLog.Targets;
 using NLog.Targets.Wrappers;
 using System.Net;
 using System.Net.Http.Headers;
-using System.Text.Json;
 using Tsundoku.Clients;
 using System.Reactive.Linq;
 using Tsundoku.Helpers;
 using Tsundoku.Models;
-using Tsundoku.Services;
 using Tsundoku.ViewModels;
 using Tsundoku.Views;
 

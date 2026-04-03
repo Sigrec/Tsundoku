@@ -184,8 +184,8 @@
                         <Button x:Name="ChangeSeriesVolumeCountButton"
                                 Theme="{StaticResource MenuButton}"
                                 Height="34" Padding="14,0" FontSize="13"
-                                ToolTip.Tip="Update Volume Count"
-                                Click="ChangeSeriesVolumeCounts">
+                                ToolTip.Tip="Refresh series data from AniList"
+                                Click="RefreshSeriesAsync">
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <i:Icon Value="fa-solid fa-arrows-rotate" FontSize="13"/>
                                 <TextBlock Text="Refresh" VerticalAlignment="Center"/>

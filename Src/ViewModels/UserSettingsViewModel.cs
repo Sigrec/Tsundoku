@@ -127,6 +127,11 @@ public sealed partial class UserSettingsViewModel : ViewModelBase
         _userService.UpdateUser(user => user.Currency = newCurrency);
     }
 
+    public async Task RepairUserDataAsync()
+    {
+        await _userService.RepairUserDataAsync();
+    }
+
     /// <summary>
     /// Updates the current user's display name.
     /// </summary>

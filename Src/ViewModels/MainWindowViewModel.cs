@@ -28,14 +28,14 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
 
     // --- Reactive Properties (Public) ---
     [Reactive] public partial string AdvancedSearchQuery { get; set; } = string.Empty;
-    [Reactive] public partial string SeriesFilterText { get; set; }
+    [Reactive] public partial string SeriesFilterText { get; set; } = string.Empty;
     [Reactive] public partial TsundokuFilter SelectedFilter { get; set; } = TsundokuFilter.None;
     [Reactive] public partial int SelectedFilterIndex { get; set; } = -1;
     [Reactive] public partial TsundokuSort SelectedSort { get; set; } = TsundokuSort.TitleAZ;
     [Reactive] public partial int SelectedSortIndex { get; set; } = 0;
     [Reactive] public partial int SelectedLangIndex { get; set; }
-    [Reactive] public partial string NotificationText { get; set; }
-    [Reactive] public partial string AdvancedSearchQueryErrorMessage { get; set; }
+    [Reactive] public partial string NotificationText { get; set; } = string.Empty;
+    [Reactive] public partial string AdvancedSearchQueryErrorMessage { get; set; } = string.Empty;
     [Reactive] public partial TsundokuLanguage SelectedLanguage { get; set; }
     [Reactive] public partial string SelectedPublisher { get; set; } = string.Empty;
 

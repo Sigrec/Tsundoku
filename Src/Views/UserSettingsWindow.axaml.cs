@@ -186,6 +186,43 @@ public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsView
         }
     }
 
+    private async void RepairUserDataAsync(object sender, RoutedEventArgs args)
+    {
+        bool confirmed = await _popupDialogService.ConfirmAsync(
+            "Repair Data",
+            "fa-solid fa-wrench",
+            "This will re-run the schema migration on your UserData.json and reload. Use this if theme colors or other data appear incorrect.\n\nContinue?",
+            this);
+
+        if (!confirmed) return;
+
+        RepairDataButton.IsEnabled = false;
+        RepairDataButton.Content = "Repairing...";
+        try
+        {
+            await ViewModel.RepairUserDataAsync();
+            await _popupDialogService.ShowAsync(
+                "Repair Complete",
+                "fa-solid fa-circle-check",
+                "User data has been repaired and reloaded.",
+                this);
+        }
+        catch (Exception ex)
+        {
+            LOGGER.Error(ex, "Failed to repair user data");
+            await _popupDialogService.ShowAsync(
+                "Repair Failed",
+                "fa-solid fa-circle-exclamation",
+                "Failed to repair user data. Check logs for details.",
+                this);
+        }
+        finally
+        {
+            RepairDataButton.Content = "Repair Data";
+            RepairDataButton.IsEnabled = true;
+        }
+    }
+
     public async void OpenAniListLink(object sender, RoutedEventArgs args)
     {
         await ViewModelBase.OpenSiteLink(@"https://anilist.co/");

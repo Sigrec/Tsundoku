@@ -28,6 +28,10 @@ public static class Constants
     public const ushort USER_NOTES_HEIGHT = TOP_SECTION_CARD_HEIGHT - 16;
 
     public const ushort IMAGE_HEIGHT = CARD_HEIGHT;
+
+    public const byte CARD_MARGIN = 12;
+    public const double CARD_CELL_WIDTH = CARD_WIDTH + (CARD_MARGIN * 2);
+    public const double CARD_CELL_HEIGHT = CARD_HEIGHT + (CARD_MARGIN * 2);
     public const ushort MENU_LENGTH = 400;
 
     #endregion

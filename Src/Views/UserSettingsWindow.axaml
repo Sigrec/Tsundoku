@@ -292,6 +292,7 @@
                         <Button Theme="{StaticResource MenuButton}" Click="ImportGoodreadsDataAsync" x:Name="ImportGoodreadsData" Content="Goodreads Import" Padding="10,6" FontSize="12"/>
                         <Button Theme="{StaticResource MenuButton}" Click="ShowChangelogAsync" Content="What's New" Padding="10,6" FontSize="12"/>
                         <Button Theme="{StaticResource MenuButton}" Click="CheckApiStatusAsync" x:Name="CheckApiStatusButton" Content="Check API Status" Padding="10,6" FontSize="12"/>
+                        <Button Theme="{StaticResource MenuButton}" Click="RepairUserDataAsync" x:Name="RepairDataButton" Content="Repair Data" Padding="10,6" FontSize="12"/>
                     </WrapPanel>
                 </StackPanel>
 
