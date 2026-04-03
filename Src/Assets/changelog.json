@@ -53,5 +53,23 @@
       "Reduced popup dialog text size for better readability"
     ],
     "actions": []
+  },
+  "2.1.0": {
+    "changes": [
+      "Refresh button in series editor now refreshes full series data from AniList instead of only updating volume counts",
+      "Save button in series editor now saves volume counts along with rating, value, and publisher",
+      "Added Auto Generate button in theme settings that generates a color palette from a seed color using the Color API",
+      "Theme generation is now significantly faster with batched color updates",
+      "Generate buttons no longer require a theme name — preview colors live before saving",
+      "Added confirmation dialog before deleting a series or removing a theme",
+      "Cover image changes now show success toast or error popup instead of failing silently",
+      "Empty cover URL input now shows a helpful message instead of silently doing nothing",
+      "Added Repair Data button in settings to fix missing theme colors or corrupted data",
+      "Esc key now closes the advanced search popup",
+      "Fixed theme colors not applying correctly in MSIX builds for newer theme properties"
+    ],
+    "actions": [
+      "Use Repair Data in settings if any theme colors appear incorrect after updating"
+    ]
   }
 }
