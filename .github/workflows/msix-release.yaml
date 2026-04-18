@@ -82,7 +82,9 @@ jobs:
       uses: microsoft/setup-msbuild@v2
 
     - name: Restore NuGet Packages
-      run: dotnet restore ${{ env.AVALONIA_PROJECT_PATH }} -r win-x64
+      run: |
+        dotnet restore ${{ env.AVALONIA_PROJECT_PATH }} -r win-x64 /p:Configuration=Release /p:Platform=x64
+        msbuild ${{ env.WAP_PROJECT_PATH }} /t:Restore /p:Configuration=Release /p:Platform=x64 /p:RuntimeIdentifier=win-x64
       shell: pwsh
 
     - name: Build and Package MSIX Bundle
@@ -95,8 +97,10 @@ jobs:
 
           $msbuildArgs = @(
             $env:WAP_PROJECT_PATH,
+            '/restore',
             '/p:Configuration=Release',
             '/p:Platform=x64',
+            '/p:RuntimeIdentifier=win-x64',
             '/p:AppxPackageSigningEnabled=true',
             "/p:PackageCertificateKeyFile=$certFile",
             '/p:AppxBundle=Always',
