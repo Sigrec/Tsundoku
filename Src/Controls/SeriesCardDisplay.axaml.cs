@@ -1,9 +1,13 @@
+using Avalonia.Animation;
+using Avalonia.Animation.Easings;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using Avalonia.Styling;
 using Microsoft.Extensions.DependencyInjection;
 using Tsundoku.Helpers;
 using Tsundoku.Models;
+using Tsundoku.Services;
 using Tsundoku.ViewModels;
 using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 
@@ -42,23 +46,85 @@ public sealed partial class SeriesCardDisplay : UserControl
     }
 
     private readonly MainWindowViewModel _mainWindowViewModel;
+    private readonly IUserService _userService;
+    private Guid _loadedCoverSeriesId;
+    private bool _isAttached;
+
     public SeriesCardDisplay()
         : this(
-            // Pull the singleton MainWindowViewModel from your IServiceProvider:
             App.ServiceProvider.GetRequiredService<MainWindowViewModel>()
-            ?? throw new InvalidOperationException(
-                   "MainWindowViewModel not registered in DI container.")
+                ?? throw new InvalidOperationException("MainWindowViewModel not registered in DI container."),
+            App.ServiceProvider.GetRequiredService<IUserService>()
+                ?? throw new InvalidOperationException("IUserService not registered in DI container.")
           )
     {
-        // Note: InitializeComponent() is called in the chained ctor below.
     }
 
-    // 2) The “real” DI‐based ctor:
-    public SeriesCardDisplay(MainWindowViewModel mainWindowViewModel)
+    public SeriesCardDisplay(MainWindowViewModel mainWindowViewModel, IUserService userService)
     {
-        _mainWindowViewModel = mainWindowViewModel
-            ?? throw new ArgumentNullException(nameof(mainWindowViewModel));
+        _mainWindowViewModel = mainWindowViewModel ?? throw new ArgumentNullException(nameof(mainWindowViewModel));
+        _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         InitializeComponent();
+    }
+
+    static SeriesCardDisplay()
+    {
+        SeriesProperty.Changed.AddClassHandler<SeriesCardDisplay>((card, e) => card.OnSeriesChanged(e));
+    }
+
+    private static readonly Animation _fadeInAnimation = new()
+    {
+        Duration = TimeSpan.FromMilliseconds(650),
+        Easing = new QuadraticEaseOut(),
+        FillMode = FillMode.Forward,
+        Children =
+        {
+            new KeyFrame { Cue = new Cue(0.0), Setters = { new Setter(OpacityProperty, 0.0) } },
+            new KeyFrame { Cue = new Cue(0.3), Setters = { new Setter(OpacityProperty, 0.0) } },
+            new KeyFrame { Cue = new Cue(1.0), Setters = { new Setter(OpacityProperty, 1.0) } }
+        }
+    };
+
+    protected override void OnAttachedToVisualTree(Avalonia.VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        _isAttached = true;
+        if (Series is not null && _loadedCoverSeriesId != Series.Id)
+        {
+            _userService.LoadSeriesCover(Series.Id);
+            _loadedCoverSeriesId = Series.Id;
+        }
+
+        _ = _fadeInAnimation.RunAsync(this);
+    }
+
+    protected override void OnDetachedFromVisualTree(Avalonia.VisualTreeAttachmentEventArgs e)
+    {
+        if (_loadedCoverSeriesId != Guid.Empty)
+        {
+            _userService.ReleaseSeriesCover(_loadedCoverSeriesId);
+            _loadedCoverSeriesId = Guid.Empty;
+        }
+        _isAttached = false;
+        base.OnDetachedFromVisualTree(e);
+    }
+
+    private void OnSeriesChanged(Avalonia.AvaloniaPropertyChangedEventArgs e)
+    {
+        if (!_isAttached) return;
+
+        if (_loadedCoverSeriesId != Guid.Empty)
+        {
+            _userService.ReleaseSeriesCover(_loadedCoverSeriesId);
+            _loadedCoverSeriesId = Guid.Empty;
+        }
+
+        if (e.NewValue is Series newSeries)
+        {
+            _userService.LoadSeriesCover(newSeries.Id);
+            _loadedCoverSeriesId = newSeries.Id;
+            _ = _fadeInAnimation.RunAsync(this);
+        }
     }
 
     private async void OpenSiteLink(object? sender, PointerPressedEventArgs e)

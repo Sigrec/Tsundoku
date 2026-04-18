@@ -2,7 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+        xmlns:i="clr-namespace:Optris.Icons.Avalonia;assembly=Optris.Icons.Avalonia"
         xmlns:vm="clr-namespace:Tsundoku.ViewModels"
         xmlns:enums="clr-namespace:Tsundoku.Models.Enums"
         x:Class="Tsundoku.Views.EditSeriesInfoWindow"
@@ -18,7 +18,7 @@
             <Border Grid.Row="0" BorderThickness="0,0,0,2" BorderBrush="{DynamicResource TsundokuDividerColor}" Padding="16,12">
                 <Grid ColumnDefinitions="*,Auto">
                     <StackPanel Orientation="Horizontal" Spacing="8" ClipToBounds="True">
-                        <i:Icon Value="fa-solid fa-pen-to-square" FontSize="16" Foreground="{DynamicResource TsundokuDividerColor}"/>
+                        <i:Icon Value="fa7-solid fa7-pen-to-square" FontSize="16" Foreground="{DynamicResource TsundokuDividerColor}"/>
                         <TextBlock FontSize="18" FontWeight="ExtraBold" Foreground="{DynamicResource TsundokuUsernameColor}" VerticalAlignment="Center"
                                    TextTrimming="CharacterEllipsis">
                             <TextBlock.Text>
@@ -30,7 +30,7 @@
                     </StackPanel>
                     <Button Grid.Column="1"
                             x:Name="DeleteSeriesButton"
-                            i:Attached.Icon="fa-solid fa-trash-can"
+                            i:Attached.Icon="fa7-solid fa7-trash-can"
                             FontSize="14" Width="34" Height="34"
                             Theme="{StaticResource MenuButton}"
                             ToolTip.Tip="Delete Series"
@@ -51,7 +51,7 @@
                                  AcceptsReturn="True"
                                  TextWrapping="Wrap"
                                  BorderThickness="2"
-                                 Watermark="Notes..."
+                                 PlaceholderText="Notes..."
                                  ScrollViewer.IsScrollChainingEnabled="false"
                                  FontWeight="Bold"
                                  FontSize="13"
@@ -60,7 +60,7 @@
 
                     <!-- Current Vols / Max Vols / Volumes Read / Rating -->
                     <Grid ColumnDefinitions="*,6,*,6,*,6,*" RowDefinitions="Auto,Auto" MinWidth="460">
-                        <TextBlock Grid.Row="0" Grid.Column="0" Text="CURRENT VOLS" Classes="section-title" Margin="0,0,0,4"/>
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="CURRENT VOLS" Classes="section-title" Margin="0,0,0,4" HorizontalAlignment="Center"/>
                         <MaskedTextBox x:Name="CurVolumeMaskedTextBox"
                                        Grid.Row="1" Grid.Column="0"
                                        Height="34" HorizontalAlignment="Stretch"
@@ -71,7 +71,7 @@
                                        ToolTip.Tip="Current Volumes"
                                        Classes="Menu" Mask="###"/>
 
-                        <TextBlock Grid.Row="0" Grid.Column="2" Text="MAX VOLS" Classes="section-title" Margin="0,0,0,4"/>
+                        <TextBlock Grid.Row="0" Grid.Column="2" Text="MAX VOLS" Classes="section-title" Margin="0,0,0,4" HorizontalAlignment="Center"/>
                         <MaskedTextBox x:Name="MaxVolumeMaskedTextBox"
                                        Grid.Row="1" Grid.Column="2"
                                        Height="34" HorizontalAlignment="Stretch"
@@ -82,7 +82,7 @@
                                        ToolTip.Tip="Max Volumes"
                                        Classes="Menu" Mask="###"/>
 
-                        <TextBlock Grid.Row="0" Grid.Column="4" Text="VOLUMES READ" Classes="section-title" Margin="0,0,0,4"/>
+                        <TextBlock Grid.Row="0" Grid.Column="4" Text="{CompiledBinding VolumesReadText}" Classes="section-title" Margin="0,0,0,4" HorizontalAlignment="Center"/>
                         <MaskedTextBox x:Name="VolumesReadMaskedTextBox"
                                        Grid.Row="1" Grid.Column="4"
                                        Height="34" HorizontalAlignment="Stretch"
@@ -92,7 +92,7 @@
                                        TextAlignment="Center" MaxLength="3"
                                        Classes="Menu" Mask="000"/>
 
-                        <TextBlock Grid.Row="0" Grid.Column="6" Text="RATING" Classes="section-title" Margin="0,0,0,4"/>
+                        <TextBlock Grid.Row="0" Grid.Column="6" Text="RATING" Classes="section-title" Margin="0,0,0,4" HorizontalAlignment="Center"/>
                         <MaskedTextBox x:Name="RatingMaskedTextBox"
                                        Grid.Row="1" Grid.Column="6"
                                        Height="34" HorizontalAlignment="Stretch"
@@ -115,18 +115,18 @@
                                      FontWeight="Bold"
                                      Text="{CompiledBinding CoverImageUrl}"
                                      Classes="Menu" BorderThickness="2"
-                                     Watermark="Image URL..."/>
+                                     PlaceholderText="Image URL..."/>
                             <Button x:Name="ChangeCoverLinkButton"
                                     Grid.Column="2"
                                     FontSize="14" Width="34" Height="34"
                                     Theme="{StaticResource MenuButton}"
                                     ToolTip.Tip="Change Cover From Link"
                                     Click="ChangeCoverFromLinkAsync">
-                                <i:Icon x:Name="ChangeCoverButtonIcon" Value="fa-solid fa-circle-down" FontSize="14"/>
+                                <i:Icon x:Name="ChangeCoverButtonIcon" Value="fa7-solid fa7-circle-down" FontSize="14"/>
                             </Button>
                             <Button x:Name="ChangeCoverFileButton"
                                     Grid.Column="4"
-                                    i:Attached.Icon="fa-solid fa-image"
+                                    i:Attached.Icon="fa7-solid fa7-image"
                                     FontSize="14" Width="34" Height="34"
                                     Theme="{StaticResource MenuButton}"
                                     ToolTip.Tip="Change Cover From File"
@@ -136,7 +136,7 @@
 
                     <!-- Publisher / Value / Demographic -->
                     <Grid ColumnDefinitions="*,6,*,6,*" RowDefinitions="Auto,Auto" MinWidth="460">
-                        <TextBlock Grid.Row="0" Grid.Column="0" Text="PUBLISHER" Classes="section-title" Margin="0,0,0,4"
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="PUBLISHER" Classes="section-title" Margin="0,0,0,4" HorizontalAlignment="Center"
                                    ToolTip.Tip="{CompiledBinding Series.Publisher}"/>
                         <TextBox x:Name="PublisherTextBox"
                                  Grid.Row="1" Grid.Column="0"
@@ -146,7 +146,7 @@
                                  AcceptsReturn="False"
                                  Text="{CompiledBinding Series.Publisher, Mode=OneTime}"/>
 
-                        <TextBlock Grid.Row="0" Grid.Column="2" Text="{CompiledBinding SeriesValueText}" Classes="section-title" Margin="0,0,0,4"/>
+                        <TextBlock Grid.Row="0" Grid.Column="2" Text="{CompiledBinding SeriesValueText}" Classes="section-title" Margin="0,0,0,4" HorizontalAlignment="Center"/>
                         <MaskedTextBox x:Name="ValueMaskedTextBox"
                                        Grid.Row="1" Grid.Column="2"
                                        Height="34" HorizontalAlignment="Stretch"
@@ -157,7 +157,7 @@
                                        Mask="{CompiledBinding SeriesValueMaskedText}"
                                        Classes="Menu"/>
 
-                        <TextBlock Grid.Row="0" Grid.Column="4" Text="DEMOGRAPHIC" Classes="section-title" Margin="0,0,0,4"/>
+                        <TextBlock Grid.Row="0" Grid.Column="4" Text="DEMOGRAPHIC" Classes="section-title" Margin="0,0,0,4" HorizontalAlignment="Center"/>
                         <ComboBox x:Name="DemographicComboBox"
                                   Grid.Row="1" Grid.Column="4"
                                   ItemsSource="{x:Static enums:SeriesDemographicModel.SERIES_DEMOGRAPHIC_SET}"
@@ -187,7 +187,7 @@
                                 ToolTip.Tip="Refresh series data from AniList"
                                 Click="RefreshSeriesAsync">
                             <StackPanel Orientation="Horizontal" Spacing="6">
-                                <i:Icon Value="fa-solid fa-arrows-rotate" FontSize="13"/>
+                                <i:Icon Value="fa7-solid fa7-arrows-rotate" FontSize="13"/>
                                 <TextBlock Text="Refresh" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
@@ -196,7 +196,7 @@
                                 ToolTip.Tip="Save Stats"
                                 Click="SaveStats">
                             <StackPanel Orientation="Horizontal" Spacing="6">
-                                <i:Icon Value="fa-solid fa-floppy-disk" FontSize="13"/>
+                                <i:Icon Value="fa7-solid fa7-floppy-disk" FontSize="13"/>
                                 <TextBlock Text="Save" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
@@ -205,7 +205,7 @@
                                       Theme="{StaticResource MenuToggleButton}"
                                       Height="34" Width="34" FontSize="14"
                                       ToolTip.Tip="Favorite"
-                                      i:Attached.Icon="fa-solid fa-heart"/>
+                                      i:Attached.Icon="fa7-solid fa7-heart"/>
                     </StackPanel>
                 </StackPanel>
 

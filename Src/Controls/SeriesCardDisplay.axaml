@@ -5,7 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:m="clr-namespace:Tsundoku.Models;assembly=Tsundoku"
     xmlns:cv="clr-namespace:Tsundoku.Converters;assembly=Tsundoku"
-    xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+    xmlns:i="clr-namespace:Optris.Icons.Avalonia;assembly=Optris.Icons.Avalonia"
     xmlns:controls="clr-namespace:Tsundoku.Controls"
     x:Name="Root"
     x:DataType="controls:SeriesCardDisplay">
@@ -50,11 +50,14 @@
             CornerRadius="14"
             BorderThickness="2"
             BorderBrush="{DynamicResource TsundokuSeriesCardBorderColor}"
-            BoxShadow="0 0 15 6 #B3000000"
+            BoxShadow="0 4 13 2 #99000000"
             Width="{CompiledBinding Source={x:Static m:Constants.CARD_WIDTH}}"
             Height="{CompiledBinding Source={x:Static m:Constants.CARD_HEIGHT}}"
             UseLayoutRounding="True"
             Classes="card-hover">
+          <Border.CacheMode>
+            <BitmapCache/>
+          </Border.CacheMode>
           <Border.Styles>
             <Style Selector="Border.card-hover">
               <Setter Property="RenderTransform" Value="translate(0px, 0px)"/>
@@ -315,7 +318,7 @@
                         Grid.Column="3"
                         Theme="{DynamicResource SeriesCardButton}"
                         Margin="8,0,0,0"
-                        i:Attached.Icon="fa-solid fa-pen"
+                        i:Attached.Icon="fa7-solid fa7-pen"
                         FontSize="14"
                         Click="OpenEditSeriesInfoWindow"/>
                   </Grid>

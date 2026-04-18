@@ -3,7 +3,7 @@
         x:Class="Tsundoku.Views.SplashWindow"
         Icon="\Assets\Icons\TsundokuLogo.ico"
         WindowStartupLocation="CenterScreen"
-        SystemDecorations="None"
+        WindowDecorations="None"
         Background="Transparent"
         TransparencyLevelHint="Transparent"
         CanResize="False"

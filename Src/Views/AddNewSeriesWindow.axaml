@@ -5,7 +5,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-		xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+		xmlns:i="clr-namespace:Optris.Icons.Avalonia;assembly=Optris.Icons.Avalonia"
         x:Class="Tsundoku.Views.AddNewSeriesWindow"
 		Icon="\Assets\Icons\TsundokuLogo.ico"
         Title="Add New Series"
@@ -22,7 +22,7 @@
 			<!-- Header -->
 			<Border Grid.Row="0" BorderThickness="0,0,0,2" BorderBrush="{DynamicResource TsundokuDividerColor}" Padding="16,12">
 				<StackPanel Orientation="Horizontal" Spacing="8">
-					<i:Icon Value="fa-solid fa-square-plus" FontSize="16" Foreground="{DynamicResource TsundokuDividerColor}"/>
+					<i:Icon Value="fa7-solid fa7-square-plus" FontSize="16" Foreground="{DynamicResource TsundokuDividerColor}"/>
 					<TextBlock Text="Add New Series" FontSize="18" FontWeight="ExtraBold" Foreground="{DynamicResource TsundokuUsernameColor}" VerticalAlignment="Center"/>
 				</StackPanel>
 			</Border>
@@ -38,7 +38,7 @@
 							FontSize="13" FontWeight="Bold" Height="60"
 							Text="{CompiledBinding TitleText}" Classes="Menu"
 							BorderThickness="2" TextWrapping="Wrap"
-							Watermark="Title or AniList/MangaDex ID..."/>
+							PlaceholderText="Title or AniList/MangaDex ID..."/>
 					</StackPanel>
 
 					<Popup
@@ -110,8 +110,8 @@
 						<StackPanel Spacing="4">
 							<TextBlock Text="FORMAT" Classes="section-title"/>
 							<Grid ColumnDefinitions="*,4,*">
-								<ToggleButton x:Name="MangaButton" Checked="IsMangaButtonClicked" Theme="{StaticResource MenuToggleButton}" Content="Manga" FontSize="13" Height="34" HorizontalAlignment="Stretch"/>
-								<ToggleButton x:Name="NovelButton" Grid.Column="2" Checked="IsNovelButtonClicked" Theme="{StaticResource MenuToggleButton}" Content="Novel" FontSize="13" Height="34" HorizontalAlignment="Stretch"/>
+								<ToggleButton x:Name="MangaButton" IsCheckedChanged="IsMangaButtonClicked" Theme="{StaticResource MenuToggleButton}" Content="Manga" FontSize="13" Height="34" HorizontalAlignment="Stretch"/>
+								<ToggleButton x:Name="NovelButton" Grid.Column="2" IsCheckedChanged="IsNovelButtonClicked" Theme="{StaticResource MenuToggleButton}" Content="Novel" FontSize="13" Height="34" HorizontalAlignment="Stretch"/>
 							</Grid>
 						</StackPanel>
 						<StackPanel Grid.Column="2" Spacing="4">
@@ -139,12 +139,12 @@
 								FontSize="13" FontWeight="Bold" Height="34"
 								Text="{CompiledBinding CoverImageUrl}" Classes="Menu"
 								BorderThickness="2" ToolTip.Tip="Optional"
-								Watermark="Optional Image URL..."/>
+								PlaceholderText="Optional Image URL..."/>
 							<ToggleButton x:Name="AllowDuplicateButton" Grid.Column="1"
 								Margin="6,0,0,0" FontSize="14" Width="34" Height="34"
 								Theme="{StaticResource MenuToggleButton}"
 								ToolTip.Tip="Allow Duplicate"
-								i:Attached.Icon="fa-solid fa-clone"/>
+								i:Attached.Icon="fa7-solid fa7-clone"/>
 						</Grid>
 					</StackPanel>
 

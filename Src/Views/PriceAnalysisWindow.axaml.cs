@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using Tsundoku.ViewModels;
 using MangaAndLightNovelWebScrape;
@@ -55,14 +56,20 @@ public sealed partial class PriceAnalysisWindow : ReactiveWindow<PriceAnalysisVi
         });
     }
 
-    private void IsMangaButtonClicked(object sender, RoutedEventArgs args)
+    private void IsMangaButtonClicked(object? sender, RoutedEventArgs args)
     {
-        NovelButton.IsChecked = false;
+        if (sender is ToggleButton { IsChecked: true })
+        {
+            NovelButton.IsChecked = false;
+        }
     }
 
-    private void IsNovelButtonClicked(object sender, RoutedEventArgs args)
+    private void IsNovelButtonClicked(object? sender, RoutedEventArgs args)
     {
-        MangaButton.IsChecked = false;
+        if (sender is ToggleButton { IsChecked: true })
+        {
+            MangaButton.IsChecked = false;
+        }
     }
 
     public async void PerformAnalysis(object sender, RoutedEventArgs args)

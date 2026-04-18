@@ -3,7 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Styling;
-using Projektanker.Icons.Avalonia;
+using Optris.Icons.Avalonia;
 using Tsundoku.ViewModels;
 using Tsundoku.Views;
 
@@ -96,7 +96,7 @@ public sealed class PopupDialogService(PopupDialogViewModel viewModel) : IPopupD
             FontWeight = FontWeight.Bold,
             Height = 34,
             BorderThickness = new Thickness(2),
-            Watermark = "Enter title...",
+            PlaceholderText = "Enter title...",
         };
         inputBox.Classes.Add("Menu");
 

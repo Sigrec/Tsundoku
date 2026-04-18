@@ -254,7 +254,9 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
         .Subscribe(result =>
         {
             CultureInfo cultureInfo = CultureInfo.GetCultureInfo(AVAILABLE_CURRENCY_WITH_CULTURE[result.Currency].Culture);
-            string formattedValue = result.Value.ToString("N2", cultureInfo);
+            int decimalDigits = cultureInfo.NumberFormat.CurrencyDecimalDigits;
+            decimal displayValue = CurrencyValueHelper.ToDisplay(result.Value, cultureInfo);
+            string formattedValue = displayValue.ToString($"N{decimalDigits}", cultureInfo);
             if (cultureInfo.NumberFormat.CurrencyPositivePattern is 0 or 2) // 0 = "$n", 2 = "$ n"
             {
                 CollectionValueText = $"{result.Currency}{formattedValue}";

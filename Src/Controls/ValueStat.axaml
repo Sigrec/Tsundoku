@@ -1,6 +1,6 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-		xmlns:icon="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+		xmlns:icon="clr-namespace:Optris.Icons.Avalonia;assembly=Optris.Icons.Avalonia"
 		xmlns:vm="using:Tsundoku.ViewModels"
 		x:DataType="vm:CollectionStatsViewModel"
         xmlns:controls="using:Tsundoku.Controls">

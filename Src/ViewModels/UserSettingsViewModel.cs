@@ -146,12 +146,12 @@ public sealed partial class UserSettingsViewModel : ViewModelBase
     /// </summary>
     /// <param name="filePath">The path to the JSON file to import.</param>
     /// <param name="owner">The parent window for the loading dialog.</param>
-    public void ImportUserDataFromJson(string filePath, Window owner)
+    public async Task ImportUserDataFromJsonAsync(string filePath, Window owner)
     {
-        _loadingDialogService.Show("Importing User Data from Json", vm =>
+        await _loadingDialogService.ShowAsync("Importing User Data from Json", async vm =>
         {
             vm.IsLoadingIndeterminate = true;
-            _userService.ImportUserDataFromJson(filePath);
+            await _userService.ImportUserDataFromJsonAsync(filePath);
         }, owner);
     }
 

@@ -1,7 +1,7 @@
 using Avalonia.Rendering.Composition;
 using Avalonia.Skia;
-using Projektanker.Icons.Avalonia;
-using Projektanker.Icons.Avalonia.FontAwesome;
+using Optris.Icons.Avalonia;
+using Optris.Icons.Avalonia.FontAwesome7;
 using ReactiveUI.Avalonia;
 using static Tsundoku.Models.Constants;
 
@@ -27,7 +27,7 @@ internal sealed class Program
     public static AppBuilder BuildAvaloniaApp()
     {
         IconProvider.Current
-            .Register<FontAwesomeIconProvider>();
+            .Register<FontAwesome7IconProvider>();
 
         // Calculate GPU cache size from actual cover dimensions
         long coverTextureBytes = (long)(LEFT_SIDE_CARD_WIDTH * BITMAP_SCALE)

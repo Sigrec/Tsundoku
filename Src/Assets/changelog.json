@@ -71,5 +71,25 @@
     "actions": [
       "Use Repair Data in settings if any theme colors appear incorrect after updating"
     ]
+  },
+  "2.2.0": {
+    "changes": [
+      "Upgraded Avalonia UI framework to v12 for better rendering performance and smoother scrolling",
+      "Upgraded to Font Awesome 7 icons via the actively-maintained Optris.Icons.Avalonia library",
+      "Cover images now load lazily as you scroll instead of all at startup — near-instant launch and far lower memory use for large collections",
+      "Series cards now individually fade in on load, filter, and search instead of a single page-wide fade",
+      "Smoother scrolling on the collection view with bitmap-cached cards and a lighter drop shadow",
+      "Currency value field now adapts to the selected currency's decimal format (Yen shows whole numbers, USD shows .00, BHD shows .000)",
+      "Stored collection values preserve their digits when switching currencies — 1000.55 USD now displays as 100055 in Yen instead of 1000.55",
+      "Total value field in Add/Edit Series now supports larger amounts (two extra digits of capacity, aligned between both windows)",
+      "Volumes Read label in Edit Series now shows the current count, matching the total value label",
+      "Centered column labels above Cur Vols, Max Vols, Vols Read, Rating, Publisher, Value, and Demographic for cleaner alignment",
+      "Importing user data from JSON no longer freezes the UI on large files",
+      "App startup is faster — Discord connection now runs in parallel with loading your collection",
+      "Startup theme pre-load uses a streaming JSON reader, reducing allocations"
+    ],
+    "actions": [
+      "If your collection values were entered in a non-USD currency (like Yen or Euro), review the Total Value in Edit Series after updating — the digit-preserving conversion may display differently than before"
+    ]
   }
 }

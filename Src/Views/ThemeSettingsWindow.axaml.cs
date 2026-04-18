@@ -254,7 +254,7 @@ public sealed partial class CollectionThemeWindow : ReactiveWindow<ThemeSettings
 
     private async Task ShowDialog(string title, string info = "Unable to Add Theme")
     {
-        await _popupDialogService.ShowAsync(title, "fa-solid fa-circle-exclamation", info, this);
+        await _popupDialogService.ShowAsync(title, "fa7-solid fa7-circle-exclamation", info, this);
     }
     private async void SaveNewTheme(object sender, RoutedEventArgs args)
     {
@@ -267,7 +267,7 @@ public sealed partial class CollectionThemeWindow : ReactiveWindow<ThemeSettings
             {
                 bool confirmed = await _popupDialogService.ConfirmAsync(
                     "Overwrite Theme",
-                    "fa-solid fa-triangle-exclamation",
+                    "fa7-solid fa7-triangle-exclamation",
                     $"Theme \"{themeName}\" already exists.\nDo you want to overwrite it?",
                     this);
 
@@ -341,7 +341,7 @@ public sealed partial class CollectionThemeWindow : ReactiveWindow<ThemeSettings
         {
             bool confirmed = await _popupDialogService.ConfirmAsync(
                 "Delete Theme",
-                "fa-solid fa-triangle-exclamation",
+                "fa7-solid fa7-triangle-exclamation",
                 $"Are you sure you want to delete the \"{selectedTheme.ThemeName}\" theme?",
                 this);
 

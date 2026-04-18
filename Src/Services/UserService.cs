@@ -56,7 +56,7 @@ public interface IUserService : IDisposable
 
     /// <summary>Imports user data from an external JSON file, backing up the current data first.</summary>
     /// <param name="filePath">The path to the JSON file to import.</param>
-    void ImportUserDataFromJson(string filePath);
+    Task ImportUserDataFromJsonAsync(string filePath);
 
     /// <summary>Updates the current user's icon from the specified image file.</summary>
     /// <param name="filePath">The path to the image file to use as the user icon.</param>
@@ -138,6 +138,14 @@ public interface IUserService : IDisposable
     /// <param name="bitmap">The new cover bitmap.</param>
     void UpdateSeriesCoverBitmap(Guid seriesId, Bitmap bitmap);
 
+    /// <summary>Loads the cover bitmap for the given series on demand (reference-counted).</summary>
+    /// <param name="seriesId">The unique identifier of the series.</param>
+    void LoadSeriesCover(Guid seriesId);
+
+    /// <summary>Releases the cover bitmap for the given series (reference-counted, disposes at zero).</summary>
+    /// <param name="seriesId">The unique identifier of the series.</param>
+    void ReleaseSeriesCover(Guid seriesId);
+
     /// <summary>Removes the specified series from the user's collection and disposes it.</summary>
     /// <param name="series">The series to remove.</param>
     void RemoveSeries(Series series);
@@ -188,6 +196,10 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
 
     private readonly SourceCache<Series, Guid> _userCollectionSourceCache = new(s => s.Id);
     public IObservable<IChangeSet<Series, Guid>> UserCollectionChanges => _userCollectionSourceCache.Connect();
+
+    private readonly Dictionary<Guid, int> _coverRefCounts = [];
+    private readonly HashSet<Guid> _coversLoading = [];
+    private readonly object _coverRefLock = new();
     private readonly SourceCache<TsundokuTheme, string> _savedThemesSourceCache = new(t => t.ThemeName);
     public IObservable<IChangeSet<TsundokuTheme, string>> SavedThemeChanges => _savedThemesSourceCache.Connect();
 
@@ -366,7 +378,11 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
         return _userCollectionSourceCache.Count;
     }
 
-    private static void PreallocateSeriesImageBitmaps(SourceCache<Series, Guid> userCollection)
+    /// <summary>
+    /// Resolves cover file paths, renames non-PNG fallbacks to .png, and recycles orphaned cover files.
+    /// Does NOT materialize bitmaps — those are lazy-loaded per card via <see cref="LoadSeriesCover"/>.
+    /// </summary>
+    private static void SyncCoverFilesAndCleanupOrphans(SourceCache<Series, Guid> userCollection)
     {
         string[] coverFilesList = [ ..Directory
             .EnumerateFiles(AppFileHelper.GetCoversFolderPath(), "*.*", SearchOption.TopDirectoryOnly)];
@@ -390,44 +406,40 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
 
                 bool hasPngExtension = Path.GetExtension(curSeries.Cover).Equals(".png", StringComparison.OrdinalIgnoreCase);
                 string baseName = Path.GetFileNameWithoutExtension(curSeries.Cover);
-                Bitmap? loadedBitmap = null;
 
                 if (hasPngExtension && File.Exists(fullCoverPath))
                 {
-                    loadedBitmap = GenerateCoverBitmap(curSeries, fullCoverPath, true);
+                    continue; // File is fine; bitmap will be loaded on demand.
+                }
+
+                LOGGER.Debug("'.png' Extension file not found for {title} or File Does Not Exist, Searching for Another Valid File...", curSeries.Titles[TsundokuLanguage.Romaji]);
+                if (coverFiles.TryGetValue(baseName, out string fallbackPath))
+                {
+                    string targetPngPath = Path.ChangeExtension(fallbackPath, ".png");
+                    try
+                    {
+                        if (!string.Equals(fallbackPath, targetPngPath, StringComparison.OrdinalIgnoreCase))
+                        {
+                            File.Move(fallbackPath, targetPngPath, overwrite: true);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        LOGGER.Warn(ex, "Failed to rename fallback cover {Fallback} to {Target}", fallbackPath, targetPngPath);
+                    }
+
+                    if (!hasPngExtension)
+                    {
+                        curSeries.Cover = Path.ChangeExtension(curSeries.Cover, ".png");
+                    }
                 }
                 else
                 {
-                    LOGGER.Debug("'.png' Extension file not found for {title} or File Does Not Exist, Searching for Another Valid File...", curSeries.Titles[TsundokuLanguage.Romaji]);
-                    if (coverFiles.TryGetValue(baseName, out string fallbackPath))
+                    if (!hasPngExtension)
                     {
-                        loadedBitmap = GenerateCoverBitmap(curSeries, fallbackPath, false);
-
-                        if (hasPngExtension)
-                        {
-                            AppFileHelper.DeleteCoverFile(Path.GetFileName(fallbackPath));
-                        }
-                        else
-                        {
-                            AppFileHelper.DeleteCoverFile(curSeries.Cover);
-                            curSeries.Cover = Path.ChangeExtension(curSeries.Cover, ".png");
-                        }
+                        curSeries.Cover = Path.ChangeExtension(curSeries.Cover, ".png");
                     }
-                    else
-                    {
-                        if (!curSeries.Cover.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
-                        {
-                            curSeries.Cover = Path.ChangeExtension(curSeries.Cover, ".png");
-                        }
-                        LOGGER.Warn("{name} {format} Series cover image {image} does not exist", curSeries.Titles[TsundokuLanguage.Romaji], curSeries.Format, curSeries.Cover);
-                    }
-                }
-
-                Bitmap? oldBitmap = curSeries.CoverBitMap;
-                curSeries.CoverBitMap = loadedBitmap;
-                if (oldBitmap is not null && !ReferenceEquals(oldBitmap, loadedBitmap))
-                {
-                    oldBitmap.Dispose();
+                    LOGGER.Warn("{name} {format} Series cover image {image} does not exist", curSeries.Titles[TsundokuLanguage.Romaji], curSeries.Format, curSeries.Cover);
                 }
             }
 
@@ -455,7 +467,7 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
             }
         });
 
-        LOGGER.Info("Cover Images fully Loaded");
+        LOGGER.Info("Cover file sync complete (lazy load enabled)");
     }
 
     private static Bitmap GenerateCoverBitmap(Series series, string fullCoverPath, bool isPngExtension)
@@ -508,7 +520,7 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
         {
             _userCollectionSourceCache.Clear();
             _userCollectionSourceCache.AddOrUpdate(user!.UserCollection);
-            PreallocateSeriesImageBitmaps(_userCollectionSourceCache);
+            SyncCoverFilesAndCleanupOrphans(_userCollectionSourceCache);
         }
     }
 
@@ -537,11 +549,12 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
         return user;
     }
 
-    public void ImportUserDataFromJson(string filePath)
+    public async Task ImportUserDataFromJsonAsync(string filePath)
     {
         try
         {
-            JsonNode? uploadedUserData = JsonNode.Parse(File.ReadAllText(filePath));
+            string fileText = await File.ReadAllTextAsync(filePath);
+            JsonNode? uploadedUserData = await Task.Run(() => JsonNode.Parse(fileText));
 
             if (uploadedUserData is null)
             {
@@ -666,6 +679,117 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
             {
                 oldBitmap.Dispose();
             }
+        });
+    }
+
+    public void LoadSeriesCover(Guid seriesId)
+    {
+        bool shouldLoad;
+        lock (_coverRefLock)
+        {
+            _coverRefCounts.TryGetValue(seriesId, out int count);
+            _coverRefCounts[seriesId] = count + 1;
+            // Only kick off a load if this is the first reference and no load is in flight
+            shouldLoad = count == 0 && _coversLoading.Add(seriesId);
+        }
+
+        if (!shouldLoad) return;
+
+        Optional<Series> lookup = _userCollectionSourceCache.Lookup(seriesId);
+        if (!lookup.HasValue)
+        {
+            lock (_coverRefLock) { _coversLoading.Remove(seriesId); }
+            return;
+        }
+
+        Series series = lookup.Value;
+        if (series.CoverBitMap is not null)
+        {
+            lock (_coverRefLock) { _coversLoading.Remove(seriesId); }
+            return;
+        }
+
+        string coverPath = series.Cover;
+        string? fullCoverPath = AppFileHelper.GetFullCoverPath(coverPath);
+        if (string.IsNullOrEmpty(fullCoverPath) || !File.Exists(fullCoverPath))
+        {
+            lock (_coverRefLock) { _coversLoading.Remove(seriesId); }
+            return;
+        }
+
+        bool hasPngExtension = Path.GetExtension(coverPath).Equals(".png", StringComparison.OrdinalIgnoreCase);
+
+        _ = Task.Run(() =>
+        {
+            Bitmap? bitmap = null;
+            try
+            {
+                bitmap = GenerateCoverBitmap(series, fullCoverPath, hasPngExtension);
+            }
+            catch (Exception ex)
+            {
+                LOGGER.Warn(ex, "Failed to load cover for {Path}", fullCoverPath);
+            }
+
+            Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+            {
+                bool stillReferenced;
+                lock (_coverRefLock)
+                {
+                    _coversLoading.Remove(seriesId);
+                    stillReferenced = _coverRefCounts.TryGetValue(seriesId, out int c) && c > 0;
+                }
+
+                if (bitmap is null) return;
+
+                if (!stillReferenced)
+                {
+                    bitmap.Dispose();
+                    return;
+                }
+
+                if (series.CoverBitMap is null)
+                {
+                    series.CoverBitMap = bitmap;
+                }
+                else
+                {
+                    bitmap.Dispose();
+                }
+            });
+        });
+    }
+
+    public void ReleaseSeriesCover(Guid seriesId)
+    {
+        bool shouldDispose;
+        lock (_coverRefLock)
+        {
+            if (!_coverRefCounts.TryGetValue(seriesId, out int count))
+            {
+                return;
+            }
+
+            if (count <= 1)
+            {
+                _coverRefCounts.Remove(seriesId);
+                shouldDispose = true;
+            }
+            else
+            {
+                _coverRefCounts[seriesId] = count - 1;
+                shouldDispose = false;
+            }
+        }
+
+        if (!shouldDispose) return;
+
+        _userCollectionSourceCache.Lookup(seriesId).IfHasValue(series =>
+        {
+            Bitmap? old = series.CoverBitMap;
+            if (old is null) return;
+            series.CoverBitMap = null;
+            old.Dispose();
         });
     }
 
