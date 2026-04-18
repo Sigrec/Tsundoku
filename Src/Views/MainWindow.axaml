@@ -8,7 +8,7 @@
 		xmlns:controls="clr-namespace:Tsundoku.Controls"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-		xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+		xmlns:i="clr-namespace:Optris.Icons.Avalonia;assembly=Optris.Icons.Avalonia"
         x:Class="Tsundoku.Views.MainWindow"
         Icon="\Assets\Icons\TsundokuLogo.ico"
         Title="Tsundoku"
@@ -53,7 +53,7 @@
                             </Style>
                         </Style>
                     </Grid.Styles>
-                    <i:Icon Value="fa-solid fa-bell" FontSize="25" FontWeight="Bold" Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}" Classes="Menu"/>
+                    <i:Icon Value="fa7-solid fa7-bell" FontSize="25" FontWeight="Bold" Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}" Classes="Menu"/>
                     <TextBlock 
                         Grid.Column="2"
                         Text="{CompiledBinding NotificationText, Mode=OneWay}" 
@@ -104,7 +104,7 @@
             <Button Width="44" Height="44"
                     CornerRadius="12"
                     Theme="{StaticResource MenuButton}"
-                    i:Attached.Icon="fa-solid fa-chevron-up"
+                    i:Attached.Icon="fa7-solid fa7-chevron-up"
                     FontSize="18"
                     Cursor="Hand"
                     Click="BackToTop_Click"/>
@@ -211,7 +211,7 @@
                 <Button Width="44" Height="44"
                         CornerRadius="12"
                         Theme="{StaticResource MenuButton}"
-                        i:Attached.Icon="fa-solid fa-swatchbook"
+                        i:Attached.Icon="fa7-solid fa7-swatchbook"
                         FontSize="18"
                         Cursor="Hand"
                         Click="ToggleThemeSelector"/>
@@ -273,7 +273,7 @@
                                 VerticalAlignment="Center">
                             <Grid ColumnDefinitions="Auto,*">
                                 <i:Icon Grid.Column="0"
-                                        Value="fa-solid fa-magnifying-glass"
+                                        Value="fa7-solid fa7-magnifying-glass"
                                         FontSize="13"
                                         Foreground="{DynamicResource TsundokuSearchBarTextColor}"
                                         Opacity="0.5"
@@ -288,7 +288,7 @@
                                          Foreground="{DynamicResource TsundokuSearchBarTextColor}"
                                          CaretBrush="{DynamicResource TsundokuSearchBarTextColor}"
                                          FontWeight="Bold"
-                                         Watermark="Search collection..."
+                                         PlaceholderText="Search collection..."
                                          FontSize="13"
                                          VerticalAlignment="Center"
                                          Padding="8,2,10,0"
@@ -335,42 +335,42 @@
                                 </Style>
                             </StackPanel.Styles>
                             <ToggleButton Name="SettingsButton"
-                                    i:Attached.Icon="fa-solid fa-gear"
+                                    i:Attached.Icon="fa7-solid fa7-gear"
                                     Width="34" Height="34" FontSize="14"
                                     Theme="{StaticResource MenuToggleButton}"
                                     ToolTip.Tip="Settings"
                                     Cursor="Hand"
                                     Click="OpenSettingsDialog"/>
                             <ToggleButton Name="UserNotesButton"
-                                    i:Attached.Icon="fa-solid fa-note-sticky"
+                                    i:Attached.Icon="fa7-solid fa7-note-sticky"
                                     Width="34" Height="34" FontSize="14"
                                     Theme="{StaticResource MenuToggleButton}"
                                     ToolTip.Tip="Notes"
                                     Cursor="Hand"
                                     Click="OpenUserNotesDialog"/>
                             <ToggleButton Name="AddNewSeriesButton"
-                                    i:Attached.Icon="fa-solid fa-square-plus"
+                                    i:Attached.Icon="fa7-solid fa7-square-plus"
                                     Width="34" Height="34" FontSize="14"
                                     Theme="{StaticResource MenuToggleButton}"
                                     ToolTip.Tip="Add Series"
                                     Cursor="Hand"
                                     Click="OpenAddSeriesDialog"/>
                             <ToggleButton Name="ThemeButton"
-                                    i:Attached.Icon="fa-solid fa-swatchbook"
+                                    i:Attached.Icon="fa7-solid fa7-swatchbook"
                                     Width="34" Height="34" FontSize="14"
                                     Theme="{StaticResource MenuToggleButton}"
                                     ToolTip.Tip="Theme"
                                     Cursor="Hand"
                                     Click="OpenThemeSettingsDialog"/>
                             <ToggleButton Name="StatsButton"
-                                    i:Attached.Icon="fa-solid fa-chart-simple"
+                                    i:Attached.Icon="fa7-solid fa7-chart-simple"
                                     Width="34" Height="34" FontSize="14"
                                     Theme="{StaticResource MenuToggleButton}"
                                     ToolTip.Tip="Stats"
                                     Cursor="Hand"
                                     Click="OpenCollectionStatsDialog"/>
                             <ToggleButton Name="AnalysisButton"
-                                    i:Attached.Icon="fa-solid fa-table-list"
+                                    i:Attached.Icon="fa7-solid fa7-table-list"
                                     Width="34" Height="34" FontSize="14"
                                     Theme="{StaticResource MenuToggleButton}"
                                     ToolTip.Tip="Analysis"
@@ -378,7 +378,7 @@
                                     Click="OpenPriceAnalysisDialog"/>
                             <Button Name="DonateButton"
                                     Theme="{StaticResource MenuButton}"
-                                    i:Attached.Icon="fa-solid fa-circle-dollar-to-slot"
+                                    i:Attached.Icon="fa7-solid fa7-circle-dollar-to-slot"
                                     Width="34" Height="34" FontSize="14"
                                     ToolTip.Tip="Donate"
                                     ToolTip.Placement="Bottom"
@@ -435,7 +435,7 @@
                                     Theme="{StaticResource MenuComboBox}"/>
                             <Button Name="ClearFilterButton"
                                     Theme="{StaticResource MenuButton}"
-                                    i:Attached.Icon="fa-solid fa-xmark"
+                                    i:Attached.Icon="fa7-solid fa7-xmark"
                                     Width="24" Height="24" FontSize="11"
                                     VerticalAlignment="Center"
                                     Cursor="Hand"
@@ -458,7 +458,7 @@
                                     Theme="{StaticResource MenuComboBox}"/>
                             <Button Name="ClearPublisherFilter"
                                     Theme="{StaticResource MenuButton}"
-                                    i:Attached.Icon="fa-solid fa-xmark"
+                                    i:Attached.Icon="fa7-solid fa7-xmark"
                                     Width="24" Height="24" FontSize="11"
                                     VerticalAlignment="Center"
                                     Cursor="Hand"

@@ -1,7 +1,7 @@
 using Avalonia;
 using Avalonia.Headless;
-using Projektanker.Icons.Avalonia;
-using Projektanker.Icons.Avalonia.FontAwesome;
+using Optris.Icons.Avalonia;
+using Optris.Icons.Avalonia.FontAwesome7;
 using ReactiveUI.Avalonia;
 using Tsundoku.Tests;
 
@@ -13,7 +13,7 @@ public class AvaloniaTestSetup
     public static AppBuilder BuildAvaloniaApp()
     {
         IconProvider.Current
-            .Register<FontAwesomeIconProvider>();
+            .Register<FontAwesome7IconProvider>();
 
         return AppBuilder.Configure<App>()
         .UseHeadless(new AvaloniaHeadlessPlatformOptions())

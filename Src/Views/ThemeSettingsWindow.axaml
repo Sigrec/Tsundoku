@@ -6,7 +6,7 @@
 		xmlns:cv="clr-namespace:Tsundoku.Converters"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+        xmlns:i="clr-namespace:Optris.Icons.Avalonia;assembly=Optris.Icons.Avalonia"
         xmlns:controls="clr-namespace:Tsundoku.Controls"
         xmlns:m="clr-namespace:Tsundoku.Models"
         x:Class="Tsundoku.Views.CollectionThemeWindow"
@@ -35,7 +35,7 @@
 	<Border Classes="Menu" BorderThickness="2" CornerRadius="0,0,8,8" ClipToBounds="True">
 		<Grid RowDefinitions="Auto,*">
 			<!-- Header -->
-			<controls:WindowHeader Grid.Row="0" Icon="fa-solid fa-swatchbook" Title="Theme Settings"/>
+			<controls:WindowHeader Grid.Row="0" Icon="fa7-solid fa7-swatchbook" Title="Theme Settings"/>
 
 		<ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden" Theme="{StaticResource ReverseCollectionScroll}">
 			<StackPanel Spacing="0">
@@ -95,13 +95,13 @@
                     <TextBlock Text="THEME MANAGEMENT" Classes="section-title"/>
                     <Grid ColumnDefinitions="Auto,Auto,6,*,Auto">
                         <Button x:Name="ExportThemeButton" Content="Export" Height="34" Padding="14,0" FontSize="13" Margin="0,0,6,0"
-                                Theme="{StaticResource MenuButton}" Click="ExportThemeAsync" i:Attached.Icon="fa-solid fa-file-export"/>
+                                Theme="{StaticResource MenuButton}" Click="ExportThemeAsync" i:Attached.Icon="fa7-solid fa7-file-export"/>
                         <Button x:Name="ImportThemeButton" Grid.Column="1" Content="Import" Height="34" Padding="14,0" FontSize="13"
-                                Theme="{StaticResource MenuButton}" Click="ImportThemeAsync" i:Attached.Icon="fa-solid fa-file-import"/>
-                        <TextBox x:Name="NewThemeName" Grid.Column="3" Height="34" FontSize="13" Classes="Menu" FontWeight="Bold" BorderThickness="2" Watermark="New theme name..."/>
+                                Theme="{StaticResource MenuButton}" Click="ImportThemeAsync" i:Attached.Icon="fa7-solid fa7-file-import"/>
+                        <TextBox x:Name="NewThemeName" Grid.Column="3" Height="34" FontSize="13" Classes="Menu" FontWeight="Bold" BorderThickness="2" PlaceholderText="New theme name..."/>
                         <Button x:Name="SaveThemeButton" Grid.Column="4" Content="Save" Height="34" Padding="14,0" FontSize="13" Margin="6,0,0,0"
                                 IsEnabled="{CompiledBinding IsSaveThemeButtonEnabled}" Theme="{StaticResource MenuButton}" Click="SaveNewTheme"
-                                i:Attached.Icon="fa-solid fa-floppy-disk"/>
+                                i:Attached.Icon="fa7-solid fa7-floppy-disk"/>
                     </Grid>
                     <Grid ColumnDefinitions="*,Auto">
                         <ComboBox x:Name="ThemeSelector" SelectionChanged="ChangeMainTheme" Height="34"
@@ -112,7 +112,7 @@
                             </ComboBox.ItemTemplate>
                         </ComboBox>
                         <Button Grid.Column="1" FontSize="14" Width="34" Height="34" Margin="6,0,0,0"
-                                Theme="{StaticResource MenuButton}" i:Attached.Icon="fa-solid fa-trash" Click="RemoveSavedTheme"/>
+                                Theme="{StaticResource MenuButton}" i:Attached.Icon="fa7-solid fa7-trash" Click="RemoveSavedTheme"/>
                     </Grid>
                 </StackPanel>
 
@@ -148,17 +148,17 @@
                     </WrapPanel>
                     <StackPanel Orientation="Horizontal" Spacing="6">
                         <Button Theme="{StaticResource MenuButton}" Height="34" Padding="14,0" FontSize="13"
-                                i:Attached.Icon="fa-solid fa-eraser" Content="Clear" Click="ClearThemeValues"/>
+                                i:Attached.Icon="fa7-solid fa7-eraser" Content="Clear" Click="ClearThemeValues"/>
                         <Button Theme="{StaticResource MenuButton}" Height="34" Padding="14,0" FontSize="13"
-                                i:Attached.Icon="fa-solid fa-wand-magic-sparkles" Content="Generate 1"
+                                i:Attached.Icon="fa7-solid fa7-wand-magic-sparkles" Content="Generate 1"
                                 ToolTip.Tip="Classy style: main color for hover icons, text color for progress bar"
                                 IsEnabled="{CompiledBinding IsGenerateThemeButtonEnabled}" Click="GenerateThemeType1"/>
                         <Button Theme="{StaticResource MenuButton}" Height="34" Padding="14,0" FontSize="13"
-                                i:Attached.Icon="fa-solid fa-wand-magic-sparkles" Content="Generate 2"
+                                i:Attached.Icon="fa7-solid fa7-wand-magic-sparkles" Content="Generate 2"
                                 ToolTip.Tip="Electric Rose style: accent color for progress bar and hover icons"
                                 IsEnabled="{CompiledBinding IsGenerateThemeButtonEnabled}" Click="GenerateThemeType2"/>
                         <Button x:Name="GenerateApiButton" Theme="{StaticResource MenuButton}" Height="34" Padding="14,0" FontSize="13"
-                                i:Attached.Icon="fa-solid fa-palette" Content="Auto Generate"
+                                i:Attached.Icon="fa7-solid fa7-palette" Content="Auto Generate"
                                 ToolTip.Tip="Generate a full color palette from Main Color 1 using the Color API"
                                 Click="GenerateFromColorApiAsync"/>
                     </StackPanel>

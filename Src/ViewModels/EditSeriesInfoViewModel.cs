@@ -5,6 +5,7 @@ using System.Reactive.Linq;
 using Avalonia.Collections;
 using ReactiveUI;
 using ReactiveUI.SourceGenerators;
+using Tsundoku.Helpers;
 using Tsundoku.Models;
 using static Tsundoku.Models.Enums.SeriesDemographicModel;
 using static Tsundoku.Models.Enums.SeriesGenreModel;
@@ -23,6 +24,7 @@ public sealed partial class EditSeriesInfoViewModel : ViewModelBase, IDisposable
     [Reactive] public partial string GenresToolTipText { get; set; }
     [Reactive] public partial string SeriesValueText { get; set; }
     [Reactive] public partial string SeriesValueMaskedText { get; set; }
+    [Reactive] public partial string VolumesReadText { get; set; }
     public AvaloniaList<string> SelectedGenres { get; set; } = [];
 
     public EditSeriesInfoViewModel(Series series, IUserService userService) : base(userService)
@@ -40,13 +42,17 @@ public sealed partial class EditSeriesInfoViewModel : ViewModelBase, IDisposable
             .Subscribe(currency =>
             {
                 CultureInfo cultureInfo = CultureInfo.GetCultureInfo(AVAILABLE_CURRENCY_WITH_CULTURE[currency].Culture);
+                int decimalDigits = cultureInfo.NumberFormat.CurrencyDecimalDigits;
+                string mask = decimalDigits > 0
+                    ? "000000000000000000." + new string('0', decimalDigits)
+                    : "000000000000000000";
                 if (cultureInfo.NumberFormat.CurrencyPositivePattern is 0 or 2) // 0 = "$n", 2 = "$ n"
                 {
-                    SeriesValueMaskedText = $"{currency}0000000000000000.00";
+                    SeriesValueMaskedText = $"{currency}{mask}";
                 }
                 else
                 {
-                    SeriesValueMaskedText = $"0000000000000000.00{currency}";
+                    SeriesValueMaskedText = $"{mask}{currency}";
                 }
             })
             .DisposeWith(_disposables);
@@ -57,15 +63,22 @@ public sealed partial class EditSeriesInfoViewModel : ViewModelBase, IDisposable
             {
                 var (currency, value) = tuple;
                 CultureInfo cultureInfo = CultureInfo.GetCultureInfo(AVAILABLE_CURRENCY_WITH_CULTURE[currency].Culture);
+                decimal displayValue = CurrencyValueHelper.ToDisplay(value, cultureInfo);
+                string formatted = displayValue.ToString($"N{cultureInfo.NumberFormat.CurrencyDecimalDigits}", cultureInfo);
                 if (cultureInfo.NumberFormat.CurrencyPositivePattern is 0 or 2) // 0 = "$n", 2 = "$ n"
                 {
-                    SeriesValueText = $"{currency}{value}";
+                    SeriesValueText = $"{currency}{formatted}";
                 }
                 else
                 {
-                    SeriesValueText = $"{value}{currency}";
+                    SeriesValueText = $"{formatted}{currency}";
                 }
             })
+            .DisposeWith(_disposables);
+
+        this.WhenAnyValue(x => x.Series.VolumesRead)
+            .ObserveOn(RxSchedulers.TaskpoolScheduler)
+            .Subscribe(volumesRead => VolumesReadText = $"VOLS READ {volumesRead}")
             .DisposeWith(_disposables);
 
         SelectedGenres.CollectionChanged += SeriesGenresChanged;

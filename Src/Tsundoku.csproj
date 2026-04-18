@@ -29,7 +29,7 @@
 		<JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
 
 		<!-- Metadata — only set Version; FileVersion and AssemblyVersion are derived automatically -->
-		<Version>2.1.0</Version>
+		<Version>2.2.0</Version>
 		<RepositoryUrl>https://github.com/Sigrec/Tsundoku</RepositoryUrl>
 		<Description>Desktop Manga and Light Novel Collection App</Description>
 		<ApplicationIcon>Assets\Icons\TsundokuLogo.ico</ApplicationIcon>
@@ -96,7 +96,7 @@
 		<PackageReference Include="Microsoft.Extensions.Http" />
 		<PackageReference Include="NLog" />
 		<PackageReference Include="D2Phap.FileWatcherEx" />
-		<PackageReference Include="Projektanker.Icons.Avalonia.FontAwesome" />
+		<PackageReference Include="Optris.Icons.Avalonia.FontAwesome7" />
 		<PackageReference Include="ReactiveUI.Avalonia" />
 		<PackageReference Include="ReactiveUI.SourceGenerators" />
 		<PackageReference Include="System.Linq.Dynamic.Core" />

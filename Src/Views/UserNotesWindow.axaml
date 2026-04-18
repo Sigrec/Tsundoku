@@ -2,7 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="using:Tsundoku.ViewModels"
-        xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+        xmlns:i="clr-namespace:Optris.Icons.Avalonia;assembly=Optris.Icons.Avalonia"
         xmlns:controls="clr-namespace:Tsundoku.Controls"
         x:Class="Tsundoku.Views.UserNotesWindow"
         Title="Notes"
@@ -19,7 +19,7 @@
     <Border Classes="Menu" BorderThickness="2" CornerRadius="0,0,8,8" ClipToBounds="True">
         <Grid RowDefinitions="Auto,*">
             <!-- Header -->
-            <controls:WindowHeader Grid.Row="0" Icon="fa-solid fa-note-sticky" Title="Notes"/>
+            <controls:WindowHeader Grid.Row="0" Icon="fa7-solid fa7-note-sticky" Title="Notes"/>
 
             <!-- Notes Area -->
             <Grid Grid.Row="1" RowDefinitions="*,Auto" Margin="16">
@@ -28,7 +28,7 @@
                          FontWeight="SemiBold"
                          FontSize="{CompiledBinding NotesFontSize}"
                          TextWrapping="Wrap"
-                         Watermark="Notes..."
+                         PlaceholderText="Notes..."
                          Text="{CompiledBinding Notes}"
                          AcceptsReturn="True"
                          AcceptsTab="True"

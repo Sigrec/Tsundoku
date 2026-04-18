@@ -71,18 +71,18 @@ public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsView
     private void ToggleControlsSection(object? sender, RoutedEventArgs e)
     {
         ControlsContent.IsVisible = !ControlsContent.IsVisible;
-        ControlsChevron.Value = ControlsContent.IsVisible ? "fa-solid fa-chevron-up" : "fa-solid fa-chevron-down";
+        ControlsChevron.Value = ControlsContent.IsVisible ? "fa7-solid fa7-chevron-up" : "fa7-solid fa7-chevron-down";
     }
 
     private void ToggleYoutubersSection(object? sender, RoutedEventArgs e)
     {
         YoutubersContent.IsVisible = !YoutubersContent.IsVisible;
-        YoutubersChevron.Value = YoutubersContent.IsVisible ? "fa-solid fa-chevron-up" : "fa-solid fa-chevron-down";
+        YoutubersChevron.Value = YoutubersContent.IsVisible ? "fa7-solid fa7-chevron-up" : "fa7-solid fa7-chevron-down";
     }
 
     private async Task ShowFileErrorDialog(string info = "Unable to Open File\nCheck if it is being used by another app")
     {
-        await _popupDialogService.ShowAsync("Error", "fa-solid fa-circle-exclamation", info, this);
+        await _popupDialogService.ShowAsync("Error", "fa7-solid fa7-circle-exclamation", info, this);
     }
 
     private async Task ImportFileAsync(bool allowMultiple, string fileTypeLabel, string pattern, Func<IReadOnlyList<IStorageFile>, Task> onFilesSelected)
@@ -110,10 +110,9 @@ public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsView
 
     private async void ImportUserDataAsync(object sender, RoutedEventArgs args)
     {
-        await ImportFileAsync(false, "JSON File", "*.json", files =>
+        await ImportFileAsync(false, "JSON File", "*.json", async files =>
         {
-            ViewModel.ImportUserDataFromJson(files[0].Path.LocalPath, this);
-            return Task.CompletedTask;
+            await ViewModel.ImportUserDataFromJsonAsync(files[0].Path.LocalPath, this);
         });
     }
 
@@ -155,17 +154,17 @@ public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsView
 
             if (aniList && mangaDex)
             {
-                await _popupDialogService.ShowAsync("API Status", "fa-solid fa-circle-check", "AniList and MangaDex are both online.", this);
+                await _popupDialogService.ShowAsync("API Status", "fa7-solid fa7-circle-check", "AniList and MangaDex are both online.", this);
             }
             else if (!aniList && !mangaDex)
             {
-                await _popupDialogService.ShowAsync("API Status", "fa-solid fa-triangle-exclamation", "AniList and MangaDex are both unavailable. Adding new series, refreshing, and imports are disabled.", this);
+                await _popupDialogService.ShowAsync("API Status", "fa7-solid fa7-triangle-exclamation", "AniList and MangaDex are both unavailable. Adding new series, refreshing, and imports are disabled.", this);
             }
             else if (!aniList)
             {
                 bool enableAdd = await _popupDialogService.ConfirmAsync(
                     "API Status",
-                    "fa-solid fa-triangle-exclamation",
+                    "fa7-solid fa7-triangle-exclamation",
                     "AniList is unavailable but MangaDex is online. Refreshing series and imports remain disabled.\n\nWould you like to enable adding new series via MangaDex?",
                     this);
 
@@ -176,7 +175,7 @@ public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsView
             }
             else
             {
-                await _popupDialogService.ShowAsync("API Status", "fa-solid fa-triangle-exclamation", "MangaDex is unavailable. You can still add and refresh series using AniList.", this);
+                await _popupDialogService.ShowAsync("API Status", "fa7-solid fa7-triangle-exclamation", "MangaDex is unavailable. You can still add and refresh series using AniList.", this);
             }
         }
         finally
@@ -190,7 +189,7 @@ public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsView
     {
         bool confirmed = await _popupDialogService.ConfirmAsync(
             "Repair Data",
-            "fa-solid fa-wrench",
+            "fa7-solid fa7-wrench",
             "This will re-run the schema migration on your UserData.json and reload. Use this if theme colors or other data appear incorrect.\n\nContinue?",
             this);
 
@@ -203,7 +202,7 @@ public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsView
             await ViewModel.RepairUserDataAsync();
             await _popupDialogService.ShowAsync(
                 "Repair Complete",
-                "fa-solid fa-circle-check",
+                "fa7-solid fa7-circle-check",
                 "User data has been repaired and reloaded.",
                 this);
         }
@@ -212,7 +211,7 @@ public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsView
             LOGGER.Error(ex, "Failed to repair user data");
             await _popupDialogService.ShowAsync(
                 "Repair Failed",
-                "fa-solid fa-circle-exclamation",
+                "fa7-solid fa7-circle-exclamation",
                 "Failed to repair user data. Check logs for details.",
                 this);
         }

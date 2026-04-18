@@ -3,6 +3,7 @@ using System.Reactive.Disposables.Fluent;
 using System.Reactive.Linq;
 using Avalonia.Animation;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
@@ -97,17 +98,23 @@ public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesView
 
     private async Task ShowErrorDialog(string info = "Unable to Add Series")
     {
-        await _popupDialogService.ShowAsync("Error", "fa-solid fa-circle-exclamation", info, this);
+        await _popupDialogService.ShowAsync("Error", "fa7-solid fa7-circle-exclamation", info, this);
     }
 
-    private void IsMangaButtonClicked(object sender, RoutedEventArgs args)
+    private void IsMangaButtonClicked(object? sender, RoutedEventArgs args)
     {
-        NovelButton.IsChecked = false;
+        if (sender is ToggleButton { IsChecked: true })
+        {
+            NovelButton.IsChecked = false;
+        }
     }
 
-    private void IsNovelButtonClicked(object sender, RoutedEventArgs args)
+    private void IsNovelButtonClicked(object? sender, RoutedEventArgs args)
     {
-        MangaButton.IsChecked = false;
+        if (sender is ToggleButton { IsChecked: true })
+        {
+            MangaButton.IsChecked = false;
+        }
     }
 
     private void ClearFields()
@@ -132,7 +139,7 @@ public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesView
 
     private void SetButtonLoading(string text)
     {
-        Projektanker.Icons.Avalonia.Icon spinner = new() { Value = "fa-solid fa-arrows-rotate", FontSize = 13 };
+        Optris.Icons.Avalonia.Icon spinner = new() { Value = "fa7-solid fa7-arrows-rotate", FontSize = 13 };
         Animation rotateAnimation = new Animation
         {
             Duration = TimeSpan.FromSeconds(1),
@@ -175,7 +182,10 @@ public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesView
             string costText = CostMaskedTextBox.Text ?? string.Empty;
             _ = decimal.TryParse(
                 (costText.Length > 1 ? costText[1..] : costText).Replace("_", "0"),
-                out decimal seriesValue);
+                out decimal enteredCost);
+            System.Globalization.CultureInfo costCulture = System.Globalization.CultureInfo.GetCultureInfo(
+                Tsundoku.Models.Enums.CurrencyModel.AVAILABLE_CURRENCY_WITH_CULTURE[ViewModel.CurrentUser.Currency].Culture);
+            decimal seriesValue = CurrencyValueHelper.ToBaseline(enteredCost, costCulture);
 
             TsundokuLanguage[] requestedLanguages = ViewModel!.SelectedAdditionalLanguages.Count != 0 ? ViewModel.ConvertSelectedLangList() : [];
 
@@ -251,7 +261,7 @@ public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesView
         {
             string? enteredTitle = await _popupDialogService.InputAsync(
                 "Missing Title",
-                "fa-solid fa-language",
+                "fa7-solid fa7-language",
                 $"MangaDex doesn't have a {lang} title for \"{romajiTitle}\".\nEnter it manually or skip.",
                 this
             );

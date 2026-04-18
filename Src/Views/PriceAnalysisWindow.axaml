@@ -3,7 +3,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:vm="using:Tsundoku.ViewModels"
-		xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+		xmlns:i="clr-namespace:Optris.Icons.Avalonia;assembly=Optris.Icons.Avalonia"
 		xmlns:controls="clr-namespace:Tsundoku.Controls"
         x:Class="Tsundoku.Views.PriceAnalysisWindow"
         Icon="\Assets\Icons\TsundokuLogo.ico"
@@ -28,7 +28,7 @@
 	<Border Classes="Menu" BorderThickness="2" CornerRadius="0,0,8,8" ClipToBounds="True">
 		<Grid RowDefinitions="Auto,*">
 			<!-- Header -->
-			<controls:WindowHeader Grid.Row="0" Icon="fa-solid fa-magnifying-glass-dollar" Title="Price Analysis"/>
+			<controls:WindowHeader Grid.Row="0" Icon="fa7-solid fa7-magnifying-glass-dollar" Title="Price Analysis"/>
 
 		<Grid Grid.Row="1" ColumnDefinitions="240,12,*" Margin="16,14,16,16">
 				<!-- LEFT COLUMN: Inputs -->
@@ -37,7 +37,7 @@
 					<StackPanel Grid.Row="0" Spacing="4" Margin="0,0,0,12">
 						<TextBlock Text="SERIES TITLE" Classes="section-title"/>
 						<TextBox x:Name="SearchTextBox"
-								Watermark="Title..."
+								PlaceholderText="Title..."
 								Classes="Menu"
 								FontSize="13"
                                 Height="68"
@@ -52,13 +52,13 @@
 						<TextBlock Text="BOOK TYPE" Classes="section-title"/>
 						<UniformGrid Columns="2">
 							<ToggleButton x:Name="MangaButton"
-										  Checked="IsMangaButtonClicked"
+										  IsCheckedChanged="IsMangaButtonClicked"
 										  Theme="{StaticResource MenuToggleButton}"
 										  Height="34" Padding="14,0" FontSize="13"
 										  HorizontalAlignment="Stretch" Margin="0,0,3,0"
 										  Content="Manga"/>
 							<ToggleButton x:Name="NovelButton"
-										  Checked="IsNovelButtonClicked"
+										  IsCheckedChanged="IsNovelButtonClicked"
 										  Theme="{StaticResource MenuToggleButton}"
 										  Height="34" Padding="14,0" FontSize="13"
 										  HorizontalAlignment="Stretch" Margin="3,0,0,0"
@@ -155,7 +155,7 @@
 							IsEnabled="{CompiledBinding IsAnalyzeButtonEnabled}"
 							Click="PerformAnalysis">
 						<StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
-							<i:Icon Value="fa-solid fa-magnifying-glass" FontSize="13"/>
+							<i:Icon Value="fa7-solid fa7-magnifying-glass" FontSize="13"/>
 							<TextBlock x:Name="StartScrapeButtonText" Text="Start Analysis" VerticalAlignment="Center"/>
 						</StackPanel>
 					</Button>

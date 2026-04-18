@@ -2,7 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
-using Projektanker.Icons.Avalonia;
+using Optris.Icons.Avalonia;
 using ReactiveUI.Avalonia;
 using System.Reactive.Linq;
 using Tsundoku.Helpers;
@@ -83,11 +83,11 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
         string customImageUrl = CoverImageUrlTextBox.Text?.Trim() ?? string.Empty;
         if (string.IsNullOrWhiteSpace(customImageUrl))
         {
-            await _popupDialogService.ShowAsync("No URL", "fa-solid fa-circle-info", "No image URL provided.", this);
+            await _popupDialogService.ShowAsync("No URL", "fa7-solid fa7-circle-info", "No image URL provided.", this);
             return;
         }
 
-        ChangeCoverButtonIcon.Value = "fa-solid fa-arrow-rotate-right";
+        ChangeCoverButtonIcon.Value = "fa7-solid fa7-arrow-rotate-right";
         ChangeCoverButtonIcon.Animation = IconAnimation.Spin;
         try
         {
@@ -105,18 +105,18 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
             }
             else
             {
-                await _popupDialogService.ShowAsync("Error", "fa-solid fa-circle-exclamation", "Failed to load cover image from the provided URL.", this);
+                await _popupDialogService.ShowAsync("Error", "fa7-solid fa7-circle-exclamation", "Failed to load cover image from the provided URL.", this);
             }
         }
         catch (Exception ex)
         {
             LOGGER.Error(ex, "Failed to change cover from link");
-            await _popupDialogService.ShowAsync("Error", "fa-solid fa-circle-exclamation", "Failed to change cover image.", this);
+            await _popupDialogService.ShowAsync("Error", "fa7-solid fa7-circle-exclamation", "Failed to change cover image.", this);
         }
         finally
         {
             ChangeCoverButtonIcon.Animation = IconAnimation.None;
-            ChangeCoverButtonIcon.Value = "fa-solid fa-circle-down";
+            ChangeCoverButtonIcon.Value = "fa7-solid fa7-circle-down";
         }
     }
 
@@ -186,13 +186,18 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
         if (string.IsNullOrWhiteSpace(valueTextRaw) || !valueTextRaw.Any(char.IsDigit)) return;
 
         string valueText = valueTextRaw[1..].Replace("_", "0");
-        if (!valueText.Contains('_') && decimal.TryParse(valueText, out decimal newValue) &&
-            decimal.Compare(ViewModel.Series.Value, newValue) != 0)
+        if (decimal.TryParse(valueText, out decimal enteredValue))
         {
-            decimal oldValue = ViewModel.Series.Value;
-            ViewModel.Series.Value = newValue;
-            ValueMaskedTextBox.Clear();
-            LOGGER.Info("Updated Value for {Title} from {Old} to {New}", ViewModel.Series.Titles[TsundokuLanguage.Romaji], oldValue, newValue);
+            System.Globalization.CultureInfo cultureInfo = System.Globalization.CultureInfo.GetCultureInfo(
+                Tsundoku.Models.Enums.CurrencyModel.AVAILABLE_CURRENCY_WITH_CULTURE[ViewModel.CurrentUser.Currency].Culture);
+            decimal newValue = CurrencyValueHelper.ToBaseline(enteredValue, cultureInfo);
+            if (decimal.Compare(ViewModel.Series.Value, newValue) != 0)
+            {
+                decimal oldValue = ViewModel.Series.Value;
+                ViewModel.Series.Value = newValue;
+                ValueMaskedTextBox.Clear();
+                LOGGER.Info("Updated Value for {Title} from {Old} to {New}", ViewModel.Series.Titles[TsundokuLanguage.Romaji], oldValue, newValue);
+            }
         }
     }
 
@@ -262,7 +267,7 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
         catch (Exception ex)
         {
             LOGGER.Error(ex, "Failed to refresh series {Title}", ViewModel.Series.Titles[TsundokuLanguage.Romaji]);
-            await _popupDialogService.ShowAsync("Error", "fa-solid fa-circle-exclamation", $"Failed to refresh series.", this);
+            await _popupDialogService.ShowAsync("Error", "fa7-solid fa7-circle-exclamation", $"Failed to refresh series.", this);
         }
         finally
         {
@@ -278,7 +283,7 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
         string title = ViewModel.Series.Titles.TryGetValue(TsundokuLanguage.Romaji, out string? t) ? t : "this series";
         bool confirmed = await _popupDialogService.ConfirmAsync(
             "Delete Series",
-            "fa-solid fa-triangle-exclamation",
+            "fa7-solid fa7-triangle-exclamation",
             $"Are you sure you want to delete \"{title}\" from your collection? This cannot be undone.",
             this);
 

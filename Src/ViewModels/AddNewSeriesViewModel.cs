@@ -69,13 +69,17 @@ public sealed partial class AddNewSeriesViewModel : ViewModelBase, IDisposable
             .Subscribe(currency =>
             {
                 CultureInfo cultureInfo = CultureInfo.GetCultureInfo(AVAILABLE_CURRENCY_WITH_CULTURE[currency].Culture);
+                int decimalDigits = cultureInfo.NumberFormat.CurrencyDecimalDigits;
+                string mask = decimalDigits > 0
+                    ? "000000000000000000." + new string('0', decimalDigits)
+                    : "000000000000000000";
                 if (cultureInfo.NumberFormat.CurrencyPositivePattern is 0 or 2) // 0 = "$n", 2 = "$ n"
                 {
-                    SeriesValueMaskedText = $"{currency}0000000000000000.00";
+                    SeriesValueMaskedText = $"{currency}{mask}";
                 }
                 else
                 {
-                    SeriesValueMaskedText = $"0000000000000000.00{currency}";
+                    SeriesValueMaskedText = $"{mask}{currency}";
                 }
             })
             .DisposeWith(_disposables);

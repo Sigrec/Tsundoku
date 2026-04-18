@@ -4,7 +4,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+        xmlns:i="clr-namespace:Optris.Icons.Avalonia;assembly=Optris.Icons.Avalonia"
         xmlns:controls="clr-namespace:Tsundoku.Controls"
         x:Class="Tsundoku.Views.UserSettingsWindow"
         x:DataType="vm:UserSettingsViewModel"
@@ -82,7 +82,7 @@
     <Border Classes="Menu" BorderThickness="2" CornerRadius="0,0,8,8" ClipToBounds="True">
         <Grid RowDefinitions="Auto,*">
             <!-- Header -->
-            <controls:WindowHeader Grid.Row="0" Icon="fa-solid fa-gear" Title="Settings"/>
+            <controls:WindowHeader Grid.Row="0" Icon="fa7-solid fa7-gear" Title="Settings"/>
 
             <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Hidden" Theme="{StaticResource ReverseCollectionScroll}">
             <StackPanel>
@@ -97,8 +97,8 @@
                                  Classes="Menu"
                                  FontSize="13"
                                  MaxLength="20"
+                                 PlaceholderText="Enter New Username..."
                                  Height="34"
-                                 Watermark="Enter New Username..."
                                  BorderThickness="2"
                                  CornerRadius="9"/>
                         <Button x:Name="ChangeUsernameButton"
@@ -106,7 +106,7 @@
                                 Width="34" Height="34"
                                 Margin="6,0,0,0"
                                 Theme="{StaticResource MenuButton}"
-                                i:Attached.Icon="fa-check"
+                                i:Attached.Icon="fa7-check"
                                 FontSize="14"
                                 Click="ChangeUsername"
                                 IsEnabled="{CompiledBinding IsChangeUsernameButtonEnabled}"/>
@@ -181,14 +181,14 @@
                                 <Setter Property="ToolTip.VerticalOffset" Value="5"/>
                             </Style>
                         </WrapPanel.Styles>
-                        <Button Theme="{StaticResource MenuButton}" Click="OpenApplicationFolder" ToolTip.Tip="App Folder" i:Attached.Icon="fa-solid fa-folder-open"/>
-                        <Button Theme="{StaticResource MenuButton}" Click="OpenCoversFolder" ToolTip.Tip="Covers Folder" i:Attached.Icon="fa-solid fa-image"/>
-                        <Button Theme="{StaticResource MenuButton}" Click="OpenScreenshotsFolder" ToolTip.Tip="Screenshots" i:Attached.Icon="fa-solid fa-camera-retro"/>
-                        <Button Theme="{StaticResource MenuButton}" Click="OpenThemesFolder" ToolTip.Tip="Themes Folder" i:Attached.Icon="fa-solid fa-swatchbook"/>
-                        <Button Theme="{StaticResource MenuButton}" Click="ReportBug" ToolTip.Tip="Report Bug" i:Attached.Icon="fa-solid fa-bug"/>
-                        <Button x:Name="ExportToSpreadSheetButton" Theme="{StaticResource MenuButton}" Click="ExportToSpreadSheetAsync" ToolTip.Tip="Export CSV" i:Attached.Icon="fa-solid fa-file-csv"/>
-                        <Button Theme="{StaticResource MenuButton}" Click="OpenCoolorsSite" ToolTip.Tip="Coolors" i:Attached.Icon="fa-solid fa-palette"/>
-                        <Button Theme="{StaticResource MenuButton}" Click="JoinDiscord" ToolTip.Tip="Discord" i:Attached.Icon="fa-brands fa-discord"/>
+                        <Button Theme="{StaticResource MenuButton}" Click="OpenApplicationFolder" ToolTip.Tip="App Folder" i:Attached.Icon="fa7-solid fa7-folder-open"/>
+                        <Button Theme="{StaticResource MenuButton}" Click="OpenCoversFolder" ToolTip.Tip="Covers Folder" i:Attached.Icon="fa7-solid fa7-image"/>
+                        <Button Theme="{StaticResource MenuButton}" Click="OpenScreenshotsFolder" ToolTip.Tip="Screenshots" i:Attached.Icon="fa7-solid fa7-camera-retro"/>
+                        <Button Theme="{StaticResource MenuButton}" Click="OpenThemesFolder" ToolTip.Tip="Themes Folder" i:Attached.Icon="fa7-solid fa7-swatchbook"/>
+                        <Button Theme="{StaticResource MenuButton}" Click="ReportBug" ToolTip.Tip="Report Bug" i:Attached.Icon="fa7-solid fa7-bug"/>
+                        <Button x:Name="ExportToSpreadSheetButton" Theme="{StaticResource MenuButton}" Click="ExportToSpreadSheetAsync" ToolTip.Tip="Export CSV" i:Attached.Icon="fa7-solid fa7-file-csv"/>
+                        <Button Theme="{StaticResource MenuButton}" Click="OpenCoolorsSite" ToolTip.Tip="Coolors" i:Attached.Icon="fa7-solid fa7-palette"/>
+                        <Button Theme="{StaticResource MenuButton}" Click="JoinDiscord" ToolTip.Tip="Discord" i:Attached.Icon="fa7-brands fa7-discord"/>
                     </WrapPanel>
                 </StackPanel>
 
@@ -198,7 +198,7 @@
                     <Button Theme="{StaticResource MenuButton}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Padding="10,6" Click="ToggleControlsSection">
                         <Grid ColumnDefinitions="*,Auto">
                             <TextBlock Text="CONTROLS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}" LetterSpacing="1" VerticalAlignment="Center"/>
-                            <i:Icon Grid.Column="1" Value="fa-solid fa-chevron-down" FontSize="11" Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}" VerticalAlignment="Center" Name="ControlsChevron"/>
+                            <i:Icon Grid.Column="1" Value="fa7-solid fa7-chevron-down" FontSize="11" Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}" VerticalAlignment="Center" Name="ControlsChevron"/>
                         </Grid>
                     </Button>
                     <StackPanel Name="ControlsContent" IsVisible="False" Spacing="4" Margin="0,6,0,0">
@@ -253,7 +253,7 @@
                     <Button Theme="{StaticResource MenuButton}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Padding="10,6" Click="ToggleYoutubersSection">
                         <Grid ColumnDefinitions="*,Auto">
                             <TextBlock Text="YOUTUBERS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}" LetterSpacing="1" VerticalAlignment="Center"/>
-                            <i:Icon Grid.Column="1" Value="fa-solid fa-chevron-down" FontSize="11" Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}" VerticalAlignment="Center" Name="YoutubersChevron"/>
+                            <i:Icon Grid.Column="1" Value="fa7-solid fa7-chevron-down" FontSize="11" Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}" VerticalAlignment="Center" Name="YoutubersChevron"/>
                         </Grid>
                     </Button>
                     <WrapPanel Name="YoutubersContent" IsVisible="False">

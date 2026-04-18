@@ -215,10 +215,10 @@
                  Foreground="{DynamicResource TsundokuDividerColor}"/>
       <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="4" HorizontalAlignment="Right">
         <Button Classes="add-filter" Click="OnAddChip" ToolTip.Tip="Add filter">
-          <i:Icon Value="fa-solid fa-plus" FontSize="11"/>
+          <i:Icon Value="fa7-solid fa7-plus" FontSize="11"/>
         </Button>
         <Button Classes="add-filter" Click="OnClearAll" ToolTip.Tip="Clear all">
-          <i:Icon Value="fa-solid fa-xmark" FontSize="11"/>
+          <i:Icon Value="fa7-solid fa7-xmark" FontSize="11"/>
         </Button>
       </StackPanel>
     </DockPanel>
@@ -250,14 +250,14 @@
                             MinWidth="44"/>
                   <Rectangle Classes="chip-div"/>
                   <TextBox Text="{CompiledBinding Value, Mode=TwoWay}"
-                           Watermark="value"
+                           PlaceholderText="value"
                            IsVisible="{CompiledBinding IsValueFreeText}"/>
                   <ComboBox ItemsSource="{CompiledBinding AvailableValues}"
                             SelectedItem="{CompiledBinding Value}"
                             IsVisible="{CompiledBinding !IsValueFreeText}"/>
                   <Rectangle Classes="chip-div"/>
                   <Button Classes="chip-remove" Click="OnRemoveChip">
-                    <i:Icon Value="fa-solid fa-xmark" FontSize="9"/>
+                    <i:Icon Value="fa7-solid fa7-xmark" FontSize="9"/>
                   </Button>
                 </StackPanel>
               </Border>

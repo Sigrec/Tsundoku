@@ -1,7 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:Tsundoku.ViewModels"
-        xmlns:i="clr-namespace:Projektanker.Icons.Avalonia;assembly=Projektanker.Icons.Avalonia"
+        xmlns:i="clr-namespace:Optris.Icons.Avalonia;assembly=Optris.Icons.Avalonia"
         x:Class="Tsundoku.Views.ChangelogWindow"
         Icon="\Assets\Icons\TsundokuLogo.ico"
         WindowStartupLocation="CenterOwner"
@@ -11,7 +11,7 @@
         CanResize="False"
         Topmost="True"
         ShowInTaskbar="False"
-        SystemDecorations="None"
+        WindowDecorations="None"
         Background="Transparent"
         TransparencyLevelHint="Transparent"
         x:DataType="vm:ViewModelBase">
@@ -32,10 +32,10 @@
                         Opacity="0"
                         IsHitTestVisible="False"
                         VerticalAlignment="Center">
-                    <i:Icon Value="fa-solid fa-chevron-left" FontSize="12"/>
+                    <i:Icon Value="fa7-solid fa7-chevron-left" FontSize="12"/>
                 </Button>
                 <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
-                    <i:Icon Value="fa-solid fa-bolt" FontSize="22"
+                    <i:Icon Value="fa7-solid fa7-bolt" FontSize="22"
                             Foreground="{DynamicResource TsundokuDividerColor}"/>
                     <TextBlock x:Name="VersionHeader"
                                FontSize="22"
@@ -50,7 +50,7 @@
                         Opacity="0"
                         IsHitTestVisible="False"
                         VerticalAlignment="Center">
-                    <i:Icon Value="fa-solid fa-chevron-right" FontSize="12"/>
+                    <i:Icon Value="fa7-solid fa7-chevron-right" FontSize="12"/>
                 </Button>
             </Grid>
 
@@ -63,7 +63,7 @@
 
             <!-- Row 2: Changes label -->
             <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="6" Margin="0,0,0,6">
-                <i:Icon Value="fa-solid fa-star" FontSize="11"
+                <i:Icon Value="fa7-solid fa7-star" FontSize="11"
                         Foreground="{DynamicResource TsundokuDividerColor}"/>
                 <TextBlock Text="CHANGES"
                            FontSize="11"
@@ -117,7 +117,7 @@
                         CornerRadius="1"
                         Opacity="0.3"/>
                 <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,4,0,0">
-                    <i:Icon Value="fa-solid fa-circle-exclamation" FontSize="11"
+                    <i:Icon Value="fa7-solid fa7-circle-exclamation" FontSize="11"
                             Foreground="{DynamicResource TsundokuSeriesProgressBarColor}"/>
                     <TextBlock Text="RECOMMENDED ACTIONS"
                                FontSize="11"
@@ -130,7 +130,7 @@
                         <DataTemplate x:DataType="x:String">
                             <Grid ColumnDefinitions="Auto,*" Margin="0,3">
                                 <i:Icon Grid.Column="0"
-                                        Value="fa-solid fa-arrow-right"
+                                        Value="fa7-solid fa7-arrow-right"
                                         FontSize="10"
                                         VerticalAlignment="Top"
                                         Margin="0,4,10,0"

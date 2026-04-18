@@ -19,7 +19,6 @@ using System.Reactive.Disposables;
 using System.Reactive.Disposables.Fluent;
 using System.Collections.Specialized;
 using Tsundoku.Services;
-using Avalonia.Animation;
 using Avalonia.Media.Transformation;
 using Avalonia.Styling;
 
@@ -125,7 +124,7 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
                     {
                         await _popupDialogService.ShowAsync(
                             "API Outage",
-                            "fa-solid fa-triangle-exclamation",
+                            "fa7-solid fa7-triangle-exclamation",
                             "AniList and MangaDex APIs are currently unavailable. Adding new series, refreshing series, and importing from Libib or Goodreads have been disabled until AniList is back online.",
                             this);
                     }
@@ -133,7 +132,7 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
                     {
                         bool enableAdd = await _popupDialogService.ConfirmAsync(
                             "API Outage",
-                            "fa-solid fa-triangle-exclamation",
+                            "fa7-solid fa7-triangle-exclamation",
                             "AniList API is currently unavailable. Refreshing series and importing from Libib or Goodreads have been disabled.\n\nMangaDex is online — would you like to enable adding new series via MangaDex?",
                             this);
 
@@ -146,7 +145,7 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
                     {
                         await _popupDialogService.ShowAsync(
                             "API Outage",
-                            "fa-solid fa-triangle-exclamation",
+                            "fa7-solid fa7-triangle-exclamation",
                             "AniList API is currently unavailable. Adding new series, refreshing series, and importing from Libib or Goodreads have been disabled until it is back online.",
                             this);
                     }
@@ -154,7 +153,7 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
                     {
                         await _popupDialogService.ShowAsync(
                             "API Outage",
-                            "fa-solid fa-triangle-exclamation",
+                            "fa7-solid fa7-triangle-exclamation",
                             "MangaDex API is currently unavailable. You can still add and refresh series using AniList.",
                             this);
                     }
@@ -164,7 +163,7 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
                     {
                         await _popupDialogService.ShowAsync(
                             "APIs Restored",
-                            "fa-solid fa-circle-check",
+                            "fa7-solid fa7-circle-check",
                             "AniList and MangaDex APIs are back online. All features have been re-enabled.",
                             this);
                     }
@@ -172,7 +171,7 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
                     {
                         await _popupDialogService.ShowAsync(
                             "API Restored",
-                            "fa-solid fa-circle-check",
+                            "fa7-solid fa7-circle-check",
                             "AniList API is back online. All features have been re-enabled.",
                             this);
                     }
@@ -180,7 +179,7 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
                     {
                         await _popupDialogService.ShowAsync(
                             "API Restored",
-                            "fa-solid fa-circle-check",
+                            "fa7-solid fa7-circle-check",
                             "MangaDex API is back online.",
                             this);
                     }
@@ -192,36 +191,7 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
                 .DisposeWith(disposables);
         });
 
-        // Fade in the cards once first realized (collection background stays visible)
-        CollectionItems.Opacity = 0;
-        bool _hasAnimated = false;
-        CollectionItems.ElementPrepared += (s, e) =>
-        {
-            if (_hasAnimated) return;
-            _hasAnimated = true;
-
-            // Wait for layout + render to fully complete before starting fade
-            Dispatcher.UIThread.Post(async () =>
-            {
-                // Allow multiple layout passes to complete so all visible cards are rendered
-                await Task.Delay(100);
-
-                Animation animation = new Animation
-                {
-                    Duration = TimeSpan.FromMilliseconds(600),
-                    Easing = new Avalonia.Animation.Easings.SineEaseInOut(),
-                    FillMode = FillMode.Forward,
-                    Children =
-                    {
-                        new KeyFrame { Cue = new Cue(0), Setters = { new Setter(OpacityProperty, 0.0) } },
-                        new KeyFrame { Cue = new Cue(1), Setters = { new Setter(OpacityProperty, 1.0) } }
-                    }
-                };
-                await animation.RunAsync(CollectionItems);
-            }, DispatcherPriority.Background);
-        };
-
-        KeyDown += async (s, e) =>
+KeyDown += async (s, e) =>
         {
             if (e.Key == Key.F11) // Fullscreen
             {

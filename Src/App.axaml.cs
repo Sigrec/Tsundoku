@@ -54,14 +54,15 @@ public sealed partial class App : Application
         {
             LOGGER.Info("Application starting up.");
 
-            // Pre-load theme before splash so it uses correct colors
+            // Pre-load theme before splash so it uses correct colors.
+            // FileStream + JsonDocument.Parse(stream) skips the intermediate UTF-16 string allocation.
             try
             {
                 string userDataPath = AppFileHelper.GetFilePath("UserData.json");
                 if (File.Exists(userDataPath))
                 {
-                    string json = File.ReadAllText(userDataPath);
-                    using JsonDocument doc = JsonDocument.Parse(json);
+                    using FileStream stream = new(userDataPath, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize: 4096, options: FileOptions.SequentialScan);
+                    using JsonDocument doc = JsonDocument.Parse(stream);
                     if (doc.RootElement.TryGetProperty("MainTheme", out JsonElement mainThemeEl))
                     {
                         string? mainTheme = mainThemeEl.GetString();
@@ -124,15 +125,16 @@ public sealed partial class App : Application
                     ConfigureServices(services);
                     ServiceProvider = services.BuildServiceProvider();
 
-                    splash.UpdateStatus("Connecting to Discord");
-                    DiscordRP.Initialize();
-
                     splash.UpdateStatus("Loading user data");
                     IUserService userService = ServiceProvider.GetRequiredService<IUserService>();
 
+                    // Discord connection and user-data load are independent — run them concurrently.
+                    Task discordInitTask = Task.Run(DiscordRP.Initialize);
+                    Task userDataTask = userService.LoadUserDataAsync();
+
                     try
                     {
-                        await userService.LoadUserDataAsync();
+                        await userDataTask;
                     }
                     catch (Exception ex)
                     {
@@ -140,6 +142,11 @@ public sealed partial class App : Application
                         desktop.Shutdown(1);
                         return;
                     }
+
+                    // Discord is non-critical — don't fail startup if it errors.
+                    _ = discordInitTask.ContinueWith(
+                        t => LOGGER.Warn(t.Exception, "Discord RPC initialization failed"),
+                        TaskContinuationOptions.OnlyOnFaulted);
 
                     splash.UpdateStatus("Applying theme");
                     IThemeResourceService themeResourceService = ServiceProvider.GetRequiredService<IThemeResourceService>();
