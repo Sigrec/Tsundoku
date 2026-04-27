@@ -72,7 +72,7 @@ public sealed partial class App : Application
                             {
                                 if (themeEl.TryGetProperty("ThemeName", out JsonElement nameEl) && nameEl.GetString() == mainTheme)
                                 {
-                                    TsundokuTheme? theme = JsonSerializer.Deserialize<TsundokuTheme>(themeEl.GetRawText());
+                                    TsundokuTheme? theme = themeEl.Deserialize(TsundokuThemeModelContext.Default.TsundokuTheme);
                                     if (theme is not null)
                                     {
                                         ThemeResourceService svc = new();

@@ -63,8 +63,7 @@ public sealed partial class EditSeriesInfoViewModel : ViewModelBase, IDisposable
             {
                 var (currency, value) = tuple;
                 CultureInfo cultureInfo = CultureInfo.GetCultureInfo(AVAILABLE_CURRENCY_WITH_CULTURE[currency].Culture);
-                decimal displayValue = CurrencyValueHelper.ToDisplay(value, cultureInfo);
-                string formatted = displayValue.ToString($"N{cultureInfo.NumberFormat.CurrencyDecimalDigits}", cultureInfo);
+                string formatted = value.ToString($"N{cultureInfo.NumberFormat.CurrencyDecimalDigits}", cultureInfo);
                 if (cultureInfo.NumberFormat.CurrencyPositivePattern is 0 or 2) // 0 = "$n", 2 = "$ n"
                 {
                     SeriesValueText = $"{currency}{formatted}";

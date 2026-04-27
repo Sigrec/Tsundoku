@@ -11,8 +11,8 @@
     <PackageVersion Include="Avalonia.Themes.Fluent" Version="12.0.1" />
     <PackageVersion Include="Avalonia.Controls.DataGrid" Version="12.0.0" />
     <PackageVersion Include="Avalonia.Headless.NUnit" Version="12.0.1" />
-    <PackageVersion Include="ReactiveUI.Avalonia" Version="11.4.12" />
-    <PackageVersion Include="ReactiveUI.SourceGenerators" Version="2.6.1" />
+    <PackageVersion Include="ReactiveUI.Avalonia" Version="12.0.1" />
+    <PackageVersion Include="ReactiveUI.SourceGenerators" Version="2.6.30" />
   </ItemGroup>
   <ItemGroup Label="Application">
     <PackageVersion Include="CsvHelper" Version="33.1.0" />
@@ -21,14 +21,15 @@
     <PackageVersion Include="GraphQL.Client" Version="6.1.0" />
     <PackageVersion Include="GraphQL.Client.Serializer.SystemTextJson" Version="6.1.0" />
     <PackageVersion Include="MangaAndLightNovelWebScrape" Version="5.0.2" />
-    <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.6" />
+    <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.7" />
     <PackageVersion Include="NLog" Version="6.1.2" />
     <PackageVersion Include="D2Phap.FileWatcherEx" Version="3.0.0" />
-    <PackageVersion Include="Optris.Icons.Avalonia.FontAwesome7" Version="12.0.5" />
+    <PackageVersion Include="Optris.Icons.Avalonia.FontAwesome7" Version="12.0.6" />
     <PackageVersion Include="System.Linq.Dynamic.Core" Version="1.7.2" />
-    <PackageVersion Include="System.Drawing.Common" Version="10.0.6" />
+    <PackageVersion Include="System.Drawing.Common" Version="10.0.7" />
     <PackageVersion Include="TextCopy" Version="6.2.1" />
     <PackageVersion Include="LiveChartsCore.SkiaSharpView.Avalonia" Version="2.1.0-dev-292" />
+    <PackageVersion Include="Microsoft.IO.RecyclableMemoryStream" Version="3.0.1" />
     <PackageVersion Include="ZLinq" Version="1.5.6" />
   </ItemGroup>
   <ItemGroup Label="Testing">
@@ -39,5 +40,9 @@
   </ItemGroup>
   <ItemGroup Label="Packaging">
     <PackageVersion Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.1721" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageVersion Include="System.Private.Uri" Version="4.3.2" />
+    <PackageVersion Include="System.Text.RegularExpressions" Version="4.3.1" />
   </ItemGroup>
 </Project>

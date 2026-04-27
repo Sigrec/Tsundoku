@@ -16,10 +16,12 @@
 		<PublishTrimmed>true</PublishTrimmed>
 		<TrimMode>partial</TrimMode>
 		<PublishReadyToRun>true</PublishReadyToRun>
-		<Optimize>true</Optimize>
 		<SelfContained>true</SelfContained>
         <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
         <InvariantGlobalization>false</InvariantGlobalization> <!-- Set to true to get add series to fail -->
+
+		<Deterministic>true</Deterministic>
+		<ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
 
 		<!-- Misc -->
 		<StartupObject>Tsundoku.Program</StartupObject>
@@ -29,7 +31,7 @@
 		<JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
 
 		<!-- Metadata — only set Version; FileVersion and AssemblyVersion are derived automatically -->
-		<Version>2.2.0</Version>
+		<Version>2.2.1</Version>
 		<RepositoryUrl>https://github.com/Sigrec/Tsundoku</RepositoryUrl>
 		<Description>Desktop Manga and Light Novel Collection App</Description>
 		<ApplicationIcon>Assets\Icons\TsundokuLogo.ico</ApplicationIcon>
@@ -40,8 +42,7 @@
 	</PropertyGroup>
 
     <PropertyGroup>
-        <!-- Suppress trimming warnings for ReactiveUI reflection usage -->
-        <NoWarn>$(NoWarn);IL2026;IL3050;AVLN3001</NoWarn>
+        <NoWarn>$(NoWarn);IL2026;AVLN3001</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
@@ -94,11 +95,15 @@
 		<PackageReference Include="GraphQL.Client.Serializer.SystemTextJson" />
 		<PackageReference Include="MangaAndLightNovelWebScrape" />
 		<PackageReference Include="Microsoft.Extensions.Http" />
+		<PackageReference Include="Microsoft.IO.RecyclableMemoryStream" />
 		<PackageReference Include="NLog" />
 		<PackageReference Include="D2Phap.FileWatcherEx" />
 		<PackageReference Include="Optris.Icons.Avalonia.FontAwesome7" />
 		<PackageReference Include="ReactiveUI.Avalonia" />
-		<PackageReference Include="ReactiveUI.SourceGenerators" />
+		<PackageReference Include="ReactiveUI.SourceGenerators">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 		<PackageReference Include="System.Linq.Dynamic.Core" />
 		<PackageReference Include="System.Drawing.Common" />
 		<PackageReference Include="TextCopy" />

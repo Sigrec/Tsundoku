@@ -186,11 +186,8 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
         if (string.IsNullOrWhiteSpace(valueTextRaw) || !valueTextRaw.Any(char.IsDigit)) return;
 
         string valueText = valueTextRaw[1..].Replace("_", "0");
-        if (decimal.TryParse(valueText, out decimal enteredValue))
+        if (decimal.TryParse(valueText, out decimal newValue))
         {
-            System.Globalization.CultureInfo cultureInfo = System.Globalization.CultureInfo.GetCultureInfo(
-                Tsundoku.Models.Enums.CurrencyModel.AVAILABLE_CURRENCY_WITH_CULTURE[ViewModel.CurrentUser.Currency].Culture);
-            decimal newValue = CurrencyValueHelper.ToBaseline(enteredValue, cultureInfo);
             if (decimal.Compare(ViewModel.Series.Value, newValue) != 0)
             {
                 decimal oldValue = ViewModel.Series.Value;

@@ -62,7 +62,7 @@
                     Margin="0,0,0,5"/>
 
             <!-- Row 2: Changes label -->
-            <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="6" Margin="0,0,0,6">
+            <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="6" Margin="0,12,0,6">
                 <i:Icon Value="fa7-solid fa7-star" FontSize="11"
                         Foreground="{DynamicResource TsundokuDividerColor}"/>
                 <TextBlock Text="CHANGES"
@@ -116,7 +116,7 @@
                         Background="{DynamicResource TsundokuDividerColor}"
                         CornerRadius="1"
                         Opacity="0.3"/>
-                <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,4,0,0">
+                <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,12,0,0">
                     <i:Icon Value="fa7-solid fa7-circle-exclamation" FontSize="11"
                             Foreground="{DynamicResource TsundokuSeriesProgressBarColor}"/>
                     <TextBlock Text="RECOMMENDED ACTIONS"

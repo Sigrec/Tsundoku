@@ -846,7 +846,7 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
         UpdateUser(user => user.MainTheme = themeName);
     }
 
-    [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "<Pending>")]
+    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "User.JSON_SERIALIZATION_OPTIONS uses the UserModelContext source-gen resolver, so this options-based call is trim-safe at runtime.")]
     public void SaveUserData(User user)
     {
         if (user is null) return;
@@ -867,13 +867,13 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
         }
     }
 
-    [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "<Pending>")]
+    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "User.JSON_SERIALIZATION_OPTIONS uses the UserModelContext source-gen resolver, so this options-based call is trim-safe at runtime.")]
     public void SaveUserData()
     {
         SaveUserData(GetCurrentUserSnapshot());
     }
 
-    [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "<Pending>")]
+    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "User.JSON_SERIALIZATION_OPTIONS uses the UserModelContext source-gen resolver, so this options-based call is trim-safe at runtime.")]
     public void SaveBackupUserData()
     {
         User? user = GetCurrentUserSnapshot();

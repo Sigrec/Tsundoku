@@ -182,10 +182,7 @@ public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesView
             string costText = CostMaskedTextBox.Text ?? string.Empty;
             _ = decimal.TryParse(
                 (costText.Length > 1 ? costText[1..] : costText).Replace("_", "0"),
-                out decimal enteredCost);
-            System.Globalization.CultureInfo costCulture = System.Globalization.CultureInfo.GetCultureInfo(
-                Tsundoku.Models.Enums.CurrencyModel.AVAILABLE_CURRENCY_WITH_CULTURE[ViewModel.CurrentUser.Currency].Culture);
-            decimal seriesValue = CurrencyValueHelper.ToBaseline(enteredCost, costCulture);
+                out decimal seriesValue);
 
             TsundokuLanguage[] requestedLanguages = ViewModel!.SelectedAdditionalLanguages.Count != 0 ? ViewModel.ConvertSelectedLangList() : [];
 
