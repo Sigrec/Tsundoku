@@ -91,5 +91,18 @@
     "actions": [
       "If your collection values were entered in a non-USD currency (like Yen or Euro), review the Total Value in Edit Series after updating — the digit-preserving conversion may display differently than before"
     ]
+  },
+  "2.2.1": {
+    "changes": [
+      "Currency values now display in the active currency's natural decimal format — a stored value of 2160.00 shows as ¥2,160 in Yen instead of ¥216,000 (reverses the digit-shifting introduced in 2.2.0)",
+      "Cover images now decode directly at the target display size instead of loading the full source resolution — faster cover loads and far lower memory use when adding or refreshing series",
+      "PNG export for screenshots and cover round-trips uses a pooled buffer manager, reducing GC pressure on large collections",
+      "Incomplete filter no longer flags series whose max volume count is unset",
+      "Startup theme pre-load and changelog parsing now use source-generated JSON for a faster launch and less allocation churn",
+      "Bumped ReactiveUI.Avalonia to 12.0.1 alongside related dependency updates"
+    ],
+    "actions": [
+      "Open Edit Series for any item whose Total Value was entered in a non-USD currency on 2.2.0 — the value now displays in the currency's natural format and may differ from what you saw before"
+    ]
   }
 }
