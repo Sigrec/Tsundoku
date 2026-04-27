@@ -72,7 +72,7 @@ public sealed partial class User : ReactiveObject
     /// Serializes this user instance to a JSON string using the shared serialization options.
     /// </summary>
     /// <returns>A JSON string representing the user data.</returns>
-    [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "<Pending>")]
+    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "JSON_SERIALIZATION_OPTIONS clones UserModelContext.Default.Options, so the source-gen resolver handles every type. The IL2026 warning on the options-based overload is spurious here.")]
     public string Serialize()
     {
         return JsonSerializer.Serialize(this, JSON_SERIALIZATION_OPTIONS);

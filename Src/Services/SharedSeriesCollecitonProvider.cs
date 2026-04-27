@@ -79,7 +79,7 @@ public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISh
     {
         _userService = userService ?? throw new ArgumentNullException(nameof(userService));
 
-        // 1. Define the text search filter predicate (pre-lowercase for faster ordinal comparison)
+        // 1. Define the text search filter predicate
         IObservable<Func<Series, bool>> textFilter = this.WhenAnyValue(x => x.SeriesFilterText)
             .DistinctUntilChanged()
             .Throttle(TimeSpan.FromMilliseconds(400))
@@ -88,13 +88,12 @@ public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISh
                 if (string.IsNullOrWhiteSpace(searchText))
                     return series => true; // No filter if search text is empty
 
-                string lowerSearch = searchText.ToLowerInvariant();
                 return (Func<Series, bool>)(series =>
                 {
                     return
-                        series.Titles.AsValueEnumerable().Any(t => t.Value.Contains(lowerSearch, StringComparison.OrdinalIgnoreCase)) ||
-                        series.Staff.AsValueEnumerable().Any(t => t.Value.Contains(lowerSearch, StringComparison.OrdinalIgnoreCase)) ||
-                        series.Publisher.Contains(lowerSearch, StringComparison.OrdinalIgnoreCase);
+                        series.Titles.AsValueEnumerable().Any(t => t.Value.Contains(searchText, StringComparison.OrdinalIgnoreCase)) ||
+                        series.Staff.AsValueEnumerable().Any(t => t.Value.Contains(searchText, StringComparison.OrdinalIgnoreCase)) ||
+                        series.Publisher.Contains(searchText, StringComparison.OrdinalIgnoreCase);
                 });
             });
 

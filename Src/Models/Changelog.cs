@@ -8,6 +8,10 @@ namespace Tsundoku.Models;
 /// </summary>
 public sealed record ChangelogEntry(string[] Changes, string[] Actions);
 
+[JsonSerializable(typeof(Dictionary<string, ChangelogEntry>))]
+[JsonSourceGenerationOptions(PropertyNameCaseInsensitive = true)]
+internal partial class ChangelogModelContext : JsonSerializerContext { }
+
 /// <summary>
 /// Provides access to embedded changelog entries and version-based display logic.
 /// </summary>
@@ -27,7 +31,7 @@ public static class Changelog
                 .First(n => n.EndsWith("changelog.json", StringComparison.Ordinal));
 
             using Stream stream = assembly.GetManifestResourceStream(resourceName)!;
-            Dictionary<string, ChangelogEntry>? data = JsonSerializer.Deserialize<Dictionary<string, ChangelogEntry>>(stream, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            Dictionary<string, ChangelogEntry>? data = JsonSerializer.Deserialize(stream, ChangelogModelContext.Default.DictionaryStringChangelogEntry);
             return data?.AsValueEnumerable().ToFrozenDictionary(StringComparer.Ordinal)
                 ?? FrozenDictionary<string, ChangelogEntry>.Empty;
         }

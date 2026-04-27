@@ -1,4 +1,5 @@
 using Avalonia.Media.Imaging;
+using Microsoft.IO;
 
 namespace Tsundoku.Helpers;
 
@@ -8,6 +9,7 @@ namespace Tsundoku.Helpers;
 public sealed class BitmapHelper
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
+    private static readonly RecyclableMemoryStreamManager StreamManager = new();
     private readonly IHttpClientFactory _httpClientFactory;
 
     /// <summary>
@@ -37,13 +39,11 @@ public sealed class BitmapHelper
         try
         {
             LOGGER.Debug("Attempting to load image from local path: {SourceFilePath}", sourceFilePath);
-            // Avalonia Bitmap constructor can load directly from a file path
-            using (Bitmap loadedBitmap = new Bitmap(sourceFilePath))
-            {
-                LOGGER.Debug("Image loaded from local path. Dimensions: {Width}x{Height}", loadedBitmap.PixelSize.Width, loadedBitmap.PixelSize.Height);
-                // ProcessAndSaveBitmap is synchronous, so it runs within this Task.Run context
-                return ProcessAndSaveBitmap(loadedBitmap, destinationCoverPath, sourceFilePath);
-            }
+            int targetWidth = LEFT_SIDE_CARD_WIDTH * BITMAP_SCALE;
+            using FileStream fileStream = new(sourceFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize: 4096, options: FileOptions.SequentialScan);
+            Bitmap decoded = Bitmap.DecodeToWidth(fileStream, targetWidth, BitmapInterpolationMode.HighQuality);
+            LOGGER.Debug("Image decoded at target width. Dimensions: {Width}x{Height}", decoded.PixelSize.Width, decoded.PixelSize.Height);
+            return SaveBitmap(decoded, destinationCoverPath, sourceFilePath);
         }
         catch (FileNotFoundException)
         {
@@ -104,13 +104,14 @@ public sealed class BitmapHelper
             }
 
             await using Stream stream = await response.Content.ReadAsStreamAsync();
-            await using MemoryStream memoryStream = new MemoryStream();
-            await stream.CopyToAsync(memoryStream);
-            memoryStream.Seek(0, SeekOrigin.Begin);
+            await using RecyclableMemoryStream buffer = StreamManager.GetStream(nameof(UpdateCoverFromUrlAsync));
+            await stream.CopyToAsync(buffer);
+            buffer.Position = 0;
 
-            using Bitmap originalBitmap = new Bitmap(memoryStream);
-            LOGGER.Debug("Bitmap loaded. Dimensions: {Width}x{Height}", originalBitmap.PixelSize.Width, originalBitmap.PixelSize.Height);
-            return ProcessAndSaveBitmap(originalBitmap, destinationCoverPath, imageUri.OriginalString);
+            int targetWidth = LEFT_SIDE_CARD_WIDTH * BITMAP_SCALE;
+            Bitmap decoded = Bitmap.DecodeToWidth(buffer, targetWidth, BitmapInterpolationMode.HighQuality);
+            LOGGER.Debug("Bitmap decoded at target width. Dimensions: {Width}x{Height}", decoded.PixelSize.Width, decoded.PixelSize.Height);
+            return SaveBitmap(decoded, destinationCoverPath, imageUri.OriginalString);
         }
         catch (ArgumentException argEx)
         {
@@ -125,41 +126,17 @@ public sealed class BitmapHelper
     }
 
     /// <summary>
-    /// Private helper method to scale an Avalonia Bitmap to a standard size and save it as a PNG.
+    /// Persists a bitmap to disk as a PNG. The bitmap is assumed to already be at the desired dimensions
+    /// (decoded via <see cref="Bitmap.DecodeToWidth(Stream, int, BitmapInterpolationMode)"/>).
     /// </summary>
-    /// <param name="originalBitmap">The bitmap to process and save.</param>
-    /// <param name="savePath">The path where the scaled image should be saved.</param>
+    /// <param name="bitmap">The bitmap to save. Ownership transfers to the caller on success.</param>
+    /// <param name="savePath">The path where the image should be saved.</param>
     /// <param name="sourceIdentifier">A string identifying the source (e.g., file path or URL) for logging purposes.</param>
-    /// <returns>The generated and scaled Avalonia Bitmap, or null if scaling or saving fails.</returns>
-    private static Bitmap? ProcessAndSaveBitmap(Bitmap originalBitmap, string savePath, string sourceIdentifier)
+    /// <returns>The same <paramref name="bitmap"/> instance on success, or null on failure (the bitmap is disposed).</returns>
+    private static Bitmap? SaveBitmap(Bitmap bitmap, string savePath, string sourceIdentifier)
     {
-        Bitmap? scaledBitmap = null;
-        int targetWidth = LEFT_SIDE_CARD_WIDTH * BITMAP_SCALE;
-        int targetHeight = IMAGE_HEIGHT * BITMAP_SCALE;
         try
         {
-            if (originalBitmap.PixelSize.Width != targetWidth || originalBitmap.PixelSize.Height != targetHeight)
-            {
-                LOGGER.Debug("Scaling bitmap from {Width}x{Height} to {TargetWidth}x{TargetHeight} for {Source}.",
-                    originalBitmap.PixelSize.Width, originalBitmap.PixelSize.Height,
-                    targetWidth, targetHeight,
-                    sourceIdentifier);
-
-                scaledBitmap = originalBitmap.CreateScaledBitmap(
-                    new PixelSize(targetWidth, targetHeight),
-                    BitmapInterpolationMode.HighQuality);
-            }
-            else
-            {
-                LOGGER.Debug("Bitmap already at target size for {Source}. No scaling needed.", sourceIdentifier);
-                // Create a copy so the caller owns a distinct instance that won't be
-                // disposed when the original bitmap's using block ends.
-                scaledBitmap = originalBitmap.CreateScaledBitmap(
-                    originalBitmap.PixelSize,
-                    BitmapInterpolationMode.HighQuality);
-            }
-
-            // Ensure the directory exists
             string? directory = Path.GetDirectoryName(savePath);
             if (!string.IsNullOrWhiteSpace(directory) && !Directory.Exists(directory))
             {
@@ -167,17 +144,14 @@ public sealed class BitmapHelper
                 LOGGER.Debug("Created directory: {DirectoryPath}", directory);
             }
 
-            // Save the bitmap (whether scaled or original)
-            // Avalonia Bitmap.Save handles various image formats; 100 usually means best quality for PNG.
-            scaledBitmap.Save(savePath, 100);
+            bitmap.Save(savePath, 100);
             LOGGER.Info("Successfully saved cover image to: {SavePath} from {Source}.", savePath, sourceIdentifier);
-
-            return scaledBitmap;
+            return bitmap;
         }
         catch (Exception ex)
         {
-            LOGGER.Error(ex, "Failed to scale or save bitmap from {SourceIdentifier} to {SavePath}.", sourceIdentifier, savePath);
-            scaledBitmap?.Dispose(); // Dispose if creation or save failed
+            LOGGER.Error(ex, "Failed to save bitmap from {SourceIdentifier} to {SavePath}.", sourceIdentifier, savePath);
+            bitmap.Dispose();
             return null;
         }
     }
@@ -204,16 +178,11 @@ public sealed class BitmapHelper
         // Offload the potentially long-running operation to a background thread.
         return await Task.Run(() =>
         {
-            // Estimate capacity: 4 bytes per pixel (RGBA) is an upper bound for PNG
-            int estimatedCapacity = image.PixelSize.Width * image.PixelSize.Height * 4;
-            using MemoryStream stream = new(estimatedCapacity);
+            using RecyclableMemoryStream stream = StreamManager.GetStream(nameof(ImageToPngByteArrayAsync));
             try
             {
-                // 3. Core Logic (executed on a background thread): Save the Avalonia Bitmap.
                 // Avalonia's Bitmap.Save(Stream) inherently saves as PNG.
                 image.Save(stream);
-
-                // 4. Conversion (executed on a background thread): Convert the stream's content to a byte array.
                 return stream.ToArray();
             }
             catch (Exception ex)
