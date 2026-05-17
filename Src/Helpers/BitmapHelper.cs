@@ -9,7 +9,7 @@ namespace Tsundoku.Helpers;
 public sealed class BitmapHelper
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
-    private static readonly RecyclableMemoryStreamManager StreamManager = new();
+    internal static readonly RecyclableMemoryStreamManager StreamManager = new();
     private readonly IHttpClientFactory _httpClientFactory;
 
     /// <summary>

@@ -1,4 +1,6 @@
+using System.Buffers;
 using Avalonia.Media.Imaging;
+using Microsoft.IO;
 
 namespace Tsundoku.Helpers;
 
@@ -7,8 +9,19 @@ namespace Tsundoku.Helpers;
 /// </summary>
 public static class ExtensionMethods
 {
+    private static readonly SearchValues<char> SmartQuoteChars = SearchValues.Create(
+    [
+        '\u201C', '\u201D', '\u201E', '\u201F',
+        '\u2018', '\u2019', '\u201A', '\u201B',
+    ]);
+
+    private static readonly SearchValues<char> WhitespaceChars = SearchValues.Create(
+    [
+        '\u0020', '\u00A0', '\u1680', '\u2000', '\u2001', '\u2002', '\u2003', '\u2004', '\u2005', '\u2006', '\u2007', '\u2008', '\u2009', '\u200A', '\u202F', '\u205F', '\u3000', '\u2028', '\u2029', '\u0009', '\u000A', '\u000B', '\u000C', '\u000D', '\u0085',
+    ]);
+
     /// <summary>
-    /// Replaces all common “smart” double‐quotes and single‐quotes with
+    /// Replaces all common smart double-quotes and single-quotes with
     /// plain ASCII " and ' in one pass over the input.
     /// </summary>
     public static string NormalizeQuotes(this string input)
@@ -16,43 +29,20 @@ public static class ExtensionMethods
         if (string.IsNullOrEmpty(input))
             return input;
 
-        // Quick check: if there are no known smart‐quote codepoints, skip allocation
-        if (input.IndexOfAny(new char[]
-        {
-            '\u201C','\u201D','\u201E','\u201F',  // “ ” „ ‟
-            '\u2018','\u2019','\u201A','\u201B'   // ‘ ’ ‚ ‛
-        }) < 0)
+        if (input.AsSpan().IndexOfAny(SmartQuoteChars) < 0)
             return input;
 
         return string.Create(input.Length, input, (span, src) =>
         {
             for (int i = 0; i < src.Length; i++)
             {
-                // grab the char once
                 char c = src[i];
-                switch (c)
+                span[i] = c switch
                 {
-                    // double‐quotes → ASCII "
-                    case '\u201C': // left double quotation mark
-                    case '\u201D': // right double quotation mark
-                    case '\u201E': // double low-9 quotation mark
-                    case '\u201F': // double high-reversed-9 quotation mark
-                        span[i] = '"';
-                        break;
-
-                    // single‐quotes/apostrophes → ASCII '
-                    case '\u2018': // left single quotation mark
-                    case '\u2019': // right single quotation mark
-                    case '\u201A': // single low-9 quotation mark
-                    case '\u201B': // single high-reversed-9 quotation mark
-                        span[i] = '\'';
-                        break;
-
-                    // all others stay the same
-                    default:
-                        span[i] = c;
-                        break;
-                }
+                    '\u201C' or '\u201D' or '\u201E' or '\u201F' => '"',
+                    '\u2018' or '\u2019' or '\u201A' or '\u201B' => '\'',
+                    _ => c,
+                };
             }
         });
     }
@@ -68,12 +58,12 @@ public static class ExtensionMethods
             return null;
         }
 
-        using MemoryStream ms = new MemoryStream();
-        source.Save(ms);           // Encode to PNG (in-memory)
-        ms.Position = 0;           // Rewind before reading
-        return new Bitmap(ms);     // Decode into new Bitmap
+        using RecyclableMemoryStream stream = BitmapHelper.StreamManager.GetStream(nameof(CloneBitmap));
+        source.Save(stream);
+        stream.Position = 0;
+        return new Bitmap(stream);
     }
-    
+
     /// <summary>
     /// Computes the Levenshtein edit distance between two strings, returning -1 if it exceeds the maximum allowed distance.
     /// </summary>
@@ -183,50 +173,31 @@ public static class ExtensionMethods
     /// <returns>A new string with all whitespace characters removed.</returns>
     public static string RemoveInPlaceCharArray(string input)
     {
-        int len = input.Length;
-        char[] src = input.ToCharArray();
+        if (string.IsNullOrEmpty(input)) return input;
+
+        ReadOnlySpan<char> src = input;
+        if (src.IndexOfAny(WhitespaceChars) < 0) return input;
+
+        const int StackThreshold = 512;
+        char[]? rented = src.Length > StackThreshold ? ArrayPool<char>.Shared.Rent(src.Length) : null;
+        Span<char> dst = rented is not null ? rented.AsSpan(0, src.Length) : stackalloc char[src.Length];
+
         int dstIdx = 0;
-        for (int i = 0; i < len; i++)
+        foreach (char ch in src)
         {
-            char ch = src[i];
-            switch (ch)
+            if (!WhitespaceChars.Contains(ch))
             {
-                case '\u0020':
-                case '\u00A0':
-                case '\u1680':
-                case '\u2000':
-                case '\u2001':
-                case '\u2002':
-                case '\u2003':
-                case '\u2004':
-                case '\u2005':
-                case '\u2006':
-                case '\u2007':
-                case '\u2008':
-                case '\u2009':
-                case '\u200A':
-                case '\u202F':
-                case '\u205F':
-                case '\u3000':
-                case '\u2028':
-                case '\u2029':
-                case '\u0009':
-                case '\u000A':
-                case '\u000B':
-                case '\u000C':
-                case '\u000D':
-                case '\u0085':
-                    continue;
-                default:
-                    src[dstIdx++] = ch;
-                    break;
+                dst[dstIdx++] = ch;
             }
         }
-        return new string(src, 0, dstIdx);
+
+        string result = new(dst[..dstIdx]);
+        if (rented is not null) ArrayPool<char>.Shared.Return(rented);
+        return result;
     }
 
     /// <summary>
-    /// Returns true if both dictionaries are null, or both non-null with identical key sets 
+    /// Returns true if both dictionaries are null, or both non-null with identical key sets
     /// and equal values for each key.
     /// </summary>
     public static bool DictionariesEqual<TKey, TValue>(

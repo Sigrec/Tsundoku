@@ -735,6 +735,16 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
         };
     }
 
+    private static string[] ExtractKeys(KeyValuePair<string, int>[] source)
+    {
+        string[] result = new string[source.Length];
+        for (int i = 0; i < source.Length; i++)
+        {
+            result[i] = source[i].Key;
+        }
+        return result;
+    }
+
     private void UpdateSplitGenreCharts(KeyValuePair<string, int>[] orderedGenreData)
     {
         int midpoint = (orderedGenreData.Length + 1) / 2;
@@ -747,7 +757,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
         }
         if (GenreYAxes1 is { Length: > 0 })
         {
-            GenreYAxes1[0].Labels = firstHalf.AsValueEnumerable().Select(kvp => kvp.Key).ToArray();
+            GenreYAxes1[0].Labels = ExtractKeys(firstHalf);
         }
 
         if (GenreDistribution2.Count > 0 && GenreDistribution2[0] is RowSeries<KeyValuePair<string, int>> series2)
@@ -756,7 +766,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
         }
         if (GenreYAxes2 is { Length: > 0 })
         {
-            GenreYAxes2[0].Labels = secondHalf.AsValueEnumerable().Select(kvp => kvp.Key).ToArray();
+            GenreYAxes2[0].Labels = ExtractKeys(secondHalf);
         }
     }
 
@@ -852,7 +862,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
 
                 if (GenreYAxes is { Length: > 0 })
                 {
-                    GenreYAxes[0].Labels = calculatedGenreData.AsValueEnumerable().Select(kvp => kvp.Key).ToArray();
+                    GenreYAxes[0].Labels = ExtractKeys(calculatedGenreData);
                 }
 
                 UpdateSplitGenreCharts(calculatedGenreData);

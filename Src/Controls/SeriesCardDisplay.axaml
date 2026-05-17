@@ -55,9 +55,6 @@
             Height="{CompiledBinding Source={x:Static m:Constants.CARD_HEIGHT}}"
             UseLayoutRounding="True"
             Classes="card-hover">
-          <Border.CacheMode>
-            <BitmapCache/>
-          </Border.CacheMode>
           <Border.Styles>
             <Style Selector="Border.card-hover">
               <Setter Property="RenderTransform" Value="translate(0px, 0px)"/>
@@ -73,6 +70,9 @@
           </Border.Transitions>
 
           <Border CornerRadius="14" ClipToBounds="True" Name="CardInner">
+            <Border.CacheMode>
+              <BitmapCache/>
+            </Border.CacheMode>
             <Grid ColumnDefinitions="Auto,*">
 
               <!-- ── Hover + ToolTip Styles ── -->

@@ -107,6 +107,12 @@ public static class GlassmorphismService
         LOGGER.Info("Glassmorphism {State}", enabled ? "enabled" : "disabled");
     }
 
+    private static readonly IReadOnlyList<WindowTransparencyLevel> GlassLevels =
+        [WindowTransparencyLevel.AcrylicBlur, WindowTransparencyLevel.Blur];
+
+    private static readonly IReadOnlyList<WindowTransparencyLevel> NoGlassLevels =
+        [WindowTransparencyLevel.None];
+
     /// <summary>
     /// Applies glassmorphism transparency settings to a single window.
     /// Also forces named controls to pick up the new resource values.
@@ -115,12 +121,12 @@ public static class GlassmorphismService
     {
         if (enabled)
         {
-            window.TransparencyLevelHint = [WindowTransparencyLevel.AcrylicBlur, WindowTransparencyLevel.Blur];
+            window.TransparencyLevelHint = GlassLevels;
             window.Background = Brushes.Transparent;
         }
         else
         {
-            window.TransparencyLevelHint = [WindowTransparencyLevel.None];
+            window.TransparencyLevelHint = NoGlassLevels;
             window.Background = null;
         }
 

@@ -45,6 +45,9 @@ public sealed partial class SeriesCardDisplay : UserControl
         set => SetValue(GlassEnabledProperty, value);
     }
 
+    private static MainWindowViewModel? _cachedMainWindowViewModel;
+    private static IUserService? _cachedUserService;
+
     private readonly MainWindowViewModel _mainWindowViewModel;
     private readonly IUserService _userService;
     private Guid _loadedCoverSeriesId;
@@ -52,11 +55,8 @@ public sealed partial class SeriesCardDisplay : UserControl
 
     public SeriesCardDisplay()
         : this(
-            App.ServiceProvider.GetRequiredService<MainWindowViewModel>()
-                ?? throw new InvalidOperationException("MainWindowViewModel not registered in DI container."),
-            App.ServiceProvider.GetRequiredService<IUserService>()
-                ?? throw new InvalidOperationException("IUserService not registered in DI container.")
-          )
+            _cachedMainWindowViewModel ??= App.ServiceProvider.GetRequiredService<MainWindowViewModel>(),
+            _cachedUserService ??= App.ServiceProvider.GetRequiredService<IUserService>())
     {
     }
 

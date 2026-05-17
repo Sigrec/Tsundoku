@@ -1,5 +1,10 @@
+using System.Reactive;
+using System.Reactive.Disposables;
+using System.Reactive.Disposables.Fluent;
+using System.Reactive.Linq;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using ReactiveUI;
 using ReactiveUI.Avalonia;
 using Tsundoku.Models;
 using Tsundoku.ViewModels;
@@ -15,9 +20,14 @@ public sealed partial class ChangelogWindow : ReactiveWindow<ViewModelBase>
     {
         InitializeComponent();
 
-        ChangesScroll.GetObservable(ScrollViewer.ExtentProperty).Subscribe(_ => UpdateScrollHint());
-        ChangesScroll.GetObservable(ScrollViewer.ViewportProperty).Subscribe(_ => UpdateScrollHint());
-        ChangesScroll.GetObservable(ScrollViewer.OffsetProperty).Subscribe(_ => UpdateScrollHint());
+        this.WhenActivated(disposables =>
+        {
+            ChangesScroll.GetObservable(ScrollViewer.ExtentProperty).Select(_ => Unit.Default)
+                .Merge(ChangesScroll.GetObservable(ScrollViewer.ViewportProperty).Select(_ => Unit.Default))
+                .Merge(ChangesScroll.GetObservable(ScrollViewer.OffsetProperty).Select(_ => Unit.Default))
+                .Subscribe(_ => UpdateScrollHint())
+                .DisposeWith(disposables);
+        });
 
         _sortedVersions = Changelog.Entries.Keys
             .OrderBy(v => Version.TryParse(v, out Version? parsed) ? parsed : new Version(0, 0))

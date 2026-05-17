@@ -18,13 +18,17 @@
             Margin="3"
             MinWidth="180">
         <StackPanel Orientation="Horizontal" Spacing="8">
-            <Button Background="{CompiledBinding ColorBrush, ElementName=Root}"
+            <Button Background="Transparent"
                     Width="28" Height="28"
                     CornerRadius="6"
                     BorderBrush="{DynamicResource TsundokuDividerColor}"
                     BorderThickness="2"
-                    Padding="0"
+                    Padding="3"
                     Cursor="Hand">
+                <Border Background="{CompiledBinding ColorBrush, ElementName=Root}"
+                        CornerRadius="3"
+                        HorizontalAlignment="Stretch"
+                        VerticalAlignment="Stretch"/>
                 <Button.Flyout>
                     <Flyout Placement="Bottom">
                         <ColorView Color="{CompiledBinding ColorBrush, ElementName=Root, Converter={StaticResource BrushToColorConverter}, Mode=TwoWay}"/>

@@ -19,28 +19,8 @@ public sealed class UserIconBitmapJsonConverter : JsonConverter<Bitmap>
         try
         {
             byte[] imageBytes = Convert.FromBase64String(base64String);
-
-            // 1. Convert bytes to the original (unscaled) Bitmap
-            Bitmap? originalBitmap = BitmapConverter.BytesToBitmap(imageBytes);
-
-            if (originalBitmap is null)
-            {
-                LOGGER.Error("Failed to create original Bitmap from byte array.");
-                return null;
-            }
-
-            // 2. Apply the scaling
-            // Ensure PixelSize and BitmapInterpolationMode are accessible
-            Bitmap? scaledBitmap = originalBitmap.CreateScaledBitmap(
-                new PixelSize(USER_ICON_WIDTH * BITMAP_SCALE, USER_ICON_HEIGHT * BITMAP_SCALE),
-                BitmapInterpolationMode.HighQuality
-            );
-
-            // Dispose of the original bitmap if it's no longer needed
-            // This is important for memory management, especially if the original is large.
-            originalBitmap.Dispose();
-
-            return scaledBitmap;
+            using MemoryStream stream = new(imageBytes, writable: false);
+            return Bitmap.DecodeToWidth(stream, USER_ICON_WIDTH * BITMAP_SCALE, BitmapInterpolationMode.HighQuality);
         }
         catch (FormatException ex)
         {

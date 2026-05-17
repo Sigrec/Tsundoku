@@ -26,9 +26,16 @@ internal sealed class FilteredDiscordLogger : DiscordRPC.Logging.ILogger
 public static class DiscordRP
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
+    private static readonly Assets _staticAssets = new()
+    {
+        LargeImageKey = "rp_large_icon",
+        LargeImageText = "Tsundoku"
+    };
     private static DiscordRpcClient? client;
     private static string UserName = string.Empty;
     private static PresenceState _presence = new();
+    private static Button[]? _cachedButtons;
+    private static bool _buttonsDirty = true;
 
     public static void Initialize()
     {
@@ -110,11 +117,13 @@ public static class DiscordRP
         if (_presence.Buttons.Count > 1)
         {
             _presence.Buttons.RemoveRange(1, _presence.Buttons.Count - 1);
+            _buttonsDirty = true;
         }
         if (additionalButton is not null)
         {
             LOGGER.Debug("Adding additional button");
             _presence.Buttons.Add(additionalButton);
+            _buttonsDirty = true;
         }
 
         ResetPresence();
@@ -127,17 +136,19 @@ public static class DiscordRP
             return;
         }
 
+        if (_buttonsDirty || _cachedButtons is null)
+        {
+            _cachedButtons = [.. _presence.Buttons];
+            _buttonsDirty = false;
+        }
+
         client.SetPresence(new RichPresence
         {
             Details = _presence.Details,
             State = _presence.State,
             Timestamps = _presence.Timestamps,
-            Buttons = [.. _presence.Buttons],
-            Assets = new Assets
-            {
-                LargeImageKey = "rp_large_icon",
-                LargeImageText = "Tsundoku"
-            }
+            Buttons = _cachedButtons,
+            Assets = _staticAssets
         });
     }
 
@@ -148,6 +159,7 @@ public static class DiscordRP
             return;
         }
         _presence = new PresenceState();
+        _buttonsDirty = true;
         ResetPresence();
     }
 

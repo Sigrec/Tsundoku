@@ -278,8 +278,8 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
         }
 
         User loadedUser;
-        string userFileData = await File.ReadAllTextAsync(userDataFilePath);
-        if (string.IsNullOrWhiteSpace(userFileData))
+        FileInfo fileInfo = new(userDataFilePath);
+        if (fileInfo.Length == 0)
         {
             LOGGER.Debug("Json is Empty Creating Default User");
             loadedUser = CreateDefaultUser();
@@ -288,7 +288,12 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
         {
             try
             {
-                JsonNode? userData = JsonNode.Parse(userFileData);
+                JsonNode? userData;
+                await using (FileStream stream = new(userDataFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize: 4096, options: FileOptions.Asynchronous | FileOptions.SequentialScan))
+                {
+                    userData = await JsonNode.ParseAsync(stream);
+                }
+
                 if (userData is not null)
                 {
                     User.UpdateSchemaVersion(userData, false);
@@ -334,8 +339,12 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
 
         try
         {
-            string userFileData = await File.ReadAllTextAsync(userDataFilePath);
-            JsonNode? userData = JsonNode.Parse(userFileData);
+            JsonNode? userData;
+            await using (FileStream stream = new(userDataFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize: 4096, options: FileOptions.Asynchronous | FileOptions.SequentialScan))
+            {
+                userData = await JsonNode.ParseAsync(stream);
+            }
+
             if (userData is null)
             {
                 LOGGER.Warn("UserData.json is malformed, cannot repair");
@@ -360,16 +369,15 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
     {
         string currentName = GetCurrentThemeSnapshot().ThemeName;
 
-        // This only loops until it finds the first match (or until the end).
-        var match = _savedThemes
-            .AsValueEnumerable()
-            .Select((theme, idx) => new { theme, idx })
-            .FirstOrDefault(x => x.theme.ThemeName.Equals(currentName));
+        for (int i = 0; i < _savedThemes.Count; i++)
+        {
+            if (_savedThemes[i].ThemeName.Equals(currentName, StringComparison.Ordinal))
+            {
+                return (uint)i;
+            }
+        }
 
-        // If no match, FirstOrDefault returns null, so idx = 0 by default.
-        int foundIndex = (match is null) ? -1 : match.idx;
-
-        return (uint)(foundIndex >= 0 ? foundIndex : 0);
+        return 0;
     }
 
 
@@ -472,31 +480,17 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
 
     private static Bitmap GenerateCoverBitmap(Series series, string fullCoverPath, bool isPngExtension)
     {
-        Bitmap loadedBitmap = new(fullCoverPath);
-        if (!isPngExtension)
-        {
-            fullCoverPath = Path.ChangeExtension(fullCoverPath, ".png");
-        }
-
         int targetWidth = LEFT_SIDE_CARD_WIDTH * BITMAP_SCALE;
-        int targetHeight = IMAGE_HEIGHT * BITMAP_SCALE;
-        if (loadedBitmap.PixelSize.Width > targetWidth || loadedBitmap.PixelSize.Height > targetHeight)
+        using FileStream sourceStream = new(fullCoverPath, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize: 4096, options: FileOptions.SequentialScan);
+        Bitmap decoded = Bitmap.DecodeToWidth(sourceStream, targetWidth, BitmapInterpolationMode.HighQuality);
+
+        string savePath = isPngExtension ? fullCoverPath : Path.ChangeExtension(fullCoverPath, ".png");
+        if (!isPngExtension || decoded.PixelSize.Width != targetWidth)
         {
-            Bitmap scaledBitmap = loadedBitmap.CreateScaledBitmap(new PixelSize(targetWidth, targetHeight), BitmapInterpolationMode.HighQuality);
-            LOGGER.Debug("Scaled {Title} cover to {Width}x{Height}", series.Titles[TsundokuLanguage.Romaji], targetWidth, targetHeight);
-            loadedBitmap.Dispose();
-
-            scaledBitmap.Save(fullCoverPath, 100);
-            return scaledBitmap;
+            decoded.Save(savePath, 100);
+            LOGGER.Debug("Saved {Title} cover at {Width}px to {Path}", series.Titles[TsundokuLanguage.Romaji], decoded.PixelSize.Width, savePath);
         }
-
-        if (!isPngExtension)
-        {
-            loadedBitmap.Save(fullCoverPath, 100);
-            LOGGER.Info("Saved Cover {path}", fullCoverPath);
-        }
-
-        return loadedBitmap;
+        return decoded;
     }
 
     public Series? GetSeriesByCoverPath(string coverPath)
@@ -553,8 +547,11 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
     {
         try
         {
-            string fileText = await File.ReadAllTextAsync(filePath);
-            JsonNode? uploadedUserData = await Task.Run(() => JsonNode.Parse(fileText));
+            JsonNode? uploadedUserData;
+            await using (FileStream stream = new(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize: 4096, options: FileOptions.Asynchronous | FileOptions.SequentialScan))
+            {
+                uploadedUserData = await JsonNode.ParseAsync(stream);
+            }
 
             if (uploadedUserData is null)
             {
@@ -1178,8 +1175,8 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
             return;
         }
         
-        using Bitmap originalIcon = new Bitmap(filePath);
-        Bitmap scaledIcon = originalIcon.CreateScaledBitmap(new PixelSize(USER_ICON_WIDTH * BITMAP_SCALE, USER_ICON_HEIGHT * BITMAP_SCALE), BitmapInterpolationMode.HighQuality);
+        using FileStream iconStream = new(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize: 4096, options: FileOptions.SequentialScan);
+        Bitmap scaledIcon = Bitmap.DecodeToWidth(iconStream, USER_ICON_WIDTH * BITMAP_SCALE, BitmapInterpolationMode.HighQuality);
         currentUser.UserIcon?.Dispose();
         currentUser.UserIcon = scaledIcon;
 
