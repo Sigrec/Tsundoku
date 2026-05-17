@@ -24,10 +24,10 @@ public sealed partial class FilterChipViewModel : ReactiveObject
     private static readonly FrozenDictionary<string, string[]> EnumValues =
         new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase)
         {
-            ["Format"] = Enum.GetValues<SeriesFormat>().Select(e => e.ToString()).ToArray(),
-            ["Status"] = Enum.GetValues<SeriesStatus>().Select(e => e.ToString()).ToArray(),
-            ["Demographic"] = Enum.GetValues<SeriesDemographic>().Select(e => e.ToString()).ToArray(),
-            ["Genre"] = Enum.GetValues<SeriesGenre>().Select(e => e.ToString()).ToArray(),
+            ["Format"] = Enum.GetNames<SeriesFormat>(),
+            ["Status"] = Enum.GetNames<SeriesStatus>(),
+            ["Demographic"] = Enum.GetNames<SeriesDemographic>(),
+            ["Genre"] = Enum.GetNames<SeriesGenre>(),
             ["Series"] = ["Complete", "InComplete"],
             ["Favorite"] = ["True", "False"],
         }.ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);

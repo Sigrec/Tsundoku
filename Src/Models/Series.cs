@@ -923,7 +923,8 @@ public sealed partial class Series(
                 {
                     try
                     {
-                        newCover = new Bitmap(fullPath);
+                        using FileStream coverStream = new(fullPath, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize: 4096, options: FileOptions.SequentialScan);
+                        newCover = Bitmap.DecodeToWidth(coverStream, LEFT_SIDE_CARD_WIDTH * BITMAP_SCALE, BitmapInterpolationMode.HighQuality);
                     }
                     catch (Exception ex)
                     {

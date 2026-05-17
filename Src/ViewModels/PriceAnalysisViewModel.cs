@@ -22,7 +22,7 @@ public sealed partial class PriceAnalysisViewModel : ViewModelBase, IDisposable
     [Reactive] public partial string WebsitesToolTipText { get; set; }
     [Reactive] public partial int CurRegionIndex { get; set; }
     public AvaloniaList<ListBoxItem> SelectedWebsites { get; } = [];
-    private static readonly StringBuilder CurWebsites = new();
+    private readonly StringBuilder _curWebsites = new();
     private static readonly Region[] CachedRegionValues = Enum.GetValues<Region>();
 
     public static readonly FrozenSet<string> ANALYSIS_COUNTRY_OPTIONS = new[]
@@ -67,30 +67,19 @@ public sealed partial class PriceAnalysisViewModel : ViewModelBase, IDisposable
 
     private void WebsiteCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        switch (e.Action)
+        if (SelectedWebsites is null || SelectedWebsites.Count == 0)
         {
-            case NotifyCollectionChangedAction.Add:
-            case NotifyCollectionChangedAction.Remove:
-                if (SelectedWebsites is not null && SelectedWebsites.Count != 0)
-                {
-                    for (int x = 0; x < SelectedWebsites.Count - 1; x++)
-                    {
-                        CurWebsites.AppendLine(SelectedWebsites[x].Content.ToString());
-                    }
-                    CurWebsites.Append(SelectedWebsites.Last().Content.ToString());
-                    WebsitesToolTipText = CurWebsites.ToString();
-                    CurWebsites.Clear();
-                }
-                else
-                {
-                    CurWebsites.Clear();
-                    WebsitesToolTipText = CurWebsites.ToString();
-                }
-                return;
-            default:
-                throw new ArgumentOutOfRangeException();
+            WebsitesToolTipText = string.Empty;
+            return;
         }
 
+        for (int x = 0; x < SelectedWebsites.Count - 1; x++)
+        {
+            _curWebsites.AppendLine(SelectedWebsites[x].Content.ToString());
+        }
+        _curWebsites.Append(SelectedWebsites[^1].Content.ToString());
+        WebsitesToolTipText = _curWebsites.ToString();
+        _curWebsites.Clear();
     }
 
     public void Dispose()

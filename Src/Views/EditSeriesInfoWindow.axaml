@@ -108,7 +108,7 @@
                     <StackPanel Spacing="4">
                         <TextBlock Text="COVER IMAGE URL" Classes="section-title"
                                    ToolTip.Tip="{CompiledBinding CoverImageUrl}"/>
-                        <Grid ColumnDefinitions="*,6,Auto,6,Auto">
+                        <Grid ColumnDefinitions="*,6,Auto,6,Auto" Width="460">
                             <TextBox x:Name="CoverImageUrlTextBox"
                                      Grid.Column="0"
                                      FontSize="13" Height="34"
