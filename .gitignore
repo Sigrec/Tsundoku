@@ -9,6 +9,7 @@ Screenshots/
 Themes/
 *.csv
 TsundokuPackage/ExportPfx.ps1
+TsundokuPackage/RenewSigningCert.ps1
 TsundokuPackage/MSIX_Output
 TsundokuPackage/msix_publish_log.txt
 
