@@ -95,8 +95,10 @@
 		<PackageReference Include="GraphQL.Client.Serializer.SystemTextJson" />
 		<PackageReference Include="MangaAndLightNovelWebScrape" />
 		<PackageReference Include="Microsoft.Extensions.Http" />
+		<PackageReference Include="Microsoft.Extensions.Logging" />
 		<PackageReference Include="Microsoft.IO.RecyclableMemoryStream" />
 		<PackageReference Include="NLog" />
+		<PackageReference Include="NLog.Extensions.Logging" />
 		<PackageReference Include="D2Phap.FileWatcherEx" />
 		<PackageReference Include="Optris.Icons.Avalonia.FontAwesome7" />
 		<PackageReference Include="ReactiveUI.Avalonia" />

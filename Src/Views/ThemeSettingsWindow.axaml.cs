@@ -54,6 +54,14 @@ public sealed partial class CollectionThemeWindow : ReactiveWindow<ThemeSettings
 
         Closing += (s, e) =>
         {
+            if (App.IsShuttingDown)
+            {
+                _themeObserveDisposable?.Dispose();
+                _themeObserveDisposable = null;
+                IsOpen = false;
+                return;
+            }
+
             if (IsOpen)
             {
                 _themeObserveDisposable?.Dispose();

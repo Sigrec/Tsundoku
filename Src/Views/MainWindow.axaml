@@ -83,6 +83,16 @@
                            FontSize="13" FontWeight="Bold"
                            HorizontalAlignment="Center"
                            Foreground="{DynamicResource TsundokuSearchBarTextColor}"/>
+                <Button Name="SaveAsShelfButton"
+                        Content="Save as shelf…"
+                        HorizontalAlignment="Center"
+                        Margin="0,8,0,0"
+                        Padding="14,6"
+                        FontSize="12"
+                        FontWeight="Bold"
+                        Cursor="Hand"
+                        Theme="{StaticResource MenuButton}"
+                        Click="SaveCurrentFilterAsShelf"/>
             </StackPanel>
         </Panel>
 
@@ -227,7 +237,7 @@
                     BorderBrush="{DynamicResource TsundokuDividerColor}"
                     BorderThickness="0,0,0,2"
                     Padding="24,12">
-                <Grid RowDefinitions="Auto,8,Auto">
+                <Grid RowDefinitions="Auto,8,Auto,8,Auto">
                     <!-- Row 0: User Area + Search -->
                     <Grid ColumnDefinitions="Auto,*">
                         <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
@@ -468,6 +478,41 @@
 
                         </StackPanel>
                     </Grid>
+
+                    <!-- Row 4: Saved shelves (named filters) -->
+                    <ItemsControl Grid.Row="4"
+                                  Name="ShelfChipsRow"
+                                  ItemsSource="{CompiledBinding Shelves}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Horizontal" ItemSpacing="6" LineSpacing="6"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="m:SavedShelf">
+                                <Button Padding="10,4"
+                                        FontSize="12"
+                                        FontWeight="Bold"
+                                        CornerRadius="14"
+                                        Cursor="Hand"
+                                        Theme="{StaticResource MenuButton}"
+                                        Click="ShelfClicked"
+                                        ToolTip.Tip="{CompiledBinding Query}"
+                                        Tag="{CompiledBinding}">
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <i:Icon Value="{CompiledBinding IconKey}" FontSize="11" VerticalAlignment="Center"/>
+                                        <TextBlock Text="{CompiledBinding Name}" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    <Button.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="Rename…" Click="RenameShelf" Tag="{CompiledBinding}"/>
+                                            <MenuItem Header="Delete" Click="DeleteShelf" Tag="{CompiledBinding}"/>
+                                        </ContextMenu>
+                                    </Button.ContextMenu>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                 </Grid>
             </Border>
 
