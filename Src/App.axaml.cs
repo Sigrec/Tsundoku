@@ -1,7 +1,9 @@
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using NLog.Config;
+using NLog.Extensions.Logging;
 using NLog.Targets;
 using NLog.Targets.Wrappers;
 using System.Net;
@@ -20,6 +22,9 @@ public sealed partial class App : Application
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
     public static Mutex? Mutex { get; set; }
     public static IServiceProvider? ServiceProvider { get; private set; }
+
+    /// <summary>True while the main window is initiating app shutdown so secondary windows can let themselves close.</summary>
+    public static bool IsShuttingDown { get; set; }
 
     public App()
     {
@@ -124,6 +129,7 @@ public sealed partial class App : Application
                     ServiceCollection services = new();
                     ConfigureServices(services);
                     ServiceProvider = services.BuildServiceProvider();
+                    AppLog.SetFactory(ServiceProvider.GetRequiredService<ILoggerFactory>());
 
                     splash.UpdateStatus("Loading user data");
                     IUserService userService = ServiceProvider.GetRequiredService<IUserService>();
@@ -266,6 +272,13 @@ public sealed partial class App : Application
         .SetHandlerLifetime(TimeSpan.FromMinutes(5))
         .AddTypedClient<AniListGraphQLClient>();
 
+        services.AddLogging(builder =>
+        {
+            builder.ClearProviders();
+            builder.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
+            ConfigureExtensions.AddNLog(builder);
+        });
+
         services.AddSingleton<BitmapHelper>();
         services.AddSingleton<MangaDex>();
         services.AddSingleton<AniList>();
@@ -386,14 +399,14 @@ public sealed partial class App : Application
         }
 
         // 1) Drop Trace..Info for that namespace, and stop processing
-        var dropLowLevels = new LoggingRule("MangaAndLightNovelWebScrape.*", LogLevel.Trace, LogLevel.Info, blackHole)
+        var dropLowLevels = new LoggingRule("MangaAndLightNovelWebScrape.*", NLog.LogLevel.Trace, NLog.LogLevel.Info, blackHole)
         {
             Final = true
         };
         config.LoggingRules.Add(dropLowLevels);
 
         // 2) Allow Warn..Fatal for that namespace, and stop processing (so it won't hit catch-alls)
-        var allowWarnPlus = new LoggingRule("MangaAndLightNovelWebScrape.*", LogLevel.Warn, LogLevel.Fatal, asyncWrapper)
+        var allowWarnPlus = new LoggingRule("MangaAndLightNovelWebScrape.*", NLog.LogLevel.Warn, NLog.LogLevel.Fatal, asyncWrapper)
         {
             Final = true
         };
@@ -402,10 +415,17 @@ public sealed partial class App : Application
     #endif
         config.LoggingRules.Add(allowWarnPlus);
 
+        // 3) Drop HttpClient request/response chatter — only surface Warn+
+        var dropHttpClientChatter = new LoggingRule("System.Net.Http.HttpClient.*", NLog.LogLevel.Trace, NLog.LogLevel.Info, blackHole)
+        {
+            Final = true
+        };
+        config.LoggingRules.Add(dropHttpClientChatter);
+
         // --- Default catch-alls ---
-        config.LoggingRules.Add(new LoggingRule("*", LogLevel.Info, LogLevel.Fatal, asyncWrapper));
+        config.LoggingRules.Add(new LoggingRule("*", NLog.LogLevel.Info, NLog.LogLevel.Fatal, asyncWrapper));
     #if DEBUG
-        config.LoggingRules.Add(new LoggingRule("*", LogLevel.Debug, LogLevel.Fatal, consoleTarget));
+        config.LoggingRules.Add(new LoggingRule("*", NLog.LogLevel.Debug, NLog.LogLevel.Fatal, consoleTarget));
     #endif
 
         LogManager.Configuration = config;

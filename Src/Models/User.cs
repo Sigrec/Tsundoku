@@ -46,6 +46,7 @@ public sealed partial class User : ReactiveObject
     public List<TsundokuLanguage> AdditionalLanguages { get; set; } = [];
     public List<TsundokuTheme> SavedThemes { get; set; }
     public List<Series> UserCollection { get; set; }
+    public List<SavedShelf> SavedShelves { get; set; } = [];
 
     [JsonConverter(typeof(UserIconBitmapJsonConverter))]
     [Reactive] public partial Bitmap? UserIcon { get; set; }
@@ -432,6 +433,17 @@ public sealed partial class User : ReactiveObject
             }
             userData[nameof(DataVersion)] = 6.2;
             LOGGER.Info("Updated schema to v6.2: Removed 15 unused theme colors, added 8 new theme colors");
+        }
+
+        if (curVersion < 6.4) // 6.4 Adds SavedShelves (named filter expressions for the main window).
+        {
+            if (!userData.AsObject().ContainsKey(nameof(SavedShelves)))
+            {
+                userData.AsObject().Add(nameof(SavedShelves), new JsonArray());
+            }
+            userData[nameof(DataVersion)] = 6.4;
+            LOGGER.Info("Updated schema to v6.4: Added SavedShelves");
+            updatedVersion = true;
         }
 
         if (!isImport)

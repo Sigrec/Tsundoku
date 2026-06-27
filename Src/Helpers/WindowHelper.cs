@@ -22,6 +22,13 @@ public static class WindowHelper
 
         window.Closing += (s, e) =>
         {
+            if (App.IsShuttingDown)
+            {
+                window.IsOpen = false;
+                onClosing?.Invoke();
+                return;
+            }
+
             if (window.IsOpen)
             {
                 window.Hide();

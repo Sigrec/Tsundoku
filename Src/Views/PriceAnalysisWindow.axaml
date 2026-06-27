@@ -125,25 +125,14 @@
 						<TextBlock Grid.Row="0" Text="WEBSITES" Classes="section-title" Margin="0,0,0,4"
 								   ToolTip.Tip="{CompiledBinding WebsitesToolTipText}"
 								   ToolTip.IsEnabled="{CompiledBinding WebsitesToolTipText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
-						<ListBox x:Name="WebsiteSelector"
-								 Grid.Row="1"
-								 Theme="{StaticResource QueryListBox}"
-								 SelectionMode="Multiple,Toggle"
-                                 SelectionChanged="WebsiteSelectionChanged"
-								 SelectedItems="{CompiledBinding SelectedWebsites}">
-							<ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Amazon USA" ToolTip.Tip="America"/>
-							<ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Books-A-Million" ToolTip.Tip="America"/>
-                            <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Crunchyroll" ToolTip.Tip="America"/>
-                            <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Forbidden Planet" ToolTip.Tip="Britain"/>
-							<ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="InStockTrades" ToolTip.Tip="America"/>
-							<ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="Kinokuniya USA" ToolTip.Tip="America"/>
-                            <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="MangaMate" ToolTip.Tip="Australia"/>
-                            <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="MerryManga" ToolTip.Tip="America"/>
-							<ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="RobertsAnimeCornerStore" ToolTip.Tip="America"/>
-                            <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="SciFier" ToolTip.Tip="America | Britain | Canada | Europe | Australia"/>
-                            <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="SpeedyHen" ToolTip.Tip="Britain"/>
-                            <ListBoxItem Theme="{StaticResource QueryListBoxItem}" Content="TravellingMan" ToolTip.Tip="Britain"/>
-                        </ListBox>
+                            <ListBox x:Name="WebsiteSelector"
+                                     Grid.Row="1"
+                                     Theme="{StaticResource QueryListBox}"
+                                     SelectionMode="Multiple,Toggle"
+                                     SelectionChanged="WebsiteSelectionChanged"
+                                     ItemsSource="{CompiledBinding AvailableWebsites}"
+                                     ItemContainerTheme="{StaticResource QueryListBoxItem}"
+                                     SelectedItems="{CompiledBinding SelectedWebsites}"/>
 					</Grid>
 
 					<!-- Start Analysis Button -->

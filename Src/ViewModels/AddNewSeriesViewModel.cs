@@ -38,6 +38,7 @@ public sealed partial class AddNewSeriesViewModel : ViewModelBase, IDisposable
     [Reactive] public partial bool IsAddSeriesButtonEnabled { get; set; } = false;
     [Reactive] public partial string SeriesValueMaskedText { get; set; }
     [Reactive] public partial AvaloniaList<TsundokuLanguage> SelectedAdditionalLanguages { get; set; } = [];
+    [Reactive] public partial SeriesUrlSource? DetectedUrlSource { get; set; }
 
     private readonly SourceList<AniListPickerSuggestion> _suggestionsSource = new();
     public ReadOnlyObservableCollection<AniListPickerSuggestion> Suggestions { get; private set; }
@@ -105,6 +106,27 @@ public sealed partial class AddNewSeriesViewModel : ViewModelBase, IDisposable
             .Subscribe(x => IsSuggestionsOpen = x)
             .DisposeWith(_disposables);
 
+
+        this.WhenAnyValue(x => x.TitleText)
+            .Select(x => x is null ? string.Empty : x.Trim())
+            .DistinctUntilChanged()
+            .ObserveOn(RxSchedulers.MainThreadScheduler)
+            .Subscribe(text =>
+            {
+                if (SeriesUrlParser.TryParse(text, out SeriesUrlInfo? info))
+                {
+                    DetectedUrlSource = info.Source;
+                    if (!string.Equals(text, info.Id, StringComparison.Ordinal))
+                    {
+                        TitleText = info.Id;
+                    }
+                }
+                else if (string.IsNullOrEmpty(text))
+                {
+                    DetectedUrlSource = null;
+                }
+            })
+            .DisposeWith(_disposables);
 
         this.WhenAnyValue(x => x.TitleText)
             .Select(x => x is null ? string.Empty : x.Trim())

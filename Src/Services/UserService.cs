@@ -34,6 +34,21 @@ public interface IUserService : IDisposable
     /// <summary>Gets an observable stream of change sets for the user's saved themes.</summary>
     IObservable<IChangeSet<TsundokuTheme, string>> SavedThemeChanges { get; }
 
+    /// <summary>Gets an observable stream of change sets for the user's saved shelves (named filters).</summary>
+    IObservable<IChangeSet<SavedShelf, Guid>> SavedShelfChanges { get; }
+
+    /// <summary>Gets the sorted, read-only collection of saved shelves.</summary>
+    ReadOnlyObservableCollection<SavedShelf> SavedShelves { get; }
+
+    /// <summary>Adds or updates a saved shelf.</summary>
+    void AddShelf(SavedShelf shelf);
+
+    /// <summary>Removes the shelf with the given id.</summary>
+    void RemoveShelf(Guid shelfId);
+
+    /// <summary>Renames an existing shelf.</summary>
+    void RenameShelf(Guid shelfId, string newName);
+
     /// <summary>Applies an update action to the current user and notifies subscribers.</summary>
     /// <param name="updateAction">The action to apply to the current user.</param>
     void UpdateUser(Action<User> updateAction);
@@ -203,8 +218,13 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
     private readonly SourceCache<TsundokuTheme, string> _savedThemesSourceCache = new(t => t.ThemeName);
     public IObservable<IChangeSet<TsundokuTheme, string>> SavedThemeChanges => _savedThemesSourceCache.Connect();
 
+    private readonly SourceCache<SavedShelf, Guid> _savedShelvesSourceCache = new(s => s.Id);
+    public IObservable<IChangeSet<SavedShelf, Guid>> SavedShelfChanges => _savedShelvesSourceCache.Connect();
+
     // private readonly ReadOnlyObservableCollection<Series> _userCollection;
     private readonly ReadOnlyObservableCollection<TsundokuTheme> _savedThemes;
+    private readonly ReadOnlyObservableCollection<SavedShelf> _savedShelves;
+    public ReadOnlyObservableCollection<SavedShelf> SavedShelves => _savedShelves;
 
     [Reactive] public partial string SeriesFilterText { get; set; } = string.Empty;
     [Reactive] public partial TsundokuFilter SelectedFilter { get; set; } = TsundokuFilter.None;
@@ -256,6 +276,14 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
 
         SavedThemeChanges
             .SortAndBind(out _savedThemes, new TsundokuThemeComparer(TsundokuLanguage.English))
+            .ObserveOn(RxSchedulers.MainThreadScheduler)
+            .Subscribe()
+            .DisposeWith(_disposables);
+
+        SavedShelfChanges
+            .SortAndBind(
+                out _savedShelves,
+                Comparer<SavedShelf>.Create((a, b) => string.Compare(a.Name, b.Name, StringComparison.OrdinalIgnoreCase)))
             .ObserveOn(RxSchedulers.MainThreadScheduler)
             .Subscribe()
             .DisposeWith(_disposables);
@@ -515,6 +543,11 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
             _userCollectionSourceCache.Clear();
             _userCollectionSourceCache.AddOrUpdate(user!.UserCollection);
             SyncCoverFilesAndCleanupOrphans(_userCollectionSourceCache);
+        }
+        if (user!.SavedShelves is not null)
+        {
+            _savedShelvesSourceCache.Clear();
+            _savedShelvesSourceCache.AddOrUpdate(user!.SavedShelves);
         }
     }
 
@@ -1102,6 +1135,87 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
     }
     
     public void ClearUserCollection() => _userCollectionSourceCache.Clear();
+
+    public void AddShelf(SavedShelf shelf)
+    {
+        ArgumentNullException.ThrowIfNull(shelf);
+        if (string.IsNullOrWhiteSpace(shelf.Name))
+        {
+            throw new ArgumentException("Shelf name cannot be null, empty, or whitespace.", nameof(shelf));
+        }
+        if (shelf.Name.Length > 60)
+        {
+            throw new ArgumentException("Shelf name must be 60 characters or fewer.", nameof(shelf));
+        }
+
+        _savedShelvesSourceCache.AddOrUpdate(shelf);
+
+        UpdateUser(user =>
+        {
+            int existing = user.SavedShelves.FindIndex(s => s.Id == shelf.Id);
+            if (existing >= 0)
+            {
+                user.SavedShelves[existing] = shelf;
+            }
+            else
+            {
+                user.SavedShelves.Add(shelf);
+            }
+        });
+
+        LOGGER.Info("Added or updated shelf '{Name}' ({Id})", shelf.Name, shelf.Id);
+    }
+
+    public void RemoveShelf(Guid shelfId)
+    {
+        if (!_savedShelvesSourceCache.Lookup(shelfId).HasValue)
+        {
+            LOGGER.Warn("Shelf {Id} not found in cache; nothing to remove", shelfId);
+            return;
+        }
+
+        _savedShelvesSourceCache.Remove(shelfId);
+
+        UpdateUser(user =>
+        {
+            user.SavedShelves.RemoveAll(s => s.Id == shelfId);
+        });
+
+        LOGGER.Info("Removed shelf {Id}", shelfId);
+    }
+
+    public void RenameShelf(Guid shelfId, string newName)
+    {
+        if (string.IsNullOrWhiteSpace(newName))
+        {
+            throw new ArgumentException("Shelf name cannot be null, empty, or whitespace.", nameof(newName));
+        }
+        if (newName.Length > 60)
+        {
+            throw new ArgumentException("Shelf name must be 60 characters or fewer.", nameof(newName));
+        }
+
+        Optional<SavedShelf> existing = _savedShelvesSourceCache.Lookup(shelfId);
+        if (!existing.HasValue)
+        {
+            LOGGER.Warn("Shelf {Id} not found in cache; cannot rename", shelfId);
+            return;
+        }
+
+        existing.Value.Name = newName;
+        _savedShelvesSourceCache.AddOrUpdate(existing.Value);
+
+        UpdateUser(user =>
+        {
+            SavedShelf? userCopy = user.SavedShelves.FirstOrDefault(s => s.Id == shelfId);
+            if (userCopy is not null)
+            {
+                userCopy.Name = newName;
+            }
+        });
+
+        LOGGER.Info("Renamed shelf {Id} → '{Name}'", shelfId, newName);
+    }
 
     public void ExportTheme(string fileName)
     {

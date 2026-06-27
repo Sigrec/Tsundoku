@@ -2,7 +2,9 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using GraphQL;
 using GraphQL.Client.Http;
+using Microsoft.Extensions.Logging;
 using Tsundoku.Clients;
+using MsLogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Tsundoku.Services;
 
@@ -36,8 +38,7 @@ public interface IApiHealthCheckService : IDisposable
 /// </summary>
 public sealed class ApiHealthCheckService : IApiHealthCheckService
 {
-    private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
-
+    private readonly MsLogger _logger;
     private readonly AniListGraphQLClient _aniListClient;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly BehaviorSubject<bool> _aniListStatus = new(true);
@@ -50,17 +51,18 @@ public sealed class ApiHealthCheckService : IApiHealthCheckService
     public IObservable<bool> IsMangaDexAvailable => _mangaDexStatus.DistinctUntilChanged();
     public bool IsAniListUp => _aniListStatus.Value;
 
-    public ApiHealthCheckService(AniListGraphQLClient aniListClient, IHttpClientFactory httpClientFactory)
+    public ApiHealthCheckService(AniListGraphQLClient aniListClient, IHttpClientFactory httpClientFactory, ILogger<ApiHealthCheckService> logger)
     {
         _aniListClient = aniListClient;
         _httpClientFactory = httpClientFactory;
+        _logger = logger;
     }
 
     public void Start()
     {
         // Run immediately then every 10 minutes
         _timer = new Timer(_ => _ = CheckAllSafeAsync(), null, TimeSpan.Zero, TimeSpan.FromMinutes(CheckIntervalMinutes));
-        LOGGER.Info("API health check service started (interval: {Interval} minutes)", CheckIntervalMinutes);
+        _logger.ServiceStarted(CheckIntervalMinutes);
     }
 
     public async Task<(bool AniList, bool MangaDex)> CheckNowAsync()
@@ -77,7 +79,7 @@ public sealed class ApiHealthCheckService : IApiHealthCheckService
         }
         catch (Exception ex)
         {
-            LOGGER.Error(ex, "Unhandled exception during API health check");
+            _logger.UnhandledCheckException(ex);
         }
     }
 
@@ -86,7 +88,7 @@ public sealed class ApiHealthCheckService : IApiHealthCheckService
         _timer?.Change(Timeout.Infinite, Timeout.Infinite);
         _timer?.Dispose();
         _timer = null;
-        LOGGER.Info("API health check service stopped");
+        _logger.ServiceStopped();
     }
 
     private async Task CheckAllAsync()
@@ -110,17 +112,17 @@ public sealed class ApiHealthCheckService : IApiHealthCheckService
             if (!isAvailable)
             {
                 string errorMsg = string.Join("; ", response.Errors!.Select(e => e.Message));
-                LOGGER.Warn("AniList API health check failed: {Error}", errorMsg);
+                _logger.AniListCheckFailedResponse(errorMsg);
             }
             else
             {
-                LOGGER.Debug("AniList API health check passed");
+                _logger.AniListCheckPassed();
             }
         }
         catch (Exception ex)
         {
             _aniListStatus.OnNext(false);
-            LOGGER.Warn(ex, "AniList API health check failed with exception");
+            _logger.AniListCheckFailedException(ex);
         }
     }
 
@@ -135,17 +137,17 @@ public sealed class ApiHealthCheckService : IApiHealthCheckService
 
             if (!isAvailable)
             {
-                LOGGER.Warn("MangaDex API health check failed: {StatusCode}", response.StatusCode);
+                _logger.MangaDexCheckFailedResponse(response.StatusCode);
             }
             else
             {
-                LOGGER.Debug("MangaDex API health check passed");
+                _logger.MangaDexCheckPassed();
             }
         }
         catch (Exception ex)
         {
             _mangaDexStatus.OnNext(false);
-            LOGGER.Warn(ex, "MangaDex API health check failed with exception");
+            _logger.MangaDexCheckFailedException(ex);
         }
     }
 

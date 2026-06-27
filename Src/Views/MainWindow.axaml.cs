@@ -78,11 +78,12 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
 
             // Back to top button visibility based on scroll offset
             CollectionPane.GetObservable(ScrollViewer.OffsetProperty)
-                .Subscribe(offset =>
+                .Select(o => (Show: o.Y > 300, Visible: o.Y > 50))
+                .DistinctUntilChanged()
+                .Subscribe(s =>
                 {
-                    bool show = offset.Y > 300;
-                    BackToTopButton.Opacity = show ? 1 : 0;
-                    BackToTopButton.IsVisible = offset.Y > 50;
+                    BackToTopButton.Opacity = s.Show ? 1 : 0;
+                    BackToTopButton.IsVisible = s.Visible;
                 })
                 .DisposeWith(disposables);
 
@@ -104,86 +105,10 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
                     _apiHealthCheckService.IsMangaDexAvailable,
                     (aniList, mangaDex) => (AniList: aniList, MangaDex: mangaDex))
                 .ObserveOn(RxSchedulers.MainThreadScheduler)
-                .Subscribe(async status =>
-                {
-                    bool aniListChanged = status.AniList == _aniListDown;
-                    bool mangaDexChanged = status.MangaDex == _mangaDexDown;
-
-                    if (!aniListChanged && !mangaDexChanged) return;
-
-                    bool wasAniListDown = _aniListDown;
-                    bool wasMangaDexDown = _mangaDexDown;
-                    _aniListDown = !status.AniList;
-                    _mangaDexDown = !status.MangaDex;
-
-                    // Disable add series button based on AniList status
-                    AddNewSeriesButton.IsEnabled = status.AniList;
-
-                    // Build message for newly down services
-                    if (_aniListDown && !wasAniListDown && _mangaDexDown && !wasMangaDexDown)
-                    {
-                        await _popupDialogService.ShowAsync(
-                            "API Outage",
-                            "fa7-solid fa7-triangle-exclamation",
-                            "AniList and MangaDex APIs are currently unavailable. Adding new series, refreshing series, and importing from Libib or Goodreads have been disabled until AniList is back online.",
-                            this);
-                    }
-                    else if (_aniListDown && !wasAniListDown && !_mangaDexDown)
-                    {
-                        bool enableAdd = await _popupDialogService.ConfirmAsync(
-                            "API Outage",
-                            "fa7-solid fa7-triangle-exclamation",
-                            "AniList API is currently unavailable. Refreshing series and importing from Libib or Goodreads have been disabled.\n\nMangaDex is online — would you like to enable adding new series via MangaDex?",
-                            this);
-
-                        if (enableAdd)
-                        {
-                            AddNewSeriesButton.IsEnabled = true;
-                        }
-                    }
-                    else if (_aniListDown && !wasAniListDown && _mangaDexDown)
-                    {
-                        await _popupDialogService.ShowAsync(
-                            "API Outage",
-                            "fa7-solid fa7-triangle-exclamation",
-                            "AniList API is currently unavailable. Adding new series, refreshing series, and importing from Libib or Goodreads have been disabled until it is back online.",
-                            this);
-                    }
-                    else if (_mangaDexDown && !wasMangaDexDown)
-                    {
-                        await _popupDialogService.ShowAsync(
-                            "API Outage",
-                            "fa7-solid fa7-triangle-exclamation",
-                            "MangaDex API is currently unavailable. You can still add and refresh series using AniList.",
-                            this);
-                    }
-
-                    // Notify when services come back online
-                    if (!_aniListDown && wasAniListDown && !_mangaDexDown && wasMangaDexDown)
-                    {
-                        await _popupDialogService.ShowAsync(
-                            "APIs Restored",
-                            "fa7-solid fa7-circle-check",
-                            "AniList and MangaDex APIs are back online. All features have been re-enabled.",
-                            this);
-                    }
-                    else if (!_aniListDown && wasAniListDown)
-                    {
-                        await _popupDialogService.ShowAsync(
-                            "API Restored",
-                            "fa7-solid fa7-circle-check",
-                            "AniList API is back online. All features have been re-enabled.",
-                            this);
-                    }
-                    else if (!_mangaDexDown && wasMangaDexDown)
-                    {
-                        await _popupDialogService.ShowAsync(
-                            "API Restored",
-                            "fa7-solid fa7-circle-check",
-                            "MangaDex API is back online.",
-                            this);
-                    }
-                })
+                .SelectMany(status => Observable.FromAsync(ct => HandleApiStatusChangeAsync(status, ct)))
+                .Subscribe(
+                    onNext: static _ => { },
+                    onError: ex => LOGGER.Error(ex, "API status handler faulted"))
                 .DisposeWith(disposables);
 
             _apiHealthCheckService.Start();
@@ -234,15 +159,15 @@ KeyDown += async (s, e) =>
         {
             if (_isShuttingDown) return;
             _isShuttingDown = true;
+            App.IsShuttingDown = true;
 
             ViewModel.SaveOnClose();
 
-            // Hide all children so their Closing handlers won't cancel
             foreach (Window child in (Window[])[_newSeriesWindow, _userSettingsWindow, _themeSettingsWindow, _priceAnalysisWindow, _collectionStatsWindow, _userNotesWindow])
             {
                 if (child.IsVisible)
                 {
-                    child.Hide();
+                    child.Close();
                 }
             }
 
@@ -546,6 +471,157 @@ KeyDown += async (s, e) =>
         {
             curSeries.CurVolumeCount -= 1;
             LOGGER.Info("Removed 1 Volume from {title}", curSeries.Titles[TsundokuLanguage.Romaji]);
+        }
+    }
+
+    private async Task HandleApiStatusChangeAsync((bool AniList, bool MangaDex) status, CancellationToken cancellationToken)
+    {
+        bool aniListChanged = status.AniList == _aniListDown;
+        bool mangaDexChanged = status.MangaDex == _mangaDexDown;
+
+        if (!aniListChanged && !mangaDexChanged) return;
+
+        bool wasAniListDown = _aniListDown;
+        bool wasMangaDexDown = _mangaDexDown;
+        _aniListDown = !status.AniList;
+        _mangaDexDown = !status.MangaDex;
+
+        AddNewSeriesButton.IsEnabled = status.AniList;
+
+        if (_aniListDown && !wasAniListDown && _mangaDexDown && !wasMangaDexDown)
+        {
+            await _popupDialogService.ShowAsync(
+                "API Outage",
+                "fa7-solid fa7-triangle-exclamation",
+                "AniList and MangaDex APIs are currently unavailable. Adding new series, refreshing series, and importing from Libib or Goodreads have been disabled until AniList is back online.",
+                this);
+        }
+        else if (_aniListDown && !wasAniListDown && !_mangaDexDown)
+        {
+            bool enableAdd = await _popupDialogService.ConfirmAsync(
+                "API Outage",
+                "fa7-solid fa7-triangle-exclamation",
+                "AniList API is currently unavailable. Refreshing series and importing from Libib or Goodreads have been disabled.\n\nMangaDex is online — would you like to enable adding new series via MangaDex?",
+                this);
+
+            if (enableAdd)
+            {
+                AddNewSeriesButton.IsEnabled = true;
+            }
+        }
+        else if (_aniListDown && !wasAniListDown && _mangaDexDown)
+        {
+            await _popupDialogService.ShowAsync(
+                "API Outage",
+                "fa7-solid fa7-triangle-exclamation",
+                "AniList API is currently unavailable. Adding new series, refreshing series, and importing from Libib or Goodreads have been disabled until it is back online.",
+                this);
+        }
+        else if (_mangaDexDown && !wasMangaDexDown)
+        {
+            await _popupDialogService.ShowAsync(
+                "API Outage",
+                "fa7-solid fa7-triangle-exclamation",
+                "MangaDex API is currently unavailable. You can still add and refresh series using AniList.",
+                this);
+        }
+
+        if (!_aniListDown && wasAniListDown && !_mangaDexDown && wasMangaDexDown)
+        {
+            await _popupDialogService.ShowAsync(
+                "APIs Restored",
+                "fa7-solid fa7-circle-check",
+                "AniList and MangaDex APIs are back online. All features have been re-enabled.",
+                this);
+        }
+        else if (!_aniListDown && wasAniListDown)
+        {
+            await _popupDialogService.ShowAsync(
+                "API Restored",
+                "fa7-solid fa7-circle-check",
+                "AniList API is back online. All features have been re-enabled.",
+                this);
+        }
+        else if (!_mangaDexDown && wasMangaDexDown)
+        {
+            await _popupDialogService.ShowAsync(
+                "API Restored",
+                "fa7-solid fa7-circle-check",
+                "MangaDex API is back online.",
+                this);
+        }
+    }
+
+    private async void SaveCurrentFilterAsShelf(object sender, RoutedEventArgs args)
+    {
+        if (string.IsNullOrWhiteSpace(ViewModel.FilterBuilder.SynthesizedQuery))
+        {
+            await _popupDialogService.ShowAsync(
+                "Empty Filter",
+                "fa7-solid fa7-circle-exclamation",
+                "Add at least one filter chip before saving as a shelf.",
+                this);
+            return;
+        }
+
+        string? name = await _popupDialogService.InputAsync(
+            "Save Filter as Shelf",
+            "fa7-solid fa7-bookmark",
+            "Name for this shelf:",
+            this);
+
+        if (string.IsNullOrWhiteSpace(name)) return;
+
+        try
+        {
+            ViewModel.SaveCurrentFilterAsShelf(name);
+            AdvancedSearchPopup.IsVisible = false;
+        }
+        catch (Exception ex)
+        {
+            LOGGER.Warn(ex, "Failed to save shelf");
+            await _popupDialogService.ShowAsync("Invalid Name", "fa7-solid fa7-triangle-exclamation", ex.Message, this);
+        }
+    }
+
+    private async void RenameShelf(object sender, RoutedEventArgs args)
+    {
+        if (sender is not MenuItem { Tag: SavedShelf shelf }) return;
+
+        string? newName = await _popupDialogService.InputAsync(
+            "Rename Shelf",
+            "fa7-solid fa7-pen-to-square",
+            $"New name for '{shelf.Name}':",
+            this);
+
+        if (string.IsNullOrWhiteSpace(newName)) return;
+
+        try
+        {
+            ViewModel.RenameShelf(shelf, newName);
+        }
+        catch (Exception ex)
+        {
+            LOGGER.Warn(ex, "Failed to rename shelf");
+            await _popupDialogService.ShowAsync("Invalid Name", "fa7-solid fa7-triangle-exclamation", ex.Message, this);
+        }
+    }
+
+    private async void DeleteShelf(object sender, RoutedEventArgs args)
+    {
+        if (sender is not Control { Tag: SavedShelf shelf }) return;
+
+        args.Handled = true;
+
+        bool confirmed = await _popupDialogService.ConfirmAsync(
+            "Delete Shelf",
+            "fa7-solid fa7-trash-can",
+            $"Delete shelf '{shelf.Name}'?",
+            this);
+
+        if (confirmed)
+        {
+            ViewModel.DeleteShelf(shelf);
         }
     }
 }

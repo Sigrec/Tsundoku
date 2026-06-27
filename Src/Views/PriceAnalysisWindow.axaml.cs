@@ -20,13 +20,14 @@ public sealed partial class PriceAnalysisWindow : ReactiveWindow<PriceAnalysisVi
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
     public bool IsOpen { get; set; }
     public bool Manga;
-    public readonly MasterScrape _scrape = new(StockStatusFilter.EXCLUDE_NONE_FILTER);
+    public readonly MasterScrape _scrape = new(StockStatusFilter.EXCLUDE_NONE_FILTER) { SkipUnavailableSites = true };
     private Region CurRegion;
 
     public PriceAnalysisWindow(PriceAnalysisViewModel viewModel)
     {
         InitializeComponent();
         ViewModel = viewModel;
+        CurRegion = viewModel.CurrentUser.Region;
 
         this.ConfigureHideOnClose(onClosing: () => SearchTextBox.Text = string.Empty);
 
@@ -77,7 +78,7 @@ public sealed partial class PriceAnalysisWindow : ReactiveWindow<PriceAnalysisVi
         string scrapeScenario = string.Empty;
         try
         {
-            HashSet<Website> websiteList = [.. ViewModel.SelectedWebsites.AsValueEnumerable().Select(website => MangaAndLightNovelWebScrape.Helpers.GetWebsiteFromString(website.Content?.ToString() ?? string.Empty))];
+            HashSet<Website> websiteList = [.. ViewModel.SelectedWebsites.AsValueEnumerable().Select(MangaAndLightNovelWebScrape.Helpers.GetWebsiteFromString)];
 
             scrapeScenario = $"\"{SearchTextBox.Text}\" on {_scrape.Browser} Browser w/ Region = \"{_scrape.Region}\" & \"{StockFilterSelector.SelectedItem as string} Filter\" & Websites = [{string.Join(", ", websiteList)}] & Memberships = ({string.Join(" & ", ViewModel.CurrentUser.Memberships)})";
 
@@ -87,8 +88,13 @@ public sealed partial class PriceAnalysisWindow : ReactiveWindow<PriceAnalysisVi
             _scrape.Browser = MangaAndLightNovelWebScrape.Helpers.GetBrowserFromString((BrowserSelector.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? string.Empty);
             _scrape.Region = ViewModel.CurrentUser.Region;
             _scrape.Filter = MangaAndLightNovelWebScrape.Helpers.GetStockStatusFilterFromString(StockFilterSelector.SelectedItem as string);
-            _scrape.IsBooksAMillionMember = ViewModel.CurrentUser.Memberships[BooksAMillion.TITLE];
-            _scrape.IsKinokuniyaUSAMember = ViewModel.CurrentUser.Memberships[KinokuniyaUSA.TITLE];
+
+            Membership memberships = Membership.None;
+            if (ViewModel.CurrentUser.Memberships.TryGetValue(BooksAMillion.TITLE, out bool bam) && bam)
+                memberships |= Membership.BooksAMillion;
+            if (ViewModel.CurrentUser.Memberships.TryGetValue(KinokuniyaUSA.TITLE, out bool kino) && kino)
+                memberships |= Membership.KinokuniyaUSA;
+            _scrape.Memberships = memberships;
 
             LOGGER.Info("Started Scrape For {Scenario}", scrapeScenario);
 
@@ -101,6 +107,34 @@ public sealed partial class PriceAnalysisWindow : ReactiveWindow<PriceAnalysisVi
 
             ViewModel.AnalyzedList.Clear();
             ViewModel.AnalyzedList.AddRange(_scrape.GetResults());
+
+            foreach ((Website site, Exception err) in _scrape.Errors)
+            {
+                if (err is SiteUnavailableException)
+                {
+                    LOGGER.Info("{Site} skipped — unreachable", site);
+                }
+                else if (err is SiteScrapeException)
+                {
+                    LOGGER.Warn(err, "{Site} scrape failed", site);
+                }
+                else
+                {
+                    LOGGER.Warn(err, "{Site} reported an unexpected error", site);
+                }
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            LOGGER.Info("Price Analysis Scrape {Scenario} was cancelled", scrapeScenario);
+        }
+        catch (ScrapeBrowserLaunchException ex)
+        {
+            LOGGER.Error(ex, "Playwright failed to launch — JavaScript-rendered sites cannot run");
+        }
+        catch (ArgumentException ex)
+        {
+            LOGGER.Warn(ex, "Price Analysis Scrape {Scenario} rejected (bad input)", scrapeScenario);
         }
         catch (Exception ex)
         {
@@ -140,7 +174,7 @@ public sealed partial class PriceAnalysisWindow : ReactiveWindow<PriceAnalysisVi
     private void WebsiteSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (sender is not ListBox listBox) { return; }
-        string[] list = [.. listBox.SelectedItems.AsValueEnumerable().Cast<ListBoxItem>().Select(x => x.Content?.ToString() ?? string.Empty)];
+        string[] list = [.. listBox.SelectedItems.AsValueEnumerable().Cast<string>()];
         ViewModel.WebsitesSelected = list.Length != 0 && MangaAndLightNovelWebScrape.Helpers.IsWebsiteListValid(CurRegion, list);
     }
 

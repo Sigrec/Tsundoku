@@ -42,7 +42,9 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
     public ReadOnlyObservableCollection<Series> UserCollection { get; }
     public ReadOnlyObservableCollection<string> AvailablePublishers => _sharedSeriesProvider.AvailablePublishers;
     public ReadOnlyObservableCollection<TsundokuTheme> SavedThemes => _userService.SavedThemes;
+    public ReadOnlyObservableCollection<SavedShelf> Shelves => _userService.SavedShelves;
     public FilterBuilderViewModel FilterBuilder { get; } = new();
+    [Reactive] public partial SavedShelf? SelectedShelf { get; set; }
 
     public Interaction<EditSeriesInfoViewModel, MainWindowViewModel?> EditSeriesInfoDialog { get; } = new Interaction<EditSeriesInfoViewModel, MainWindowViewModel?>();
 
@@ -115,6 +117,55 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
                 }
             })
             .DisposeWith(_disposables);
+
+        this.WhenAnyValue(x => x.SelectedShelf)
+            .DistinctUntilChanged()
+            .ObserveOn(RxSchedulers.MainThreadScheduler)
+            .Subscribe(shelf =>
+            {
+                string query = shelf?.Query ?? string.Empty;
+                AdvancedSearchQuery = query;
+                _sharedSeriesProvider.AdvancedSearchQuery = query;
+
+                if (shelf is not null)
+                {
+                    LOGGER.Info("Shelf \"{ShelfName}\" applied: {Query}", shelf.Name, shelf.Query);
+                }
+                else
+                {
+                    LOGGER.Info("Shelf cleared");
+                }
+            })
+            .DisposeWith(_disposables);
+    }
+
+    public void SaveCurrentFilterAsShelf(string name)
+    {
+        string query = FilterBuilder.SynthesizedQuery;
+        if (string.IsNullOrWhiteSpace(query))
+        {
+            LOGGER.Warn("Cannot save an empty filter as a shelf");
+            return;
+        }
+
+        SavedShelf shelf = new() { Name = name.Trim(), Query = query };
+        _userService.AddShelf(shelf);
+    }
+
+    public void DeleteShelf(SavedShelf shelf)
+    {
+        if (shelf is null) return;
+        if (ReferenceEquals(SelectedShelf, shelf))
+        {
+            SelectedShelf = null;
+        }
+        _userService.RemoveShelf(shelf.Id);
+    }
+
+    public void RenameShelf(SavedShelf shelf, string newName)
+    {
+        if (shelf is null || string.IsNullOrWhiteSpace(newName)) return;
+        _userService.RenameShelf(shelf.Id, newName.Trim());
     }
 
     public void SaveUserData()
@@ -135,7 +186,7 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
 
     public async Task CreateEditSeriesDialog(Series series)
     {
-        await EditSeriesInfoDialog.Handle(new EditSeriesInfoViewModel(series, _userService));
+        await EditSeriesInfoDialog.Handle(new EditSeriesInfoViewModel(series, _userService, _sharedSeriesProvider));
     }
 
     public void UpdateUserIcon(string filePath)

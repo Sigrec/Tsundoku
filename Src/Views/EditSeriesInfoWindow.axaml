@@ -16,25 +16,95 @@
         <Grid RowDefinitions="Auto,*">
             <!-- Header -->
             <Border Grid.Row="0" BorderThickness="0,0,0,2" BorderBrush="{DynamicResource TsundokuDividerColor}" Padding="16,12">
-                <Grid ColumnDefinitions="*,Auto">
-                    <StackPanel Orientation="Horizontal" Spacing="8" ClipToBounds="True">
-                        <i:Icon Value="fa7-solid fa7-pen-to-square" FontSize="16" Foreground="{DynamicResource TsundokuDividerColor}"/>
-                        <TextBlock FontSize="18" FontWeight="ExtraBold" Foreground="{DynamicResource TsundokuUsernameColor}" VerticalAlignment="Center"
-                                   TextTrimming="CharacterEllipsis">
-                            <TextBlock.Text>
-                                <MultiBinding StringFormat="Edit Series — {0}">
-                                    <Binding Path="Title" RelativeSource="{RelativeSource AncestorType=Window}"/>
-                                </MultiBinding>
-                            </TextBlock.Text>
-                        </TextBlock>
+                <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto">
+                    <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                        <i:Icon Value="fa7-solid fa7-pen-to-square" FontSize="16" Foreground="{DynamicResource TsundokuDividerColor}" VerticalAlignment="Center"/>
+                        <TextBlock Text="Edit Series"
+                                   FontSize="18"
+                                   FontWeight="ExtraBold"
+                                   Foreground="{DynamicResource TsundokuUsernameColor}"
+                                   VerticalAlignment="Center"/>
                     </StackPanel>
-                    <Button Grid.Column="1"
-                            x:Name="DeleteSeriesButton"
-                            i:Attached.Icon="fa7-solid fa7-trash-can"
-                            FontSize="14" Width="34" Height="34"
-                            Theme="{StaticResource MenuButton}"
-                            ToolTip.Tip="Delete Series"
-                            Click="RemoveSeries"/>
+                    <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Top">
+                        <Button x:Name="PreviousSeriesButton"
+                                i:Attached.Icon="fa7-solid fa7-chevron-left"
+                                FontSize="14" Width="34" Height="34"
+                                Theme="{StaticResource MenuButton}"
+                                ToolTip.Tip="Previous Series"
+                                IsEnabled="{CompiledBinding HasPrevious}"
+                                Click="NavigatePreviousSeries"/>
+                        <Button x:Name="NextSeriesButton"
+                                i:Attached.Icon="fa7-solid fa7-chevron-right"
+                                FontSize="14" Width="34" Height="34"
+                                Theme="{StaticResource MenuButton}"
+                                ToolTip.Tip="Next Series"
+                                IsEnabled="{CompiledBinding HasNext}"
+                                Click="NavigateNextSeries"/>
+                        <Border Width="1" Margin="0,4" Background="{DynamicResource TsundokuDividerColor}" Opacity="0.5"/>
+                        <Button x:Name="OpenSeriesLinkButton"
+                                i:Attached.Icon="fa7-solid fa7-arrow-up-right-from-square"
+                                FontSize="14" Width="34" Height="34"
+                                Theme="{StaticResource MenuButton}"
+                                ToolTip.Tip="Open Series Link"
+                                Click="OpenSeriesLinkAsync"/>
+                        <ToggleButton x:Name="FavoriteButton"
+                                      IsChecked="{CompiledBinding Series.IsFavorite, Mode=TwoWay}"
+                                      Theme="{StaticResource MenuToggleButton}"
+                                      Height="34" Width="34" FontSize="14"
+                                      ToolTip.Tip="Favorite"
+                                      i:Attached.Icon="fa7-solid fa7-heart"/>
+                        <Button x:Name="ChangeSeriesVolumeCountButton"
+                                i:Attached.Icon="fa7-solid fa7-arrows-rotate"
+                                FontSize="14" Width="34" Height="34"
+                                Theme="{StaticResource MenuButton}"
+                                ToolTip.Tip="Refresh series data from AniList"
+                                Click="RefreshSeriesAsync"/>
+                        <Button x:Name="SaveStatsButton"
+                                i:Attached.Icon="fa7-solid fa7-floppy-disk"
+                                FontSize="14" Width="34" Height="34"
+                                Theme="{StaticResource MenuButton}"
+                                ToolTip.Tip="Save Stats"
+                                Click="SaveStats"/>
+                        <Button x:Name="MarkCompleteButton"
+                                i:Attached.Icon="fa7-solid fa7-check-double"
+                                FontSize="14" Width="34" Height="34"
+                                Theme="{StaticResource MenuButton}"
+                                ToolTip.Tip="Mark Complete (set current = max)"
+                                Click="MarkSeriesComplete"/>
+                        <Button x:Name="DeleteSeriesButton"
+                                i:Attached.Icon="fa7-solid fa7-trash-can"
+                                FontSize="14" Width="34" Height="34"
+                                Theme="{StaticResource MenuButton}"
+                                ToolTip.Tip="Delete Series"
+                                Click="RemoveSeries"/>
+                    </StackPanel>
+                    <ItemsControl Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                                  ItemsSource="{CompiledBinding Series.Titles}"
+                                  Margin="26,6,0,0">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid ColumnDefinitions="Auto,*" Margin="0,1">
+                                    <TextBlock Grid.Column="0"
+                                               Text="{Binding Key}"
+                                               FontSize="10"
+                                               FontWeight="Bold"
+                                               LetterSpacing="0.5"
+                                               Opacity="0.55"
+                                               Foreground="{DynamicResource TsundokuMenuTextColor}"
+                                               VerticalAlignment="Top"
+                                               Margin="0,2,8,0"/>
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding Value}"
+                                               FontSize="13"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource TsundokuUsernameColor}"
+                                               TextWrapping="Wrap"
+                                               VerticalAlignment="Top"
+                                               MaxWidth="700"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                 </Grid>
             </Border>
 
@@ -45,8 +115,8 @@
                     <StackPanel Spacing="4">
                         <TextBlock Text="SERIES NOTES" Classes="section-title"/>
                         <TextBox x:Name="SeriesNotesTextBox"
-                                 Height="160"
-                                 Width="460"
+                                 Height="220"
+                                 Width="560"
                                  Text="{CompiledBinding Series.SeriesNotes, Mode=TwoWay}"
                                  AcceptsReturn="True"
                                  TextWrapping="Wrap"
@@ -59,7 +129,7 @@
                     </StackPanel>
 
                     <!-- Current Vols / Max Vols / Volumes Read / Rating -->
-                    <Grid ColumnDefinitions="*,6,*,6,*,6,*" RowDefinitions="Auto,Auto" MinWidth="460">
+                    <Grid ColumnDefinitions="*,6,*,6,*,6,*" RowDefinitions="Auto,Auto" MinWidth="560">
                         <TextBlock Grid.Row="0" Grid.Column="0" Text="CURRENT VOLS" Classes="section-title" Margin="0,0,0,4" HorizontalAlignment="Center"/>
                         <MaskedTextBox x:Name="CurVolumeMaskedTextBox"
                                        Grid.Row="1" Grid.Column="0"
@@ -108,7 +178,7 @@
                     <StackPanel Spacing="4">
                         <TextBlock Text="COVER IMAGE URL" Classes="section-title"
                                    ToolTip.Tip="{CompiledBinding CoverImageUrl}"/>
-                        <Grid ColumnDefinitions="*,6,Auto,6,Auto" Width="460">
+                        <Grid ColumnDefinitions="*,6,Auto,6,Auto" Width="560">
                             <TextBox x:Name="CoverImageUrlTextBox"
                                      Grid.Column="0"
                                      FontSize="13" Height="34"
@@ -135,7 +205,7 @@
                     </StackPanel>
 
                     <!-- Publisher / Value / Demographic -->
-                    <Grid ColumnDefinitions="*,6,*,6,*" RowDefinitions="Auto,Auto" MinWidth="460">
+                    <Grid ColumnDefinitions="*,6,*,6,*" RowDefinitions="Auto,Auto" MinWidth="560">
                         <TextBlock Grid.Row="0" Grid.Column="0" Text="PUBLISHER" Classes="section-title" Margin="0,0,0,4" HorizontalAlignment="Center"
                                    ToolTip.Tip="{CompiledBinding Series.Publisher}"/>
                         <TextBox x:Name="PublisherTextBox"
@@ -178,35 +248,6 @@
                         </ComboBox>
                     </Grid>
 
-                    <!-- Action Buttons -->
-                    <Border Classes="divider"/>
-                    <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
-                        <Button x:Name="ChangeSeriesVolumeCountButton"
-                                Theme="{StaticResource MenuButton}"
-                                Height="34" Padding="14,0" FontSize="13"
-                                ToolTip.Tip="Refresh series data from AniList"
-                                Click="RefreshSeriesAsync">
-                            <StackPanel Orientation="Horizontal" Spacing="6">
-                                <i:Icon Value="fa7-solid fa7-arrows-rotate" FontSize="13"/>
-                                <TextBlock Text="Refresh" VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-                        <Button Theme="{StaticResource MenuButton}"
-                                Height="34" Padding="14,0" FontSize="13"
-                                ToolTip.Tip="Save Stats"
-                                Click="SaveStats">
-                            <StackPanel Orientation="Horizontal" Spacing="6">
-                                <i:Icon Value="fa7-solid fa7-floppy-disk" FontSize="13"/>
-                                <TextBlock Text="Save" VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-                        <ToggleButton x:Name="FavoriteButton"
-                                      IsChecked="{CompiledBinding Series.IsFavorite, Mode=TwoWay}"
-                                      Theme="{StaticResource MenuToggleButton}"
-                                      Height="34" Width="34" FontSize="14"
-                                      ToolTip.Tip="Favorite"
-                                      i:Attached.Icon="fa7-solid fa7-heart"/>
-                    </StackPanel>
                 </StackPanel>
 
                 <!-- RIGHT COLUMN: Genres -->

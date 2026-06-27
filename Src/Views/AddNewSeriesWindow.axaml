@@ -33,12 +33,37 @@
 				<StackPanel Grid.Column="0" Spacing="12" Name="FormFields" Width="520">
 					<!-- Title -->
 					<StackPanel Spacing="4">
-						<TextBlock Text="TITLE OR ID" Classes="section-title" ToolTip.Tip="{Binding #SeriesInputTextBox.Text}"/>
+						<StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+							<Border x:Name="UrlSourcePill"
+									Padding="8,3"
+									CornerRadius="10"
+									Background="{DynamicResource TsundokuStatusAndBookTypeBGColor}"
+									BorderBrush="{DynamicResource TsundokuStatusAndBookTypeBorderColor}"
+									BorderThickness="1.5"
+									VerticalAlignment="Center"
+									IsVisible="{CompiledBinding DetectedUrlSource, Converter={x:Static ObjectConverters.IsNotNull}}">
+								<StackPanel Orientation="Horizontal" Spacing="6">
+									<i:Icon Value="fa7-solid fa7-link" FontSize="10"
+											Foreground="{DynamicResource TsundokuStatusAndBookTypeTextColor}"
+											VerticalAlignment="Center"/>
+									<TextBlock FontSize="10" FontWeight="Bold"
+											   Foreground="{DynamicResource TsundokuStatusAndBookTypeTextColor}"
+											   VerticalAlignment="Center">
+										<Run Text="Detected: "/>
+										<Run Text="{CompiledBinding DetectedUrlSource}"/>
+									</TextBlock>
+								</StackPanel>
+							</Border>
+							<TextBlock Text="TITLE, ID OR LINK" Classes="section-title" VerticalAlignment="Center" ToolTip.Tip="{Binding #SeriesInputTextBox.Text}"/>
+						</StackPanel>
 						<TextBox x:Name="SeriesInputTextBox"
-							FontSize="13" FontWeight="Bold" Height="60"
+							FontSize="13" FontWeight="Bold"
+							Height="90" MinHeight="90" MaxHeight="90"
 							Text="{CompiledBinding TitleText}" Classes="Menu"
 							BorderThickness="2" TextWrapping="Wrap"
-							PlaceholderText="Title or AniList/MangaDex ID..."/>
+							ScrollViewer.VerticalScrollBarVisibility="Auto"
+							ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+							PlaceholderText="Title, AniList/MangaDex ID, or paste URL..."/>
 					</StackPanel>
 
 					<Popup
