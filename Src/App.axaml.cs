@@ -415,6 +415,13 @@ public sealed partial class App : Application
     #endif
         config.LoggingRules.Add(allowWarnPlus);
 
+        // 3) Drop HttpClient request/response chatter — only surface Warn+
+        var dropHttpClientChatter = new LoggingRule("System.Net.Http.HttpClient.*", NLog.LogLevel.Trace, NLog.LogLevel.Info, blackHole)
+        {
+            Final = true
+        };
+        config.LoggingRules.Add(dropHttpClientChatter);
+
         // --- Default catch-alls ---
         config.LoggingRules.Add(new LoggingRule("*", NLog.LogLevel.Info, NLog.LogLevel.Fatal, asyncWrapper));
     #if DEBUG

@@ -7,6 +7,7 @@ using ReactiveUI;
 using ReactiveUI.SourceGenerators;
 using Tsundoku.Helpers;
 using Tsundoku.Models;
+using Tsundoku.Services;
 using static Tsundoku.Models.Enums.SeriesDemographicModel;
 using static Tsundoku.Models.Enums.SeriesGenreModel;
 
@@ -18,18 +19,23 @@ namespace Tsundoku.ViewModels;
 public sealed partial class EditSeriesInfoViewModel : ViewModelBase, IDisposable
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
-    public Series Series { get; }
+    private readonly ISharedSeriesCollectionProvider? _sharedSeriesProvider;
+    [Reactive] public partial Series Series { get; set; }
     [Reactive] public partial int DemographicIndex { get; set; }
     [Reactive] public partial string CoverImageUrl { get; set; }
     [Reactive] public partial string GenresToolTipText { get; set; }
     [Reactive] public partial string SeriesValueText { get; set; }
     [Reactive] public partial string SeriesValueMaskedText { get; set; }
     [Reactive] public partial string VolumesReadText { get; set; }
+    [Reactive] public partial bool HasPrevious { get; set; }
+    [Reactive] public partial bool HasNext { get; set; }
     public AvaloniaList<string> SelectedGenres { get; set; } = [];
 
-    public EditSeriesInfoViewModel(Series series, IUserService userService) : base(userService)
+    public EditSeriesInfoViewModel(Series series, IUserService userService, ISharedSeriesCollectionProvider? sharedSeriesProvider = null) : base(userService)
     {
         Series = series;
+        _sharedSeriesProvider = sharedSeriesProvider;
+        RecomputeNavigationFlags();
         this.WhenAnyValue(x => x.Series.Demographic)
             .DistinctUntilChanged()
             .ObserveOn(RxSchedulers.TaskpoolScheduler)
@@ -122,6 +128,53 @@ public sealed partial class EditSeriesInfoViewModel : ViewModelBase, IDisposable
             }
         }
         return newGenres;
+    }
+
+    /// <summary>Swaps to the previous series in the active filtered/sorted collection, if any.</summary>
+    public bool NavigatePrevious()
+    {
+        if (_sharedSeriesProvider is null) return false;
+        IReadOnlyList<Series> list = _sharedSeriesProvider.DynamicUserCollection;
+        int index = IndexOfCurrent(list);
+        if (index <= 0) return false;
+        Series = list[index - 1];
+        RecomputeNavigationFlags();
+        return true;
+    }
+
+    /// <summary>Swaps to the next series in the active filtered/sorted collection, if any.</summary>
+    public bool NavigateNext()
+    {
+        if (_sharedSeriesProvider is null) return false;
+        IReadOnlyList<Series> list = _sharedSeriesProvider.DynamicUserCollection;
+        int index = IndexOfCurrent(list);
+        if (index < 0 || index >= list.Count - 1) return false;
+        Series = list[index + 1];
+        RecomputeNavigationFlags();
+        return true;
+    }
+
+    private int IndexOfCurrent(IReadOnlyList<Series> list)
+    {
+        for (int i = 0; i < list.Count; i++)
+        {
+            if (ReferenceEquals(list[i], Series)) return i;
+        }
+        return -1;
+    }
+
+    private void RecomputeNavigationFlags()
+    {
+        if (_sharedSeriesProvider is null)
+        {
+            HasPrevious = false;
+            HasNext = false;
+            return;
+        }
+        IReadOnlyList<Series> list = _sharedSeriesProvider.DynamicUserCollection;
+        int index = IndexOfCurrent(list);
+        HasPrevious = index > 0;
+        HasNext = index >= 0 && index < list.Count - 1;
     }
 
     public void Dispose()

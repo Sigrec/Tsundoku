@@ -25,14 +25,59 @@
                                    Foreground="{DynamicResource TsundokuUsernameColor}"
                                    VerticalAlignment="Center"/>
                     </StackPanel>
-                    <Button Grid.Row="0" Grid.Column="1"
-                            x:Name="DeleteSeriesButton"
-                            i:Attached.Icon="fa7-solid fa7-trash-can"
-                            FontSize="14" Width="34" Height="34"
-                            Theme="{StaticResource MenuButton}"
-                            ToolTip.Tip="Delete Series"
-                            VerticalAlignment="Top"
-                            Click="RemoveSeries"/>
+                    <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Top">
+                        <Button x:Name="PreviousSeriesButton"
+                                i:Attached.Icon="fa7-solid fa7-chevron-left"
+                                FontSize="14" Width="34" Height="34"
+                                Theme="{StaticResource MenuButton}"
+                                ToolTip.Tip="Previous Series"
+                                IsEnabled="{CompiledBinding HasPrevious}"
+                                Click="NavigatePreviousSeries"/>
+                        <Button x:Name="NextSeriesButton"
+                                i:Attached.Icon="fa7-solid fa7-chevron-right"
+                                FontSize="14" Width="34" Height="34"
+                                Theme="{StaticResource MenuButton}"
+                                ToolTip.Tip="Next Series"
+                                IsEnabled="{CompiledBinding HasNext}"
+                                Click="NavigateNextSeries"/>
+                        <Border Width="1" Margin="0,4" Background="{DynamicResource TsundokuDividerColor}" Opacity="0.5"/>
+                        <Button x:Name="OpenSeriesLinkButton"
+                                i:Attached.Icon="fa7-solid fa7-arrow-up-right-from-square"
+                                FontSize="14" Width="34" Height="34"
+                                Theme="{StaticResource MenuButton}"
+                                ToolTip.Tip="Open Series Link"
+                                Click="OpenSeriesLinkAsync"/>
+                        <ToggleButton x:Name="FavoriteButton"
+                                      IsChecked="{CompiledBinding Series.IsFavorite, Mode=TwoWay}"
+                                      Theme="{StaticResource MenuToggleButton}"
+                                      Height="34" Width="34" FontSize="14"
+                                      ToolTip.Tip="Favorite"
+                                      i:Attached.Icon="fa7-solid fa7-heart"/>
+                        <Button x:Name="ChangeSeriesVolumeCountButton"
+                                i:Attached.Icon="fa7-solid fa7-arrows-rotate"
+                                FontSize="14" Width="34" Height="34"
+                                Theme="{StaticResource MenuButton}"
+                                ToolTip.Tip="Refresh series data from AniList"
+                                Click="RefreshSeriesAsync"/>
+                        <Button x:Name="SaveStatsButton"
+                                i:Attached.Icon="fa7-solid fa7-floppy-disk"
+                                FontSize="14" Width="34" Height="34"
+                                Theme="{StaticResource MenuButton}"
+                                ToolTip.Tip="Save Stats"
+                                Click="SaveStats"/>
+                        <Button x:Name="MarkCompleteButton"
+                                i:Attached.Icon="fa7-solid fa7-check-double"
+                                FontSize="14" Width="34" Height="34"
+                                Theme="{StaticResource MenuButton}"
+                                ToolTip.Tip="Mark Complete (set current = max)"
+                                Click="MarkSeriesComplete"/>
+                        <Button x:Name="DeleteSeriesButton"
+                                i:Attached.Icon="fa7-solid fa7-trash-can"
+                                FontSize="14" Width="34" Height="34"
+                                Theme="{StaticResource MenuButton}"
+                                ToolTip.Tip="Delete Series"
+                                Click="RemoveSeries"/>
+                    </StackPanel>
                     <ItemsControl Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
                                   ItemsSource="{CompiledBinding Series.Titles}"
                                   Margin="26,6,0,0">
@@ -70,7 +115,7 @@
                     <StackPanel Spacing="4">
                         <TextBlock Text="SERIES NOTES" Classes="section-title"/>
                         <TextBox x:Name="SeriesNotesTextBox"
-                                 Height="160"
+                                 Height="220"
                                  Width="560"
                                  Text="{CompiledBinding Series.SeriesNotes, Mode=TwoWay}"
                                  AcceptsReturn="True"
@@ -203,35 +248,6 @@
                         </ComboBox>
                     </Grid>
 
-                    <!-- Action Buttons -->
-                    <Border Classes="divider"/>
-                    <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
-                        <Button x:Name="ChangeSeriesVolumeCountButton"
-                                Theme="{StaticResource MenuButton}"
-                                Height="34" Padding="14,0" FontSize="13"
-                                ToolTip.Tip="Refresh series data from AniList"
-                                Click="RefreshSeriesAsync">
-                            <StackPanel Orientation="Horizontal" Spacing="6">
-                                <i:Icon Value="fa7-solid fa7-arrows-rotate" FontSize="13"/>
-                                <TextBlock Text="Refresh" VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-                        <Button Theme="{StaticResource MenuButton}"
-                                Height="34" Padding="14,0" FontSize="13"
-                                ToolTip.Tip="Save Stats"
-                                Click="SaveStats">
-                            <StackPanel Orientation="Horizontal" Spacing="6">
-                                <i:Icon Value="fa7-solid fa7-floppy-disk" FontSize="13"/>
-                                <TextBlock Text="Save" VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </Button>
-                        <ToggleButton x:Name="FavoriteButton"
-                                      IsChecked="{CompiledBinding Series.IsFavorite, Mode=TwoWay}"
-                                      Theme="{StaticResource MenuToggleButton}"
-                                      Height="34" Width="34" FontSize="14"
-                                      ToolTip.Tip="Favorite"
-                                      i:Attached.Icon="fa7-solid fa7-heart"/>
-                    </StackPanel>
                 </StackPanel>
 
                 <!-- RIGHT COLUMN: Genres -->

@@ -126,6 +126,15 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
                 string query = shelf?.Query ?? string.Empty;
                 AdvancedSearchQuery = query;
                 _sharedSeriesProvider.AdvancedSearchQuery = query;
+
+                if (shelf is not null)
+                {
+                    LOGGER.Info("Shelf \"{ShelfName}\" applied: {Query}", shelf.Name, shelf.Query);
+                }
+                else
+                {
+                    LOGGER.Info("Shelf cleared");
+                }
             })
             .DisposeWith(_disposables);
     }
@@ -177,7 +186,7 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
 
     public async Task CreateEditSeriesDialog(Series series)
     {
-        await EditSeriesInfoDialog.Handle(new EditSeriesInfoViewModel(series, _userService));
+        await EditSeriesInfoDialog.Handle(new EditSeriesInfoViewModel(series, _userService, _sharedSeriesProvider));
     }
 
     public void UpdateUserIcon(string filePath)

@@ -74,13 +74,13 @@ public sealed partial class SeriesCardDisplay : UserControl
 
     private static readonly Animation _fadeInAnimation = new()
     {
-        Duration = TimeSpan.FromMilliseconds(650),
+        Duration = TimeSpan.FromMilliseconds(950),
         Easing = new QuadraticEaseOut(),
         FillMode = FillMode.Forward,
         Children =
         {
             new KeyFrame { Cue = new Cue(0.0), Setters = { new Setter(OpacityProperty, 0.0) } },
-            new KeyFrame { Cue = new Cue(0.3), Setters = { new Setter(OpacityProperty, 0.0) } },
+            new KeyFrame { Cue = new Cue(0.2), Setters = { new Setter(OpacityProperty, 0.0) } },
             new KeyFrame { Cue = new Cue(1.0), Setters = { new Setter(OpacityProperty, 1.0) } }
         }
     };

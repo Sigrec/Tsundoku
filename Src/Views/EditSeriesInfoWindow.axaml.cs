@@ -6,6 +6,7 @@ using Optris.Icons.Avalonia;
 using ReactiveUI.Avalonia;
 using System.Reactive.Linq;
 using Tsundoku.Helpers;
+using Tsundoku.Models;
 using Tsundoku.Services;
 using Tsundoku.ViewModels;
 using static Tsundoku.Models.Enums.SeriesDemographicModel;
@@ -33,18 +34,7 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
 
         Opened += (s, e) =>
         {
-            string curTitle = ViewModel.Series.Titles.TryGetValue(ViewModel.CurrentUser.Language, out string? title)
-                ? title
-                : ViewModel.Series.Titles[TsundokuLanguage.Romaji];
-
-            DiscordRP.SetPresence(
-                state: $"Editing {curTitle} {ViewModel.Series.Format}",
-                refreshTimestamp: true,
-                additionalButton: new DiscordRPC.Button { Label = "AniList", Url = ViewModel.Series.Link.ToString() });
-                
-            this.Title = $"{curTitle}";
-
-            UpdateSelectedGenres();
+            ApplyCurrentSeries();
             _IsInitialized = true;
 
             // Disable refresh if AniList is down
@@ -289,6 +279,67 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
             _mainWindowViewModel.DeleteSeries(ViewModel.Series);
             this.Close();
         }
+    }
+
+    private async void OpenSeriesLinkAsync(object sender, RoutedEventArgs args)
+    {
+        if (ViewModel?.Series?.Link is null) return;
+        await ViewModelBase.OpenSiteLink(ViewModel.Series.Link.ToString());
+    }
+
+    private void NavigatePreviousSeries(object sender, RoutedEventArgs args)
+    {
+        if (ViewModel?.NavigatePrevious() == true)
+        {
+            ApplyCurrentSeries();
+        }
+    }
+
+    private void NavigateNextSeries(object sender, RoutedEventArgs args)
+    {
+        if (ViewModel?.NavigateNext() == true)
+        {
+            ApplyCurrentSeries();
+        }
+    }
+
+    private void ApplyCurrentSeries()
+    {
+        if (ViewModel?.Series is null) return;
+
+        string curTitle = ViewModel.Series.Titles.TryGetValue(ViewModel.CurrentUser.Language, out string? title)
+            ? title
+            : ViewModel.Series.Titles[TsundokuLanguage.Romaji];
+
+        DiscordRP.SetPresence(
+            state: $"Editing {curTitle} {ViewModel.Series.Format}",
+            refreshTimestamp: true,
+            additionalButton: new DiscordRPC.Button { Label = "AniList", Url = ViewModel.Series.Link.ToString() });
+
+        this.Title = curTitle;
+        UpdateSelectedGenres();
+    }
+
+    private async void MarkSeriesComplete(object sender, RoutedEventArgs args)
+    {
+        if (ViewModel?.Series is null) return;
+
+        Series series = ViewModel.Series;
+        if (series.MaxVolumeCount == 0)
+        {
+            await _popupDialogService.ShowAsync(
+                "Max Volumes Unknown",
+                "fa7-solid fa7-circle-exclamation",
+                "Set the maximum volume count before marking this series complete.",
+                this);
+            return;
+        }
+
+        if (series.CurVolumeCount == series.MaxVolumeCount) return;
+
+        series.CurVolumeCount = series.MaxVolumeCount;
+        AppLog.CreateLogger<EditSeriesInfoWindow>()
+            .SeriesMarkedComplete(series.Titles[TsundokuLanguage.Romaji], series.MaxVolumeCount);
     }
 
     private void ChangeSeriesVolumeCounts()

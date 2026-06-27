@@ -584,14 +584,6 @@ KeyDown += async (s, e) =>
         }
     }
 
-    private void ShelfClicked(object sender, RoutedEventArgs args)
-    {
-        if (sender is Button { Tag: SavedShelf shelf })
-        {
-            ViewModel.SelectedShelf = shelf;
-        }
-    }
-
     private async void RenameShelf(object sender, RoutedEventArgs args)
     {
         if (sender is not MenuItem { Tag: SavedShelf shelf }) return;
@@ -617,7 +609,9 @@ KeyDown += async (s, e) =>
 
     private async void DeleteShelf(object sender, RoutedEventArgs args)
     {
-        if (sender is not MenuItem { Tag: SavedShelf shelf }) return;
+        if (sender is not Control { Tag: SavedShelf shelf }) return;
+
+        args.Handled = true;
 
         bool confirmed = await _popupDialogService.ConfirmAsync(
             "Delete Shelf",

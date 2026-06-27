@@ -480,39 +480,145 @@
                     </Grid>
 
                     <!-- Row 4: Saved shelves (named filters) -->
-                    <ItemsControl Grid.Row="4"
-                                  Name="ShelfChipsRow"
-                                  ItemsSource="{CompiledBinding Shelves}">
-                        <ItemsControl.ItemsPanel>
+                    <ListBox Grid.Row="4"
+                             Name="ShelfChipsRow"
+                             Background="Transparent"
+                             BorderThickness="0"
+                             Padding="0"
+                             SelectionMode="Single,Toggle"
+                             ItemsSource="{CompiledBinding Shelves}"
+                             SelectedItem="{CompiledBinding SelectedShelf, Mode=TwoWay}">
+                        <ListBox.Styles>
+                            <Style Selector="ListBoxItem">
+                                <Setter Property="Padding" Value="0"/>
+                                <Setter Property="Margin" Value="0,0,6,6"/>
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="BorderThickness" Value="0"/>
+                                <Setter Property="CornerRadius" Value="14"/>
+                                <Setter Property="Cursor" Value="Hand"/>
+                                <Setter Property="Transitions">
+                                    <Transitions>
+                                        <BrushTransition Property="Background" Duration="0:0:0.18"/>
+                                    </Transitions>
+                                </Setter>
+                            </Style>
+                            <Style Selector="ListBoxItem /template/ ContentPresenter">
+                                <Setter Property="CornerRadius" Value="14"/>
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="BorderThickness" Value="0"/>
+                                <Setter Property="Padding" Value="0"/>
+                            </Style>
+                            <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="BorderThickness" Value="0"/>
+                            </Style>
+                            <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="BorderThickness" Value="0"/>
+                            </Style>
+                            <Style Selector="ListBoxItem:selected:focus /template/ ContentPresenter">
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="BorderThickness" Value="0"/>
+                            </Style>
+                            <Style Selector="ListBoxItem Border.shelf-chip">
+                                <Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGColor}"/>
+                                <Setter Property="BorderBrush" Value="{DynamicResource TsundokuMenuButtonBorderColor}"/>
+                                <Setter Property="Transitions">
+                                    <Transitions>
+                                        <BrushTransition Property="Background" Duration="0:0:0.22"/>
+                                        <BrushTransition Property="BorderBrush" Duration="0:0:0.22"/>
+                                    </Transitions>
+                                </Setter>
+                            </Style>
+                            <Style Selector="ListBoxItem Border.shelf-chip TextBlock.shelf-text">
+                                <Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
+                                <Setter Property="Transitions">
+                                    <Transitions>
+                                        <BrushTransition Property="Foreground" Duration="0:0:0.22"/>
+                                    </Transitions>
+                                </Setter>
+                            </Style>
+                            <Style Selector="ListBoxItem Border.shelf-chip i|Icon.shelf-icon">
+                                <Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
+                                <Setter Property="Transitions">
+                                    <Transitions>
+                                        <BrushTransition Property="Foreground" Duration="0:0:0.22"/>
+                                    </Transitions>
+                                </Setter>
+                            </Style>
+                            <Style Selector="ListBoxItem:selected Border.shelf-chip">
+                                <Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
+                                <Setter Property="BorderBrush" Value="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
+                            </Style>
+                            <Style Selector="ListBoxItem:selected Border.shelf-chip TextBlock.shelf-text">
+                                <Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonBGColor}"/>
+                            </Style>
+                            <Style Selector="ListBoxItem:selected Border.shelf-chip i|Icon.shelf-icon">
+                                <Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonBGColor}"/>
+                            </Style>
+                            <Style Selector="ListBoxItem Border.shelf-chip Button.shelf-close i|Icon.shelf-close-icon">
+                                <Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
+                                <Setter Property="Opacity" Value="0.55"/>
+                            </Style>
+                            <Style Selector="ListBoxItem Border.shelf-chip Button.shelf-close:pointerover">
+                                <Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBorderColor}"/>
+                            </Style>
+                            <Style Selector="ListBoxItem Border.shelf-chip Button.shelf-close:pointerover i|Icon.shelf-close-icon">
+                                <Setter Property="Opacity" Value="1"/>
+                            </Style>
+                            <Style Selector="ListBoxItem:selected Border.shelf-chip Button.shelf-close i|Icon.shelf-close-icon">
+                                <Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonBGColor}"/>
+                                <Setter Property="Opacity" Value="0.7"/>
+                            </Style>
+                            <Style Selector="ListBoxItem:selected Border.shelf-chip Button.shelf-close:pointerover">
+                                <Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGColor}"/>
+                            </Style>
+                            <Style Selector="ListBoxItem:selected Border.shelf-chip Button.shelf-close:pointerover i|Icon.shelf-close-icon">
+                                <Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
+                                <Setter Property="Opacity" Value="1"/>
+                            </Style>
+                        </ListBox.Styles>
+                        <ListBox.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <WrapPanel Orientation="Horizontal" ItemSpacing="6" LineSpacing="6"/>
+                                <WrapPanel Orientation="Horizontal"/>
                             </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
+                        </ListBox.ItemsPanel>
+                        <ListBox.ItemTemplate>
                             <DataTemplate x:DataType="m:SavedShelf">
-                                <Button Padding="10,4"
-                                        FontSize="12"
-                                        FontWeight="Bold"
+                                <Border Classes="shelf-chip"
+                                        BorderThickness="2"
                                         CornerRadius="14"
-                                        Cursor="Hand"
-                                        Theme="{StaticResource MenuButton}"
-                                        Click="ShelfClicked"
-                                        ToolTip.Tip="{CompiledBinding Query}"
-                                        Tag="{CompiledBinding}">
+                                        Padding="10,4,4,4"
+                                        ToolTip.Tip="{CompiledBinding Query}">
                                     <StackPanel Orientation="Horizontal" Spacing="6">
-                                        <i:Icon Value="{CompiledBinding IconKey}" FontSize="11" VerticalAlignment="Center"/>
-                                        <TextBlock Text="{CompiledBinding Name}" VerticalAlignment="Center"/>
+                                        <i:Icon Classes="shelf-icon" Value="{CompiledBinding IconKey}" FontSize="11" VerticalAlignment="Center"/>
+                                        <TextBlock Classes="shelf-text" Text="{CompiledBinding Name}" FontSize="12" FontWeight="Bold" VerticalAlignment="Center"/>
+                                        <Button Classes="shelf-close"
+                                                Tag="{CompiledBinding}"
+                                                Click="DeleteShelf"
+                                                ToolTip.Tip="Delete shelf"
+                                                Width="18" Height="18"
+                                                Padding="0"
+                                                Margin="2,0,0,0"
+                                                CornerRadius="9"
+                                                VerticalAlignment="Center"
+                                                HorizontalAlignment="Center"
+                                                Background="Transparent"
+                                                BorderThickness="0"
+                                                Cursor="Hand">
+                                            <i:Icon Classes="shelf-close-icon" Value="fa7-solid fa7-xmark" FontSize="11"/>
+                                        </Button>
                                     </StackPanel>
-                                    <Button.ContextMenu>
+                                    <Border.ContextMenu>
                                         <ContextMenu>
                                             <MenuItem Header="Rename…" Click="RenameShelf" Tag="{CompiledBinding}"/>
                                             <MenuItem Header="Delete" Click="DeleteShelf" Tag="{CompiledBinding}"/>
                                         </ContextMenu>
-                                    </Button.ContextMenu>
-                                </Button>
+                                    </Border.ContextMenu>
+                                </Border>
                             </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
                 </Grid>
             </Border>
 

@@ -3,8 +3,8 @@ using System.Collections.Specialized;
 using System.Reactive.Disposables.Fluent;
 using System.Reactive.Linq;
 using Avalonia.Collections;
-using Avalonia.Controls;
 using MangaAndLightNovelWebScrape;
+using MangaAndLightNovelWebScrape.Websites;
 using ReactiveUI;
 using ReactiveUI.SourceGenerators;
 
@@ -21,9 +21,30 @@ public sealed partial class PriceAnalysisViewModel : ViewModelBase, IDisposable
     [Reactive] public partial bool WebsitesSelected { get; set; } = false;
     [Reactive] public partial string WebsitesToolTipText { get; set; }
     [Reactive] public partial int CurRegionIndex { get; set; }
-    public AvaloniaList<ListBoxItem> SelectedWebsites { get; } = [];
+    public AvaloniaList<string> AvailableWebsites { get; } = [];
+    public AvaloniaList<string> SelectedWebsites { get; } = [];
     private readonly StringBuilder _curWebsites = new();
     private static readonly Region[] CachedRegionValues = Enum.GetValues<Region>();
+
+    private static readonly FrozenDictionary<Website, string> WebsiteTitles =
+        new Dictionary<Website, string>
+        {
+            [Website.AllStarComics] = AllStarComics.TITLE,
+            [Website.AmazonUSA] = AmazonUSA.TITLE,
+            [Website.BooksAMillion] = BooksAMillion.TITLE,
+            [Website.Crunchyroll] = Crunchyroll.TITLE,
+            [Website.ForbiddenPlanet] = ForbiddenPlanet.TITLE,
+            [Website.InStockTrades] = InStockTrades.TITLE,
+            [Website.KingsComics] = KingsComics.TITLE,
+            [Website.KinokuniyaUSA] = KinokuniyaUSA.TITLE,
+            [Website.MangaMart] = MangaMart.TITLE,
+            [Website.MangaMate] = MangaMate.TITLE,
+            [Website.MerryManga] = MerryManga.TITLE,
+            [Website.OKComics] = OKComics.TITLE,
+            [Website.RobertsAnimeCornerStore] = RobertsAnimeCornerStore.TITLE,
+            [Website.SciFier] = SciFier.TITLE,
+            [Website.TravellingMan] = TravellingMan.TITLE,
+        }.ToFrozenDictionary();
 
     public static readonly FrozenSet<string> ANALYSIS_COUNTRY_OPTIONS = new[]
     {
@@ -48,12 +69,29 @@ public sealed partial class PriceAnalysisViewModel : ViewModelBase, IDisposable
 
     public PriceAnalysisViewModel(IUserService userService) : base(userService)
     {
-
         SelectedWebsites.CollectionChanged += WebsiteCollectionChanged;
+
         this.WhenAnyValue(x => x.CurrentUser.Region)
             .DistinctUntilChanged()
-            .Subscribe(x => CurRegionIndex = Array.IndexOf(CachedRegionValues, x))
+            .Subscribe(region =>
+            {
+                CurRegionIndex = Array.IndexOf(CachedRegionValues, region);
+                RebuildAvailableWebsites(region);
+            })
             .DisposeWith(_disposables);
+    }
+
+    private void RebuildAvailableWebsites(Region region)
+    {
+        SelectedWebsites.Clear();
+        AvailableWebsites.Clear();
+        foreach (Website site in MangaAndLightNovelWebScrape.Helpers.GetRegionWebsiteList(region))
+        {
+            if (WebsiteTitles.TryGetValue(site, out string? title))
+            {
+                AvailableWebsites.Add(title);
+            }
+        }
     }
 
     /// <summary>
@@ -75,9 +113,9 @@ public sealed partial class PriceAnalysisViewModel : ViewModelBase, IDisposable
 
         for (int x = 0; x < SelectedWebsites.Count - 1; x++)
         {
-            _curWebsites.AppendLine(SelectedWebsites[x].Content.ToString());
+            _curWebsites.AppendLine(SelectedWebsites[x]);
         }
-        _curWebsites.Append(SelectedWebsites[^1].Content.ToString());
+        _curWebsites.Append(SelectedWebsites[^1]);
         WebsitesToolTipText = _curWebsites.ToString();
         _curWebsites.Clear();
     }
