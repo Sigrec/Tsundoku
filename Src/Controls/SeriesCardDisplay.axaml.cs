@@ -1,3 +1,5 @@
+using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using Avalonia.Animation;
 using Avalonia.Animation.Easings;
 using Avalonia.Controls;
@@ -5,6 +7,7 @@ using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Styling;
 using Microsoft.Extensions.DependencyInjection;
+using ReactiveUI;
 using Tsundoku.Helpers;
 using Tsundoku.Models;
 using Tsundoku.Services;
@@ -52,6 +55,8 @@ public sealed partial class SeriesCardDisplay : UserControl
     private readonly IUserService _userService;
     private Guid _loadedCoverSeriesId;
     private bool _isAttached;
+    private IDisposable? _completionSubscription;
+    private uint _lastKnownCurCount;
 
     public SeriesCardDisplay()
         : this(
@@ -85,6 +90,40 @@ public sealed partial class SeriesCardDisplay : UserControl
         }
     };
 
+    private static readonly Animation _completionPulseAnimation = new()
+    {
+        Duration = TimeSpan.FromMilliseconds(650),
+        Easing = new CubicEaseOut(),
+        FillMode = FillMode.Forward,
+        Children =
+        {
+            new KeyFrame
+            {
+                Cue = new Cue(0.0),
+                Setters =
+                {
+                    new Setter(RenderTransformProperty, new ScaleTransform(1.0, 1.0)),
+                },
+            },
+            new KeyFrame
+            {
+                Cue = new Cue(0.35),
+                Setters =
+                {
+                    new Setter(RenderTransformProperty, new ScaleTransform(1.06, 1.06)),
+                },
+            },
+            new KeyFrame
+            {
+                Cue = new Cue(1.0),
+                Setters =
+                {
+                    new Setter(RenderTransformProperty, new ScaleTransform(1.0, 1.0)),
+                },
+            },
+        }
+    };
+
     protected override void OnAttachedToVisualTree(Avalonia.VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
@@ -95,6 +134,7 @@ public sealed partial class SeriesCardDisplay : UserControl
             _loadedCoverSeriesId = Series.Id;
         }
 
+        SubscribeToCompletion(Series);
         _ = _fadeInAnimation.RunAsync(this);
     }
 
@@ -105,6 +145,8 @@ public sealed partial class SeriesCardDisplay : UserControl
             _userService.ReleaseSeriesCover(_loadedCoverSeriesId);
             _loadedCoverSeriesId = Guid.Empty;
         }
+        _completionSubscription?.Dispose();
+        _completionSubscription = null;
         _isAttached = false;
         base.OnDetachedFromVisualTree(e);
     }
@@ -123,8 +165,34 @@ public sealed partial class SeriesCardDisplay : UserControl
         {
             _userService.LoadSeriesCover(newSeries.Id);
             _loadedCoverSeriesId = newSeries.Id;
+            SubscribeToCompletion(newSeries);
             _ = _fadeInAnimation.RunAsync(this);
         }
+        else
+        {
+            _completionSubscription?.Dispose();
+            _completionSubscription = null;
+        }
+    }
+
+    private void SubscribeToCompletion(Series? series)
+    {
+        _completionSubscription?.Dispose();
+        _completionSubscription = null;
+        if (series is null) return;
+
+        _lastKnownCurCount = series.CurVolumeCount;
+        _completionSubscription = series.WhenAnyValue(x => x.CurVolumeCount)
+            .Skip(1)
+            .Subscribe(cur =>
+            {
+                uint prev = _lastKnownCurCount;
+                _lastKnownCurCount = cur;
+                if (series.MaxVolumeCount > 0 && cur == series.MaxVolumeCount && prev < series.MaxVolumeCount)
+                {
+                    _ = _completionPulseAnimation.RunAsync(this);
+                }
+            });
     }
 
     private async void OpenSiteLink(object? sender, PointerPressedEventArgs e)

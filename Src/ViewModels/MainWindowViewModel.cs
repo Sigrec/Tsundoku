@@ -150,6 +150,7 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
 
         SavedShelf shelf = new() { Name = name.Trim(), Query = query };
         _userService.AddShelf(shelf);
+        SelectedShelf = shelf;
     }
 
     public void DeleteShelf(SavedShelf shelf)

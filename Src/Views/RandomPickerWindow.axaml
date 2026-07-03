@@ -1,0 +1,214 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Tsundoku.ViewModels"
+        xmlns:i="clr-namespace:Optris.Icons.Avalonia;assembly=Optris.Icons.Avalonia"
+        xmlns:controls="clr-namespace:Tsundoku.Controls"
+        x:Class="Tsundoku.Views.RandomPickerWindow"
+        Icon="\Assets\Icons\TsundokuLogo.ico"
+        Title="What To Collect Next"
+        Classes="Menu"
+        CanResize="False"
+        SizeToContent="Height"
+        Width="440"
+        WindowStartupLocation="CenterOwner"
+        KeyboardNavigation.TabNavigation="Cycle"
+        x:DataType="vm:RandomPickerViewModel">
+    <Window.Styles>
+        <StyleInclude Source="avares://Tsundoku/Styles/CardScrollBarStyles.axaml"/>
+    </Window.Styles>
+    <Border Classes="Menu" BorderThickness="2" CornerRadius="0,0,8,8" ClipToBounds="True">
+        <Grid RowDefinitions="Auto,*">
+            <controls:WindowHeader Grid.Row="0" Icon="fa7-solid fa7-dice" Title="What To Collect Next"/>
+
+            <Grid Grid.Row="1" Margin="18,16,18,16" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
+
+                <!-- Pool status + keyboard hints -->
+                <StackPanel Grid.Row="0"
+                            Margin="0,0,0,10"
+                            HorizontalAlignment="Center"
+                            Spacing="2">
+                    <TextBlock FontSize="11"
+                               FontWeight="Bold"
+                               Opacity="0.55"
+                               HorizontalAlignment="Center"
+                               Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="{}Pool: {0} incomplete series in current view">
+                                <Binding Path="EligibleCount"/>
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                    <TextBlock FontSize="10"
+                               Opacity="0.4"
+                               HorizontalAlignment="Center"
+                               IsVisible="{CompiledBinding HasPick}"
+                               Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}"
+                               Text="Space or R to reroll · Esc to close"/>
+                </StackPanel>
+
+                <!-- Picked series card -->
+                <Border Grid.Row="1"
+                        IsVisible="{CompiledBinding HasPick}"
+                        Background="{DynamicResource TsundokuMenuButtonBGColor}"
+                        BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}"
+                        BorderThickness="2"
+                        CornerRadius="14"
+                        Padding="14">
+                    <Grid RowDefinitions="Auto,Auto">
+                        <Grid Grid.Row="0" ColumnDefinitions="Auto,12,*">
+                            <Image Grid.Column="0"
+                                   Width="120"
+                                   VerticalAlignment="Top"
+                                   Source="{CompiledBinding PickedSeries.CoverBitMap}"
+                                   Stretch="Uniform"/>
+
+                            <StackPanel Grid.Column="2"
+                                        VerticalAlignment="Top"
+                                        Spacing="6">
+                                <TextBlock Text="{CompiledBinding MainTitle}"
+                                           FontSize="15"
+                                           FontWeight="Bold"
+                                           TextWrapping="Wrap"
+                                           Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
+
+                                <ItemsControl ItemsSource="{CompiledBinding OtherTitles}"
+                                              IsVisible="{CompiledBinding OtherTitles.Count}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}"
+                                                       FontSize="11"
+                                                       Opacity="0.55"
+                                                       TextWrapping="Wrap"
+                                                       Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+
+                                <TextBlock FontSize="12"
+                                           Margin="0,4,0,0"
+                                           Opacity="0.7"
+                                           Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}">
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="{}You have {0} of {1} volumes">
+                                            <Binding Path="PickedSeries.CurVolumeCount"/>
+                                            <Binding Path="PickedSeries.MaxVolumeCount"/>
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+
+                                <Border Margin="0,4,0,0"
+                                        Background="{DynamicResource TsundokuMenuButtonTextAndIconColor}"
+                                        CornerRadius="10"
+                                        Padding="10,6"
+                                        HorizontalAlignment="Left">
+                                    <TextBlock Foreground="{DynamicResource TsundokuMenuButtonBGColor}"
+                                               FontSize="13"
+                                               FontWeight="Bold">
+                                        <TextBlock.Text>
+                                            <MultiBinding StringFormat="{}Grab Vol {0} next">
+                                                <Binding Path="NextVolumeToBuy"/>
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                </Border>
+                            </StackPanel>
+                        </Grid>
+
+                        <ScrollViewer Grid.Row="1"
+                                      Classes="card-desc"
+                                      Margin="0,12,0,0"
+                                      MaxHeight="160"
+                                      HorizontalScrollBarVisibility="Disabled"
+                                      VerticalScrollBarVisibility="Auto">
+                            <TextBlock Text="{CompiledBinding PickedSeries.Description}"
+                                       TextWrapping="Wrap"
+                                       FontSize="11"
+                                       LineHeight="16"
+                                       Opacity="0.6"
+                                       Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
+                        </ScrollViewer>
+                    </Grid>
+                </Border>
+
+                <!-- Empty state -->
+                <Border Grid.Row="1"
+                        IsVisible="{CompiledBinding !HasPick}"
+                        Background="{DynamicResource TsundokuMenuButtonBGColor}"
+                        BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}"
+                        BorderThickness="2"
+                        CornerRadius="14"
+                        Padding="18"
+                        MinHeight="140">
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="8">
+                        <i:Icon Value="fa7-solid fa7-circle-check"
+                                FontSize="28"
+                                Opacity="0.4"
+                                Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}"
+                                HorizontalAlignment="Center"/>
+                        <TextBlock Text="{CompiledBinding EmptyStateMessage}"
+                                   TextWrapping="Wrap"
+                                   TextAlignment="Center"
+                                   MaxWidth="320"
+                                   Opacity="0.7"
+                                   Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Actions -->
+                <UniformGrid Grid.Row="2"
+                             Columns="3"
+                             Margin="0,14,0,0"
+                             IsVisible="{CompiledBinding HasPick}">
+                    <Button Theme="{StaticResource MenuButton}"
+                            Height="34" Padding="10,0" FontSize="12"
+                            Margin="0,0,4,0"
+                            HorizontalAlignment="Stretch"
+                            Cursor="Hand"
+                            Click="RollAgain">
+                        <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
+                            <i:Icon Value="fa7-solid fa7-dice" FontSize="12"/>
+                            <TextBlock Text="Roll Again" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Theme="{StaticResource MenuButton}"
+                            Height="34" Padding="10,0" FontSize="12"
+                            Margin="4,0"
+                            HorizontalAlignment="Stretch"
+                            Cursor="Hand"
+                            Click="CheckPrices">
+                        <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
+                            <i:Icon Value="fa7-solid fa7-magnifying-glass-dollar" FontSize="12"/>
+                            <TextBlock Text="Check Prices" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Theme="{StaticResource MenuButton}"
+                            Height="34" Padding="10,0" FontSize="12"
+                            Margin="4,0,0,0"
+                            HorizontalAlignment="Stretch"
+                            Cursor="Hand"
+                            Click="CloseWindow">
+                        <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
+                            <i:Icon Value="fa7-solid fa7-xmark" FontSize="12"/>
+                            <TextBlock Text="Close" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </UniformGrid>
+
+                <!-- Actions (empty state) -->
+                <StackPanel Grid.Row="2"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Center"
+                            Margin="0,14,0,0"
+                            Spacing="8"
+                            IsVisible="{CompiledBinding !HasPick}">
+                    <Button Theme="{StaticResource MenuButton}"
+                            Height="34" Padding="14,0" FontSize="12"
+                            Cursor="Hand"
+                            Click="CloseWindow">
+                        <TextBlock Text="Close" VerticalAlignment="Center"/>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>

@@ -37,6 +37,7 @@ public sealed partial class AniList
 
     [GeneratedRegex(@"(?is)<i>Note[s]?:.*?</i>|<br\s*/?>|\(Source:.*?\)", RegexOptions.IgnoreCase)] private static partial Regex AniListDescRegex();
     [GeneratedRegex(@"(?:\s*\n)?(?:<br\s*/?>\s*){2,}(?:\n\s*)?", RegexOptions.IgnoreCase)] private static partial Regex AniListBreakRegex();
+    [GeneratedRegex(@"[ \t]*\r?\n(?:[ \t]*\r?\n){2,}")] private static partial Regex ExcessNewlinesRegex();
     [GeneratedRegex(@" \(.*\)")] private static partial Regex StaffRegex();
     [GeneratedRegex(@"</?[^>]+>")] private static partial Regex HtmlTagStripRegex();
     [GeneratedRegex("[“”‘’]")] private static partial Regex SmartQuotesRegex();
@@ -465,6 +466,11 @@ public sealed partial class AniList
             "‘" or "’" => "'",
             _ => m.Value
         });
+
+        // 6. Collapse 3+ consecutive newlines (with optional trailing/leading whitespace)
+        //    down to a single blank line so AniList's stacked \n\n\n runs don't render
+        //    as huge vertical gaps.
+        cleaned = ExcessNewlinesRegex().Replace(cleaned, "\n\n");
 
         return cleaned.Trim();
     }

@@ -38,6 +38,9 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
     [GeneratedRegex(@"\s*\([^)]*\)")]
     private static partial Regex StaffNameRegex();
 
+    [GeneratedRegex(@"[ \t]*\r?\n(?:[ \t]*\r?\n){2,}")]
+    private static partial Regex ExcessNewlinesRegex();
+
     /// <summary>
     /// Asynchronously retrieves MangaDex series data by its title.
     /// Logs and handles HTTP and JSON errors, and URL-encodes the title.
@@ -809,10 +812,14 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
             !span.Contains("___", StringComparison.OrdinalIgnoreCase) &&
             !span.Contains("\r\n \r\n", StringComparison.OrdinalIgnoreCase))
         {
-            return ExtensionMethods.NormalizeQuotes(seriesDescription.TrimEnd('\n')).Trim();
+            return ExcessNewlinesRegex().Replace(
+                ExtensionMethods.NormalizeQuotes(seriesDescription.TrimEnd('\n')).Trim(),
+                "\n\n");
         }
-        
-        return ExtensionMethods.NormalizeQuotes(MangaDexDescCleanupRegex().Replace(seriesDescription, string.Empty)).Trim();
+
+        return ExcessNewlinesRegex().Replace(
+            ExtensionMethods.NormalizeQuotes(MangaDexDescCleanupRegex().Replace(seriesDescription, string.Empty)).Trim(),
+            "\n\n");
     }
 
     private readonly struct AuthorEntry(string id, string type)

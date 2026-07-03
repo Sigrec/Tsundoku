@@ -17,7 +17,7 @@
   <ItemGroup Label="Application">
     <PackageVersion Include="CsvHelper" Version="33.1.0" />
     <PackageVersion Include="DiscordRichPresence" Version="1.6.1.70" />
-    <PackageVersion Include="DynamicData" Version="9.4.31" />
+    <PackageVersion Include="DynamicData" Version="9.4.33" />
     <PackageVersion Include="GraphQL.Client" Version="6.1.0" />
     <PackageVersion Include="GraphQL.Client.Serializer.SystemTextJson" Version="6.1.0" />
     <PackageVersion Include="MangaAndLightNovelWebScrape" Version="6.0.0" />
