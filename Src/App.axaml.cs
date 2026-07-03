@@ -309,6 +309,8 @@ public sealed partial class App : Application
         services.AddSingleton<UserNotesWindow>();
         services.AddSingleton<UserNotesWindowViewModel>();
 
+        services.AddTransient<RandomPickerViewModel>();
+
         services.AddTransient<EditSeriesInfoWindow>();
 
         services.AddTransient<PopupDialogViewModel>();

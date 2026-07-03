@@ -540,6 +540,17 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
         }
         if (user!.UserCollection is not null)
         {
+            foreach (Series s in user!.UserCollection)
+            {
+                if (!string.IsNullOrEmpty(s.Description))
+                {
+                    string collapsed = s.Description.CollapseExcessNewlines();
+                    if (!ReferenceEquals(collapsed, s.Description))
+                    {
+                        s.Description = collapsed;
+                    }
+                }
+            }
             _userCollectionSourceCache.Clear();
             _userCollectionSourceCache.AddOrUpdate(user!.UserCollection);
             SyncCoverFilesAndCleanupOrphans(_userCollectionSourceCache);

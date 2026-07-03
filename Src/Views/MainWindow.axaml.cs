@@ -278,6 +278,40 @@ KeyDown += async (s, e) =>
         }
     }
 
+    private async void OpenRandomPicker(object sender, RoutedEventArgs args)
+    {
+        IServiceProvider? services = App.ServiceProvider;
+        if (services is null) return;
+        RandomPickerViewModel pickerVm = services.GetRequiredService<RandomPickerViewModel>();
+        pickerVm.Reset();
+
+        RandomPickerWindow picker = new(pickerVm);
+        picker.RollOnOpen();
+
+        await picker.ShowDialog(this);
+
+        if (!string.IsNullOrWhiteSpace(picker.RequestedPriceAnalysisTitle))
+        {
+            PriceAnalysisWindow? paWindow = this.OpenManagedWindow<PriceAnalysisWindow, PriceAnalysisViewModel>(_priceAnalysisWindow, "Price Analysis Window");
+            if (paWindow is not null)
+            {
+                AnalysisButton.IsChecked = true;
+                paWindow.Closing += (s, e) => AnalysisButton.IsChecked = false;
+                paWindow.SearchTextBox.Text = picker.RequestedPriceAnalysisTitle;
+                if (picker.RequestedIsNovel)
+                {
+                    paWindow.NovelButton.IsChecked = true;
+                    paWindow.MangaButton.IsChecked = false;
+                }
+                else
+                {
+                    paWindow.MangaButton.IsChecked = true;
+                    paWindow.NovelButton.IsChecked = false;
+                }
+            }
+        }
+    }
+
     private void OpenThemeSettingsDialog(object sender, RoutedEventArgs args)
     {
         CollectionThemeWindow? window = this.OpenManagedWindow<CollectionThemeWindow, ThemeSettingsViewModel>(_themeSettingsWindow, "Theme Settings Window");

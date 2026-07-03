@@ -131,5 +131,14 @@
       "Series cards now fade in a touch more gradually so filter and shelf toggles read as a soft cross-fade instead of a hard repaint"
     ],
     "actions": []
+  },
+  "2.3.1": {
+    "changes": [
+      "New Random Picker — dice button in the toolbar rolls an incomplete series from your current view, shows which volume to buy next, and deep-links into Price Analysis pre-filled with the series title and book type (Space or R to reroll, Esc to close)",
+      "Fixed Smart Shelves so a newly-created shelf is immediately selected and highlighted — previously the fresh chip did nothing on first click because it was already representing the current filter state",
+      "Series card gets a brief pulse animation the moment you complete a set — the volume that brings Cur to Max plays it once",
+      "AniList and MangaDex descriptions no longer render giant vertical gaps between paragraphs; excess blank lines are collapsed on parse, and existing series descriptions are cleaned up on load"
+    ],
+    "actions": []
   }
 }

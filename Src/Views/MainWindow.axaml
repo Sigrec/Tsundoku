@@ -386,6 +386,13 @@
                                     ToolTip.Tip="Analysis"
                                     Cursor="Hand"
                                     Click="OpenPriceAnalysisDialog"/>
+                            <Button Name="RandomPickerButton"
+                                    i:Attached.Icon="fa7-solid fa7-dice"
+                                    Width="34" Height="34" FontSize="14"
+                                    Theme="{StaticResource MenuButton}"
+                                    ToolTip.Tip="What to collect next"
+                                    Cursor="Hand"
+                                    Click="OpenRandomPicker"/>
                             <Button Name="DonateButton"
                                     Theme="{StaticResource MenuButton}"
                                     i:Attached.Icon="fa7-solid fa7-circle-dollar-to-slot"

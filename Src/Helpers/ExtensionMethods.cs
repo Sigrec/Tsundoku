@@ -1,4 +1,5 @@
 using System.Buffers;
+using System.Text.RegularExpressions;
 using Avalonia.Media.Imaging;
 using Microsoft.IO;
 
@@ -7,8 +8,22 @@ namespace Tsundoku.Helpers;
 /// <summary>
 /// Provides extension methods and utility functions for string manipulation, bitmap cloning, and collection comparison.
 /// </summary>
-public static class ExtensionMethods
+public static partial class ExtensionMethods
 {
+    [GeneratedRegex(@"[ \t]*\r?\n(?:[ \t]*\r?\n){2,}")]
+    private static partial Regex ExcessNewlinesRegex();
+
+    /// <summary>
+    /// Collapses runs of 3+ consecutive newlines down to a single blank line
+    /// (i.e. exactly one \n\n). CRLF-safe. Returns the original string when
+    /// no such run is present.
+    /// </summary>
+    public static string CollapseExcessNewlines(this string input)
+    {
+        if (string.IsNullOrEmpty(input)) return input;
+        return ExcessNewlinesRegex().Replace(input, "\n\n");
+    }
+
     private static readonly SearchValues<char> SmartQuoteChars = SearchValues.Create(
     [
         '\u201C', '\u201D', '\u201E', '\u201F',
