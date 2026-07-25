@@ -5,7 +5,9 @@ using Avalonia.Animation.Easings;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using Avalonia.Media.Transformation;
 using Avalonia.Styling;
+using Avalonia.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
 using Tsundoku.Helpers;
@@ -90,6 +92,9 @@ public sealed partial class SeriesCardDisplay : UserControl
         }
     };
 
+    private static readonly ITransform _pulseIdentity = TransformOperations.Parse("scale(1, 1)");
+    private static readonly ITransform _pulsePeak = TransformOperations.Parse("scale(1.06, 1.06)");
+
     private static readonly Animation _completionPulseAnimation = new()
     {
         Duration = TimeSpan.FromMilliseconds(650),
@@ -100,26 +105,17 @@ public sealed partial class SeriesCardDisplay : UserControl
             new KeyFrame
             {
                 Cue = new Cue(0.0),
-                Setters =
-                {
-                    new Setter(RenderTransformProperty, new ScaleTransform(1.0, 1.0)),
-                },
+                Setters = { new Setter(RenderTransformProperty, _pulseIdentity) },
             },
             new KeyFrame
             {
                 Cue = new Cue(0.35),
-                Setters =
-                {
-                    new Setter(RenderTransformProperty, new ScaleTransform(1.06, 1.06)),
-                },
+                Setters = { new Setter(RenderTransformProperty, _pulsePeak) },
             },
             new KeyFrame
             {
                 Cue = new Cue(1.0),
-                Setters =
-                {
-                    new Setter(RenderTransformProperty, new ScaleTransform(1.0, 1.0)),
-                },
+                Setters = { new Setter(RenderTransformProperty, _pulseIdentity) },
             },
         }
     };
@@ -184,13 +180,21 @@ public sealed partial class SeriesCardDisplay : UserControl
         _lastKnownCurCount = series.CurVolumeCount;
         _completionSubscription = series.WhenAnyValue(x => x.CurVolumeCount)
             .Skip(1)
+            .ObserveOn(RxSchedulers.MainThreadScheduler)
             .Subscribe(cur =>
             {
                 uint prev = _lastKnownCurCount;
                 _lastKnownCurCount = cur;
-                if (series.MaxVolumeCount > 0 && cur == series.MaxVolumeCount && prev < series.MaxVolumeCount)
+                if (!_isAttached) return;
+                if (series.MaxVolumeCount == 0 || cur != series.MaxVolumeCount || prev >= series.MaxVolumeCount) return;
+
+                try
                 {
                     _ = _completionPulseAnimation.RunAsync(this);
+                }
+                catch (Exception ex)
+                {
+                    LOGGER.Warn(ex, "Completion pulse animation failed on card for {SeriesId}", series.Id);
                 }
             });
     }

@@ -12,7 +12,7 @@ public sealed partial class RandomPickerViewModel : ViewModelBase
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
     private readonly ISharedSeriesCollectionProvider _sharedSeriesProvider;
-    private readonly Random _rng = new();
+    private static readonly Random _rng = Random.Shared;
     private Guid _lastPickedId = Guid.Empty;
 
     [Reactive] public partial Series? PickedSeries { get; set; }
@@ -31,7 +31,7 @@ public sealed partial class RandomPickerViewModel : ViewModelBase
     public void Roll()
     {
         ReadOnlyObservableCollection<Series> pool = _sharedSeriesProvider.DynamicUserCollection;
-        List<Series> eligible = [.. pool.Where(s => s.CurVolumeCount < s.MaxVolumeCount)];
+        List<Series> eligible = [.. pool.AsValueEnumerable().Where(static s => s.CurVolumeCount < s.MaxVolumeCount)];
         EligibleCount = eligible.Count;
 
         if (eligible.Count == 0)
@@ -86,12 +86,17 @@ public sealed partial class RandomPickerViewModel : ViewModelBase
 
         MainTitle = primary;
 
-        OtherTitles.Clear();
+        List<string> others = new(series.Titles.Count);
         foreach (KeyValuePair<TsundokuLanguageModel.TsundokuLanguage, string> kv in series.Titles)
         {
             if (string.IsNullOrWhiteSpace(kv.Value)) continue;
             if (string.Equals(kv.Value, primary, StringComparison.Ordinal)) continue;
-            OtherTitles.Add(kv.Value);
+            others.Add(kv.Value);
+        }
+        OtherTitles.Clear();
+        if (others.Count > 0)
+        {
+            OtherTitles.AddRange(others);
         }
     }
 

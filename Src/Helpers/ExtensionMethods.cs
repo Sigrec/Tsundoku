@@ -21,6 +21,7 @@ public static partial class ExtensionMethods
     public static string CollapseExcessNewlines(this string input)
     {
         if (string.IsNullOrEmpty(input)) return input;
+        if (!input.Contains("\n\n\n", StringComparison.Ordinal)) return input;
         return ExcessNewlinesRegex().Replace(input, "\n\n");
     }
 

@@ -59,6 +59,7 @@
                             <Image Grid.Column="0"
                                    Width="120"
                                    VerticalAlignment="Top"
+                                   RenderOptions.BitmapInterpolationMode="HighQuality"
                                    Source="{CompiledBinding PickedSeries.CoverBitMap}"
                                    Stretch="Uniform"/>
 

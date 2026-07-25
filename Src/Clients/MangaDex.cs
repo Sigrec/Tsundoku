@@ -812,14 +812,20 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
             !span.Contains("___", StringComparison.OrdinalIgnoreCase) &&
             !span.Contains("\r\n \r\n", StringComparison.OrdinalIgnoreCase))
         {
-            return ExcessNewlinesRegex().Replace(
-                ExtensionMethods.NormalizeQuotes(seriesDescription.TrimEnd('\n')).Trim(),
-                "\n\n");
+            string cleaned = ExtensionMethods.NormalizeQuotes(seriesDescription.TrimEnd('\n')).Trim();
+            if (cleaned.Contains("\n\n\n", StringComparison.Ordinal))
+            {
+                cleaned = ExcessNewlinesRegex().Replace(cleaned, "\n\n");
+            }
+            return cleaned;
         }
 
-        return ExcessNewlinesRegex().Replace(
-            ExtensionMethods.NormalizeQuotes(MangaDexDescCleanupRegex().Replace(seriesDescription, string.Empty)).Trim(),
-            "\n\n");
+        string collapsed = ExtensionMethods.NormalizeQuotes(MangaDexDescCleanupRegex().Replace(seriesDescription, string.Empty)).Trim();
+        if (collapsed.Contains("\n\n\n", StringComparison.Ordinal))
+        {
+            collapsed = ExcessNewlinesRegex().Replace(collapsed, "\n\n");
+        }
+        return collapsed;
     }
 
     private readonly struct AuthorEntry(string id, string type)

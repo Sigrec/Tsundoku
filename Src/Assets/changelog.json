@@ -140,5 +140,13 @@
       "AniList and MangaDex descriptions no longer render giant vertical gaps between paragraphs; excess blank lines are collapsed on parse, and existing series descriptions are cleaned up on load"
     ],
     "actions": []
+  },
+  "2.3.2": {
+    "changes": [
+      "Fixed a crash when clicking the + button on the volume that completes a series — the completion pulse animation now runs cleanly instead of throwing",
+      "Random Picker cover art uses higher-quality downscaling for a crisper preview at the 120px thumbnail size",
+      "Upgraded the Avalonia UI framework to 12.1.0 for upstream rendering and control improvements"
+    ],
+    "actions": []
   }
 }

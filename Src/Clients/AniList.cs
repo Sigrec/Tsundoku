@@ -470,7 +470,10 @@ public sealed partial class AniList
         // 6. Collapse 3+ consecutive newlines (with optional trailing/leading whitespace)
         //    down to a single blank line so AniList's stacked \n\n\n runs don't render
         //    as huge vertical gaps.
-        cleaned = ExcessNewlinesRegex().Replace(cleaned, "\n\n");
+        if (cleaned.Contains("\n\n\n", StringComparison.Ordinal))
+        {
+            cleaned = ExcessNewlinesRegex().Replace(cleaned, "\n\n");
+        }
 
         return cleaned.Trim();
     }

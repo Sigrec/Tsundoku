@@ -283,7 +283,6 @@ KeyDown += async (s, e) =>
         IServiceProvider? services = App.ServiceProvider;
         if (services is null) return;
         RandomPickerViewModel pickerVm = services.GetRequiredService<RandomPickerViewModel>();
-        pickerVm.Reset();
 
         RandomPickerWindow picker = new(pickerVm);
         picker.RollOnOpen();
