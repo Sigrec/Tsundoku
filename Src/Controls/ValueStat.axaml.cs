@@ -35,4 +35,12 @@ public sealed class ValueStat : TemplatedControl
         get => GetValue(CopyTextProperty);
         set => SetValue(CopyTextProperty, value);
     }
+
+    public static readonly StyledProperty<string?> SecondaryTextProperty = AvaloniaProperty.Register<ValueStat, string?>(nameof(SecondaryText));
+
+    public string? SecondaryText
+    {
+        get => GetValue(SecondaryTextProperty);
+        set => SetValue(SecondaryTextProperty, value);
+    }
 }

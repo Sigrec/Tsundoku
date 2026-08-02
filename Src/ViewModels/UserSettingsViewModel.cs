@@ -25,21 +25,34 @@ public sealed partial class UserSettingsViewModel : ViewModelBase
     [Reactive] public partial bool KinokuniyaUSAMember { get; set; }
     [Reactive] public partial bool RefreshCovers { get; set; }
     [Reactive] public partial bool GlassmorphismEnabled { get; set; }
+    [Reactive] public partial bool PreferNearlyCompleteSeriesPick { get; set; }
     [Reactive] public partial string SelectedCurrency { get; set; } = "$";
+    [Reactive] public partial string SelectedSecondaryCurrency { get; set; } = OffOption;
+    [Reactive] public partial string CurrencyRatesStatus { get; set; } = "Using bundled defaults";
+    [Reactive] public partial bool CanRefreshCurrencyRates { get; set; } = true;
+
+    public const string OffOption = "Off";
+    public IReadOnlyList<string> SecondaryCurrencyOptions { get; } =
+        [OffOption, .. Tsundoku.Models.Constants.AVAILABLE_CURRENCIES];
+
+    public bool IsSecondaryCurrencyActive => !string.IsNullOrEmpty(SelectedSecondaryCurrency) && SelectedSecondaryCurrency != OffOption;
 
     private readonly AddNewSeriesViewModel _addNewSeriesViewModel;
     private readonly ILoadingDialogService _loadingDialogService;
     private readonly BitmapHelper _bitmapHelper;
     private readonly Clients.MangaDex _mangaDex;
     private readonly Clients.AniList _aniList;
+    private readonly ICurrencyRateService _currencyRateService;
 
-    public UserSettingsViewModel(IUserService userService, AddNewSeriesViewModel addNewSeriesViewModel, ILoadingDialogService loadingDialogService, BitmapHelper bitmapHelper, Clients.MangaDex mangaDex, Clients.AniList aniList) : base(userService)
+    public UserSettingsViewModel(IUserService userService, AddNewSeriesViewModel addNewSeriesViewModel, ILoadingDialogService loadingDialogService, BitmapHelper bitmapHelper, Clients.MangaDex mangaDex, Clients.AniList aniList, ICurrencyRateService currencyRateService) : base(userService)
     {
         _addNewSeriesViewModel = addNewSeriesViewModel;
         _loadingDialogService = loadingDialogService;
         _bitmapHelper = bitmapHelper;
         _mangaDex = mangaDex;
         _aniList = aniList;
+        _currencyRateService = currencyRateService;
+        RefreshRatesStatus();
 
         // Sync SelectedCurrency from user data
         this.WhenAnyValue(x => x.CurrentUser)
@@ -71,27 +84,29 @@ public sealed partial class UserSettingsViewModel : ViewModelBase
                 KinokuniyaUSAMember = user.Memberships.TryGetValue(KinokuniyaUSA.TITLE, out bool kino) && kino;
                 RefreshCovers = user.RefreshCovers;
                 GlassmorphismEnabled = user.GlassmorphismEnabled;
+                PreferNearlyCompleteSeriesPick = user.PreferNearlyCompleteSeriesPick;
+                SelectedSecondaryCurrency = string.IsNullOrEmpty(user.SecondaryCurrency) ? OffOption : user.SecondaryCurrency;
             })
             .DisposeWith(_disposables);
 
         this.WhenAnyValue(x => x.BooksAMillionMember)
             .Skip(1)
             .DistinctUntilChanged()
-            .ObserveOn(RxSchedulers.MainThreadScheduler)
+            .ObserveOn(TsundokuSchedulers.MainThread)
             .Subscribe(isMember => UpdateMembership(BooksAMillion.TITLE, isMember))
             .DisposeWith(_disposables);
 
         this.WhenAnyValue(x => x.KinokuniyaUSAMember)
             .Skip(1)
             .DistinctUntilChanged()
-            .ObserveOn(RxSchedulers.MainThreadScheduler)
+            .ObserveOn(TsundokuSchedulers.MainThread)
             .Subscribe(isMember => UpdateMembership(KinokuniyaUSA.TITLE, isMember))
             .DisposeWith(_disposables);
 
         this.WhenAnyValue(x => x.RefreshCovers)
             .Skip(1)
             .DistinctUntilChanged()
-            .ObserveOn(RxSchedulers.MainThreadScheduler)
+            .ObserveOn(TsundokuSchedulers.MainThread)
             .Subscribe(value =>
             {
                 _userService.UpdateUser(user => user.RefreshCovers = value);
@@ -102,7 +117,7 @@ public sealed partial class UserSettingsViewModel : ViewModelBase
         this.WhenAnyValue(x => x.GlassmorphismEnabled)
             .Skip(1)
             .DistinctUntilChanged()
-            .ObserveOn(RxSchedulers.MainThreadScheduler)
+            .ObserveOn(TsundokuSchedulers.MainThread)
             .Subscribe(value =>
             {
                 _userService.UpdateUser(user => user.GlassmorphismEnabled = value);
@@ -110,6 +125,55 @@ public sealed partial class UserSettingsViewModel : ViewModelBase
                 LOGGER.Debug("Updated GlassmorphismEnabled to {Value}", value);
             })
             .DisposeWith(_disposables);
+
+        this.WhenAnyValue(x => x.PreferNearlyCompleteSeriesPick)
+            .Skip(1)
+            .DistinctUntilChanged()
+            .ObserveOn(TsundokuSchedulers.MainThread)
+            .Subscribe(value =>
+            {
+                _userService.UpdateUser(user => user.PreferNearlyCompleteSeriesPick = value);
+                LOGGER.Debug("Updated PreferNearlyCompleteSeriesPick to {Value}", value);
+            })
+            .DisposeWith(_disposables);
+
+        this.WhenAnyValue(x => x.SelectedSecondaryCurrency)
+            .Skip(1)
+            .DistinctUntilChanged()
+            .ObserveOn(TsundokuSchedulers.MainThread)
+            .Subscribe(value =>
+            {
+                string? persisted = value == OffOption ? null : value;
+                _userService.UpdateUser(user => user.SecondaryCurrency = persisted);
+                this.RaisePropertyChanged(nameof(IsSecondaryCurrencyActive));
+                LOGGER.Debug("Updated SecondaryCurrency to {Value}", persisted ?? "(off)");
+            })
+            .DisposeWith(_disposables);
+    }
+
+    public async Task RefreshCurrencyRatesAsync()
+    {
+        CanRefreshCurrencyRates = false;
+        try
+        {
+            CurrencyRatesStatus = "Refreshing…";
+            bool ok = await _currencyRateService.RefreshAsync();
+            CurrencyRatesStatus = ok ? BuildRatesStatus() : "Refresh failed — using previous rates";
+        }
+        finally
+        {
+            CanRefreshCurrencyRates = true;
+        }
+    }
+
+    private void RefreshRatesStatus() => CurrencyRatesStatus = BuildRatesStatus();
+
+    private string BuildRatesStatus()
+    {
+        DateTime? last = _currencyRateService.LastRefreshedUtc;
+        return last is null
+            ? "Using bundled defaults — refresh for live rates"
+            : $"Last refreshed {last.Value.ToLocalTime():yyyy-MM-dd HH:mm}";
     }
 
     private void UpdateMembership(string websiteTitle, bool isMember)

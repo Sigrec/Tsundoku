@@ -1,0 +1,155 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Tsundoku.ViewModels"
+        xmlns:m="clr-namespace:Tsundoku.Models"
+        xmlns:i="clr-namespace:Optris.Icons.Avalonia;assembly=Optris.Icons.Avalonia"
+        xmlns:controls="clr-namespace:Tsundoku.Controls"
+        x:Class="Tsundoku.Views.TrashWindow"
+        Icon="\Assets\Icons\TsundokuLogo.ico"
+        Title="Trash"
+        Classes="Menu"
+        CanResize="True"
+        MinWidth="620"
+        MaxWidth="820"
+        MinHeight="480"
+        MaxHeight="820"
+        WindowStartupLocation="CenterOwner"
+        x:DataType="vm:TrashViewModel">
+    <Border Classes="Menu" BorderThickness="2" CornerRadius="0,0,8,8" ClipToBounds="True">
+        <Grid RowDefinitions="Auto,Auto,*">
+            <controls:WindowHeader Grid.Row="0" Icon="fa7-solid fa7-trash-can" Title="Trash"/>
+
+            <!-- Header bar: count + policy + empty-all -->
+            <Grid Grid.Row="1" ColumnDefinitions="*,Auto" Margin="18,14,18,10">
+                <StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="2">
+                    <TextBlock FontSize="12" FontWeight="Bold" Opacity="0.7"
+                               Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="{}{0} series in trash">
+                                <Binding Path="TrashCount"/>
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                    <TextBlock FontSize="10" Opacity="0.45"
+                               Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="{}Entries are auto-deleted after {0} days">
+                                <Binding Path="RetentionDays"/>
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                </StackPanel>
+                <Button Grid.Column="1"
+                        Theme="{StaticResource MenuButton}"
+                        Padding="12,4"
+                        FontSize="12"
+                        FontWeight="Bold"
+                        Cursor="Hand"
+                        IsEnabled="{CompiledBinding TrashCount}"
+                        Click="EmptyTrashClick">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <i:Icon Value="fa7-solid fa7-fire" FontSize="12"/>
+                        <TextBlock Text="Empty Trash" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+            </Grid>
+
+            <!-- Empty state -->
+            <StackPanel Grid.Row="2"
+                        IsVisible="{CompiledBinding !TrashCount}"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Spacing="14">
+                <i:Icon Value="fa7-solid fa7-trash-can"
+                        FontSize="40"
+                        Opacity="0.3"
+                        HorizontalAlignment="Center"
+                        Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
+                <TextBlock Text="Trash is empty"
+                           FontSize="14"
+                           FontWeight="SemiBold"
+                           Opacity="0.6"
+                           HorizontalAlignment="Center"
+                           Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
+            </StackPanel>
+
+            <!-- List of trashed items -->
+            <ScrollViewer Grid.Row="2"
+                          IsVisible="{CompiledBinding TrashCount}"
+                          HorizontalScrollBarVisibility="Disabled"
+                          VerticalScrollBarVisibility="Auto"
+                          Padding="14,4,14,14">
+                <ItemsControl ItemsSource="{CompiledBinding Trash}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Spacing="8"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="m:TrashedSeries">
+                            <Border Background="{DynamicResource TsundokuMenuButtonBGColor}"
+                                    BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}"
+                                    BorderThickness="2"
+                                    CornerRadius="12"
+                                    Padding="12">
+                                <Grid ColumnDefinitions="Auto,12,*,Auto" VerticalAlignment="Center">
+                                    <TextBlock Grid.Column="0"
+                                               Text="{CompiledBinding Series.Titles[Romaji], FallbackValue=Series}"
+                                               MaxWidth="200"
+                                               TextTrimming="CharacterEllipsis"
+                                               FontSize="14"
+                                               FontWeight="Bold"
+                                               VerticalAlignment="Center"
+                                               Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
+
+                                    <StackPanel Grid.Column="2" Spacing="2" VerticalAlignment="Center">
+                                        <TextBlock Text="{CompiledBinding Series.Format}"
+                                                   FontSize="11"
+                                                   Opacity="0.65"
+                                                   Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
+                                        <TextBlock FontSize="11"
+                                                   Opacity="0.55"
+                                                   Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}">
+                                            <TextBlock.Text>
+                                                <MultiBinding StringFormat="{}Deleted {0:yyyy-MM-dd HH:mm}">
+                                                    <Binding Path="DeletedAtUtc"/>
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                        <Button Theme="{StaticResource MenuButton}"
+                                                Padding="10,4"
+                                                FontSize="11"
+                                                Cursor="Hand"
+                                                Tag="{CompiledBinding Series.Id}"
+                                                Click="RestoreClick"
+                                                ToolTip.Tip="Restore this series to your collection">
+                                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                                <i:Icon Value="fa7-solid fa7-arrow-rotate-left" FontSize="11"/>
+                                                <TextBlock Text="Restore" VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Button>
+                                        <Button Theme="{StaticResource MenuButton}"
+                                                Padding="10,4"
+                                                FontSize="11"
+                                                Cursor="Hand"
+                                                Tag="{CompiledBinding Series.Id}"
+                                                Click="PurgeClick"
+                                                ToolTip.Tip="Delete this series permanently">
+                                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                                <i:Icon Value="fa7-solid fa7-xmark" FontSize="11"/>
+                                                <TextBlock Text="Delete Forever" VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Button>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Grid>
+    </Border>
+</Window>

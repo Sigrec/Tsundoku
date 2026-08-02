@@ -104,7 +104,7 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
                     _apiHealthCheckService.IsAniListAvailable,
                     _apiHealthCheckService.IsMangaDexAvailable,
                     (aniList, mangaDex) => (AniList: aniList, MangaDex: mangaDex))
-                .ObserveOn(RxSchedulers.MainThreadScheduler)
+                .ObserveOn(TsundokuSchedulers.MainThread)
                 .SelectMany(status => Observable.FromAsync(ct => HandleApiStatusChangeAsync(status, ct)))
                 .Subscribe(
                     onNext: static _ => { },
@@ -147,6 +147,35 @@ KeyDown += async (s, e) =>
                 if (AdvancedSearchPopup.IsVisible)
                 {
                     await ToggleNotificationPopup($"To Exit Advanced Search Press CTRL+F, Esc, or Click Anywhere");
+                }
+            }
+            else if (e.KeyModifiers == KeyModifiers.Control && e.Key == Key.N) // Open Add Series
+            {
+                OpenAddSeriesDialog(this, new RoutedEventArgs());
+            }
+            else if (e.KeyModifiers == KeyModifiers.Control && e.Key == Key.E) // Edit hovered series
+            {
+                Series? target = Controls.SeriesCardDisplay.HoveredSeries;
+                if (target is not null)
+                {
+                    await ViewModel.CreateEditSeriesDialog(target);
+                }
+                else
+                {
+                    await ToggleNotificationPopup("Hover a series card first to edit it");
+                }
+            }
+            else if (e.KeyModifiers == KeyModifiers.Control && e.Key == Key.R) // Refresh hovered series
+            {
+                Series? target = Controls.SeriesCardDisplay.HoveredSeries;
+                if (target is not null)
+                {
+                    await ToggleNotificationPopup($"Refreshing \"{target.Titles.Values.FirstOrDefault() ?? "series"}\"");
+                    await ViewModel.RefreshSeries(target);
+                }
+                else
+                {
+                    await ToggleNotificationPopup("Hover a series card first to refresh it");
                 }
             }
             else if (e.Key == Key.Escape && AdvancedSearchPopup.IsVisible)
@@ -278,6 +307,13 @@ KeyDown += async (s, e) =>
         }
     }
 
+    private void OpenTrashDialog(object sender, RoutedEventArgs args)
+    {
+        TrashWindow? trash = App.ServiceProvider?.GetService(typeof(TrashWindow)) as TrashWindow;
+        if (trash is null) return;
+        this.OpenManagedWindow<TrashWindow, TrashViewModel>(trash, "Trash Window");
+    }
+
     private async void OpenRandomPicker(object sender, RoutedEventArgs args)
     {
         IServiceProvider? services = App.ServiceProvider;
@@ -348,6 +384,11 @@ KeyDown += async (s, e) =>
     {
         if (CollectionPane.Offset.Y <= 0) return;
         CollectionPane.Offset = new Avalonia.Vector(0, 0);
+    }
+
+    private void ClearAllFiltersClick(object? sender, RoutedEventArgs e)
+    {
+        ViewModel?.ClearAllFilters();
     }
 
     /// <summary>

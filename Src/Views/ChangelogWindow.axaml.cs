@@ -6,6 +6,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using ReactiveUI;
 using ReactiveUI.Avalonia;
+using Tsundoku.Helpers;
 using Tsundoku.Models;
 using Tsundoku.ViewModels;
 

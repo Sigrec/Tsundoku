@@ -1,3 +1,4 @@
+using Avalonia.Interactivity;
 using ReactiveUI.Avalonia;
 using Tsundoku.Helpers;
 using Tsundoku.ViewModels;
@@ -12,6 +13,20 @@ public sealed partial class UserNotesWindow : ReactiveWindow<UserNotesWindowView
     {
         ViewModel = viewModel;
         InitializeComponent();
-        this.ConfigureHideOnClose();
+        this.ConfigureHideOnClose(onOpened: RefreshPreview);
+    }
+
+    private void NotesEditToggled(object? sender, RoutedEventArgs e)
+    {
+        if (NotesEditToggle.IsChecked != true)
+        {
+            RefreshPreview();
+        }
+    }
+
+    private void RefreshPreview()
+    {
+        if (ViewModel is null) return;
+        MarkdownRenderer.ApplyTo(NotesPreview, ViewModel.Notes);
     }
 }

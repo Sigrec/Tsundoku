@@ -43,7 +43,13 @@
 					<controls:ValueStat Text="{CompiledBinding FullyCollectedCount, StringFormat='{}{0:N0}'}" Title="Fully Collected" PointerPressed="CopyTextAsync"/>
 					<controls:ValueStat Text="{CompiledBinding CompletionRate}" Title="Completion Rate" PointerPressed="CopyTextAsync"/>
 				</WrapPanel>
-				<controls:ValueStat Text="{CompiledBinding CurrentUser.CollectionValue}" Title="Collection Value" Width="NaN" MinWidth="480" MaxWidth="976" HorizontalAlignment="Center" Margin="4,4,4,0" PointerPressed="CopyTextAsync"/>
+				<controls:ValueStat Text="{CompiledBinding CurrentUser.CollectionValue}"
+				                    SecondaryText="{CompiledBinding SecondaryCollectionValue}"
+				                    Title="Collection Value"
+				                    Width="NaN" MinWidth="480" MaxWidth="976"
+				                    HorizontalAlignment="Center"
+				                    Margin="4,4,4,0"
+				                    PointerPressed="CopyTextAsync"/>
 
 				<!-- DISTRIBUTIONS (3 pie charts in a row, legend below each chart) -->
 				<Border Classes="divider" Margin="0,12,0,0"/>

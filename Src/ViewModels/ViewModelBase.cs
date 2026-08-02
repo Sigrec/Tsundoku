@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Reactive.Linq;
 using ReactiveUI;
 using ReactiveUI.SourceGenerators;
+using Tsundoku.Helpers;
 using Tsundoku.Models;
 
 namespace Tsundoku.ViewModels;
@@ -29,7 +30,7 @@ public partial class ViewModelBase : ReactiveObject
         .Split('+')[0];
 
     /// <summary>The current user data schema version for migration logic.</summary>
-    public const double SCHEMA_VERSION = 6.4;
+    public const double SCHEMA_VERSION = 6.6;
 
     /// <summary>The file name used for persisting user data.</summary>
     public const string USER_DATA_FILEPATH = @"UserData.json";
@@ -52,9 +53,14 @@ public partial class ViewModelBase : ReactiveObject
         _userService = userService;
         _userService.CurrentTheme
             .Where(theme => theme is not null)
-            .ObserveOn(RxSchedulers.MainThreadScheduler)
             .Subscribe(theme => CurrentTheme = theme!)
             .DisposeWith(_disposables);
+
+        TsundokuTheme? snapshot = _userService.GetCurrentThemeSnapshot();
+        if (snapshot is not null)
+        {
+            CurrentTheme = snapshot;
+        }
 
         _userService.CurrentUser
             .Where(user => user is not null) // Filters out the initial null from BehaviorSubject

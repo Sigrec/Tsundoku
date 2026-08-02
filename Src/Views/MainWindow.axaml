@@ -362,7 +362,7 @@
                                     i:Attached.Icon="fa7-solid fa7-square-plus"
                                     Width="34" Height="34" FontSize="14"
                                     Theme="{StaticResource MenuToggleButton}"
-                                    ToolTip.Tip="Add Series"
+                                    ToolTip.Tip="Add Series (Ctrl+N)"
                                     Cursor="Hand"
                                     Click="OpenAddSeriesDialog"/>
                             <ToggleButton Name="ThemeButton"
@@ -393,6 +393,13 @@
                                     ToolTip.Tip="What to collect next"
                                     Cursor="Hand"
                                     Click="OpenRandomPicker"/>
+                            <Button Name="TrashButton"
+                                    i:Attached.Icon="fa7-solid fa7-trash-can"
+                                    Width="34" Height="34" FontSize="14"
+                                    Theme="{StaticResource MenuButton}"
+                                    ToolTip.Tip="Trash (restore recently-deleted series)"
+                                    Cursor="Hand"
+                                    Click="OpenTrashDialog"/>
                             <Button Name="DonateButton"
                                     Theme="{StaticResource MenuButton}"
                                     i:Attached.Icon="fa7-solid fa7-circle-dollar-to-slot"
@@ -630,26 +637,56 @@
             </Border>
 
             <!-- Collection -->
-            <ScrollViewer Name="CollectionPane" DockPanel.Dock="Bottom" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" IsScrollInertiaEnabled="True" Theme="{StaticResource CollectionScroll}" Background="{DynamicResource TsundokuCollectionBGColor}">
-                <ItemsRepeater Name="CollectionItems" Margin="20,30,20,30" ItemsSource="{CompiledBinding UserCollection}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                    <ItemsRepeater.Layout>
-                        <UniformGridLayout
-                            Orientation="Horizontal"
-                            ItemsJustification="Center"
-                            MinItemWidth="{x:Static m:Constants.CARD_CELL_WIDTH}"
-                            MinItemHeight="{x:Static m:Constants.CARD_CELL_HEIGHT}"/>
-                    </ItemsRepeater.Layout>
+            <Grid DockPanel.Dock="Bottom" Background="{DynamicResource TsundokuCollectionBGColor}">
+                <ScrollViewer Name="CollectionPane" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" IsScrollInertiaEnabled="True" Theme="{StaticResource CollectionScroll}">
+                    <ItemsRepeater Name="CollectionItems" Margin="20,30,20,30" ItemsSource="{CompiledBinding UserCollection}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                        <ItemsRepeater.Layout>
+                            <UniformGridLayout
+                                Orientation="Horizontal"
+                                ItemsJustification="Center"
+                                MinItemWidth="{x:Static m:Constants.CARD_CELL_WIDTH}"
+                                MinItemHeight="{x:Static m:Constants.CARD_CELL_HEIGHT}"/>
+                        </ItemsRepeater.Layout>
 
-                    <ItemsRepeater.ItemTemplate>
-                         <DataTemplate DataType="m:Series">
-                            <controls:SeriesCardDisplay
-                                Series="{CompiledBinding}"
-                                Language="{CompiledBinding $parent[Window].((vm:MainWindowViewModel)DataContext).CurrentUser.Language}"
-                                GlassEnabled="{CompiledBinding $parent[Window].((vm:MainWindowViewModel)DataContext).CurrentUser.GlassmorphismEnabled}" />
-                        </DataTemplate>
-                    </ItemsRepeater.ItemTemplate>
-                </ItemsRepeater>
-		    </ScrollViewer>
+                        <ItemsRepeater.ItemTemplate>
+                             <DataTemplate DataType="m:Series">
+                                <controls:SeriesCardDisplay
+                                    Series="{CompiledBinding}"
+                                    Language="{CompiledBinding $parent[Window].((vm:MainWindowViewModel)DataContext).CurrentUser.Language}"
+                                    GlassEnabled="{CompiledBinding $parent[Window].((vm:MainWindowViewModel)DataContext).CurrentUser.GlassmorphismEnabled}" />
+                            </DataTemplate>
+                        </ItemsRepeater.ItemTemplate>
+                    </ItemsRepeater>
+                </ScrollViewer>
+
+                <!-- Empty state: active filter matches zero series -->
+                <StackPanel Name="EmptyStatePanel"
+                            IsVisible="{CompiledBinding IsFilteredEmpty}"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Spacing="14"
+                            IsHitTestVisible="True">
+                    <i:Icon Value="fa7-solid fa7-magnifying-glass"
+                            FontSize="38"
+                            Opacity="0.35"
+                            HorizontalAlignment="Center"
+                            Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
+                    <TextBlock Text="No series match this filter"
+                               FontSize="15"
+                               FontWeight="SemiBold"
+                               Opacity="0.75"
+                               HorizontalAlignment="Center"
+                               Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
+                    <Button Content="Clear filter"
+                            HorizontalAlignment="Center"
+                            Padding="16,6"
+                            FontSize="12"
+                            FontWeight="Bold"
+                            Cursor="Hand"
+                            Theme="{StaticResource MenuButton}"
+                            Click="ClearAllFiltersClick"/>
+                </StackPanel>
+            </Grid>
 	    </DockPanel>
     </Panel>
 </Window>

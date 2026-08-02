@@ -21,6 +21,12 @@
 								   Foreground="{DynamicResource TsundokuUsernameColor}"
 								   FontSize="22"
 								   FontWeight="ExtraBold"/>
+						<TextBlock Text="{TemplateBinding SecondaryText}"
+								   IsVisible="{TemplateBinding SecondaryText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+								   Foreground="{DynamicResource TsundokuUsernameColor}"
+								   FontSize="13"
+								   FontWeight="SemiBold"
+								   Opacity="0.7"/>
 						<TextBlock Text="{TemplateBinding Title}"
 								   Foreground="{DynamicResource TsundokuDividerColor}"
 								   FontSize="11"

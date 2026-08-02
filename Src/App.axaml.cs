@@ -287,6 +287,7 @@ public sealed partial class App : Application
         services.AddSingleton<IUserService, UserService>();
         services.AddSingleton<ISharedSeriesCollectionProvider, SharedSeriesCollectionProvider>();
         services.AddSingleton<IApiHealthCheckService, ApiHealthCheckService>();
+        services.AddSingleton<ICurrencyRateService, CurrencyRateService>();
 
         services.AddTransient<LoadingDialogViewModel>();
         services.AddTransient<ILoadingDialogService, LoadingDialogService>();
@@ -308,6 +309,9 @@ public sealed partial class App : Application
 
         services.AddSingleton<UserNotesWindow>();
         services.AddSingleton<UserNotesWindowViewModel>();
+
+        services.AddSingleton<TrashWindow>();
+        services.AddSingleton<TrashViewModel>();
 
         services.AddTransient<RandomPickerViewModel>();
 

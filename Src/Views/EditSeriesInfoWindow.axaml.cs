@@ -39,7 +39,7 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
 
             // Disable refresh if AniList is down
             System.ObservableExtensions.Subscribe(
-                _apiHealthCheckService.IsAniListAvailable.ObserveOn(AvaloniaScheduler.Instance),
+                _apiHealthCheckService.IsAniListAvailable.ObserveOn(TsundokuSchedulers.MainThread),
                 isAvailable => ChangeSeriesVolumeCountButton.IsEnabled = isAvailable);
         };
 
@@ -269,9 +269,9 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
     {
         string title = ViewModel.Series.Titles.TryGetValue(TsundokuLanguage.Romaji, out string? t) ? t : "this series";
         bool confirmed = await _popupDialogService.ConfirmAsync(
-            "Delete Series",
-            "fa7-solid fa7-triangle-exclamation",
-            $"Are you sure you want to delete \"{title}\" from your collection? This cannot be undone.",
+            "Move to Trash",
+            "fa7-solid fa7-trash-can",
+            $"Move \"{title}\" to the trash? You can restore it from the Trash toolbar button within 30 days.",
             this);
 
         if (confirmed)
@@ -318,6 +318,23 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
 
         this.Title = curTitle;
         UpdateSelectedGenres();
+
+        // Preview is the default view. Re-render whenever we navigate to a series
+        // (prev/next in the toolbar swaps the underlying model without reopening).
+        if (NotesEditToggle.IsChecked != true)
+        {
+            MarkdownRenderer.ApplyTo(NotesPreview, ViewModel.Series.SeriesNotes);
+        }
+    }
+
+    private void NotesEditToggled(object? sender, RoutedEventArgs e)
+    {
+        if (ViewModel?.Series is null) return;
+        // When leaving edit mode, refresh the rendered preview with whatever the user just typed.
+        if (NotesEditToggle.IsChecked != true)
+        {
+            MarkdownRenderer.ApplyTo(NotesPreview, ViewModel.Series.SeriesNotes);
+        }
     }
 
     private async void MarkSeriesComplete(object sender, RoutedEventArgs args)
