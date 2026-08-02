@@ -38,13 +38,13 @@ public sealed partial class EditSeriesInfoViewModel : ViewModelBase, IDisposable
         RecomputeNavigationFlags();
         this.WhenAnyValue(x => x.Series.Demographic)
             .DistinctUntilChanged()
-            .ObserveOn(RxSchedulers.TaskpoolScheduler)
+            .ObserveOn(TsundokuSchedulers.TaskPool)
             .Subscribe(x => DemographicIndex = SERIES_DEMOGRAPHICS_DICT[x])
             .DisposeWith(_disposables);
 
         this.WhenAnyValue(x => x.CurrentUser.Currency)
             .DistinctUntilChanged()
-            .ObserveOn(RxSchedulers.TaskpoolScheduler)
+            .ObserveOn(TsundokuSchedulers.TaskPool)
             .Subscribe(currency =>
             {
                 CultureInfo cultureInfo = CultureInfo.GetCultureInfo(AVAILABLE_CURRENCY_WITH_CULTURE[currency].Culture);
@@ -63,11 +63,12 @@ public sealed partial class EditSeriesInfoViewModel : ViewModelBase, IDisposable
             })
             .DisposeWith(_disposables);
 
-        this.WhenAnyValue(x => x.CurrentUser.Currency, x => x.Series.Value)
-            .ObserveOn(RxSchedulers.TaskpoolScheduler)
+        this.WhenAnyValue(x => x.CurrentUser.Currency, x => x.Series.Value, (currency, value) => (Currency: currency, Value: value))
+            .ObserveOn(TsundokuSchedulers.TaskPool)
             .Subscribe(tuple =>
             {
-                var (currency, value) = tuple;
+                string currency = tuple.Currency;
+                decimal value = tuple.Value;
                 CultureInfo cultureInfo = CultureInfo.GetCultureInfo(AVAILABLE_CURRENCY_WITH_CULTURE[currency].Culture);
                 string formatted = value.ToString($"N{cultureInfo.NumberFormat.CurrencyDecimalDigits}", cultureInfo);
                 if (cultureInfo.NumberFormat.CurrencyPositivePattern is 0 or 2) // 0 = "$n", 2 = "$ n"
@@ -82,7 +83,7 @@ public sealed partial class EditSeriesInfoViewModel : ViewModelBase, IDisposable
             .DisposeWith(_disposables);
 
         this.WhenAnyValue(x => x.Series.VolumesRead)
-            .ObserveOn(RxSchedulers.TaskpoolScheduler)
+            .ObserveOn(TsundokuSchedulers.TaskPool)
             .Subscribe(volumesRead => VolumesReadText = $"VOLS READ {volumesRead}")
             .DisposeWith(_disposables);
 

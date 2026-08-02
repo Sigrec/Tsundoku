@@ -92,6 +92,23 @@ public sealed partial class SeriesCardDisplay : UserControl
         }
     };
 
+    // Per-series cooldown so fast scrolling (which recycles cards through many series in a
+    // short window) doesn't stack a fresh 950ms fade for every recycled attach. Filter/sort
+    // changes usually pause longer than the cooldown so they still get the polished fade in.
+    private static readonly Dictionary<Guid, long> _lastFadedTicks = new();
+    private const long FadeCooldownTicks = TimeSpan.TicksPerMillisecond * 1500;
+
+    private static bool TryClaimFadeSlot(Guid seriesId)
+    {
+        long now = DateTime.UtcNow.Ticks;
+        if (_lastFadedTicks.TryGetValue(seriesId, out long last) && now - last < FadeCooldownTicks)
+        {
+            return false;
+        }
+        _lastFadedTicks[seriesId] = now;
+        return true;
+    }
+
     private static readonly ITransform _pulseIdentity = TransformOperations.Parse("scale(1, 1)");
     private static readonly ITransform _pulsePeak = TransformOperations.Parse("scale(1.06, 1.06)");
 
@@ -131,7 +148,10 @@ public sealed partial class SeriesCardDisplay : UserControl
         }
 
         SubscribeToCompletion(Series);
-        _ = _fadeInAnimation.RunAsync(this);
+        if (Series is null || TryClaimFadeSlot(Series.Id))
+        {
+            _ = _fadeInAnimation.RunAsync(this);
+        }
     }
 
     protected override void OnDetachedFromVisualTree(Avalonia.VisualTreeAttachmentEventArgs e)
@@ -143,8 +163,27 @@ public sealed partial class SeriesCardDisplay : UserControl
         }
         _completionSubscription?.Dispose();
         _completionSubscription = null;
+        if (ReferenceEquals(_hoveredCard, this)) _hoveredCard = null;
         _isAttached = false;
         base.OnDetachedFromVisualTree(e);
+    }
+
+    // Tracks the card the pointer is currently over so window-level keyboard
+    // shortcuts (Ctrl+E / Ctrl+R) know which series to act on. Cleared on detach
+    // so a scrolled-away card can't become a stale target.
+    private static SeriesCardDisplay? _hoveredCard;
+    public static Series? HoveredSeries => _hoveredCard?.Series;
+
+    protected override void OnPointerEntered(Avalonia.Input.PointerEventArgs e)
+    {
+        _hoveredCard = this;
+        base.OnPointerEntered(e);
+    }
+
+    protected override void OnPointerExited(Avalonia.Input.PointerEventArgs e)
+    {
+        if (ReferenceEquals(_hoveredCard, this)) _hoveredCard = null;
+        base.OnPointerExited(e);
     }
 
     private void OnSeriesChanged(Avalonia.AvaloniaPropertyChangedEventArgs e)
@@ -162,7 +201,10 @@ public sealed partial class SeriesCardDisplay : UserControl
             _userService.LoadSeriesCover(newSeries.Id);
             _loadedCoverSeriesId = newSeries.Id;
             SubscribeToCompletion(newSeries);
-            _ = _fadeInAnimation.RunAsync(this);
+            if (TryClaimFadeSlot(newSeries.Id))
+            {
+                _ = _fadeInAnimation.RunAsync(this);
+            }
         }
         else
         {
@@ -180,7 +222,7 @@ public sealed partial class SeriesCardDisplay : UserControl
         _lastKnownCurCount = series.CurVolumeCount;
         _completionSubscription = series.WhenAnyValue(x => x.CurVolumeCount)
             .Skip(1)
-            .ObserveOn(RxSchedulers.MainThreadScheduler)
+            .ObserveOn(TsundokuSchedulers.MainThread)
             .Subscribe(cur =>
             {
                 uint prev = _lastKnownCurCount;

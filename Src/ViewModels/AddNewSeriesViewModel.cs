@@ -66,7 +66,7 @@ public sealed partial class AddNewSeriesViewModel : ViewModelBase, IDisposable
 
         this.WhenAnyValue(x => x.CurrentUser.Currency)
             .DistinctUntilChanged()
-            .ObserveOn(RxSchedulers.MainThreadScheduler)
+            .ObserveOn(TsundokuSchedulers.MainThread)
             .Subscribe(currency =>
             {
                 CultureInfo cultureInfo = CultureInfo.GetCultureInfo(AVAILABLE_CURRENCY_WITH_CULTURE[currency].Culture);
@@ -93,7 +93,7 @@ public sealed partial class AddNewSeriesViewModel : ViewModelBase, IDisposable
         _suggestionsSource.Connect()
             .Sort(new AniListPickerSuggestionComparer())
             .Bind(out ReadOnlyObservableCollection<AniListPickerSuggestion> _suggestions)
-            .ObserveOn(RxSchedulers.MainThreadScheduler)
+            .ObserveOn(TsundokuSchedulers.MainThread)
             .Subscribe()
             .DisposeWith(_disposables);
 
@@ -102,7 +102,7 @@ public sealed partial class AddNewSeriesViewModel : ViewModelBase, IDisposable
         _suggestionsSource
             .CountChanged
             .Select(count => count > 0)
-            .ObserveOn(RxSchedulers.MainThreadScheduler)
+            .ObserveOn(TsundokuSchedulers.MainThread)
             .Subscribe(x => IsSuggestionsOpen = x)
             .DisposeWith(_disposables);
 
@@ -110,7 +110,7 @@ public sealed partial class AddNewSeriesViewModel : ViewModelBase, IDisposable
         this.WhenAnyValue(x => x.TitleText)
             .Select(x => x is null ? string.Empty : x.Trim())
             .DistinctUntilChanged()
-            .ObserveOn(RxSchedulers.MainThreadScheduler)
+            .ObserveOn(TsundokuSchedulers.MainThread)
             .Subscribe(text =>
             {
                 if (SeriesUrlParser.TryParse(text, out SeriesUrlInfo? info))
@@ -130,7 +130,7 @@ public sealed partial class AddNewSeriesViewModel : ViewModelBase, IDisposable
 
         this.WhenAnyValue(x => x.TitleText)
             .Select(x => x is null ? string.Empty : x.Trim())
-            .Throttle(TimeSpan.FromMilliseconds(300), RxSchedulers.TaskpoolScheduler)
+            .Throttle(TimeSpan.FromMilliseconds(300), TsundokuSchedulers.TaskPool)
             .DistinctUntilChanged()
             .Select(x =>
             {
@@ -143,7 +143,7 @@ public sealed partial class AddNewSeriesViewModel : ViewModelBase, IDisposable
                 });
             })
             .Switch()
-            .ObserveOn(RxSchedulers.MainThreadScheduler)
+            .ObserveOn(TsundokuSchedulers.MainThread)
             .Subscribe(items =>
             {
                 _suggestionsSource.Edit(list =>

@@ -6,6 +6,7 @@ using DynamicData;
 using DynamicData.Binding;
 using ReactiveUI;
 using ReactiveUI.SourceGenerators;
+using Tsundoku.Helpers;
 
 namespace Tsundoku.ViewModels;
 
@@ -29,7 +30,7 @@ public sealed partial class FilterBuilderViewModel : ReactiveObject, IDisposable
             .AutoRefresh(c => c.Value)
             .AutoRefresh(c => c.IsConnectorOr)
             .Throttle(TimeSpan.FromMilliseconds(150))
-            .ObserveOn(RxSchedulers.MainThreadScheduler)
+            .ObserveOn(TsundokuSchedulers.MainThread)
             .Subscribe(_ => RebuildQuery())
             .DisposeWith(_disposables);
     }

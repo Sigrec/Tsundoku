@@ -11,6 +11,9 @@
         WindowStartupLocation="CenterScreen"
         SizeToContent="WidthAndHeight"
         CanResize="false">
+    <Window.Styles>
+        <StyleInclude Source="avares://Tsundoku/Styles/CardScrollBarStyles.axaml"/>
+    </Window.Styles>
 
     <Border Classes="Menu" BorderThickness="2" CornerRadius="0,0,8,8" ClipToBounds="True">
         <Grid RowDefinitions="Auto,*">
@@ -65,6 +68,18 @@
                                 Theme="{StaticResource MenuButton}"
                                 ToolTip.Tip="Save Stats"
                                 Click="SaveStats"/>
+                        <Button x:Name="RevertButton"
+                                i:Attached.Icon="fa7-solid fa7-rotate-left"
+                                FontSize="14" Width="34" Height="34"
+                                Theme="{StaticResource MenuButton}"
+                                ToolTip.Tip="Revert unsaved changes (back to last save or window open)"
+                                Click="RevertUnsavedChanges"/>
+                        <Button x:Name="ReapplyButton"
+                                i:Attached.Icon="fa7-solid fa7-rotate-right"
+                                FontSize="14" Width="34" Height="34"
+                                Theme="{StaticResource MenuButton}"
+                                ToolTip.Tip="Reapply reverted changes"
+                                Click="ReapplyRevertedChanges"/>
                         <Button x:Name="MarkCompleteButton"
                                 i:Attached.Icon="fa7-solid fa7-check-double"
                                 FontSize="14" Width="34" Height="34"
@@ -113,19 +128,51 @@
                 <StackPanel Grid.Column="0" Spacing="12">
                     <!-- Series Notes -->
                     <StackPanel Spacing="4">
-                        <TextBlock Text="SERIES NOTES" Classes="section-title"/>
-                        <TextBox x:Name="SeriesNotesTextBox"
-                                 Height="220"
-                                 Width="560"
-                                 Text="{CompiledBinding Series.SeriesNotes, Mode=TwoWay}"
-                                 AcceptsReturn="True"
-                                 TextWrapping="Wrap"
-                                 BorderThickness="2"
-                                 PlaceholderText="Notes..."
-                                 ScrollViewer.IsScrollChainingEnabled="false"
-                                 FontWeight="Bold"
-                                 FontSize="13"
-                                 Classes="Menu"/>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Grid.Column="0" Text="SERIES NOTES" Classes="section-title" VerticalAlignment="Center"/>
+                            <ToggleButton Grid.Column="1"
+                                          x:Name="NotesEditToggle"
+                                          Content="Edit"
+                                          Padding="10,3"
+                                          FontSize="10"
+                                          FontWeight="Bold"
+                                          Cursor="Hand"
+                                          Theme="{StaticResource MenuToggleButton}"
+                                          ToolTip.Tip="Switch to Edit mode. Preview renders Markdown: # heading, **bold**, *italic*, ~~strike~~, `code`, ```block```, [text](url), > quote, - / 1. lists, ---"
+                                          IsCheckedChanged="NotesEditToggled"/>
+                        </Grid>
+
+                        <Panel Height="220" Width="560">
+                            <TextBox x:Name="SeriesNotesTextBox"
+                                     IsVisible="{Binding #NotesEditToggle.IsChecked}"
+                                     Text="{CompiledBinding Series.SeriesNotes, Mode=TwoWay}"
+                                     AcceptsReturn="True"
+                                     TextWrapping="Wrap"
+                                     BorderThickness="2"
+                                     PlaceholderText="Notes... (supports Markdown — toggle Edit to see preview)"
+                                     ScrollViewer.IsScrollChainingEnabled="false"
+                                     FontWeight="Bold"
+                                     FontSize="13"
+                                     Classes="Menu"/>
+
+                            <Border IsVisible="{Binding !#NotesEditToggle.IsChecked}"
+                                    BorderThickness="2"
+                                    BorderBrush="{DynamicResource TsundokuSearchBarBorderColor}"
+                                    Background="{DynamicResource TsundokuSearchBarBGColor}"
+                                    CornerRadius="10">
+                                <ScrollViewer x:Name="NotesPreviewScroller"
+                                              Classes="card-desc"
+                                              HorizontalScrollBarVisibility="Disabled"
+                                              VerticalScrollBarVisibility="Auto"
+                                              Padding="12,10">
+                                    <SelectableTextBlock x:Name="NotesPreview"
+                                                         FontWeight="Normal"
+                                                         FontSize="13"
+                                                         TextWrapping="Wrap"
+                                                         Foreground="{DynamicResource TsundokuSearchBarTextColor}"/>
+                                </ScrollViewer>
+                            </Border>
+                        </Panel>
                     </StackPanel>
 
                     <!-- Current Vols / Max Vols / Volumes Read / Rating -->

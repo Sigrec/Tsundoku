@@ -140,6 +140,10 @@
                         <ToggleButton x:Name="GlassmorphismButton" Grid.Column="1" IsChecked="{CompiledBinding GlassmorphismEnabled}" Classes="toggle-switch" VerticalAlignment="Center" ToolTip.Tip="Enable transparent blur effect on windows"/>
                     </Grid>
                     <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Text="Random Picker: prefer near-complete series" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="{DynamicResource TsundokuMenuTextColor}"/>
+                        <ToggleButton x:Name="PreferNearlyCompleteButton" Grid.Column="1" IsChecked="{CompiledBinding PreferNearlyCompleteSeriesPick}" Classes="toggle-switch" VerticalAlignment="Center" ToolTip.Tip="Bias the What-To-Collect roll toward series that are only a few volumes from complete"/>
+                    </Grid>
+                    <Grid ColumnDefinitions="*,Auto">
                         <TextBlock Text="Currency" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="{DynamicResource TsundokuMenuTextColor}"/>
                         <ComboBox x:Name="CurrencyComboBox"
                                   Grid.Column="1"
@@ -163,6 +167,39 @@
                                 </ResourceDictionary>
                             </ComboBox.Resources>
                         </ComboBox>
+                    </Grid>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Text="Secondary Currency" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="{DynamicResource TsundokuMenuTextColor}"
+                                   ToolTip.Tip="Show your collection value converted to a second currency in Collection Stats"/>
+                        <ComboBox x:Name="SecondaryCurrencyComboBox"
+                                  Grid.Column="1"
+                                  ItemsSource="{CompiledBinding SecondaryCurrencyOptions}"
+                                  Theme="{StaticResource MenuComboBox}"
+                                  HorizontalAlignment="Right"
+                                  SelectedItem="{CompiledBinding SelectedSecondaryCurrency}"
+                                  ItemContainerTheme="{StaticResource MenuComboBoxItem}"
+                                  Width="80" Height="28"
+                                  AutoScrollToSelectedItem="True">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </Grid>
+                    <Grid ColumnDefinitions="*,Auto" IsVisible="{CompiledBinding IsSecondaryCurrencyActive}">
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                            <TextBlock Text="Exchange Rates" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource TsundokuMenuTextColor}"/>
+                            <TextBlock Text="{CompiledBinding CurrencyRatesStatus}" FontSize="10" Opacity="0.6" Foreground="{DynamicResource TsundokuMenuTextColor}"/>
+                        </StackPanel>
+                        <Button Grid.Column="1"
+                                Theme="{StaticResource MenuButton}"
+                                Content="Refresh Rates"
+                                Padding="10,4"
+                                FontSize="12"
+                                Cursor="Hand"
+                                IsEnabled="{CompiledBinding CanRefreshCurrencyRates}"
+                                Click="RefreshCurrencyRatesClick"/>
                     </Grid>
                 </StackPanel>
 

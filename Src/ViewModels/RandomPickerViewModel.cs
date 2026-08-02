@@ -54,6 +54,10 @@ public sealed partial class RandomPickerViewModel : ViewModelBase
         {
             next = eligible[0];
         }
+        else if (CurrentUser?.PreferNearlyCompleteSeriesPick == true)
+        {
+            next = PickWeightedByRemainingVolumes(eligible);
+        }
         else
         {
             do
@@ -118,5 +122,41 @@ public sealed partial class RandomPickerViewModel : ViewModelBase
         {
             _userService.ReleaseSeriesCover(_lastPickedId);
         }
+    }
+
+    /// <summary>
+    /// Picks a series with weight inversely proportional to the SQUARE of remaining
+    /// volumes, biasing hard toward sets that are only a few volumes away from complete
+    /// (e.g. 1 remaining = weight 1.0, 2 = 0.25, 5 = 0.04, 32 = 0.001).
+    /// Avoids repicking the immediately previous series when possible.
+    /// </summary>
+    private Series PickWeightedByRemainingVolumes(List<Series> eligible)
+    {
+        double totalWeight = 0;
+        double[] weights = new double[eligible.Count];
+        for (int i = 0; i < eligible.Count; i++)
+        {
+            Series s = eligible[i];
+            uint remaining = s.MaxVolumeCount - s.CurVolumeCount;
+            if (remaining == 0) continue;
+            double w = 1.0 / ((double)remaining * remaining);
+            if (s.Id == _lastPickedId) w *= 0.25;
+            weights[i] = w;
+            totalWeight += w;
+        }
+
+        if (totalWeight <= 0)
+        {
+            return eligible[_rng.Next(eligible.Count)];
+        }
+
+        double roll = _rng.NextDouble() * totalWeight;
+        double cumulative = 0;
+        for (int i = 0; i < eligible.Count; i++)
+        {
+            cumulative += weights[i];
+            if (roll < cumulative) return eligible[i];
+        }
+        return eligible[^1];
     }
 }

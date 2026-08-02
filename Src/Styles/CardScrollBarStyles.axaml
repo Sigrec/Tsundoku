@@ -18,4 +18,5 @@
             <Setter Property="IsVisible" Value="False" />
         </Style>
     </Style>
+
 </Styles>

@@ -276,6 +276,10 @@ public sealed partial class App : Application
         {
             builder.ClearProviders();
             builder.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
+            // Filter out framework HTTP chatter at the source — cheaper than dropping
+            // it downstream in NLog, and matches the standard .NET config pattern.
+            builder.AddFilter("Microsoft.Extensions.Http", Microsoft.Extensions.Logging.LogLevel.Warning);
+            builder.AddFilter("System.Net.Http", Microsoft.Extensions.Logging.LogLevel.Warning);
             ConfigureExtensions.AddNLog(builder);
         });
 
@@ -287,6 +291,7 @@ public sealed partial class App : Application
         services.AddSingleton<IUserService, UserService>();
         services.AddSingleton<ISharedSeriesCollectionProvider, SharedSeriesCollectionProvider>();
         services.AddSingleton<IApiHealthCheckService, ApiHealthCheckService>();
+        services.AddSingleton<ICurrencyRateService, CurrencyRateService>();
 
         services.AddTransient<LoadingDialogViewModel>();
         services.AddTransient<ILoadingDialogService, LoadingDialogService>();
@@ -308,6 +313,9 @@ public sealed partial class App : Application
 
         services.AddSingleton<UserNotesWindow>();
         services.AddSingleton<UserNotesWindowViewModel>();
+
+        services.AddSingleton<TrashWindow>();
+        services.AddSingleton<TrashViewModel>();
 
         services.AddTransient<RandomPickerViewModel>();
 

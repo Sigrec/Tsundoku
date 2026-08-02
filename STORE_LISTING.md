@@ -66,6 +66,12 @@ The Product Features field is entered as individual items in Partner Center (one
   <li>Change covers from URL or file</li>
 </ul>
 
+<p><b>Notes</b></p>
+<ul>
+  <li>Per-series notes and app-wide notes with a live Markdown preview toggle</li>
+  <li>Supports headings, bold, italic, strikethrough, code (inline and fenced), links (explicit, reference-style, and bare URLs), lists (bullet, numbered, nested), blockquotes, horizontal rules, and footnotes</li>
+</ul>
+
 <p><b>Additional Features</b></p>
 <ul>
   <li>Multilingual font support for Japanese, Korean, Chinese, Arabic, Thai, and more</li>
@@ -110,7 +116,7 @@ Up to 20. Plain text, one per line. Keep them short — tagline-style, not full 
 8. Smart Shelves
 9. Flexible Sorting
 10. Inline Series Editor
-11. Quick Volume Controls
+11. Markdown Notes Preview
 12. Customizable Themes
 13. Multi-Currency Support
 14. Collection Statistics

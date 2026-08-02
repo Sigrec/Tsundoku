@@ -49,6 +49,27 @@ public interface IUserService : IDisposable
     /// <summary>Renames an existing shelf.</summary>
     void RenameShelf(Guid shelfId, string newName);
 
+    /// <summary>Number of days a trashed series is retained before being auto-purged.</summary>
+    int TrashRetentionDays { get; }
+
+    /// <summary>Read-only observable collection of trashed series, newest first.</summary>
+    ReadOnlyObservableCollection<TrashedSeries> Trash { get; }
+
+    /// <summary>Moves the series to the trash (soft delete). Cover file is preserved for restore.</summary>
+    void TrashSeries(Series series);
+
+    /// <summary>Restores a trashed series back to the active collection.</summary>
+    void RestoreSeries(Guid seriesId);
+
+    /// <summary>Permanently removes a trashed series and deletes its cover file.</summary>
+    void PurgeSeries(Guid seriesId);
+
+    /// <summary>Permanently removes every entry in the trash.</summary>
+    void EmptyTrash();
+
+    /// <summary>Purges trash entries older than <see cref="TrashRetentionDays"/>. Called on startup.</summary>
+    void PurgeExpiredTrash();
+
     /// <summary>Applies an update action to the current user and notifies subscribers.</summary>
     /// <param name="updateAction">The action to apply to the current user.</param>
     void UpdateUser(Action<User> updateAction);
@@ -221,6 +242,11 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
     private readonly SourceCache<SavedShelf, Guid> _savedShelvesSourceCache = new(s => s.Id);
     public IObservable<IChangeSet<SavedShelf, Guid>> SavedShelfChanges => _savedShelvesSourceCache.Connect();
 
+    private readonly SourceCache<TrashedSeries, Guid> _trashSourceCache = new(t => t.Series.Id);
+    private readonly ReadOnlyObservableCollection<TrashedSeries> _trash;
+    public ReadOnlyObservableCollection<TrashedSeries> Trash => _trash;
+    public int TrashRetentionDays => 30;
+
     // private readonly ReadOnlyObservableCollection<Series> _userCollection;
     private readonly ReadOnlyObservableCollection<TsundokuTheme> _savedThemes;
     private readonly ReadOnlyObservableCollection<SavedShelf> _savedShelves;
@@ -239,7 +265,6 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
             .Where(user => user is not null)
             .Select(user => user!.MainTheme)
             .DistinctUntilChanged()
-            .ObserveOn(RxSchedulers.MainThreadScheduler)
             .Subscribe(mainThemeName =>
             {
                 Optional<TsundokuTheme> lookupTheme = _savedThemesSourceCache.Lookup(mainThemeName);
@@ -276,7 +301,7 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
 
         SavedThemeChanges
             .SortAndBind(out _savedThemes, new TsundokuThemeComparer(TsundokuLanguage.English))
-            .ObserveOn(RxSchedulers.MainThreadScheduler)
+            .ObserveOn(TsundokuSchedulers.MainThread)
             .Subscribe()
             .DisposeWith(_disposables);
 
@@ -284,7 +309,15 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
             .SortAndBind(
                 out _savedShelves,
                 Comparer<SavedShelf>.Create((a, b) => string.Compare(a.Name, b.Name, StringComparison.OrdinalIgnoreCase)))
-            .ObserveOn(RxSchedulers.MainThreadScheduler)
+            .ObserveOn(TsundokuSchedulers.MainThread)
+            .Subscribe()
+            .DisposeWith(_disposables);
+
+        _trashSourceCache.Connect()
+            .SortAndBind(
+                out _trash,
+                Comparer<TrashedSeries>.Create((a, b) => b.DeletedAtUtc.CompareTo(a.DeletedAtUtc)))
+            .ObserveOn(TsundokuSchedulers.MainThread)
             .Subscribe()
             .DisposeWith(_disposables);
     }
@@ -395,8 +428,10 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
 
     public uint GetCurrentThemeIndex()
     {
-        string currentName = GetCurrentThemeSnapshot().ThemeName;
+        TsundokuTheme? current = GetCurrentThemeSnapshot();
+        if (current is null) return 0;
 
+        string currentName = current.ThemeName;
         for (int i = 0; i < _savedThemes.Count; i++)
         {
             if (_savedThemes[i].ThemeName.Equals(currentName, StringComparison.Ordinal))
@@ -560,6 +595,12 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
             _savedShelvesSourceCache.Clear();
             _savedShelvesSourceCache.AddOrUpdate(user!.SavedShelves);
         }
+        if (user!.TrashedSeries is not null)
+        {
+            _trashSourceCache.Clear();
+            _trashSourceCache.AddOrUpdate(user!.TrashedSeries);
+        }
+        PurgeExpiredTrash();
     }
 
     private static User CreateDefaultUser()
@@ -1030,6 +1071,106 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
 
         LOGGER.Info("Removed {series} ({id}) from Collection", FormatSeriesDisplayName(series), series.Id);
         series.Dispose();
+    }
+
+    public void TrashSeries(Series series)
+    {
+        if (series is null) return;
+
+        _userCollectionSourceCache.Remove(series.Id);
+
+        TrashedSeries entry = new()
+        {
+            Series = series,
+            DeletedAtUtc = DateTime.UtcNow,
+        };
+        _trashSourceCache.AddOrUpdate(entry);
+
+        UpdateUser(user =>
+        {
+            user.UserCollection.Remove(series);
+            user.TrashedSeries.RemoveAll(t => t.Series.Id == series.Id);
+            user.TrashedSeries.Add(entry);
+        });
+
+        // Release the bitmap now that the card has detached; keep the cover file on
+        // disk so Restore can bring it back cleanly.
+        series.CoverBitMap?.Dispose();
+        series.CoverBitMap = null;
+
+        LOGGER.Info("Trashed {series} ({id}); auto-purge in {days} days", FormatSeriesDisplayName(series), series.Id, TrashRetentionDays);
+    }
+
+    public void RestoreSeries(Guid seriesId)
+    {
+        Optional<TrashedSeries> lookup = _trashSourceCache.Lookup(seriesId);
+        if (!lookup.HasValue)
+        {
+            LOGGER.Warn("Restore skipped: series {Id} not in trash", seriesId);
+            return;
+        }
+
+        Series series = lookup.Value.Series;
+        _trashSourceCache.Remove(seriesId);
+        _userCollectionSourceCache.AddOrUpdate(series);
+
+        UpdateUser(user =>
+        {
+            user.TrashedSeries.RemoveAll(t => t.Series.Id == seriesId);
+            if (!user.UserCollection.Any(s => s.Id == seriesId))
+            {
+                user.UserCollection.Add(series);
+            }
+        });
+
+        LOGGER.Info("Restored {series} ({id}) from trash", FormatSeriesDisplayName(series), seriesId);
+    }
+
+    public void PurgeSeries(Guid seriesId)
+    {
+        Optional<TrashedSeries> lookup = _trashSourceCache.Lookup(seriesId);
+        if (!lookup.HasValue) return;
+
+        Series series = lookup.Value.Series;
+        _trashSourceCache.Remove(seriesId);
+        UpdateUser(user => user.TrashedSeries.RemoveAll(t => t.Series.Id == seriesId));
+
+        try
+        {
+            series.Dispose(deleteCover: true);
+        }
+        catch (Exception ex)
+        {
+            LOGGER.Warn(ex, "Failed to dispose purged series {Id}", seriesId);
+        }
+
+        LOGGER.Info("Purged {series} ({id}) permanently", FormatSeriesDisplayName(series), seriesId);
+    }
+
+    public void EmptyTrash()
+    {
+        Guid[] ids = [.. _trashSourceCache.Items.Select(t => t.Series.Id)];
+        foreach (Guid id in ids)
+        {
+            PurgeSeries(id);
+        }
+    }
+
+    public void PurgeExpiredTrash()
+    {
+        DateTime cutoff = DateTime.UtcNow.AddDays(-TrashRetentionDays);
+        Guid[] expired = [..
+            _trashSourceCache.Items
+                .Where(t => t.DeletedAtUtc < cutoff)
+                .Select(t => t.Series.Id)];
+
+        if (expired.Length == 0) return;
+
+        foreach (Guid id in expired)
+        {
+            PurgeSeries(id);
+        }
+        LOGGER.Info("Auto-purged {Count} trash entries older than {Days} days", expired.Length, TrashRetentionDays);
     }
 
     public void AddTheme(TsundokuTheme theme)

@@ -234,7 +234,7 @@ public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISh
         _userService.UserCollectionChanges
             .Filter(series => series is not null)
             .Filter(combinedFilter)
-            .ObserveOn(RxSchedulers.MainThreadScheduler)
+            .ObserveOn(TsundokuSchedulers.MainThread)
             .SortAndBind(out _dynamicUserCollection, seriesComparerChanged)
             .Subscribe()
             .DisposeWith(_disposables);
@@ -244,7 +244,7 @@ public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISh
             .Filter(series => series is not null)
             .DistinctValues(series => series.Publisher)
             .Throttle(TimeSpan.FromMilliseconds(300))
-            .ObserveOn(RxSchedulers.MainThreadScheduler)
+            .ObserveOn(TsundokuSchedulers.MainThread)
             .SortAndBind(out _availablePublishers, StringComparer.OrdinalIgnoreCase)
             .Subscribe()
             .DisposeWith(_disposables);

@@ -150,20 +150,65 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
 
     [Reactive] public partial SolidColorBrush PaneBackgroundColor { get; set; }
     [Reactive] public partial string CollectionValueText { get; set; }
+    [Reactive] public partial string SecondaryCollectionValue { get; set; } = string.Empty;
+    [Reactive] public partial bool SecondaryCollectionValueVisible { get; set; }
 
     public ReadOnlyObservableCollection<Series> UserCollection { get; }
     private readonly ISharedSeriesCollectionProvider _sharedSeriesProvider;
+    private readonly ICurrencyRateService _currencyRateService;
     private bool disposedValue;
 
-    public CollectionStatsViewModel(IUserService userService, ISharedSeriesCollectionProvider sharedSeriesProvider) : base(userService)
+    public CollectionStatsViewModel(IUserService userService, ISharedSeriesCollectionProvider sharedSeriesProvider, ICurrencyRateService currencyRateService) : base(userService)
     {
         _sharedSeriesProvider = sharedSeriesProvider ?? throw new ArgumentNullException(nameof(sharedSeriesProvider));
+        _currencyRateService = currencyRateService ?? throw new ArgumentNullException(nameof(currencyRateService));
         UserCollection = _sharedSeriesProvider.DynamicUserCollection;
 
         SetupStats();
         SetupPieCharts();
         SetupBarCharts();
         UpdateStatsTheme();
+
+        // Recompute secondary total from the FULL collection (not the filtered view)
+        // whenever total value, primary currency, or secondary currency changes.
+        Observable.CombineLatest(
+                _userService.UserCollectionChanges
+                    .AutoRefresh(x => x.Value)
+                    .ToCollection()
+                    .Select(series => decimal.Round(series.Sum(s => s.Value), 2)),
+                this.WhenAnyValue(x => x.CurrentUser.Currency),
+                this.WhenAnyValue(x => x.CurrentUser.SecondaryCurrency),
+                (total, primary, secondary) => (Total: total, Primary: primary, Secondary: secondary))
+            .DistinctUntilChanged()
+            .ObserveOn(TsundokuSchedulers.MainThread)
+            .Subscribe(tuple => UpdateSecondaryCollectionValue(tuple.Total, tuple.Primary, tuple.Secondary))
+            .DisposeWith(_disposables);
+    }
+
+    private void UpdateSecondaryCollectionValue(decimal totalInPrimary, string primarySymbol, string? secondarySymbol)
+    {
+        if (string.IsNullOrWhiteSpace(secondarySymbol) || secondarySymbol == primarySymbol)
+        {
+            SecondaryCollectionValueVisible = false;
+            SecondaryCollectionValue = string.Empty;
+            return;
+        }
+
+        decimal? converted = _currencyRateService.Convert(totalInPrimary, primarySymbol, secondarySymbol);
+        if (converted is null)
+        {
+            SecondaryCollectionValueVisible = false;
+            SecondaryCollectionValue = string.Empty;
+            return;
+        }
+
+        string cultureName = Models.Constants.AVAILABLE_CURRENCY_WITH_CULTURE.TryGetValue(secondarySymbol, out (int _, string Culture) info)
+            ? info.Culture
+            : "en-US";
+        CultureInfo ci = CultureInfo.GetCultureInfo(cultureName);
+        string formatted = converted.Value.ToString($"N{ci.NumberFormat.CurrencyDecimalDigits}", ci);
+        SecondaryCollectionValue = $"≈ {secondarySymbol}{formatted}";
+        SecondaryCollectionValueVisible = true;
     }
 
     private void UpdateStatsTheme()
@@ -207,7 +252,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
             .AutoRefresh(x => x.Rating)
             .DistinctUntilChanged()
             .Throttle(TimeSpan.FromMilliseconds(100))
-            .ObserveOn(RxSchedulers.MainThreadScheduler)
+            .ObserveOn(TsundokuSchedulers.MainThread)
             .ToCollection()
             .Select(list =>
             {
@@ -230,7 +275,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
             .AutoRefresh(x => x.VolumesRead)
             .DistinctUntilChanged()
             .Throttle(TimeSpan.FromMilliseconds(100))
-            .ObserveOn(RxSchedulers.MainThreadScheduler)
+            .ObserveOn(TsundokuSchedulers.MainThread)
             .ToCollection()
             .Select(seriesCollection => (uint)seriesCollection.Sum(item => item.VolumesRead))
             .Subscribe(volumesRead =>
@@ -244,13 +289,13 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
                 .AutoRefresh(x => x.Value)
                 .DistinctUntilChanged()
                 .Throttle(TimeSpan.FromMilliseconds(100))
-                .ObserveOn(RxSchedulers.MainThreadScheduler)
+                .ObserveOn(TsundokuSchedulers.MainThread)
                 .ToCollection()
                 .Select(seriesCollection => decimal.Round(seriesCollection.Sum(item => item.Value), 2)),
             this.WhenAnyValue(x => x.CurrentUser.Currency),
             (Value, Currency) => new { Value, Currency }
         )
-        .ObserveOn(RxSchedulers.MainThreadScheduler)
+        .ObserveOn(TsundokuSchedulers.MainThread)
         .Subscribe(result =>
         {
             CultureInfo cultureInfo = CultureInfo.GetCultureInfo(AVAILABLE_CURRENCY_WITH_CULTURE[result.Currency].Culture);
@@ -272,7 +317,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
 
         _userService.UserCollectionChanges
             .DistinctUntilChanged()
-            .ObserveOn(RxSchedulers.MainThreadScheduler)
+            .ObserveOn(TsundokuSchedulers.MainThread)
             .ToCollection()
             .Subscribe(seriesList =>
             {
@@ -283,7 +328,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
         _userService.UserCollectionChanges
             .AutoRefresh(x => x.IsFavorite)
             .DistinctUntilChanged()
-            .ObserveOn(RxSchedulers.MainThreadScheduler)
+            .ObserveOn(TsundokuSchedulers.MainThread)
             .ToCollection()
             .Select(seriesList => seriesList.Count(x => x.IsFavorite))
             .Subscribe(count =>
@@ -296,7 +341,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
             .AutoRefresh(x => x.CurVolumeCount)
             .AutoRefresh(x => x.MaxVolumeCount)
             .DistinctUntilChanged()
-            .ObserveOn(RxSchedulers.MainThreadScheduler)
+            .ObserveOn(TsundokuSchedulers.MainThread)
             .Throttle(TimeSpan.FromMilliseconds(500))
             .ToCollection()
             .Select(seriesList =>
@@ -410,7 +455,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
 
         _ = _userService.UserCollectionChanges
                 .AutoRefresh(x => x.Rating)
-                .ObserveOn(RxSchedulers.MainThreadScheduler)
+                .ObserveOn(TsundokuSchedulers.MainThread)
                 .QueryWhenChanged(query => query.Items)
                 .Select(seriesList => // Perform all your counting logic on this snapshot
                 {
@@ -472,17 +517,23 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
                     NineRatingCount.Value = calculatedValues.Nine;
                     TenRatingCount.Value = calculatedValues.Ten;
 
-                    MaxRatingCount.Value = calculatedValues.Max;
-                    MaxRatingCount1.Value = calculatedValues.Max;
-                    MaxRatingCount2.Value = calculatedValues.Max;
-                    MaxRatingCount3.Value = calculatedValues.Max;
-                    MaxRatingCount4.Value = calculatedValues.Max;
-                    MaxRatingCount5.Value = calculatedValues.Max;
-                    MaxRatingCount6.Value = calculatedValues.Max;
-                    MaxRatingCount7.Value = calculatedValues.Max;
-                    MaxRatingCount8.Value = calculatedValues.Max;
-                    MaxRatingCount9.Value = calculatedValues.Max;
-                    MaxRatingCount10.Value = calculatedValues.Max;
+                    int max = calculatedValues.Max;
+                    double axisMax = max > 0 ? max + Math.Max(1, Math.Ceiling(max * 0.15)) : 1;
+                    if (RatingYAxes.Count > 0)
+                    {
+                        RatingYAxes[0].MaxLimit = axisMax;
+                    }
+                    MaxRatingCount.Value = axisMax;
+                    MaxRatingCount1.Value = axisMax;
+                    MaxRatingCount2.Value = axisMax;
+                    MaxRatingCount3.Value = axisMax;
+                    MaxRatingCount4.Value = axisMax;
+                    MaxRatingCount5.Value = axisMax;
+                    MaxRatingCount6.Value = axisMax;
+                    MaxRatingCount7.Value = axisMax;
+                    MaxRatingCount8.Value = axisMax;
+                    MaxRatingCount9.Value = axisMax;
+                    MaxRatingCount10.Value = axisMax;
                 })
                 .DisposeWith(_disposables);
     }
@@ -571,7 +622,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
 
         _userService.UserCollectionChanges
             .AutoRefresh(x => x.MaxVolumeCount)
-            .ObserveOn(RxSchedulers.MainThreadScheduler)
+            .ObserveOn(TsundokuSchedulers.MainThread)
             .QueryWhenChanged(query => query.Items)
             .Select(seriesList =>
             {
@@ -659,17 +710,23 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
                 NineVolumeCount.Value = calculatedValues.Nine;
                 TenVolumeCount.Value = calculatedValues.Ten;
 
-                MaxVolumeCount.Value = calculatedValues.Max;
-                MaxVolumeCount1.Value = calculatedValues.Max;
-                MaxVolumeCount2.Value = calculatedValues.Max;
-                MaxVolumeCount3.Value = calculatedValues.Max;
-                MaxVolumeCount4.Value = calculatedValues.Max;
-                MaxVolumeCount5.Value = calculatedValues.Max;
-                MaxVolumeCount6.Value = calculatedValues.Max;
-                MaxVolumeCount7.Value = calculatedValues.Max;
-                MaxVolumeCount8.Value = calculatedValues.Max;
-                MaxVolumeCount9.Value = calculatedValues.Max;
-                MaxVolumeCount10.Value = calculatedValues.Max;
+                int max = calculatedValues.Max;
+                double axisMax = max > 0 ? max + Math.Max(1, Math.Ceiling(max * 0.15)) : 1;
+                if (VolumeCountYAxes.Count > 0)
+                {
+                    VolumeCountYAxes[0].MaxLimit = axisMax;
+                }
+                MaxVolumeCount.Value = axisMax;
+                MaxVolumeCount1.Value = axisMax;
+                MaxVolumeCount2.Value = axisMax;
+                MaxVolumeCount3.Value = axisMax;
+                MaxVolumeCount4.Value = axisMax;
+                MaxVolumeCount5.Value = axisMax;
+                MaxVolumeCount6.Value = axisMax;
+                MaxVolumeCount7.Value = axisMax;
+                MaxVolumeCount8.Value = axisMax;
+                MaxVolumeCount9.Value = axisMax;
+                MaxVolumeCount10.Value = axisMax;
             })
             .DisposeWith(_disposables);
     }
@@ -826,7 +883,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
             .AutoRefresh(x => x.Genres)
             .DistinctUntilChanged()
             .Throttle(TimeSpan.FromMilliseconds(500))
-            .ObserveOn(RxSchedulers.MainThreadScheduler)
+            .ObserveOn(TsundokuSchedulers.MainThread)
             .QueryWhenChanged(query => query.Items)
             .Select(seriesList =>
             {

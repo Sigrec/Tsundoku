@@ -46,7 +46,7 @@ public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsView
                 .DisposeWith(disposables);
 
             _apiHealthCheckService.IsAniListAvailable
-                .ObserveOn(RxSchedulers.MainThreadScheduler)
+                .ObserveOn(TsundokuSchedulers.MainThread)
                 .Subscribe(isAvailable =>
                 {
                     RefreshSeriesButton.IsEnabled = isAvailable;
@@ -61,6 +61,12 @@ public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsView
     {
         await ViewModel.RefreshAllCoversAsync(this.Owner as Window ?? this);
     }
+
+    private async void RefreshCurrencyRatesClick(object? sender, RoutedEventArgs args)
+    {
+        await ViewModel.RefreshCurrencyRatesAsync();
+    }
+
 
     private async void ExportToSpreadSheetAsync(object sender, RoutedEventArgs e)
     {

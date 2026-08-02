@@ -148,5 +148,19 @@
       "Upgraded the Avalonia UI framework to 12.1.0 for upstream rendering and control improvements"
     ],
     "actions": []
+  },
+  "3.0.0": {
+    "changes": [
+      "New Trash — deleted series now move to a Trash view for 30 days before permanent deletion; open it from the trash-can icon in the toolbar to Restore individual series, Delete Forever, or Empty Trash all at once",
+      "New Markdown support in Series Notes and app-wide Notes — a Preview toggle renders headings (# / ## / ### and beyond), **bold**, *italic*, ~~strikethrough~~, `inline code`, fenced ```code``` blocks, links (explicit, reference-style, and bare URLs), bullet / numbered / nested lists, blockquotes, horizontal rules, and footnotes; escape any syntax char with a backslash",
+      "New Secondary Currency in Collection Stats — pick a second currency in Preferences to see your collection value shown as an \"≈ £123.45\" line under the primary total; a Refresh Rates button pulls live exchange rates from open.er-api.com and falls back to bundled defaults offline",
+      "New Revert / Reapply icons in Edit Series — undo unsaved edits back to the state at window open (or last Save), or bring the reverted edits back if you clicked Revert by mistake",
+      "New Keyboard shortcuts on the main window — Ctrl+N opens Add Series, Ctrl+E edits the currently hovered series card, Ctrl+R refreshes the hovered card",
+      "Removed the User Notes font-size slider — superseded by markdown formatting (# / ## / ### for headings give you clear size hierarchy without a global slider)",
+      "Framework HTTP client and factory chatter no longer floods the debug log"
+    ],
+    "actions": [
+      "Try the Preview toggle in Edit Series or Notes to render any existing plain-text notes as markdown — bullet lists, links, and headings you already had will render immediately without any edits"
+    ]
   }
 }

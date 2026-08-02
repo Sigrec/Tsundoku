@@ -1,4 +1,6 @@
 using Avalonia.Controls;
+using Avalonia;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
@@ -23,6 +25,8 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
     private readonly IApiHealthCheckService _apiHealthCheckService;
     private readonly IPopupDialogService _popupDialogService;
     private bool _IsInitialized = false;
+    private SeriesSnapshot? _snapshotBeforeEdit;
+    private SeriesSnapshot? _snapshotAfterRevert;
 
     public EditSeriesInfoWindow(MainWindowViewModel mainWindowViewModel, BitmapHelper bitmapHelper, IApiHealthCheckService apiHealthCheckService, IPopupDialogService popupDialogService)
     {
@@ -32,6 +36,26 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
         _popupDialogService = popupDialogService;
         InitializeComponent();
 
+        // Guarantee mouse-wheel scrolls the preview even when the pointer is over an
+        // inline control (CheckBox, link) or the SelectableTextBlock's text-selection
+        // layer that would normally swallow the wheel event before ScrollViewer's own
+        // bubble-phase handler runs. handledEventsToo: true means we still see the
+        // event after a child marked it Handled.
+        NotesPreviewScroller.AddHandler(
+            InputElement.PointerWheelChangedEvent,
+            (_, e) =>
+            {
+                double delta = e.Delta.Y * 40;
+                Vector current = NotesPreviewScroller.Offset;
+                double maxY = Math.Max(0, NotesPreviewScroller.Extent.Height - NotesPreviewScroller.Viewport.Height);
+                double newY = Math.Clamp(current.Y - delta, 0, maxY);
+                if (Math.Abs(newY - current.Y) < 0.01) return;
+                NotesPreviewScroller.Offset = new Vector(current.X, newY);
+                e.Handled = true;
+            },
+            RoutingStrategies.Bubble,
+            handledEventsToo: true);
+
         Opened += (s, e) =>
         {
             ApplyCurrentSeries();
@@ -39,7 +63,7 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
 
             // Disable refresh if AniList is down
             System.ObservableExtensions.Subscribe(
-                _apiHealthCheckService.IsAniListAvailable.ObserveOn(AvaloniaScheduler.Instance),
+                _apiHealthCheckService.IsAniListAvailable.ObserveOn(TsundokuSchedulers.MainThread),
                 isAvailable => ChangeSeriesVolumeCountButton.IsEnabled = isAvailable);
         };
 
@@ -135,11 +159,20 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
     
     private void SaveStats(object sender, RoutedEventArgs args)
     {
+        if (ViewModel?.Series is null) return;
+
         ChangeSeriesVolumeCounts();
         ChangeSeriesVolumesRead();
         ChangeSeriesRating();
         ChangeSeriesValue();
         ChangeSeriesPublisher();
+
+        // Deliberately DON'T reset _snapshotBeforeEdit — Revert always targets
+        // the state as of window open (or prev/next navigation). Intermediate
+        // Saves persist the change but leave the revert-anchor alone, so the
+        // user can always roll all their edits back to the starting point.
+        // Any pending Reapply target is now stale.
+        _snapshotAfterRevert = null;
     }
 
     private void ChangeSeriesVolumesRead()
@@ -269,9 +302,9 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
     {
         string title = ViewModel.Series.Titles.TryGetValue(TsundokuLanguage.Romaji, out string? t) ? t : "this series";
         bool confirmed = await _popupDialogService.ConfirmAsync(
-            "Delete Series",
-            "fa7-solid fa7-triangle-exclamation",
-            $"Are you sure you want to delete \"{title}\" from your collection? This cannot be undone.",
+            "Move to Trash",
+            "fa7-solid fa7-trash-can",
+            $"Move \"{title}\" to the trash? You can restore it from the Trash toolbar button within 30 days.",
             this);
 
         if (confirmed)
@@ -318,6 +351,118 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
 
         this.Title = curTitle;
         UpdateSelectedGenres();
+
+        // Snapshot the current state so Revert can restore it. Loading a different
+        // series (prev/next) resets both endpoints — Revert / Reapply are scoped to
+        // the currently-open edit session for the current series only.
+        _snapshotBeforeEdit = SeriesSnapshot.Capture(ViewModel.Series);
+        _snapshotAfterRevert = null;
+
+        // Preview is the default view. Re-render whenever we navigate to a series
+        // (prev/next in the toolbar swaps the underlying model without reopening).
+        RefreshNotesPreviewIfShown();
+    }
+
+    private void RevertUnsavedChanges(object? sender, RoutedEventArgs e)
+    {
+        if (ViewModel?.Series is null || _snapshotBeforeEdit is null) return;
+
+        SeriesSnapshot current = SeriesSnapshot.Capture(ViewModel.Series);
+        bool hasPendingInput = HasPendingInput();
+        bool hasModelDiff = !_snapshotBeforeEdit.Equals(current);
+        if (!hasPendingInput && !hasModelDiff) return; // Nothing to revert
+
+        // Discard unsaved input in every field the Save flow reads from.
+        // Those textboxes push to the model only on Save, so a Revert that leaves
+        // them full would still commit the "reverted" numbers on next Save.
+        ClearPendingInput();
+
+        if (hasModelDiff)
+        {
+            // Remember what we just threw away so Reapply can bring it back.
+            _snapshotAfterRevert = current;
+            _snapshotBeforeEdit.ApplyTo(ViewModel.Series);
+        }
+
+        RefreshNotesPreviewIfShown();
+        UpdateSelectedGenres();
+    }
+
+    private bool HasPendingInput()
+    {
+        static bool NonEmpty(string? s) => !string.IsNullOrWhiteSpace(s?.Replace("_", string.Empty).Trim());
+        return NonEmpty(CurVolumeMaskedTextBox.Text)
+            || NonEmpty(MaxVolumeMaskedTextBox.Text)
+            || NonEmpty(VolumesReadMaskedTextBox.Text)
+            || (RatingMaskedTextBox.Text is string r && !r.StartsWith("__._", StringComparison.Ordinal))
+            || (ValueMaskedTextBox.Text is string v && v.Length > 1 && NonEmpty(v[1..]))
+            || !string.IsNullOrWhiteSpace(PublisherTextBox.Text)
+            || !string.IsNullOrWhiteSpace(CoverImageUrlTextBox.Text);
+    }
+
+    private void ClearPendingInput()
+    {
+        CurVolumeMaskedTextBox.Clear();
+        MaxVolumeMaskedTextBox.Clear();
+        VolumesReadMaskedTextBox.Clear();
+        RatingMaskedTextBox.Clear();
+        ValueMaskedTextBox.Clear();
+        PublisherTextBox.Clear();
+        CoverImageUrlTextBox.Clear();
+    }
+
+    private void ReapplyRevertedChanges(object? sender, RoutedEventArgs e)
+    {
+        if (ViewModel?.Series is null || _snapshotAfterRevert is null) return;
+
+        SeriesSnapshot current = SeriesSnapshot.Capture(ViewModel.Series);
+        if (_snapshotAfterRevert.Equals(current)) return;
+
+        _snapshotAfterRevert.ApplyTo(ViewModel.Series);
+        _snapshotAfterRevert = null; // one-shot redo
+
+        RefreshNotesPreviewIfShown();
+        UpdateSelectedGenres();
+    }
+
+    private void RefreshNotesPreviewIfShown()
+    {
+        if (ViewModel?.Series is null) return;
+        if (NotesEditToggle.IsChecked != true)
+        {
+            MarkdownRenderer.ApplyTo(NotesPreview, ViewModel.Series.SeriesNotes, OpenLink);
+            // ScrollViewer doesn't recompute its extent on Inline mutations alone —
+            // force a measure pass so the vertical scrollbar shows up on first open
+            // when the rendered content overflows.
+            ForcePreviewLayoutRefresh();
+        }
+    }
+
+    private async void OpenLink(string url) => await Tsundoku.ViewModels.ViewModelBase.OpenSiteLink(url);
+
+    private void ForcePreviewLayoutRefresh()
+    {
+        // Post two invalidations: one synchronous (before the next layout pass) and
+        // one at ContextIdle (after layout completes). Together these guarantee the
+        // ScrollViewer re-measures its content on first open, even before the user
+        // interacts — otherwise scroll only kicks in on next toggle.
+        NotesPreview.InvalidateMeasure();
+        NotesPreviewScroller.InvalidateMeasure();
+        Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+        {
+            NotesPreview.InvalidateMeasure();
+            NotesPreviewScroller.InvalidateMeasure();
+        }, Avalonia.Threading.DispatcherPriority.ContextIdle);
+    }
+
+    private void NotesEditToggled(object? sender, RoutedEventArgs e)
+    {
+        if (ViewModel?.Series is null) return;
+        // When leaving edit mode, refresh the rendered preview with whatever the user just typed.
+        if (NotesEditToggle.IsChecked != true)
+        {
+            MarkdownRenderer.ApplyTo(NotesPreview, ViewModel.Series.SeriesNotes, OpenLink);
+        }
     }
 
     private async void MarkSeriesComplete(object sender, RoutedEventArgs args)

@@ -759,7 +759,7 @@ public sealed partial class Series(
 
     public void UpdateCover(Bitmap newCover)
     {
-        RxSchedulers.MainThreadScheduler.Schedule(() =>
+        TsundokuSchedulers.MainThread.Schedule(() =>
         {
             this.CoverBitMap?.Dispose();
             this.CoverBitMap = newCover;

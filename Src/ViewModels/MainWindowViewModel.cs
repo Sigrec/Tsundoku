@@ -1,4 +1,6 @@
 ﻿using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Disposables.Fluent;
 
@@ -9,6 +11,7 @@ using ReactiveUI.SourceGenerators;
 using Tsundoku.Clients;
 using Tsundoku.Helpers;
 using Tsundoku.Models;
+using Tsundoku.Services;
 using static Tsundoku.Models.Enums.TsundokuFilterModel;
 using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 using static Tsundoku.Models.Enums.TsundokuSortModel;
@@ -38,6 +41,7 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
     [Reactive] public partial string AdvancedSearchQueryErrorMessage { get; set; } = string.Empty;
     [Reactive] public partial TsundokuLanguage SelectedLanguage { get; set; }
     [Reactive] public partial string SelectedPublisher { get; set; } = string.Empty;
+    [Reactive] public partial bool IsFilteredEmpty { get; set; }
 
     public ReadOnlyObservableCollection<Series> UserCollection { get; }
     public ReadOnlyObservableCollection<string> AvailablePublishers => _sharedSeriesProvider.AvailablePublishers;
@@ -65,7 +69,7 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
 
         this.WhenAnyValue(x => x.SelectedFilter)
             .DistinctUntilChanged()
-            .ObserveOn(RxSchedulers.MainThreadScheduler)
+            .ObserveOn(TsundokuSchedulers.MainThread)
             .Do(filter => LOGGER.Info("Applying filter: {Filter}", filter))
             .Subscribe(filter =>
             {
@@ -79,7 +83,7 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
 
         this.WhenAnyValue(x => x.SelectedSort)
             .DistinctUntilChanged()
-            .ObserveOn(RxSchedulers.MainThreadScheduler)
+            .ObserveOn(TsundokuSchedulers.MainThread)
             .Subscribe(sort =>
             {
                 SelectedSortIndex = TSUNDOKU_SORT_DICT[sort];
@@ -107,7 +111,7 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
 
         this.WhenAnyValue(x => x.CurrentUser.Language)
             .DistinctUntilChanged()
-            .ObserveOn(RxSchedulers.MainThreadScheduler)
+            .ObserveOn(TsundokuSchedulers.MainThread)
             .Subscribe(lang =>
             {
                 int newIndex = INDEXED_LANGUAGES[lang];
@@ -120,12 +124,14 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
 
         this.WhenAnyValue(x => x.SelectedShelf)
             .DistinctUntilChanged()
-            .ObserveOn(RxSchedulers.MainThreadScheduler)
+            .ObserveOn(TsundokuSchedulers.MainThread)
             .Subscribe(shelf =>
             {
                 string query = shelf?.Query ?? string.Empty;
                 AdvancedSearchQuery = query;
                 _sharedSeriesProvider.AdvancedSearchQuery = query;
+
+                _userService.UpdateUser(u => u.LastSelectedShelfId = shelf?.Id);
 
                 if (shelf is not null)
                 {
@@ -137,6 +143,67 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
                 }
             })
             .DisposeWith(_disposables);
+
+        // Restore last-selected shelf on startup (once the user + shelves are loaded).
+        this.WhenAnyValue(x => x.CurrentUser)
+            .Where(user => user is not null)
+            .Take(1)
+            .ObserveOn(TsundokuSchedulers.MainThread)
+            .Subscribe(user =>
+            {
+                Guid? lastId = user.LastSelectedShelfId;
+                if (lastId is null || SelectedShelf is not null) return;
+                SavedShelf? match = Shelves.FirstOrDefault(s => s.Id == lastId.Value);
+                if (match is not null)
+                {
+                    SelectedShelf = match;
+                }
+            })
+            .DisposeWith(_disposables);
+
+        // Empty-state detection: fires whenever the filter surface changes OR the
+        // filtered collection membership changes. True only when a filter is active
+        // AND the resulting view has zero items.
+        IObservable<Unit> collectionChanges = Observable
+            .FromEventPattern<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>(
+                h => ((INotifyCollectionChanged)UserCollection).CollectionChanged += h,
+                h => ((INotifyCollectionChanged)UserCollection).CollectionChanged -= h)
+            .Select(_ => Unit.Default)
+            .StartWith(Unit.Default);
+
+        IObservable<Unit> filterSurfaceChanges = this.WhenAnyValue(
+                x => x.SeriesFilterText,
+                x => x.AdvancedSearchQuery,
+                x => x.SelectedFilter,
+                x => x.SelectedPublisher,
+                x => x.SelectedShelf,
+                (_, _, _, _, _) => Unit.Default);
+
+        Observable.CombineLatest(collectionChanges, filterSurfaceChanges, (_, _) => Unit.Default)
+            .Throttle(TimeSpan.FromMilliseconds(50), TsundokuSchedulers.TaskPool)
+            .ObserveOn(TsundokuSchedulers.MainThread)
+            .Subscribe(_ =>
+            {
+                IsFilteredEmpty = UserCollection.Count == 0 && HasActiveFilter();
+            })
+            .DisposeWith(_disposables);
+    }
+
+    private bool HasActiveFilter() =>
+        !string.IsNullOrWhiteSpace(SeriesFilterText)
+        || !string.IsNullOrWhiteSpace(AdvancedSearchQuery)
+        || SelectedFilter != TsundokuFilter.None
+        || !string.IsNullOrWhiteSpace(SelectedPublisher)
+        || SelectedShelf is not null;
+
+    public void ClearAllFilters()
+    {
+        SeriesFilterText = string.Empty;
+        AdvancedSearchQuery = string.Empty;
+        SelectedFilter = TsundokuFilter.None;
+        SelectedPublisher = string.Empty;
+        SelectedShelf = null;
+        FilterBuilder.ClearAll();
     }
 
     public void SaveCurrentFilterAsShelf(string name)
@@ -212,7 +279,7 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
 
     public void DeleteSeries(Series series)
     {
-        _userService.RemoveSeries(series);
+        _userService.TrashSeries(series);
     }
 
     public void UpdateSeriesCard(Series series)

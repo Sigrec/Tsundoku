@@ -41,12 +41,15 @@ public sealed partial class User : ReactiveObject
     [Reactive] public partial string Notes { get; set; }
     [Reactive] public partial bool RefreshCovers { get; set; }
     [Reactive] public partial bool GlassmorphismEnabled { get; set; }
-    [Reactive] public partial double NotesFontSize { get; set; } = 16;
     public string LastSeenAppVersion { get; set; } = string.Empty;
     public List<TsundokuLanguage> AdditionalLanguages { get; set; } = [];
     public List<TsundokuTheme> SavedThemes { get; set; }
     public List<Series> UserCollection { get; set; }
     public List<SavedShelf> SavedShelves { get; set; } = [];
+    public Guid? LastSelectedShelfId { get; set; }
+    [Reactive] public partial bool PreferNearlyCompleteSeriesPick { get; set; }
+    [Reactive] public partial string? SecondaryCurrency { get; set; }
+    public List<TrashedSeries> TrashedSeries { get; set; } = [];
 
     [JsonConverter(typeof(UserIconBitmapJsonConverter))]
     [Reactive] public partial Bitmap? UserIcon { get; set; }
@@ -443,6 +446,36 @@ public sealed partial class User : ReactiveObject
             }
             userData[nameof(DataVersion)] = 6.4;
             LOGGER.Info("Updated schema to v6.4: Added SavedShelves");
+            updatedVersion = true;
+        }
+
+        if (curVersion < 6.5) // 6.5 Adds LastSelectedShelfId and PreferNearlyCompleteSeriesPick.
+        {
+            if (!userData.AsObject().ContainsKey(nameof(LastSelectedShelfId)))
+            {
+                userData.AsObject().Add(nameof(LastSelectedShelfId), null);
+            }
+            if (!userData.AsObject().ContainsKey(nameof(PreferNearlyCompleteSeriesPick)))
+            {
+                userData.AsObject().Add(nameof(PreferNearlyCompleteSeriesPick), false);
+            }
+            userData[nameof(DataVersion)] = 6.5;
+            LOGGER.Info("Updated schema to v6.5: Added LastSelectedShelfId and PreferNearlyCompleteSeriesPick");
+            updatedVersion = true;
+        }
+
+        if (curVersion < 6.6) // 6.6 Adds SecondaryCurrency (nullable) and TrashedSeries (soft-delete list).
+        {
+            if (!userData.AsObject().ContainsKey(nameof(SecondaryCurrency)))
+            {
+                userData.AsObject().Add(nameof(SecondaryCurrency), null);
+            }
+            if (!userData.AsObject().ContainsKey(nameof(TrashedSeries)))
+            {
+                userData.AsObject().Add(nameof(TrashedSeries), new JsonArray());
+            }
+            userData[nameof(DataVersion)] = 6.6;
+            LOGGER.Info("Updated schema to v6.6: Added SecondaryCurrency and TrashedSeries");
             updatedVersion = true;
         }
 

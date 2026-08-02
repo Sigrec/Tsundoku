@@ -70,9 +70,6 @@
           </Border.Transitions>
 
           <Border CornerRadius="14" ClipToBounds="True" Name="CardInner">
-            <Border.CacheMode>
-              <BitmapCache/>
-            </Border.CacheMode>
             <Grid ColumnDefinitions="Auto,*">
 
               <!-- ── Hover + ToolTip Styles ── -->
@@ -101,6 +98,26 @@
                     RenderOptions.BitmapInterpolationMode="LowQuality"
                     Stretch="UniformToFill"
                     IsVisible="{CompiledBinding CoverBitMap, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+
+                <!-- Favorite badge (top-right of cover) -->
+                <Border IsVisible="{CompiledBinding Series.IsFavorite, ElementName=Root}"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        Margin="0,8,8,0"
+                        Width="26" Height="26"
+                        CornerRadius="13"
+                        Background="{DynamicResource TsundokuMenuBGColor}"
+                        BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}"
+                        BorderThickness="1"
+                        BoxShadow="0 2 6 0 #99000000"
+                        IsHitTestVisible="False"
+                        ToolTip.Tip="Favorite">
+                    <i:Icon Value="fa7-solid fa7-star"
+                            FontSize="12"
+                            Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"/>
+                </Border>
 
                 <!-- Missing Cover Fallback -->
                 <StackPanel
@@ -320,6 +337,7 @@
                         Margin="8,0,0,0"
                         i:Attached.Icon="fa7-solid fa7-pen"
                         FontSize="14"
+                        ToolTip.Tip="Edit Series (Ctrl+E on hovered card, Ctrl+R to refresh)"
                         Click="OpenEditSeriesInfoWindow"/>
                   </Grid>
                   </Border>
