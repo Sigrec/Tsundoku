@@ -28,6 +28,10 @@ public static class MarkdownRenderer
     private static readonly FontFamily MonoFont = new("Consolas, Menlo, monospace");
     private static readonly SolidColorBrush MutedBrush = new(Colors.Gray, 0.7);
     private static readonly SolidColorBrush QuoteBrush = new(Colors.Gray, 0.85);
+    private static readonly string HorizontalRuleGlyph = new('─', 40);
+    // Pre-built indentation prefixes for the common nesting depths (0..4 levels).
+    // Deeper nests fall back to on-demand allocation.
+    private static readonly string[] NestPrefixes = ["", "  ", "    ", "      ", "        "];
 
     public static void ApplyTo(
         SelectableTextBlock target,
@@ -39,7 +43,8 @@ public static class MarkdownRenderer
 
         if (string.IsNullOrWhiteSpace(markdown)) return;
 
-        string[] lines = markdown.Replace("\r\n", "\n").Split('\n');
+        string normalized = markdown.Contains('\r') ? markdown.Replace("\r\n", "\n") : markdown;
+        string[] lines = normalized.Split('\n');
 
         // First pass: collect reference-link and footnote definitions and mark those
         // lines so the block pass skips them.
@@ -104,7 +109,7 @@ public static class MarkdownRenderer
 
             if (IsHorizontalRule(line))
             {
-                target.Inlines.Add(new Run(new string('─', 40)) { Foreground = MutedBrush });
+                target.Inlines.Add(new Run(HorizontalRuleGlyph) { Foreground = MutedBrush });
                 if (i < lines.Length - 1) target.Inlines.Add(new LineBreak());
                 continue;
             }
@@ -124,7 +129,9 @@ public static class MarkdownRenderer
             int indent = CountLeadingSpaces(line);
             int nestDepth = indent / 2;
             string content = line[indent..];
-            string nestPrefix = nestDepth > 0 ? new string(' ', nestDepth * 2) : string.Empty;
+            string nestPrefix = nestDepth <= 0
+                ? string.Empty
+                : nestDepth < NestPrefixes.Length ? NestPrefixes[nestDepth] : new string(' ', nestDepth * 2);
 
             if (content.Length >= 2 && (content[0] == '-' || content[0] == '*') && content[1] == ' ')
             {
@@ -166,7 +173,7 @@ public static class MarkdownRenderer
         {
             target.Inlines.Add(new LineBreak());
             target.Inlines.Add(new LineBreak());
-            target.Inlines.Add(new Run(new string('─', 40)) { Foreground = MutedBrush });
+            target.Inlines.Add(new Run(HorizontalRuleGlyph) { Foreground = MutedBrush });
             target.Inlines.Add(new LineBreak());
             for (int idx = 0; idx < footnoteOrder.Count; idx++)
             {

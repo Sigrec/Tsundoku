@@ -167,9 +167,11 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
         ChangeSeriesValue();
         ChangeSeriesPublisher();
 
-        // Refresh the "clean" snapshot to the just-saved state so Revert now
-        // targets *this* save point. A subsequent Reapply is no longer valid.
-        _snapshotBeforeEdit = SeriesSnapshot.Capture(ViewModel.Series);
+        // Deliberately DON'T reset _snapshotBeforeEdit — Revert always targets
+        // the state as of window open (or prev/next navigation). Intermediate
+        // Saves persist the change but leave the revert-anchor alone, so the
+        // user can always roll all their edits back to the starting point.
+        // Any pending Reapply target is now stale.
         _snapshotAfterRevert = null;
     }
 

@@ -1,6 +1,6 @@
 # [Tsundoku](https://en.wikipedia.org/wiki/Tsundoku) — Desktop Manga & Light Novel Collection App · [Follow me on AniList](https://anilist.co/user/Preminence/)
 
-> **[Windows Download (v2.3.2)](https://apps.microsoft.com/detail/9p85xxdqfhs2?hl=en-us&gl=US&ocid=pdpshare)**
+> **[Windows Download (v3.0.0)](https://apps.microsoft.com/detail/9p85xxdqfhs2?hl=en-us&gl=US&ocid=pdpshare)**
 
 **Important:** Your collection is stored in `UserData.json` with an automatic backup saved to `UserData_Backup.json` on every close. If you delete or lose both files, your library will be lost. The `Covers` folder is provided so you can replace cover images if you want—just keep the **exact** filename and extension (always `.png`).
 
@@ -50,6 +50,11 @@
 - Hover effects with smooth animations
 - Quick volume increment/decrement buttons
 - Edit series info, refresh metadata, and change covers from URL or file
+
+### Notes
+
+- Per-series notes and app-wide notes both support **Markdown** with a live preview toggle
+- Headings, **bold**, *italic*, ~~strike~~, `code`, fenced code blocks, links (explicit / reference / bare), lists (bullet / numbered / nested), blockquotes, horizontal rules, and footnotes
 
 ### Additional
 
