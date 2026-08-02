@@ -15,6 +15,9 @@
         WindowStartupLocation="CenterScreen"
         CanResize="True"
         x:DataType="vm:UserNotesWindowViewModel">
+    <Window.Styles>
+        <StyleInclude Source="avares://Tsundoku/Styles/CardScrollBarStyles.axaml"/>
+    </Window.Styles>
 
     <Border Classes="Menu" BorderThickness="2" CornerRadius="0,0,8,8" ClipToBounds="True">
         <Grid RowDefinitions="Auto,*">
@@ -22,7 +25,7 @@
             <controls:WindowHeader Grid.Row="0" Icon="fa7-solid fa7-note-sticky" Title="Notes"/>
 
             <!-- Notes Area -->
-            <Grid Grid.Row="1" RowDefinitions="Auto,*,Auto" Margin="16">
+            <Grid Grid.Row="1" RowDefinitions="Auto,*" Margin="16">
                 <ToggleButton Grid.Row="0"
                               x:Name="NotesEditToggle"
                               Content="Edit"
@@ -41,7 +44,7 @@
                              IsVisible="{Binding #NotesEditToggle.IsChecked}"
                              Classes="Menu"
                              FontWeight="SemiBold"
-                             FontSize="{CompiledBinding NotesFontSize}"
+                             FontSize="14"
                              TextWrapping="Wrap"
                              PlaceholderText="Notes... (supports Markdown — toggle Edit to see preview)"
                              Text="{CompiledBinding Notes}"
@@ -55,52 +58,19 @@
                             BorderBrush="{DynamicResource TsundokuSearchBarBorderColor}"
                             Background="{DynamicResource TsundokuSearchBarBGColor}"
                             CornerRadius="10">
-                        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Padding="14">
+                        <ScrollViewer x:Name="NotesPreviewScroller"
+                                      Classes="card-desc"
+                                      HorizontalScrollBarVisibility="Disabled"
+                                      VerticalScrollBarVisibility="Auto"
+                                      Padding="14">
                             <SelectableTextBlock Name="NotesPreview"
                                                  FontWeight="Normal"
-                                                 FontSize="{CompiledBinding NotesFontSize}"
+                                                 FontSize="14"
                                                  TextWrapping="Wrap"
                                                  Foreground="{DynamicResource TsundokuSearchBarTextColor}"/>
                         </ScrollViewer>
                     </Border>
                 </Panel>
-
-                <!-- Font Size Slider (horizontal, bottom) -->
-                <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="8" Margin="0,8,0,0" HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <TextBlock Text="A" FontSize="9" FontWeight="Bold"
-                               Foreground="{DynamicResource TsundokuDividerColor}"
-                               VerticalAlignment="Center"/>
-                    <Slider Name="FontSizeSlider"
-                            Orientation="Horizontal"
-                            Minimum="8" Maximum="32" Value="{CompiledBinding NotesFontSize}"
-                            Width="200"
-                            TickFrequency="0.5"
-                            IsSnapToTickEnabled="True"
-                            SmallChange="0.5"
-                            LargeChange="2"
-                            Foreground="{DynamicResource TsundokuDividerColor}">
-                        <Slider.Styles>
-                            <Style Selector="Slider /template/ Thumb">
-                                <Setter Property="Background" Value="{DynamicResource TsundokuDividerColor}"/>
-                            </Style>
-                            <Style Selector="Slider /template/ Thumb:pointerover">
-                                <Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBorderHoverColor}"/>
-                            </Style>
-                            <Style Selector="Slider /template/ Thumb:pressed">
-                                <Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBorderHoverColor}"/>
-                            </Style>
-                            <Style Selector="Slider /template/ RepeatButton#PART_DecreaseButton">
-                                <Setter Property="Background" Value="{DynamicResource TsundokuDividerColor}"/>
-                            </Style>
-                            <Style Selector="Slider /template/ RepeatButton#PART_IncreaseButton">
-                                <Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGColor}"/>
-                            </Style>
-                        </Slider.Styles>
-                    </Slider>
-                    <TextBlock Text="A" FontSize="16" FontWeight="Bold"
-                               Foreground="{DynamicResource TsundokuDividerColor}"
-                               VerticalAlignment="Center"/>
-                </StackPanel>
             </Grid>
         </Grid>
     </Border>

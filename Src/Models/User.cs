@@ -41,7 +41,6 @@ public sealed partial class User : ReactiveObject
     [Reactive] public partial string Notes { get; set; }
     [Reactive] public partial bool RefreshCovers { get; set; }
     [Reactive] public partial bool GlassmorphismEnabled { get; set; }
-    [Reactive] public partial double NotesFontSize { get; set; } = 16;
     public string LastSeenAppVersion { get; set; } = string.Empty;
     public List<TsundokuLanguage> AdditionalLanguages { get; set; } = [];
     public List<TsundokuTheme> SavedThemes { get; set; }

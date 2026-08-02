@@ -169,15 +169,23 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
         SetupBarCharts();
         UpdateStatsTheme();
 
-        // Recompute secondary total whenever collection value or the secondary currency selection changes.
-        this.WhenAnyValue(x => x.CurrentUser.CollectionValue, x => x.CurrentUser.SecondaryCurrency, x => x.CurrentUser.Currency,
-                          (val, secondary, primary) => (Value: val, Secondary: secondary, Primary: primary))
+        // Recompute secondary total from the FULL collection (not the filtered view)
+        // whenever total value, primary currency, or secondary currency changes.
+        Observable.CombineLatest(
+                _userService.UserCollectionChanges
+                    .AutoRefresh(x => x.Value)
+                    .ToCollection()
+                    .Select(series => decimal.Round(series.Sum(s => s.Value), 2)),
+                this.WhenAnyValue(x => x.CurrentUser.Currency),
+                this.WhenAnyValue(x => x.CurrentUser.SecondaryCurrency),
+                (total, primary, secondary) => (Total: total, Primary: primary, Secondary: secondary))
             .DistinctUntilChanged()
-            .Subscribe(tuple => UpdateSecondaryCollectionValue(tuple.Value, tuple.Primary, tuple.Secondary))
+            .ObserveOn(TsundokuSchedulers.MainThread)
+            .Subscribe(tuple => UpdateSecondaryCollectionValue(tuple.Total, tuple.Primary, tuple.Secondary))
             .DisposeWith(_disposables);
     }
 
-    private void UpdateSecondaryCollectionValue(string? formattedPrimary, string primarySymbol, string? secondarySymbol)
+    private void UpdateSecondaryCollectionValue(decimal totalInPrimary, string primarySymbol, string? secondarySymbol)
     {
         if (string.IsNullOrWhiteSpace(secondarySymbol) || secondarySymbol == primarySymbol)
         {
@@ -186,24 +194,11 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
             return;
         }
 
-        decimal totalUsd = 0;
-        try
-        {
-            foreach (Series s in _sharedSeriesProvider.DynamicUserCollection)
-            {
-                totalUsd += s.Value;
-            }
-        }
-        catch
-        {
-            SecondaryCollectionValueVisible = false;
-            return;
-        }
-
-        decimal? converted = _currencyRateService.Convert(totalUsd, primarySymbol, secondarySymbol);
+        decimal? converted = _currencyRateService.Convert(totalInPrimary, primarySymbol, secondarySymbol);
         if (converted is null)
         {
             SecondaryCollectionValueVisible = false;
+            SecondaryCollectionValue = string.Empty;
             return;
         }
 

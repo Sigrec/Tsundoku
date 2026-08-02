@@ -11,6 +11,7 @@ using ReactiveUI.SourceGenerators;
 using Tsundoku.Clients;
 using Tsundoku.Helpers;
 using Tsundoku.Models;
+using Tsundoku.Services;
 using static Tsundoku.Models.Enums.TsundokuFilterModel;
 using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 using static Tsundoku.Models.Enums.TsundokuSortModel;
