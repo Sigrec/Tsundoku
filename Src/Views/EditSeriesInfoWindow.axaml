@@ -147,7 +147,7 @@
                                     CornerRadius="10">
                                 <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Padding="12,10">
                                     <SelectableTextBlock x:Name="NotesPreview"
-                                                         FontWeight="Bold"
+                                                         FontWeight="Normal"
                                                          FontSize="13"
                                                          TextWrapping="Wrap"
                                                          Foreground="{DynamicResource TsundokuSearchBarTextColor}"/>
