@@ -128,7 +128,7 @@ public sealed partial class AddNewSeriesViewModel : ViewModelBase, IDisposable
             })
             .DisposeWith(_disposables);
 
-        this.WhenAnyValue(x => x.TitleText)
+        Observable.Switch(this.WhenAnyValue(x => x.TitleText)
             .Select(x => x is null ? string.Empty : x.Trim())
             .Throttle(TimeSpan.FromMilliseconds(300), TsundokuSchedulers.TaskPool)
             .DistinctUntilChanged()
@@ -141,8 +141,7 @@ public sealed partial class AddNewSeriesViewModel : ViewModelBase, IDisposable
                 {
                     return await _aniList.GetPickerSuggestionsAsync(x, ct);
                 });
-            })
-            .Switch()
+            }))
             .ObserveOn(TsundokuSchedulers.MainThread)
             .Subscribe(items =>
             {

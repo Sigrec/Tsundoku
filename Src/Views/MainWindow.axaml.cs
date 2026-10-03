@@ -224,7 +224,7 @@ KeyDown += async (s, e) =>
             var pixelSize = new PixelSize((int)Bounds.Width, (int)Bounds.Height);
             using var rtb = new RenderTargetBitmap(pixelSize, new Avalonia.Vector(96, 96));
             rtb.Render(this);
-            rtb.Save(finalScreenshotPath);
+            rtb.Save(finalScreenshotPath, PngBitmapEncoderOptions.Default);
 
             LOGGER.Info("Screenshot saved to: {Path}", finalScreenshotPath);
             await ToggleNotificationPopup($"Saved Screenshot for \"{baseFileNameWithoutExtension}\"");

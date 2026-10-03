@@ -550,7 +550,7 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
         string savePath = isPngExtension ? fullCoverPath : Path.ChangeExtension(fullCoverPath, ".png");
         if (!isPngExtension || decoded.PixelSize.Width != targetWidth)
         {
-            decoded.Save(savePath, 100);
+            decoded.Save(savePath, PngBitmapEncoderOptions.Default);
             LOGGER.Debug("Saved {Title} cover at {Width}px to {Path}", series.Titles[TsundokuLanguage.Romaji], decoded.PixelSize.Width, savePath);
         }
         return decoded;

@@ -144,7 +144,7 @@ public sealed class BitmapHelper
                 LOGGER.Debug("Created directory: {DirectoryPath}", directory);
             }
 
-            bitmap.Save(savePath, 100);
+            bitmap.Save(savePath, PngBitmapEncoderOptions.Default);
             LOGGER.Info("Successfully saved cover image to: {SavePath} from {Source}.", savePath, sourceIdentifier);
             return bitmap;
         }
@@ -182,7 +182,7 @@ public sealed class BitmapHelper
             try
             {
                 // Avalonia's Bitmap.Save(Stream) inherently saves as PNG.
-                image.Save(stream);
+                image.Save(stream, PngBitmapEncoderOptions.Default);
                 return stream.ToArray();
             }
             catch (Exception ex)

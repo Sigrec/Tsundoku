@@ -102,10 +102,7 @@
 		<PackageReference Include="D2Phap.FileWatcherEx" />
 		<PackageReference Include="Optris.Icons.Avalonia.FontAwesome7" />
 		<PackageReference Include="ReactiveUI.Avalonia" />
-		<PackageReference Include="ReactiveUI.SourceGenerators">
-		  <PrivateAssets>all</PrivateAssets>
-		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
+		<PackageReference Include="ReactiveUI.SourceGenerators" />
 		<PackageReference Include="System.Linq.Dynamic.Core" />
 		<PackageReference Include="System.Drawing.Common" />
 		<PackageReference Include="TextCopy" />

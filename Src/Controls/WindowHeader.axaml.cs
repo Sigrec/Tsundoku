@@ -1,4 +1,5 @@
 using Avalonia.Controls.Primitives;
+using Avalonia.Metadata;
 
 namespace Tsundoku.Controls;
 
@@ -20,5 +21,15 @@ public sealed class WindowHeader : TemplatedControl
     {
         get => GetValue(IconProperty);
         set => SetValue(IconProperty, value);
+    }
+
+    public static readonly StyledProperty<object?> RightContentProperty =
+        AvaloniaProperty.Register<WindowHeader, object?>(nameof(RightContent));
+
+    [Content]
+    public object? RightContent
+    {
+        get => GetValue(RightContentProperty);
+        set => SetValue(RightContentProperty, value);
     }
 }

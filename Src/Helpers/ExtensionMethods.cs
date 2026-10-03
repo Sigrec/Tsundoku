@@ -75,7 +75,7 @@ public static partial class ExtensionMethods
         }
 
         using RecyclableMemoryStream stream = BitmapHelper.StreamManager.GetStream(nameof(CloneBitmap));
-        source.Save(stream);
+        source.Save(stream, PngBitmapEncoderOptions.Default);
         stream.Position = 0;
         return new Bitmap(stream);
     }

@@ -211,7 +211,7 @@ public sealed partial class User : ReactiveObject
                 {
                     using Bitmap originalBitmap = new Bitmap(coverPath);
                     Bitmap resizedBitMap = originalBitmap.CreateScaledBitmap(new PixelSize(LEFT_SIDE_CARD_WIDTH * BITMAP_SCALE, IMAGE_HEIGHT * BITMAP_SCALE), BitmapInterpolationMode.HighQuality);
-                    resizedBitMap.Save(coverPath, 100);
+                    resizedBitMap.Save(coverPath, PngBitmapEncoderOptions.Default);
                 }
             }
             userData[nameof(DataVersion)] = 1.9;
