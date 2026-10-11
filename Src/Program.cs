@@ -43,6 +43,6 @@ internal sealed class Program
 #if DEBUG
             .LogToTrace()
 #endif
-            .UseReactiveUI(_ => { });
+            .UseReactiveUI(builder => builder.WithExceptionHandler(Tsundoku.Helpers.UnhandledErrorReporter.ReactiveExceptionObserver));
     }
 }

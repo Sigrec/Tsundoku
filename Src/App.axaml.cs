@@ -46,6 +46,7 @@ public sealed partial class App : Application
         Mutex = new Mutex(true, appName, out bool createdNew);
 
         ConfigureNLog();
+        UnhandledErrorReporter.Register(desktop);
         SingleLinePasteHelper.Register();
 
         if (!createdNew)
@@ -143,6 +144,7 @@ public sealed partial class App : Application
                     catch (Exception ex)
                     {
                         LOGGER.Fatal(ex, "FATAL ERROR: Failed to load essential user data on startup. Shutting down.");
+                        await ErrorDialog.ShowAsync(splash, "Tsundoku Failed to Start", "Tsundoku could not load your collection data and has to close.", ex);
                         desktop.Shutdown(1);
                         return;
                     }
@@ -206,6 +208,7 @@ public sealed partial class App : Application
                 catch (Exception ex)
                 {
                     LOGGER.Fatal(ex, "Failed during startup");
+                    await ErrorDialog.ShowAsync(splash, "Tsundoku Failed to Start", "Tsundoku ran into an error while starting and has to close.", ex);
                     desktop.Shutdown(1);
                 }
             };

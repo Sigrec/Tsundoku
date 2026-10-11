@@ -177,5 +177,12 @@
       "Upgraded the Avalonia UI framework to 12.1.4"
     ],
     "actions": []
+  },
+  "3.1.1": {
+    "changes": [
+      "Fixed the app failing to start once a series had been in the Trash for more than 30 days",
+      "Errors now show a message with the details instead of the app closing without explanation"
+    ],
+    "actions": []
   }
 }

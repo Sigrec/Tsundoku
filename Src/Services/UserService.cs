@@ -334,6 +334,7 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
             SaveUserData(defaultUser);
             RefreshSourceCache(defaultUser);
             _userSubject.OnNext(defaultUser);
+            PurgeExpiredTrash();
             LOGGER.Info("Finished Loading \"{UserName}'s\" Data!", defaultUser.UserName);
             return;
         }
@@ -386,6 +387,7 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
 
         RefreshSourceCache(loadedUser);
         _userSubject.OnNext(loadedUser);
+        PurgeExpiredTrash();
         if (needsSave)
         {
             SaveUserData();
@@ -600,7 +602,6 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
             _trashSourceCache.Clear();
             _trashSourceCache.AddOrUpdate(user!.TrashedSeries);
         }
-        PurgeExpiredTrash();
     }
 
     private static User CreateDefaultUser()
@@ -732,6 +733,7 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
             // Push to reactive stream
             RefreshSourceCache(newUser);
             _userSubject.OnNext(newUser);
+            PurgeExpiredTrash();
             SaveUserData();
 
             LOGGER.Info("Successfully imported user data from '{}'. Backup created as '{}'.", filePath, backupFileName);
