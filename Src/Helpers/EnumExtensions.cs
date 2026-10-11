@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Reflection;
 using System.Runtime.Serialization;
 
@@ -5,12 +6,14 @@ namespace Tsundoku.Helpers;
 
 public static class EnumExtensions
 {
+    private static readonly ConcurrentDictionary<Enum, string> MemberValueCache = new();
+
     public static string GetEnumMemberValue(this Enum value)
     {
-        return value.GetType()
-            .GetField(value.ToString())
+        return MemberValueCache.GetOrAdd(value, static key => key.GetType()
+            .GetField(key.ToString())
             ?.GetCustomAttribute<EnumMemberAttribute>()
-            ?.Value ?? value.ToString();
+            ?.Value ?? key.ToString());
     }
 
     public static TEnum GetEnumValueFromMemberValue<TEnum>(this string stringValue, bool ignoreCase = true)

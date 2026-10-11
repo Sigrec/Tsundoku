@@ -1,4 +1,3 @@
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Media;
@@ -46,7 +45,7 @@ public static class GlassmorphismService
 
     public static void UpdateOriginalColors()
     {
-        if (Application.Current?.Resources is not Avalonia.Controls.ResourceDictionary resources) return;
+        if (Application.Current?.Resources is not ResourceDictionary resources) return;
 
         foreach (string key in AllTrackedColorKeys)
         {
@@ -64,7 +63,7 @@ public static class GlassmorphismService
     {
         _isEnabled = enabled;
 
-        if (Application.Current?.Resources is not Avalonia.Controls.ResourceDictionary resources)
+        if (Application.Current?.Resources is not ResourceDictionary resources)
         {
             return;
         }

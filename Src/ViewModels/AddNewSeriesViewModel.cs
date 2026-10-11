@@ -1,19 +1,17 @@
 ﻿using Tsundoku.Models;
 using ReactiveUI.SourceGenerators;
 using System.Collections.Specialized;
+using System.Diagnostics.CodeAnalysis;
 using Tsundoku.Helpers;
 using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 using Avalonia.Collections;
 using Tsundoku.Clients;
-using Tsundoku.Services;
 using static Tsundoku.Models.Enums.SeriesDemographicModel;
 using static Tsundoku.Models.Enums.SeriesFormatModel;
-using ReactiveUI;
 using System.Globalization;
 using System.Reactive.Linq;
 using System.Collections.ObjectModel;
 using DynamicData;
-using System.Reactive.Disposables;
 using System.Reactive.Disposables.Fluent;
 
 namespace Tsundoku.ViewModels;
@@ -74,20 +72,14 @@ public sealed partial class AddNewSeriesViewModel : ViewModelBase, IDisposable
                 string mask = decimalDigits > 0
                     ? "000000000000000000." + new string('0', decimalDigits)
                     : "000000000000000000";
-                if (cultureInfo.NumberFormat.CurrencyPositivePattern is 0 or 2) // 0 = "$n", 2 = "$ n"
-                {
-                    SeriesValueMaskedText = $"{currency}{mask}";
-                }
-                else
-                {
-                    SeriesValueMaskedText = $"{mask}{currency}";
-                }
+                SeriesValueMaskedText = cultureInfo.NumberFormat.CurrencyPositivePattern is 0 or 2 ? $"{currency}{mask}" : $"{mask}{currency}";
             })
             .DisposeWith(_disposables);
 
         SetupTitleSuggestions();
     }
 
+    [MemberNotNull(nameof(Suggestions))]
     private void SetupTitleSuggestions()
     {
         _suggestionsSource.Connect()
@@ -128,21 +120,16 @@ public sealed partial class AddNewSeriesViewModel : ViewModelBase, IDisposable
             })
             .DisposeWith(_disposables);
 
-        this.WhenAnyValue(x => x.TitleText)
+        Observable.Switch(this.WhenAnyValue(x => x.TitleText)
             .Select(x => x is null ? string.Empty : x.Trim())
             .Throttle(TimeSpan.FromMilliseconds(300), TsundokuSchedulers.TaskPool)
             .DistinctUntilChanged()
             .Select(x =>
             {
-                if (string.IsNullOrWhiteSpace(x) || x.Length < 2 || !_apiHealthCheckService.IsAniListUp)
-                    return Observable.Return(Array.Empty<AniListPickerSuggestion>());
-
-                return Observable.FromAsync(async ct =>
-                {
-                    return await _aniList.GetPickerSuggestionsAsync(x, ct);
-                });
-            })
-            .Switch()
+                return string.IsNullOrWhiteSpace(x) || x.Length < 2 || !_apiHealthCheckService.IsAniListUp
+                    ? Observable.Return(Array.Empty<AniListPickerSuggestion>())
+                    : Observable.FromAsync(async ct => await _aniList.GetPickerSuggestionsAsync(x, ct));
+            }))
             .ObserveOn(TsundokuSchedulers.MainThread)
             .Subscribe(items =>
             {
@@ -180,20 +167,24 @@ public sealed partial class AddNewSeriesViewModel : ViewModelBase, IDisposable
             AdditionalLanguagesToolTipText = string.Empty;
         }
 
-        _userService.UpdateUser(user =>
-        {
-            user.AdditionalLanguages = [.. SelectedAdditionalLanguages];
-        });
+        _userService.UpdateUser(user => user.AdditionalLanguages = [.. SelectedAdditionalLanguages!]);
     }
     
     /// <summary>
     /// Recieves the call from the AddNewSeriesWindow Button "Add" press which sends the data to this method which calls for the method to get the series data and create a new series object. Then it checks to see if it's a valid series and whether the series already exists in the users collection if not then it adds.
     /// </summary>
-    /// <param name="title">The titles of the new series to add</param>
+    /// <param name="input">The title, ID or link of the new series to add</param>
     /// <param name="bookType">The book type or format of the series to add either a Manga(Comic) or Novel</param>
     /// <param name="curVolCount">The current # of volumes the user has collected for this series</param>
     /// <param name="maxVolCount">The max # of volumes this series currently has</param>
     /// <param name="additionalLanguages">Additional languages to get more info for from Mangadex</param>
+    /// <param name="customImageUrl">Cover image URL to use instead of the one from the API</param>
+    /// <param name="publisher">Publisher of the series</param>
+    /// <param name="demographic">Demographic of the series</param>
+    /// <param name="volumesRead">Number of volumes the user has read</param>
+    /// <param name="rating">The user's rating, or -1 for none</param>
+    /// <param name="value">Total value of the user's volumes</param>
+    /// <param name="allowDuplicate">Whether the series may be added when it is already in the collection</param>
     /// <returns>Whether the series can be added to the users collection or not</returns>
     public async Task<(bool Success, string Message, Series? AddedSeries)> GetSeriesDataAsync(string input, SeriesFormat bookType, uint curVolCount = 0, uint maxVolCount = 1, TsundokuLanguage[]? additionalLanguages = null, string customImageUrl = "", string publisher = "Unknown", SeriesDemographic demographic = SeriesDemographic.Unknown, uint volumesRead = 0, decimal rating = -1, decimal value = 0, bool allowDuplicate = false)
     {

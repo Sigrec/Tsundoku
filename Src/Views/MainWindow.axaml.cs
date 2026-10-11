@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
@@ -6,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using Avalonia.Media.Imaging;
 using System.Reactive.Linq;
 using Tsundoku.Helpers;
@@ -18,9 +20,6 @@ using ReactiveUI.Avalonia;
 using System.Reactive.Disposables;
 using System.Reactive.Disposables.Fluent;
 using System.Collections.Specialized;
-using Tsundoku.Services;
-using Avalonia.Media.Transformation;
-using Avalonia.Styling;
 
 namespace Tsundoku.Views;
 
@@ -30,12 +29,12 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
     private readonly IUserService _userService;
     private readonly IApiHealthCheckService _apiHealthCheckService;
     private readonly IPopupDialogService _popupDialogService;
-    private readonly AddNewSeriesWindow _newSeriesWindow;
-    private readonly UserSettingsWindow _userSettingsWindow;
-    private readonly CollectionThemeWindow _themeSettingsWindow;
-    private readonly PriceAnalysisWindow _priceAnalysisWindow;
-    private readonly CollectionStatsWindow _collectionStatsWindow;
-    private readonly UserNotesWindow _userNotesWindow;
+    private readonly Lazy<AddNewSeriesWindow> _newSeriesWindow;
+    private readonly Lazy<UserSettingsWindow> _userSettingsWindow;
+    private readonly Lazy<CollectionThemeWindow> _themeSettingsWindow;
+    private readonly Lazy<PriceAnalysisWindow> _priceAnalysisWindow;
+    private readonly Lazy<CollectionStatsWindow> _collectionStatsWindow;
+    private readonly Lazy<UserNotesWindow> _userNotesWindow;
     private WindowState previousWindowState;
     private CancellationTokenSource? _notificationCts;
     private bool _isShuttingDown;
@@ -47,22 +46,17 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
         IUserService userService,
         IApiHealthCheckService apiHealthCheckService,
         IPopupDialogService popupDialogService,
-        AddNewSeriesWindow newSeriesWindow,
-        UserSettingsWindow userSettingsWindow,
-        CollectionThemeWindow themeSettingsWindow,
-        PriceAnalysisWindow priceAnalysisWindow,
-        CollectionStatsWindow collectionStatsWindow,
-        UserNotesWindow userNotesWindow)
+        IServiceProvider serviceProvider)
     {
         _userService = userService;
         _apiHealthCheckService = apiHealthCheckService;
         _popupDialogService = popupDialogService;
-        _newSeriesWindow = newSeriesWindow;
-        _userSettingsWindow = userSettingsWindow;
-        _themeSettingsWindow = themeSettingsWindow;
-        _priceAnalysisWindow = priceAnalysisWindow;
-        _collectionStatsWindow = collectionStatsWindow;
-        _userNotesWindow = userNotesWindow;
+        _newSeriesWindow = CreateManagedWindow<AddNewSeriesWindow>(serviceProvider, () => AddNewSeriesButton);
+        _userSettingsWindow = CreateManagedWindow<UserSettingsWindow>(serviceProvider, () => SettingsButton);
+        _themeSettingsWindow = CreateManagedWindow<CollectionThemeWindow>(serviceProvider, () => ThemeButton);
+        _priceAnalysisWindow = CreateManagedWindow<PriceAnalysisWindow>(serviceProvider, () => AnalysisButton);
+        _collectionStatsWindow = CreateManagedWindow<CollectionStatsWindow>(serviceProvider, () => StatsButton);
+        _userNotesWindow = CreateManagedWindow<UserNotesWindow>(serviceProvider, () => UserNotesButton);
         InitializeComponent();
         ViewModel = viewModel;
         DataContext = viewModel;
@@ -94,7 +88,7 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
                 .Where(e => e.EventArgs.Action == NotifyCollectionChangedAction.Reset)
                 .Subscribe(_ =>
                 {
-                    CollectionPane.Offset = new Avalonia.Vector(0, 0);
+                    CollectionPane.Offset = new Vector(0, 0);
                     Dispatcher.UIThread.Post(() => CollectionItems.InvalidateMeasure(), DispatcherPriority.Render);
                 })
                 .DisposeWith(disposables);
@@ -192,13 +186,12 @@ KeyDown += async (s, e) =>
 
             ViewModel.SaveOnClose();
 
-            foreach (Window child in (Window[])[_newSeriesWindow, _userSettingsWindow, _themeSettingsWindow, _priceAnalysisWindow, _collectionStatsWindow, _userNotesWindow])
-            {
-                if (child.IsVisible)
-                {
-                    child.Close();
-                }
-            }
+            CloseIfOpen(_newSeriesWindow);
+            CloseIfOpen(_userSettingsWindow);
+            CloseIfOpen(_themeSettingsWindow);
+            CloseIfOpen(_priceAnalysisWindow);
+            CloseIfOpen(_collectionStatsWindow);
+            CloseIfOpen(_userNotesWindow);
 
             if (Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop)
             {
@@ -209,10 +202,10 @@ KeyDown += async (s, e) =>
 
     private async Task ScreenCaptureWindows()
     {
-        string userName = ViewModel.CurrentUser.UserName;
+        string userName = ViewModel!.CurrentUser.UserName;
         string themeName = ViewModel.CurrentTheme.ThemeName;
         TsundokuLanguage language = ViewModel.CurrentUser.Language;
-        string filterSegment = (ViewModel.SelectedFilter != TsundokuFilter.None && ViewModel.SelectedFilter != TsundokuFilter.Query)
+        string filterSegment = (ViewModel.SelectedFilter is not TsundokuFilter.None and not TsundokuFilter.Query)
             ? $"-{ViewModel.SelectedFilter.GetEnumMemberValue()}"
             : string.Empty;
 
@@ -221,10 +214,10 @@ KeyDown += async (s, e) =>
 
         try
         {
-            var pixelSize = new PixelSize((int)Bounds.Width, (int)Bounds.Height);
-            using var rtb = new RenderTargetBitmap(pixelSize, new Avalonia.Vector(96, 96));
+            PixelSize pixelSize = new((int)Bounds.Width, (int)Bounds.Height);
+            using RenderTargetBitmap rtb = new(pixelSize, new Vector(96, 96));
             rtb.Render(this);
-            rtb.Save(finalScreenshotPath);
+            rtb.Save(finalScreenshotPath, PngBitmapEncoderOptions.Default);
 
             LOGGER.Info("Screenshot saved to: {Path}", finalScreenshotPath);
             await ToggleNotificationPopup($"Saved Screenshot for \"{baseFileNameWithoutExtension}\"");
@@ -238,7 +231,7 @@ KeyDown += async (s, e) =>
 
     private async Task DoShowEditSeriesInfoDialogAsync(IInteractionContext<EditSeriesInfoViewModel, MainWindowViewModel?> interaction)
     {
-        EditSeriesInfoWindow dialog = App.ServiceProvider.GetRequiredService<EditSeriesInfoWindow>();
+        EditSeriesInfoWindow dialog = App.ServiceProvider!.GetRequiredService<EditSeriesInfoWindow>();
         dialog.DataContext = interaction.Input;
 
         MainWindowViewModel? resultFromDialog = await this.OpenManagedDialogWithResultAsync<EditSeriesInfoWindow, EditSeriesInfoViewModel, MainWindowViewModel?>(
@@ -257,7 +250,7 @@ KeyDown += async (s, e) =>
         _notificationCts = new CancellationTokenSource();
         CancellationToken token = _notificationCts.Token;
 
-        ViewModel.NotificationText = notiText;
+        ViewModel!.NotificationText = notiText;
         NotificationPopup.IsVisible = true;
         try
         {
@@ -267,50 +260,63 @@ KeyDown += async (s, e) =>
         catch (TaskCanceledException) { }
     }
 
+    private static Lazy<TWindow> CreateManagedWindow<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] TWindow>(IServiceProvider serviceProvider, Func<ToggleButton> toolbarButton) where TWindow : Window
+    {
+        return new Lazy<TWindow>(() =>
+        {
+            TWindow window = serviceProvider.GetRequiredService<TWindow>();
+            window.Closing += (s, e) => toolbarButton().IsChecked = false;
+            return window;
+        });
+    }
+
+    private static void CloseIfOpen<TWindow>(Lazy<TWindow> window) where TWindow : Window
+    {
+        if (window.IsValueCreated && window.Value.IsVisible)
+        {
+            window.Value.Close();
+        }
+    }
+
     private void OpenAddSeriesDialog(object sender, RoutedEventArgs args)
     {
-        AddNewSeriesWindow? window = this.OpenManagedWindow<AddNewSeriesWindow, AddNewSeriesViewModel>(_newSeriesWindow, "Add New Series Window");
+        AddNewSeriesWindow? window = this.OpenManagedWindow<AddNewSeriesWindow, AddNewSeriesViewModel>(_newSeriesWindow.Value, "Add New Series Window");
         if (window is not null)
         {
             AddNewSeriesButton.IsChecked = true;
-            window.Closing += (s, e) => AddNewSeriesButton.IsChecked = false;
         }
     }
 
     private void OpenSettingsDialog(object sender, RoutedEventArgs args)
     {
-        UserSettingsWindow? window = this.OpenManagedWindow<UserSettingsWindow, UserSettingsViewModel>(_userSettingsWindow, "Settings Window");
+        UserSettingsWindow? window = this.OpenManagedWindow<UserSettingsWindow, UserSettingsViewModel>(_userSettingsWindow.Value, "Settings Window");
         if (window is not null)
         {
             SettingsButton.IsChecked = true;
-            window.Closing += (s, e) => SettingsButton.IsChecked = false;
         }
     }
 
     private void OpenCollectionStatsDialog(object sender, RoutedEventArgs args)
     {
-        CollectionStatsWindow? window = this.OpenManagedWindow<CollectionStatsWindow, CollectionStatsViewModel>(_collectionStatsWindow, "Collection Stats Window");
+        CollectionStatsWindow? window = this.OpenManagedWindow<CollectionStatsWindow, CollectionStatsViewModel>(_collectionStatsWindow.Value, "Collection Stats Window");
         if (window is not null)
         {
             StatsButton.IsChecked = true;
-            window.Closing += (s, e) => StatsButton.IsChecked = false;
         }
     }
 
     private void OpenPriceAnalysisDialog(object sender, RoutedEventArgs args)
     {
-        PriceAnalysisWindow? window = this.OpenManagedWindow<PriceAnalysisWindow, PriceAnalysisViewModel>(_priceAnalysisWindow, "Price Analysis Window");
+        PriceAnalysisWindow? window = this.OpenManagedWindow<PriceAnalysisWindow, PriceAnalysisViewModel>(_priceAnalysisWindow.Value, "Price Analysis Window");
         if (window is not null)
         {
             AnalysisButton.IsChecked = true;
-            window.Closing += (s, e) => AnalysisButton.IsChecked = false;
         }
     }
 
     private void OpenTrashDialog(object sender, RoutedEventArgs args)
     {
-        TrashWindow? trash = App.ServiceProvider?.GetService(typeof(TrashWindow)) as TrashWindow;
-        if (trash is null) return;
+        if (App.ServiceProvider?.GetService(typeof(TrashWindow)) is not TrashWindow trash) return;
         this.OpenManagedWindow<TrashWindow, TrashViewModel>(trash, "Trash Window");
     }
 
@@ -324,14 +330,14 @@ KeyDown += async (s, e) =>
         picker.RollOnOpen();
 
         await picker.ShowDialog(this);
+        pickerVm.Dispose();
 
         if (!string.IsNullOrWhiteSpace(picker.RequestedPriceAnalysisTitle))
         {
-            PriceAnalysisWindow? paWindow = this.OpenManagedWindow<PriceAnalysisWindow, PriceAnalysisViewModel>(_priceAnalysisWindow, "Price Analysis Window");
+            PriceAnalysisWindow? paWindow = this.OpenManagedWindow<PriceAnalysisWindow, PriceAnalysisViewModel>(_priceAnalysisWindow.Value, "Price Analysis Window");
             if (paWindow is not null)
             {
                 AnalysisButton.IsChecked = true;
-                paWindow.Closing += (s, e) => AnalysisButton.IsChecked = false;
                 paWindow.SearchTextBox.Text = picker.RequestedPriceAnalysisTitle;
                 if (picker.RequestedIsNovel)
                 {
@@ -349,21 +355,19 @@ KeyDown += async (s, e) =>
 
     private void OpenThemeSettingsDialog(object sender, RoutedEventArgs args)
     {
-        CollectionThemeWindow? window = this.OpenManagedWindow<CollectionThemeWindow, ThemeSettingsViewModel>(_themeSettingsWindow, "Theme Settings Window");
+        CollectionThemeWindow? window = this.OpenManagedWindow<CollectionThemeWindow, ThemeSettingsViewModel>(_themeSettingsWindow.Value, "Theme Settings Window");
         if (window is not null)
         {
             ThemeButton.IsChecked = true;
-            window.Closing += (s, e) => ThemeButton.IsChecked = false;
         }
     }
 
     private void OpenUserNotesDialog(object sender, RoutedEventArgs args)
     {
-        UserNotesWindow? window = this.OpenManagedWindow<UserNotesWindow, UserNotesWindowViewModel>(_userNotesWindow, "User Notes Window");
+        UserNotesWindow? window = this.OpenManagedWindow<UserNotesWindow, UserNotesWindowViewModel>(_userNotesWindow.Value, "User Notes Window");
         if (window is not null)
         {
             UserNotesButton.IsChecked = true;
-            window.Closing += (s, e) => UserNotesButton.IsChecked = false;
         }
     }
 
@@ -375,21 +379,18 @@ KeyDown += async (s, e) =>
     {
         if (LanguageSelector.SelectedItem is TsundokuLanguage selectedItem)
         {
-            ViewModel.UpdateUserLanguage(selectedItem);
+            ViewModel!.UpdateUserLanguage(selectedItem);
             LOGGER.Info("Changed Language to {Lang}", selectedItem);
         }
     }
 
-    private void BackToTop_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private void BackToTop_Click(object? sender, RoutedEventArgs e)
     {
         if (CollectionPane.Offset.Y <= 0) return;
-        CollectionPane.Offset = new Avalonia.Vector(0, 0);
+        CollectionPane.Offset = new Vector(0, 0);
     }
 
-    private void ClearAllFiltersClick(object? sender, RoutedEventArgs e)
-    {
-        ViewModel?.ClearAllFilters();
-    }
+    private void ClearAllFiltersClick(object? sender, RoutedEventArgs e) => ViewModel?.ClearAllFilters();
 
     /// <summary>
     /// Changes the sort on the users collection
@@ -399,11 +400,11 @@ KeyDown += async (s, e) =>
         if (SortSelector.SelectedItem is string selectedItem)
         {
             LOGGER.Debug("Changing Sort to {sort}", selectedItem);
-            ViewModel.SelectedSort = selectedItem.GetEnumValueFromMemberValue(TsundokuSort.TitleAZ);
+            ViewModel!.SelectedSort = selectedItem.GetEnumValueFromMemberValue(TsundokuSort.TitleAZ);
         }
     }
 
-    private void ToggleThemeSelector(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private void ToggleThemeSelector(object? sender, RoutedEventArgs e)
     {
         ThemeGrid.IsVisible = !ThemeGrid.IsVisible;
         if (ThemeGrid.IsVisible)
@@ -434,7 +435,7 @@ KeyDown += async (s, e) =>
         {
             TsundokuFilter filter = selectedItem.GetEnumValueFromMemberValue(TsundokuFilter.None);
             LOGGER.Debug("Changing Filter to {filter}", filter);
-            ViewModel.SelectedFilter = filter;
+            ViewModel!.SelectedFilter = filter;
             ClearFilterButton.IsVisible = filter != TsundokuFilter.None;
         }
     }
@@ -442,7 +443,7 @@ KeyDown += async (s, e) =>
     private void ClearFilterClicked(object sender, RoutedEventArgs e)
     {
         CollectionFilterSelector.SelectedIndex = -1;
-        ViewModel.SelectedFilter = TsundokuFilter.None;
+        ViewModel!.SelectedFilter = TsundokuFilter.None;
         ViewModel.SelectedFilterIndex = -1;
         ClearFilterButton.IsVisible = false;
         LOGGER.Debug("Cleared Filter");
@@ -453,18 +454,18 @@ KeyDown += async (s, e) =>
         if (PublisherFilterSelector.SelectedItem is string selectedPublisher)
         {
             LOGGER.Debug("Changing Publisher Filter to {publisher}", selectedPublisher);
-            ViewModel.SelectedPublisher = selectedPublisher;
+            ViewModel!.SelectedPublisher = selectedPublisher;
         }
         else
         {
-            ViewModel.SelectedPublisher = string.Empty;
+            ViewModel!.SelectedPublisher = string.Empty;
         }
     }
 
     private void ClearPublisherFilterClicked(object sender, RoutedEventArgs e)
     {
         PublisherFilterSelector.SelectedItem = null;
-        ViewModel.SelectedPublisher = string.Empty;
+        ViewModel!.SelectedPublisher = string.Empty;
         LOGGER.Debug("Cleared Publisher Filter");
     }
 
@@ -488,7 +489,7 @@ KeyDown += async (s, e) =>
         });
         if (file.Count == 1)
         {
-            ViewModel.UpdateUserIcon(Path.ChangeExtension(file[0].Path.LocalPath, ".png"));
+            ViewModel!.UpdateUserIcon(Path.ChangeExtension(file[0].Path.LocalPath, ".png"));
         }
         else
         {
@@ -521,7 +522,10 @@ KeyDown += async (s, e) =>
     /// </summary>
     private async void CopySeriesTitleAsync(object sender, PointerPressedEventArgs args)
     {
-        await ClipboardHelper.CopyToClipboardAsync(((TextBlock)sender).Text);
+        if (sender is TextBlock { Text: { Length: > 0 } title })
+        {
+            await ClipboardHelper.CopyToClipboardAsync(title);
+        }
     }
 
     /// <summary>
@@ -628,7 +632,7 @@ KeyDown += async (s, e) =>
 
     private async void SaveCurrentFilterAsShelf(object sender, RoutedEventArgs args)
     {
-        if (string.IsNullOrWhiteSpace(ViewModel.FilterBuilder.SynthesizedQuery))
+        if (string.IsNullOrWhiteSpace(ViewModel!.FilterBuilder.SynthesizedQuery))
         {
             await _popupDialogService.ShowAsync(
                 "Empty Filter",
@@ -672,7 +676,7 @@ KeyDown += async (s, e) =>
 
         try
         {
-            ViewModel.RenameShelf(shelf, newName);
+            ViewModel!.RenameShelf(shelf, newName);
         }
         catch (Exception ex)
         {
@@ -695,7 +699,7 @@ KeyDown += async (s, e) =>
 
         if (confirmed)
         {
-            ViewModel.DeleteShelf(shelf);
+            ViewModel!.DeleteShelf(shelf);
         }
     }
 }

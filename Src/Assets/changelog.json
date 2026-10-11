@@ -162,5 +162,20 @@
     "actions": [
       "Try the Preview toggle in Edit Series or Notes to render any existing plain-text notes as markdown — bullet lists, links, and headings you already had will render immediately without any edits"
     ]
+  },
+  "3.1.0": {
+    "changes": [
+      "Fixed pasting into text boxes when the copied text starts with a line break",
+      "Fixed Refresh Series sometimes removing the wrong series",
+      "Fixed Collection Stats and the publisher filter going stale after an import or reload",
+      "Fixed long stalls when adding or refreshing series from AniList",
+      "Fixed collection imports overwriting the previous backup",
+      "Smoother scrolling through large collections",
+      "Faster startup",
+      "Safer saves that can't leave a damaged collection file",
+      "Moved the Notes window Edit toggle into the window header",
+      "Upgraded the Avalonia UI framework to 12.1.4"
+    ],
+    "actions": []
   }
 }

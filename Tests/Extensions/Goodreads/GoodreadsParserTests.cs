@@ -38,7 +38,7 @@ public class GoodreadsParserTests
     [Test]
     public async Task ExtractUniqueTitles_EmptyFilePaths_ReturnsNull()
     {
-        string[] paths = Array.Empty<string>();
+        string[] paths = [];
         Dictionary<(string Title, SeriesFormat Format, string Publisher, decimal Rating), uint>? result =
             await GoodreadsParser.ExtractUniqueTitles(paths);
         Assert.That(result, Is.Null);
@@ -184,7 +184,7 @@ public class GoodreadsParserTests
         string path = CreateTempCsvFile(csv);
 
         Dictionary<(string Title, SeriesFormat Format, string Publisher, decimal Rating), uint>? result =
-            await GoodreadsParser.ExtractUniqueTitles(new[] { path });
+            await GoodreadsParser.ExtractUniqueTitles([path]);
 
         Assert.That(result, Is.Not.Null);
 

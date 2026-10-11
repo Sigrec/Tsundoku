@@ -82,7 +82,7 @@ public interface IUserService : IDisposable
 
     /// <summary>Persists the specified user data to disk.</summary>
     /// <param name="user">The user to save.</param>
-    void SaveUserData(User user);
+    void SaveUserData(User? user);
 
     /// <summary>Persists the current user data to disk.</summary>
     void SaveUserData();
@@ -268,14 +268,14 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
             .Subscribe(mainThemeName =>
             {
                 Optional<TsundokuTheme> lookupTheme = _savedThemesSourceCache.Lookup(mainThemeName);
-                TsundokuTheme theme;
+                TsundokuTheme? theme;
 
                 if (!lookupTheme.HasValue)
                 {
                     // Fall back to the first available theme, if any
-                    theme = _savedThemes.AsValueEnumerable().FirstOrDefault();
+                    theme = _savedThemes!.AsValueEnumerable().FirstOrDefault();
 
-                    User user = _userSubject.Value;
+                    User user = _userSubject.Value!;
                     if (theme is not null)
                     {
                         LOGGER.Warn("MainTheme '{MainThemeName}' not found, defaulted to '{ThemeName}'.", mainThemeName, theme.ThemeName);
@@ -339,6 +339,7 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
         }
 
         User loadedUser;
+        bool needsSave = true;
         FileInfo fileInfo = new(userDataFilePath);
         if (fileInfo.Length == 0)
         {
@@ -357,8 +358,8 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
 
                 if (userData is not null)
                 {
-                    User.UpdateSchemaVersion(userData, false);
-                    loadedUser = userData.Deserialize(UserModelContext.Default.User);
+                    needsSave = User.UpdateSchemaVersion(userData, false);
+                    loadedUser = userData.Deserialize(UserModelContext.Default.User)!;
                 }
                 else
                 {
@@ -385,7 +386,10 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
 
         RefreshSourceCache(loadedUser);
         _userSubject.OnNext(loadedUser);
-        SaveUserData();
+        if (needsSave)
+        {
+            SaveUserData();
+        }
         LOGGER.Info("Finished Loading \"{UserName}'s\" Data!", loadedUser.UserName);
     }
 
@@ -444,10 +448,7 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
     }
 
 
-    public int GetCurCollectionCount()
-    {
-        return _userCollectionSourceCache.Count;
-    }
+    public int GetCurCollectionCount() => _userCollectionSourceCache.Count;
 
     /// <summary>
     /// Resolves cover file paths, renames non-PNG fallbacks to .png, and recycles orphaned cover files.
@@ -484,7 +485,7 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
                 }
 
                 LOGGER.Debug("'.png' Extension file not found for {title} or File Does Not Exist, Searching for Another Valid File...", curSeries.Titles[TsundokuLanguage.Romaji]);
-                if (coverFiles.TryGetValue(baseName, out string fallbackPath))
+                if (coverFiles.TryGetValue(baseName, out string? fallbackPath))
                 {
                     string targetPngPath = Path.ChangeExtension(fallbackPath, ".png");
                     try
@@ -550,7 +551,7 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
         string savePath = isPngExtension ? fullCoverPath : Path.ChangeExtension(fullCoverPath, ".png");
         if (!isPngExtension || decoded.PixelSize.Width != targetWidth)
         {
-            decoded.Save(savePath, 100);
+            decoded.Save(savePath, PngBitmapEncoderOptions.Default);
             LOGGER.Debug("Saved {Title} cover at {Width}px to {Path}", series.Titles[TsundokuLanguage.Romaji], decoded.PixelSize.Width, savePath);
         }
         return decoded;
@@ -558,10 +559,9 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
 
     public Series? GetSeriesByCoverPath(string coverPath)
     {
-        if (string.IsNullOrWhiteSpace(coverPath))
-            return null;
-
-        return _userCollectionSourceCache.Items
+        return string.IsNullOrWhiteSpace(coverPath)
+            ? null
+            : _userCollectionSourceCache.Items
             .AsValueEnumerable()
             .FirstOrDefault(series => string.Equals(series.Cover, coverPath));
     }
@@ -661,7 +661,7 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
             {
                 backupFileName = $"UserData_Backup_{count}.json";
                 count++;
-            } while (File.Exists(backupFileName));
+            } while (File.Exists(AppFileHelper.GetFilePath(backupFileName)));
 
             string originalUserDataPath = AppFileHelper.GetUserDataJsonPath(); // This is the user data file you want to modify
             string backupOfOriginalPath = AppFileHelper.GetFilePath(backupFileName); // This is where the old data will be backed up
@@ -746,10 +746,7 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
         }
     }
 
-    public IReadOnlyList<Series> GetUserCollection()
-    {
-        return GetCurrentUserSnapshot().UserCollection;
-    }
+    public IReadOnlyList<Series> GetUserCollection() => GetCurrentUserSnapshot()!.UserCollection;
 
     public void UpdateSeriesCoverBitmap(Guid seriesId, Bitmap bitmap)
     {
@@ -877,25 +874,19 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
 
     public void UpdateUser(Action<User> updateAction)
     {
-        User user = _userSubject.Value;
+        User user = _userSubject.Value!;
         updateAction(user);
         _userSubject.OnNext(user);
         LOGGER.Trace("User properties updated for: {UserName}", user.UserName);
     }
 
-    public User? GetCurrentUserSnapshot()
-    {
-        return _userSubject.Value;
-    }
+    public User? GetCurrentUserSnapshot() => _userSubject.Value;
 
-    public TsundokuTheme? GetCurrentThemeSnapshot()
-    {
-        return _currentThemeSubject.Value;
-    }
+    public TsundokuTheme? GetCurrentThemeSnapshot() => _currentThemeSubject.Value;
 
     public TsundokuTheme? GetMainTheme()
     {
-        return _savedThemes.AsValueEnumerable().FirstOrDefault(theme => theme.ThemeName.Equals(GetCurrentUserSnapshot().MainTheme))
+        return _savedThemes.AsValueEnumerable().FirstOrDefault(theme => theme.ThemeName.Equals(GetCurrentUserSnapshot()!.MainTheme))
             ?? _savedThemes.AsValueEnumerable().FirstOrDefault();
     }
 
@@ -903,33 +894,24 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
     /// Sets the current theme used by the app without updating the User object
     /// </summary>
     /// <param name="theme">The theme you want to override the current app theme with</param>
-    public void OverrideCurrentTheme(TsundokuTheme theme)
-    {
-        _currentThemeSubject.OnNext(theme);
-    }
+    public void OverrideCurrentTheme(TsundokuTheme theme) => _currentThemeSubject.OnNext(theme);
 
     public void SetCurrentTheme(TsundokuTheme theme)
     {
         // Also update the User object's MainTheme property
         UpdateUser(user => user.MainTheme = theme.ThemeName);
-        if (GetCurrentUserSnapshot().MainTheme.Equals(theme.ThemeName))
+        if (GetCurrentUserSnapshot()!.MainTheme.Equals(theme.ThemeName))
         {
             OverrideCurrentTheme(theme);
         }
     }
 
-    public TsundokuLanguage GetLanguage()
-    {
-        return GetCurrentUserSnapshot().Language;
-    }
+    public TsundokuLanguage GetLanguage() => GetCurrentUserSnapshot()!.Language;
 
-    public void SetCurrentTheme(string themeName)
-    {
-        UpdateUser(user => user.MainTheme = themeName);
-    }
+    public void SetCurrentTheme(string themeName) => UpdateUser(user => user.MainTheme = themeName);
 
     [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "User.JSON_SERIALIZATION_OPTIONS uses the UserModelContext source-gen resolver, so this options-based call is trim-safe at runtime.")]
-    public void SaveUserData(User user)
+    public void SaveUserData(User? user)
     {
         if (user is null) return;
 
@@ -938,9 +920,7 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
 
         try
         {
-            using FileStream createStream = File.Create(userDataFullPath);
-            JsonSerializer.Serialize(createStream, user, User.JSON_SERIALIZATION_OPTIONS);
-            createStream.Flush();
+            WriteUserFile(user, userDataFullPath);
             LOGGER.Debug("Successfully saved user data to: {Path}", userDataFullPath);
         }
         catch (Exception ex)
@@ -950,10 +930,7 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
     }
 
     [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "User.JSON_SERIALIZATION_OPTIONS uses the UserModelContext source-gen resolver, so this options-based call is trim-safe at runtime.")]
-    public void SaveUserData()
-    {
-        SaveUserData(GetCurrentUserSnapshot());
-    }
+    public void SaveUserData() => SaveUserData(GetCurrentUserSnapshot());
 
     [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "User.JSON_SERIALIZATION_OPTIONS uses the UserModelContext source-gen resolver, so this options-based call is trim-safe at runtime.")]
     public void SaveBackupUserData()
@@ -966,9 +943,7 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
 
         try
         {
-            using FileStream createStream = File.Create(backupPath);
-            JsonSerializer.Serialize(createStream, user, User.JSON_SERIALIZATION_OPTIONS);
-            createStream.Flush();
+            WriteUserFile(user, backupPath);
             LOGGER.Debug("Successfully saved backup user data to: {Path}", backupPath);
         }
         catch (Exception ex)
@@ -977,10 +952,23 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
         }
     }
 
-    public bool DoesDuplicateExist(Series series)
+    /// <summary>
+    /// Serializes the user to a temporary file and then swaps it into place, so an interrupted
+    /// save never leaves a truncated file at <paramref name="path"/>.
+    /// </summary>
+    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "User.JSON_SERIALIZATION_OPTIONS uses the UserModelContext source-gen resolver, so this options-based call is trim-safe at runtime.")]
+    private static void WriteUserFile(User user, string path)
     {
-        return _userCollectionSourceCache.Items.AsValueEnumerable().Contains(series, new SeriesValueComparer());
+        string tempPath = path + ".tmp";
+        using (FileStream createStream = File.Create(tempPath))
+        {
+            JsonSerializer.Serialize(createStream, user, User.JSON_SERIALIZATION_OPTIONS);
+            createStream.Flush(flushToDisk: true);
+        }
+        File.Move(tempPath, path, overwrite: true);
     }
+
+    public bool DoesDuplicateExist(Series series) => _userCollectionSourceCache.Items.AsValueEnumerable().Contains(series, new SeriesValueComparer());
 
     public bool AddSeries(Series? series, bool allowDuplicate = false)
     {
@@ -1000,10 +988,7 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
 
         _userCollectionSourceCache.AddOrUpdate(series);
 
-        UpdateUser(user =>
-        {
-            user.UserCollection.Add(series);
-        });
+        UpdateUser(user => user.UserCollection.Add(series));
 
         LOGGER.Debug("Added {series} ({id}) to Collection", FormatSeriesDisplayName(series), series.Id);
         return true;
@@ -1027,13 +1012,7 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
         bool shouldRefreshCover = originalSeries.IsCoverImageEmpty() || (GetCurrentUserSnapshot()?.RefreshCovers ?? false);
         originalSeries.UpdateFrom(refreshedSeries, shouldRefreshCover);
 
-        UpdateUser(user =>
-        {
-            int index = user.UserCollection.BinarySearch(originalSeries, new SeriesComparer(user.Language));
-            if (index < 0) index = ~index;
-            user.UserCollection.RemoveAt(index);
-            user.UserCollection.Insert(index, originalSeries);
-        });
+        UpdateUser(static _ => { });
 
         LOGGER.Info("Refreshed {series} ({id} | CoverRefresh={CoverRefresh}) in Collection", FormatSeriesDisplayName(originalSeries), originalSeries.Id, shouldRefreshCover);
 
@@ -1064,10 +1043,7 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
             LOGGER.Warn("Series with ID {SeriesId} not found in cache before removal.", series.Id);
         }
 
-        UpdateUser(user =>
-        {
-            user.UserCollection.Remove(series);
-        });
+        UpdateUser(user => user.UserCollection.Remove(series));
 
         LOGGER.Info("Removed {series} ({id}) from Collection", FormatSeriesDisplayName(series), series.Id);
         series.Dispose();
@@ -1201,7 +1177,7 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
         UpdateUser(user =>
         {
             // Instantiate the comparer once for this operation
-            TsundokuThemeComparer comparer = new TsundokuThemeComparer(user.Language);
+            TsundokuThemeComparer comparer = new(user.Language);
             int insertionIndex = user.SavedThemes.BinarySearch(theme, comparer);
 
             if (insertionIndex >= 0)
@@ -1255,10 +1231,7 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
         if (_savedThemesSourceCache.Lookup(theme.ThemeName).HasValue)
         {
             _savedThemesSourceCache.Remove(theme.ThemeName);
-            UpdateUser(user =>
-            {
-                user.SavedThemes.Remove(theme);
-            });
+            UpdateUser(user => user.SavedThemes.Remove(theme));
             LOGGER.Info("Removed {theme} Theme", theme.ThemeName);
         }
         else
@@ -1328,10 +1301,7 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
 
         _savedShelvesSourceCache.Remove(shelfId);
 
-        UpdateUser(user =>
-        {
-            user.SavedShelves.RemoveAll(s => s.Id == shelfId);
-        });
+        UpdateUser(user => user.SavedShelves.RemoveAll(s => s.Id == shelfId));
 
         LOGGER.Info("Removed shelf {Id}", shelfId);
     }
@@ -1371,10 +1341,7 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
 
     public void ExportTheme(string fileName)
     {
-        TsundokuTheme theme = _currentThemeSubject.Value;
-        if (theme is null)
-            throw new ArgumentNullException(nameof(fileName));
-
+        TsundokuTheme theme = _currentThemeSubject.Value ?? throw new ArgumentNullException(nameof(fileName));
         string themesFolderPath = AppFileHelper.GetThemesFolderPath();
         string themeFileName = $"{fileName}_Theme.json";
         string themeFullPath = Path.Combine(themesFolderPath, themeFileName);
@@ -1434,7 +1401,7 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
 
     public void UpdateUserIcon(string filePath)
     {
-        User currentUser = GetCurrentUserSnapshot();
+        User? currentUser = GetCurrentUserSnapshot();
         if (currentUser is null)
         {
             LOGGER.Warn("Attempted to update user icon, but no user is currently loaded.");

@@ -1,4 +1,3 @@
-using System.Reactive.Disposables;
 using System.Reactive.Disposables.Fluent;
 using System.Reactive.Linq;
 using Avalonia.Animation;
@@ -12,7 +11,6 @@ using ReactiveUI;
 using ReactiveUI.Avalonia;
 using Tsundoku.Helpers;
 using Tsundoku.Models;
-using Tsundoku.Services;
 using Tsundoku.ViewModels;
 using static Tsundoku.Models.Enums.SeriesDemographicModel;
 using static Tsundoku.Models.Enums.SeriesFormatModel;
@@ -25,6 +23,7 @@ public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesView
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
     public bool IsOpen { get; set; }
     private readonly IPopupDialogService _popupDialogService;
+    private CancellationTokenSource? _buttonSpinnerCancellation;
 
     public AddNewSeriesWindow(AddNewSeriesViewModel viewModel, IPopupDialogService popupDialogService)
     {
@@ -34,10 +33,7 @@ public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesView
 
         this.ConfigureHideOnClose(onClosing: () => viewModel.ClearSuggestions());
 
-        Deactivated += (s, e) =>
-        {
-            viewModel.IsSuggestionsOpen = false;
-        };
+        Deactivated += (s, e) => viewModel.IsSuggestionsOpen = false;
 
         this.WhenActivated(disposables =>
         {
@@ -50,8 +46,8 @@ public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesView
             (title, curVolText, maxVolText, mangaChecked, novelChecked) =>
             {
                 // Convert the volume text to numbers
-                ushort currentVolume = ConvertNumText(curVolText.Replace("_", string.Empty));
-                ushort maxVolume = ConvertNumText(maxVolText.Replace("_", string.Empty));
+                ushort currentVolume = ConvertNumText(curVolText!.Replace("_", string.Empty));
+                ushort maxVolume = ConvertNumText(maxVolText!.Replace("_", string.Empty));
 
                 // Use the named variables for clarity
                 bool isAnyChecked = mangaChecked.GetValueOrDefault() || novelChecked.GetValueOrDefault();
@@ -64,7 +60,7 @@ public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesView
             .Subscribe(isEnabled => ViewModel.IsAddSeriesButtonEnabled = isEnabled)
             .DisposeWith(disposables);
 
-            this.WhenAnyValue(x => x.ViewModel.SelectedSuggestion)
+            this.WhenAnyValue(x => x.ViewModel!.SelectedSuggestion)
                 .Subscribe(selectedSuggestion =>
                 {
                     if (selectedSuggestion is not null)
@@ -96,10 +92,7 @@ public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesView
     }
 
 
-    private async Task ShowErrorDialog(string info = "Unable to Add Series")
-    {
-        await _popupDialogService.ShowAsync("Error", "fa7-solid fa7-circle-exclamation", info, this);
-    }
+    private async Task ShowErrorDialog(string info = "Unable to Add Series") => await _popupDialogService.ShowAsync("Error", "fa7-solid fa7-circle-exclamation", info, this);
 
     private void IsMangaButtonClicked(object? sender, RoutedEventArgs args)
     {
@@ -132,15 +125,14 @@ public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesView
         CoverImageUrlTextBox.Text = string.Empty;
     }
 
-    private static ushort ConvertNumText(string value)
-    {
-        return ushort.TryParse(value, out ushort result) ? result : (ushort)1;
-    }
+    private static ushort ConvertNumText(string value) => ushort.TryParse(value, out ushort result) ? result : (ushort)1;
 
     private void SetButtonLoading(string text)
     {
+        StopButtonSpinner();
+        _buttonSpinnerCancellation = new CancellationTokenSource();
         Optris.Icons.Avalonia.Icon spinner = new() { Value = "fa7-solid fa7-arrows-rotate", FontSize = 13 };
-        Animation rotateAnimation = new Animation
+        Animation rotateAnimation = new()
         {
             Duration = TimeSpan.FromSeconds(1),
             IterationCount = IterationCount.Infinite,
@@ -150,7 +142,7 @@ public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesView
                 new KeyFrame { Cue = new Cue(1), Setters = { new Setter(RotateTransform.AngleProperty, 360.0) } }
             }
         };
-        rotateAnimation.RunAsync(spinner);
+        _ = rotateAnimation.RunAsync(spinner, _buttonSpinnerCancellation.Token);
 
         AddSeriesButton.Content = new StackPanel
         {
@@ -163,7 +155,15 @@ public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesView
 
     private void ClearButtonLoading()
     {
+        StopButtonSpinner();
         AddSeriesButton.Content = "Add Series";
+    }
+
+    private void StopButtonSpinner()
+    {
+        _buttonSpinnerCancellation?.Cancel();
+        _buttonSpinnerCancellation?.Dispose();
+        _buttonSpinnerCancellation = null;
     }
 
     public async void OnAddSeriesButtonClicked(object sender, RoutedEventArgs args)
@@ -171,7 +171,7 @@ public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesView
         try
         {
             AddSeriesButton.IsEnabled = false;
-            string customImageUrl = CoverImageUrlTextBox.Text;
+            string? customImageUrl = CoverImageUrlTextBox.Text;
             _ = uint.TryParse(VolumesRead.Text?.Replace("_", string.Empty), out uint volumesRead);
 
             string ratingText = Rating.Text ?? string.Empty;
@@ -186,15 +186,15 @@ public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesView
 
             TsundokuLanguage[] requestedLanguages = ViewModel!.SelectedAdditionalLanguages.Count != 0 ? ViewModel.ConvertSelectedLangList() : [];
 
-            string inputDisplay = ViewModel.SelectedSuggestion?.Display ?? SeriesInputTextBox.Text.Trim();
+            string inputDisplay = ViewModel.SelectedSuggestion?.Display ?? SeriesInputTextBox.Text!.Trim();
             string truncated = inputDisplay.Length > 30 ? string.Concat(inputDisplay.AsSpan(0, 30), "...") : inputDisplay;
             SetButtonLoading($"Loading \"{truncated}\"");
 
             (bool success, string message, Series? addedSeries) = await ViewModel!.GetSeriesDataAsync(
-                input: ViewModel.SelectedSuggestion is not null ? ViewModel.SelectedSuggestion.Id : SeriesInputTextBox.Text.Trim(),
+                input: ViewModel.SelectedSuggestion is not null ? ViewModel.SelectedSuggestion.Id : SeriesInputTextBox.Text!.Trim(),
                 bookType: (MangaButton.IsChecked == true) ? SeriesFormat.Manga : SeriesFormat.Novel,
-                curVolCount: ConvertNumText(CurVolCount.Text.Replace("_", string.Empty)),
-                maxVolCount: ConvertNumText(MaxVolCount.Text.Replace("_", string.Empty)),
+                curVolCount: ConvertNumText(CurVolCount.Text!.Replace("_", string.Empty)),
+                maxVolCount: ConvertNumText(MaxVolCount.Text!.Replace("_", string.Empty)),
                 additionalLanguages: requestedLanguages,
                 customImageUrl: !string.IsNullOrWhiteSpace(customImageUrl) ? customImageUrl.Trim() : string.Empty,
                 publisher: !string.IsNullOrWhiteSpace(PublisherTextBox.Text) ? PublisherTextBox.Text.Trim() : "Unknown",
@@ -209,8 +209,8 @@ public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesView
             {
                 string addedTitle = addedSeries is not null
                     ? addedSeries.Titles.GetValueOrDefault(ViewModel.CurrentUser.Language)
-                        ?? addedSeries.Titles.GetValueOrDefault(TsundokuLanguage.Romaji, SeriesInputTextBox.Text.Trim())
-                    : SeriesInputTextBox.Text.Trim();
+                        ?? addedSeries.Titles.GetValueOrDefault(TsundokuLanguage.Romaji, SeriesInputTextBox.Text!.Trim())
+                    : SeriesInputTextBox.Text!.Trim();
                 ClearFields();
                 ViewModel.ClearSuggestions();
 
@@ -226,7 +226,7 @@ public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesView
             }
             else
             {
-                await ShowErrorDialog($"Unable to add \"{SeriesInputTextBox.Text.Trim()}\" to Collection{(!string.IsNullOrWhiteSpace(message) ? $", {message}" : string.Empty)}");
+                await ShowErrorDialog($"Unable to add \"{SeriesInputTextBox.Text!.Trim()}\" to Collection{(!string.IsNullOrWhiteSpace(message) ? $", {message}" : string.Empty)}");
             }
         }
         catch (Exception ex)

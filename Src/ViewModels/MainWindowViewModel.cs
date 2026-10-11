@@ -1,17 +1,14 @@
 ﻿using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Reactive;
-using System.Reactive.Disposables;
 using System.Reactive.Disposables.Fluent;
 
 using System.Reactive.Linq;
 using Avalonia.Media.Imaging;
-using ReactiveUI;
 using ReactiveUI.SourceGenerators;
 using Tsundoku.Clients;
 using Tsundoku.Helpers;
 using Tsundoku.Models;
-using Tsundoku.Services;
 using static Tsundoku.Models.Enums.TsundokuFilterModel;
 using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 using static Tsundoku.Models.Enums.TsundokuSortModel;
@@ -182,10 +179,7 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
         Observable.CombineLatest(collectionChanges, filterSurfaceChanges, (_, _) => Unit.Default)
             .Throttle(TimeSpan.FromMilliseconds(50), TsundokuSchedulers.TaskPool)
             .ObserveOn(TsundokuSchedulers.MainThread)
-            .Subscribe(_ =>
-            {
-                IsFilteredEmpty = UserCollection.Count == 0 && HasActiveFilter();
-            })
+            .Subscribe(_ => IsFilteredEmpty = UserCollection.Count == 0 && HasActiveFilter())
             .DisposeWith(_disposables);
     }
 
@@ -236,10 +230,7 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
         _userService.RenameShelf(shelf.Id, newName.Trim());
     }
 
-    public void SaveUserData()
-    {
-        _userService.SaveUserData();
-    }
+    public void SaveUserData() => _userService.SaveUserData();
 
     public bool ShouldShowChangelog()
     {
@@ -247,45 +238,25 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
         return Changelog.ShouldShow(CUR_TSUNDOKU_VERSION, lastSeen);
     }
 
-    public void MarkChangelogSeen()
-    {
-        _userService.UpdateUser(user => user.LastSeenAppVersion = CUR_TSUNDOKU_VERSION);
-    }
+    public void MarkChangelogSeen() => _userService.UpdateUser(user => user.LastSeenAppVersion = CUR_TSUNDOKU_VERSION);
 
-    public async Task CreateEditSeriesDialog(Series series)
-    {
-        await EditSeriesInfoDialog.Handle(new EditSeriesInfoViewModel(series, _userService, _sharedSeriesProvider));
-    }
+    public async Task CreateEditSeriesDialog(Series series) => await EditSeriesInfoDialog.Handle(new EditSeriesInfoViewModel(series, _userService, _sharedSeriesProvider));
 
-    public void UpdateUserIcon(string filePath)
-    {
-        _userService.UpdateUserIcon(filePath);
-    }
-    public void UpdateUserLanguage(TsundokuLanguage newLang)
-    {
-        _userService.UpdateUser(user => user.Language = newLang);
-    }
+    public void UpdateUserIcon(string filePath) => _userService.UpdateUserIcon(filePath);
+    public void UpdateUserLanguage(TsundokuLanguage newLang) => _userService.UpdateUser(user => user.Language = newLang);
 
     /// <summary>
     /// Changes the cover for series
     /// </summary>
     /// <param name="series">The series to change the cover for</param>
-    /// <param name="newBitmapPath">The path to the new cover</param>
-    public void ChangeCover(Series series, Bitmap newCover)
-    {
+    /// <param name="newCover">The new cover image</param>
+    public void ChangeCover(Series series, Bitmap newCover) =>
         // Update Current Viewed Collection
         _userService.UpdateSeriesCoverBitmap(series.Id, newCover);
-    }
 
-    public void DeleteSeries(Series series)
-    {
-        _userService.TrashSeries(series);
-    }
+    public void DeleteSeries(Series series) => _userService.TrashSeries(series);
 
-    public void UpdateSeriesCard(Series series)
-    {
-        _userService.AddSeries(series);
-    }
+    public void UpdateSeriesCard(Series series) => _userService.AddSeries(series);
 
     public async Task RefreshSeries(Series originalSeries)
     {

@@ -27,7 +27,7 @@ public class SeriesModelTests
     public void Setup()
     {
         // 1. Build a minimal DI container that mirrors your app's setup
-        ServiceCollection services = new ServiceCollection();
+        ServiceCollection services = new();
 
         // Register IHttpClientFactory for default clients (e.g., if BitmapHelper uses an unnamed client)
         services.AddHttpClient("AddCoverClient", client =>
@@ -76,16 +76,10 @@ public class SeriesModelTests
     }
 
     [OneTimeTearDown]
-    public void OneTimeCleanup()
-    {
-        (_serviceProvider as IDisposable)?.Dispose();
-    }
+    public void OneTimeCleanup() => (_serviceProvider as IDisposable)?.Dispose();
 
     [TearDown]
-    public void Cleanup()
-    {
-        _series?.Dispose();
-    }
+    public void Cleanup() => _series?.Dispose();
 
     [AvaloniaTest]
     public async Task CreateNewSeriesCardAsync_IncludesAllRequestedAdditionalLanguages()
@@ -139,7 +133,7 @@ public class SeriesModelTests
 
         Assert.That(_series, Is.Not.Null, "Expected non-null Series");
 
-        bool hasJapanese = _series!.Titles.TryGetValue(TsundokuLanguage.Japanese, out var jpTitle);
+        bool hasJapanese = _series!.Titles.TryGetValue(TsundokuLanguage.Japanese, out string? jpTitle);
 
         using (Assert.EnterMultipleScope())
         {
@@ -259,7 +253,7 @@ public class SeriesModelTests
 
     private static Series CreateDummySeries(Guid? id = null)
     {
-        WriteableBitmap emptyBitmap = new WriteableBitmap(
+        WriteableBitmap emptyBitmap = new(
             new PixelSize(1, 1),                  // 1x1 pixel
             new Vector(96, 96),                   // DPI
             PixelFormat.Bgra8888,

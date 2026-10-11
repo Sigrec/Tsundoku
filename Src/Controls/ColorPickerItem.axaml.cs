@@ -1,4 +1,3 @@
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 
@@ -24,8 +23,5 @@ public sealed partial class ColorPickerItem : UserControl
         set => SetValue(ColorBrushProperty, value);
     }
 
-    public ColorPickerItem()
-    {
-        InitializeComponent();
-    }
+    public ColorPickerItem() => InitializeComponent();
 }

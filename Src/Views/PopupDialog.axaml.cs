@@ -9,6 +9,6 @@ public sealed partial class PopupDialog : ReactiveWindow<PopupDialogViewModel>
     {
         InitializeComponent();
 
-        Closing += (s, e) => { ViewModel.ResetPopupInfo(); };
+        Closing += (s, e) => ViewModel!.ResetPopupInfo();
     }
 }

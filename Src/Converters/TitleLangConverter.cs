@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Runtime.CompilerServices;
 using Avalonia.Data.Converters;
 using static Tsundoku.Models.Enums.TsundokuLanguageModel;
@@ -23,7 +21,7 @@ public sealed class TitleLangConverter : IMultiValueConverter
         if (values[1] is TsundokuLanguage lang && titles.ContainsKey(lang))
             effective = lang;
 
-        if (!titles.TryGetValue(effective, out string title) || string.IsNullOrEmpty(title))
+        if (!titles.TryGetValue(effective, out string? title) || string.IsNullOrEmpty(title))
         {
             // If we tried a non-Romaji key first, fallback to Romaji
             if (effective != TsundokuLanguage.Romaji &&
@@ -43,7 +41,7 @@ public sealed class TitleLangConverter : IMultiValueConverter
                 return "ERROR";
 
             if (di != 0)
-                return AppendSuffix(title, di);
+                return AppendSuffix(title!, di);
         }
 
         return title;
@@ -115,15 +113,18 @@ public sealed class TitleLangConverter : IMultiValueConverter
     private static int CountDigits(uint n)
     {
         // Cheap digit count without loops for common ranges
-        if (n < 10U) return 1;
-        if (n < 100U) return 2;
-        if (n < 1_000U) return 3;
-        if (n < 10_000U) return 4;
-        if (n < 100_000U) return 5;
-        if (n < 1_000_000U) return 6;
-        if (n < 10_000_000U) return 7;
-        if (n < 100_000_000U) return 8;
-        if (n < 1_000_000_000U) return 9;
-        return 10;
+        return n switch
+        {
+            < 10U => 1,
+            < 100U => 2,
+            < 1_000U => 3,
+            < 10_000U => 4,
+            < 100_000U => 5,
+            < 1_000_000U => 6,
+            < 10_000_000U => 7,
+            < 100_000_000U => 8,
+            < 1_000_000_000U => 9,
+            _ => 10
+        };
     }
 }

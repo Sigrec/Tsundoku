@@ -50,12 +50,12 @@ public class ParserHelperTests
 
     private static CsvReader CreateCsvReader(string csvContent)
     {
-        StringReader stringReader = new StringReader(csvContent);
-        CsvConfiguration config = new CsvConfiguration(CultureInfo.InvariantCulture)
+        StringReader stringReader = new(csvContent);
+        CsvConfiguration config = new(CultureInfo.InvariantCulture)
         {
             HasHeaderRecord = true,
         };
-        CsvReader csv = new CsvReader(stringReader, config);
+        CsvReader csv = new(stringReader, config);
         csv.Read();
         csv.ReadHeader();
         csv.Read();

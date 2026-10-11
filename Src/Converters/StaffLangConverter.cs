@@ -35,7 +35,7 @@ public sealed class StaffLangConverter : IMultiValueConverter
             return "ERROR";
         }
 
-        if (!staff.TryGetValue(effective, out string result) || string.IsNullOrWhiteSpace(result))
+        if (!staff.TryGetValue(effective, out string? result) || string.IsNullOrWhiteSpace(result))
         {
             if (effective != TsundokuLanguage.Romaji &&
                 (!staff.TryGetValue(TsundokuLanguage.Romaji, out result) || string.IsNullOrWhiteSpace(result)))
@@ -50,10 +50,7 @@ public sealed class StaffLangConverter : IMultiValueConverter
         return result;
     }
 
-    public object? ConvertBack(object? value, Type[] targetTypes, object? parameter, CultureInfo culture)
-    {
-        throw new NotSupportedException();
-    }
+    public object? ConvertBack(object? value, Type[] targetTypes, object? parameter, CultureInfo culture) => throw new NotSupportedException();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool TryGetMap(object? source, out IReadOnlyDictionary<TsundokuLanguage, string> dict)

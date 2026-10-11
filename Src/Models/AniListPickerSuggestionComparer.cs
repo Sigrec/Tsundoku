@@ -17,8 +17,7 @@ public sealed class AniListPickerSuggestionComparer : IComparer<AniListPickerSug
         // Handle null cases
         if (x is null || y is null)
         {
-            if (x is null && y is null) return 0;
-            return x is null ? -1 : 1;
+            return x is null && y is null ? 0 : x is null ? -1 : 1;
         }
 
         // Prioritize "MANGA"

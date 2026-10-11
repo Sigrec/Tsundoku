@@ -21,15 +21,9 @@ public sealed partial class FilterBuilder : UserControl
 
     private FilterBuilderViewModel? ViewModel => DataContext as FilterBuilderViewModel;
 
-    private void OnAddChip(object? sender, RoutedEventArgs e)
-    {
-        ViewModel?.AddChip();
-    }
+    private void OnAddChip(object? sender, RoutedEventArgs e) => ViewModel?.AddChip();
 
-    private void OnClearAll(object? sender, RoutedEventArgs e)
-    {
-        ViewModel?.ClearAll();
-    }
+    private void OnClearAll(object? sender, RoutedEventArgs e) => ViewModel?.ClearAll();
 
     private void OnRemoveChip(object? sender, RoutedEventArgs e)
     {

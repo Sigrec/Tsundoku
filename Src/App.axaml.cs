@@ -32,10 +32,7 @@ public sealed partial class App : Application
         // Do NOT put any DI logic here, as the ServiceProvider is not fully ready yet.
     }
 
-    public override void Initialize()
-    {
-        AvaloniaXamlLoader.Load(this);
-    }
+    public override void Initialize() => AvaloniaXamlLoader.Load(this);
 
     public override void OnFrameworkInitializationCompleted()
     {
@@ -49,6 +46,7 @@ public sealed partial class App : Application
         Mutex = new Mutex(true, appName, out bool createdNew);
 
         ConfigureNLog();
+        SingleLinePasteHelper.Register();
 
         if (!createdNew)
         {
@@ -123,7 +121,7 @@ public sealed partial class App : Application
                 try
                 {
                     // Let the splash window fully render before starting heavy work
-                    await Task.Delay(500);
+                    await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(static () => { }, Avalonia.Threading.DispatcherPriority.Background);
 
                     splash.UpdateStatus("Initializing services");
                     ServiceCollection services = new();
@@ -181,12 +179,7 @@ public sealed partial class App : Application
                         userService,
                         ServiceProvider.GetRequiredService<IApiHealthCheckService>(),
                         ServiceProvider.GetRequiredService<IPopupDialogService>(),
-                        ServiceProvider.GetRequiredService<AddNewSeriesWindow>(),
-                        ServiceProvider.GetRequiredService<UserSettingsWindow>(),
-                        ServiceProvider.GetRequiredService<CollectionThemeWindow>(),
-                        ServiceProvider.GetRequiredService<PriceAnalysisWindow>(),
-                        ServiceProvider.GetRequiredService<CollectionStatsWindow>(),
-                        ServiceProvider.GetRequiredService<UserNotesWindow>());
+                        ServiceProvider);
 
                     mainWindow.Opened += async (_, _) =>
                     {
@@ -254,7 +247,13 @@ public sealed partial class App : Application
             client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("(https://github.com/Sigrec/Tsundoku)"));
 
             client.Timeout = TimeSpan.FromSeconds(90);
-        }).SetHandlerLifetime(TimeSpan.FromMinutes(5));
+        })
+        .ConfigurePrimaryHttpMessageHandler(static () => new SocketsHttpHandler
+        {
+            AutomaticDecompression = DecompressionMethods.All,
+            PooledConnectionLifetime = TimeSpan.FromMinutes(5),
+        })
+        .SetHandlerLifetime(TimeSpan.FromMinutes(5));
 
         // --- AniList GraphQL Client Setup ---
         services.AddHttpClient("AniListHttpClient", client =>
@@ -268,6 +267,11 @@ public sealed partial class App : Application
             client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("(https://github.com/Sigrec/Tsundoku)"));
 
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        })
+        .ConfigurePrimaryHttpMessageHandler(static () => new SocketsHttpHandler
+        {
+            AutomaticDecompression = DecompressionMethods.All,
+            PooledConnectionLifetime = TimeSpan.FromMinutes(5),
         })
         .SetHandlerLifetime(TimeSpan.FromMinutes(5))
         .AddTypedClient<AniListGraphQLClient>();
@@ -335,7 +339,7 @@ public sealed partial class App : Application
         LoggingConfiguration config = LogManager.Configuration ?? new LoggingConfiguration();
 
         // Configure (or create) the file target
-        FileTarget fileTarget = config.FindTargetByName<FileTarget>("TsundokuLogs");
+        FileTarget? fileTarget = config.FindTargetByName<FileTarget>("TsundokuLogs");
         if (fileTarget is null)
         {
             fileTarget = new FileTarget("TsundokuLogs")
@@ -360,7 +364,7 @@ public sealed partial class App : Application
             fileTarget.ArchiveFileName = Path.Combine(localCachePath, "TsundokuLogs.{#}.log");
         }
 
-        var asyncWrapper = new AsyncTargetWrapper(fileTarget)
+        AsyncTargetWrapper asyncWrapper = new(fileTarget)
         {
             Name = "TsundokuLogsAsync",
             OverflowAction = AsyncTargetWrapperOverflowAction.Discard,
@@ -371,7 +375,7 @@ public sealed partial class App : Application
 
     #if DEBUG
         // Configure (or create) the console target (only in DEBUG)
-        ColoredConsoleTarget consoleTarget = config.FindTargetByName<ColoredConsoleTarget>("TsundokuConsole");
+        ColoredConsoleTarget? consoleTarget = config.FindTargetByName<ColoredConsoleTarget>("TsundokuConsole");
         if (consoleTarget is null)
         {
             consoleTarget = new ColoredConsoleTarget("TsundokuConsole")
@@ -385,7 +389,7 @@ public sealed partial class App : Application
         // Clear existing rules for these targets (avoid duplicates)
         for (int i = config.LoggingRules.Count - 1; i >= 0; i--)
         {
-            var rule = config.LoggingRules[i];
+            LoggingRule rule = config.LoggingRules[i];
             if (rule.Targets.Any(t =>
                 t == fileTarget
                 || t == asyncWrapper
@@ -401,22 +405,22 @@ public sealed partial class App : Application
         // --- Namespace-specific filtering for MangaAndLightNovelWebScrape.* ---
 
         // Null target to swallow low levels
-        NLog.Targets.NullTarget? blackHole = config.FindTargetByName<NLog.Targets.NullTarget>("BlackHole");
+        NullTarget? blackHole = config.FindTargetByName<NullTarget>("BlackHole");
         if (blackHole is null)
         {
-            blackHole = new NLog.Targets.NullTarget("BlackHole");
+            blackHole = new NullTarget("BlackHole");
             config.AddTarget(blackHole);
         }
 
         // 1) Drop Trace..Info for that namespace, and stop processing
-        var dropLowLevels = new LoggingRule("MangaAndLightNovelWebScrape.*", NLog.LogLevel.Trace, NLog.LogLevel.Info, blackHole)
+        LoggingRule dropLowLevels = new("MangaAndLightNovelWebScrape.*", NLog.LogLevel.Trace, NLog.LogLevel.Info, blackHole)
         {
             Final = true
         };
         config.LoggingRules.Add(dropLowLevels);
 
         // 2) Allow Warn..Fatal for that namespace, and stop processing (so it won't hit catch-alls)
-        var allowWarnPlus = new LoggingRule("MangaAndLightNovelWebScrape.*", NLog.LogLevel.Warn, NLog.LogLevel.Fatal, asyncWrapper)
+        LoggingRule allowWarnPlus = new("MangaAndLightNovelWebScrape.*", NLog.LogLevel.Warn, NLog.LogLevel.Fatal, asyncWrapper)
         {
             Final = true
         };
@@ -426,7 +430,7 @@ public sealed partial class App : Application
         config.LoggingRules.Add(allowWarnPlus);
 
         // 3) Drop HttpClient request/response chatter — only surface Warn+
-        var dropHttpClientChatter = new LoggingRule("System.Net.Http.HttpClient.*", NLog.LogLevel.Trace, NLog.LogLevel.Info, blackHole)
+        LoggingRule dropHttpClientChatter = new("System.Net.Http.HttpClient.*", NLog.LogLevel.Trace, NLog.LogLevel.Info, blackHole)
         {
             Final = true
         };

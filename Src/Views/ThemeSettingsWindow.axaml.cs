@@ -1,4 +1,3 @@
-using System.Reactive.Disposables;
 using System.Reactive.Disposables.Fluent;
 using System.Reactive.Linq;
 using Avalonia.Controls;
@@ -12,7 +11,6 @@ using ReactiveUI.Avalonia;
 using Tsundoku.Clients;
 using Tsundoku.Helpers;
 using Tsundoku.Models;
-using Tsundoku.Services;
 using Tsundoku.ViewModels;
 
 namespace Tsundoku.Views;
@@ -23,7 +21,7 @@ public sealed partial class CollectionThemeWindow : ReactiveWindow<ThemeSettings
     private TsundokuTheme? BackupCurrentTheme { get; set; }
     public bool IsOpen = false;
     private bool _isInitialized = false;
-    private string CurThemeName;
+    private string CurThemeName = null!;
     private readonly IPopupDialogService _popupDialogService;
     private readonly IThemeResourceService _themeResourceService;
     private readonly ColorApi _colorApi;
@@ -73,7 +71,7 @@ public sealed partial class CollectionThemeWindow : ReactiveWindow<ThemeSettings
                 IsOpen = false;
 
                 TsundokuTheme? curSelectedTheme = ViewModel.GetMainTheme();
-                if (!BackupCurrentTheme.Equals(curSelectedTheme!))
+                if (!BackupCurrentTheme!.Equals(curSelectedTheme!))
                 {
                     ViewModel.SetTheme(curSelectedTheme);
                 }
@@ -85,7 +83,7 @@ public sealed partial class CollectionThemeWindow : ReactiveWindow<ThemeSettings
 
         this.WhenActivated(disposables =>
         {
-            this.WhenAnyValue(x => x.MainColor1.Text, x => x.MainColor2.Text, x => x.TextColor1.Text, x => x.TextColor2.Text, x => x.AccentColor1.Text, x => x.AccentColor2.Text, (mc1, mc2, tc1, tc2, ac1, ac2) => _isInitialized && !mc1.Contains('_') && !mc2.Contains('_') && !tc1.Contains('_') && !tc2.Contains('_') && !ac1.Contains('_') && !ac2.Contains('_'))
+            this.WhenAnyValue(x => x.MainColor1.Text, x => x.MainColor2.Text, x => x.TextColor1.Text, x => x.TextColor2.Text, x => x.AccentColor1.Text, x => x.AccentColor2.Text, (mc1, mc2, tc1, tc2, ac1, ac2) => _isInitialized && !mc1!.Contains('_') && !mc2!.Contains('_') && !tc1!.Contains('_') && !tc2!.Contains('_') && !ac1!.Contains('_') && !ac2!.Contains('_'))
                 .Subscribe(x => ViewModel.IsGenerateThemeButtonEnabled = x)
                 .DisposeWith(disposables);
 
@@ -117,15 +115,15 @@ public sealed partial class CollectionThemeWindow : ReactiveWindow<ThemeSettings
     /// </summary>
     private void ApplySharedThemeColors()
     {
-        SolidColorBrush mc1 = new(Color.Parse(MainColor1.Text));
-        SolidColorBrush mc2 = new(Color.Parse(MainColor2.Text));
-        SolidColorBrush tc1 = new(Color.Parse(TextColor1.Text));
-        SolidColorBrush tc2 = new(Color.Parse(TextColor2.Text));
-        SolidColorBrush ac1 = new(Color.Parse(AccentColor1.Text));
-        SolidColorBrush ac2 = new(Color.Parse(AccentColor2.Text));
+        SolidColorBrush mc1 = new(Color.Parse(MainColor1.Text!));
+        SolidColorBrush mc2 = new(Color.Parse(MainColor2.Text!));
+        SolidColorBrush tc1 = new(Color.Parse(TextColor1.Text!));
+        SolidColorBrush tc2 = new(Color.Parse(TextColor2.Text!));
+        SolidColorBrush ac1 = new(Color.Parse(AccentColor1.Text!));
+        SolidColorBrush ac2 = new(Color.Parse(AccentColor2.Text!));
 
         // MainColor1 roles
-        BackupCurrentTheme.MenuBGColor = mc1;
+        BackupCurrentTheme!.MenuBGColor = mc1;
         BackupCurrentTheme.SeriesCardBGColor = mc1;
         BackupCurrentTheme.SeriesProgressBarBGColor = mc1;
 
@@ -177,10 +175,10 @@ public sealed partial class CollectionThemeWindow : ReactiveWindow<ThemeSettings
         _themeObserveDisposable?.Dispose();
 
         ApplySharedThemeColors();
-        BackupCurrentTheme.MenuButtonTextAndIconHoverColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
-        BackupCurrentTheme.SeriesButtonIconHoverColor = new SolidColorBrush(Color.Parse(MainColor1.Text));
-        BackupCurrentTheme.SeriesProgressBarColor = new SolidColorBrush(Color.Parse(TextColor1.Text));
-        BackupCurrentTheme.SeriesProgressTextColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
+        BackupCurrentTheme!.MenuButtonTextAndIconHoverColor = new SolidColorBrush(Color.Parse(MainColor1.Text!));
+        BackupCurrentTheme.SeriesButtonIconHoverColor = new SolidColorBrush(Color.Parse(MainColor1.Text!));
+        BackupCurrentTheme.SeriesProgressBarColor = new SolidColorBrush(Color.Parse(TextColor1.Text!));
+        BackupCurrentTheme.SeriesProgressTextColor = new SolidColorBrush(Color.Parse(AccentColor1.Text!));
 
         _themeResourceService.ApplyTheme(BackupCurrentTheme);
         _themeObserveDisposable = _themeResourceService.ObserveAndApply(BackupCurrentTheme);
@@ -193,10 +191,10 @@ public sealed partial class CollectionThemeWindow : ReactiveWindow<ThemeSettings
         _themeObserveDisposable?.Dispose();
 
         ApplySharedThemeColors();
-        BackupCurrentTheme.MenuButtonTextAndIconHoverColor = new SolidColorBrush(Color.Parse(AccentColor2.Text));
-        BackupCurrentTheme.SeriesButtonIconHoverColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
-        BackupCurrentTheme.SeriesProgressBarColor = new SolidColorBrush(Color.Parse(AccentColor1.Text));
-        BackupCurrentTheme.SeriesProgressTextColor = new SolidColorBrush(Color.Parse(TextColor2.Text));
+        BackupCurrentTheme!.MenuButtonTextAndIconHoverColor = new SolidColorBrush(Color.Parse(AccentColor2.Text!));
+        BackupCurrentTheme.SeriesButtonIconHoverColor = new SolidColorBrush(Color.Parse(AccentColor1.Text!));
+        BackupCurrentTheme.SeriesProgressBarColor = new SolidColorBrush(Color.Parse(AccentColor1.Text!));
+        BackupCurrentTheme.SeriesProgressTextColor = new SolidColorBrush(Color.Parse(TextColor2.Text!));
 
         _themeResourceService.ApplyTheme(BackupCurrentTheme);
         _themeObserveDisposable = _themeResourceService.ObserveAndApply(BackupCurrentTheme);
@@ -208,16 +206,16 @@ public sealed partial class CollectionThemeWindow : ReactiveWindow<ThemeSettings
         string name = NewThemeName.Text?.Trim() ?? string.Empty;
         if (!string.IsNullOrWhiteSpace(name) && !name.Equals("Default", StringComparison.OrdinalIgnoreCase))
         {
-            BackupCurrentTheme.ThemeName = name;
+            BackupCurrentTheme!.ThemeName = name;
             TsundokuTheme themeToSave = BackupCurrentTheme.Cloning();
             themeToSave.ThemeName = name;
-            ViewModel.SaveTheme(themeToSave);
+            ViewModel!.SaveTheme(themeToSave);
         }
     }
 
     private async void GenerateFromColorApiAsync(object sender, RoutedEventArgs args)
     {
-        string seedHex = MainColor1.Text;
+        string? seedHex = MainColor1.Text;
         if (string.IsNullOrWhiteSpace(seedHex) || seedHex.Contains('_'))
         {
             await ShowDialog("Error", "Enter a valid hex color in Main Color 1 to generate from.");
@@ -260,16 +258,13 @@ public sealed partial class CollectionThemeWindow : ReactiveWindow<ThemeSettings
         }
     }
 
-    private async Task ShowDialog(string title, string info = "Unable to Add Theme")
-    {
-        await _popupDialogService.ShowAsync(title, "fa7-solid fa7-circle-exclamation", info, this);
-    }
+    private async Task ShowDialog(string title, string info = "Unable to Add Theme") => await _popupDialogService.ShowAsync(title, "fa7-solid fa7-circle-exclamation", info, this);
     private async void SaveNewTheme(object sender, RoutedEventArgs args)
     {
         try
         {
-            string themeName = NewThemeName.Text.Trim();
-            bool themeExists = ViewModel.SavedThemes.Any(t => t.ThemeName.Equals(themeName, StringComparison.OrdinalIgnoreCase));
+            string themeName = NewThemeName.Text!.Trim();
+            bool themeExists = ViewModel!.SavedThemes.Any(t => t.ThemeName.Equals(themeName, StringComparison.OrdinalIgnoreCase));
 
             if (themeExists)
             {
@@ -282,7 +277,7 @@ public sealed partial class CollectionThemeWindow : ReactiveWindow<ThemeSettings
                 if (!confirmed) return;
             }
 
-            TsundokuTheme themeToSave = BackupCurrentTheme.Cloning();
+            TsundokuTheme themeToSave = BackupCurrentTheme!.Cloning();
             themeToSave.ThemeName = themeName;
             ViewModel.SaveTheme(themeToSave);
         }
@@ -297,7 +292,7 @@ public sealed partial class CollectionThemeWindow : ReactiveWindow<ThemeSettings
     {
         try
         {
-            ViewModel.ExportTheme(CurThemeName);
+            ViewModel!.ExportTheme(CurThemeName);
             await ShowDialog("Info", $"Exported \"{CurThemeName}\" Theme");
             LOGGER.Info("Exported \"{ThemeName}\"", CurThemeName);
         }
@@ -333,7 +328,7 @@ public sealed partial class CollectionThemeWindow : ReactiveWindow<ThemeSettings
             string newThemeFileLocalPath = file[0].Path.LocalPath;
             try
             {
-                await ViewModel.ImportThemeAsync(newThemeFileLocalPath);
+                await ViewModel!.ImportThemeAsync(newThemeFileLocalPath);
             }
             catch
             {
@@ -357,7 +352,7 @@ public sealed partial class CollectionThemeWindow : ReactiveWindow<ThemeSettings
 
             try
             {
-                ViewModel.RemoveTheme(selectedTheme.ThemeName);
+                ViewModel!.RemoveTheme(selectedTheme.ThemeName);
             }
             catch
             {
@@ -376,7 +371,7 @@ public sealed partial class CollectionThemeWindow : ReactiveWindow<ThemeSettings
             if (ThemeSelector.SelectedItem is TsundokuTheme selectedTheme)
             {
                 CurThemeName = selectedTheme.ThemeName;
-                ViewModel.SetTheme(selectedTheme);
+                ViewModel!.SetTheme(selectedTheme);
                 BackupCurrentTheme = selectedTheme.Cloning();
                 BackupCurrentTheme.ThemeName = "Backup";
                 ViewModel.OverrideCurrentTheme(BackupCurrentTheme);

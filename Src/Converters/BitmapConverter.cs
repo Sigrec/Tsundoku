@@ -23,7 +23,7 @@ public static class BitmapConverter
         try
         {
             using MemoryStream stream = new();
-            bitmap.Save(stream, 100);
+            bitmap.Save(stream, PngBitmapEncoderOptions.Default);
             return stream.ToArray();
         }
         catch (Exception ex)

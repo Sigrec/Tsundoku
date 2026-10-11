@@ -4,7 +4,6 @@ using Avalonia.Interactivity;
 using Tsundoku.ViewModels;
 using MangaAndLightNovelWebScrape;
 using ReactiveUI;
-using System.Reactive.Disposables;
 using System.Reactive.Disposables.Fluent;
 using System.Reactive.Linq;
 using MangaAndLightNovelWebScrape.Models;
@@ -41,11 +40,11 @@ public sealed partial class PriceAnalysisWindow : ReactiveWindow<PriceAnalysisVi
                     this.WhenAnyValue(
                         x => x.BrowserSelector.SelectedItem,
                         x => x.RegionComboBox.SelectedItem,
-                        x => x.ViewModel.WebsitesSelected))
+                        x => x.ViewModel!.WebsitesSelected))
                 .Select(values =>
                 {
-                    var (title, manga, novel) = values.First;
-                    var (browser, region, websiteCheck) = values.Second;
+                    (string? title, bool? manga, bool? novel) = values.First;
+                    (object? browser, object? region, bool websiteCheck) = values.Second;
                     return !string.IsNullOrWhiteSpace(title)
                         && !(manga == false && novel == false && websiteCheck)
                         && browser is not null
@@ -75,19 +74,24 @@ public sealed partial class PriceAnalysisWindow : ReactiveWindow<PriceAnalysisVi
 
     public async void PerformAnalysis(object sender, RoutedEventArgs args)
     {
+        if (StockFilterSelector.SelectedItem is not string stockFilter || SearchTextBox.Text is not { Length: > 0 } searchTitle)
+        {
+            return;
+        }
+
         string scrapeScenario = string.Empty;
         try
         {
-            HashSet<Website> websiteList = [.. ViewModel.SelectedWebsites.AsValueEnumerable().Select(MangaAndLightNovelWebScrape.Helpers.GetWebsiteFromString)];
+            HashSet<Website> websiteList = [.. ViewModel!.SelectedWebsites.AsValueEnumerable().Select(MangaAndLightNovelWebScrape.Helpers.GetWebsiteFromString)];
 
-            scrapeScenario = $"\"{SearchTextBox.Text}\" on {_scrape.Browser} Browser w/ Region = \"{_scrape.Region}\" & \"{StockFilterSelector.SelectedItem as string} Filter\" & Websites = [{string.Join(", ", websiteList)}] & Memberships = ({string.Join(" & ", ViewModel.CurrentUser.Memberships)})";
+            scrapeScenario = $"\"{searchTitle}\" on {_scrape.Browser} Browser w/ Region = \"{_scrape.Region}\" & \"{stockFilter} Filter\" & Websites = [{string.Join(", ", websiteList)}] & Memberships = ({string.Join(" & ", ViewModel.CurrentUser.Memberships)})";
 
             ToggleControlEnablement();
             StartScrapeButtonText.Text = "Analyzing...";
 
             _scrape.Browser = MangaAndLightNovelWebScrape.Helpers.GetBrowserFromString((BrowserSelector.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? string.Empty);
             _scrape.Region = ViewModel.CurrentUser.Region;
-            _scrape.Filter = MangaAndLightNovelWebScrape.Helpers.GetStockStatusFilterFromString(StockFilterSelector.SelectedItem as string);
+            _scrape.Filter = MangaAndLightNovelWebScrape.Helpers.GetStockStatusFilterFromString(stockFilter);
 
             Membership memberships = Membership.None;
             if (ViewModel.CurrentUser.Memberships.TryGetValue(BooksAMillion.TITLE, out bool bam) && bam)
@@ -99,7 +103,7 @@ public sealed partial class PriceAnalysisWindow : ReactiveWindow<PriceAnalysisVi
             LOGGER.Info("Started Scrape For {Scenario}", scrapeScenario);
 
             await _scrape.InitializeScrapeAsync(
-                title: SearchTextBox.Text,
+                title: searchTitle,
                 bookType: MangaButton.IsChecked is not null && MangaButton.IsChecked.Value ? BookType.Manga : BookType.LightNovel,
                 websiteList
             );
@@ -143,7 +147,7 @@ public sealed partial class PriceAnalysisWindow : ReactiveWindow<PriceAnalysisVi
         finally
         {
             ToggleControlEnablement();
-            StartScrapeButton.IsEnabled = ViewModel.IsAnalyzeButtonEnabled;
+            StartScrapeButton.IsEnabled = ViewModel!.IsAnalyzeButtonEnabled;
             StartScrapeButtonText.Text = "Start Analysis";
         }
     }
@@ -166,7 +170,7 @@ public sealed partial class PriceAnalysisWindow : ReactiveWindow<PriceAnalysisVi
         {
             Region newRegion = MangaAndLightNovelWebScrape.Helpers.GetRegionFromString(selectedRegion);
             CurRegion = newRegion;
-            ViewModel.UpdateUserRegion(newRegion);
+            ViewModel!.UpdateUserRegion(newRegion);
             LOGGER.Info("Region Changed to {}", selectedRegion);
         }
     }
@@ -174,12 +178,15 @@ public sealed partial class PriceAnalysisWindow : ReactiveWindow<PriceAnalysisVi
     private void WebsiteSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (sender is not ListBox listBox) { return; }
-        string[] list = [.. listBox.SelectedItems.AsValueEnumerable().Cast<string>()];
-        ViewModel.WebsitesSelected = list.Length != 0 && MangaAndLightNovelWebScrape.Helpers.IsWebsiteListValid(CurRegion, list);
+        string[] list = [.. listBox.SelectedItems!.AsValueEnumerable().Cast<string>()];
+        ViewModel!.WebsitesSelected = list.Length != 0 && MangaAndLightNovelWebScrape.Helpers.IsWebsiteListValid(CurRegion, list);
     }
 
     private async void OpenSiteLinkAsync(object sender, PointerPressedEventArgs args)
     {
-        await ViewModelBase.OpenSiteLink(_scrape.GetResultUrls()[MangaAndLightNovelWebScrape.Helpers.GetWebsiteFromString((sender as TextBlock).Text)]);
+        if (sender is TextBlock { Text: { Length: > 0 } website })
+        {
+            await ViewModelBase.OpenSiteLink(_scrape.GetResultUrls()[MangaAndLightNovelWebScrape.Helpers.GetWebsiteFromString(website)]);
+        }
     }
 }

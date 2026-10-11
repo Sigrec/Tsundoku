@@ -1,7 +1,6 @@
 using Avalonia.Media.Imaging;
 using ReactiveUI;
 using ReactiveUI.SourceGenerators;
-using System.Globalization;
 using System.Reactive.Concurrency;
 using System.Text.Encodings.Web;
 using Tsundoku.Clients;
@@ -12,7 +11,6 @@ using static Tsundoku.Models.Enums.SeriesFormatModel;
 using static Tsundoku.Models.Enums.SeriesGenreModel;
 using static Tsundoku.Models.Enums.SeriesStatusModel;
 using static Tsundoku.Models.Enums.TsundokuLanguageModel;
-using static Tsundoku.Models.Enums.TsundokuSortModel;
 
 namespace Tsundoku.Models;
 
@@ -32,12 +30,12 @@ public sealed partial class Series(
     uint VolumesRead,
     decimal Value,
     SeriesDemographic Demographic,
-    Bitmap CoverBitMap,
+    Bitmap? CoverBitMap,
     string Publisher = "Unknown",
     uint DuplicateIndex = 0) : ReactiveObject, IDisposable, IEquatable<Series?>
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
-    private static readonly SeriesModelContext SeriesJsonModel = new SeriesModelContext(new JsonSerializerOptions()
+    private static readonly SeriesModelContext SeriesJsonModel = new(new JsonSerializerOptions()
     {
         WriteIndented = true,
         ReadCommentHandling = JsonCommentHandling.Disallow,
@@ -70,13 +68,24 @@ public sealed partial class Series(
     /// <summary>
     /// All Chinese or Taiwanese series use "Chinese (Simplified)" and go to "Chinese"
     /// </summary>
+    /// <param name="bitmapHelper">Helper used to download and save the cover image</param>
+    /// <param name="mangaDex">MangaDex client</param>
+    /// <param name="aniList">AniList client</param>
     /// <param name="input">Title or ID of the series the user wants to add to their collection</param>
     /// <param name="bookType">Booktype of the series the user wants to add, either Manga or Light Novel</param>
     /// <param name="maxVolCount">Current max volume count of the series</param>
     /// <param name="minVolCount">Current volume count the user has for the series</param>
-    /// <param name="ALQuery">AniList object for the AniList HTTP Client</param>
-    /// <param name="MD_Query">MangaDex object for the MangaDex HTTP client</param>
     /// <param name="additionalLanguages">List of additional languages to query for</param>
+    /// <param name="publisher">Publisher of the series</param>
+    /// <param name="demographic">Demographic of the series</param>
+    /// <param name="volumesRead">Number of volumes the user has read</param>
+    /// <param name="rating">The user's rating, or -1 for none</param>
+    /// <param name="value">Total value of the user's volumes</param>
+    /// <param name="customImageUrl">Cover image URL to use instead of the one from the API</param>
+    /// <param name="allowDuplicate">Whether the series may be added when it is already in the collection</param>
+    /// <param name="isRefresh">Whether this call refreshes an existing series</param>
+    /// <param name="isCoverImageRefresh">Whether the cover image should be downloaded again on refresh</param>
+    /// <param name="coverPath">Existing cover file name, used when refreshing</param>
     /// <returns></returns>
     public static async Task<Series?> CreateNewSeriesCardAsync(
         BitmapHelper bitmapHelper,
@@ -113,7 +122,7 @@ public sealed partial class Series(
         {
             switch (input)
             {
-                case string s when int.TryParse(s, out var seriesId):
+                case string s when int.TryParse(s, out int seriesId):
                     mediaDataDoc = await aniList
                         .GetSeriesByIDAsync(seriesId, bookType, pageNum);
                     isAniList  = true;
@@ -257,7 +266,7 @@ public sealed partial class Series(
         string? customImageUrl,
         SeriesFormat bookType,
         bool isAniListId,
-        JsonDocument mediaDataDoc,
+        JsonDocument? mediaDataDoc,
         TsundokuLanguage[]? additionalLanguages,
         bool allowDuplicate,
         bool isRefresh,
@@ -269,10 +278,16 @@ public sealed partial class Series(
         decimal value,
         SeriesDemographic demographic,
         string? publisher,
-        string coverPath,
+        string? coverPath,
         BitmapHelper bitmapHelper,
         BuildContext context)
     {
+        if (mediaDataDoc is null)
+        {
+            LOGGER.Warn("AniList returned no data for {Input}", input);
+            return null;
+        }
+
         // Parse the root "Media" element
         if (!mediaDataDoc.RootElement.TryGetProperty("Media", out JsonElement mediaData))
         {
@@ -310,7 +325,7 @@ public sealed partial class Series(
         }
         else
         {
-            context.CoverPath = coverPath;
+            context.CoverPath = coverPath ?? string.Empty;
         }
 
         // Fallback to MangaDex to fetch Japanese title for KR/TW/CW origin
@@ -386,11 +401,11 @@ public sealed partial class Series(
             : customImageUrl;
 
         string desc = mediaData.TryGetProperty("description", out JsonElement descriptionProp)
-            ? AniList.ParseSeriesDescription(descriptionProp.GetString())
+            ? AniList.ParseSeriesDescription(descriptionProp.GetString() ?? string.Empty)
             : string.Empty;
 
         SeriesStatus status = SeriesStatusModel.Parse(GetStringOrEmpty(mediaData, "status"));
-        Uri link = new Uri(GetStringOrEmpty(mediaData, "siteUrl"));
+        Uri link = new(GetStringOrEmpty(mediaData, "siteUrl"));
 
         HashSet<SeriesGenre> genres = mediaData.TryGetProperty("genres", out JsonElement genresElement)
             ? AniList.ParseGenreArray(context.RomajiTitle, genresElement)
@@ -433,7 +448,7 @@ public sealed partial class Series(
     }
 
     private static async Task<Series?> TryCreateMangaDexSeriesAsync(
-        JsonDocument mediaDataDoc,
+        JsonDocument? mediaDataDoc,
         MangaDex mangaDex,
         string input,
         string? customImageUrl,
@@ -449,10 +464,16 @@ public sealed partial class Series(
         decimal value,
         SeriesDemographic demographic,
         string? publisher,
-        string coverPath,
+        string? coverPath,
         BitmapHelper bitmapHelper,
         BuildContext context)
     {
+        if (mediaDataDoc is null)
+        {
+            LOGGER.Warn("MangaDex returned no data for {Input}", input);
+            return null;
+        }
+
         if (!mediaDataDoc.RootElement.TryGetProperty("data", out JsonElement data))
         {
             LOGGER.Warn("MangaDex response missing 'data' for {Input}", input);
@@ -511,7 +532,7 @@ public sealed partial class Series(
         JsonElement coverArtRel = relationships
             .AsValueEnumerable()
             .FirstOrDefault(static x =>
-                x.TryGetProperty("type", out var typeProp) &&
+                x.TryGetProperty("type", out JsonElement typeProp) &&
                 typeProp.ValueEquals("cover_art"));
 
         string coverId = coverArtRel.ValueKind == JsonValueKind.Object
@@ -521,9 +542,9 @@ public sealed partial class Series(
         string seriesId = string.IsNullOrEmpty(curMangaDexId) ? GetStringOrEmpty(data, "id") : curMangaDexId;
 
         // Resolve cover URL (prefer custom, fallback to generated)
-        string coverUrl = string.IsNullOrWhiteSpace(customImageUrl)
+        string coverUrl = (string.IsNullOrWhiteSpace(customImageUrl)
             ? await mangaDex.GetCoverLinkAsync(coverId, seriesId, context.RomajiTitle)
-            : customImageUrl;
+            : customImageUrl) ?? string.Empty;
 
         // Conditionally generate cover file path
         (context.CoverPath, bool isDupe) = !isRefresh
@@ -533,7 +554,7 @@ public sealed partial class Series(
                 context.FilteredBookType,
                 allowDuplicate,
                 ref context.DupeIndex)
-            : (coverPath, false);
+            : (coverPath ?? string.Empty, false);
 
         // Titles
         Dictionary<TsundokuLanguage, string> titles = context.NewTitles;
@@ -549,7 +570,8 @@ public sealed partial class Series(
         // Native language title (e.g., "ko", "zh-hk") if not English
         if (!"en".Equals(context.CountryOfOrigin, StringComparison.Ordinal) &&
             MANGADEX_LANG_CODES.TryGetValue(context.CountryOfOrigin, out TsundokuLanguage mdNativeLang) &&
-            MangaDex.TryGetAltTitle(context.CountryOfOrigin, altTitleList, out string nativeAlt))
+            MangaDex.TryGetAltTitle(context.CountryOfOrigin, altTitleList, out string? nativeAlt) &&
+            nativeAlt is not null)
         {
             titles[mdNativeLang] = nativeAlt;
         }
@@ -652,7 +674,7 @@ public sealed partial class Series(
                 this.Titles[TsundokuLanguage.Romaji], oldCur, oldMax, newCur, newMax
             );
 
-            action();
+            action?.Invoke();
         }
         else
         {
@@ -672,7 +694,7 @@ public sealed partial class Series(
                 this.Titles[TsundokuLanguage.Romaji], oldCur, newCur
             );
 
-            action();
+            action?.Invoke();
         }
         else
         {
@@ -692,7 +714,7 @@ public sealed partial class Series(
                 this.Titles[TsundokuLanguage.Romaji], oldMax, newMax
             );
 
-            action();
+            action?.Invoke();
         }
         else
         {
@@ -707,10 +729,7 @@ public sealed partial class Series(
     /// <returns>
     /// <c>true</c> if the origin is Korean, Taiwanese, or Chinese (Simplified/Traditional); otherwise, <c>false</c>.
     /// </returns>
-    private static bool IsAsianNonJapanese(string origin)
-    {
-        return origin == "KR" || origin == "CW" || origin == "TW";
-    }
+    private static bool IsAsianNonJapanese(string origin) => origin is "KR" or "CW" or "TW";
 
     /// <summary>
     /// Adds additional titles to the provided dictionary based on the specified alternate languages
@@ -752,10 +771,7 @@ public sealed partial class Series(
         }
     }
 
-    public void DeleteCover()
-    {
-        AppFileHelper.DeleteCoverFile(this.Cover);
-    }
+    public void DeleteCover() => AppFileHelper.DeleteCoverFile(this.Cover);
 
     public void UpdateCover(Bitmap newCover)
     {
@@ -775,15 +791,9 @@ public sealed partial class Series(
             .ToArray();
     }
 
-    public bool HasGenre(SeriesGenre genre)
-    {
-        return this.Genres is not null && this.Genres.Contains(genre);
-    }
+    public bool HasGenre(SeriesGenre genre) => this.Genres is not null && this.Genres.Contains(genre);
 
-    public override string ToString()
-    {
-        return JsonSerializer.Serialize(this, typeof(Series), SeriesJsonModel);
-    }
+    public override string ToString() => JsonSerializer.Serialize(this, typeof(Series), SeriesJsonModel);
 
     /// <summary>
     /// Extracts the series identifier (AniList numeric ID or MangaDex UUID) from the
@@ -808,10 +818,7 @@ public sealed partial class Series(
         return segments[^1].TrimEnd('/');
     }
 
-    public bool IsCoverImageEmpty()
-    {
-        return this.CoverBitMap is null || this.CoverBitMap.PixelSize.Width == 0 || this.CoverBitMap.PixelSize.Height == 0;
-    }
+    public bool IsCoverImageEmpty() => this.CoverBitMap is null || this.CoverBitMap.PixelSize.Width == 0 || this.CoverBitMap.PixelSize.Height == 0;
 
     public void UpdateFrom(Series other, bool isCoverEmpty)
     {
@@ -969,25 +976,13 @@ public sealed partial class Series(
         GC.SuppressFinalize(this);
     }
 
-    public bool Equals(Series? other)
-    {
-        return other is not null && this.Id.Equals(other.Id);
-    }
+    public bool Equals(Series? other) => other is not null && this.Id.Equals(other.Id);
 
-    public override int GetHashCode()
-    {
-        return Id.GetHashCode();
-    }
+    public override int GetHashCode() => Id.GetHashCode();
 
-    public static bool operator ==(Series? left, Series? right)
-    {
-        return EqualityComparer<Series>.Default.Equals(left, right);
-    }
+    public static bool operator ==(Series? left, Series? right) => EqualityComparer<Series>.Default.Equals(left, right);
 
-    public static bool operator !=(Series? left, Series? right)
-    {
-        return !(left == right);
-    }
+    public static bool operator !=(Series? left, Series? right) => !(left == right);
 
     public override bool Equals(object? obj) => Equals(obj as Series);
 
@@ -1068,7 +1063,7 @@ public sealed partial class Series(
         public string NativeTitle = string.Empty;
         public string RomajiTitle = string.Empty;
         public string EnglishTitle = string.Empty;
-        public string JapaneseTitle = string.Empty;
+        public string? JapaneseTitle = string.Empty;
         public string CountryOfOrigin = string.Empty;
         public string CoverPath = string.Empty;
 

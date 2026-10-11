@@ -77,7 +77,7 @@ public sealed class TsundokuUIScheduler : LocalScheduler
 public static class TsundokuSchedulers
 {
     public static IScheduler MainThread => TsundokuUIScheduler.Instance;
-    public static IScheduler TaskPool => System.Reactive.Concurrency.TaskPoolScheduler.Default;
+    public static IScheduler TaskPool => TaskPoolScheduler.Default;
 }
 
 /// <summary>

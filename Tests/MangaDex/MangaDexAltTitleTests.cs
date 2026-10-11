@@ -10,10 +10,7 @@ public class MangaDexAltTitleTests
     private static JsonElement altTitles;
     private static JsonElement[] altTitlesArray;
 
-    private static JsonElement CreateJsonElement(string json)
-    {
-        return JsonDocument.Parse(json).RootElement;
-    }
+    private static JsonElement CreateJsonElement(string json) => JsonDocument.Parse(json).RootElement;
 
     [OneTimeSetUp]
     public void OneTimeSetup()
@@ -29,10 +26,7 @@ public class MangaDexAltTitleTests
     }
 
     [OneTimeTearDown]
-    public void OneTimeTeardown()
-    {
-        document?.Dispose();
-    }
+    public void OneTimeTeardown() => document?.Dispose();
 
     [Test]
     public void GetAdditionalMangaDexTitleList_FullDocument_ParsesAltTitlesFromAttributes()
@@ -42,11 +36,11 @@ public class MangaDexAltTitleTests
         using (Assert.EnterMultipleScope())
         {
             Assert.That(results, Has.Length.EqualTo(5), "Expected 5 alternative titles in the list.");
-            Assert.That(results.Any(e => e.TryGetProperty("ja", out JsonElement j) && j.GetString().Equals("戦奏教室")), "Expected 'ja' title '戦奏教室' to be present.");
-            Assert.That(results.Any(e => e.TryGetProperty("ja-ro", out JsonElement jro) && jro.GetString().Equals("Sensou Kyoushitsu")), "Expected 'ja-ro' title 'Sensou Kyoushitsu' to be present.");
-            Assert.That(results.Any(e => e.TryGetProperty("fr", out JsonElement fr) && fr.GetString().Equals("The Bugle Call")), "Expected 'fr' title 'The Bugle Call' to be present.");
-            Assert.That(results.Any(e => e.TryGetProperty("ru", out JsonElement ru) && ru.GetString().Equals("Зов горна")), "Expected 'ru' title 'Зов горна' to be present.");
-            Assert.That(results.Any(e => e.TryGetProperty("pt-br", out JsonElement ptbr) && ptbr.GetString().Equals("Uma Canção de Guerra")), "Expected 'pt-br' title 'Uma Canção de Guerra' to be present.");
+            Assert.That(results.Any(e => e.TryGetProperty("ja", out JsonElement j) && j.GetString()!.Equals("戦奏教室")), "Expected 'ja' title '戦奏教室' to be present.");
+            Assert.That(results.Any(e => e.TryGetProperty("ja-ro", out JsonElement jro) && jro.GetString()!.Equals("Sensou Kyoushitsu")), "Expected 'ja-ro' title 'Sensou Kyoushitsu' to be present.");
+            Assert.That(results.Any(e => e.TryGetProperty("fr", out JsonElement fr) && fr.GetString()!.Equals("The Bugle Call")), "Expected 'fr' title 'The Bugle Call' to be present.");
+            Assert.That(results.Any(e => e.TryGetProperty("ru", out JsonElement ru) && ru.GetString()!.Equals("Зов горна")), "Expected 'ru' title 'Зов горна' to be present.");
+            Assert.That(results.Any(e => e.TryGetProperty("pt-br", out JsonElement ptbr) && ptbr.GetString()!.Equals("Uma Canção de Guerra")), "Expected 'pt-br' title 'Uma Canção de Guerra' to be present.");
         }
     }
 
@@ -80,7 +74,7 @@ public class MangaDexAltTitleTests
         string country = "es-la"; // This language is in availableTranslatedLanguages, but not in altTitles
                                   // (only "pt-br", "ru", "fr", "ja", "ja-ro" are in altTitles)
 
-        string? actualTitle = Clients.MangaDex.GetAltTitle(country, altTitles.EnumerateArray().ToArray());
+        string? actualTitle = Clients.MangaDex.GetAltTitle(country, [.. altTitles.EnumerateArray()]);
 
         Assert.That(actualTitle, Is.Null);
     }
@@ -157,7 +151,7 @@ public class MangaDexAltTitleTests
         string country = "ru"; // Corresponds to {"ru": "Зов горна"}
         string expectedTitle = "Зов горна";
 
-        bool result = Clients.MangaDex.TryGetAltTitle(country, altTitles.EnumerateArray().ToArray(), out string? actualTitle);
+        bool result = Clients.MangaDex.TryGetAltTitle(country, [.. altTitles.EnumerateArray()], out string? actualTitle);
 
         Assert.That(result, Is.True);
         Assert.That(actualTitle, Is.EqualTo(expectedTitle));
@@ -179,7 +173,7 @@ public class MangaDexAltTitleTests
         // The first "ja" entry in the JSON is "戦奏教室"
         string expectedTitle = "戦奏教室";
 
-        bool result = Clients.MangaDex.TryGetAltTitle(country, altTitles.EnumerateArray().ToArray(), out string? actualTitle);
+        bool result = Clients.MangaDex.TryGetAltTitle(country, [.. altTitles.EnumerateArray()], out string? actualTitle);
 
         Assert.That(result, Is.True);
         Assert.That(actualTitle, Is.EqualTo(expectedTitle));
@@ -200,7 +194,7 @@ public class MangaDexAltTitleTests
 
         string country = "de"; // Does not exist in the altTitles of the JSON
 
-        bool result = Clients.MangaDex.TryGetAltTitle(country, altTitles.EnumerateArray().ToArray(), out string? actualTitle);
+        bool result = Clients.MangaDex.TryGetAltTitle(country, [.. altTitles.EnumerateArray()], out string? actualTitle);
 
         Assert.That(result, Is.False);
         Assert.That(actualTitle, Is.Null);
@@ -259,7 +253,7 @@ public class MangaDexAltTitleTests
     {
         string country = ""; // Empty string as country code
 
-        bool result = Clients.MangaDex.TryGetAltTitle(country, altTitles.EnumerateArray().ToArray(), out string? actualTitle);
+        bool result = Clients.MangaDex.TryGetAltTitle(country, [.. altTitles.EnumerateArray()], out string? actualTitle);
 
         Assert.That(result, Is.False);
         Assert.That(actualTitle, Is.Null);

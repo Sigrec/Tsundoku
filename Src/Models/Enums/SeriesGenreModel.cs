@@ -68,13 +68,11 @@ public static class SeriesGenreModel
     /// </summary>
     /// <param name="genre">The SeriesGenre value.</param>
     /// <returns>The first alias defined in the GenreAliases attribute, or the enum's name if no aliases are defined.</returns>
-    public static string GetPrimaryAlias(SeriesGenre genre)
-    {
+    public static string GetPrimaryAlias(SeriesGenre genre) =>
         // Get the aliases using the existing GetAliases method.
         // FirstOrDefault() safely gets the first element or a default value (null for strings)
         // if the sequence is empty.
-        return GetAliases(genre).FirstOrDefault() ?? genre.ToString();
-    }
+        GetAliases(genre).FirstOrDefault() ?? genre.ToString();
 
     /// <summary>
     /// Attempts to parse a genre string (including its aliases) into a SeriesGenre value.
@@ -103,14 +101,7 @@ public static class SeriesGenreModel
     /// <param name="genreString">The genre string or alias to look up.</param>
     /// <returns>The corresponding SeriesGenre value.</returns>
     /// <exception cref="ArgumentException">Thrown if the genre string is not a recognized genre or alias.</exception>
-    public static SeriesGenre Parse(string genreString)
-    {
-        if (TryParse(genreString, out SeriesGenre result))
-        {
-            return result;
-        }
-        return SeriesGenre.Unknown;
-    }
+    public static SeriesGenre Parse(string genreString) => TryParse(genreString, out SeriesGenre result) ? result : SeriesGenre.Unknown;
 
     /// <summary>
     /// Gets the primary aliases associated with a SeriesGenre value.

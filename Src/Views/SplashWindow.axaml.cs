@@ -8,10 +8,7 @@ namespace Tsundoku.Views;
 /// </summary>
 public sealed partial class SplashWindow : Window
 {
-    public SplashWindow()
-    {
-        InitializeComponent();
-    }
+    public SplashWindow() => InitializeComponent();
 
     /// <summary>
     /// Updates the status text shown on the splash screen. Thread-safe.

@@ -6,17 +6,15 @@ public sealed class SeriesValueComparer : IEqualityComparer<Series>
 {
     public bool Equals(Series? x, Series? y)
     {
-        if (x is null || y is null)
-            return false;
-
-        return x.Format == y.Format
+        return x is not null && y is not null
+            && x.Format == y.Format
             && x.Titles.SequenceEqual(y.Titles)
             && x.Staff.SequenceEqual(y.Staff);
     }
 
     public int GetHashCode(Series obj)
     {
-        HashCode hash = new HashCode();
+        HashCode hash = new();
         hash.Add(obj.Format);
         foreach (KeyValuePair<TsundokuLanguage, string> title in obj.Titles)
         {

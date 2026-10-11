@@ -20,6 +20,12 @@ public sealed partial class AniList
     /// <summary>Extra seconds added to rate limit delays to avoid hitting the limit again immediately.</summary>
     private const int RateLimitPaddingSeconds = 5;
 
+    /// <summary>Length of the AniList rate limit window, used when the reset header is missing or implausible.</summary>
+    private const int RateLimitWindowSeconds = 60;
+
+    /// <summary>UTC ticks before which no request should be sent because the rate limit budget is used up.</summary>
+    private long _rateLimitResumeUtcTicks;
+
     /// <summary>Base multiplier for exponential backoff when a 429 response includes headers.</summary>
     private const int BackoffBaseWithHeaders = 5;
 
@@ -48,10 +54,7 @@ public sealed partial class AniList
     /// Initializes a new instance of <see cref="AniList"/> with the specified GraphQL client.
     /// </summary>
     /// <param name="aniListClient">The AniList GraphQL HTTP client.</param>
-    public AniList(AniListGraphQLClient aniListClient)
-    {
-        _aniListClient = aniListClient;
-    }
+    public AniList(AniListGraphQLClient aniListClient) => _aniListClient = aniListClient;
 
     /// <summary>
     /// Retrieves AniList series information by its title.
@@ -120,7 +123,7 @@ public sealed partial class AniList
                     }}
                 }}
             }}",
-            Variables = new { search = search, perPage = perPage }
+            Variables = new { search, perPage }
         };
 
         GraphQLResponse<JsonDocument?>? response = await SendWithRateLimitRetryAsync<JsonDocument?>(
@@ -175,8 +178,8 @@ public sealed partial class AniList
             bool isNativeNotEmpty = !string.IsNullOrWhiteSpace(native);
 
             bool inRomaji = isRomajiNotEmpty && romaji.Contains(needle, StringComparison.OrdinalIgnoreCase);
-            bool inEnglish = isEnglishNotEmpty && english.Contains(needle, StringComparison.OrdinalIgnoreCase);
-            bool inNative = isNativeNotEmpty && native.Contains(needle, StringComparison.OrdinalIgnoreCase);
+            bool inEnglish = isEnglishNotEmpty && english!.Contains(needle, StringComparison.OrdinalIgnoreCase);
+            bool inNative = isNativeNotEmpty && native!.Contains(needle, StringComparison.OrdinalIgnoreCase);
             if (!inRomaji && !inEnglish && !inNative) continue;
 
             // Find best matching title without allocating a list per iteration
@@ -197,7 +200,7 @@ public sealed partial class AniList
             int id = idEl.GetInt32();
             string display = $"{chosen} ({format ?? "MEDIA"}) [{id}]";
 
-            list.Add(new AniListPickerSuggestion(id.ToString(), display, format));
+            list.Add(new AniListPickerSuggestion(id.ToString(), display, format ?? string.Empty));
         }
 
         return list;
@@ -207,9 +210,10 @@ public sealed partial class AniList
     /// Executes a GraphQL query against the AniList API using the given media selector and variables.
     /// Includes automatic retry handling if rate-limited.
     /// </summary>
-    /// <param name="mediaSelector">The GraphQL selection string (e.g., Media(...)).</param>
+    /// <param name="queryType">The name of the predefined query to run (e.g., "Title").</param>
     /// <param name="variables">An anonymous object containing GraphQL variables.</param>
     /// <param name="contextLabel">A descriptive label used for logging purposes.</param>
+    /// <param name="maxRetries">The maximum number of attempts before giving up.</param>
     /// <param name="cancellationToken">Token used to cancel the request early.</param>
     /// <returns>A <see cref="JsonDocument"/> containing the query response, or null if the request fails or is canceled.</returns>
     private async Task<JsonDocument?> ExecuteAniListQueryAsync(
@@ -319,18 +323,18 @@ public sealed partial class AniList
 
             try
             {
+                TimeSpan pendingWait = new(Interlocked.Read(ref _rateLimitResumeUtcTicks) - DateTime.UtcNow.Ticks);
+                if (pendingWait > TimeSpan.Zero)
+                {
+                    LOGGER.Info("AniList rate limit budget exhausted. Waiting {Delay} before sending {Context}.", pendingWait, context);
+                    await Task.Delay(pendingWait, cancellationToken);
+                }
+
                 GraphQLResponse<JsonDocument?> response = await _aniListClient
                     .SendQueryAsync<JsonDocument?>(request, cancellationToken);
 
-                TimeSpan? delay = GetRateLimitDelay(response.AsGraphQLHttpResponse().ResponseHeaders);
-                if (delay is null)
-                {
-                    return response;
-                }
-
-                attempts++;
-                LOGGER.Warn("Rate limit hit (attempt {Attempt}/{Max}). Delaying {Delay}...", attempts, maxRetries, delay.Value);
-                await Task.Delay(delay.Value, cancellationToken);
+                RecordRateLimitWindow(response.AsGraphQLHttpResponse().ResponseHeaders);
+                return response;
             }
             catch (GraphQLHttpRequestException ex) when (ex.StatusCode == HttpStatusCode.TooManyRequests)
             {
@@ -392,16 +396,52 @@ public sealed partial class AniList
     }
 
     /// <summary>
+    /// Records when the next request may be sent if a successful response used up the rate limit budget.
+    /// </summary>
+    /// <param name="headers">HTTP response headers of a successful response.</param>
+    private void RecordRateLimitWindow(HttpResponseHeaders headers)
+    {
+        if (!headers.TryGetValues("X-RateLimit-Remaining", out IEnumerable<string>? remainingValues) ||
+            !short.TryParse(remainingValues.FirstOrDefault(), out short remaining))
+        {
+            return;
+        }
+
+        LOGGER.Debug("AniList Rate Remaining = {Remaining}", remaining);
+        if (remaining > 0)
+        {
+            return;
+        }
+
+        DateTime nowUtc = DateTime.UtcNow;
+        TimeSpan delay = TimeSpan.FromSeconds(RateLimitWindowSeconds);
+        if (headers.TryGetValues("X-RateLimit-Reset", out IEnumerable<string>? resetValues) &&
+            long.TryParse(resetValues.FirstOrDefault(), out long resetUnixSeconds))
+        {
+            TimeSpan untilReset = DateTimeOffset.FromUnixTimeSeconds(resetUnixSeconds).UtcDateTime - nowUtc;
+            if (untilReset > TimeSpan.Zero && untilReset < delay)
+            {
+                delay = untilReset;
+            }
+        }
+
+        delay += TimeSpan.FromSeconds(RateLimitPaddingSeconds);
+        Interlocked.Exchange(ref _rateLimitResumeUtcTicks, (nowUtc + delay).Ticks);
+        LOGGER.Warn("AniList rate limit budget used up. Next request held for {Delay}.", delay);
+    }
+
+    /// <summary>
     /// Parses the AniList rate limit headers and returns the retry delay if rate-limited.
     /// </summary>
     /// <param name="headers">HTTP response headers.</param>
+    /// <param name="paddingSeconds">Extra seconds added to the delay reported by the headers.</param>
     /// <returns>
     /// A <see cref="TimeSpan"/> representing the delay until the rate limit resets,
     /// or <c>null</c> if no delay is needed.
     /// </returns>
     private static TimeSpan? GetRateLimitDelay(HttpResponseHeaders headers, int paddingSeconds = RateLimitPaddingSeconds)
     {
-        if (headers.TryGetValues("X-RateLimit-Remaining", out var remainingValues) &&
+        if (headers.TryGetValues("X-RateLimit-Remaining", out IEnumerable<string>? remainingValues) &&
             short.TryParse(remainingValues.FirstOrDefault(), out short remaining))
         {
             LOGGER.Debug("AniList Rate Remaining = {Remaining}", remaining);
@@ -416,7 +456,7 @@ public sealed partial class AniList
             LOGGER.Warn("AniList response missing or invalid 'X-RateLimit-Remaining' header.");
         }
 
-        if (headers.TryGetValues("Retry-After", out var retryAfterValues) &&
+        if (headers.TryGetValues("Retry-After", out IEnumerable<string>? retryAfterValues) &&
             short.TryParse(retryAfterValues.FirstOrDefault(), out short delaySeconds))
         {
             LOGGER.Warn("AniList rate limit reached. Delaying for {Seconds} seconds.", delaySeconds + paddingSeconds);
@@ -520,21 +560,21 @@ public sealed partial class AniList
         {
             if (titleElement.TryGetProperty("romaji", out JsonElement romajiElement) && romajiElement.ValueKind == JsonValueKind.String)
             {
-                string romajiTitle = romajiElement.GetString();
+                string romajiTitle = romajiElement.GetString()!;
                 newTitles["Romaji"] = romajiTitle;
                 LOGGER.Debug("Added AniList romaji title: {Title}", romajiTitle);
             }
 
             if (titleElement.TryGetProperty("english", out JsonElement englishElement) && englishElement.ValueKind == JsonValueKind.String)
             {
-                string englishTitle = englishElement.GetString();
+                string englishTitle = englishElement.GetString()!;
                 newTitles["English"] = englishTitle;
                 LOGGER.Debug("Added AniList English title: {Title}", englishTitle);
             }
 
             if (titleElement.TryGetProperty("native", out JsonElement nativeElement) && nativeElement.ValueKind == JsonValueKind.String)
             {
-                string nativeTitle = nativeElement.GetString();
+                string nativeTitle = nativeElement.GetString()!;
                 newTitles["Japanese"] = nativeTitle;
                 LOGGER.Debug("Added AniList Japanese title: {Title}", nativeTitle);
             }
@@ -564,14 +604,14 @@ public sealed partial class AniList
             return false;
         }
 
-        StringBuilder nativeBuilder = new StringBuilder(nativeStaff);
-        StringBuilder fullBuilder = new StringBuilder(fullStaff);
-        HashSet<string> nativeSeen = new HashSet<string>(StringComparer.Ordinal);
-        HashSet<string> fullSeen = new HashSet<string>(StringComparer.Ordinal);
+        StringBuilder nativeBuilder = new(nativeStaff);
+        StringBuilder fullBuilder = new(fullStaff);
+        HashSet<string> nativeSeen = new(StringComparer.Ordinal);
+        HashSet<string> fullSeen = new(StringComparer.Ordinal);
 
         foreach (JsonElement edge in staffEdges.EnumerateArray())
         {
-            string roleRaw = edge.GetProperty("role").GetString();
+            string? roleRaw = edge.GetProperty("role").GetString();
             if (string.IsNullOrWhiteSpace(roleRaw))
             {
                 continue;
@@ -593,10 +633,10 @@ public sealed partial class AniList
 
             JsonElement nameNode = edge.GetProperty("node").GetProperty("name");
 
-            string native = nameNode.TryGetProperty("native", out JsonElement nativeVal) ? nativeVal.GetString() : null;
-            string full = nameNode.TryGetProperty("full", out JsonElement fullVal) ? fullVal.GetString() : null;
+            string? native = nameNode.TryGetProperty("native", out JsonElement nativeVal) ? nativeVal.GetString() : null;
+            string? full = nameNode.TryGetProperty("full", out JsonElement fullVal) ? fullVal.GetString() : null;
 
-            string alt = null;
+            string? alt = null;
             if (nameNode.TryGetProperty("alternative", out JsonElement altArr) &&
                 altArr.ValueKind == JsonValueKind.Array &&
                 altArr.GetArrayLength() > 0)

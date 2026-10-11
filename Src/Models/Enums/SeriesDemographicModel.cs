@@ -21,12 +21,5 @@ public static class SeriesDemographicModel
         .Select((value, index) => new KeyValuePair<SeriesDemographic, int>(value, index))
         .ToFrozenDictionary(pair => pair.Key, pair => pair.Value);
 
-    public static SeriesDemographic Parse(string demographicString)
-    {
-        if (Enum.TryParse(demographicString, true, out SeriesDemographic result))
-        {
-            return result;
-        }
-        return SeriesDemographic.Unknown;
-    }
+    public static SeriesDemographic Parse(string demographicString) => Enum.TryParse(demographicString, true, out SeriesDemographic result) ? result : SeriesDemographic.Unknown;
 }

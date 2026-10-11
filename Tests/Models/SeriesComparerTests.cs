@@ -17,7 +17,7 @@ public class SeriesComparerTests
     [AvaloniaTest]
     public void Compare_BothNull_ReturnsZero()
     {
-        SeriesComparer comparer = new SeriesComparer(TsundokuLanguage.English, TsundokuSort.TitleAZ);
+        SeriesComparer comparer = new(TsundokuLanguage.English, TsundokuSort.TitleAZ);
         int result = comparer.Compare(null, null);
         Assert.That(result, Is.EqualTo(0));
     }
@@ -25,7 +25,7 @@ public class SeriesComparerTests
     [AvaloniaTest]
     public void Compare_LeftNull_ReturnsNegative()
     {
-        SeriesComparer comparer = new SeriesComparer(TsundokuLanguage.English, TsundokuSort.TitleAZ);
+        SeriesComparer comparer = new(TsundokuLanguage.English, TsundokuSort.TitleAZ);
         Series series = CreateSeries("Alpha");
         int result = comparer.Compare(null, series);
         Assert.That(result, Is.LessThan(0));
@@ -34,7 +34,7 @@ public class SeriesComparerTests
     [AvaloniaTest]
     public void Compare_RightNull_ReturnsPositive()
     {
-        SeriesComparer comparer = new SeriesComparer(TsundokuLanguage.English, TsundokuSort.TitleAZ);
+        SeriesComparer comparer = new(TsundokuLanguage.English, TsundokuSort.TitleAZ);
         Series series = CreateSeries("Alpha");
         int result = comparer.Compare(series, null);
         Assert.That(result, Is.GreaterThan(0));
@@ -43,7 +43,7 @@ public class SeriesComparerTests
     [AvaloniaTest]
     public void TitleAZ_SortsAlphabetically()
     {
-        SeriesComparer comparer = new SeriesComparer(TsundokuLanguage.English, TsundokuSort.TitleAZ);
+        SeriesComparer comparer = new(TsundokuLanguage.English, TsundokuSort.TitleAZ);
         Series alpha = CreateSeries("Alpha");
         Series beta = CreateSeries("Beta");
 
@@ -54,7 +54,7 @@ public class SeriesComparerTests
     [AvaloniaTest]
     public void TitleAZ_EqualTitles_ComparesByDuplicateIndex()
     {
-        SeriesComparer comparer = new SeriesComparer(TsundokuLanguage.English, TsundokuSort.TitleAZ);
+        SeriesComparer comparer = new(TsundokuLanguage.English, TsundokuSort.TitleAZ);
         Series first = CreateSeries("Same", duplicateIndex: 1);
         Series second = CreateSeries("Same", duplicateIndex: 2);
 
@@ -65,7 +65,7 @@ public class SeriesComparerTests
     [AvaloniaTest]
     public void TitleZA_SortsReverseAlphabetically()
     {
-        SeriesComparer comparer = new SeriesComparer(TsundokuLanguage.English, TsundokuSort.TitleZA);
+        SeriesComparer comparer = new(TsundokuLanguage.English, TsundokuSort.TitleZA);
         Series alpha = CreateSeries("Alpha");
         Series beta = CreateSeries("Beta");
 
@@ -76,7 +76,7 @@ public class SeriesComparerTests
     [AvaloniaTest]
     public void Rating_HigherRatingComesFirst()
     {
-        SeriesComparer comparer = new SeriesComparer(TsundokuLanguage.English, TsundokuSort.Rating);
+        SeriesComparer comparer = new(TsundokuLanguage.English, TsundokuSort.Rating);
         Series low = CreateSeries("Low", rating: 3.0m);
         Series high = CreateSeries("High", rating: 9.0m);
 
@@ -87,7 +87,7 @@ public class SeriesComparerTests
     [AvaloniaTest]
     public void Rating_EqualRatings_FallsBackToTitle()
     {
-        SeriesComparer comparer = new SeriesComparer(TsundokuLanguage.English, TsundokuSort.Rating);
+        SeriesComparer comparer = new(TsundokuLanguage.English, TsundokuSort.Rating);
         Series alpha = CreateSeries("Alpha", rating: 5.0m);
         Series beta = CreateSeries("Beta", rating: 5.0m);
 
@@ -98,7 +98,7 @@ public class SeriesComparerTests
     [AvaloniaTest]
     public void Unread_MoreUnreadComesFirst()
     {
-        SeriesComparer comparer = new SeriesComparer(TsundokuLanguage.English, TsundokuSort.Unread);
+        SeriesComparer comparer = new(TsundokuLanguage.English, TsundokuSort.Unread);
         Series fewUnread = CreateSeries("Few", maxVolCount: 10, curVolCount: 8);
         Series manyUnread = CreateSeries("Many", maxVolCount: 10, curVolCount: 2);
 
@@ -109,7 +109,7 @@ public class SeriesComparerTests
     [AvaloniaTest]
     public void Unread_EqualUnread_FallsBackToTitle()
     {
-        SeriesComparer comparer = new SeriesComparer(TsundokuLanguage.English, TsundokuSort.Unread);
+        SeriesComparer comparer = new(TsundokuLanguage.English, TsundokuSort.Unread);
         Series alpha = CreateSeries("Alpha", maxVolCount: 10, curVolCount: 5);
         Series beta = CreateSeries("Beta", maxVolCount: 10, curVolCount: 5);
 
@@ -120,7 +120,7 @@ public class SeriesComparerTests
     [AvaloniaTest]
     public void Read_MoreReadComesFirst()
     {
-        SeriesComparer comparer = new SeriesComparer(TsundokuLanguage.English, TsundokuSort.Read);
+        SeriesComparer comparer = new(TsundokuLanguage.English, TsundokuSort.Read);
         Series fewRead = CreateSeries("Few", volumesRead: 2);
         Series manyRead = CreateSeries("Many", volumesRead: 8);
 
@@ -131,7 +131,7 @@ public class SeriesComparerTests
     [AvaloniaTest]
     public void Read_EqualRead_FallsBackToTitle()
     {
-        SeriesComparer comparer = new SeriesComparer(TsundokuLanguage.English, TsundokuSort.Read);
+        SeriesComparer comparer = new(TsundokuLanguage.English, TsundokuSort.Read);
         Series alpha = CreateSeries("Alpha", volumesRead: 5);
         Series beta = CreateSeries("Beta", volumesRead: 5);
 
@@ -142,7 +142,7 @@ public class SeriesComparerTests
     [AvaloniaTest]
     public void Value_HigherValueComesFirst()
     {
-        SeriesComparer comparer = new SeriesComparer(TsundokuLanguage.English, TsundokuSort.Value);
+        SeriesComparer comparer = new(TsundokuLanguage.English, TsundokuSort.Value);
         Series cheap = CreateSeries("Cheap", value: 10.0m);
         Series expensive = CreateSeries("Expensive", value: 100.0m);
 
@@ -153,7 +153,7 @@ public class SeriesComparerTests
     [AvaloniaTest]
     public void Value_EqualValue_FallsBackToTitle()
     {
-        SeriesComparer comparer = new SeriesComparer(TsundokuLanguage.English, TsundokuSort.Value);
+        SeriesComparer comparer = new(TsundokuLanguage.English, TsundokuSort.Value);
         Series alpha = CreateSeries("Alpha", value: 50.0m);
         Series beta = CreateSeries("Beta", value: 50.0m);
 
@@ -164,7 +164,7 @@ public class SeriesComparerTests
     [AvaloniaTest]
     public void VolumeCount_HigherCountComesFirst()
     {
-        SeriesComparer comparer = new SeriesComparer(TsundokuLanguage.English, TsundokuSort.VolumeCount);
+        SeriesComparer comparer = new(TsundokuLanguage.English, TsundokuSort.VolumeCount);
         Series few = CreateSeries("Few", curVolCount: 3);
         Series many = CreateSeries("Many", curVolCount: 20);
 
@@ -175,7 +175,7 @@ public class SeriesComparerTests
     [AvaloniaTest]
     public void VolumeCount_EqualCount_FallsBackToTitle()
     {
-        SeriesComparer comparer = new SeriesComparer(TsundokuLanguage.English, TsundokuSort.VolumeCount);
+        SeriesComparer comparer = new(TsundokuLanguage.English, TsundokuSort.VolumeCount);
         Series alpha = CreateSeries("Alpha", curVolCount: 10);
         Series beta = CreateSeries("Beta", curVolCount: 10);
 
@@ -186,7 +186,7 @@ public class SeriesComparerTests
     [AvaloniaTest]
     public void TitleAZ_UsesRomajiFallback_WhenLanguageMissing()
     {
-        SeriesComparer comparer = new SeriesComparer(TsundokuLanguage.Japanese, TsundokuSort.TitleAZ);
+        SeriesComparer comparer = new(TsundokuLanguage.Japanese, TsundokuSort.TitleAZ);
 
         Series alpha = CreateSeriesWithRomaji("Romaji Alpha");
         Series beta = CreateSeriesWithRomaji("Romaji Beta");
@@ -198,7 +198,7 @@ public class SeriesComparerTests
     [AvaloniaTest]
     public void DefaultSort_UsesTitleAZ()
     {
-        SeriesComparer comparer = new SeriesComparer(TsundokuLanguage.English);
+        SeriesComparer comparer = new(TsundokuLanguage.English);
         Series alpha = CreateSeries("Alpha");
         Series beta = CreateSeries("Beta");
 
@@ -215,7 +215,7 @@ public class SeriesComparerTests
         decimal value = 49.99m,
         uint duplicateIndex = 0)
     {
-        WriteableBitmap emptyBitmap = new WriteableBitmap(
+        WriteableBitmap emptyBitmap = new(
             new PixelSize(1, 1),
             new Vector(96, 96),
             PixelFormat.Bgra8888,
@@ -244,7 +244,7 @@ public class SeriesComparerTests
 
     private static Series CreateSeriesWithRomaji(string romajiTitle)
     {
-        WriteableBitmap emptyBitmap = new WriteableBitmap(
+        WriteableBitmap emptyBitmap = new(
             new PixelSize(1, 1),
             new Vector(96, 96),
             PixelFormat.Bgra8888,

@@ -1,7 +1,5 @@
 using System.Collections.Concurrent;
 using System.Collections.Frozen;
-using System.Net.Http;
-using System.Text.Json;
 
 namespace Tsundoku.Services;
 

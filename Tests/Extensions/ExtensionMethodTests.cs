@@ -162,7 +162,7 @@ public class ExtensionMethodTests
     [Test]
     public void DictionariesEqual_SameReference_ReturnsTrue()
     {
-        var dict = new Dictionary<string, int> { { "a", 1 } };
+        Dictionary<string, int> dict = new() { { "a", 1 } };
         bool result = ExtensionMethods.DictionariesEqual(dict, dict);
         Assert.That(result, Is.True);
     }
@@ -170,7 +170,7 @@ public class ExtensionMethodTests
     [Test]
     public void DictionariesEqual_OneNull_ReturnsFalse()
     {
-        var dict = new Dictionary<string, int> { { "a", 1 } };
+        Dictionary<string, int> dict = new() { { "a", 1 } };
         Assert.That(ExtensionMethods.DictionariesEqual(dict, null), Is.False);
         Assert.That(ExtensionMethods.DictionariesEqual(null, dict), Is.False);
     }
@@ -178,32 +178,32 @@ public class ExtensionMethodTests
     [Test]
     public void DictionariesEqual_DifferentCounts_ReturnsFalse()
     {
-        var a = new Dictionary<string, int> { { "a", 1 } };
-        var b = new Dictionary<string, int> { { "a", 1 }, { "b", 2 } };
+        Dictionary<string, int> a = new() { { "a", 1 } };
+        Dictionary<string, int> b = new() { { "a", 1 }, { "b", 2 } };
         Assert.That(ExtensionMethods.DictionariesEqual(a, b), Is.False);
     }
 
     [Test]
     public void DictionariesEqual_SameKeysAndValues_ReturnsTrue()
     {
-        var a = new Dictionary<string, int> { { "a", 1 }, { "b", 2 } };
-        var b = new Dictionary<string, int> { { "a", 1 }, { "b", 2 } };
+        Dictionary<string, int> a = new() { { "a", 1 }, { "b", 2 } };
+        Dictionary<string, int> b = new() { { "a", 1 }, { "b", 2 } };
         Assert.That(ExtensionMethods.DictionariesEqual(a, b), Is.True);
     }
 
     [Test]
     public void DictionariesEqual_SameKeysDifferentValues_ReturnsFalse()
     {
-        var a = new Dictionary<string, int> { { "a", 1 } };
-        var b = new Dictionary<string, int> { { "a", 99 } };
+        Dictionary<string, int> a = new() { { "a", 1 } };
+        Dictionary<string, int> b = new() { { "a", 99 } };
         Assert.That(ExtensionMethods.DictionariesEqual(a, b), Is.False);
     }
 
     [Test]
     public void DictionariesEqual_DifferentKeys_ReturnsFalse()
     {
-        var a = new Dictionary<string, int> { { "a", 1 } };
-        var b = new Dictionary<string, int> { { "z", 1 } };
+        Dictionary<string, int> a = new() { { "a", 1 } };
+        Dictionary<string, int> b = new() { { "z", 1 } };
         Assert.That(ExtensionMethods.DictionariesEqual(a, b), Is.False);
     }
 
@@ -221,14 +221,14 @@ public class ExtensionMethodTests
     [Test]
     public void HashSetsEqual_SameReference_ReturnsTrue()
     {
-        var set = new HashSet<int> { 1, 2, 3 };
+        HashSet<int> set = [1, 2, 3];
         Assert.That(ExtensionMethods.HashSetsEqual(set, set), Is.True);
     }
 
     [Test]
     public void HashSetsEqual_OneNull_ReturnsFalse()
     {
-        var set = new HashSet<int> { 1 };
+        HashSet<int> set = [1];
         Assert.That(ExtensionMethods.HashSetsEqual(set, null), Is.False);
         Assert.That(ExtensionMethods.HashSetsEqual(null, set), Is.False);
     }
@@ -236,16 +236,16 @@ public class ExtensionMethodTests
     [Test]
     public void HashSetsEqual_SameElements_ReturnsTrue()
     {
-        var a = new HashSet<int> { 1, 2, 3 };
-        var b = new HashSet<int> { 3, 2, 1 };
+        HashSet<int> a = [1, 2, 3];
+        HashSet<int> b = [3, 2, 1];
         Assert.That(ExtensionMethods.HashSetsEqual(a, b), Is.True);
     }
 
     [Test]
     public void HashSetsEqual_DifferentElements_ReturnsFalse()
     {
-        var a = new HashSet<int> { 1, 2 };
-        var b = new HashSet<int> { 3, 4 };
+        HashSet<int> a = [1, 2];
+        HashSet<int> b = [3, 4];
         Assert.That(ExtensionMethods.HashSetsEqual(a, b), Is.False);
     }
 

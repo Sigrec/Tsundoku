@@ -47,7 +47,7 @@ public static partial class LibibParser
                     BadDataFound = null
                 };
 
-                using CsvReader csv = new CsvReader(reader, config);
+                using CsvReader csv = new(reader, config);
                 if (csv.Read()) // Read the first row (which should be the header)
                 {
                     csv.ReadHeader(); // Parse the header names
@@ -168,10 +168,7 @@ public static partial class LibibParser
 
     private sealed class TitleFormatComparer : IEqualityComparer<(string Title, SeriesFormat Format, string Publisher)>
     {
-        public bool Equals((string Title, SeriesFormat Format, string Publisher) x, (string Title, SeriesFormat Format, string Publisher) y)
-        {
-            return StringComparer.OrdinalIgnoreCase.Equals(x.Title, y.Title) && x.Format == y.Format;
-        }
+        public bool Equals((string Title, SeriesFormat Format, string Publisher) x, (string Title, SeriesFormat Format, string Publisher) y) => StringComparer.OrdinalIgnoreCase.Equals(x.Title, y.Title) && x.Format == y.Format;
 
         public int GetHashCode((string Title, SeriesFormat Format, string Publisher) obj)
         {

@@ -1,4 +1,3 @@
-using Avalonia.Controls;
 using Avalonia.Interactivity;
 using ReactiveUI.Avalonia;
 using Tsundoku.Models;
@@ -54,10 +53,7 @@ public sealed partial class SeriesPickerWindow : ReactiveWindow<ViewModelBase>
         CountText.Text = $"{selected}/{total} selected";
     }
 
-    private void OnSelectAll(object? sender, RoutedEventArgs e)
-    {
-        SelectAll();
-    }
+    private void OnSelectAll(object? sender, RoutedEventArgs e) => SelectAll();
 
     private void OnDeselectAll(object? sender, RoutedEventArgs e)
     {

@@ -28,10 +28,7 @@ public class AniListGraphQLClientTests
     }
 
     [OneTimeTearDown]
-    public void OneTimeTeardown()
-    {
-        _httpClient.Dispose();
-    }
+    public void OneTimeTeardown() => _httpClient.Dispose();
 
     [TestCase("ようこそ実力至上主義の教室へ", SeriesFormat.Novel)]
     [TestCase("-0.5˚C", SeriesFormat.Manga)]

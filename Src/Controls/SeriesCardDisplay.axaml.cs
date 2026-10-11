@@ -1,4 +1,3 @@
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Avalonia.Animation;
 using Avalonia.Animation.Easings;
@@ -7,12 +6,9 @@ using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Media.Transformation;
 using Avalonia.Styling;
-using Avalonia.Threading;
 using Microsoft.Extensions.DependencyInjection;
-using ReactiveUI;
 using Tsundoku.Helpers;
 using Tsundoku.Models;
-using Tsundoku.Services;
 using Tsundoku.ViewModels;
 using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 
@@ -62,8 +58,8 @@ public sealed partial class SeriesCardDisplay : UserControl
 
     public SeriesCardDisplay()
         : this(
-            _cachedMainWindowViewModel ??= App.ServiceProvider.GetRequiredService<MainWindowViewModel>(),
-            _cachedUserService ??= App.ServiceProvider.GetRequiredService<IUserService>())
+            _cachedMainWindowViewModel ??= App.ServiceProvider!.GetRequiredService<MainWindowViewModel>(),
+            _cachedUserService ??= App.ServiceProvider!.GetRequiredService<IUserService>())
     {
     }
 
@@ -74,10 +70,7 @@ public sealed partial class SeriesCardDisplay : UserControl
         InitializeComponent();
     }
 
-    static SeriesCardDisplay()
-    {
-        SeriesProperty.Changed.AddClassHandler<SeriesCardDisplay>((card, e) => card.OnSeriesChanged(e));
-    }
+    static SeriesCardDisplay() => SeriesProperty.Changed.AddClassHandler<SeriesCardDisplay>((card, e) => card.OnSeriesChanged(e));
 
     private static readonly Animation _fadeInAnimation = new()
     {
@@ -92,21 +85,42 @@ public sealed partial class SeriesCardDisplay : UserControl
         }
     };
 
-    // Per-series cooldown so fast scrolling (which recycles cards through many series in a
-    // short window) doesn't stack a fresh 950ms fade for every recycled attach. Filter/sort
-    // changes usually pause longer than the cooldown so they still get the polished fade in.
-    private static readonly Dictionary<Guid, long> _lastFadedTicks = new();
-    private const long FadeCooldownTicks = TimeSpan.TicksPerMillisecond * 1500;
+    // Scrolling recycles cards in a steady stream, so only cards that change right after a
+    // quiet period (initial load, filter/sort change) get the 950ms fade in.
+    private const long FadeQuietMilliseconds = 250;
+    private const long FadeBurstMilliseconds = 150;
+    private static long _lastCardChangeMilliseconds;
+    private static long _fadeBurstStartMilliseconds;
+    private CancellationTokenSource? _fadeCancellation;
 
-    private static bool TryClaimFadeSlot(Guid seriesId)
+    private static bool TryClaimFadeSlot()
     {
-        long now = DateTime.UtcNow.Ticks;
-        if (_lastFadedTicks.TryGetValue(seriesId, out long last) && now - last < FadeCooldownTicks)
+        long now = Environment.TickCount64;
+        if (now - _lastCardChangeMilliseconds > FadeQuietMilliseconds)
         {
-            return false;
+            _fadeBurstStartMilliseconds = now;
         }
-        _lastFadedTicks[seriesId] = now;
-        return true;
+        _lastCardChangeMilliseconds = now;
+        return now - _fadeBurstStartMilliseconds <= FadeBurstMilliseconds;
+    }
+
+    private void CancelFadeIn()
+    {
+        _fadeCancellation?.Cancel();
+        _fadeCancellation?.Dispose();
+        _fadeCancellation = null;
+    }
+
+    private void FadeInIfSettled()
+    {
+        CancelFadeIn();
+        if (!TryClaimFadeSlot())
+        {
+            return;
+        }
+
+        _fadeCancellation = new CancellationTokenSource();
+        _ = _fadeInAnimation.RunAsync(this, _fadeCancellation.Token);
     }
 
     private static readonly ITransform _pulseIdentity = TransformOperations.Parse("scale(1, 1)");
@@ -137,7 +151,7 @@ public sealed partial class SeriesCardDisplay : UserControl
         }
     };
 
-    protected override void OnAttachedToVisualTree(Avalonia.VisualTreeAttachmentEventArgs e)
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
         _isAttached = true;
@@ -148,13 +162,10 @@ public sealed partial class SeriesCardDisplay : UserControl
         }
 
         SubscribeToCompletion(Series);
-        if (Series is null || TryClaimFadeSlot(Series.Id))
-        {
-            _ = _fadeInAnimation.RunAsync(this);
-        }
+        FadeInIfSettled();
     }
 
-    protected override void OnDetachedFromVisualTree(Avalonia.VisualTreeAttachmentEventArgs e)
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         if (_loadedCoverSeriesId != Guid.Empty)
         {
@@ -163,6 +174,7 @@ public sealed partial class SeriesCardDisplay : UserControl
         }
         _completionSubscription?.Dispose();
         _completionSubscription = null;
+        CancelFadeIn();
         if (ReferenceEquals(_hoveredCard, this)) _hoveredCard = null;
         _isAttached = false;
         base.OnDetachedFromVisualTree(e);
@@ -174,19 +186,19 @@ public sealed partial class SeriesCardDisplay : UserControl
     private static SeriesCardDisplay? _hoveredCard;
     public static Series? HoveredSeries => _hoveredCard?.Series;
 
-    protected override void OnPointerEntered(Avalonia.Input.PointerEventArgs e)
+    protected override void OnPointerEntered(PointerEventArgs e)
     {
         _hoveredCard = this;
         base.OnPointerEntered(e);
     }
 
-    protected override void OnPointerExited(Avalonia.Input.PointerEventArgs e)
+    protected override void OnPointerExited(PointerEventArgs e)
     {
         if (ReferenceEquals(_hoveredCard, this)) _hoveredCard = null;
         base.OnPointerExited(e);
     }
 
-    private void OnSeriesChanged(Avalonia.AvaloniaPropertyChangedEventArgs e)
+    private void OnSeriesChanged(AvaloniaPropertyChangedEventArgs e)
     {
         if (!_isAttached) return;
 
@@ -201,10 +213,7 @@ public sealed partial class SeriesCardDisplay : UserControl
             _userService.LoadSeriesCover(newSeries.Id);
             _loadedCoverSeriesId = newSeries.Id;
             SubscribeToCompletion(newSeries);
-            if (TryClaimFadeSlot(newSeries.Id))
-            {
-                _ = _fadeInAnimation.RunAsync(this);
-            }
+            FadeInIfSettled();
         }
         else
         {
@@ -262,15 +271,9 @@ public sealed partial class SeriesCardDisplay : UserControl
         }
     }
 
-    private void SubtractVolume(object? sender, RoutedEventArgs e)
-    {
-        Series?.DecrementCurVolumeCount();
-    }
+    private void SubtractVolume(object? sender, RoutedEventArgs e) => Series?.DecrementCurVolumeCount();
 
-    private void AddVolume(object? sender, RoutedEventArgs e)
-    {
-        Series?.IncrementCurVolumeCount();
-    }
+    private void AddVolume(object? sender, RoutedEventArgs e) => Series?.IncrementCurVolumeCount();
 
     private async void OpenEditSeriesInfoWindow(object? sender, RoutedEventArgs e)
     {

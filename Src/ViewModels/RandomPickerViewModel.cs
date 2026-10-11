@@ -1,14 +1,12 @@
 using System.Collections.ObjectModel;
 using Avalonia.Collections;
-using ReactiveUI;
 using ReactiveUI.SourceGenerators;
 using Tsundoku.Models;
 using Tsundoku.Models.Enums;
-using Tsundoku.Services;
 
 namespace Tsundoku.ViewModels;
 
-public sealed partial class RandomPickerViewModel : ViewModelBase
+public sealed partial class RandomPickerViewModel : ViewModelBase, IDisposable
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
     private readonly ISharedSeriesCollectionProvider _sharedSeriesProvider;
@@ -23,10 +21,7 @@ public sealed partial class RandomPickerViewModel : ViewModelBase
     [Reactive] public partial string MainTitle { get; set; } = string.Empty;
     public AvaloniaList<string> OtherTitles { get; } = [];
 
-    public RandomPickerViewModel(IUserService userService, ISharedSeriesCollectionProvider sharedSeriesProvider) : base(userService)
-    {
-        _sharedSeriesProvider = sharedSeriesProvider ?? throw new ArgumentNullException(nameof(sharedSeriesProvider));
-    }
+    public RandomPickerViewModel(IUserService userService, ISharedSeriesCollectionProvider sharedSeriesProvider) : base(userService) => _sharedSeriesProvider = sharedSeriesProvider ?? throw new ArgumentNullException(nameof(sharedSeriesProvider));
 
     public void Roll()
     {
@@ -122,6 +117,13 @@ public sealed partial class RandomPickerViewModel : ViewModelBase
         {
             _userService.ReleaseSeriesCover(_lastPickedId);
         }
+    }
+
+    public void Dispose()
+    {
+        ReleaseCurrentCover();
+        _lastPickedId = Guid.Empty;
+        _disposables.Dispose();
     }
 
     /// <summary>
