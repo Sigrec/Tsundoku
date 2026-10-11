@@ -25,6 +25,7 @@ public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesView
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
     public bool IsOpen { get; set; }
     private readonly IPopupDialogService _popupDialogService;
+    private CancellationTokenSource? _buttonSpinnerCancellation;
 
     public AddNewSeriesWindow(AddNewSeriesViewModel viewModel, IPopupDialogService popupDialogService)
     {
@@ -139,6 +140,8 @@ public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesView
 
     private void SetButtonLoading(string text)
     {
+        StopButtonSpinner();
+        _buttonSpinnerCancellation = new CancellationTokenSource();
         Optris.Icons.Avalonia.Icon spinner = new() { Value = "fa7-solid fa7-arrows-rotate", FontSize = 13 };
         Animation rotateAnimation = new Animation
         {
@@ -150,7 +153,7 @@ public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesView
                 new KeyFrame { Cue = new Cue(1), Setters = { new Setter(RotateTransform.AngleProperty, 360.0) } }
             }
         };
-        rotateAnimation.RunAsync(spinner);
+        _ = rotateAnimation.RunAsync(spinner, _buttonSpinnerCancellation.Token);
 
         AddSeriesButton.Content = new StackPanel
         {
@@ -163,7 +166,15 @@ public sealed partial class AddNewSeriesWindow : ReactiveWindow<AddNewSeriesView
 
     private void ClearButtonLoading()
     {
+        StopButtonSpinner();
         AddSeriesButton.Content = "Add Series";
+    }
+
+    private void StopButtonSpinner()
+    {
+        _buttonSpinnerCancellation?.Cancel();
+        _buttonSpinnerCancellation?.Dispose();
+        _buttonSpinnerCancellation = null;
     }
 
     public async void OnAddSeriesButtonClicked(object sender, RoutedEventArgs args)

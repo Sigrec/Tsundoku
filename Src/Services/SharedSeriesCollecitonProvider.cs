@@ -243,7 +243,7 @@ public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISh
         _userService.UserCollectionChanges
             .Filter(series => series is not null)
             .DistinctValues(series => series.Publisher)
-            .Throttle(TimeSpan.FromMilliseconds(300))
+            .Batch(TimeSpan.FromMilliseconds(300))
             .ObserveOn(TsundokuSchedulers.MainThread)
             .SortAndBind(out _availablePublishers, StringComparer.OrdinalIgnoreCase)
             .Subscribe()

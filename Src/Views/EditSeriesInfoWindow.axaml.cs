@@ -27,6 +27,7 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
     private bool _IsInitialized = false;
     private SeriesSnapshot? _snapshotBeforeEdit;
     private SeriesSnapshot? _snapshotAfterRevert;
+    private IDisposable? _aniListAvailabilitySubscription;
 
     public EditSeriesInfoWindow(MainWindowViewModel mainWindowViewModel, BitmapHelper bitmapHelper, IApiHealthCheckService apiHealthCheckService, IPopupDialogService popupDialogService)
     {
@@ -62,7 +63,8 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
             _IsInitialized = true;
 
             // Disable refresh if AniList is down
-            System.ObservableExtensions.Subscribe(
+            _aniListAvailabilitySubscription?.Dispose();
+            _aniListAvailabilitySubscription = System.ObservableExtensions.Subscribe(
                 _apiHealthCheckService.IsAniListAvailable.ObserveOn(TsundokuSchedulers.MainThread),
                 isAvailable => ChangeSeriesVolumeCountButton.IsEnabled = isAvailable);
         };
@@ -70,6 +72,9 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
         Closed += (s, e) =>
         {
             DiscordRP.SetPresence(refreshTimestamp: true);
+            _aniListAvailabilitySubscription?.Dispose();
+            _aniListAvailabilitySubscription = null;
+            ViewModel?.Dispose();
         };
     }
 

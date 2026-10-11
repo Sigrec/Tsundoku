@@ -479,11 +479,12 @@ public sealed partial class User : ReactiveObject
             updatedVersion = true;
         }
 
-        if (!isImport)
+        bool migrated = updatedVersion || curVersion < ViewModelBase.SCHEMA_VERSION;
+        if (!isImport && migrated)
         {
             AppFileHelper.WriteUserDataToFile(userData);
         }
-        return updatedVersion;
+        return migrated;
     }
 }
 

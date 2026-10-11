@@ -38,13 +38,11 @@ public sealed partial class EditSeriesInfoViewModel : ViewModelBase, IDisposable
         RecomputeNavigationFlags();
         this.WhenAnyValue(x => x.Series.Demographic)
             .DistinctUntilChanged()
-            .ObserveOn(TsundokuSchedulers.TaskPool)
             .Subscribe(x => DemographicIndex = SERIES_DEMOGRAPHICS_DICT[x])
             .DisposeWith(_disposables);
 
         this.WhenAnyValue(x => x.CurrentUser.Currency)
             .DistinctUntilChanged()
-            .ObserveOn(TsundokuSchedulers.TaskPool)
             .Subscribe(currency =>
             {
                 CultureInfo cultureInfo = CultureInfo.GetCultureInfo(AVAILABLE_CURRENCY_WITH_CULTURE[currency].Culture);
@@ -64,7 +62,6 @@ public sealed partial class EditSeriesInfoViewModel : ViewModelBase, IDisposable
             .DisposeWith(_disposables);
 
         this.WhenAnyValue(x => x.CurrentUser.Currency, x => x.Series.Value, (currency, value) => (Currency: currency, Value: value))
-            .ObserveOn(TsundokuSchedulers.TaskPool)
             .Subscribe(tuple =>
             {
                 string currency = tuple.Currency;
@@ -83,7 +80,6 @@ public sealed partial class EditSeriesInfoViewModel : ViewModelBase, IDisposable
             .DisposeWith(_disposables);
 
         this.WhenAnyValue(x => x.Series.VolumesRead)
-            .ObserveOn(TsundokuSchedulers.TaskPool)
             .Subscribe(volumesRead => VolumesReadText = $"VOLS READ {volumesRead}")
             .DisposeWith(_disposables);
 

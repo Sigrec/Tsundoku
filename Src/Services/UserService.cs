@@ -339,6 +339,7 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
         }
 
         User loadedUser;
+        bool needsSave = true;
         FileInfo fileInfo = new(userDataFilePath);
         if (fileInfo.Length == 0)
         {
@@ -357,7 +358,7 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
 
                 if (userData is not null)
                 {
-                    User.UpdateSchemaVersion(userData, false);
+                    needsSave = User.UpdateSchemaVersion(userData, false);
                     loadedUser = userData.Deserialize(UserModelContext.Default.User);
                 }
                 else
@@ -385,7 +386,10 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
 
         RefreshSourceCache(loadedUser);
         _userSubject.OnNext(loadedUser);
-        SaveUserData();
+        if (needsSave)
+        {
+            SaveUserData();
+        }
         LOGGER.Info("Finished Loading \"{UserName}'s\" Data!", loadedUser.UserName);
     }
 
@@ -661,7 +665,7 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
             {
                 backupFileName = $"UserData_Backup_{count}.json";
                 count++;
-            } while (File.Exists(backupFileName));
+            } while (File.Exists(AppFileHelper.GetFilePath(backupFileName)));
 
             string originalUserDataPath = AppFileHelper.GetUserDataJsonPath(); // This is the user data file you want to modify
             string backupOfOriginalPath = AppFileHelper.GetFilePath(backupFileName); // This is where the old data will be backed up
@@ -938,9 +942,7 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
 
         try
         {
-            using FileStream createStream = File.Create(userDataFullPath);
-            JsonSerializer.Serialize(createStream, user, User.JSON_SERIALIZATION_OPTIONS);
-            createStream.Flush();
+            WriteUserFile(user, userDataFullPath);
             LOGGER.Debug("Successfully saved user data to: {Path}", userDataFullPath);
         }
         catch (Exception ex)
@@ -966,15 +968,29 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
 
         try
         {
-            using FileStream createStream = File.Create(backupPath);
-            JsonSerializer.Serialize(createStream, user, User.JSON_SERIALIZATION_OPTIONS);
-            createStream.Flush();
+            WriteUserFile(user, backupPath);
             LOGGER.Debug("Successfully saved backup user data to: {Path}", backupPath);
         }
         catch (Exception ex)
         {
             LOGGER.Error(ex, "Failed to save backup user data to {Path}.", backupPath);
         }
+    }
+
+    /// <summary>
+    /// Serializes the user to a temporary file and then swaps it into place, so an interrupted
+    /// save never leaves a truncated file at <paramref name="path"/>.
+    /// </summary>
+    [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "User.JSON_SERIALIZATION_OPTIONS uses the UserModelContext source-gen resolver, so this options-based call is trim-safe at runtime.")]
+    private static void WriteUserFile(User user, string path)
+    {
+        string tempPath = path + ".tmp";
+        using (FileStream createStream = File.Create(tempPath))
+        {
+            JsonSerializer.Serialize(createStream, user, User.JSON_SERIALIZATION_OPTIONS);
+            createStream.Flush(flushToDisk: true);
+        }
+        File.Move(tempPath, path, overwrite: true);
     }
 
     public bool DoesDuplicateExist(Series series)
@@ -1027,13 +1043,7 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
         bool shouldRefreshCover = originalSeries.IsCoverImageEmpty() || (GetCurrentUserSnapshot()?.RefreshCovers ?? false);
         originalSeries.UpdateFrom(refreshedSeries, shouldRefreshCover);
 
-        UpdateUser(user =>
-        {
-            int index = user.UserCollection.BinarySearch(originalSeries, new SeriesComparer(user.Language));
-            if (index < 0) index = ~index;
-            user.UserCollection.RemoveAt(index);
-            user.UserCollection.Insert(index, originalSeries);
-        });
+        UpdateUser(static _ => { });
 
         LOGGER.Info("Refreshed {series} ({id} | CoverRefresh={CoverRefresh}) in Collection", FormatSeriesDisplayName(originalSeries), originalSeries.Id, shouldRefreshCover);
 

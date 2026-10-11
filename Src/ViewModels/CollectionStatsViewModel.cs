@@ -250,10 +250,9 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
     {
         _userService.UserCollectionChanges
             .AutoRefresh(x => x.Rating)
-            .DistinctUntilChanged()
+            .ToCollection()
             .Throttle(TimeSpan.FromMilliseconds(100))
             .ObserveOn(TsundokuSchedulers.MainThread)
-            .ToCollection()
             .Select(list =>
             {
                 decimal total = 0;
@@ -273,10 +272,9 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
 
         _userService.UserCollectionChanges
             .AutoRefresh(x => x.VolumesRead)
-            .DistinctUntilChanged()
+            .ToCollection()
             .Throttle(TimeSpan.FromMilliseconds(100))
             .ObserveOn(TsundokuSchedulers.MainThread)
-            .ToCollection()
             .Select(seriesCollection => (uint)seriesCollection.Sum(item => item.VolumesRead))
             .Subscribe(volumesRead =>
             {
@@ -287,10 +285,9 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
         Observable.CombineLatest(
             _userService.UserCollectionChanges
                 .AutoRefresh(x => x.Value)
-                .DistinctUntilChanged()
+                .ToCollection()
                 .Throttle(TimeSpan.FromMilliseconds(100))
                 .ObserveOn(TsundokuSchedulers.MainThread)
-                .ToCollection()
                 .Select(seriesCollection => decimal.Round(seriesCollection.Sum(item => item.Value), 2)),
             this.WhenAnyValue(x => x.CurrentUser.Currency),
             (Value, Currency) => new { Value, Currency }
@@ -340,10 +337,9 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
         _userService.UserCollectionChanges
             .AutoRefresh(x => x.CurVolumeCount)
             .AutoRefresh(x => x.MaxVolumeCount)
-            .DistinctUntilChanged()
-            .ObserveOn(TsundokuSchedulers.MainThread)
-            .Throttle(TimeSpan.FromMilliseconds(500))
             .ToCollection()
+            .Throttle(TimeSpan.FromMilliseconds(500))
+            .ObserveOn(TsundokuSchedulers.MainThread)
             .Select(seriesList =>
             {
                 uint totalCurVolumes = 0;
@@ -881,10 +877,9 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
 
         _userService.UserCollectionChanges
             .AutoRefresh(x => x.Genres)
-            .DistinctUntilChanged()
+            .ToCollection()
             .Throttle(TimeSpan.FromMilliseconds(500))
             .ObserveOn(TsundokuSchedulers.MainThread)
-            .QueryWhenChanged(query => query.Items)
             .Select(seriesList =>
             {
                 GenreData.Clear();

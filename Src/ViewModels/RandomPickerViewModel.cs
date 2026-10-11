@@ -8,7 +8,7 @@ using Tsundoku.Services;
 
 namespace Tsundoku.ViewModels;
 
-public sealed partial class RandomPickerViewModel : ViewModelBase
+public sealed partial class RandomPickerViewModel : ViewModelBase, IDisposable
 {
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
     private readonly ISharedSeriesCollectionProvider _sharedSeriesProvider;
@@ -122,6 +122,13 @@ public sealed partial class RandomPickerViewModel : ViewModelBase
         {
             _userService.ReleaseSeriesCover(_lastPickedId);
         }
+    }
+
+    public void Dispose()
+    {
+        ReleaseCurrentCover();
+        _lastPickedId = Guid.Empty;
+        _disposables.Dispose();
     }
 
     /// <summary>

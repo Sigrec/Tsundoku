@@ -20,6 +20,12 @@ public sealed partial class AniList
     /// <summary>Extra seconds added to rate limit delays to avoid hitting the limit again immediately.</summary>
     private const int RateLimitPaddingSeconds = 5;
 
+    /// <summary>Length of the AniList rate limit window, used when the reset header is missing or implausible.</summary>
+    private const int RateLimitWindowSeconds = 60;
+
+    /// <summary>UTC ticks before which no request should be sent because the rate limit budget is used up.</summary>
+    private long _rateLimitResumeUtcTicks;
+
     /// <summary>Base multiplier for exponential backoff when a 429 response includes headers.</summary>
     private const int BackoffBaseWithHeaders = 5;
 
@@ -319,18 +325,18 @@ public sealed partial class AniList
 
             try
             {
+                TimeSpan pendingWait = new(Interlocked.Read(ref _rateLimitResumeUtcTicks) - DateTime.UtcNow.Ticks);
+                if (pendingWait > TimeSpan.Zero)
+                {
+                    LOGGER.Info("AniList rate limit budget exhausted. Waiting {Delay} before sending {Context}.", pendingWait, context);
+                    await Task.Delay(pendingWait, cancellationToken);
+                }
+
                 GraphQLResponse<JsonDocument?> response = await _aniListClient
                     .SendQueryAsync<JsonDocument?>(request, cancellationToken);
 
-                TimeSpan? delay = GetRateLimitDelay(response.AsGraphQLHttpResponse().ResponseHeaders);
-                if (delay is null)
-                {
-                    return response;
-                }
-
-                attempts++;
-                LOGGER.Warn("Rate limit hit (attempt {Attempt}/{Max}). Delaying {Delay}...", attempts, maxRetries, delay.Value);
-                await Task.Delay(delay.Value, cancellationToken);
+                RecordRateLimitWindow(response.AsGraphQLHttpResponse().ResponseHeaders);
+                return response;
             }
             catch (GraphQLHttpRequestException ex) when (ex.StatusCode == HttpStatusCode.TooManyRequests)
             {
@@ -389,6 +395,41 @@ public sealed partial class AniList
 
         LOGGER.Error("Exceeded maximum retry attempts ({MaxRetries}) due to rate limiting.");
         return null;
+    }
+
+    /// <summary>
+    /// Records when the next request may be sent if a successful response used up the rate limit budget.
+    /// </summary>
+    /// <param name="headers">HTTP response headers of a successful response.</param>
+    private void RecordRateLimitWindow(HttpResponseHeaders headers)
+    {
+        if (!headers.TryGetValues("X-RateLimit-Remaining", out IEnumerable<string>? remainingValues) ||
+            !short.TryParse(remainingValues.FirstOrDefault(), out short remaining))
+        {
+            return;
+        }
+
+        LOGGER.Debug("AniList Rate Remaining = {Remaining}", remaining);
+        if (remaining > 0)
+        {
+            return;
+        }
+
+        DateTime nowUtc = DateTime.UtcNow;
+        TimeSpan delay = TimeSpan.FromSeconds(RateLimitWindowSeconds);
+        if (headers.TryGetValues("X-RateLimit-Reset", out IEnumerable<string>? resetValues) &&
+            long.TryParse(resetValues.FirstOrDefault(), out long resetUnixSeconds))
+        {
+            TimeSpan untilReset = DateTimeOffset.FromUnixTimeSeconds(resetUnixSeconds).UtcDateTime - nowUtc;
+            if (untilReset > TimeSpan.Zero && untilReset < delay)
+            {
+                delay = untilReset;
+            }
+        }
+
+        delay += TimeSpan.FromSeconds(RateLimitPaddingSeconds);
+        Interlocked.Exchange(ref _rateLimitResumeUtcTicks, (nowUtc + delay).Ticks);
+        LOGGER.Warn("AniList rate limit budget used up. Next request held for {Delay}.", delay);
     }
 
     /// <summary>

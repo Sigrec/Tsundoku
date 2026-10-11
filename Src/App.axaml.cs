@@ -49,6 +49,7 @@ public sealed partial class App : Application
         Mutex = new Mutex(true, appName, out bool createdNew);
 
         ConfigureNLog();
+        SingleLinePasteHelper.Register();
 
         if (!createdNew)
         {
@@ -123,7 +124,7 @@ public sealed partial class App : Application
                 try
                 {
                     // Let the splash window fully render before starting heavy work
-                    await Task.Delay(500);
+                    await Avalonia.Threading.Dispatcher.UIThread.InvokeAsync(static () => { }, Avalonia.Threading.DispatcherPriority.Background);
 
                     splash.UpdateStatus("Initializing services");
                     ServiceCollection services = new();
@@ -181,12 +182,7 @@ public sealed partial class App : Application
                         userService,
                         ServiceProvider.GetRequiredService<IApiHealthCheckService>(),
                         ServiceProvider.GetRequiredService<IPopupDialogService>(),
-                        ServiceProvider.GetRequiredService<AddNewSeriesWindow>(),
-                        ServiceProvider.GetRequiredService<UserSettingsWindow>(),
-                        ServiceProvider.GetRequiredService<CollectionThemeWindow>(),
-                        ServiceProvider.GetRequiredService<PriceAnalysisWindow>(),
-                        ServiceProvider.GetRequiredService<CollectionStatsWindow>(),
-                        ServiceProvider.GetRequiredService<UserNotesWindow>());
+                        ServiceProvider);
 
                     mainWindow.Opened += async (_, _) =>
                     {
@@ -254,7 +250,13 @@ public sealed partial class App : Application
             client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("(https://github.com/Sigrec/Tsundoku)"));
 
             client.Timeout = TimeSpan.FromSeconds(90);
-        }).SetHandlerLifetime(TimeSpan.FromMinutes(5));
+        })
+        .ConfigurePrimaryHttpMessageHandler(static () => new SocketsHttpHandler
+        {
+            AutomaticDecompression = DecompressionMethods.All,
+            PooledConnectionLifetime = TimeSpan.FromMinutes(5),
+        })
+        .SetHandlerLifetime(TimeSpan.FromMinutes(5));
 
         // --- AniList GraphQL Client Setup ---
         services.AddHttpClient("AniListHttpClient", client =>
@@ -268,6 +270,11 @@ public sealed partial class App : Application
             client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("(https://github.com/Sigrec/Tsundoku)"));
 
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        })
+        .ConfigurePrimaryHttpMessageHandler(static () => new SocketsHttpHandler
+        {
+            AutomaticDecompression = DecompressionMethods.All,
+            PooledConnectionLifetime = TimeSpan.FromMinutes(5),
         })
         .SetHandlerLifetime(TimeSpan.FromMinutes(5))
         .AddTypedClient<AniListGraphQLClient>();

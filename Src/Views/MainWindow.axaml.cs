@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
@@ -30,12 +31,12 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
     private readonly IUserService _userService;
     private readonly IApiHealthCheckService _apiHealthCheckService;
     private readonly IPopupDialogService _popupDialogService;
-    private readonly AddNewSeriesWindow _newSeriesWindow;
-    private readonly UserSettingsWindow _userSettingsWindow;
-    private readonly CollectionThemeWindow _themeSettingsWindow;
-    private readonly PriceAnalysisWindow _priceAnalysisWindow;
-    private readonly CollectionStatsWindow _collectionStatsWindow;
-    private readonly UserNotesWindow _userNotesWindow;
+    private readonly Lazy<AddNewSeriesWindow> _newSeriesWindow;
+    private readonly Lazy<UserSettingsWindow> _userSettingsWindow;
+    private readonly Lazy<CollectionThemeWindow> _themeSettingsWindow;
+    private readonly Lazy<PriceAnalysisWindow> _priceAnalysisWindow;
+    private readonly Lazy<CollectionStatsWindow> _collectionStatsWindow;
+    private readonly Lazy<UserNotesWindow> _userNotesWindow;
     private WindowState previousWindowState;
     private CancellationTokenSource? _notificationCts;
     private bool _isShuttingDown;
@@ -47,22 +48,17 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
         IUserService userService,
         IApiHealthCheckService apiHealthCheckService,
         IPopupDialogService popupDialogService,
-        AddNewSeriesWindow newSeriesWindow,
-        UserSettingsWindow userSettingsWindow,
-        CollectionThemeWindow themeSettingsWindow,
-        PriceAnalysisWindow priceAnalysisWindow,
-        CollectionStatsWindow collectionStatsWindow,
-        UserNotesWindow userNotesWindow)
+        IServiceProvider serviceProvider)
     {
         _userService = userService;
         _apiHealthCheckService = apiHealthCheckService;
         _popupDialogService = popupDialogService;
-        _newSeriesWindow = newSeriesWindow;
-        _userSettingsWindow = userSettingsWindow;
-        _themeSettingsWindow = themeSettingsWindow;
-        _priceAnalysisWindow = priceAnalysisWindow;
-        _collectionStatsWindow = collectionStatsWindow;
-        _userNotesWindow = userNotesWindow;
+        _newSeriesWindow = CreateManagedWindow<AddNewSeriesWindow>(serviceProvider, () => AddNewSeriesButton);
+        _userSettingsWindow = CreateManagedWindow<UserSettingsWindow>(serviceProvider, () => SettingsButton);
+        _themeSettingsWindow = CreateManagedWindow<CollectionThemeWindow>(serviceProvider, () => ThemeButton);
+        _priceAnalysisWindow = CreateManagedWindow<PriceAnalysisWindow>(serviceProvider, () => AnalysisButton);
+        _collectionStatsWindow = CreateManagedWindow<CollectionStatsWindow>(serviceProvider, () => StatsButton);
+        _userNotesWindow = CreateManagedWindow<UserNotesWindow>(serviceProvider, () => UserNotesButton);
         InitializeComponent();
         ViewModel = viewModel;
         DataContext = viewModel;
@@ -192,13 +188,12 @@ KeyDown += async (s, e) =>
 
             ViewModel.SaveOnClose();
 
-            foreach (Window child in (Window[])[_newSeriesWindow, _userSettingsWindow, _themeSettingsWindow, _priceAnalysisWindow, _collectionStatsWindow, _userNotesWindow])
-            {
-                if (child.IsVisible)
-                {
-                    child.Close();
-                }
-            }
+            CloseIfOpen(_newSeriesWindow);
+            CloseIfOpen(_userSettingsWindow);
+            CloseIfOpen(_themeSettingsWindow);
+            CloseIfOpen(_priceAnalysisWindow);
+            CloseIfOpen(_collectionStatsWindow);
+            CloseIfOpen(_userNotesWindow);
 
             if (Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop)
             {
@@ -267,43 +262,57 @@ KeyDown += async (s, e) =>
         catch (TaskCanceledException) { }
     }
 
+    private static Lazy<TWindow> CreateManagedWindow<TWindow>(IServiceProvider serviceProvider, Func<ToggleButton> toolbarButton) where TWindow : Window
+    {
+        return new Lazy<TWindow>(() =>
+        {
+            TWindow window = serviceProvider.GetRequiredService<TWindow>();
+            window.Closing += (s, e) => toolbarButton().IsChecked = false;
+            return window;
+        });
+    }
+
+    private static void CloseIfOpen<TWindow>(Lazy<TWindow> window) where TWindow : Window
+    {
+        if (window.IsValueCreated && window.Value.IsVisible)
+        {
+            window.Value.Close();
+        }
+    }
+
     private void OpenAddSeriesDialog(object sender, RoutedEventArgs args)
     {
-        AddNewSeriesWindow? window = this.OpenManagedWindow<AddNewSeriesWindow, AddNewSeriesViewModel>(_newSeriesWindow, "Add New Series Window");
+        AddNewSeriesWindow? window = this.OpenManagedWindow<AddNewSeriesWindow, AddNewSeriesViewModel>(_newSeriesWindow.Value, "Add New Series Window");
         if (window is not null)
         {
             AddNewSeriesButton.IsChecked = true;
-            window.Closing += (s, e) => AddNewSeriesButton.IsChecked = false;
         }
     }
 
     private void OpenSettingsDialog(object sender, RoutedEventArgs args)
     {
-        UserSettingsWindow? window = this.OpenManagedWindow<UserSettingsWindow, UserSettingsViewModel>(_userSettingsWindow, "Settings Window");
+        UserSettingsWindow? window = this.OpenManagedWindow<UserSettingsWindow, UserSettingsViewModel>(_userSettingsWindow.Value, "Settings Window");
         if (window is not null)
         {
             SettingsButton.IsChecked = true;
-            window.Closing += (s, e) => SettingsButton.IsChecked = false;
         }
     }
 
     private void OpenCollectionStatsDialog(object sender, RoutedEventArgs args)
     {
-        CollectionStatsWindow? window = this.OpenManagedWindow<CollectionStatsWindow, CollectionStatsViewModel>(_collectionStatsWindow, "Collection Stats Window");
+        CollectionStatsWindow? window = this.OpenManagedWindow<CollectionStatsWindow, CollectionStatsViewModel>(_collectionStatsWindow.Value, "Collection Stats Window");
         if (window is not null)
         {
             StatsButton.IsChecked = true;
-            window.Closing += (s, e) => StatsButton.IsChecked = false;
         }
     }
 
     private void OpenPriceAnalysisDialog(object sender, RoutedEventArgs args)
     {
-        PriceAnalysisWindow? window = this.OpenManagedWindow<PriceAnalysisWindow, PriceAnalysisViewModel>(_priceAnalysisWindow, "Price Analysis Window");
+        PriceAnalysisWindow? window = this.OpenManagedWindow<PriceAnalysisWindow, PriceAnalysisViewModel>(_priceAnalysisWindow.Value, "Price Analysis Window");
         if (window is not null)
         {
             AnalysisButton.IsChecked = true;
-            window.Closing += (s, e) => AnalysisButton.IsChecked = false;
         }
     }
 
@@ -324,14 +333,14 @@ KeyDown += async (s, e) =>
         picker.RollOnOpen();
 
         await picker.ShowDialog(this);
+        pickerVm.Dispose();
 
         if (!string.IsNullOrWhiteSpace(picker.RequestedPriceAnalysisTitle))
         {
-            PriceAnalysisWindow? paWindow = this.OpenManagedWindow<PriceAnalysisWindow, PriceAnalysisViewModel>(_priceAnalysisWindow, "Price Analysis Window");
+            PriceAnalysisWindow? paWindow = this.OpenManagedWindow<PriceAnalysisWindow, PriceAnalysisViewModel>(_priceAnalysisWindow.Value, "Price Analysis Window");
             if (paWindow is not null)
             {
                 AnalysisButton.IsChecked = true;
-                paWindow.Closing += (s, e) => AnalysisButton.IsChecked = false;
                 paWindow.SearchTextBox.Text = picker.RequestedPriceAnalysisTitle;
                 if (picker.RequestedIsNovel)
                 {
@@ -349,21 +358,19 @@ KeyDown += async (s, e) =>
 
     private void OpenThemeSettingsDialog(object sender, RoutedEventArgs args)
     {
-        CollectionThemeWindow? window = this.OpenManagedWindow<CollectionThemeWindow, ThemeSettingsViewModel>(_themeSettingsWindow, "Theme Settings Window");
+        CollectionThemeWindow? window = this.OpenManagedWindow<CollectionThemeWindow, ThemeSettingsViewModel>(_themeSettingsWindow.Value, "Theme Settings Window");
         if (window is not null)
         {
             ThemeButton.IsChecked = true;
-            window.Closing += (s, e) => ThemeButton.IsChecked = false;
         }
     }
 
     private void OpenUserNotesDialog(object sender, RoutedEventArgs args)
     {
-        UserNotesWindow? window = this.OpenManagedWindow<UserNotesWindow, UserNotesWindowViewModel>(_userNotesWindow, "User Notes Window");
+        UserNotesWindow? window = this.OpenManagedWindow<UserNotesWindow, UserNotesWindowViewModel>(_userNotesWindow.Value, "User Notes Window");
         if (window is not null)
         {
             UserNotesButton.IsChecked = true;
-            window.Closing += (s, e) => UserNotesButton.IsChecked = false;
         }
     }
 
