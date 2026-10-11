@@ -3,11 +3,9 @@ using System.Globalization;
 using System.Reactive.Disposables.Fluent;
 using System.Reactive.Linq;
 using Avalonia.Collections;
-using ReactiveUI;
 using ReactiveUI.SourceGenerators;
 using Tsundoku.Helpers;
 using Tsundoku.Models;
-using Tsundoku.Services;
 using static Tsundoku.Models.Enums.SeriesDemographicModel;
 using static Tsundoku.Models.Enums.SeriesGenreModel;
 
@@ -50,14 +48,7 @@ public sealed partial class EditSeriesInfoViewModel : ViewModelBase, IDisposable
                 string mask = decimalDigits > 0
                     ? "000000000000000000." + new string('0', decimalDigits)
                     : "000000000000000000";
-                if (cultureInfo.NumberFormat.CurrencyPositivePattern is 0 or 2) // 0 = "$n", 2 = "$ n"
-                {
-                    SeriesValueMaskedText = $"{currency}{mask}";
-                }
-                else
-                {
-                    SeriesValueMaskedText = $"{mask}{currency}";
-                }
+                SeriesValueMaskedText = cultureInfo.NumberFormat.CurrencyPositivePattern is 0 or 2 ? $"{currency}{mask}" : $"{mask}{currency}";
             })
             .DisposeWith(_disposables);
 
@@ -68,14 +59,7 @@ public sealed partial class EditSeriesInfoViewModel : ViewModelBase, IDisposable
                 decimal value = tuple.Value;
                 CultureInfo cultureInfo = CultureInfo.GetCultureInfo(AVAILABLE_CURRENCY_WITH_CULTURE[currency].Culture);
                 string formatted = value.ToString($"N{cultureInfo.NumberFormat.CurrencyDecimalDigits}", cultureInfo);
-                if (cultureInfo.NumberFormat.CurrencyPositivePattern is 0 or 2) // 0 = "$n", 2 = "$ n"
-                {
-                    SeriesValueText = $"{currency}{formatted}";
-                }
-                else
-                {
-                    SeriesValueText = $"{formatted}{currency}";
-                }
+                SeriesValueText = cultureInfo.NumberFormat.CurrencyPositivePattern is 0 or 2 ? $"{currency}{formatted}" : $"{formatted}{currency}";
             })
             .DisposeWith(_disposables);
 

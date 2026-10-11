@@ -1,9 +1,6 @@
 using System.Collections.ObjectModel;
-using ReactiveUI;
 using ReactiveUI.SourceGenerators;
-using Tsundoku.Helpers;
 using Tsundoku.Models;
-using Tsundoku.Services;
 
 namespace Tsundoku.ViewModels;
 

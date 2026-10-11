@@ -8,17 +8,14 @@ namespace Tsundoku.Tests.Models;
 public class ThemeResourceKeysTests
 {
     private static readonly FieldInfo[] ConstantFields =
-        typeof(ThemeResourceKeys)
+        [.. typeof(ThemeResourceKeys)
             .GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
-            .Where(f => f.IsLiteral && !f.IsInitOnly && f.FieldType == typeof(string))
-            .ToArray();
+            .Where(f => f.IsLiteral && !f.IsInitOnly && f.FieldType == typeof(string))];
 
     [Test]
     public void PropertyMap_ContainsAllExpectedKeys()
     {
-        string[] expectedKeys = ConstantFields
-            .Select(f => (string)f.GetRawConstantValue()!)
-            .ToArray();
+        string[] expectedKeys = [.. ConstantFields.Select(f => (string)f.GetRawConstantValue()!)];
 
         foreach (string key in expectedKeys)
         {
@@ -43,8 +40,8 @@ public class ThemeResourceKeysTests
     [Test]
     public void PropertyMap_HasNoDuplicateKeys()
     {
-        string[] keys = ThemeResourceKeys.PropertyMap.Keys.ToArray();
-        string[] distinctKeys = keys.Distinct().ToArray();
+        string[] keys = [.. ThemeResourceKeys.PropertyMap.Keys];
+        string[] distinctKeys = [.. keys.Distinct()];
 
         Assert.That(keys.Length, Is.EqualTo(distinctKeys.Length), "PropertyMap should have no duplicate keys");
     }
@@ -99,7 +96,7 @@ public class ThemeResourceKeysTests
     {
         TsundokuTheme theme = TsundokuTheme.DEFAULT_THEME;
 
-        foreach (var kvp in ThemeResourceKeys.PropertyMap)
+        foreach (KeyValuePair<string, Func<TsundokuTheme, SolidColorBrush>> kvp in ThemeResourceKeys.PropertyMap)
         {
             SolidColorBrush result = kvp.Value(theme);
             Assert.That(result, Is.Not.Null, $"Getter for key '{kvp.Key}' returned null for DEFAULT_THEME");

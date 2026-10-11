@@ -159,10 +159,7 @@ public sealed partial class TsundokuTheme : ReactiveObject, ICloneable, ICompara
 
     }
 
-    public TsundokuTheme(string themeName)
-    {
-        ThemeName = themeName;
-    }
+    public TsundokuTheme(string themeName) => ThemeName = themeName;
 
     [JsonConstructor]
     public TsundokuTheme(string themeName, SolidColorBrush menuBGColor, SolidColorBrush usernameColor, SolidColorBrush menuTextColor, SolidColorBrush searchBarBGColor, SolidColorBrush searchBarBorderColor, SolidColorBrush searchBarTextColor, SolidColorBrush dividerColor, SolidColorBrush menuButtonBGColor, SolidColorBrush menuButtonBGHoverColor, SolidColorBrush menuButtonBorderColor, SolidColorBrush menuButtonBorderHoverColor, SolidColorBrush menuButtonTextAndIconColor, SolidColorBrush menuButtonTextAndIconHoverColor, SolidColorBrush collectionBGColor, SolidColorBrush statusAndBookTypeBGColor, SolidColorBrush statusAndBookTypeTextColor, SolidColorBrush seriesCardBGColor, SolidColorBrush seriesCardTitleColor, SolidColorBrush seriesCardPublisherColor, SolidColorBrush seriesCardStaffColor, SolidColorBrush seriesCardDescColor, SolidColorBrush seriesCardBorderColor, SolidColorBrush seriesProgressBarColor, SolidColorBrush seriesProgressBarBGColor, SolidColorBrush seriesProgressBarBorderColor, SolidColorBrush seriesProgressTextColor, SolidColorBrush seriesButtonIconColor, SolidColorBrush seriesButtonIconHoverColor, SolidColorBrush statusAndBookTypeBorderColor, SolidColorBrush seriesCoverBGColor, SolidColorBrush seriesCardButtonBGColor, SolidColorBrush seriesCardButtonBGHoverColor, SolidColorBrush seriesCardButtonBorderColor, SolidColorBrush seriesCardButtonBorderHoverColor, SolidColorBrush seriesCardDividerColor) : this(themeName)
@@ -206,7 +203,7 @@ public sealed partial class TsundokuTheme : ReactiveObject, ICloneable, ICompara
 
     public override int GetHashCode()
     {
-        HashCode hash = new HashCode();
+        HashCode hash = new();
         hash.Add(ThemeName);
         hash.Add(MenuBGColor.Color.ToUInt32());
         hash.Add(UsernameColor.Color.ToUInt32());
@@ -246,11 +243,7 @@ public sealed partial class TsundokuTheme : ReactiveObject, ICloneable, ICompara
         return hash.ToHashCode();
     }
 
-    public int CompareTo(object? obj)
-    {
-        if (obj is not TsundokuTheme other) return 1;
-        return this.ThemeName.CompareTo(other.ThemeName);
-    }
+    public int CompareTo(object? obj) => obj is not TsundokuTheme other ? 1 : this.ThemeName.CompareTo(other.ThemeName);
 
     public TsundokuTheme Cloning()
     {
@@ -294,16 +287,10 @@ public sealed partial class TsundokuTheme : ReactiveObject, ICloneable, ICompara
         );
     }
 
-    private static SolidColorBrush? CloneBrush(SolidColorBrush? brush)
-    {
-        if (brush is null) return null;
-        return new SolidColorBrush(brush.Color);
-    }
+    [return: System.Diagnostics.CodeAnalysis.NotNullIfNotNull(nameof(brush))]
+    private static SolidColorBrush? CloneBrush(SolidColorBrush? brush) => brush is null ? null : new SolidColorBrush(brush.Color);
 
-    object ICloneable.Clone()
-    {
-        return Cloning();
-    }
+    object ICloneable.Clone() => Cloning();
 
     public override bool Equals(object? obj)
     {
@@ -354,12 +341,7 @@ public sealed partial class TsundokuTheme : ReactiveObject, ICloneable, ICompara
         BrushEquals(SeriesCardDividerColor, other.SeriesCardDividerColor);
     }
 
-    private static bool BrushEquals(SolidColorBrush? a, SolidColorBrush? b)
-    {
-        if (ReferenceEquals(a, b)) return true;
-        if (a is null || b is null) return false;
-        return a.Color.Equals(b.Color);
-    }
+    private static bool BrushEquals(SolidColorBrush? a, SolidColorBrush? b) => ReferenceEquals(a, b) || (a is not null && b is not null && a.Color.Equals(b.Color));
 
     public sealed class SolidColorBrushJsonConverter : JsonConverter<SolidColorBrush>
     {

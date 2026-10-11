@@ -13,10 +13,7 @@ public sealed class SeriesComparer(TsundokuLanguage curLang, TsundokuSort sort =
     private readonly TsundokuSort _sort = sort;
     private readonly StringComparer _seriesTitleComparer = GetOrCreateComparer(CULTURE_LANG_CODES[curLang]);
 
-    private static StringComparer GetOrCreateComparer(string cultureName)
-    {
-        return _comparerCache.GetOrAdd(cultureName, name => StringComparer.Create(new CultureInfo(name), false));
-    }
+    private static StringComparer GetOrCreateComparer(string cultureName) => _comparerCache.GetOrAdd(cultureName, name => StringComparer.Create(new CultureInfo(name), false));
 
     public int Compare(Series? x, Series? y)
     {
@@ -47,10 +44,7 @@ public sealed class SeriesComparer(TsundokuLanguage curLang, TsundokuSort sort =
         return titleComparison != 0 ? titleComparison : x.DuplicateIndex.CompareTo(y.DuplicateIndex);
     }
 
-    private static int CompareByRating(Series x, Series y)
-    {
-        return y.Rating.CompareTo(x.Rating);
-    }
+    private static int CompareByRating(Series x, Series y) => y.Rating.CompareTo(x.Rating);
 
     private static int CompareByUnread(Series x, Series y)
     {
@@ -59,18 +53,9 @@ public sealed class SeriesComparer(TsundokuLanguage curLang, TsundokuSort sort =
         return yUnread.CompareTo(xUnread);
     }
 
-    private static int CompareByRead(Series x, Series y)
-    {
-        return y.VolumesRead.CompareTo(x.VolumesRead);
-    }
+    private static int CompareByRead(Series x, Series y) => y.VolumesRead.CompareTo(x.VolumesRead);
 
-    private static int CompareByValue(Series x, Series y)
-    {
-        return y.Value.CompareTo(x.Value);
-    }
+    private static int CompareByValue(Series x, Series y) => y.Value.CompareTo(x.Value);
 
-    private static int CompareByVolumeCount(Series x, Series y)
-    {
-        return y.CurVolumeCount.CompareTo(x.CurVolumeCount);
-    }
+    private static int CompareByVolumeCount(Series x, Series y) => y.CurVolumeCount.CompareTo(x.CurVolumeCount);
 }

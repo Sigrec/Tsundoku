@@ -15,8 +15,5 @@ public sealed class LanguageCodeAttribute : Attribute
     /// <summary>AniList country code (e.g., "JP", "KR"). Empty if AniList doesn't use this language.</summary>
     public string AniList { get; init; } = string.Empty;
 
-    public LanguageCodeAttribute(string culture)
-    {
-        Culture = culture;
-    }
+    public LanguageCodeAttribute(string culture) => Culture = culture;
 }

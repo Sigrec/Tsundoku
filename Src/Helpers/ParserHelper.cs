@@ -10,8 +10,5 @@ public static class ParserHelper
         return string.IsNullOrWhiteSpace(fieldVal) ? nullValue : fieldVal.Trim();
     }
 
-    public static bool ContainsAny(this string input, IEnumerable<string> values)
-    {
-        return values.AsValueEnumerable().Any(val => input.Contains(val, StringComparison.OrdinalIgnoreCase));
-    }
+    public static bool ContainsAny(this string input, IEnumerable<string> values) => values.AsValueEnumerable().Any(val => input.Contains(val, StringComparison.OrdinalIgnoreCase));
 }

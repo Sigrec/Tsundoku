@@ -97,10 +97,7 @@ public class ChangelogTests
     }
 
     [Test]
-    public void Entries_IsNotNull()
-    {
-        Assert.That(Changelog.Entries, Is.Not.Null);
-    }
+    public void Entries_IsNotNull() => Assert.That(Changelog.Entries, Is.Not.Null);
 
     [Test]
     public void ChangelogEntry_Deconstruct()

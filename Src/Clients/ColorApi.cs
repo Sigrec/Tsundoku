@@ -12,10 +12,7 @@ public sealed class ColorApi
     private readonly HttpClient _httpClient;
     private const string BaseUrl = "https://www.thecolorapi.com";
 
-    public ColorApi(IHttpClientFactory httpClientFactory)
-    {
-        _httpClient = httpClientFactory.CreateClient("ColorApiClient");
-    }
+    public ColorApi(IHttpClientFactory httpClientFactory) => _httpClient = httpClientFactory.CreateClient("ColorApiClient");
 
     /// <summary>
     /// Generates a harmonious color palette from a seed color.

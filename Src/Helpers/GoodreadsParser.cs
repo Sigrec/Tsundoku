@@ -116,16 +116,9 @@ public static partial class GoodreadsParser
                         }
                     }
 
-                    string cleanedTitle;
-                    if (!titleSpan.StartsWith("By", StringComparison.OrdinalIgnoreCase))
-                    {
-                        cleanedTitle = TitleCleanRegex().Replace(rawTitle, string.Empty);
-                    }
-                    else
-                    {
-                        cleanedTitle = PrefixTitleCleanRegex().Replace(rawTitle, string.Empty);
-                    }
-
+                    string cleanedTitle = !titleSpan.StartsWith("By", StringComparison.OrdinalIgnoreCase)
+                        ? TitleCleanRegex().Replace(rawTitle, string.Empty)
+                        : PrefixTitleCleanRegex().Replace(rawTitle, string.Empty);
                     (string Title, SeriesFormat Format, string Publisher, decimal Rating) entry = (HttpUtility.HtmlDecode(cleanedTitle).Trim(), format, PublisherCleanRegex().Replace(publisher, string.Empty).Trim(), rating);
                     if (result.TryGetValue(entry, out uint count))
                     {
@@ -151,10 +144,7 @@ public static partial class GoodreadsParser
 
     private sealed class TitleFormatComparer : IEqualityComparer<(string Title, SeriesFormat Format, string Publisher, decimal Rating)>
     {
-        public bool Equals((string Title, SeriesFormat Format, string Publisher, decimal Rating) x, (string Title, SeriesFormat Format, string Publisher, decimal Rating) y)
-        {
-            return StringComparer.OrdinalIgnoreCase.Equals(x.Title, y.Title) && x.Format == y.Format;
-        }
+        public bool Equals((string Title, SeriesFormat Format, string Publisher, decimal Rating) x, (string Title, SeriesFormat Format, string Publisher, decimal Rating) y) => StringComparer.OrdinalIgnoreCase.Equals(x.Title, y.Title) && x.Format == y.Format;
 
         public int GetHashCode((string Title, SeriesFormat Format, string Publisher, decimal Rating) obj)
         {

@@ -176,7 +176,7 @@ public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISh
 
                 if (string.IsNullOrWhiteSpace(query))
                 {
-                    return (Func<Series, bool>)(series => true);
+                    return series => true;
                 }
 
                 Func<Series, bool>? predicate = BuildAdvancedPredicate(query);
@@ -198,11 +198,9 @@ public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISh
             .Throttle(TimeSpan.FromMilliseconds(100))
             .Select(publisher =>
             {
-                if (string.IsNullOrWhiteSpace(publisher))
-                    return (Func<Series, bool>)(series => true);
-
-                return (Func<Series, bool>)(series =>
-                    series.Publisher.Equals(publisher, StringComparison.OrdinalIgnoreCase));
+                return string.IsNullOrWhiteSpace(publisher)
+                    ? (Func<Series, bool>)(series => true)
+                    : series => series.Publisher.Equals(publisher, StringComparison.OrdinalIgnoreCase);
             });
 
         // 4. Combine filter predicates into a single observable predicate
@@ -221,7 +219,7 @@ public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISh
         IObservable<IComparer<Series>> seriesComparerChanged = Observable.CombineLatest(
                 _userService.CurrentUser
                     .Where(user => user is not null)
-                    .Select(user => user.Language)
+                    .Select(user => user!.Language)
                     .DistinctUntilChanged(),
                 this.WhenAnyValue(x => x.SelectedSort)
                     .DistinctUntilChanged(),
@@ -320,14 +318,7 @@ public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISh
             bool result = predicates[0](series);
             for (int i = 1; i < predicates.Length; i++)
             {
-                if (isOrConnector[i])
-                {
-                    result = result || predicates[i](series);
-                }
-                else
-                {
-                    result = result && predicates[i](series);
-                }
+                result = isOrConnector[i] ? result || predicates[i](series) : result && predicates[i](series);
             }
             return result;
         };
@@ -339,13 +330,10 @@ public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISh
     private static Func<Series, bool>? BuildSinglePredicate(string filterName, string op, string filterValue)
     {
         // Numeric filters (Rating, Value, Read, CurVolumes, MaxVolumes)
-        if (NumericAccessors.TryGetValue(filterName, out Func<Series, decimal>? accessor))
-        {
-            if (!decimal.TryParse(filterValue, out decimal target))
-            {
-                return null;
-            }
-            return op switch
+        return NumericAccessors.TryGetValue(filterName, out Func<Series, decimal>? accessor)
+            ? !decimal.TryParse(filterValue, out decimal target)
+                ? null
+                : op switch
             {
                 "==" => s => accessor(s) == target,
                 ">=" => s => accessor(s) >= target,
@@ -353,20 +341,18 @@ public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISh
                 ">" => s => accessor(s) > target,
                 "<" => s => accessor(s) < target,
                 _ => null,
-            };
-        }
-
-        return filterName.ToLowerInvariant() switch
+            }
+            : filterName.ToLowerInvariant() switch
         {
-            "format" => TryParseEnum<SeriesFormat>(filterValue, out SeriesFormat fmt)
+            "format" => TryParseEnum(filterValue, out SeriesFormat fmt)
                 ? BuildEnumPredicate(s => s.Format, fmt, op)
                 : null,
 
-            "status" => TryParseEnum<SeriesStatus>(filterValue, out SeriesStatus status)
+            "status" => TryParseEnum(filterValue, out SeriesStatus status)
                 ? BuildEnumPredicate(s => s.Status, status, op)
                 : null,
 
-            "demographic" => TryParseEnum<SeriesDemographic>(filterValue, out SeriesDemographic demo)
+            "demographic" => TryParseEnum(filterValue, out SeriesDemographic demo)
                 ? BuildEnumPredicate(s => s.Demographic, demo, op)
                 : null,
 
@@ -383,7 +369,7 @@ public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISh
             "notes" => BuildStringContainsPredicate(s => s.SeriesNotes, filterValue),
             "publisher" => BuildStringContainsPredicate(s => s.Publisher, filterValue),
 
-            "genre" => filterValue.TryGetEnumValueFromMemberValue<SeriesGenre>(out SeriesGenre genre)
+            "genre" => filterValue.TryGetEnumValueFromMemberValue(out SeriesGenre genre)
                 ? s => s.Genres is not null && s.Genres.Contains(genre)
                 : null,
 
@@ -391,10 +377,7 @@ public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISh
         };
     }
 
-    private static bool TryParseEnum<TEnum>(string value, out TEnum result) where TEnum : struct, Enum
-    {
-        return Enum.TryParse(value, true, out result);
-    }
+    private static bool TryParseEnum<TEnum>(string value, out TEnum result) where TEnum : struct, Enum => Enum.TryParse(value, true, out result);
 
     private static Func<Series, bool>? BuildEnumPredicate<TEnum>(Func<Series, TEnum> accessor, TEnum target, string op)
         where TEnum : struct, Enum

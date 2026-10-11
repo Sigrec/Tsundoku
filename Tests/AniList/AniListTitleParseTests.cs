@@ -50,7 +50,7 @@ public class AniListTitleParseTests
         """;
 
         JsonElement element = JsonDocument.Parse(json).RootElement;
-        Dictionary<string, string> titles = new();
+        Dictionary<string, string> titles = [];
 
         Clients.AniList.ExtractTitlesFromAniList(element, ref titles);
 
@@ -70,7 +70,7 @@ public class AniListTitleParseTests
     {
         string json = """{ "id": 12345 }""";
         JsonElement element = JsonDocument.Parse(json).RootElement;
-        Dictionary<string, string> titles = new();
+        Dictionary<string, string> titles = [];
 
         Clients.AniList.ExtractTitlesFromAniList(element, ref titles);
 
@@ -82,7 +82,7 @@ public class AniListTitleParseTests
     {
         string json = """{ "title": "invalid" }""";
         JsonElement element = JsonDocument.Parse(json).RootElement;
-        Dictionary<string, string> titles = new();
+        Dictionary<string, string> titles = [];
 
         Clients.AniList.ExtractTitlesFromAniList(element, ref titles);
 

@@ -18,7 +18,7 @@ public partial class ViewModelBase : ReactiveObject
     private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
 
     /// <summary>Gets or sets the current collection filter text.</summary>
-    public static string Filter { get; set; }
+    public static string? Filter { get; set; }
 
     /// <summary>Indicates whether the collection is currently reloading.</summary>
     public bool isReloading = false;
@@ -64,7 +64,7 @@ public partial class ViewModelBase : ReactiveObject
 
         _userService.CurrentUser
             .Where(user => user is not null) // Filters out the initial null from BehaviorSubject
-            .Subscribe(user => CurrentUser = user)
+            .Subscribe(user => CurrentUser = user!)
             .DisposeWith(_disposables);
     }
 

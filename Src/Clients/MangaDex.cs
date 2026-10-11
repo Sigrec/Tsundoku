@@ -1,7 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using System.Web;
 using Tsundoku.Helpers;
-using Tsundoku.Models.Enums;
 using static Tsundoku.Models.Enums.SeriesGenreModel;
 
 namespace Tsundoku.Clients;
@@ -128,6 +127,7 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
     /// Asynchronously retrieves the author name for a given MangaDex author ID.
     /// </summary>
     /// <param name="id">The unique MangaDex author ID.</param>
+    /// <param name="type">The relationship type (e.g., "author"), used for logging.</param>
     /// <returns>
     /// The author's name if found, or <c>null</c> if the request fails.
     /// </returns>
@@ -200,11 +200,11 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
     /// </returns>
     public async Task<(StringBuilder FullStaff, StringBuilder NativeStaff)> GetStaffAsync(JsonElement[] relationships, string title)
     {
-        StringBuilder nativeStaffBuilder = new StringBuilder();
-        StringBuilder fullStaffBuilder = new StringBuilder();
+        StringBuilder nativeStaffBuilder = new();
+        StringBuilder fullStaffBuilder = new();
 
         // Deduplicate author/artist entries by ID, joining types (e.g., "author & artist")
-        Dictionary<string, string> authorTypeMap = new();
+        Dictionary<string, string> authorTypeMap = [];
         foreach (JsonElement r in relationships)
         {
             if (r.TryGetProperty("type", out JsonElement typeElem) &&
@@ -229,7 +229,7 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
         }
         AuthorEntry[] authorEntries = [.. authorTypeMap.AsValueEnumerable().Select(static kvp => new AuthorEntry(kvp.Key, kvp.Value))];
 
-        SemaphoreSlim semaphore = new SemaphoreSlim(MaxConcurrentRequests);
+        SemaphoreSlim semaphore = new(MaxConcurrentRequests);
         Task<(AuthorEntry Entry, string StaffNameRaw, string? Bio)>[] fetchTasks = [.. authorEntries.Select(async entry =>
         {
             await semaphore.WaitAsync();
@@ -297,7 +297,9 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
     /// Handles both single-object and array responses from the API.
     /// Logs and distinguishes between HTTP, JSON, and unexpected exceptions.
     /// </summary>
-    /// <param name="id">The MangaDex series ID used to query the cover endpoint.</param>
+    /// <param name="id">The MangaDex cover ID used to query the cover endpoint.</param>
+    /// <param name="mangaDexId">The MangaDex series ID the cover belongs to.</param>
+    /// <param name="title">The series title, used for logging.</param>
     /// <returns>
     /// The cover image file name if available; otherwise, <c>null</c> if an error occurs or no data is returned.
     /// </returns>
@@ -395,10 +397,7 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
     /// </summary>
     /// <param name="input">The string to validate as a GUID.</param>
     /// <returns><c>true</c> if the input is a valid GUID; otherwise, <c>false</c>.</returns>
-    public static bool IsMangaDexId(string input)
-    {
-        return Guid.TryParse(input, out _);
-    }
+    public static bool IsMangaDexId(string input) => Guid.TryParse(input, out _);
 
     /// <summary>
     /// Determines if a series is considered digital or "invalid" based on specific keyword criteria across its titles.
@@ -661,6 +660,8 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
     /// occurrence of each language's title is returned.
     /// </summary>
     /// <param name="root">The JsonElement representing the root of the MangaDex JSON data.</param>
+    /// <param name="englishTitle">The English title already chosen for the series.</param>
+    /// <param name="nativeTitle">The native title already chosen for the series.</param>
     /// <returns>An array of JsonElement, where each element is a unique alternative title object (e.g., {"en": "Title"}).
     /// Returns an empty array if no alternative titles are found or the structure is invalid.</returns>
     public static JsonElement[] GetAdditionalMangaDexTitleList(JsonElement root, string englishTitle, string nativeTitle)
@@ -753,12 +754,12 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
     /// and a valid English name that maps to a known <see cref="SeriesGenre"/> enum are included.
     /// </summary>
     /// <param name="romajiTitle">The title of the series, used for logging when no genres are found.</param>
-    /// <param name="tags">The JSON array of tag elements from MangaDex.</param>
+    /// <param name="attributes">The MangaDex attributes object containing the "tags" array.</param>
     /// <returns>A <see cref="HashSet{T}"/> of <see cref="SeriesGenre"/> values parsed from the input.</returns>
     public static HashSet<SeriesGenre> ParseGenreData(string romajiTitle, JsonElement attributes)
     {
         if(attributes.ValueKind != JsonValueKind.Object || 
-            !attributes.TryGetProperty("tags", out var tags) || 
+            !attributes.TryGetProperty("tags", out JsonElement tags) || 
             tags.ValueKind != JsonValueKind.Array)
         {
             LOGGER.Info("No genre(s) returned for {Title} from MangaDex", romajiTitle);
@@ -772,7 +773,7 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
             if (!tag.TryGetProperty("attributes", out JsonElement attr) ||
                 !attr.TryGetProperty("group", out JsonElement group) ||
                 group.ValueKind != JsonValueKind.String ||
-                !group.GetString().Equals("genre", StringComparison.OrdinalIgnoreCase))
+                !group.GetString()!.Equals("genre", StringComparison.OrdinalIgnoreCase))
             {
                 continue;
             }
@@ -784,7 +785,7 @@ public sealed partial class MangaDex(IHttpClientFactory httpClientFactory)
                 continue;
             }
 
-            if (SeriesGenreModel.TryParse(enName.GetString(), out SeriesGenre genre))
+            if (TryParse(enName.GetString()!, out SeriesGenre genre))
             {
                 genres.Add(genre);
             }

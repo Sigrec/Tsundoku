@@ -16,10 +16,7 @@ public sealed class BitmapHelper
     /// Initializes a new instance of <see cref="BitmapHelper"/> with the specified HTTP client factory.
     /// </summary>
     /// <param name="httpClientFactory">The factory used to create HTTP clients for image downloads.</param>
-    public BitmapHelper(IHttpClientFactory httpClientFactory)
-    {
-        _httpClientFactory = httpClientFactory;
-    }
+    public BitmapHelper(IHttpClientFactory httpClientFactory) => _httpClientFactory = httpClientFactory;
 
     /// <summary>
     /// Updates the cover image from a local file path. It loads the existing image,
@@ -166,7 +163,7 @@ public sealed class BitmapHelper
     /// The Task's Result is a byte array representing the image data in PNG format,
     /// or an empty array if the input bitmap is null.
     /// </returns>
-    /// <exception cref="System.Exception">Throws an exception if the bitmap saving process fails.</exception>
+    /// <exception cref="Exception">Throws an exception if the bitmap saving process fails.</exception>
     public static async Task<byte[]> ImageToPngByteArrayAsync(Bitmap image)
     {
         if (image is null)

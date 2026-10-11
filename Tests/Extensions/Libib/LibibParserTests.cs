@@ -120,7 +120,7 @@ public class LibibParserTests
         using (Assert.EnterMultipleScope())
         {
             Assert.That(result, Contains.Key(("Series A", SeriesFormat.Manga, "pub")));
-            Assert.That(result[("Series A", SeriesFormat.Manga, "pub")], Is.EqualTo(1));
+            Assert.That(result![("Series A", SeriesFormat.Manga, "pub")], Is.EqualTo(1));
 
             Assert.That(result, Contains.Key(("Series B", SeriesFormat.Manga, "pub")));
             Assert.That(result[("Series B", SeriesFormat.Manga, "pub")], Is.EqualTo(1));
@@ -174,7 +174,7 @@ public class LibibParserTests
         using (Assert.EnterMultipleScope())
         {
             Assert.That(result, Contains.Key(("Title A", SeriesFormat.Manga, "Viz Media")));
-            Assert.That(result[("Title A", SeriesFormat.Manga, "Viz Media")], Is.EqualTo(1));
+            Assert.That(result![("Title A", SeriesFormat.Manga, "Viz Media")], Is.EqualTo(1));
 
             Assert.That(result, Contains.Key(("Title B", SeriesFormat.Manga, "Kodansha")));
             Assert.That(result[("Title B", SeriesFormat.Manga, "Kodansha")], Is.EqualTo(1));
@@ -224,7 +224,7 @@ public class LibibParserTests
         using (Assert.EnterMultipleScope())
         {
             Assert.That(result, Contains.Key(("Title A", SeriesFormat.Manga, "TOKYOPOP")));
-            Assert.That(result[("Title A", SeriesFormat.Manga, "TOKYOPOP")], Is.EqualTo(1));
+            Assert.That(result![("Title A", SeriesFormat.Manga, "TOKYOPOP")], Is.EqualTo(1));
 
             Assert.That(result, Contains.Key(("Title B", SeriesFormat.Manga, "J-Novel Club")));
             Assert.That(result[("Title B", SeriesFormat.Manga, "J-Novel Club")], Is.EqualTo(1));
@@ -258,7 +258,7 @@ public class LibibParserTests
         {
             (string Title, SeriesFormat Format, string Publisher) key = ("My & Awesome Title \"Test\"", SeriesFormat.Manga, "Viz Media");
             Assert.That(result, Contains.Key(key));
-            Assert.That(result[key], Is.EqualTo(1));
+            Assert.That(result![key], Is.EqualTo(1));
         }
     }
 
@@ -344,7 +344,7 @@ public class LibibParserTests
         Assert.That(result, Has.Count.EqualTo(1));
 
         // Retrieve the single item from the HashSet and assert its properties
-        var actualEntry = result.Single();
+        KeyValuePair<(string Title, SeriesFormat Format, string Publisher), uint> actualEntry = result.Single();
         (string actualTitle, SeriesFormat actualFormat, _) = actualEntry.Key;
 
         using (Assert.EnterMultipleScope())

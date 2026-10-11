@@ -16,7 +16,7 @@ public class MangaDexClientTests
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
-        ServiceCollection services = new ServiceCollection();
+        ServiceCollection services = new();
 
         services.AddHttpClient("MangaDexClient", client =>
         {
@@ -155,7 +155,7 @@ public class MangaDexClientTests
 
         JsonElement data = doc!.RootElement.GetProperty("data");
         JsonElement relationships = data.GetProperty("relationships");
-        JsonElement[] relationshipsArray = relationships.EnumerateArray().ToArray();
+        JsonElement[] relationshipsArray = [.. relationships.EnumerateArray()];
 
         (StringBuilder fullStaff, StringBuilder nativeStaff) = await _mangaDex.GetStaffAsync(relationshipsArray, title);
 

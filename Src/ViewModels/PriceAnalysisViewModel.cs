@@ -5,7 +5,6 @@ using System.Reactive.Linq;
 using Avalonia.Collections;
 using MangaAndLightNovelWebScrape;
 using MangaAndLightNovelWebScrape.Websites;
-using ReactiveUI;
 using ReactiveUI.SourceGenerators;
 
 namespace Tsundoku.ViewModels;
@@ -98,10 +97,7 @@ public sealed partial class PriceAnalysisViewModel : ViewModelBase, IDisposable
     /// Updates the current user's region for price analysis.
     /// </summary>
     /// <param name="newRegion">The new region to set.</param>
-    public void UpdateUserRegion(Region newRegion)
-    {
-        _userService.UpdateUser(user => user.Region = newRegion);
-    }
+    public void UpdateUserRegion(Region newRegion) => _userService.UpdateUser(user => user.Region = newRegion);
 
     private void WebsiteCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {

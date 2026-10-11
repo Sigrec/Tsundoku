@@ -13,7 +13,7 @@ namespace Tsundoku.Tests.Models;
 [Parallelizable(ParallelScope.All)]
 public class SeriesValueComparerTests
 {
-    private readonly SeriesValueComparer _comparer = new SeriesValueComparer();
+    private readonly SeriesValueComparer _comparer = new();
 
     [AvaloniaTest]
     public void Equals_BothNull_ReturnsFalse()
@@ -120,16 +120,20 @@ public class SeriesValueComparerTests
     public void GetHashCode_DifferentTitles_IsConsistent()
     {
         Series a = CreateSeries("Alpha", SeriesFormat.Manga, "Author A");
+        int firstHash = _comparer.GetHashCode(a);
+        int secondHash = _comparer.GetHashCode(a);
 
-        Assert.That(_comparer.GetHashCode(a), Is.EqualTo(_comparer.GetHashCode(a)));
+        Assert.That(secondHash, Is.EqualTo(firstHash));
     }
 
     [AvaloniaTest]
     public void GetHashCode_DifferentStaff_IsConsistent()
     {
         Series a = CreateSeries("Title", SeriesFormat.Manga, "Author A");
+        int firstHash = _comparer.GetHashCode(a);
+        int secondHash = _comparer.GetHashCode(a);
 
-        Assert.That(_comparer.GetHashCode(a), Is.EqualTo(_comparer.GetHashCode(a)));
+        Assert.That(secondHash, Is.EqualTo(firstHash));
     }
 
     private static Series CreateSeries(
@@ -139,7 +143,7 @@ public class SeriesValueComparerTests
         decimal rating = 5.0m,
         decimal value = 49.99m)
     {
-        WriteableBitmap emptyBitmap = new WriteableBitmap(
+        WriteableBitmap emptyBitmap = new(
             new PixelSize(1, 1),
             new Vector(96, 96),
             PixelFormat.Bgra8888,
@@ -170,7 +174,7 @@ public class SeriesValueComparerTests
         string frenchTitle,
         SeriesFormat format)
     {
-        WriteableBitmap emptyBitmap = new WriteableBitmap(
+        WriteableBitmap emptyBitmap = new(
             new PixelSize(1, 1),
             new Vector(96, 96),
             PixelFormat.Bgra8888,

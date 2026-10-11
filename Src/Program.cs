@@ -1,9 +1,7 @@
 using Avalonia.Rendering.Composition;
-using Avalonia.Skia;
 using Optris.Icons.Avalonia;
 using Optris.Icons.Avalonia.FontAwesome7;
 using ReactiveUI.Avalonia;
-using static Tsundoku.Models.Constants;
 
 namespace Tsundoku;
 
@@ -19,10 +17,7 @@ internal sealed class Program
     private const int BytesPerPixel = 4;
 
     [STAThread]
-    public static void Main(string[] args)
-    {
-        BuildAvaloniaApp().StartWithClassicDesktopLifetime(args, Avalonia.Controls.ShutdownMode.OnMainWindowClose);
-    }
+    public static void Main(string[] args) => BuildAvaloniaApp().StartWithClassicDesktopLifetime(args, Avalonia.Controls.ShutdownMode.OnMainWindowClose);
 
     public static AppBuilder BuildAvaloniaApp()
     {

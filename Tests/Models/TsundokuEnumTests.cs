@@ -64,10 +64,7 @@ public class TsundokuEnumTests
     }
 
     [Test]
-    public void TsundokuLanguageStringValueToLanguageMap_UnknownKey_ThrowsKeyNotFound()
-    {
-        Assert.That(() => _ = TsundokuLanguageStringValueToLanguageMap["NonexistentLang"], Throws.TypeOf<KeyNotFoundException>());
-    }
+    public void TsundokuLanguageStringValueToLanguageMap_UnknownKey_ThrowsKeyNotFound() => Assert.That(() => _ = TsundokuLanguageStringValueToLanguageMap["NonexistentLang"], Throws.TypeOf<KeyNotFoundException>());
 
     [Test]
     public void TsundokuLanguageLanguageToStringValueMap_InvalidEnum_ThrowsKeyNotFound()

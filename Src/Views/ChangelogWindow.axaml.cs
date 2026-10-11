@@ -1,5 +1,4 @@
 using System.Reactive;
-using System.Reactive.Disposables;
 using System.Reactive.Disposables.Fluent;
 using System.Reactive.Linq;
 using Avalonia.Controls;
@@ -30,9 +29,7 @@ public sealed partial class ChangelogWindow : ReactiveWindow<ViewModelBase>
                 .DisposeWith(disposables);
         });
 
-        _sortedVersions = Changelog.Entries.Keys
-            .OrderBy(v => Version.TryParse(v, out Version? parsed) ? parsed : new Version(0, 0))
-            .ToArray();
+        _sortedVersions = [.. Changelog.Entries.Keys.OrderBy(v => Version.TryParse(v, out Version? parsed) ? parsed : new Version(0, 0))];
     }
 
     public void SetVersion(string version)
@@ -108,8 +105,5 @@ public sealed partial class ChangelogWindow : ReactiveWindow<ViewModelBase>
         ScrollHint.IsVisible = canScroll && !atBottom;
     }
 
-    private void OnDismissClicked(object? sender, RoutedEventArgs e)
-    {
-        Close();
-    }
+    private void OnDismissClicked(object? sender, RoutedEventArgs e) => Close();
 }

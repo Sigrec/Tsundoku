@@ -77,25 +77,21 @@ public sealed partial class User : ReactiveObject
     /// </summary>
     /// <returns>A JSON string representing the user data.</returns>
     [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = "JSON_SERIALIZATION_OPTIONS clones UserModelContext.Default.Options, so the source-gen resolver handles every type. The IL2026 warning on the options-based overload is spurious here.")]
-    public string Serialize()
-    {
-        return JsonSerializer.Serialize(this, JSON_SERIALIZATION_OPTIONS);
-    }
+    public string Serialize() => JsonSerializer.Serialize(this, JSON_SERIALIZATION_OPTIONS);
 
     /// <summary>
     /// Updates the users data version
     /// </summary>
     /// <param name="userData">Users parsed Json data</param>
     /// <param name="isImport">Whether the data that needs to check for an update is an import</param>
-    /// <param name="updatedCovers">Whether the covers </param>
     /// <returns></returns>
     public static bool UpdateSchemaVersion(JsonNode userData, bool isImport = false)
     {
         bool updatedVersion = false;
         JsonObject series;
         JsonObject theme;
-        JsonArray collectionJsonArray = userData[nameof(UserCollection)].AsArray();
-        JsonArray themeJsonArray = userData[nameof(SavedThemes)].AsArray();
+        JsonArray collectionJsonArray = userData[nameof(UserCollection)]!.AsArray();
+        JsonArray themeJsonArray = userData[nameof(SavedThemes)]!.AsArray();
 
         // For users who did not get the older update
         bool containsOldDataVerionProperty = userData.AsObject().ContainsKey("CurDataVersion");
@@ -103,7 +99,7 @@ public sealed partial class User : ReactiveObject
         {
             userData.AsObject().Add(nameof(DataVersion), "1.0");
         }
-        double curVersion = containsOldDataVerionProperty ? double.Parse(userData["CurDataVersion"].ToString()) : double.Parse(userData[nameof(DataVersion)].ToString());
+        double curVersion = containsOldDataVerionProperty ? double.Parse(userData["CurDataVersion"]!.ToString()) : double.Parse(userData[nameof(DataVersion)]!.ToString());
 
         if (curVersion < 1.5) // 1.5 Version Upgrade changes Series Title, Staff. & Status to accomadte new changes & adds Stats related variables to Series and also changes Native to Japanese
         {
@@ -112,44 +108,44 @@ public sealed partial class User : ReactiveObject
             userData.AsObject().Add(nameof(VolumesRead), 0);
             userData.AsObject().Add(nameof(CollectionValue), string.Empty);
 
-            if (userData[nameof(Language)].ToString().Equals("Native"))
+            if (userData[nameof(Language)]!.ToString().Equals("Native"))
             {
                 userData[nameof(Language)] = "Japanese";
             }
 
             for (int x = 0; x < collectionJsonArray.Count; x++)
             {
-                series = collectionJsonArray.ElementAt(x).AsObject();
+                series = collectionJsonArray.ElementAt(x)!.AsObject();
                 series["Titles"] = new JsonObject
                 {
-                    ["Romaji"] = series["Titles"][0].ToString(),
-                    ["English"] = series["Titles"][1].ToString(),
-                    [series["Format"].ToString() switch
+                    ["Romaji"] = series["Titles"]![0]!.ToString(),
+                    ["English"] = series["Titles"]![1]!.ToString(),
+                    [series["Format"]!.ToString() switch
                     {
                         "Manhwa" => "Korean",
                         "Manhua" => "Chinese",
                         _ => "Japanese"
-                    }] = series["Titles"][2].ToString()
+                    }] = series["Titles"]![2]!.ToString()
                 };
 
                 series["Staff"] = new JsonObject
                 {
-                    ["Romaji"] = series["Staff"][0].ToString(),
-                    [series["Format"].ToString() switch
+                    ["Romaji"] = series["Staff"]![0]!.ToString(),
+                    [series["Format"]!.ToString() switch
                     {
                         "Manhwa" => "Korean",
                         "Manhua" => "Chinese",
                         _ => "Japanese"
-                    }] = series["Staff"][1].ToString()
+                    }] = series["Staff"]![1]!.ToString()
                 };
                 series.AsObject().Add("Score", 0);
 
-                if (series["Titles"]["Romaji"].ToString().Equals(series["Titles"]["English"].ToString()))
+                if (series["Titles"]!["Romaji"]!.ToString().Equals(series["Titles"]!["English"]!.ToString()))
                 {
-                    series["Titles"].AsObject().Remove("English");
+                    series["Titles"]!.AsObject().Remove("English");
                 }
 
-                if (curVersion < 1.4 && series["Status"].ToString().Equals("Complete"))
+                if (curVersion < 1.4 && series["Status"]!.ToString().Equals("Complete"))
                 {
                     series["Status"] = "Finished";
                 }
@@ -163,8 +159,8 @@ public sealed partial class User : ReactiveObject
         {
             for (int x = 0; x < collectionJsonArray.Count; x++)
             {
-                series = collectionJsonArray.ElementAt(x).AsObject();
-                if (double.Parse(series["Score"].ToString()) == 0)
+                series = collectionJsonArray.ElementAt(x)!.AsObject();
+                if (double.Parse(series["Score"]!.ToString()) == 0)
                 {
                     series["Score"] = -1;
                 }
@@ -189,11 +185,11 @@ public sealed partial class User : ReactiveObject
         {
             for (int x = 0; x < themeJsonArray.Count; x++)
             {
-                theme = themeJsonArray.ElementAt(x).AsObject();
-                theme["SeriesButtonBGColor"] = (uint)theme["SeriesSwitchPaneButtonBGColor"];
-                theme["SeriesButtonBGHoverColor"] = (uint)theme["SeriesSwitchPaneButtonBGHoverColor"];
-                theme["SeriesButtonIconColor"] = (uint)theme["SeriesSwitchPaneButtonIconColor"];
-                theme["SeriesButtonIconHoverColor"] = (uint)theme["SeriesSwitchPaneButtonIconHoverColor"];
+                theme = themeJsonArray.ElementAt(x)!.AsObject();
+                theme["SeriesButtonBGColor"] = (uint)theme["SeriesSwitchPaneButtonBGColor"]!;
+                theme["SeriesButtonBGHoverColor"] = (uint)theme["SeriesSwitchPaneButtonBGHoverColor"]!;
+                theme["SeriesButtonIconColor"] = (uint)theme["SeriesSwitchPaneButtonIconColor"]!;
+                theme["SeriesButtonIconHoverColor"] = (uint)theme["SeriesSwitchPaneButtonIconHoverColor"]!;
             }
 
             userData[nameof(DataVersion)] = 1.8;
@@ -206,10 +202,10 @@ public sealed partial class User : ReactiveObject
             string coverPath;
             for (int x = 0; x < collectionJsonArray.Count; x++)
             {
-                coverPath = collectionJsonArray.ElementAt(x)["Cover"].ToString();
+                coverPath = collectionJsonArray.ElementAt(x)!["Cover"]!.ToString();
                 if (File.Exists(coverPath))
                 {
-                    using Bitmap originalBitmap = new Bitmap(coverPath);
+                    using Bitmap originalBitmap = new(coverPath);
                     Bitmap resizedBitMap = originalBitmap.CreateScaledBitmap(new PixelSize(LEFT_SIDE_CARD_WIDTH * BITMAP_SCALE, IMAGE_HEIGHT * BITMAP_SCALE), BitmapInterpolationMode.HighQuality);
                     resizedBitMap.Save(coverPath, PngBitmapEncoderOptions.Default);
                 }
@@ -230,7 +226,7 @@ public sealed partial class User : ReactiveObject
             userData.AsObject()[nameof(MeanRating)] = decimal.TryParse(userData["MeanScore"]?.ToString(), out decimal meanScore) ? meanScore : 0m;
             for (int x = 0; x < collectionJsonArray.Count; x++)
             {
-                series = collectionJsonArray.ElementAt(x).AsObject();
+                series = collectionJsonArray.ElementAt(x)!.AsObject();
                 series["Rating"] = decimal.TryParse(series["Score"]?.ToString(), out decimal score) ? score : 0m;
             }
             userData.AsObject().Remove("MeanScore");
@@ -244,16 +240,16 @@ public sealed partial class User : ReactiveObject
         {
             for (int x = 0; x < collectionJsonArray.Count; x++)
             {
-                series = collectionJsonArray.ElementAt(x).AsObject();
+                series = collectionJsonArray.ElementAt(x)!.AsObject();
                 if (string.IsNullOrWhiteSpace(series["Demographic"]?.ToString()))
                 {
                     series["Demographic"] = SeriesDemographic.Unknown.ToString();
                 }
             }
-            JsonArray themes = userData[nameof(SavedThemes)].AsArray();
+            JsonArray themes = userData[nameof(SavedThemes)]!.AsArray();
             for (int x = 0; x < themes.Count; x++)
             {
-                if (themes.ElementAt(x)["ThemeName"].ToString().Equals("Default"))
+                if (themes.ElementAt(x)!["ThemeName"]!.ToString().Equals("Default"))
                 {
                     themes.RemoveAt(x);
                 }
@@ -265,7 +261,7 @@ public sealed partial class User : ReactiveObject
 
         if (curVersion < 2.2) // 2.2 Removes RightStufAnime as the site no longer exists
         {
-            userData[nameof(Memberships)].AsObject().Remove("RightStufAnime");
+            userData[nameof(Memberships)]!.AsObject().Remove("RightStufAnime");
             userData[nameof(DataVersion)] = 2.2;
             LOGGER.Info("Updated Users Data to v2.2", !isImport);
             updatedVersion = true;
@@ -283,15 +279,15 @@ public sealed partial class User : ReactiveObject
         {
             for (int x = 0; x < collectionJsonArray.Count; x++)
             {
-                series = collectionJsonArray.ElementAt(x).AsObject();
+                series = collectionJsonArray.ElementAt(x)!.AsObject();
                 string[] coverFileName = series["Cover"]?.ToString().Split('_') ?? [];
                 string format = series["Format"]?.ToString() ?? string.Empty;
                 string oldCoverFileName = series["Cover"]?.ToString() ?? string.Empty;
                 if (coverFileName.Length > 1 && !coverFileName[1].StartsWith(format, StringComparison.OrdinalIgnoreCase) && File.Exists(oldCoverFileName))
                 {
-                    series["Cover"] = $@"{coverFileName[0]}_{format}.{oldCoverFileName.Substring(oldCoverFileName.Length - 3)}";
-                    File.Move(oldCoverFileName, series["Cover"].ToString());
-                    LOGGER.Debug("Updated {} Cover File Name", series["Titles"]["Romaji"].ToString());
+                    series["Cover"] = $@"{coverFileName[0]}_{format}.{oldCoverFileName[^3..]}";
+                    File.Move(oldCoverFileName, series["Cover"]!.ToString());
+                    LOGGER.Debug("Updated {} Cover File Name", series["Titles"]!["Romaji"]!.ToString());
                 }
             }
             userData[nameof(DataVersion)] = 2.5;
@@ -303,7 +299,7 @@ public sealed partial class User : ReactiveObject
         {
             for (int x = 0; x < themeJsonArray.Count; x++)
             {
-                theme = themeJsonArray.ElementAt(x).AsObject();
+                theme = themeJsonArray.ElementAt(x)!.AsObject();
                 foreach (System.Reflection.PropertyInfo property in typeof(TsundokuTheme).GetProperties().Skip(1))
                 {
                     if (uint.TryParse(theme[property.Name]?.ToString(), out uint colorValue))
@@ -321,8 +317,8 @@ public sealed partial class User : ReactiveObject
         {
             for (int x = 0; x < themeJsonArray.Count; x++)
             {
-                themeJsonArray.ElementAt(x).AsObject().Remove("SeriesButtonBGColor");
-                themeJsonArray.ElementAt(x).AsObject().Remove("SeriesButtonBGHoverColor");
+                themeJsonArray.ElementAt(x)!.AsObject().Remove("SeriesButtonBGColor");
+                themeJsonArray.ElementAt(x)!.AsObject().Remove("SeriesButtonBGHoverColor");
             }
             userData[nameof(DataVersion)] = 4.0;
             LOGGER.Info("Updated Users Data to v4.0", !isImport);
@@ -333,8 +329,8 @@ public sealed partial class User : ReactiveObject
         {
             for (int x = 0; x < collectionJsonArray.Count; x++)
             {
-                series = collectionJsonArray.ElementAt(x).AsObject();
-                series.Add("Value", decimal.Parse(series["Cost"].ToString()));
+                series = collectionJsonArray.ElementAt(x)!.AsObject();
+                series.Add("Value", decimal.Parse(series["Cost"]!.ToString()));
                 series.Remove("Cost");
             }
             userData[nameof(DataVersion)] = 5.0;
@@ -346,10 +342,10 @@ public sealed partial class User : ReactiveObject
         {
             for (int x = 0; x < themeJsonArray.Count; x++)
             {
-                theme = themeJsonArray.ElementAt(x).AsObject();
-                if (!theme.ContainsKey("SeriesCardPublisherColor")) theme.Add("SeriesCardPublisherColor", theme["SeriesCardStaffColor"].ToString());
+                theme = themeJsonArray.ElementAt(x)!.AsObject();
+                if (!theme.ContainsKey("SeriesCardPublisherColor")) theme.Add("SeriesCardPublisherColor", theme["SeriesCardStaffColor"]!.ToString());
             }
-            userData[nameof(Memberships)].AsObject().Remove("Barnes & Noble");
+            userData[nameof(Memberships)]!.AsObject().Remove("Barnes & Noble");
             userData[nameof(DataVersion)] = 5.1;
             LOGGER.Info("Updated Users Data to v5.1", !isImport);
             updatedVersion = true;
@@ -359,14 +355,14 @@ public sealed partial class User : ReactiveObject
         {
             for (int x = 0; x < themeJsonArray.Count; x++)
             {
-                theme = themeJsonArray.ElementAt(x).AsObject();
+                theme = themeJsonArray.ElementAt(x)!.AsObject();
                 if (!theme.ContainsKey("UserIconBorderColor"))
                 {
-                    theme.Add("UserIconBorderColor", theme["DividerColor"].ToString());
+                    theme.Add("UserIconBorderColor", theme["DividerColor"]!.ToString());
                 }
                 else if (theme["UserIconBorderColor"] is null)
                 {
-                    theme["UserIconBorderColor"] = theme["DividerColor"].ToString();
+                    theme["UserIconBorderColor"] = theme["DividerColor"]!.ToString();
                 }
             }
             userData[nameof(DataVersion)] = 5.2;
@@ -378,8 +374,8 @@ public sealed partial class User : ReactiveObject
         {
             for (int x = 0; x < collectionJsonArray.Count; x++)
             {
-                series = collectionJsonArray.ElementAt(x).AsObject();
-                series["Cover"] = Path.GetFileName(series["Cover"].ToString());
+                series = collectionJsonArray.ElementAt(x)!.AsObject();
+                series["Cover"] = Path.GetFileName(series["Cover"]!.ToString());
             }
             userData.AsObject().Remove("CurDataVersion");
             userData.AsObject().Add(nameof(DataVersion), "6.0");
@@ -389,7 +385,7 @@ public sealed partial class User : ReactiveObject
 
         if (curVersion < 6.1) // 6.1 Update "CollectionPrice" to "CollectionValue"
         {
-            userData.AsObject()[nameof(CollectionValue)] = (string)userData["CollectionPrice"];
+            userData.AsObject()[nameof(CollectionValue)] = (string?)userData["CollectionPrice"];
             userData.AsObject().Remove("CollectionPrice");
             userData[nameof(DataVersion)] = 6.1;
         }

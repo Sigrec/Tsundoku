@@ -14,19 +14,13 @@ public static class SingleLinePasteHelper
 {
     private static readonly char[] LineBreakChars = ['\r', '\n'];
 
-    public static void Register()
-    {
-        TextBox.PastingFromClipboardEvent.AddClassHandler<TextBox>(OnPastingFromClipboard);
-    }
+    public static void Register() => TextBox.PastingFromClipboardEvent.AddClassHandler<TextBox>(OnPastingFromClipboard);
 
     public static string ToSingleLine(string? text)
     {
-        if (string.IsNullOrEmpty(text))
-        {
-            return string.Empty;
-        }
-
-        return string.Join(' ', text.Split(LineBreakChars, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
+        return string.IsNullOrEmpty(text)
+            ? string.Empty
+            : string.Join(' ', text.Split(LineBreakChars, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
     }
 
     private static async void OnPastingFromClipboard(TextBox textBox, RoutedEventArgs e)

@@ -1,4 +1,3 @@
-using System.Runtime.Serialization;
 using static Tsundoku.Models.Enums.TsundokuSortModel;
 
 namespace Tsundoku.Tests.Helpers;
@@ -138,7 +137,7 @@ public class EnumExtensionsTests
     [Test]
     public void TryGetEnumValueFromMemberValue_ExactMatch_ReturnsTrueAndCorrectValue()
     {
-        bool success = "Volume Count".TryGetEnumValueFromMemberValue<TsundokuSort>(out TsundokuSort result);
+        bool success = "Volume Count".TryGetEnumValueFromMemberValue(out TsundokuSort result);
         Assert.That(success, Is.True);
         Assert.That(result, Is.EqualTo(TsundokuSort.VolumeCount));
     }
@@ -146,7 +145,7 @@ public class EnumExtensionsTests
     [Test]
     public void TryGetEnumValueFromMemberValue_CaseInsensitiveMatch_ReturnsTrueAndCorrectValue()
     {
-        bool success = "value".TryGetEnumValueFromMemberValue<TsundokuSort>(out TsundokuSort result);
+        bool success = "value".TryGetEnumValueFromMemberValue(out TsundokuSort result);
         Assert.That(success, Is.True);
         Assert.That(result, Is.EqualTo(TsundokuSort.Value));
     }
@@ -154,7 +153,7 @@ public class EnumExtensionsTests
     [Test]
     public void TryGetEnumValueFromMemberValue_NoMatch_ReturnsFalseAndDefault()
     {
-        bool success = "DoesNotExist".TryGetEnumValueFromMemberValue<TsundokuSort>(out TsundokuSort result);
+        bool success = "DoesNotExist".TryGetEnumValueFromMemberValue(out TsundokuSort result);
         Assert.That(success, Is.False);
         Assert.That(result, Is.EqualTo(default(TsundokuSort)));
     }
@@ -162,7 +161,7 @@ public class EnumExtensionsTests
     [Test]
     public void TryGetEnumValueFromMemberValue_CaseSensitiveExactMatch_ReturnsTrueAndCorrectValue()
     {
-        bool success = "Read".TryGetEnumValueFromMemberValue<TsundokuSort>(out TsundokuSort result, ignoreCase: false);
+        bool success = "Read".TryGetEnumValueFromMemberValue(out TsundokuSort result, ignoreCase: false);
         Assert.That(success, Is.True);
         Assert.That(result, Is.EqualTo(TsundokuSort.Read));
     }
@@ -170,14 +169,14 @@ public class EnumExtensionsTests
     [Test]
     public void TryGetEnumValueFromMemberValue_CaseSensitiveMismatch_ReturnsFalse()
     {
-        bool success = "read".TryGetEnumValueFromMemberValue<TsundokuSort>(out TsundokuSort _, ignoreCase: false);
+        bool success = "read".TryGetEnumValueFromMemberValue(out TsundokuSort _, ignoreCase: false);
         Assert.That(success, Is.False);
     }
 
     [Test]
     public void TryGetEnumValueFromMemberValue_EmptyString_ReturnsFalse()
     {
-        bool success = string.Empty.TryGetEnumValueFromMemberValue<TsundokuSort>(out TsundokuSort _);
+        bool success = string.Empty.TryGetEnumValueFromMemberValue(out TsundokuSort _);
         Assert.That(success, Is.False);
     }
 

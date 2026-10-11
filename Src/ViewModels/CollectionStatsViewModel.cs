@@ -10,13 +10,11 @@ using SkiaSharp;
 using Tsundoku.Helpers;
 using DynamicData;
 using Avalonia.Media;
-using ReactiveUI;
 using static Tsundoku.Models.Enums.SeriesStatusModel;
 using static Tsundoku.Models.Enums.SeriesDemographicModel;
 using static Tsundoku.Models.Enums.SeriesFormatModel;
 using static Tsundoku.Models.Enums.SeriesGenreModel;
 using System.Globalization;
-using System.Reactive.Disposables;
 using System.Reactive.Disposables.Fluent;
 
 namespace Tsundoku.ViewModels;
@@ -202,7 +200,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
             return;
         }
 
-        string cultureName = Models.Constants.AVAILABLE_CURRENCY_WITH_CULTURE.TryGetValue(secondarySymbol, out (int _, string Culture) info)
+        string cultureName = AVAILABLE_CURRENCY_WITH_CULTURE.TryGetValue(secondarySymbol, out (int _, string Culture) info)
             ? info.Culture
             : "en-US";
         CultureInfo ci = CultureInfo.GetCultureInfo(cultureName);
@@ -231,10 +229,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
         this.WhenAnyValue(
             x => x.CurrentTheme.SeriesCardBGColor)
         .DistinctUntilChanged()
-        .Subscribe(_ =>
-        {
-            UpdateBackgroundColors();
-        })
+        .Subscribe(_ => UpdateBackgroundColors())
         .DisposeWith(_disposables);
     }
 
@@ -276,10 +271,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
             .Throttle(TimeSpan.FromMilliseconds(100))
             .ObserveOn(TsundokuSchedulers.MainThread)
             .Select(seriesCollection => (uint)seriesCollection.Sum(item => item.VolumesRead))
-            .Subscribe(volumesRead =>
-            {
-                _userService.UpdateUser(user => user.VolumesRead = volumesRead);
-            })
+            .Subscribe(volumesRead => _userService.UpdateUser(user => user.VolumesRead = volumesRead))
             .DisposeWith(_disposables);
 
         Observable.CombineLatest(
@@ -298,14 +290,9 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
             CultureInfo cultureInfo = CultureInfo.GetCultureInfo(AVAILABLE_CURRENCY_WITH_CULTURE[result.Currency].Culture);
             int decimalDigits = cultureInfo.NumberFormat.CurrencyDecimalDigits;
             string formattedValue = result.Value.ToString($"N{decimalDigits}", cultureInfo);
-            if (cultureInfo.NumberFormat.CurrencyPositivePattern is 0 or 2) // 0 = "$n", 2 = "$ n"
-            {
-                CollectionValueText = $"{result.Currency}{formattedValue}";
-            }
-            else
-            {
-                CollectionValueText = $"{formattedValue}{result.Currency}";
-            }
+            CollectionValueText = cultureInfo.NumberFormat.CurrencyPositivePattern is 0 or 2
+                ? $"{result.Currency}{formattedValue}"
+                : $"{formattedValue}{result.Currency}";
 
             _userService.UpdateUser(user =>
                 user.CollectionValue = CollectionValueText);
@@ -316,10 +303,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
             .DistinctUntilChanged()
             .ObserveOn(TsundokuSchedulers.MainThread)
             .ToCollection()
-            .Subscribe(seriesList =>
-            {
-                SeriesCount = seriesList.Count;
-            })
+            .Subscribe(seriesList => SeriesCount = seriesList.Count)
             .DisposeWith(_disposables);
 
         _userService.UserCollectionChanges
@@ -328,10 +312,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
             .ObserveOn(TsundokuSchedulers.MainThread)
             .ToCollection()
             .Select(seriesList => seriesList.Count(x => x.IsFavorite))
-            .Subscribe(count =>
-            {
-                FavoriteCount = count;
-            })
+            .Subscribe(count => FavoriteCount = count)
             .DisposeWith(_disposables);
 
         _userService.UserCollectionChanges
@@ -378,7 +359,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
 #region BarCharts
     private void SetupBarCharts()
     {
-        SolidColorPaint behindBarPaint = new SolidColorPaint(ConvertAvaloniaBrushToSKColor(CurrentTheme.MenuButtonBGColor).WithAlpha(120));
+        SolidColorPaint behindBarPaint = new(ConvertAvaloniaBrushToSKColor(CurrentTheme.MenuButtonBGColor).WithAlpha(120));
 
         SetupRatingBarChart(behindBarPaint);
         SetupVolumeDistributionBarChart(behindBarPaint);
@@ -400,11 +381,11 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
     {
         // A `ColumnSeries<ObservableValue>` named `ratingBarBehindObject` is created for the max rating counts.
         ColumnSeries<ObservableValue> ratingBarBehindObject = CreateColumnSeries(
-            new ObservableCollection<ObservableValue> {
+            [
                 MaxRatingCount, MaxRatingCount1, MaxRatingCount2, MaxRatingCount3,
                 MaxRatingCount4, MaxRatingCount5, MaxRatingCount6, MaxRatingCount7,
                 MaxRatingCount8, MaxRatingCount9, MaxRatingCount10
-            },
+            ],
             isHoverable: false,
             ignoresBarPosition: true
         );
@@ -414,11 +395,11 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
 
         // The second series: Actual Rating Counts
         ColumnSeries<ObservableValue> ratingBarObject = CreateColumnSeries(
-            new ObservableCollection<ObservableValue> {
+            [
                 ZeroRatingCount, OneRatingCount, TwoRatingCount, ThreeRatingCount,
                 FourRatingCount, FiveRatingCount, SixRatingCount, SevenRatingCount,
                 EightRatingCount, NineRatingCount, TenRatingCount
-            },
+            ],
             isHoverable: false,
             dataLabelsSize: 15,
             ignoresBarPosition: true
@@ -429,7 +410,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
         RatingDistribution.Add(ratingBarObject);
 
         // --- Rating Chart Axes ---
-        Axis ratingXAxisObject = new Axis
+        Axis ratingXAxisObject = new()
         {
             LabelsRotation = 0,
             TextSize = 14,
@@ -441,7 +422,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
         RatingXAxes.Add(ratingXAxisObject);
 
         // An `Axis` named `ratingYAxisObject` is added to `RatingYAxes` for the Y-axis.
-        Axis ratingYAxisObject = new Axis
+        Axis ratingYAxisObject = new()
         {
             Labels = [],
             MinLimit = 0,
@@ -463,7 +444,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
                         {
                             counts[10]++;
                         }
-                        else if (bucketIndex >= 0 && bucketIndex < 10)
+                        else if (bucketIndex is >= 0 and < 10)
                         {
                             counts[bucketIndex]++;
                         }
@@ -567,11 +548,11 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
     private void SetupVolumeDistributionBarChart(SolidColorPaint behindBarPaint)
     {
         ColumnSeries<ObservableValue> volumeBarBehindObject = CreateColumnSeries(
-            new ObservableCollection<ObservableValue> {
+            [
                 MaxVolumeCount, MaxVolumeCount1, MaxVolumeCount2, MaxVolumeCount3,
                 MaxVolumeCount4, MaxVolumeCount5, MaxVolumeCount6, MaxVolumeCount7,
                 MaxVolumeCount8, MaxVolumeCount9, MaxVolumeCount10
-            },
+            ],
             isHoverable: false,
             ignoresBarPosition: true
         );
@@ -581,11 +562,11 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
 
         // The second series: Actual Volume Counts
         ColumnSeries<ObservableValue> volumeBarObject = CreateColumnSeries(
-            new ObservableCollection<ObservableValue> {
+            [
                 ZeroVolumeCount, OneVolumeCount, TwoVolumeCount, ThreeVolumeCount,
                 FourVolumeCount, FiveVolumeCount, SixVolumeCount, SevenVolumeCount,
                 EightVolumeCount, NineVolumeCount, TenVolumeCount
-            },
+            ],
             isHoverable: false,
             dataLabelsSize: 15,
             ignoresBarPosition: true
@@ -596,7 +577,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
         VolumeCountDistribution.Add(volumeBarObject);
 
         // --- Volume Count Chart Axes ---
-        Axis volumeXAxisObject = new Axis
+        Axis volumeXAxisObject = new()
         {
             LabelsRotation = 0,
             TextSize = 14,
@@ -608,7 +589,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
         };
         VolumeCountXAxes.Add(volumeXAxisObject);
 
-        Axis volumeYAxisObject = new Axis
+        Axis volumeYAxisObject = new()
         {
             Labels = Array.Empty<string>(),
             MinLimit = 0,
@@ -628,43 +609,43 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
                 {
                     uint volume = series.MaxVolumeCount;
 
-                    if (volume >= 1 && volume < 10)
+                    if (volume is >= 1 and < 10)
                     {
                         volumeCounts[0]++;
                     }
-                    else if (volume >= 10 && volume < 20)
+                    else if (volume is >= 10 and < 20)
                     {
                         volumeCounts[1]++;
                     }
-                    else if (volume >= 20 && volume < 30)
+                    else if (volume is >= 20 and < 30)
                     {
                         volumeCounts[2]++;
                     }
-                    else if (volume >= 30 && volume < 40)
+                    else if (volume is >= 30 and < 40)
                     {
                         volumeCounts[3]++;
                     }
-                    else if (volume >= 40 && volume < 50)
+                    else if (volume is >= 40 and < 50)
                     {
                         volumeCounts[4]++;
                     }
-                    else if (volume >= 50 && volume < 60)
+                    else if (volume is >= 50 and < 60)
                     {
                         volumeCounts[5]++;
                     }
-                    else if (volume >= 60 && volume < 70)
+                    else if (volume is >= 60 and < 70)
                     {
                         volumeCounts[6]++;
                     }
-                    else if (volume >= 70 && volume < 80)
+                    else if (volume is >= 70 and < 80)
                     {
                         volumeCounts[7]++;
                     }
-                    else if (volume >= 80 && volume < 90)
+                    else if (volume is >= 80 and < 90)
                     {
                         volumeCounts[8]++;
                     }
-                    else if (volume >= 90 && volume < 100)
+                    else if (volume is >= 90 and < 100)
                     {
                         volumeCounts[9]++;
                     }
@@ -761,7 +742,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
     {
         return new RowSeries<KeyValuePair<string, int>>
         {
-            Values = Array.Empty<KeyValuePair<string, int>>(),
+            Values = [],
             IsHoverable = false,
             Mapping = (dataPoint, index) => new(index, dataPoint.Value)
         };
@@ -892,14 +873,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
                     {
                         string genreKey = genre.GetEnumMemberValue();
 
-                        if (GenreData.TryGetValue(genreKey, out int count))
-                        {
-                            GenreData[genreKey] = count + 1;
-                        }
-                        else
-                        {
-                            GenreData[genreKey] = 1;
-                        }
+                        GenreData[genreKey] = GenreData.TryGetValue(genreKey, out int count) ? count + 1 : 1;
                     }
                 }
 
@@ -1001,10 +975,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
         ManfraLegendColor = SKColorToBrush(s_pieChartPalette[5]);
     }
 
-    private static SolidColorBrush SKColorToBrush(SKColor color)
-    {
-        return new SolidColorBrush(new Avalonia.Media.Color(color.Alpha, color.Red, color.Green, color.Blue));
-    }
+    private static SolidColorBrush SKColorToBrush(SKColor color) => new(new Color(color.Alpha, color.Red, color.Green, color.Blue));
 
     private static PieSeries<ObservableValue> CreatePieSeries(ObservableValue countValue, string name, SKColor fill)
     {
@@ -1202,19 +1173,9 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
 
 #endregion
 
-    private static decimal CalculatePercentage(double? count, decimal total)
-    {
-        if (count is null || total == 0)
-        {
-            return 0m;
-        }
-        return decimal.Round((decimal)count / total * 100m, 2);
-    }
+    private static decimal CalculatePercentage(double? count, decimal total) => count is null || total == 0 ? 0m : decimal.Round((decimal)count / total * 100m, 2);
 
-    private static SKColor ConvertAvaloniaBrushToSKColor(SolidColorBrush brush)
-    {
-        return new SKColor(brush.Color.R, brush.Color.G, brush.Color.B, brush.Color.A);
-    }
+    private static SKColor ConvertAvaloniaBrushToSKColor(SolidColorBrush brush) => new(brush.Color.R, brush.Color.G, brush.Color.B, brush.Color.A);
 
     private void Dispose(bool disposing)
     {

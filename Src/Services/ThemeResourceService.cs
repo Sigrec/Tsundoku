@@ -1,6 +1,4 @@
-using Avalonia;
 using Avalonia.Media;
-using ReactiveUI;
 using System.Collections.Frozen;
 using System.ComponentModel;
 using System.Reactive.Disposables;
@@ -51,7 +49,7 @@ public sealed class ThemeResourceService : IThemeResourceService
 
     public IDisposable ObserveAndApply(TsundokuTheme theme)
     {
-        CompositeDisposable disposable = new();
+        CompositeDisposable disposable = [];
 
         void OnPropertyChanged(object? sender, PropertyChangedEventArgs args)
         {

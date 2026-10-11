@@ -23,7 +23,7 @@ public static class AppFileHelper
     private const string ScreenshotsFolderName = "Screenshots";
 
     /// <summary>Recognized image file extensions for cover images.</summary>
-    public static readonly HashSet<string> VALID_IMAGE_EXTENSIONS = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+    public static readonly HashSet<string> VALID_IMAGE_EXTENSIONS = new(StringComparer.OrdinalIgnoreCase)
     {
         ".png", ".jpg", ".jpeg"
     };
@@ -49,12 +49,10 @@ public static class AppFileHelper
     /// Gets the full path for UserData.json, now located directly within the "Tsundoku\" folder.
     /// </summary>
     /// <returns>The full path to UserData.json.</returns>
-    public static string GetUserDataJsonPath()
-    {
+    public static string GetUserDataJsonPath() =>
         // Assuming ViewModelBase.USER_DATA_FILEPATH holds "UserData.json"
         // Pass an EMPTY string for the subfolder to place it directly under Tsundoku\
-        return GetFilePath(ViewModelBase.USER_DATA_FILEPATH);
-    }
+        GetFilePath(ViewModelBase.USER_DATA_FILEPATH);
 
     /// <summary>
     /// Creates a unique file path for a cover image within the "Covers" subfolder,
@@ -63,6 +61,7 @@ public static class AppFileHelper
     /// <param name="coverLink">The URL or link from which the cover image is sourced, used to derive the file extension.</param>
     /// <param name="title">The title of the book/item to base the cover name on.</param>
     /// <param name="bookType">The format/type of the book (e.g., "Manga", "Novel").</param>
+    /// <param name="allowDuplicate">Whether a numbered duplicate file name may be created when the name is taken.</param>
     /// <param name="dupeIndex">A reference parameter that will hold the duplicate index if a duplicate was found (e.g., 2 for _2).</param>
     /// <returns>A unique, full file path for the cover image.</returns>
     public static (string, bool) CreateUniqueCoverFileName(string coverLink, string title, SeriesFormat bookType, bool allowDuplicate, ref uint dupeIndex)
@@ -140,37 +139,25 @@ public static class AppFileHelper
     /// Gets the full path for the "Covers\" subfolder.
     /// </summary>
     /// <returns>The full path to the Covers folder.</returns>
-    public static string GetCoversFolderPath()
-    {
-        return GetFolderPath(CoversFolderName);
-    }
+    public static string GetCoversFolderPath() => GetFolderPath(CoversFolderName);
 
     /// <summary>
     /// Gets the full path for the "Logs\" subfolder.
     /// </summary>
     /// <returns>The full path to the Logs folder.</returns>
-    public static string GetLogFolderPath()
-    {
-        return GetFolderPath(LogsFolderName);
-    }
+    public static string GetLogFolderPath() => GetFolderPath(LogsFolderName);
 
     /// <summary>
     /// Gets the full path for the "Themes\" subfolder.
     /// </summary>
     /// <returns>The full path to the Themes folder.</returns>
-    public static string GetThemesFolderPath()
-    {
-        return GetFolderPath(ThemesFolderName);
-    }
+    public static string GetThemesFolderPath() => GetFolderPath(ThemesFolderName);
 
     /// <summary>
     /// Gets the full path for the "Screenshots\" subfolder.
     /// </summary>
     /// <returns>The full path to the Screenshots folder.</returns>
-    public static string GetScreenshotsFolderPath()
-    {
-        return GetFolderPath(ScreenshotsFolderName);
-    }
+    public static string GetScreenshotsFolderPath() => GetFolderPath(ScreenshotsFolderName);
 
     /// <summary>
     /// Generates a unique file path for a screenshot within the "Screenshots" subfolder.
@@ -331,7 +318,7 @@ public static class AppFileHelper
     /// Finds the full path to an existing cover file in the "Covers" folder
     /// by iterating through known valid image extensions, given only the base filename.
     /// </summary>
-    /// <param name="baseFileNameWithoutExtension">The base name of the cover file without any extension (e.g., "MySeries_MANGA").</param>
+    /// <param name="baseFileNameWithExtension">The cover file name to look for (e.g., "MySeries_MANGA.png"); its extension is swapped for each valid image extension.</param>
     /// <returns>The full path to the first found existing cover file with a valid extension, or null if no such file is found.</returns>
     public static string? FindExistingCoverByBaseName(string baseFileNameWithExtension)
     {
@@ -377,10 +364,10 @@ public static class AppFileHelper
 
         try
         {
-            System.IO.FileAttributes attributes = File.GetAttributes(filePath);
-            if ((attributes & System.IO.FileAttributes.ReadOnly) == System.IO.FileAttributes.ReadOnly)
+            FileAttributes attributes = File.GetAttributes(filePath);
+            if ((attributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
             {
-                File.SetAttributes(filePath, attributes & ~System.IO.FileAttributes.ReadOnly);
+                File.SetAttributes(filePath, attributes & ~FileAttributes.ReadOnly);
                 LOGGER.Trace("Removed ReadOnly attribute from: {FilePath}", filePath);
             }
 

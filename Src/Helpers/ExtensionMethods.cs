@@ -18,12 +18,7 @@ public static partial class ExtensionMethods
     /// (i.e. exactly one \n\n). CRLF-safe. Returns the original string when
     /// no such run is present.
     /// </summary>
-    public static string CollapseExcessNewlines(this string input)
-    {
-        if (string.IsNullOrEmpty(input)) return input;
-        if (!input.Contains("\n\n\n", StringComparison.Ordinal)) return input;
-        return ExcessNewlinesRegex().Replace(input, "\n\n");
-    }
+    public static string CollapseExcessNewlines(this string input) => string.IsNullOrEmpty(input) || !input.Contains("\n\n\n", StringComparison.Ordinal) ? input : ExcessNewlinesRegex().Replace(input, "\n\n");
 
     private static readonly SearchValues<char> SmartQuoteChars = SearchValues.Create(
     [
@@ -42,13 +37,9 @@ public static partial class ExtensionMethods
     /// </summary>
     public static string NormalizeQuotes(this string input)
     {
-        if (string.IsNullOrEmpty(input))
-            return input;
-
-        if (input.AsSpan().IndexOfAny(SmartQuoteChars) < 0)
-            return input;
-
-        return string.Create(input.Length, input, (span, src) =>
+        return string.IsNullOrEmpty(input) || input.AsSpan().IndexOfAny(SmartQuoteChars) < 0
+            ? input
+            : string.Create(input.Length, input, (span, src) =>
         {
             for (int i = 0; i < src.Length; i++)
             {
@@ -91,8 +82,7 @@ public static partial class ExtensionMethods
     {
         if (string.IsNullOrWhiteSpace(s))
         {
-            if (string.IsNullOrEmpty(t)) return 0;
-            return t.Length <= maxDistance ? t.Length : -1;
+            return string.IsNullOrEmpty(t) ? 0 : t.Length <= maxDistance ? t.Length : -1;
         }
 
         if (string.IsNullOrWhiteSpace(t))
@@ -170,17 +160,7 @@ public static partial class ExtensionMethods
     /// An integer threshold value used in similarity matching,
     /// typically 1/6 of the shorter string's length.
     /// </returns>
-    public static int SimilarThreshold(string input, string compareTo)
-    {
-        if (!string.IsNullOrWhiteSpace(compareTo) && input.Length > compareTo.Length)
-        {
-            return compareTo.Length / 6;
-        }
-        else
-        {
-            return input.Length / 6;
-        }
-    }
+    public static int SimilarThreshold(string input, string compareTo) => !string.IsNullOrWhiteSpace(compareTo) && input.Length > compareTo.Length ? compareTo.Length / 6 : input.Length / 6;
 
     /// <summary>
     /// Removes all Unicode whitespace characters from the input string in a single pass.
@@ -246,18 +226,5 @@ public static partial class ExtensionMethods
     /// <summary>
     /// Returns true if both sets are null, or both non-null with the same elements.
     /// </summary>
-    public static bool HashSetsEqual<T>(HashSet<T>? a, HashSet<T>? b)
-    {
-        if (ReferenceEquals(a, b))
-        {
-            return true;
-        }
-
-        if (a is null || b is null)
-        {
-            return false;
-        }
-
-        return a.SetEquals(b);
-    }
+    public static bool HashSetsEqual<T>(HashSet<T>? a, HashSet<T>? b) => ReferenceEquals(a, b) || (a is not null && b is not null && a.SetEquals(b));
 }

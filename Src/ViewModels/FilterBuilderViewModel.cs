@@ -103,8 +103,5 @@ public sealed partial class FilterBuilderViewModel : ReactiveObject, IDisposable
         }
     }
 
-    public void Dispose()
-    {
-        _disposables.Dispose();
-    }
+    public void Dispose() => _disposables.Dispose();
 }

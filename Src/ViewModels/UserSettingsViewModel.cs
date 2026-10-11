@@ -6,7 +6,6 @@ using Tsundoku.Models;
 using MangaAndLightNovelWebScrape.Websites;
 using static Tsundoku.Models.Enums.TsundokuLanguageModel;
 using Tsundoku.Helpers;
-using Tsundoku.Services;
 using System.Globalization;
 using static Tsundoku.Models.Enums.SeriesFormatModel;
 using Avalonia.Controls;
@@ -33,7 +32,7 @@ public sealed partial class UserSettingsViewModel : ViewModelBase
 
     public const string OffOption = "Off";
     public IReadOnlyList<string> SecondaryCurrencyOptions { get; } =
-        [OffOption, .. Tsundoku.Models.Constants.AVAILABLE_CURRENCIES];
+        [OffOption, .. AVAILABLE_CURRENCIES];
 
     public bool IsSecondaryCurrencyActive => !string.IsNullOrEmpty(SelectedSecondaryCurrency) && SelectedSecondaryCurrency != OffOption;
 
@@ -186,24 +185,15 @@ public sealed partial class UserSettingsViewModel : ViewModelBase
     /// Updates the current user's currency preference.
     /// </summary>
     /// <param name="newCurrency">The new currency symbol to set.</param>
-    public void UpdateUserCurrency(string newCurrency)
-    {
-        _userService.UpdateUser(user => user.Currency = newCurrency);
-    }
+    public void UpdateUserCurrency(string newCurrency) => _userService.UpdateUser(user => user.Currency = newCurrency);
 
-    public async Task RepairUserDataAsync()
-    {
-        await _userService.RepairUserDataAsync();
-    }
+    public async Task RepairUserDataAsync() => await _userService.RepairUserDataAsync();
 
     /// <summary>
     /// Updates the current user's display name.
     /// </summary>
     /// <param name="newUsername">The new username to set.</param>
-    public void UpdateUserName(string newUsername)
-    {
-        _userService.UpdateUser(user => user.UserName = newUsername);
-    }
+    public void UpdateUserName(string newUsername) => _userService.UpdateUser(user => user.UserName = newUsername);
 
     /// <summary>
     /// Imports user data from an external JSON file, showing a loading dialog during the operation.

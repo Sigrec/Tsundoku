@@ -13,7 +13,7 @@ public sealed record SeriesUrlInfo(SeriesUrlSource Source, string Id);
 /// <summary>
 /// Detects supported manga/light-novel URLs and extracts the series identifier so the
 /// Add-Series flow can prefill the input with the source's native ID. Uses the same
-/// segment-walk pattern as <see cref="Tsundoku.Models.Series.GetLinkId"/>.
+/// segment-walk pattern as <see cref="Models.Series.GetLinkId"/>.
 /// </summary>
 public static class SeriesUrlParser
 {
@@ -34,7 +34,7 @@ public static class SeriesUrlParser
         return host switch
         {
             "anilist.co" => TryExtract(uri, "manga", static s => uint.TryParse(s, out _), SeriesUrlSource.AniList, out info),
-            "mangadex.org" => TryExtract(uri, "title", Tsundoku.Clients.MangaDex.IsMangaDexId, SeriesUrlSource.MangaDex, out info),
+            "mangadex.org" => TryExtract(uri, "title", Clients.MangaDex.IsMangaDexId, SeriesUrlSource.MangaDex, out info),
             _ => false
         };
     }

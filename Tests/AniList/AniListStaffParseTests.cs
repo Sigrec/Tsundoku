@@ -1,7 +1,6 @@
 ﻿using System.Net;
 using System.Net.Http.Headers;
 using System.Text.Json;
-using Tsundoku.Clients;
 using static Tsundoku.Models.Enums.SeriesFormatModel;
 
 namespace Tsundoku.Tests.AniList;
@@ -13,7 +12,7 @@ public class AniListStaffParseTests
     [TestCase("リコリス・リコイル 公式コミックアンソロジー リピート", SeriesFormat.Manga)]
     public async Task ExtractStaffFromAniList_ShouldReturnCorrectStaffString_Anthology(string title, SeriesFormat format)
     {
-        HttpClient httpClient = new HttpClient
+        HttpClient httpClient = new()
         {
             BaseAddress = new Uri("https://graphql.anilist.co"),
             Timeout = TimeSpan.FromSeconds(30),
@@ -23,7 +22,7 @@ public class AniListStaffParseTests
         httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("Tsundoku-Test", "1.0"));
         httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-        Clients.AniList aniList = new Clients.AniList(new AniListGraphQLClient(httpClient));
+        Clients.AniList aniList = new(new AniListGraphQLClient(httpClient));
 
         JsonDocument? result = await aniList.GetSeriesByTitleAsync(title, format, pageNum: 1);
         Assert.That(result, Is.Not.Null, "Expected non-null result from AniList query.");

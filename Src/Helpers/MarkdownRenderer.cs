@@ -1,7 +1,5 @@
-using System.Text;
 using Avalonia.Controls;
 using Avalonia.Controls.Documents;
-using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
 
@@ -39,7 +37,7 @@ public static class MarkdownRenderer
         Action<string>? onLinkClicked = null)
     {
         target.Inlines?.Clear();
-        target.Inlines ??= new InlineCollection();
+        target.Inlines ??= [];
 
         if (string.IsNullOrWhiteSpace(markdown)) return;
 
@@ -208,7 +206,7 @@ public static class MarkdownRenderer
         string trimmed = line.Trim();
         if (trimmed.Length < 3) return false;
         char c = trimmed[0];
-        if (c != '-' && c != '*' && c != '_') return false;
+        if (c is not '-' and not '*' and not '_') return false;
         foreach (char ch in trimmed) if (ch != c) return false;
         return true;
     }

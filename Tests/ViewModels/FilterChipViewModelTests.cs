@@ -62,7 +62,7 @@ public class FilterChipViewModelTests
         foreach (string field in enumFields)
         {
             FilterChipViewModel chip = new(field, "==", string.Empty);
-            Assert.That(chip.AvailableOperators, Is.EqualTo(new[] { "==" }), $"Failed for field: {field}");
+            Assert.That(chip.AvailableOperators, Is.EqualTo(["=="]), $"Failed for field: {field}");
         }
     }
 
@@ -95,7 +95,7 @@ public class FilterChipViewModelTests
     {
         FilterChipViewModel chip = new("Favorite", "==", "True");
 
-        Assert.That(chip.AvailableValues, Is.EqualTo(new[] { "True", "False" }));
+        Assert.That(chip.AvailableValues, Is.EqualTo(["True", "False"]));
     }
 
     [AvaloniaTest]
@@ -103,7 +103,7 @@ public class FilterChipViewModelTests
     {
         FilterChipViewModel chip = new("Series", "==", "Complete");
 
-        Assert.That(chip.AvailableValues, Is.EqualTo(new[] { "Complete", "InComplete" }));
+        Assert.That(chip.AvailableValues, Is.EqualTo(["Complete", "InComplete"]));
     }
 
     [AvaloniaTest]
@@ -129,8 +129,10 @@ public class FilterChipViewModelTests
     [AvaloniaTest]
     public void ToQuerySegment_FreeTextWithSpace_WrapsValueInQuotes()
     {
-        FilterChipViewModel chip = new("Notes", "==");
-        chip.Value = "some notes here";
+        FilterChipViewModel chip = new("Notes", "==")
+        {
+            Value = "some notes here"
+        };
 
         string result = chip.ToQuerySegment();
 
@@ -140,8 +142,10 @@ public class FilterChipViewModelTests
     [AvaloniaTest]
     public void ToQuerySegment_FreeTextWithoutSpace_DoesNotWrapInQuotes()
     {
-        FilterChipViewModel chip = new("Notes", "==");
-        chip.Value = "important";
+        FilterChipViewModel chip = new("Notes", "==")
+        {
+            Value = "important"
+        };
 
         string result = chip.ToQuerySegment();
 
@@ -151,8 +155,10 @@ public class FilterChipViewModelTests
     [AvaloniaTest]
     public void ToQuerySegment_PublisherWithSpace_WrapsValueInQuotes()
     {
-        FilterChipViewModel chip = new("Publisher", "==");
-        chip.Value = "Yen Press";
+        FilterChipViewModel chip = new("Publisher", "==")
+        {
+            Value = "Yen Press"
+        };
 
         string result = chip.ToQuerySegment();
 

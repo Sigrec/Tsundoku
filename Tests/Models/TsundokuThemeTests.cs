@@ -10,10 +10,9 @@ namespace Tsundoku.Tests.Models;
 public class TsundokuThemeTests
 {
     private static readonly PropertyInfo[] BrushProperties =
-        typeof(TsundokuTheme)
+        [.. typeof(TsundokuTheme)
             .GetProperties(BindingFlags.Public | BindingFlags.Instance)
-            .Where(p => p.PropertyType == typeof(SolidColorBrush))
-            .ToArray();
+            .Where(p => p.PropertyType == typeof(SolidColorBrush))];
 
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
@@ -25,7 +24,7 @@ public class TsundokuThemeTests
     [Test]
     public void DefaultTheme_HasNoNullProperties()
     {
-        TsundokuTheme theme = TsundokuTheme.DEFAULT_THEME;
+        TsundokuTheme theme = DEFAULT_THEME;
 
         Assert.That(theme.ThemeName, Is.Not.Null.And.Not.Empty, "ThemeName should not be null or empty");
 
@@ -39,7 +38,7 @@ public class TsundokuThemeTests
     [Test]
     public void Cloning_ProducesEqualButSeparateInstance()
     {
-        TsundokuTheme original = TsundokuTheme.DEFAULT_THEME;
+        TsundokuTheme original = DEFAULT_THEME;
         TsundokuTheme clone = original.Cloning();
 
         using (Assert.EnterMultipleScope())
@@ -61,8 +60,8 @@ public class TsundokuThemeTests
     [Test]
     public void Equals_SameValues_ReturnsTrue()
     {
-        TsundokuTheme a = TsundokuTheme.DEFAULT_THEME.Cloning();
-        TsundokuTheme b = TsundokuTheme.DEFAULT_THEME.Cloning();
+        TsundokuTheme a = DEFAULT_THEME.Cloning();
+        TsundokuTheme b = DEFAULT_THEME.Cloning();
 
         Assert.That(a, Is.EqualTo(b));
     }
@@ -70,8 +69,8 @@ public class TsundokuThemeTests
     [Test]
     public void Equals_DifferentThemeName_ReturnsFalse()
     {
-        TsundokuTheme a = TsundokuTheme.DEFAULT_THEME.Cloning();
-        TsundokuTheme b = TsundokuTheme.DEFAULT_THEME.Cloning();
+        TsundokuTheme a = DEFAULT_THEME.Cloning();
+        TsundokuTheme b = DEFAULT_THEME.Cloning();
         b.ThemeName = "Different";
 
         Assert.That(a, Is.Not.EqualTo(b));
@@ -80,8 +79,8 @@ public class TsundokuThemeTests
     [Test]
     public void Equals_DifferentColor_ReturnsFalse()
     {
-        TsundokuTheme a = TsundokuTheme.DEFAULT_THEME.Cloning();
-        TsundokuTheme b = TsundokuTheme.DEFAULT_THEME.Cloning();
+        TsundokuTheme a = DEFAULT_THEME.Cloning();
+        TsundokuTheme b = DEFAULT_THEME.Cloning();
         b.MenuBGColor = new SolidColorBrush(Colors.Red);
 
         Assert.That(a, Is.Not.EqualTo(b));
@@ -90,7 +89,7 @@ public class TsundokuThemeTests
     [Test]
     public void Equals_Null_ReturnsFalse()
     {
-        TsundokuTheme theme = TsundokuTheme.DEFAULT_THEME;
+        TsundokuTheme theme = DEFAULT_THEME;
 
         Assert.That(theme.Equals(null), Is.False);
     }
@@ -98,7 +97,7 @@ public class TsundokuThemeTests
     [Test]
     public void Equals_SameReference_ReturnsTrue()
     {
-        TsundokuTheme theme = TsundokuTheme.DEFAULT_THEME;
+        TsundokuTheme theme = DEFAULT_THEME;
 
         Assert.That(theme.Equals(theme), Is.True);
     }
@@ -106,7 +105,7 @@ public class TsundokuThemeTests
     [Test]
     public void Equals_DifferentType_ReturnsFalse()
     {
-        TsundokuTheme theme = TsundokuTheme.DEFAULT_THEME;
+        TsundokuTheme theme = DEFAULT_THEME;
 
         Assert.That(theme.Equals("not a theme"), Is.False);
     }
@@ -114,8 +113,8 @@ public class TsundokuThemeTests
     [Test]
     public void GetHashCode_EqualObjects_ReturnSameHash()
     {
-        TsundokuTheme a = TsundokuTheme.DEFAULT_THEME.Cloning();
-        TsundokuTheme b = TsundokuTheme.DEFAULT_THEME.Cloning();
+        TsundokuTheme a = DEFAULT_THEME.Cloning();
+        TsundokuTheme b = DEFAULT_THEME.Cloning();
 
         Assert.That(a.GetHashCode(), Is.EqualTo(b.GetHashCode()));
     }
@@ -123,7 +122,7 @@ public class TsundokuThemeTests
     [Test]
     public void GetHashCode_IsConsistent_AcrossMultipleCalls()
     {
-        TsundokuTheme theme = TsundokuTheme.DEFAULT_THEME;
+        TsundokuTheme theme = DEFAULT_THEME;
 
         int hash1 = theme.GetHashCode();
         int hash2 = theme.GetHashCode();
@@ -134,8 +133,8 @@ public class TsundokuThemeTests
     [Test]
     public void GetHashCode_DifferentObjects_ReturnDifferentHash()
     {
-        TsundokuTheme a = TsundokuTheme.DEFAULT_THEME.Cloning();
-        TsundokuTheme b = TsundokuTheme.DEFAULT_THEME.Cloning();
+        TsundokuTheme a = DEFAULT_THEME.Cloning();
+        TsundokuTheme b = DEFAULT_THEME.Cloning();
         b.MenuBGColor = new SolidColorBrush(Colors.Red);
 
         Assert.That(a.GetHashCode(), Is.Not.EqualTo(b.GetHashCode()));
@@ -144,7 +143,7 @@ public class TsundokuThemeTests
     [Test]
     public void JsonRoundTrip_PreservesAllProperties()
     {
-        TsundokuTheme original = TsundokuTheme.DEFAULT_THEME.Cloning();
+        TsundokuTheme original = DEFAULT_THEME.Cloning();
 
         string json = JsonSerializer.Serialize(original, SerializerOptions);
         TsundokuTheme? deserialized = JsonSerializer.Deserialize<TsundokuTheme>(json, SerializerOptions);
@@ -240,7 +239,7 @@ public class TsundokuThemeTests
     public void SolidColorBrushJsonConverter_WriteNull_WritesNullValue()
     {
         SolidColorBrushJsonConverter converter = new();
-        using System.IO.MemoryStream stream = new();
+        using MemoryStream stream = new();
         using Utf8JsonWriter writer = new(stream);
 
         converter.Write(writer, null!, new JsonSerializerOptions());
@@ -255,7 +254,7 @@ public class TsundokuThemeTests
     {
         SolidColorBrushJsonConverter converter = new();
         SolidColorBrush brush = new(Color.Parse("#ff20232d"));
-        using System.IO.MemoryStream stream = new();
+        using MemoryStream stream = new();
         using Utf8JsonWriter writer = new(stream);
 
         converter.Write(writer, brush, new JsonSerializerOptions());

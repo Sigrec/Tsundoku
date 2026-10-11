@@ -19,7 +19,7 @@ public sealed partial class CollectionStatsWindow : ReactiveWindow<CollectionSta
             onOpened: () =>
             {
                 CanUpdate = false;
-                if (Screens.Primary.WorkingArea.Height < 1250) this.Height = 550;
+                if (Screens.Primary!.WorkingArea.Height < 1250) this.Height = 550;
             });
     }
 

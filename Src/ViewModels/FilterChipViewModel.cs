@@ -48,7 +48,7 @@ public sealed partial class FilterChipViewModel : ReactiveObject
     [Reactive] public partial string[] AvailableValues { get; private set; }
     [Reactive] public partial bool IsValueFreeText { get; private set; }
     private FrozenSet<string> _availableOperatorsSet = NumericOperatorsSet;
-    private FrozenSet<string> _availableValuesSet = FrozenSet<string>.Empty;
+    private FrozenSet<string> _availableValuesSet = [];
 
     public FilterChipViewModel(string field = "Rating", string op = ">=", string value = "0")
     {
@@ -71,7 +71,7 @@ public sealed partial class FilterChipViewModel : ReactiveObject
         _availableOperatorsSet = isNumeric ? NumericOperatorsSet : EqualityOnlyOperatorSet;
         IsValueFreeText = isNumeric || field.Equals("Notes", StringComparison.OrdinalIgnoreCase) || field.Equals("Publisher", StringComparison.OrdinalIgnoreCase);
         AvailableValues = EnumValues.TryGetValue(field, out string[]? vals) ? vals : [];
-        _availableValuesSet = AvailableValues.Length > 0 ? AvailableValues.ToFrozenSet(StringComparer.OrdinalIgnoreCase) : FrozenSet<string>.Empty;
+        _availableValuesSet = AvailableValues.Length > 0 ? AvailableValues.ToFrozenSet(StringComparer.OrdinalIgnoreCase) : [];
 
         // Reset operator to == if current isn't available
         if (!_availableOperatorsSet.Contains(SelectedOperator))
@@ -90,10 +90,7 @@ public sealed partial class FilterChipViewModel : ReactiveObject
         }
     }
 
-    public void ToggleConnector()
-    {
-        IsConnectorOr = !IsConnectorOr;
-    }
+    public void ToggleConnector() => IsConnectorOr = !IsConnectorOr;
 
     public string ToQuerySegment()
     {

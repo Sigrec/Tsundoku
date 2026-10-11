@@ -1,6 +1,4 @@
 using Avalonia.Controls;
-using Avalonia;
-using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
@@ -9,7 +7,6 @@ using ReactiveUI.Avalonia;
 using System.Reactive.Linq;
 using Tsundoku.Helpers;
 using Tsundoku.Models;
-using Tsundoku.Services;
 using Tsundoku.ViewModels;
 using static Tsundoku.Models.Enums.SeriesDemographicModel;
 using static Tsundoku.Models.Enums.SeriesGenreModel;
@@ -43,7 +40,7 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
         // bubble-phase handler runs. handledEventsToo: true means we still see the
         // event after a child marked it Handled.
         NotesPreviewScroller.AddHandler(
-            InputElement.PointerWheelChangedEvent,
+            PointerWheelChangedEvent,
             (_, e) =>
             {
                 double delta = e.Delta.Y * 40;
@@ -82,7 +79,7 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
     {
         if (newCover is not null)
         {
-            if (!ViewModel.Series.Cover.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
+            if (!ViewModel!.Series.Cover.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
             {
                 ViewModel.Series.DeleteCover();
                 ViewModel.Series.Cover = Path.ChangeExtension(ViewModel.Series.Cover, ".png");
@@ -110,7 +107,7 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
         ChangeCoverButtonIcon.Animation = IconAnimation.Spin;
         try
         {
-            string fullCoverPath = AppFileHelper.GetFullCoverPath(ViewModel.Series.Cover);
+            string fullCoverPath = AppFileHelper.GetFullCoverPath(ViewModel!.Series.Cover);
             Bitmap? newCover = await _bitmapHelper.UpdateCoverFromUrlAsync(customImageUrl, fullCoverPath);
 
             if (newCover is not null)
@@ -149,7 +146,7 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
 
         if (file.Count == 1)
         {
-            string fullCoverPath = AppFileHelper.GetFullCoverPath(ViewModel.Series.Cover);
+            string fullCoverPath = AppFileHelper.GetFullCoverPath(ViewModel!.Series.Cover);
             Bitmap? newCover = BitmapHelper.UpdateCoverFromFilePath(file[0].Path.LocalPath, fullCoverPath);
             if (newCover is not null)
             {
@@ -182,10 +179,10 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
 
     private void ChangeSeriesVolumesRead()
     {
-        string volumesReadText = VolumesReadMaskedTextBox.Text.Replace("_", string.Empty);
+        string volumesReadText = VolumesReadMaskedTextBox.Text!.Replace("_", string.Empty);
         if (!string.IsNullOrWhiteSpace(volumesReadText) &&
             uint.TryParse(volumesReadText, out uint newVolumesRead) &&
-            ViewModel.Series.VolumesRead != newVolumesRead)
+            ViewModel!.Series.VolumesRead != newVolumesRead)
         {
             uint oldVolumesRead = ViewModel.Series.VolumesRead;
             ViewModel.Series.VolumesRead = newVolumesRead;
@@ -196,10 +193,10 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
 
     private void ChangeSeriesRating()
     {
-        if (RatingMaskedTextBox.Text.StartsWith("__._", StringComparison.Ordinal)) return;
+        if (RatingMaskedTextBox.Text!.StartsWith("__._", StringComparison.Ordinal)) return;
 
         string rawInput = RatingMaskedTextBox.Text[..4].Trim().Replace("_", "0");
-        if (decimal.TryParse(rawInput, out decimal ratingVal) && ratingVal <= 10.0m && ratingVal != ViewModel.Series.Rating)
+        if (decimal.TryParse(rawInput, out decimal ratingVal) && ratingVal <= 10.0m && ratingVal != ViewModel!.Series.Rating)
         {
             ratingVal = decimal.Round(ratingVal, 1);
             ViewModel.Series.Rating = ratingVal;
@@ -210,13 +207,13 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
 
     private void ChangeSeriesValue()
     {
-        string valueTextRaw = ValueMaskedTextBox.Text;
+        string? valueTextRaw = ValueMaskedTextBox.Text;
         if (string.IsNullOrWhiteSpace(valueTextRaw) || !valueTextRaw.Any(char.IsDigit)) return;
 
         string valueText = valueTextRaw[1..].Replace("_", "0");
         if (decimal.TryParse(valueText, out decimal newValue))
         {
-            if (decimal.Compare(ViewModel.Series.Value, newValue) != 0)
+            if (decimal.Compare(ViewModel!.Series.Value, newValue) != 0)
             {
                 decimal oldValue = ViewModel.Series.Value;
                 ViewModel.Series.Value = newValue;
@@ -228,8 +225,8 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
 
     private void ChangeSeriesPublisher()
     {
-        string publisherText = PublisherTextBox.Text.Trim();
-        if (!string.IsNullOrEmpty(publisherText) && !publisherText.Equals(ViewModel.Series.Publisher, StringComparison.Ordinal))
+        string publisherText = PublisherTextBox.Text!.Trim();
+        if (!string.IsNullOrEmpty(publisherText) && !publisherText.Equals(ViewModel!.Series.Publisher, StringComparison.Ordinal))
         {
             string oldPublisher = ViewModel.Series.Publisher;
             ViewModel.Series.Publisher = publisherText;
@@ -265,7 +262,7 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
         if (_IsInitialized && DemographicComboBox.IsDropDownOpen)
         {
             SeriesDemographic newDemographic = DemographicComboBox.SelectedItem is null ? SeriesDemographic.Unknown : (SeriesDemographic)DemographicComboBox.SelectedItem;
-            ViewModel.Series.Demographic = newDemographic;
+            ViewModel!.Series.Demographic = newDemographic;
 
             LOGGER.Info(
                 "Changed Demographic for {RomajiTitle} to {Demographic}",
@@ -283,7 +280,7 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
         }
         try
         {
-            await _mainWindowViewModel.RefreshSeries(ViewModel.Series);
+            await _mainWindowViewModel.RefreshSeries(ViewModel!.Series);
             if (Owner is MainWindow mainWindow)
             {
                 mainWindow.ShowNotification($"Refreshed \"{ViewModel.Series.Titles[TsundokuLanguage.Romaji]}\"");
@@ -291,7 +288,7 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
         }
         catch (Exception ex)
         {
-            LOGGER.Error(ex, "Failed to refresh series {Title}", ViewModel.Series.Titles[TsundokuLanguage.Romaji]);
+            LOGGER.Error(ex, "Failed to refresh series {Title}", ViewModel!.Series.Titles[TsundokuLanguage.Romaji]);
             await _popupDialogService.ShowAsync("Error", "fa7-solid fa7-circle-exclamation", $"Failed to refresh series.", this);
         }
         finally
@@ -305,7 +302,7 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
 
     private async void RemoveSeries(object sender, RoutedEventArgs args)
     {
-        string title = ViewModel.Series.Titles.TryGetValue(TsundokuLanguage.Romaji, out string? t) ? t : "this series";
+        string title = ViewModel!.Series.Titles.TryGetValue(TsundokuLanguage.Romaji, out string? t) ? t : "this series";
         bool confirmed = await _popupDialogService.ConfirmAsync(
             "Move to Trash",
             "fa7-solid fa7-trash-can",
@@ -443,7 +440,7 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
         }
     }
 
-    private async void OpenLink(string url) => await Tsundoku.ViewModels.ViewModelBase.OpenSiteLink(url);
+    private async void OpenLink(string url) => await ViewModelBase.OpenSiteLink(url);
 
     private void ForcePreviewLayoutRefresh()
     {
@@ -494,8 +491,8 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
 
     private void ChangeSeriesVolumeCounts()
     {
-        string curText = CurVolumeMaskedTextBox.Text.Replace("_", string.Empty).Trim();
-        string maxText = MaxVolumeMaskedTextBox.Text.Replace("_", string.Empty).Trim();
+        string curText = CurVolumeMaskedTextBox.Text!.Replace("_", string.Empty).Trim();
+        string maxText = MaxVolumeMaskedTextBox.Text!.Replace("_", string.Empty).Trim();
 
         // Try parsing each non‐empty field:
         ushort newCur = 0, newMax = 0;
@@ -517,7 +514,7 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
         // Both were provided:
         if (hasCur && hasMax)
         {
-            ViewModel.Series.UpdateVolumeCounts(newCur, newMax, () =>
+            ViewModel!.Series.UpdateVolumeCounts(newCur, newMax, () =>
             {
                 CurVolumeMaskedTextBox.Clear();
                 MaxVolumeMaskedTextBox.Clear();
@@ -525,25 +522,25 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
         }
         else if (hasCur) // Only “current” was provided:
         {
-            ViewModel.Series.UpdateCurVolumeCount(newCur, CurVolumeMaskedTextBox.Clear);
+            ViewModel!.Series.UpdateCurVolumeCount(newCur, CurVolumeMaskedTextBox.Clear);
         }
         // Only “max” was provided:
         else if (hasMax)
         {
-            ViewModel.Series.UpdateMaxVolumeCount(newMax, MaxVolumeMaskedTextBox.Clear);
+            ViewModel!.Series.UpdateMaxVolumeCount(newMax, MaxVolumeMaskedTextBox.Clear);
         }
     }
 
     private void UpdateSelectedGenres()
     {
-        if (ViewModel.Series.Genres is null)
+        if (ViewModel!.Series.Genres is null)
         {
             return;
         }
 
         foreach (SeriesGenre genre in ViewModel.Series.Genres.AsValueEnumerable().OrderBy(g => g.ToString()))
         {
-            GenreSelector.SelectedItems.Add(GetPrimaryAlias(genre));
+            GenreSelector.SelectedItems!.Add(GetPrimaryAlias(genre));
         }
     }
 }

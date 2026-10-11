@@ -1,4 +1,3 @@
-using Avalonia.Input;
 using Avalonia.Interactivity;
 using ReactiveUI.Avalonia;
 using Tsundoku.Models.Enums;
@@ -37,15 +36,9 @@ public sealed partial class RandomPickerWindow : ReactiveWindow<RandomPickerView
         }
     }
 
-    public void RollOnOpen()
-    {
-        ViewModel!.Roll();
-    }
+    public void RollOnOpen() => ViewModel!.Roll();
 
-    private void RollAgain(object? sender, RoutedEventArgs e)
-    {
-        ViewModel!.Roll();
-    }
+    private void RollAgain(object? sender, RoutedEventArgs e) => ViewModel!.Roll();
 
     private void CheckPrices(object? sender, RoutedEventArgs e)
     {
@@ -59,8 +52,5 @@ public sealed partial class RandomPickerWindow : ReactiveWindow<RandomPickerView
         Close();
     }
 
-    private void CloseWindow(object? sender, RoutedEventArgs e)
-    {
-        Close();
-    }
+    private void CloseWindow(object? sender, RoutedEventArgs e) => Close();
 }

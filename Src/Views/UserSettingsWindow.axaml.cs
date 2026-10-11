@@ -2,13 +2,11 @@ using Avalonia.Interactivity;
 using Tsundoku.ViewModels;
 using Avalonia.Controls;
 using System.Diagnostics;
-using System.Reactive.Disposables;
 using System.Reactive.Disposables.Fluent;
 using ReactiveUI;
 using Avalonia.Platform.Storage;
 using System.Reactive.Linq;
 using Tsundoku.Helpers;
-using Tsundoku.Services;
 using ReactiveUI.Avalonia;
 
 namespace Tsundoku.Views;
@@ -29,15 +27,15 @@ public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsView
         ViewModel = viewModel;
 
         this.ConfigureHideOnClose(
-            onOpened: () => { if (Screens.Primary.WorkingArea.Height < 955) this.Height = 550; });
+            onOpened: () => { if (Screens.Primary!.WorkingArea.Height < 955) this.Height = 550; });
 
         this.WhenActivated(disposables =>
         {
-            this.WhenAnyValue(x => x.BooksAMillionButton.IsChecked, (member) => member is not null && member == true)
+            this.WhenAnyValue(x => x.BooksAMillionButton.IsChecked, (member) => member is not null and true)
                 .Subscribe(x => ViewModel.BooksAMillionMember = x)
                 .DisposeWith(disposables);
 
-            this.WhenAnyValue(x => x.KinokuniyaUSAButton.IsChecked, (member) => member is not null && member == true)
+            this.WhenAnyValue(x => x.KinokuniyaUSAButton.IsChecked, (member) => member is not null and true)
                 .Subscribe(x => ViewModel.KinokuniyaUSAMember = x)
                 .DisposeWith(disposables);
 
@@ -57,21 +55,12 @@ public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsView
         });
     }
 
-    private async void RefreshAllCoversAsync(object sender, RoutedEventArgs args)
-    {
-        await ViewModel.RefreshAllCoversAsync(this.Owner as Window ?? this);
-    }
+    private async void RefreshAllCoversAsync(object sender, RoutedEventArgs args) => await ViewModel!.RefreshAllCoversAsync(this.Owner as Window ?? this);
 
-    private async void RefreshCurrencyRatesClick(object? sender, RoutedEventArgs args)
-    {
-        await ViewModel.RefreshCurrencyRatesAsync();
-    }
+    private async void RefreshCurrencyRatesClick(object? sender, RoutedEventArgs args) => await ViewModel!.RefreshCurrencyRatesAsync();
 
 
-    private async void ExportToSpreadSheetAsync(object sender, RoutedEventArgs e)
-    {
-        await ViewModel.ExportToSpreadSheetAsync(this);
-    }
+    private async void ExportToSpreadSheetAsync(object sender, RoutedEventArgs e) => await ViewModel!.ExportToSpreadSheetAsync(this);
 
 
     private void ToggleControlsSection(object? sender, RoutedEventArgs e)
@@ -86,10 +75,7 @@ public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsView
         YoutubersChevron.Value = YoutubersContent.IsVisible ? "fa7-solid fa7-chevron-up" : "fa7-solid fa7-chevron-down";
     }
 
-    private async Task ShowFileErrorDialog(string info = "Unable to Open File\nCheck if it is being used by another app")
-    {
-        await _popupDialogService.ShowAsync("Error", "fa7-solid fa7-circle-exclamation", info, this);
-    }
+    private async Task ShowFileErrorDialog(string info = "Unable to Open File\nCheck if it is being used by another app") => await _popupDialogService.ShowAsync("Error", "fa7-solid fa7-circle-exclamation", info, this);
 
     private async Task ImportFileAsync(bool allowMultiple, string fileTypeLabel, string pattern, Func<IReadOnlyList<IStorageFile>, Task> onFilesSelected)
     {
@@ -114,34 +100,13 @@ public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsView
         }
     }
 
-    private async void ImportUserDataAsync(object sender, RoutedEventArgs args)
-    {
-        await ImportFileAsync(false, "JSON File", "*.json", async files =>
-        {
-            await ViewModel.ImportUserDataFromJsonAsync(files[0].Path.LocalPath, this);
-        });
-    }
+    private async void ImportUserDataAsync(object sender, RoutedEventArgs args) => await ImportFileAsync(false, "JSON File", "*.json", async files => await ViewModel!.ImportUserDataFromJsonAsync(files[0].Path.LocalPath, this));
 
-    private async void ImportLibibDataAsync(object sender, RoutedEventArgs args)
-    {
-        await ImportFileAsync(true, "CSV File", "*.csv", async files =>
-        {
-            await ViewModel.ImportLibibDataFromCsv([.. files.AsValueEnumerable().Select(f => f.Path.LocalPath)], this.Owner as Window);
-        });
-    }
+    private async void ImportLibibDataAsync(object sender, RoutedEventArgs args) => await ImportFileAsync(true, "CSV File", "*.csv", async files => await ViewModel!.ImportLibibDataFromCsv([.. files.AsValueEnumerable().Select(f => f.Path.LocalPath)], this.Owner as Window ?? this));
 
-    private async void ImportGoodreadsDataAsync(object sender, RoutedEventArgs args)
-    {
-        await ImportFileAsync(true, "CSV File", "*.csv", async files =>
-        {
-            await ViewModel.ImportGoodreadsDataFromCsv([.. files.AsValueEnumerable().Select(f => f.Path.LocalPath)], this.Owner as Window);
-        });
-    }
+    private async void ImportGoodreadsDataAsync(object sender, RoutedEventArgs args) => await ImportFileAsync(true, "CSV File", "*.csv", async files => await ViewModel!.ImportGoodreadsDataFromCsv([.. files.AsValueEnumerable().Select(f => f.Path.LocalPath)], this.Owner as Window ?? this));
 
-    private async void OpenReleasesPage(object sender, PointerPressedEventArgs args)
-    {
-        await ViewModelBase.OpenSiteLink(@"https://github.com/Sigrec/Tsundoku/releases");
-    }
+    private async void OpenReleasesPage(object sender, PointerPressedEventArgs args) => await ViewModelBase.OpenSiteLink(@"https://github.com/Sigrec/Tsundoku/releases");
 
     private async void ShowChangelogAsync(object sender, RoutedEventArgs args)
     {
@@ -205,7 +170,7 @@ public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsView
         RepairDataButton.Content = "Repairing...";
         try
         {
-            await ViewModel.RepairUserDataAsync();
+            await ViewModel!.RepairUserDataAsync();
             await _popupDialogService.ShowAsync(
                 "Repair Complete",
                 "fa7-solid fa7-circle-check",
@@ -228,16 +193,10 @@ public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsView
         }
     }
 
-    public async void OpenAniListLink(object sender, RoutedEventArgs args)
-    {
-        await ViewModelBase.OpenSiteLink(@"https://anilist.co/");
-    }
+    public async void OpenAniListLink(object sender, RoutedEventArgs args) => await ViewModelBase.OpenSiteLink(@"https://anilist.co/");
 
-    public async void OpenMangadexLink(object sender, RoutedEventArgs args)
-    {
-        await ViewModelBase.OpenSiteLink(@"https://mangadex.org/");
-    }
-    
+    public async void OpenMangadexLink(object sender, RoutedEventArgs args) => await ViewModelBase.OpenSiteLink(@"https://mangadex.org/");
+
     public void OpenApplicationFolder(object sender, RoutedEventArgs args) => OpenFolder(AppFileHelper.GetFolderPath(string.Empty));
     public void OpenCoversFolder(object sender, RoutedEventArgs args) => OpenFolder(AppFileHelper.GetCoversFolderPath());
     public void OpenScreenshotsFolder(object sender, RoutedEventArgs args) => OpenFolder(AppFileHelper.GetScreenshotsFolderPath());
@@ -263,10 +222,10 @@ public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsView
 
     public void ChangeUsername(object sender, RoutedEventArgs args)
     {
-        string newUsername = UsernameChangeTextBox.Text;
+        string? newUsername = UsernameChangeTextBox.Text;
         if (!string.IsNullOrWhiteSpace(newUsername))
         {
-            ViewModel.UpdateUserName(newUsername);
+            ViewModel!.UpdateUserName(newUsername);
             LOGGER.Info("Username Changed to {Username}", newUsername);
         }
     }
@@ -279,18 +238,9 @@ public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsView
         }
     }
 
-    public async void OpenCoolorsSite(object sender, RoutedEventArgs args)
-    {
-        await ViewModelBase.OpenSiteLink(@"https://coolors.co/generate");
-    }
+    public async void OpenCoolorsSite(object sender, RoutedEventArgs args) => await ViewModelBase.OpenSiteLink(@"https://coolors.co/generate");
 
-    public async void JoinDiscord(object sender, RoutedEventArgs args)
-    {
-        await ViewModelBase.OpenSiteLink(@"https://discord.gg/QcZ5jcFPeU");
-    }
+    public async void JoinDiscord(object sender, RoutedEventArgs args) => await ViewModelBase.OpenSiteLink(@"https://discord.gg/QcZ5jcFPeU");
 
-    public async void ReportBug(object sender, RoutedEventArgs args)
-    {
-        await ViewModelBase.OpenSiteLink(@"https://github.com/Sigrec/Tsundoku/issues/new/choose");
-    }
+    public async void ReportBug(object sender, RoutedEventArgs args) => await ViewModelBase.OpenSiteLink(@"https://github.com/Sigrec/Tsundoku/issues/new/choose");
 }

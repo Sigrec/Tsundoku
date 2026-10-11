@@ -7,10 +7,10 @@ namespace Tsundoku.Converters;
 
 public sealed class BrushToColorConverter : IValueConverter
 {
-    public static readonly BrushToColorConverter Instance = new BrushToColorConverter();
+    public static readonly BrushToColorConverter Instance = new();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is ISolidColorBrush solid) return solid.Color;
         if (value is Color color) return color;
@@ -18,15 +18,5 @@ public sealed class BrushToColorConverter : IValueConverter
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-    {
-        if (value is SolidColorBrush brush) return brush;
-
-        if (value is Color color)
-        {
-            return new SolidColorBrush(color);
-        }
-
-        return new SolidColorBrush(Colors.Transparent);
-    }
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) => value is SolidColorBrush brush ? brush : value is Color color ? new SolidColorBrush(color) : new SolidColorBrush(Colors.Transparent);
 }

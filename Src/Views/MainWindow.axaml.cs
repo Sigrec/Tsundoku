@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using Avalonia.Media.Imaging;
 using System.Reactive.Linq;
 using Tsundoku.Helpers;
@@ -19,9 +20,6 @@ using ReactiveUI.Avalonia;
 using System.Reactive.Disposables;
 using System.Reactive.Disposables.Fluent;
 using System.Collections.Specialized;
-using Tsundoku.Services;
-using Avalonia.Media.Transformation;
-using Avalonia.Styling;
 
 namespace Tsundoku.Views;
 
@@ -90,7 +88,7 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
                 .Where(e => e.EventArgs.Action == NotifyCollectionChangedAction.Reset)
                 .Subscribe(_ =>
                 {
-                    CollectionPane.Offset = new Avalonia.Vector(0, 0);
+                    CollectionPane.Offset = new Vector(0, 0);
                     Dispatcher.UIThread.Post(() => CollectionItems.InvalidateMeasure(), DispatcherPriority.Render);
                 })
                 .DisposeWith(disposables);
@@ -204,10 +202,10 @@ KeyDown += async (s, e) =>
 
     private async Task ScreenCaptureWindows()
     {
-        string userName = ViewModel.CurrentUser.UserName;
+        string userName = ViewModel!.CurrentUser.UserName;
         string themeName = ViewModel.CurrentTheme.ThemeName;
         TsundokuLanguage language = ViewModel.CurrentUser.Language;
-        string filterSegment = (ViewModel.SelectedFilter != TsundokuFilter.None && ViewModel.SelectedFilter != TsundokuFilter.Query)
+        string filterSegment = (ViewModel.SelectedFilter is not TsundokuFilter.None and not TsundokuFilter.Query)
             ? $"-{ViewModel.SelectedFilter.GetEnumMemberValue()}"
             : string.Empty;
 
@@ -216,8 +214,8 @@ KeyDown += async (s, e) =>
 
         try
         {
-            var pixelSize = new PixelSize((int)Bounds.Width, (int)Bounds.Height);
-            using var rtb = new RenderTargetBitmap(pixelSize, new Avalonia.Vector(96, 96));
+            PixelSize pixelSize = new((int)Bounds.Width, (int)Bounds.Height);
+            using RenderTargetBitmap rtb = new(pixelSize, new Vector(96, 96));
             rtb.Render(this);
             rtb.Save(finalScreenshotPath, PngBitmapEncoderOptions.Default);
 
@@ -233,7 +231,7 @@ KeyDown += async (s, e) =>
 
     private async Task DoShowEditSeriesInfoDialogAsync(IInteractionContext<EditSeriesInfoViewModel, MainWindowViewModel?> interaction)
     {
-        EditSeriesInfoWindow dialog = App.ServiceProvider.GetRequiredService<EditSeriesInfoWindow>();
+        EditSeriesInfoWindow dialog = App.ServiceProvider!.GetRequiredService<EditSeriesInfoWindow>();
         dialog.DataContext = interaction.Input;
 
         MainWindowViewModel? resultFromDialog = await this.OpenManagedDialogWithResultAsync<EditSeriesInfoWindow, EditSeriesInfoViewModel, MainWindowViewModel?>(
@@ -252,7 +250,7 @@ KeyDown += async (s, e) =>
         _notificationCts = new CancellationTokenSource();
         CancellationToken token = _notificationCts.Token;
 
-        ViewModel.NotificationText = notiText;
+        ViewModel!.NotificationText = notiText;
         NotificationPopup.IsVisible = true;
         try
         {
@@ -262,7 +260,7 @@ KeyDown += async (s, e) =>
         catch (TaskCanceledException) { }
     }
 
-    private static Lazy<TWindow> CreateManagedWindow<TWindow>(IServiceProvider serviceProvider, Func<ToggleButton> toolbarButton) where TWindow : Window
+    private static Lazy<TWindow> CreateManagedWindow<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] TWindow>(IServiceProvider serviceProvider, Func<ToggleButton> toolbarButton) where TWindow : Window
     {
         return new Lazy<TWindow>(() =>
         {
@@ -318,8 +316,7 @@ KeyDown += async (s, e) =>
 
     private void OpenTrashDialog(object sender, RoutedEventArgs args)
     {
-        TrashWindow? trash = App.ServiceProvider?.GetService(typeof(TrashWindow)) as TrashWindow;
-        if (trash is null) return;
+        if (App.ServiceProvider?.GetService(typeof(TrashWindow)) is not TrashWindow trash) return;
         this.OpenManagedWindow<TrashWindow, TrashViewModel>(trash, "Trash Window");
     }
 
@@ -382,21 +379,18 @@ KeyDown += async (s, e) =>
     {
         if (LanguageSelector.SelectedItem is TsundokuLanguage selectedItem)
         {
-            ViewModel.UpdateUserLanguage(selectedItem);
+            ViewModel!.UpdateUserLanguage(selectedItem);
             LOGGER.Info("Changed Language to {Lang}", selectedItem);
         }
     }
 
-    private void BackToTop_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private void BackToTop_Click(object? sender, RoutedEventArgs e)
     {
         if (CollectionPane.Offset.Y <= 0) return;
-        CollectionPane.Offset = new Avalonia.Vector(0, 0);
+        CollectionPane.Offset = new Vector(0, 0);
     }
 
-    private void ClearAllFiltersClick(object? sender, RoutedEventArgs e)
-    {
-        ViewModel?.ClearAllFilters();
-    }
+    private void ClearAllFiltersClick(object? sender, RoutedEventArgs e) => ViewModel?.ClearAllFilters();
 
     /// <summary>
     /// Changes the sort on the users collection
@@ -406,11 +400,11 @@ KeyDown += async (s, e) =>
         if (SortSelector.SelectedItem is string selectedItem)
         {
             LOGGER.Debug("Changing Sort to {sort}", selectedItem);
-            ViewModel.SelectedSort = selectedItem.GetEnumValueFromMemberValue(TsundokuSort.TitleAZ);
+            ViewModel!.SelectedSort = selectedItem.GetEnumValueFromMemberValue(TsundokuSort.TitleAZ);
         }
     }
 
-    private void ToggleThemeSelector(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    private void ToggleThemeSelector(object? sender, RoutedEventArgs e)
     {
         ThemeGrid.IsVisible = !ThemeGrid.IsVisible;
         if (ThemeGrid.IsVisible)
@@ -441,7 +435,7 @@ KeyDown += async (s, e) =>
         {
             TsundokuFilter filter = selectedItem.GetEnumValueFromMemberValue(TsundokuFilter.None);
             LOGGER.Debug("Changing Filter to {filter}", filter);
-            ViewModel.SelectedFilter = filter;
+            ViewModel!.SelectedFilter = filter;
             ClearFilterButton.IsVisible = filter != TsundokuFilter.None;
         }
     }
@@ -449,7 +443,7 @@ KeyDown += async (s, e) =>
     private void ClearFilterClicked(object sender, RoutedEventArgs e)
     {
         CollectionFilterSelector.SelectedIndex = -1;
-        ViewModel.SelectedFilter = TsundokuFilter.None;
+        ViewModel!.SelectedFilter = TsundokuFilter.None;
         ViewModel.SelectedFilterIndex = -1;
         ClearFilterButton.IsVisible = false;
         LOGGER.Debug("Cleared Filter");
@@ -460,18 +454,18 @@ KeyDown += async (s, e) =>
         if (PublisherFilterSelector.SelectedItem is string selectedPublisher)
         {
             LOGGER.Debug("Changing Publisher Filter to {publisher}", selectedPublisher);
-            ViewModel.SelectedPublisher = selectedPublisher;
+            ViewModel!.SelectedPublisher = selectedPublisher;
         }
         else
         {
-            ViewModel.SelectedPublisher = string.Empty;
+            ViewModel!.SelectedPublisher = string.Empty;
         }
     }
 
     private void ClearPublisherFilterClicked(object sender, RoutedEventArgs e)
     {
         PublisherFilterSelector.SelectedItem = null;
-        ViewModel.SelectedPublisher = string.Empty;
+        ViewModel!.SelectedPublisher = string.Empty;
         LOGGER.Debug("Cleared Publisher Filter");
     }
 
@@ -495,7 +489,7 @@ KeyDown += async (s, e) =>
         });
         if (file.Count == 1)
         {
-            ViewModel.UpdateUserIcon(Path.ChangeExtension(file[0].Path.LocalPath, ".png"));
+            ViewModel!.UpdateUserIcon(Path.ChangeExtension(file[0].Path.LocalPath, ".png"));
         }
         else
         {
@@ -528,7 +522,10 @@ KeyDown += async (s, e) =>
     /// </summary>
     private async void CopySeriesTitleAsync(object sender, PointerPressedEventArgs args)
     {
-        await ClipboardHelper.CopyToClipboardAsync(((TextBlock)sender).Text);
+        if (sender is TextBlock { Text: { Length: > 0 } title })
+        {
+            await ClipboardHelper.CopyToClipboardAsync(title);
+        }
     }
 
     /// <summary>
@@ -635,7 +632,7 @@ KeyDown += async (s, e) =>
 
     private async void SaveCurrentFilterAsShelf(object sender, RoutedEventArgs args)
     {
-        if (string.IsNullOrWhiteSpace(ViewModel.FilterBuilder.SynthesizedQuery))
+        if (string.IsNullOrWhiteSpace(ViewModel!.FilterBuilder.SynthesizedQuery))
         {
             await _popupDialogService.ShowAsync(
                 "Empty Filter",
@@ -679,7 +676,7 @@ KeyDown += async (s, e) =>
 
         try
         {
-            ViewModel.RenameShelf(shelf, newName);
+            ViewModel!.RenameShelf(shelf, newName);
         }
         catch (Exception ex)
         {
@@ -702,7 +699,7 @@ KeyDown += async (s, e) =>
 
         if (confirmed)
         {
-            ViewModel.DeleteShelf(shelf);
+            ViewModel!.DeleteShelf(shelf);
         }
     }
 }

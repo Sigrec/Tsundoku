@@ -32,10 +32,7 @@ public sealed partial class App : Application
         // Do NOT put any DI logic here, as the ServiceProvider is not fully ready yet.
     }
 
-    public override void Initialize()
-    {
-        AvaloniaXamlLoader.Load(this);
-    }
+    public override void Initialize() => AvaloniaXamlLoader.Load(this);
 
     public override void OnFrameworkInitializationCompleted()
     {
@@ -342,7 +339,7 @@ public sealed partial class App : Application
         LoggingConfiguration config = LogManager.Configuration ?? new LoggingConfiguration();
 
         // Configure (or create) the file target
-        FileTarget fileTarget = config.FindTargetByName<FileTarget>("TsundokuLogs");
+        FileTarget? fileTarget = config.FindTargetByName<FileTarget>("TsundokuLogs");
         if (fileTarget is null)
         {
             fileTarget = new FileTarget("TsundokuLogs")
@@ -367,7 +364,7 @@ public sealed partial class App : Application
             fileTarget.ArchiveFileName = Path.Combine(localCachePath, "TsundokuLogs.{#}.log");
         }
 
-        var asyncWrapper = new AsyncTargetWrapper(fileTarget)
+        AsyncTargetWrapper asyncWrapper = new(fileTarget)
         {
             Name = "TsundokuLogsAsync",
             OverflowAction = AsyncTargetWrapperOverflowAction.Discard,
@@ -378,7 +375,7 @@ public sealed partial class App : Application
 
     #if DEBUG
         // Configure (or create) the console target (only in DEBUG)
-        ColoredConsoleTarget consoleTarget = config.FindTargetByName<ColoredConsoleTarget>("TsundokuConsole");
+        ColoredConsoleTarget? consoleTarget = config.FindTargetByName<ColoredConsoleTarget>("TsundokuConsole");
         if (consoleTarget is null)
         {
             consoleTarget = new ColoredConsoleTarget("TsundokuConsole")
@@ -392,7 +389,7 @@ public sealed partial class App : Application
         // Clear existing rules for these targets (avoid duplicates)
         for (int i = config.LoggingRules.Count - 1; i >= 0; i--)
         {
-            var rule = config.LoggingRules[i];
+            LoggingRule rule = config.LoggingRules[i];
             if (rule.Targets.Any(t =>
                 t == fileTarget
                 || t == asyncWrapper
@@ -408,22 +405,22 @@ public sealed partial class App : Application
         // --- Namespace-specific filtering for MangaAndLightNovelWebScrape.* ---
 
         // Null target to swallow low levels
-        NLog.Targets.NullTarget? blackHole = config.FindTargetByName<NLog.Targets.NullTarget>("BlackHole");
+        NullTarget? blackHole = config.FindTargetByName<NullTarget>("BlackHole");
         if (blackHole is null)
         {
-            blackHole = new NLog.Targets.NullTarget("BlackHole");
+            blackHole = new NullTarget("BlackHole");
             config.AddTarget(blackHole);
         }
 
         // 1) Drop Trace..Info for that namespace, and stop processing
-        var dropLowLevels = new LoggingRule("MangaAndLightNovelWebScrape.*", NLog.LogLevel.Trace, NLog.LogLevel.Info, blackHole)
+        LoggingRule dropLowLevels = new("MangaAndLightNovelWebScrape.*", NLog.LogLevel.Trace, NLog.LogLevel.Info, blackHole)
         {
             Final = true
         };
         config.LoggingRules.Add(dropLowLevels);
 
         // 2) Allow Warn..Fatal for that namespace, and stop processing (so it won't hit catch-alls)
-        var allowWarnPlus = new LoggingRule("MangaAndLightNovelWebScrape.*", NLog.LogLevel.Warn, NLog.LogLevel.Fatal, asyncWrapper)
+        LoggingRule allowWarnPlus = new("MangaAndLightNovelWebScrape.*", NLog.LogLevel.Warn, NLog.LogLevel.Fatal, asyncWrapper)
         {
             Final = true
         };
@@ -433,7 +430,7 @@ public sealed partial class App : Application
         config.LoggingRules.Add(allowWarnPlus);
 
         // 3) Drop HttpClient request/response chatter — only surface Warn+
-        var dropHttpClientChatter = new LoggingRule("System.Net.Http.HttpClient.*", NLog.LogLevel.Trace, NLog.LogLevel.Info, blackHole)
+        LoggingRule dropHttpClientChatter = new("System.Net.Http.HttpClient.*", NLog.LogLevel.Trace, NLog.LogLevel.Info, blackHole)
         {
             Final = true
         };

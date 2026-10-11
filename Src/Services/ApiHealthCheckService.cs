@@ -1,7 +1,6 @@
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using GraphQL;
-using GraphQL.Client.Http;
 using Microsoft.Extensions.Logging;
 using Tsundoku.Clients;
 using MsLogger = Microsoft.Extensions.Logging.ILogger;
@@ -91,16 +90,13 @@ public sealed class ApiHealthCheckService : IApiHealthCheckService
         _logger.ServiceStopped();
     }
 
-    private async Task CheckAllAsync()
-    {
-        await Task.WhenAll(CheckAniListAsync(), CheckMangaDexAsync());
-    }
+    private async Task CheckAllAsync() => await Task.WhenAll(CheckAniListAsync(), CheckMangaDexAsync());
 
     private async Task CheckAniListAsync()
     {
         try
         {
-            GraphQLRequest request = new GraphQLRequest
+            GraphQLRequest request = new()
             {
                 Query = "{ Page(page:1,perPage:1) { media(type:MANGA) { id } } }"
             };

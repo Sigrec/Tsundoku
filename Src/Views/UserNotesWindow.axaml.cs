@@ -1,5 +1,3 @@
-using Avalonia;
-using Avalonia.Input;
 using Avalonia.Interactivity;
 using ReactiveUI.Avalonia;
 using Tsundoku.Helpers;
@@ -16,7 +14,7 @@ public sealed partial class UserNotesWindow : ReactiveWindow<UserNotesWindowView
         ViewModel = viewModel;
         InitializeComponent();
         NotesPreviewScroller.AddHandler(
-            InputElement.PointerWheelChangedEvent,
+            PointerWheelChangedEvent,
             (_, e) =>
             {
                 double delta = e.Delta.Y * 40;
@@ -47,7 +45,7 @@ public sealed partial class UserNotesWindow : ReactiveWindow<UserNotesWindowView
         ForcePreviewLayoutRefresh();
     }
 
-    private async void OpenLink(string url) => await Tsundoku.ViewModels.ViewModelBase.OpenSiteLink(url);
+    private async void OpenLink(string url) => await ViewModelBase.OpenSiteLink(url);
 
     private void ForcePreviewLayoutRefresh()
     {

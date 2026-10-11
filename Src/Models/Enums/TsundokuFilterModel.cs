@@ -9,13 +9,13 @@ public static class TsundokuFilterModel
 {
     public static readonly ImmutableArray<string> TSUNDOKU_FILTER_LIST = Enum.GetValues<TsundokuFilter>()
         .AsValueEnumerable()
-        .Where(filter => filter != TsundokuFilter.None && filter != TsundokuFilter.Query)
+        .Where(filter => filter is not TsundokuFilter.None and not TsundokuFilter.Query)
         .Select(filter => filter.GetEnumMemberValue())
         .ToImmutableArray();
 
     public static readonly FrozenDictionary<TsundokuFilter, int> TSUNDOKU_FILTER_DICT = Enum.GetValues<TsundokuFilter>()
         .AsValueEnumerable()
-        .Where(filter => filter != TsundokuFilter.None && filter != TsundokuFilter.Query)
+        .Where(filter => filter is not TsundokuFilter.None and not TsundokuFilter.Query)
         .Select((filter, index) => (filter, index))
         .ToFrozenDictionary(x => x.filter, x => x.index);
 

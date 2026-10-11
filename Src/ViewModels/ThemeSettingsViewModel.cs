@@ -16,10 +16,7 @@ public sealed partial class ThemeSettingsViewModel : ViewModelBase
 
     public ReadOnlyObservableCollection<TsundokuTheme> SavedThemes => _userService.SavedThemes;
 
-    public ThemeSettingsViewModel(IUserService userService) : base(userService)
-    {
-        UpdateSelectedThemeIndex();
-    }
+    public ThemeSettingsViewModel(IUserService userService) : base(userService) => UpdateSelectedThemeIndex();
 
     /// <summary>
     /// Synchronizes the selected theme index with the current theme from the user service.
@@ -38,46 +35,31 @@ public sealed partial class ThemeSettingsViewModel : ViewModelBase
     /// Gets the user's main (default) theme.
     /// </summary>
     /// <returns>The main theme.</returns>
-    public TsundokuTheme GetMainTheme()
-    {
-        return _userService.GetMainTheme()!;
-    }
+    public TsundokuTheme GetMainTheme() => _userService.GetMainTheme()!;
 
     /// <summary>
     /// Gets a snapshot of the currently active theme.
     /// </summary>
     /// <returns>The current theme.</returns>
-    public TsundokuTheme GetCurrentTheme()
-    {
-        return _userService.GetCurrentThemeSnapshot()!;
-    }
+    public TsundokuTheme GetCurrentTheme() => _userService.GetCurrentThemeSnapshot()!;
 
     /// <summary>
     /// Temporarily overrides the current theme for preview without saving the preference.
     /// </summary>
     /// <param name="theme">The theme to preview.</param>
-    public void OverrideCurrentTheme(TsundokuTheme theme)
-    {
-        _userService.OverrideCurrentTheme(theme);
-    }
+    public void OverrideCurrentTheme(TsundokuTheme theme) => _userService.OverrideCurrentTheme(theme);
 
     /// <summary>
     /// Sets the specified theme as the active theme and updates the user's preference.
     /// </summary>
     /// <param name="theme">The theme to activate.</param>
-    public void SetTheme(TsundokuTheme theme)
-    {
-        _userService.SetCurrentTheme(theme);
-    }
+    public void SetTheme(TsundokuTheme theme) => _userService.SetCurrentTheme(theme);
 
     /// <summary>
     /// Sets the theme with the specified name as the active theme.
     /// </summary>
     /// <param name="themeName">The name of the theme to activate.</param>
-    public void SetTheme(string themeName)
-    {
-        _userService.SetCurrentTheme(themeName);
-    }
+    public void SetTheme(string themeName) => _userService.SetCurrentTheme(themeName);
 
     /// <summary>
     /// Removes the theme with the specified name and updates the selected index.
@@ -93,10 +75,7 @@ public sealed partial class ThemeSettingsViewModel : ViewModelBase
     /// Exports the current theme to a JSON file.
     /// </summary>
     /// <param name="fileName">The base file name for the exported theme.</param>
-    public void ExportTheme(string fileName)
-    {
-        _userService.ExportTheme(fileName);
-    }
+    public void ExportTheme(string fileName) => _userService.ExportTheme(fileName);
 
     /// <summary>
     /// Imports a theme from a JSON file, saves user data, and updates the selected index.

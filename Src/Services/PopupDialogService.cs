@@ -1,4 +1,3 @@
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
@@ -24,7 +23,7 @@ public sealed class PopupDialogService(PopupDialogViewModel viewModel) : IPopupD
         Window owner)
     {
         _viewModel.SetPopupInfo(title, icon, info);
-        PopupDialog dialog = new PopupDialog
+        PopupDialog dialog = new()
         {
             ViewModel = _viewModel
         };
@@ -45,7 +44,7 @@ public sealed class PopupDialogService(PopupDialogViewModel viewModel) : IPopupD
     {
         string? result = null;
 
-        Window inputDialog = new Window
+        Window inputDialog = new()
         {
             Title = title,
             Width = 400,
@@ -57,22 +56,22 @@ public sealed class PopupDialogService(PopupDialogViewModel viewModel) : IPopupD
             Icon = owner.Icon
         };
 
-        Border border = new Border
+        Border border = new()
         {
             BorderThickness = new Thickness(2),
             CornerRadius = new CornerRadius(0, 0, 8, 8),
             ClipToBounds = true,
             Background = (IBrush)Application.Current!.FindResource("TsundokuMenuBGColor")!,
-            BorderBrush = (IBrush)Application.Current.FindResource("TsundokuDividerColor")!
+            BorderBrush = (IBrush)Application.Current!.FindResource("TsundokuDividerColor")!
         };
 
-        StackPanel content = new StackPanel
+        StackPanel content = new()
         {
             Margin = new Thickness(20),
             Spacing = 12
         };
 
-        Icon iconControl = new Icon
+        Icon iconControl = new()
         {
             Value = icon,
             FontSize = 36,
@@ -80,17 +79,17 @@ public sealed class PopupDialogService(PopupDialogViewModel viewModel) : IPopupD
             Foreground = (IBrush)Application.Current!.FindResource("TsundokuDividerColor")!
         };
 
-        TextBlock messageText = new TextBlock
+        TextBlock messageText = new()
         {
             Text = prompt,
             FontSize = 14,
             TextAlignment = TextAlignment.Center,
             FontWeight = FontWeight.Bold,
             TextWrapping = TextWrapping.Wrap,
-            Foreground = (IBrush)Application.Current.FindResource("TsundokuMenuTextColor")!
+            Foreground = (IBrush)Application.Current!.FindResource("TsundokuMenuTextColor")!
         };
 
-        TextBox inputBox = new TextBox
+        TextBox inputBox = new()
         {
             FontSize = 13,
             FontWeight = FontWeight.Bold,
@@ -100,33 +99,33 @@ public sealed class PopupDialogService(PopupDialogViewModel viewModel) : IPopupD
         };
         inputBox.Classes.Add("Menu");
 
-        StackPanel buttonPanel = new StackPanel
+        StackPanel buttonPanel = new()
         {
             Orientation = Orientation.Horizontal,
             HorizontalAlignment = HorizontalAlignment.Center,
             Spacing = 10
         };
 
-        Application.Current.Resources.TryGetResource("MenuButton", null, out object? themeObj);
+        Application.Current!.Resources.TryGetResource("MenuButton", null, out object? themeObj);
         ControlTheme? menuButtonTheme = themeObj as ControlTheme;
 
-        Button confirmBtn = new Button
+        Button confirmBtn = new()
         {
             Content = "Confirm",
             FontSize = 13,
             FontWeight = FontWeight.Bold,
             Padding = new Thickness(20, 6),
-            Cursor = new Avalonia.Input.Cursor(Avalonia.Input.StandardCursorType.Hand),
+            Cursor = new Cursor(StandardCursorType.Hand),
             Theme = menuButtonTheme
         };
 
-        Button skipBtn = new Button
+        Button skipBtn = new()
         {
             Content = "Skip",
             FontSize = 13,
             FontWeight = FontWeight.Bold,
             Padding = new Thickness(20, 6),
-            Cursor = new Avalonia.Input.Cursor(Avalonia.Input.StandardCursorType.Hand),
+            Cursor = new Cursor(StandardCursorType.Hand),
             Theme = menuButtonTheme
         };
 
@@ -153,7 +152,7 @@ public sealed class PopupDialogService(PopupDialogViewModel viewModel) : IPopupD
     {
         bool result = false;
 
-        Window confirmDialog = new Window
+        Window confirmDialog = new()
         {
             Title = title,
             Width = 350,
@@ -165,22 +164,22 @@ public sealed class PopupDialogService(PopupDialogViewModel viewModel) : IPopupD
             Icon = owner.Icon
         };
 
-        Border border = new Border
+        Border border = new()
         {
             BorderThickness = new Thickness(2),
             CornerRadius = new CornerRadius(0, 0, 8, 8),
             ClipToBounds = true,
             Background = (IBrush)Application.Current!.FindResource("TsundokuMenuBGColor")!,
-            BorderBrush = (IBrush)Application.Current.FindResource("TsundokuDividerColor")!
+            BorderBrush = (IBrush)Application.Current!.FindResource("TsundokuDividerColor")!
         };
 
-        StackPanel content = new StackPanel
+        StackPanel content = new()
         {
             Margin = new Thickness(20),
             Spacing = 12
         };
 
-        Icon iconControl = new Icon
+        Icon iconControl = new()
         {
             Value = icon,
             FontSize = 25,
@@ -188,43 +187,43 @@ public sealed class PopupDialogService(PopupDialogViewModel viewModel) : IPopupD
             Foreground = (IBrush)Application.Current!.FindResource("TsundokuDividerColor")!
         };
 
-        TextBlock messageText = new TextBlock
+        TextBlock messageText = new()
         {
             Text = info,
             FontSize = 14,
             TextAlignment = TextAlignment.Center,
             FontWeight = FontWeight.Bold,
             TextWrapping = TextWrapping.Wrap,
-            Foreground = (IBrush)Application.Current.FindResource("TsundokuMenuTextColor")!
+            Foreground = (IBrush)Application.Current!.FindResource("TsundokuMenuTextColor")!
         };
 
-        StackPanel buttonPanel = new StackPanel
+        StackPanel buttonPanel = new()
         {
             Orientation = Orientation.Horizontal,
             HorizontalAlignment = HorizontalAlignment.Center,
             Spacing = 10
         };
 
-        Application.Current.Resources.TryGetResource("MenuButton", null, out object? themeObj);
+        Application.Current!.Resources.TryGetResource("MenuButton", null, out object? themeObj);
         ControlTheme? menuButtonTheme = themeObj as ControlTheme;
 
-        Button confirmBtn = new Button
+        Button confirmBtn = new()
         {
             Content = "Confirm",
             FontSize = 13,
             FontWeight = FontWeight.Bold,
             Padding = new Thickness(20, 6),
-            Cursor = new Avalonia.Input.Cursor(Avalonia.Input.StandardCursorType.Hand),
+            Cursor = new Cursor(StandardCursorType.Hand),
             Theme = menuButtonTheme
         };
 
-        Button cancelBtn = new Button
+        Button cancelBtn = new()
         {
             Content = "Cancel",
             FontSize = 13,
             FontWeight = FontWeight.Bold,
             Padding = new Thickness(20, 6),
-            Cursor = new Avalonia.Input.Cursor(Avalonia.Input.StandardCursorType.Hand),
+            Cursor = new Cursor(StandardCursorType.Hand),
             Theme = menuButtonTheme
         };
 
