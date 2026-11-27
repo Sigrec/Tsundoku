@@ -825,13 +825,13 @@ public sealed partial class Series(
         // 1. Titles (Dictionary<TsundokuLanguage, string>) – deep‐compare by count + per‐key/value
         if (!ExtensionMethods.DictionariesEqual(Titles, other.Titles))
         {
-            Titles = new Dictionary<TsundokuLanguage, string>(other.Titles);
+            Titles = [with(other.Titles)];
         }
 
         // 2. Staff (Dictionary<TsundokuLanguage, string>) – deep‐compare
         if (!ExtensionMethods.DictionariesEqual(Staff, other.Staff))
         {
-            Staff = new Dictionary<TsundokuLanguage, string>(other.Staff);
+            Staff = [with(other.Staff)];
         }
 
         // 3. Description (string)

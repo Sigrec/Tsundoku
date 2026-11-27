@@ -85,7 +85,7 @@ public sealed partial class RandomPickerViewModel : ViewModelBase, IDisposable
 
         MainTitle = primary;
 
-        List<string> others = new(series.Titles.Count);
+        List<string> others = [with(series.Titles.Count)];
         foreach (KeyValuePair<TsundokuLanguageModel.TsundokuLanguage, string> kv in series.Titles)
         {
             if (string.IsNullOrWhiteSpace(kv.Value)) continue;

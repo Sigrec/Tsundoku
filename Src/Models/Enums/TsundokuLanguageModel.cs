@@ -22,11 +22,11 @@ public static class TsundokuLanguageModel
 
     static TsundokuLanguageModel()
     {
-        Dictionary<string, TsundokuLanguage> stringToLang = new(StringComparer.OrdinalIgnoreCase);
+        Dictionary<string, TsundokuLanguage> stringToLang = [with(StringComparer.OrdinalIgnoreCase)];
         Dictionary<TsundokuLanguage, string> langToString = [];
-        Dictionary<string, TsundokuLanguage> aniList = new(StringComparer.OrdinalIgnoreCase);
+        Dictionary<string, TsundokuLanguage> aniList = [with(StringComparer.OrdinalIgnoreCase)];
         Dictionary<TsundokuLanguage, string> culture = [];
-        Dictionary<string, TsundokuLanguage> mangaDex = new(StringComparer.OrdinalIgnoreCase);
+        Dictionary<string, TsundokuLanguage> mangaDex = [with(StringComparer.OrdinalIgnoreCase)];
 
         foreach (TsundokuLanguage lang in Enum.GetValues<TsundokuLanguage>())
         {

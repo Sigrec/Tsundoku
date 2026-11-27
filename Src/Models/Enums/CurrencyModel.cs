@@ -22,7 +22,7 @@ public static class CurrencyModel
     static CurrencyModel()
     {
         List<string> symbols = [];
-        Dictionary<string, (int Index, string Culture)> currencyMap = new(StringComparer.Ordinal);
+        Dictionary<string, (int Index, string Culture)> currencyMap = [with(StringComparer.Ordinal)];
 
         int index = 0;
         foreach (Currency currency in Enum.GetValues<Currency>())

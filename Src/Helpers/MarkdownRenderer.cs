@@ -46,8 +46,8 @@ public static class MarkdownRenderer
 
         // First pass: collect reference-link and footnote definitions and mark those
         // lines so the block pass skips them.
-        Dictionary<string, string> linkRefs = new(StringComparer.OrdinalIgnoreCase);
-        Dictionary<string, string> footnoteDefs = new(StringComparer.Ordinal);
+        Dictionary<string, string> linkRefs = [with(StringComparer.OrdinalIgnoreCase)];
+        Dictionary<string, string> footnoteDefs = [with(StringComparer.Ordinal)];
         List<string> footnoteOrder = [];
         bool[] skip = new bool[lines.Length];
 

@@ -25,7 +25,8 @@ jobs:
     - name: Setup .NET SDK
       uses: actions/setup-dotnet@v5
       with:
-        dotnet-version: '10.x'
+        dotnet-version: '11.0.x'
+        dotnet-quality: 'preview'
 
     - name: Extract Version from csproj
       id: version

@@ -33,12 +33,12 @@ public static class Changelog
             using Stream stream = assembly.GetManifestResourceStream(resourceName)!;
             Dictionary<string, ChangelogEntry>? data = JsonSerializer.Deserialize(stream, ChangelogModelContext.Default.DictionaryStringChangelogEntry);
             return data?.AsValueEnumerable().ToFrozenDictionary(StringComparer.Ordinal)
-                ?? FrozenDictionary<string, ChangelogEntry>.Empty;
+                ?? [];
         }
         catch (Exception ex)
         {
             LOGGER.Error(ex, "Failed to load changelog.json from embedded resources");
-            return FrozenDictionary<string, ChangelogEntry>.Empty;
+            return [];
         }
     }
 

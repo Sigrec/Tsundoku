@@ -23,10 +23,10 @@ public static class AppFileHelper
     private const string ScreenshotsFolderName = "Screenshots";
 
     /// <summary>Recognized image file extensions for cover images.</summary>
-    public static readonly HashSet<string> VALID_IMAGE_EXTENSIONS = new(StringComparer.OrdinalIgnoreCase)
-    {
-        ".png", ".jpg", ".jpeg"
-    };
+    public static readonly HashSet<string> VALID_IMAGE_EXTENSIONS =
+    [
+with(StringComparer.OrdinalIgnoreCase),         ".png", ".jpg", ".jpeg"
+    ];
 
     /// <summary>
     /// Gets the full, writable path for application-specific files,

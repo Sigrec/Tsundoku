@@ -1,6 +1,4 @@
 using CsvHelper;
-using CsvHelper.Configuration;
-using System.Globalization;
 using System.Text.RegularExpressions;
 using static Tsundoku.Models.Enums.SeriesFormatModel;
 
@@ -31,28 +29,15 @@ public static partial class LibibParser
             return null;
         }
 
-        Dictionary<(string Title, SeriesFormat Format, string Publisher), uint> result = new(new TitleFormatComparer());
+        Dictionary<(string Title, SeriesFormat Format, string Publisher), uint> result = [with(new TitleFormatComparer())];
         List<(string Title, SeriesFormat Format)> seenTitles = [];
         await Task.Run(() =>
         {
             foreach (string path in csvFilePaths)
             {
-                using StreamReader reader = new(path);
-                CsvConfiguration config = new(CultureInfo.InvariantCulture)
-                {
-                    HeaderValidated = null,
-                    MissingFieldFound = null,
-                    TrimOptions = TrimOptions.Trim,
-                    DetectColumnCountChanges = false,
-                    BadDataFound = null
-                };
-
-                using CsvReader csv = new(reader, config);
-                if (csv.Read()) // Read the first row (which should be the header)
-                {
-                    csv.ReadHeader(); // Parse the header names
-                }
-                else
+                using CsvReader csv = CsvReader.FromFile(path, new CsvReaderOptions { TrimWhitespace = true });
+                csv.ReadHeader();
+                if (csv.Headers.Count == 0)
                 {
                     // If the file is empty (no rows at all), skip to the next file
                     LOGGER.Warn("User imported csv file {File} is empty", path);
@@ -61,7 +46,7 @@ public static partial class LibibParser
 
                 while (csv.Read())
                 {
-                    string? rawTitle = csv.GetField("title");
+                    string? rawTitle = csv.GetOptionalField("title");
                     if (string.IsNullOrWhiteSpace(rawTitle)) continue;
 
                     string description = csv.ParseCsvString("description", string.Empty);
