@@ -194,7 +194,8 @@
       "A dated backup of your collection is saved each time you close the app, and you can choose how many to keep and where they go in Settings",
       "Special volumes and extras now count in Collection Stats and have their own Special Volumes color in Theme Settings",
       "Menus, flyouts, and tooltips now follow your theme, long descriptions fade out instead of looking cut off, and the header shows a larger user icon",
-      "Fixed the completion animation not playing, and the Refresh Series picker losing your selection when searching or mixing up series with the same title"
+      "Fixed the completion animation not playing, and the Refresh Series picker losing your selection when searching or mixing up series with the same title",
+      "Upgraded the Avalonia UI framework to 12.2.0"
     ],
     "actions": [
       "Open Volumes Owned on series where you skipped a volume, since existing collections start out owning volumes 1 through your current count",
