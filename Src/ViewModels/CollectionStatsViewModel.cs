@@ -318,6 +318,9 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
         _userService.UserCollectionChanges
             .AutoRefresh(x => x.CurVolumeCount)
             .AutoRefresh(x => x.MaxVolumeCount)
+            .AutoRefresh(x => x.OwnedVolumes)
+            .AutoRefresh(x => x.SpecialVolumes)
+            .AutoRefresh(x => x.ExtraVolumes)
             .ToCollection()
             .Throttle(TimeSpan.FromMilliseconds(500))
             .ObserveOn(TsundokuSchedulers.MainThread)
@@ -327,11 +330,15 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
                 uint totalMaxVolumes = 0;
                 int fullyCollected = 0;
 
+                // Special volumes (18.5, 0, …) and named extras are real books, so they count toward
+                // collected and to-be-collected totals alongside the whole-numbered volumes.
                 foreach (Series series in seriesList)
                 {
-                    totalCurVolumes += series.CurVolumeCount;
-                    totalMaxVolumes += series.MaxVolumeCount;
-                    if (series.CurVolumeCount == series.MaxVolumeCount)
+                    uint owned = series.CurVolumeCount + (uint)series.OwnedSpecialCount + (uint)series.OwnedExtraCount;
+                    uint total = series.MaxVolumeCount + (uint)series.SpecialVolumes.Count + (uint)series.ExtraVolumes.Count;
+                    totalCurVolumes += owned;
+                    totalMaxVolumes += Math.Max(total, owned);
+                    if (owned == total)
                     {
                         fullyCollected++;
                     }

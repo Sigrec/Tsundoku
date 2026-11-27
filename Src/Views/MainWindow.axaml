@@ -659,6 +659,15 @@
                     </ItemsRepeater>
                 </ScrollViewer>
 
+                <!-- Bulk edit bar: shown while cards are selected (Ctrl+click / Shift+click) -->
+                <controls:BulkEditBar Name="BulkEditBar"
+                                      DataContext="{CompiledBinding BulkEdit}"
+                                      ZIndex="3"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Bottom"
+                                      MaxWidth="1100"
+                                      Margin="20,0,20,20"/>
+
                 <!-- Empty state: active filter matches zero series -->
                 <StackPanel Name="EmptyStatePanel"
                             IsVisible="{CompiledBinding IsFilteredEmpty}"

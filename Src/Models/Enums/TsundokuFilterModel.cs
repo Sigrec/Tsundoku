@@ -26,6 +26,7 @@ public static class TsundokuFilterModel
         [EnumMember(Value = "Favorites")] Favorites,
         [EnumMember(Value = "Complete")] Complete,
         [EnumMember(Value = "Incomplete")] Incomplete,
+        [EnumMember(Value = "Has Gaps")] HasGaps,
         [EnumMember(Value = "Ongoing")] Ongoing,
         [EnumMember(Value = "Finished")] Finished,
         [EnumMember(Value = "Hiatus")] Hiatus,

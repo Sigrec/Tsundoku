@@ -4,7 +4,6 @@ using Avalonia.Animation.Easings;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media;
-using Avalonia.Media.Transformation;
 using Avalonia.Styling;
 using Microsoft.Extensions.DependencyInjection;
 using Tsundoku.Helpers;
@@ -68,6 +67,29 @@ public sealed partial class SeriesCardDisplay : UserControl
         _mainWindowViewModel = mainWindowViewModel ?? throw new ArgumentNullException(nameof(mainWindowViewModel));
         _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         InitializeComponent();
+        RenderTransform = _pulseScale;
+        CardBorder.AddHandler(PointerPressedEvent, OnCardPointerPressed, RoutingStrategies.Tunnel);
+    }
+
+    // Ctrl+click and Shift+click select cards for bulk edit. Handled on the tunnel pass so the
+    // cover's open-link, the title's copy, and the card buttons don't also fire.
+    private void OnCardPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (Series is null || !e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+        {
+            return;
+        }
+
+        if (e.KeyModifiers.HasFlag(KeyModifiers.Shift))
+        {
+            _mainWindowViewModel.BulkEdit.SelectRange(Series);
+            e.Handled = true;
+        }
+        else if (e.KeyModifiers.HasFlag(KeyModifiers.Control))
+        {
+            _mainWindowViewModel.BulkEdit.Toggle(Series);
+            e.Handled = true;
+        }
     }
 
     static SeriesCardDisplay() => SeriesProperty.Changed.AddClassHandler<SeriesCardDisplay>((card, e) => card.OnSeriesChanged(e));
@@ -123,33 +145,35 @@ public sealed partial class SeriesCardDisplay : UserControl
         _ = _fadeInAnimation.RunAsync(this, _fadeCancellation.Token);
     }
 
-    private static readonly ITransform _pulseIdentity = TransformOperations.Parse("scale(1, 1)");
-    private static readonly ITransform _pulsePeak = TransformOperations.Parse("scale(1.06, 1.06)");
+    private const double PulsePeakScale = 1.06;
+    private static readonly TimeSpan PulseUpDuration = TimeSpan.FromMilliseconds(230);
+    private static readonly TimeSpan PulseDownDuration = TimeSpan.FromMilliseconds(420);
 
-    private static readonly Animation _completionPulseAnimation = new()
+    // Avalonia has no animator for RenderTransform, and Animation only runs on visuals, so the
+    // pulse uses transitions on the ScaleX/ScaleY of a per-card ScaleTransform.
+    private readonly ScaleTransform _pulseScale = new(1, 1);
+    private int _pulseVersion;
+
+    private async Task PlayCompletionPulseAsync()
     {
-        Duration = TimeSpan.FromMilliseconds(650),
-        Easing = new CubicEaseOut(),
-        FillMode = FillMode.Forward,
-        Children =
-        {
-            new KeyFrame
-            {
-                Cue = new Cue(0.0),
-                Setters = { new Setter(RenderTransformProperty, _pulseIdentity) },
-            },
-            new KeyFrame
-            {
-                Cue = new Cue(0.35),
-                Setters = { new Setter(RenderTransformProperty, _pulsePeak) },
-            },
-            new KeyFrame
-            {
-                Cue = new Cue(1.0),
-                Setters = { new Setter(RenderTransformProperty, _pulseIdentity) },
-            },
-        }
-    };
+        int version = ++_pulseVersion;
+        _pulseScale.Transitions = BuildPulseTransitions(PulseUpDuration);
+        _pulseScale.ScaleX = PulsePeakScale;
+        _pulseScale.ScaleY = PulsePeakScale;
+
+        await Task.Delay(PulseUpDuration);
+        if (version != _pulseVersion) return;
+
+        _pulseScale.Transitions = BuildPulseTransitions(PulseDownDuration);
+        _pulseScale.ScaleX = 1;
+        _pulseScale.ScaleY = 1;
+    }
+
+    private static Transitions BuildPulseTransitions(TimeSpan duration) =>
+    [
+        new DoubleTransition { Property = ScaleTransform.ScaleXProperty, Duration = duration, Easing = new CubicEaseOut() },
+        new DoubleTransition { Property = ScaleTransform.ScaleYProperty, Duration = duration, Easing = new CubicEaseOut() },
+    ];
 
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
@@ -241,7 +265,7 @@ public sealed partial class SeriesCardDisplay : UserControl
 
                 try
                 {
-                    _ = _completionPulseAnimation.RunAsync(this);
+                    _ = PlayCompletionPulseAsync();
                 }
                 catch (Exception ex)
                 {
@@ -269,6 +293,18 @@ public sealed partial class SeriesCardDisplay : UserControl
                 : Series.Titles[TsundokuLanguage.Romaji];
             await ClipboardHelper.CopyToClipboardAsync(title);
         }
+    }
+
+    private async void OpenVolumesOwned(object? sender, PointerPressedEventArgs e)
+    {
+        if (Series is null || !e.GetCurrentPoint(this).Properties.IsLeftButtonPressed
+            || TopLevel.GetTopLevel(this) is not Window owner)
+        {
+            return;
+        }
+
+        e.Handled = true;
+        await Views.VolumesOwnedWindow.ShowForAsync(Series, Language ?? TsundokuLanguage.Romaji, owner);
     }
 
     private void SubtractVolume(object? sender, RoutedEventArgs e) => Series?.DecrementCurVolumeCount();

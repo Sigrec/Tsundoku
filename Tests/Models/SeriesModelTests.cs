@@ -197,16 +197,18 @@ public class SeriesModelTests
     public void Series_UpdateFrom_UpdatesCorrectly()
     {
         Series original = CreateDummySeries();
+        original.SetOwnedVolumes([1, 2, 4, 4.5m]);
         Series updated = CreateDummySeries();
         updated.Description = "New description";
-        updated.CurVolumeCount = 99;
+        updated.CurVolumeCount = 9;
 
         original.UpdateFrom(updated, false);
 
         using (Assert.EnterMultipleScope())
         {
             Assert.That(original.Description, Is.EqualTo("New description"));
-            Assert.That(original.CurVolumeCount, Is.EqualTo(99));
+            Assert.That(original.OwnedVolumes, Is.EqualTo(new List<decimal> { 1, 2, 4, 4.5m }));
+            Assert.That(original.CurVolumeCount, Is.EqualTo(3));
             Assert.That(original.Titles, Is.EqualTo(updated.Titles));
             Assert.That(original.Staff, Is.EqualTo(updated.Staff));
         }

@@ -203,6 +203,57 @@
                     </Grid>
                 </StackPanel>
 
+                <!-- Backups -->
+                <Border Classes="divider"/>
+                <StackPanel Margin="20,14,20,14" Spacing="6">
+                    <TextBlock Text="BACKUPS" Classes="section-title" Margin="0,0,0,4"/>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Text="Dated Backups to Keep" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" Foreground="{DynamicResource TsundokuMenuTextColor}"
+                                   ToolTip.Tip="A dated copy of your collection is saved each time Tsundoku closes; the oldest copies beyond this count are removed"/>
+                        <ComboBox x:Name="BackupRetentionComboBox"
+                                  Grid.Column="1"
+                                  ItemsSource="{CompiledBinding BackupRetentionOptions}"
+                                  Theme="{StaticResource MenuComboBox}"
+                                  HorizontalAlignment="Right"
+                                  SelectedItem="{CompiledBinding SelectedBackupRetentionCount}"
+                                  ItemContainerTheme="{StaticResource MenuComboBoxItem}"
+                                  Width="80" Height="28">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </Grid>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="0,0,8,0">
+                            <TextBlock Text="Backup Folder" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource TsundokuMenuTextColor}"/>
+                            <TextBlock Text="{CompiledBinding BackupFolderDisplay}" FontSize="10" Opacity="0.6" TextTrimming="PathSegmentEllipsis"
+                                       ToolTip.Tip="{CompiledBinding BackupFolderDisplay}"
+                                       Foreground="{DynamicResource TsundokuMenuTextColor}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                            <Button Theme="{StaticResource MenuButton}" Content="Choose…" Padding="10,4" FontSize="12" Cursor="Hand"
+                                    ToolTip.Tip="Pick a folder such as OneDrive or Dropbox to keep backups off this machine"
+                                    Click="ChooseBackupFolderAsync"/>
+                            <Button Theme="{StaticResource MenuButton}" Content="Reset" Padding="10,4" FontSize="12" Cursor="Hand"
+                                    IsVisible="{CompiledBinding IsCustomBackupFolder}"
+                                    ToolTip.Tip="Go back to the app's own Backups folder"
+                                    Click="ResetBackupFolder"/>
+                        </StackPanel>
+                    </Grid>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Text="{CompiledBinding BackupStatus}" FontSize="11" Opacity="0.6" VerticalAlignment="Center" Foreground="{DynamicResource TsundokuMenuTextColor}"/>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6">
+                            <Button Theme="{StaticResource MenuButton}" Content="Open Folder" Padding="10,4" FontSize="12" Cursor="Hand"
+                                    ToolTip.Tip="Restore by importing a backup with Json Import"
+                                    Click="OpenBackupsFolder"/>
+                            <Button Theme="{StaticResource MenuButton}" Content="Back Up Now" Padding="10,4" FontSize="12" Cursor="Hand"
+                                    Click="BackUpNow"/>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+
                 <!-- Quick Actions -->
                 <Border Classes="divider"/>
                 <StackPanel Margin="20,14,20,14" Spacing="10">
@@ -223,6 +274,7 @@
                         <Button Theme="{StaticResource MenuButton}" Click="OpenScreenshotsFolder" ToolTip.Tip="Screenshots" i:Attached.Icon="fa7-solid fa7-camera-retro"/>
                         <Button Theme="{StaticResource MenuButton}" Click="OpenThemesFolder" ToolTip.Tip="Themes Folder" i:Attached.Icon="fa7-solid fa7-swatchbook"/>
                         <Button Theme="{StaticResource MenuButton}" Click="ReportBug" ToolTip.Tip="Report Bug" i:Attached.Icon="fa7-solid fa7-bug"/>
+                        <Button Theme="{StaticResource MenuButton}" Click="CopyMissingVolumesAsync" ToolTip.Tip="Copy Missing Volumes" i:Attached.Icon="fa7-solid fa7-clipboard-list"/>
                         <Button x:Name="ExportToSpreadSheetButton" Theme="{StaticResource MenuButton}" Click="ExportToSpreadSheetAsync" ToolTip.Tip="Export CSV" i:Attached.Icon="fa7-solid fa7-file-csv"/>
                         <Button Theme="{StaticResource MenuButton}" Click="OpenCoolorsSite" ToolTip.Tip="Coolors" i:Attached.Icon="fa7-solid fa7-palette"/>
                         <Button Theme="{StaticResource MenuButton}" Click="JoinDiscord" ToolTip.Tip="Discord" i:Attached.Icon="fa7-brands fa7-discord"/>
@@ -249,6 +301,30 @@
                             <TextBlock Text="Open Series Page" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource TsundokuMenuTextColor}"/>
                             <Border Grid.Column="1" Background="{DynamicResource TsundokuMenuButtonBGColor}" BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}" BorderThickness="2" CornerRadius="5" Padding="6,2">
                                 <TextBlock Text="Click Image" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
+                            </Border>
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto" Margin="0,2">
+                            <TextBlock Text="Select Series for Bulk Edit" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource TsundokuMenuTextColor}"/>
+                            <Border Grid.Column="1" Background="{DynamicResource TsundokuMenuButtonBGColor}" BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}" BorderThickness="2" CornerRadius="5" Padding="6,2">
+                                <TextBlock Text="CTRL / SHIFT + Click" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
+                            </Border>
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto" Margin="0,2">
+                            <TextBlock Text="Select All Shown Series" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource TsundokuMenuTextColor}"/>
+                            <Border Grid.Column="1" Background="{DynamicResource TsundokuMenuButtonBGColor}" BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}" BorderThickness="2" CornerRadius="5" Padding="6,2">
+                                <TextBlock Text="CTRL + A" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
+                            </Border>
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto" Margin="0,2">
+                            <TextBlock Text="Undo Last Bulk Edit" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource TsundokuMenuTextColor}"/>
+                            <Border Grid.Column="1" Background="{DynamicResource TsundokuMenuButtonBGColor}" BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}" BorderThickness="2" CornerRadius="5" Padding="6,2">
+                                <TextBlock Text="CTRL + Z" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
+                            </Border>
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto" Margin="0,2">
+                            <TextBlock Text="Clear Selection" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource TsundokuMenuTextColor}"/>
+                            <Border Grid.Column="1" Background="{DynamicResource TsundokuMenuButtonBGColor}" BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}" BorderThickness="2" CornerRadius="5" Padding="6,2">
+                                <TextBlock Text="ESC" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
                             </Border>
                         </Grid>
                         <Grid ColumnDefinitions="*,Auto" Margin="0,2">

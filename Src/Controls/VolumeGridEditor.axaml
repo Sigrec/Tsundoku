@@ -1,0 +1,112 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Tsundoku.Controls.VolumeGridEditor">
+
+    <UserControl.Styles>
+        <Style Selector="Border.vol-chip">
+            <Setter Property="MinWidth" Value="0"/>
+            <Setter Property="Height" Value="26"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="Padding" Value="4,0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource TsundokuMenuButtonBorderColor}"/>
+        </Style>
+        <Style Selector="Border.vol-chip > TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="{DynamicResource TsundokuMenuTextColor}"/>
+            <Setter Property="Opacity" Value="0.7"/>
+        </Style>
+        <Style Selector="Border.vol-chip:pointerover">
+            <Setter Property="BorderBrush" Value="{DynamicResource TsundokuSeriesProgressBarColor}"/>
+        </Style>
+        <Style Selector="Border.vol-chip.owned">
+            <Setter Property="Background" Value="{DynamicResource TsundokuSeriesProgressBarColor}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource TsundokuSeriesProgressBarColor}"/>
+        </Style>
+        <Style Selector="Border.vol-chip.owned > TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource TsundokuMenuBGColor}"/>
+            <Setter Property="Opacity" Value="1"/>
+        </Style>
+        <Style Selector="Border.vol-chip.special">
+            <Setter Property="BorderBrush" Value="{DynamicResource TsundokuSeriesCardStaffColor}"/>
+        </Style>
+        <Style Selector="Border.vol-chip.special > TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource TsundokuSeriesCardStaffColor}"/>
+            <Setter Property="Opacity" Value="1"/>
+        </Style>
+        <Style Selector="Border.vol-chip.special.owned">
+            <Setter Property="Background" Value="{DynamicResource TsundokuSeriesCardStaffColor}"/>
+        </Style>
+        <Style Selector="Border.vol-chip.special.owned > TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource TsundokuMenuBGColor}"/>
+        </Style>
+        <Style Selector="Border.vol-full">
+            <Setter Property="Height" Value="26"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="{DynamicResource TsundokuSeriesProgressBarColor}"/>
+        </Style>
+        <Style Selector="Border.vol-full > TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="{DynamicResource TsundokuMenuBGColor}"/>
+        </Style>
+        <Style Selector="TextBlock.row-label">
+                        <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="TextAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Opacity" Value="0.6"/>
+            <Setter Property="Foreground" Value="{DynamicResource TsundokuMenuTextColor}"/>
+        </Style>
+    </UserControl.Styles>
+
+    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" RowSpacing="6">
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+            <TextBlock Name="HeaderText" Classes="section-title" VerticalAlignment="Center"/>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6">
+                <Button Theme="{StaticResource MenuButton}" Content="All" Padding="10,3" FontSize="11" FontWeight="Bold" Cursor="Hand"
+                        ToolTip.Tip="Own every volume and listed special" Click="OwnAll"/>
+                <Button Theme="{StaticResource MenuButton}" Content="None" Padding="10,3" FontSize="11" FontWeight="Bold" Cursor="Hand"
+                        ToolTip.Tip="Clear every owned volume" Click="OwnNone"/>
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Row="1" ColumnDefinitions="*,6,Auto,14,150,6,Auto">
+            <TextBox Name="RangeBox" Classes="Menu" Height="32" BorderThickness="2" FontWeight="Bold" FontSize="13"
+                     PlaceholderText="1-46, 48-100, 18.5"
+                     ToolTip.Tip="Owned volumes as ranges. Decimals like 18.5 are added as specials."
+                     KeyDown="RangeBoxKeyDown"/>
+            <Button Grid.Column="2" Theme="{StaticResource MenuButton}" Content="Apply" Padding="10,4" FontSize="12" FontWeight="Bold" Cursor="Hand"
+                    Click="ApplyRanges"/>
+            <TextBox Grid.Column="4" Name="SpecialBox" Classes="Menu" Height="32" BorderThickness="2" FontWeight="Bold" FontSize="13"
+                     PlaceholderText="18.5 or Fanbook" MaxLength="40" KeyDown="SpecialBoxKeyDown"/>
+            <Button Grid.Column="6" Theme="{StaticResource MenuButton}" Content="Add Special" Padding="10,4" FontSize="12" FontWeight="Bold" Cursor="Hand"
+                    ToolTip.Tip="Add a numbered special like 18.5 or 0, or a named extra like Fanbook, and mark it owned"
+                    Click="AddSpecial"/>
+        </Grid>
+
+        <TextBlock Grid.Row="2" Name="MessageText" FontSize="11" FontWeight="Bold" Foreground="#E0605A" IsVisible="False" TextWrapping="Wrap"/>
+
+        <Border Grid.Row="3" Background="{DynamicResource TsundokuSearchBarBGColor}"
+                BorderBrush="{DynamicResource TsundokuSearchBarBorderColor}"
+                BorderThickness="2"
+                CornerRadius="10"
+                Padding="14,12,6,8"
+                Margin="0,2,0,0">
+            <ScrollViewer Name="RowsScroller" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Classes="card-desc">
+                <StackPanel Name="RowsPanel" Spacing="0" Margin="0,0,6,0" Grid.IsSharedSizeScope="True"/>
+            </ScrollViewer>
+        </Border>
+
+        <TextBlock Grid.Row="4" FontSize="10" Opacity="0.55" TextWrapping="Wrap" Foreground="{DynamicResource TsundokuMenuTextColor}"
+                   Text="Click a volume to toggle it · Shift+click toggles a range · right-click a special or extra to remove it · click a full row to expand it"/>
+    </Grid>
+</UserControl>

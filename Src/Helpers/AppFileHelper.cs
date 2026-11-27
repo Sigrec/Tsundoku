@@ -21,6 +21,7 @@ public static class AppFileHelper
     private const string LogsFolderName = "Logs";
     private const string ThemesFolderName = "Themes";
     private const string ScreenshotsFolderName = "Screenshots";
+    private const string BackupsFolderName = "Backups";
 
     /// <summary>Recognized image file extensions for cover images.</summary>
     public static readonly HashSet<string> VALID_IMAGE_EXTENSIONS =
@@ -158,6 +159,12 @@ with(StringComparer.OrdinalIgnoreCase),         ".png", ".jpg", ".jpeg"
     /// </summary>
     /// <returns>The full path to the Screenshots folder.</returns>
     public static string GetScreenshotsFolderPath() => GetFolderPath(ScreenshotsFolderName);
+
+    /// <summary>
+    /// Gets the full path for the default "Backups\" subfolder.
+    /// </summary>
+    /// <returns>The full path to the Backups folder.</returns>
+    public static string GetBackupsFolderPath() => GetFolderPath(BackupsFolderName);
 
     /// <summary>
     /// Generates a unique file path for a screenshot within the "Screenshots" subfolder.

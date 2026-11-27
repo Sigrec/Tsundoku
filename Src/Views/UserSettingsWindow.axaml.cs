@@ -201,6 +201,46 @@ public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsView
     public void OpenCoversFolder(object sender, RoutedEventArgs args) => OpenFolder(AppFileHelper.GetCoversFolderPath());
     public void OpenScreenshotsFolder(object sender, RoutedEventArgs args) => OpenFolder(AppFileHelper.GetScreenshotsFolderPath());
     public void OpenThemesFolder(object sender, RoutedEventArgs args) => OpenFolder(AppFileHelper.GetThemesFolderPath());
+    public void OpenBackupsFolder(object sender, RoutedEventArgs args) => OpenFolder(ViewModel!.GetBackupFolder());
+
+    private void BackUpNow(object? sender, RoutedEventArgs args) => ViewModel!.BackUpNow();
+
+    private async void CopyMissingVolumesAsync(object? sender, RoutedEventArgs args)
+    {
+        (string text, int seriesCount) = ViewModel!.BuildMissingVolumesList();
+        if (seriesCount == 0)
+        {
+            await _popupDialogService.ShowAsync("Missing Volumes", "fa7-solid fa7-circle-check", "Every series is complete. Nothing is missing.", this);
+            return;
+        }
+
+        await ClipboardHelper.CopyToClipboardAsync(text);
+        await _popupDialogService.ShowAsync(
+            "Missing Volumes",
+            "fa7-solid fa7-clipboard-list",
+            $"Copied the missing volumes for {seriesCount} series to the clipboard.",
+            this);
+    }
+
+    private void ResetBackupFolder(object? sender, RoutedEventArgs args) => ViewModel!.SetBackupFolder(null);
+
+    private async void ChooseBackupFolderAsync(object? sender, RoutedEventArgs args)
+    {
+        try
+        {
+            IReadOnlyList<IStorageFolder> folders = await this.StorageProvider.OpenFolderPickerAsync(
+                new FolderPickerOpenOptions { Title = "Choose Backup Folder", AllowMultiple = false });
+            if (folders.Count > 0 && folders[0].TryGetLocalPath() is string localPath)
+            {
+                ViewModel!.SetBackupFolder(localPath);
+            }
+        }
+        catch (Exception ex)
+        {
+            LOGGER.Error(ex, "Failed to choose backup folder");
+            await ShowFileErrorDialog("Unable to use that folder as the backup location.");
+        }
+    }
 
     private static void OpenFolder(string folderPath)
     {

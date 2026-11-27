@@ -56,7 +56,17 @@ public sealed partial class App : Application
         }
         else
         {
-            LOGGER.Info("Application starting up.");
+            LOGGER.Info(
+                "Tsundoku v{Version} ({BuildConfiguration}) starting up on {OS} ({Architecture}), {Runtime}",
+                ViewModelBase.CUR_TSUNDOKU_VERSION,
+#if DEBUG
+                "Debug",
+#else
+                "Release",
+#endif
+                System.Runtime.InteropServices.RuntimeInformation.OSDescription,
+                System.Runtime.InteropServices.RuntimeInformation.OSArchitecture,
+                System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription);
 
             // Pre-load theme before splash so it uses correct colors.
             // FileStream + JsonDocument.Parse(stream) skips the intermediate UTF-16 string allocation.
@@ -293,12 +303,14 @@ public sealed partial class App : Application
         services.AddSingleton<BitmapHelper>();
         services.AddSingleton<MangaDex>();
         services.AddSingleton<AniList>();
+        services.AddSingleton<BulkEditViewModel>();
         services.AddSingleton<MainWindowViewModel>();
 
         services.AddSingleton<IUserService, UserService>();
         services.AddSingleton<ISharedSeriesCollectionProvider, SharedSeriesCollectionProvider>();
         services.AddSingleton<IApiHealthCheckService, ApiHealthCheckService>();
         services.AddSingleton<ICurrencyRateService, CurrencyRateService>();
+        services.AddSingleton<IUserBackupService, UserBackupService>();
 
         services.AddTransient<LoadingDialogViewModel>();
         services.AddTransient<ILoadingDialogService, LoadingDialogService>();

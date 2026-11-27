@@ -57,13 +57,135 @@ public sealed partial class Series(
     public Uri Link { get; set; } = Link;
     [Reactive] public partial HashSet<SeriesGenre> Genres { get; set; } = Genres;
     [Reactive] public partial string SeriesNotes { get; set; } = string.Empty;
-    [Reactive] public partial uint MaxVolumeCount { get; set; } = MaxVolumeCount;
-    [Reactive] public partial uint CurVolumeCount { get; set; } = CurVolumeCount;
+    private uint _maxVolumeCount = MaxVolumeCount;
+    private uint _curVolumeCount = CurVolumeCount;
+    private List<decimal> _ownedVolumes = VolumeMath.Sequence(CurVolumeCount);
+    private List<decimal> _specialVolumes = [];
+
+    public uint MaxVolumeCount
+    {
+        get => _maxVolumeCount;
+        set
+        {
+            if (_maxVolumeCount == value) return;
+            this.RaiseAndSetIfChanged(ref _maxVolumeCount, value);
+            RaiseVolumeDerivedChanged();
+        }
+    }
+
+    /// <summary>
+    /// Number of main volumes owned (whole numbers 1 and up in <see cref="OwnedVolumes"/>). Setting it
+    /// adds the next volumes after the highest owned, or removes the highest owned, to match.
+    /// </summary>
+    public uint CurVolumeCount
+    {
+        get => _curVolumeCount;
+        set => SetMainOwnedCount(value);
+    }
+
+    /// <summary>Every owned volume number, sorted, including specials like 18.5.</summary>
+    public List<decimal> OwnedVolumes
+    {
+        get => _ownedVolumes;
+        set => ApplyOwnedVolumes(VolumeMath.Normalize(value));
+    }
+
+    /// <summary>Special volume numbers (0, 18.5, …) this series has, owned or not.</summary>
+    public List<decimal> SpecialVolumes
+    {
+        get => _specialVolumes;
+        set
+        {
+            _specialVolumes = VolumeMath.NormalizeSpecials(value);
+            this.RaisePropertyChanged();
+            RaiseVolumeDerivedChanged();
+        }
+    }
+
+    private List<ExtraVolume> _extraVolumes = [];
+
+    /// <summary>Named books with no volume number (fanbooks, box set bonuses), shown after the numbered volumes.</summary>
+    public List<ExtraVolume> ExtraVolumes
+    {
+        get => _extraVolumes;
+        set
+        {
+            _extraVolumes = value ?? [];
+            this.RaisePropertyChanged();
+            RaiseVolumeDerivedChanged();
+        }
+    }
+
+    /// <summary>Card progress text, e.g. <c>20 / 20</c>, or <c>20 / 20 +2</c> with owned specials or extras.</summary>
+    [JsonIgnore]
+    public string ProgressText
+    {
+        get
+        {
+            int ownedBeyondMain = OwnedSpecialCount + OwnedExtraCount;
+            return ownedBeyondMain > 0
+                ? $"{_curVolumeCount} / {_maxVolumeCount} +{ownedBeyondMain}"
+                : $"{_curVolumeCount} / {_maxVolumeCount}";
+        }
+    }
+
+    [JsonIgnore] public int OwnedSpecialCount => VolumeMath.CountOwnedSpecials(_ownedVolumes, _specialVolumes);
+
+    [JsonIgnore] public int OwnedExtraCount => _extraVolumes.Count(static e => e.Owned);
+
+    /// <summary>Main volumes missing from 1..max plus listed specials that aren't owned.</summary>
+    [JsonIgnore]
+    public List<decimal> MissingVolumes =>
+        [.. VolumeMath.MissingMain(_ownedVolumes, _maxVolumeCount), .. VolumeMath.MissingSpecials(_ownedVolumes, _specialVolumes)];
+
+    /// <summary>Names of extras that aren't owned.</summary>
+    [JsonIgnore] public List<string> MissingExtraNames => [.. _extraVolumes.Where(static e => !e.Owned).Select(static e => e.Name)];
+
+    [JsonIgnore] public int MissingVolumeCount => MissingVolumes.Count + _extraVolumes.Count(static e => !e.Owned);
+
+    /// <summary>Whether a volume or special below the highest owned volume is missing.</summary>
+    [JsonIgnore] public bool HasGaps => VolumeMath.HasGaps(_ownedVolumes, _specialVolumes);
+
+    /// <summary>Card line listing missing volumes, shown only when the series has gaps.</summary>
+    [JsonIgnore]
+    public string GapText
+    {
+        get
+        {
+            if (!HasGaps) return string.Empty;
+
+            string mainRanges = VolumeMath.FormatRanges(VolumeMath.MissingMain(_ownedVolumes, _maxVolumeCount), "–");
+            string[] rangeParts = mainRanges.Length == 0 ? [] : mainRanges.Split(", ");
+            List<decimal> missingSpecials = VolumeMath.MissingSpecials(_ownedVolumes, _specialVolumes);
+
+            StringBuilder text = new("Missing ");
+            const int MaxRangesShown = 4;
+            text.AppendJoin(", ", rangeParts.Take(MaxRangesShown));
+            if (rangeParts.Length > MaxRangesShown)
+            {
+                text.Append($", +{rangeParts.Length - MaxRangesShown} more");
+            }
+            if (missingSpecials.Count > 0)
+            {
+                text.Append(rangeParts.Length > 0 ? " · special " : "special ");
+                text.AppendJoin(", ", missingSpecials.Select(VolumeMath.Format));
+            }
+            List<string> missingExtras = MissingExtraNames;
+            if (missingExtras.Count > 0)
+            {
+                text.Append(" · ").AppendJoin(", ", missingExtras);
+            }
+            return text.ToString();
+        }
+    }
     [Reactive] public partial uint VolumesRead { get; set; } = VolumesRead;
     [Reactive] public partial decimal Value { get; set; } = Value;
     [Reactive] public partial decimal Rating { get; set; } = Rating;
     [Reactive] public partial SeriesDemographic Demographic { get; set; } = Demographic;
     [Reactive] public partial bool IsFavorite { get; set; } = false;
+
+    /// <summary>Whether the card is part of the main window's bulk-edit selection. Never persisted.</summary>
+    [JsonIgnore][Reactive] public partial bool IsSelected { get; set; }
 
     /// <summary>
     /// All Chinese or Taiwanese series use "Chinese (Simplified)" and go to "Chinese"
@@ -644,21 +766,202 @@ public sealed partial class Series(
         );
     }
 
+    #region Owned volumes
+
+    /// <summary>Adds the next volume after the highest owned, or fills the lowest gap once at the max.</summary>
     public void IncrementCurVolumeCount()
     {
-        if (this.CurVolumeCount < this.MaxVolumeCount)
+        if (this.CurVolumeCount < this.MaxVolumeCount && VolumeMath.NextToAdd(_ownedVolumes, _maxVolumeCount) is decimal next)
         {
-            this.CurVolumeCount++;
+            ApplyOwnedVolumes(VolumeMath.Normalize([.. _ownedVolumes, next]));
         }
     }
 
+    /// <summary>Removes the highest owned main volume.</summary>
     public void DecrementCurVolumeCount()
     {
-        if (this.CurVolumeCount > 0)
+        uint highest = VolumeMath.HighestMain(_ownedVolumes);
+        if (highest > 0)
         {
-            this.CurVolumeCount--;
+            List<decimal> owned = [.. _ownedVolumes];
+            owned.Remove(highest);
+            ApplyOwnedVolumes(owned);
         }
     }
+
+    /// <summary>Marks one volume owned or not owned. A special number is added to <see cref="SpecialVolumes"/> if new.</summary>
+    public void ToggleVolume(decimal volume)
+    {
+        volume = decimal.Round(volume, 2);
+        List<decimal> owned = [.. _ownedVolumes];
+        if (!owned.Remove(volume))
+        {
+            if (!VolumeMath.IsMain(volume) && !_specialVolumes.Contains(volume))
+            {
+                SpecialVolumes = [.. _specialVolumes, volume];
+            }
+            owned.Add(volume);
+        }
+        ApplyOwnedVolumes(VolumeMath.Normalize(owned));
+    }
+
+    /// <summary>Sets every main volume in <paramref name="volumes"/> to <paramref name="owned"/>.</summary>
+    public void SetVolumesOwned(IEnumerable<decimal> volumes, bool owned)
+    {
+        HashSet<decimal> set = [.. _ownedVolumes];
+        foreach (decimal volume in volumes)
+        {
+            if (owned) set.Add(volume);
+            else set.Remove(volume);
+        }
+        ApplyOwnedVolumes(VolumeMath.Normalize(set));
+    }
+
+    /// <summary>
+    /// Replaces the owned volumes. Specials in <paramref name="volumes"/> that the series doesn't list
+    /// yet are added to <see cref="SpecialVolumes"/>.
+    /// </summary>
+    public void SetOwnedVolumes(IEnumerable<decimal> volumes)
+    {
+        List<decimal> normalized = VolumeMath.Normalize(volumes);
+        List<decimal> newSpecials = [];
+        foreach (decimal volume in normalized)
+        {
+            if (!VolumeMath.IsMain(volume) && !_specialVolumes.Contains(volume))
+            {
+                newSpecials.Add(volume);
+            }
+        }
+        if (newSpecials.Count > 0)
+        {
+            SpecialVolumes = [.. _specialVolumes, .. newSpecials];
+        }
+        ApplyOwnedVolumes(normalized);
+    }
+
+    /// <summary>Lists a special volume for this series and marks it owned.</summary>
+    /// <returns><c>false</c> when the number is a main volume or already listed.</returns>
+    public bool AddSpecialVolume(decimal volume)
+    {
+        volume = decimal.Round(volume, 2);
+        if (volume < 0m || VolumeMath.IsMain(volume) || _specialVolumes.Contains(volume))
+        {
+            return false;
+        }
+
+        SpecialVolumes = [.. _specialVolumes, volume];
+        ApplyOwnedVolumes(VolumeMath.Normalize([.. _ownedVolumes, volume]));
+        return true;
+    }
+
+    /// <summary>Removes a special volume from this series, owned or not.</summary>
+    public void RemoveSpecialVolume(decimal volume)
+    {
+        volume = decimal.Round(volume, 2);
+        if (!_specialVolumes.Contains(volume)) return;
+
+        SpecialVolumes = [.. _specialVolumes.Where(s => s != volume)];
+        List<decimal> owned = [.. _ownedVolumes];
+        owned.Remove(volume);
+        ApplyOwnedVolumes(owned);
+    }
+
+    /// <summary>Longest name accepted for an extra volume.</summary>
+    public const int MaxExtraNameLength = 40;
+
+    /// <summary>Adds a named extra (fanbook, box set bonus, …) and marks it owned.</summary>
+    /// <returns><c>false</c> when the name is blank, too long, or already listed (ignoring case).</returns>
+    public bool AddExtraVolume(string name)
+    {
+        string trimmed = name.Trim();
+        if (trimmed.Length == 0 || trimmed.Length > MaxExtraNameLength || FindExtraIndex(trimmed) >= 0)
+        {
+            return false;
+        }
+
+        ExtraVolumes = [.. _extraVolumes, new ExtraVolume(trimmed, Owned: true)];
+        return true;
+    }
+
+    /// <summary>Flips whether the named extra is owned.</summary>
+    public void ToggleExtraVolume(string name)
+    {
+        int index = FindExtraIndex(name);
+        if (index < 0) return;
+
+        List<ExtraVolume> extras = [.. _extraVolumes];
+        extras[index] = extras[index] with { Owned = !extras[index].Owned };
+        ExtraVolumes = extras;
+    }
+
+    /// <summary>Marks every extra owned or not owned.</summary>
+    public void SetAllExtrasOwned(bool owned)
+    {
+        if (_extraVolumes.All(e => e.Owned == owned)) return;
+        ExtraVolumes = [.. _extraVolumes.Select(e => e with { Owned = owned })];
+    }
+
+    /// <summary>Removes the named extra from this series.</summary>
+    public void RemoveExtraVolume(string name)
+    {
+        int index = FindExtraIndex(name);
+        if (index < 0) return;
+
+        List<ExtraVolume> extras = [.. _extraVolumes];
+        extras.RemoveAt(index);
+        ExtraVolumes = extras;
+    }
+
+    private int FindExtraIndex(string name) =>
+        _extraVolumes.FindIndex(e => string.Equals(e.Name, name.Trim(), StringComparison.OrdinalIgnoreCase));
+
+    /// <summary>Owns every main volume 1..max. Specials are left as they are.</summary>
+    public void MarkMainRunComplete()
+    {
+        if (_maxVolumeCount == 0) return;
+        ApplyOwnedVolumes(VolumeMath.Normalize([.. _ownedVolumes, .. VolumeMath.Sequence(_maxVolumeCount)]));
+    }
+
+    /// <summary>Adds or removes main volumes until <paramref name="count"/> are owned. Specials are kept.</summary>
+    private void SetMainOwnedCount(uint count)
+    {
+        List<decimal> owned = [.. _ownedVolumes];
+        uint current = VolumeMath.CountMain(owned);
+        while (current < count)
+        {
+            decimal next = VolumeMath.NextToAdd(owned, _maxVolumeCount) ?? (VolumeMath.HighestMain(owned) + 1);
+            owned = VolumeMath.Normalize([.. owned, next]);
+            current++;
+        }
+        while (current > count)
+        {
+            owned.Remove(VolumeMath.HighestMain(owned));
+            current--;
+        }
+        ApplyOwnedVolumes(owned);
+    }
+
+    private void ApplyOwnedVolumes(List<decimal> owned)
+    {
+        _ownedVolumes = owned;
+        this.RaiseAndSetIfChanged(ref _curVolumeCount, VolumeMath.CountMain(owned), nameof(CurVolumeCount));
+        this.RaisePropertyChanged(nameof(OwnedVolumes));
+        RaiseVolumeDerivedChanged();
+    }
+
+    private void RaiseVolumeDerivedChanged()
+    {
+        this.RaisePropertyChanged(nameof(ProgressText));
+        this.RaisePropertyChanged(nameof(OwnedSpecialCount));
+        this.RaisePropertyChanged(nameof(OwnedExtraCount));
+        this.RaisePropertyChanged(nameof(MissingExtraNames));
+        this.RaisePropertyChanged(nameof(MissingVolumes));
+        this.RaisePropertyChanged(nameof(MissingVolumeCount));
+        this.RaisePropertyChanged(nameof(HasGaps));
+        this.RaisePropertyChanged(nameof(GapText));
+    }
+
+    #endregion
 
     public void UpdateVolumeCounts(uint newCur, uint newMax, Action? action = null)
     {
@@ -666,8 +969,12 @@ public sealed partial class Series(
         {
             uint oldCur = this.CurVolumeCount;
             uint oldMax = this.MaxVolumeCount;
-            this.CurVolumeCount = newCur;
+            if (newMax > 0 && VolumeMath.HighestMain(_ownedVolumes) > newMax)
+            {
+                ApplyOwnedVolumes([.. _ownedVolumes.Where(v => !VolumeMath.IsMain(v) || v <= newMax)]);
+            }
             this.MaxVolumeCount = newMax;
+            this.CurVolumeCount = newCur;
 
             LOGGER.Info(
                 "Changed Series Volume Counts For {RomajiTitle} From {OldCur}/{OldMax} -> {NewCur}/{NewMax}",
@@ -702,9 +1009,11 @@ public sealed partial class Series(
         }
     }
 
-    public void UpdateMaxVolumeCount(uint newMax, Action? action = null)
+    /// <summary>Changes the max volume count unless an owned main volume is above it.</summary>
+    /// <returns><c>false</c> when <paramref name="newMax"/> is below the highest owned volume.</returns>
+    public bool UpdateMaxVolumeCount(uint newMax, Action? action = null)
     {
-        if (newMax >= this.CurVolumeCount)
+        if (newMax >= VolumeMath.HighestMain(_ownedVolumes))
         {
             uint oldMax = this.MaxVolumeCount;
             this.MaxVolumeCount = newMax;
@@ -715,11 +1024,11 @@ public sealed partial class Series(
             );
 
             action?.Invoke();
+            return true;
         }
-        else
-        {
-            LOGGER.Warn("{NewMax} cannot be less than {CurVolumeCount}", newMax, this.CurVolumeCount);
-        }
+
+        LOGGER.Warn("{NewMax} cannot be less than the highest owned volume {HighestOwned}", newMax, VolumeMath.HighestMain(_ownedVolumes));
+        return false;
     }
 
     /// <summary>
@@ -870,17 +1179,14 @@ public sealed partial class Series(
             Genres = [.. other.Genres];
         }
 
-        // 9. MaxVolumeCount (ushort)
-        if (MaxVolumeCount != other.MaxVolumeCount)
+        // 9. MaxVolumeCount — never below a volume the user owns
+        if (MaxVolumeCount != other.MaxVolumeCount && other.MaxVolumeCount >= VolumeMath.HighestMain(_ownedVolumes))
         {
             MaxVolumeCount = other.MaxVolumeCount;
         }
 
-        // 10. CurVolumeCount (ushort)
-        if (CurVolumeCount != other.CurVolumeCount)
-        {
-            CurVolumeCount = other.CurVolumeCount;
-        }
+        // 10. Owned and special volumes are the user's own data and are kept as they are. The refreshed
+        // series was built from the count alone, so copying its list would erase gaps and specials.
 
         // 11. Rating (decimal)
         if (Rating != other.Rating)

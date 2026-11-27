@@ -467,6 +467,12 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
         }
     }
 
+    private async void OpenVolumesOwnedAsync(object? sender, RoutedEventArgs args)
+    {
+        if (ViewModel?.Series is null) return;
+        await VolumesOwnedWindow.ShowForAsync(ViewModel.Series, ViewModel.CurrentUser.Language, this);
+    }
+
     private async void MarkSeriesComplete(object sender, RoutedEventArgs args)
     {
         if (ViewModel?.Series is null) return;
@@ -484,7 +490,7 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
 
         if (series.CurVolumeCount == series.MaxVolumeCount) return;
 
-        series.CurVolumeCount = series.MaxVolumeCount;
+        series.MarkMainRunComplete();
         AppLog.CreateLogger<EditSeriesInfoWindow>()
             .SeriesMarkedComplete(series.Titles[TsundokuLanguage.Romaji], series.MaxVolumeCount);
     }
@@ -525,9 +531,13 @@ public sealed partial class EditSeriesInfoWindow : ReactiveWindow<EditSeriesInfo
             ViewModel!.Series.UpdateCurVolumeCount(newCur, CurVolumeMaskedTextBox.Clear);
         }
         // Only “max” was provided:
-        else if (hasMax)
+        else if (hasMax && !ViewModel!.Series.UpdateMaxVolumeCount(newMax, MaxVolumeMaskedTextBox.Clear))
         {
-            ViewModel!.Series.UpdateMaxVolumeCount(newMax, MaxVolumeMaskedTextBox.Clear);
+            _ = _popupDialogService.ShowAsync(
+                "Max Volumes Too Low",
+                "fa7-solid fa7-circle-exclamation",
+                $"Max volumes can't be {newMax} because you own volume {VolumeMath.HighestMain(ViewModel.Series.OwnedVolumes)}. Unmark the higher volumes in Volumes Owned first.",
+                this);
         }
     }
 

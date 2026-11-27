@@ -1,5 +1,7 @@
+using Avalonia.Controls;
 using Avalonia.Interactivity;
 using ReactiveUI.Avalonia;
+using Tsundoku.Helpers;
 using Tsundoku.Models;
 using Tsundoku.ViewModels;
 using static Tsundoku.Models.Enums.TsundokuLanguageModel;
@@ -8,83 +10,140 @@ namespace Tsundoku.Views;
 
 public sealed partial class SeriesPickerWindow : ReactiveWindow<ViewModelBase>
 {
-    private readonly List<Series> _allSeries;
-    private readonly TsundokuLanguage _language;
+    private readonly List<SeriesPickerItem> _allItems;
+    private readonly HashSet<Guid> _selectedIds = [];
+    private bool _isRepopulating;
 
     public List<Series>? SelectedSeries { get; private set; }
 
     public SeriesPickerWindow(IReadOnlyList<Series> series, TsundokuLanguage language)
     {
-        _language = language;
-        _allSeries = [.. series];
+        _allItems = BuildItems(series, language);
         InitializeComponent();
 
+        foreach (SeriesPickerItem item in _allItems)
+        {
+            _selectedIds.Add(item.Series.Id);
+        }
         PopulateList(string.Empty);
-        SelectAll();
 
         SearchBox.TextChanged += (_, _) => PopulateList(SearchBox.Text ?? string.Empty);
-        SeriesList.SelectionChanged += (_, _) => UpdateCount();
+        SeriesList.SelectionChanged += OnSelectionChanged;
+    }
+
+    /// <summary>
+    /// Builds one row per series. Titles shared by more than one series get the format appended
+    /// so the rows can be told apart.
+    /// </summary>
+    private static List<SeriesPickerItem> BuildItems(IReadOnlyList<Series> series, TsundokuLanguage language)
+    {
+        Dictionary<string, int> titleCounts = [with(StringComparer.OrdinalIgnoreCase)];
+        List<(Series Series, string Title)> titled = [with(series.Count)];
+        foreach (Series s in series)
+        {
+            string title = s.Titles.TryGetValue(language, out string? t) ? t : s.Titles[TsundokuLanguage.Romaji];
+            titled.Add((s, title));
+            titleCounts[title] = titleCounts.GetValueOrDefault(title) + 1;
+        }
+
+        List<SeriesPickerItem> items = [with(titled.Count)];
+        foreach ((Series s, string title) in titled)
+        {
+            string display = titleCounts[title] > 1 ? $"{title} ({s.Format})" : title;
+            items.Add(new SeriesPickerItem(s, display));
+        }
+        return items;
     }
 
     private void PopulateList(string filter)
     {
-        List<string> titles = [];
-        foreach (Series s in _allSeries)
+        _isRepopulating = true;
+        try
         {
-            string title = s.Titles.TryGetValue(_language, out string? t) ? t : s.Titles[TsundokuLanguage.Romaji];
-            if (string.IsNullOrWhiteSpace(filter) || title.Contains(filter, StringComparison.OrdinalIgnoreCase))
+            List<SeriesPickerItem> visible = [];
+            foreach (SeriesPickerItem item in _allItems)
             {
-                titles.Add(title);
-            }
-        }
-        SeriesList.ItemsSource = titles;
-    }
-
-    private void SelectAll()
-    {
-        SeriesList.SelectAll();
-        UpdateCount();
-    }
-
-    private void UpdateCount()
-    {
-        int selected = SeriesList.SelectedItems?.Count ?? 0;
-        int total = SeriesList.ItemCount;
-        CountText.Text = $"{selected}/{total} selected";
-    }
-
-    private void OnSelectAll(object? sender, RoutedEventArgs e) => SelectAll();
-
-    private void OnDeselectAll(object? sender, RoutedEventArgs e)
-    {
-        SeriesList.UnselectAll();
-        UpdateCount();
-    }
-
-    private void OnConfirm(object? sender, RoutedEventArgs e)
-    {
-        HashSet<string> selectedTitles = [];
-        if (SeriesList.SelectedItems is not null)
-        {
-            foreach (object? item in SeriesList.SelectedItems)
-            {
-                if (item is string title)
+                if (string.IsNullOrWhiteSpace(filter) || item.DisplayText.Contains(filter, StringComparison.OrdinalIgnoreCase))
                 {
-                    selectedTitles.Add(title);
+                    visible.Add(item);
+                }
+            }
+            SeriesList.ItemsSource = visible;
+
+            foreach (SeriesPickerItem item in visible)
+            {
+                if (_selectedIds.Contains(item.Series.Id))
+                {
+                    SeriesList.SelectedItems?.Add(item);
                 }
             }
         }
-
-        SelectedSeries = [];
-        foreach (Series s in _allSeries)
+        finally
         {
-            string title = s.Titles.TryGetValue(_language, out string? t) ? t : s.Titles[TsundokuLanguage.Romaji];
-            if (selectedTitles.Contains(title))
+            _isRepopulating = false;
+        }
+        UpdateCount();
+    }
+
+    private void OnSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (_isRepopulating) return;
+
+        foreach (object? added in e.AddedItems)
+        {
+            if (added is SeriesPickerItem item) _selectedIds.Add(item.Series.Id);
+        }
+        foreach (object? removed in e.RemovedItems)
+        {
+            if (removed is SeriesPickerItem item) _selectedIds.Remove(item.Series.Id);
+        }
+        UpdateCount();
+    }
+
+    private void UpdateCount() => CountText.Text = $"{_selectedIds.Count}/{_allItems.Count} selected";
+
+    /// <summary>Selects every row the current search shows.</summary>
+    private void OnSelectAll(object? sender, RoutedEventArgs e)
+    {
+        foreach (SeriesPickerItem item in VisibleItems())
+        {
+            _selectedIds.Add(item.Series.Id);
+        }
+        PopulateList(SearchBox.Text ?? string.Empty);
+    }
+
+    /// <summary>Deselects every row the current search shows.</summary>
+    private void OnDeselectAll(object? sender, RoutedEventArgs e)
+    {
+        foreach (SeriesPickerItem item in VisibleItems())
+        {
+            _selectedIds.Remove(item.Series.Id);
+        }
+        _isRepopulating = true;
+        try
+        {
+            SeriesList.UnselectAll();
+        }
+        finally
+        {
+            _isRepopulating = false;
+        }
+        UpdateCount();
+    }
+
+    private IEnumerable<SeriesPickerItem> VisibleItems() =>
+        SeriesList.ItemsSource as IEnumerable<SeriesPickerItem> ?? [];
+
+    private void OnConfirm(object? sender, RoutedEventArgs e)
+    {
+        SelectedSeries = [];
+        foreach (SeriesPickerItem item in _allItems)
+        {
+            if (_selectedIds.Contains(item.Series.Id))
             {
-                SelectedSeries.Add(s);
+                SelectedSeries.Add(item.Series);
             }
         }
-
         Close();
     }
 

@@ -118,6 +118,7 @@ public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISh
                         // Collection Completion Filters
                         TsundokuFilter.Complete => series.CurVolumeCount == series.MaxVolumeCount,
                         TsundokuFilter.Incomplete => series.MaxVolumeCount > 0 && series.CurVolumeCount < series.MaxVolumeCount,
+                        TsundokuFilter.HasGaps => series.HasGaps,
 
                         // Favorites Filter
                         TsundokuFilter.Favorites => series.IsFavorite,
@@ -259,6 +260,7 @@ public sealed partial class SharedSeriesCollectionProvider : ReactiveObject, ISh
             ["Read"] = s => s.VolumesRead,
             ["CurVolumes"] = s => s.CurVolumeCount,
             ["MaxVolumes"] = s => s.MaxVolumeCount,
+            ["Missing"] = s => s.MissingVolumeCount,
         }.ToFrozenDictionary(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>

@@ -48,15 +48,19 @@
       Margin="12"
       CornerRadius="14"
       BorderThickness="2"
-      BorderBrush="{DynamicResource TsundokuSeriesCardBorderColor}"
       BoxShadow="0 4 13 2 #99000000"
       Width="{CompiledBinding Source={x:Static m:Constants.CARD_WIDTH}}"
       Height="{CompiledBinding Source={x:Static m:Constants.CARD_HEIGHT}}"
       UseLayoutRounding="True"
-      Classes="card-hover">
+      Classes="card-hover"
+      Classes.selected="{CompiledBinding IsSelected}">
     <Border.Styles>
       <Style Selector="Border.card-hover">
         <Setter Property="RenderTransform" Value="translate(0px, 0px)"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource TsundokuSeriesCardBorderColor}"/>
+      </Style>
+      <Style Selector="Border.card-hover.selected">
+        <Setter Property="BorderBrush" Value="{DynamicResource TsundokuSeriesProgressBarColor}"/>
       </Style>
       <Style Selector="Border.card-hover:pointerover">
         <Setter Property="RenderTransform" Value="translate(0px, -4px)"/>
@@ -97,6 +101,25 @@
               RenderOptions.BitmapInterpolationMode="LowQuality"
               Stretch="UniformToFill"
               IsVisible="{CompiledBinding CoverBitMap, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+
+          <!-- Bulk-edit selection badge (top-left of cover) -->
+          <Border IsVisible="{CompiledBinding IsSelected}"
+                  HorizontalAlignment="Left"
+                  VerticalAlignment="Top"
+                  Margin="8,8,0,0"
+                  Width="26" Height="26"
+                  CornerRadius="13"
+                  Background="{DynamicResource TsundokuSeriesProgressBarColor}"
+                  BorderBrush="{DynamicResource TsundokuMenuBGColor}"
+                  BorderThickness="2"
+                  BoxShadow="0 2 6 0 #99000000"
+                  IsHitTestVisible="False">
+              <i:Icon Value="fa7-solid fa7-check"
+                      FontSize="12"
+                      Foreground="{DynamicResource TsundokuMenuBGColor}"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center"/>
+          </Border>
 
           <!-- Favorite badge (top-right of cover) -->
           <Border IsVisible="{CompiledBinding Series.IsFavorite, ElementName=Root}"
@@ -197,7 +220,7 @@
             <!-- Info Section -->
             <Grid
                 Grid.Row="0"
-                RowDefinitions="Auto,Auto,Auto,*"
+                RowDefinitions="Auto,Auto,Auto,*,Auto"
                 Margin="10,4,10,0">
 
               <!-- Publisher -->
@@ -285,8 +308,20 @@
                     Foreground="{DynamicResource TsundokuSeriesCardDescColor}"
                     Opacity="0.9"
                     Text="{CompiledBinding Description}"
-                    Padding="0,0,10,0"/>
+                    Padding="0,0,10,10"/>
               </ScrollViewer>
+
+              <!-- Missing volumes (only when the owned run has gaps) -->
+              <TextBlock
+                  Grid.Row="4"
+                  IsVisible="{CompiledBinding HasGaps}"
+                  Text="{CompiledBinding GapText}"
+                  FontSize="11"
+                  FontWeight="Bold"
+                  Foreground="{DynamicResource TsundokuSeriesProgressBarColor}"
+                  TextTrimming="CharacterEllipsis"
+                  MaxLines="1"
+                  Margin="0,2,0,4"/>
             </Grid>
 
             <!-- Progress Footer -->
@@ -300,33 +335,37 @@
               <Button Grid.Column="1" Theme="{DynamicResource SeriesCardButton}" Content="+" Padding="1,0,0,2" Margin="0,0,8,0" Click="AddVolume"/>
 
               <!-- Progress Bar with overlay text -->
-              <Panel Grid.Column="2">
-                <ProgressBar
+              <Panel Grid.Column="2"
+                     Cursor="Hand"
+                     Background="Transparent"
+                     PointerPressed="OpenVolumesOwned"
+                     ToolTip.Tip="Click to mark which volumes you own">
+                <controls:VolumeStrip
                     Height="28"
-                    Value="{CompiledBinding CurVolumeCount}"
-                    Background="{DynamicResource TsundokuSeriesProgressBarBGColor}"
-                    Foreground="{DynamicResource TsundokuSeriesProgressBarColor}"
-                    BorderBrush="{DynamicResource TsundokuSeriesProgressBarBorderColor}"
-                    BorderThickness="2"
-                    CornerRadius="6"
-                    Padding="3"
-                    Minimum="0"
-                    Maximum="{CompiledBinding MaxVolumeCount}"/>
-                <TextBlock
+                    OwnedVolumes="{CompiledBinding OwnedVolumes}"
+                    SpecialVolumes="{CompiledBinding SpecialVolumes}"
+                    ExtraVolumes="{CompiledBinding ExtraVolumes}"
+                    MaxVolumeCount="{CompiledBinding MaxVolumeCount}"
+                    Track="{DynamicResource TsundokuSeriesProgressBarBGColor}"
+                    Fill="{DynamicResource TsundokuSeriesProgressBarColor}"
+                    Outline="{DynamicResource TsundokuSeriesProgressBarBorderColor}"
+                    SpecialFill="{DynamicResource TsundokuSeriesCardStaffColor}"
+                    MissingFill="#E0605A"/>
+                <Border
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
-                    Margin="0,1,0,0"
-                    FontSize="13"
-                    FontWeight="Bold"
-                    Foreground="{DynamicResource TsundokuSeriesProgressTextColor}"
+                    Background="{DynamicResource TsundokuSeriesProgressBarBGColor}"
+                    Opacity="0.88"
+                    CornerRadius="4"
+                    Padding="5,0"
                     IsHitTestVisible="False">
-                  <TextBlock.Text>
-                    <MultiBinding StringFormat="{}{0} / {1}" Mode="OneWay">
-                      <Binding Path="CurVolumeCount"/>
-                      <Binding Path="MaxVolumeCount"/>
-                    </MultiBinding>
-                  </TextBlock.Text>
-                </TextBlock>
+                  <TextBlock
+                      Margin="0,1,0,0"
+                      FontSize="13"
+                      FontWeight="Bold"
+                      Foreground="{DynamicResource TsundokuSeriesProgressTextColor}"
+                      Text="{CompiledBinding ProgressText}"/>
+                </Border>
               </Panel>
 
               <!-- Edit Button -->

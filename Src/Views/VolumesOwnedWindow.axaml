@@ -1,0 +1,28 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:Tsundoku.Controls"
+        x:Class="Tsundoku.Views.VolumesOwnedWindow"
+        Icon="\Assets\Icons\TsundokuLogo.ico"
+        Title="Volumes Owned"
+        Classes="Menu"
+        SizeToContent="Height"
+        Width="600"
+        MinWidth="600"
+        MaxWidth="600"
+        CanResize="True"
+        CanMaximize="False"
+        WindowStartupLocation="CenterOwner">
+    <Border Classes="Menu" BorderThickness="2" CornerRadius="0,0,8,8" ClipToBounds="True">
+        <Grid RowDefinitions="Auto,Auto,*">
+            <controls:WindowHeader Grid.Row="0" Name="Header" Icon="fa7-solid fa7-layer-group" Title="Volumes Owned"/>
+            <TextBlock Grid.Row="1"
+                       Name="SeriesTitleText"
+                       Margin="18,12,18,0"
+                       FontSize="15"
+                       FontWeight="Bold"
+                       TextTrimming="CharacterEllipsis"
+                       Foreground="{DynamicResource TsundokuUsernameColor}"/>
+            <controls:VolumeGridEditor Grid.Row="2" Name="VolumeGrid" Margin="18,10,18,18"/>
+        </Grid>
+    </Border>
+</Window>
