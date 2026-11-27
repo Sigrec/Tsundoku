@@ -502,7 +502,7 @@ public sealed partial class AniList
         // 5. Normalize smart quotes
         cleaned = SmartQuotesRegex().Replace(cleaned, m => m.Value switch
         {
-            """ or """ => "\"",
+            "“" or "”" => "\"",
             "‘" or "’" => "'",
             _ => m.Value
         });

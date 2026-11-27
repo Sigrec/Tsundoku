@@ -1,4 +1,4 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Microsoft.Extensions.DependencyInjection;
@@ -82,6 +82,7 @@ public class SeriesModelTests
     public void Cleanup() => _series?.Dispose();
 
     [AvaloniaTest]
+    [Category(TestCategories.Network)]
     public async Task CreateNewSeriesCardAsync_IncludesAllRequestedAdditionalLanguages()
     {
         string input = "Rent-A-Girlfriend";
@@ -118,6 +119,7 @@ public class SeriesModelTests
     }
 
     [AvaloniaTest]
+    [Category(TestCategories.Network)]
     public async Task CreateNewSeriesCardAsync_Radiant_HasJapaneseTitle()
     {
         _series = await Series.CreateNewSeriesCardAsync(
@@ -143,6 +145,7 @@ public class SeriesModelTests
     }
 
     [AvaloniaTest]
+    [Category(TestCategories.Network)]
     public async Task CreateNewSeriesCardAsync_Anthology_HasFullStaffList()
     {
         App.ConfigureNLog();

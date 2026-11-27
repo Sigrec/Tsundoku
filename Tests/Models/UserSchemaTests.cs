@@ -144,13 +144,13 @@ public class UserSchemaTests
     }
 
     [Test]
-    public void V62Migration_UpdatesDataVersionTo6Point2()
+    public void V62Migration_UpdatesDataVersionToCurrentSchema()
     {
         JsonNode userData = CreatePreV62UserData();
 
         User.UpdateSchemaVersion(userData, isImport: true);
 
-        Assert.That(userData["DataVersion"]!.GetValue<double>(), Is.EqualTo(6.2));
+        Assert.That(userData["DataVersion"]!.GetValue<double>(), Is.EqualTo(Tsundoku.ViewModels.ViewModelBase.SCHEMA_VERSION));
     }
 
     [Test]

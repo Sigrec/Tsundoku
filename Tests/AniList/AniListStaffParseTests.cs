@@ -10,6 +10,7 @@ namespace Tsundoku.Tests.AniList;
 public class AniListStaffParseTests
 {
     [TestCase("リコリス・リコイル 公式コミックアンソロジー リピート", SeriesFormat.Manga)]
+    [Category(TestCategories.Network)]
     public async Task ExtractStaffFromAniList_ShouldReturnCorrectStaffString_Anthology(string title, SeriesFormat format)
     {
         HttpClient httpClient = new()

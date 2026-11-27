@@ -6,7 +6,6 @@ using static Tsundoku.Models.TsundokuTheme;
 namespace Tsundoku.Tests.Models;
 
 [TestFixture]
-[Parallelizable(ParallelScope.All)]
 public class TsundokuThemeTests
 {
     private static readonly PropertyInfo[] BrushProperties =
@@ -21,7 +20,7 @@ public class TsundokuThemeTests
         PropertyNameCaseInsensitive = true,
     };
 
-    [Test]
+    [AvaloniaTest]
     public void DefaultTheme_HasNoNullProperties()
     {
         TsundokuTheme theme = DEFAULT_THEME;
@@ -35,7 +34,7 @@ public class TsundokuThemeTests
         }
     }
 
-    [Test]
+    [AvaloniaTest]
     public void Cloning_ProducesEqualButSeparateInstance()
     {
         TsundokuTheme original = DEFAULT_THEME;
@@ -57,7 +56,7 @@ public class TsundokuThemeTests
         }
     }
 
-    [Test]
+    [AvaloniaTest]
     public void Equals_SameValues_ReturnsTrue()
     {
         TsundokuTheme a = DEFAULT_THEME.Cloning();
@@ -66,7 +65,7 @@ public class TsundokuThemeTests
         Assert.That(a, Is.EqualTo(b));
     }
 
-    [Test]
+    [AvaloniaTest]
     public void Equals_DifferentThemeName_ReturnsFalse()
     {
         TsundokuTheme a = DEFAULT_THEME.Cloning();
@@ -76,7 +75,7 @@ public class TsundokuThemeTests
         Assert.That(a, Is.Not.EqualTo(b));
     }
 
-    [Test]
+    [AvaloniaTest]
     public void Equals_DifferentColor_ReturnsFalse()
     {
         TsundokuTheme a = DEFAULT_THEME.Cloning();
@@ -86,7 +85,7 @@ public class TsundokuThemeTests
         Assert.That(a, Is.Not.EqualTo(b));
     }
 
-    [Test]
+    [AvaloniaTest]
     public void Equals_Null_ReturnsFalse()
     {
         TsundokuTheme theme = DEFAULT_THEME;
@@ -94,7 +93,7 @@ public class TsundokuThemeTests
         Assert.That(theme.Equals(null), Is.False);
     }
 
-    [Test]
+    [AvaloniaTest]
     public void Equals_SameReference_ReturnsTrue()
     {
         TsundokuTheme theme = DEFAULT_THEME;
@@ -102,7 +101,7 @@ public class TsundokuThemeTests
         Assert.That(theme.Equals(theme), Is.True);
     }
 
-    [Test]
+    [AvaloniaTest]
     public void Equals_DifferentType_ReturnsFalse()
     {
         TsundokuTheme theme = DEFAULT_THEME;
@@ -110,7 +109,7 @@ public class TsundokuThemeTests
         Assert.That(theme.Equals("not a theme"), Is.False);
     }
 
-    [Test]
+    [AvaloniaTest]
     public void GetHashCode_EqualObjects_ReturnSameHash()
     {
         TsundokuTheme a = DEFAULT_THEME.Cloning();
@@ -119,7 +118,7 @@ public class TsundokuThemeTests
         Assert.That(a.GetHashCode(), Is.EqualTo(b.GetHashCode()));
     }
 
-    [Test]
+    [AvaloniaTest]
     public void GetHashCode_IsConsistent_AcrossMultipleCalls()
     {
         TsundokuTheme theme = DEFAULT_THEME;
@@ -130,7 +129,7 @@ public class TsundokuThemeTests
         Assert.That(hash1, Is.EqualTo(hash2));
     }
 
-    [Test]
+    [AvaloniaTest]
     public void GetHashCode_DifferentObjects_ReturnDifferentHash()
     {
         TsundokuTheme a = DEFAULT_THEME.Cloning();
@@ -140,7 +139,7 @@ public class TsundokuThemeTests
         Assert.That(a.GetHashCode(), Is.Not.EqualTo(b.GetHashCode()));
     }
 
-    [Test]
+    [AvaloniaTest]
     public void JsonRoundTrip_PreservesAllProperties()
     {
         TsundokuTheme original = DEFAULT_THEME.Cloning();
@@ -164,7 +163,7 @@ public class TsundokuThemeTests
         }
     }
 
-    [Test]
+    [AvaloniaTest]
     public void SolidColorBrushJsonConverter_NullHex_ReturnsNull()
     {
         string json = "null";
@@ -178,7 +177,7 @@ public class TsundokuThemeTests
         Assert.That(result, Is.Null);
     }
 
-    [Test]
+    [AvaloniaTest]
     public void SolidColorBrushJsonConverter_EmptyString_ReturnsNull()
     {
         string json = "\"\"";
@@ -192,7 +191,7 @@ public class TsundokuThemeTests
         Assert.That(result, Is.Null);
     }
 
-    [Test]
+    [AvaloniaTest]
     public void SolidColorBrushJsonConverter_WhitespaceString_ReturnsNull()
     {
         string json = "\"   \"";
@@ -206,7 +205,7 @@ public class TsundokuThemeTests
         Assert.That(result, Is.Null);
     }
 
-    [Test]
+    [AvaloniaTest]
     public void SolidColorBrushJsonConverter_InvalidHex_ReturnsNull()
     {
         string json = "\"not-a-color\"";
@@ -220,7 +219,7 @@ public class TsundokuThemeTests
         Assert.That(result, Is.Null);
     }
 
-    [Test]
+    [AvaloniaTest]
     public void SolidColorBrushJsonConverter_ValidHex_ReturnsBrush()
     {
         string json = "\"#ff20232d\"";
@@ -235,7 +234,7 @@ public class TsundokuThemeTests
         Assert.That(result!.Color, Is.EqualTo(Color.Parse("#ff20232d")));
     }
 
-    [Test]
+    [AvaloniaTest]
     public void SolidColorBrushJsonConverter_WriteNull_WritesNullValue()
     {
         SolidColorBrushJsonConverter converter = new();
@@ -249,7 +248,7 @@ public class TsundokuThemeTests
         Assert.That(json, Is.EqualTo("null"));
     }
 
-    [Test]
+    [AvaloniaTest]
     public void SolidColorBrushJsonConverter_WriteValidBrush_WritesColorString()
     {
         SolidColorBrushJsonConverter converter = new();
@@ -264,7 +263,7 @@ public class TsundokuThemeTests
         Assert.That(json, Does.Contain("20232D").IgnoreCase);
     }
 
-    [Test]
+    [AvaloniaTest]
     public void CompareTo_OrdersByThemeName()
     {
         TsundokuTheme a = new("Alpha");
@@ -278,7 +277,7 @@ public class TsundokuThemeTests
         }
     }
 
-    [Test]
+    [AvaloniaTest]
     public void CompareTo_NonThemeObject_ReturnsOne()
     {
         TsundokuTheme theme = new("Test");

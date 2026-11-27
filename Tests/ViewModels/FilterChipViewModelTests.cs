@@ -219,7 +219,7 @@ public class FilterChipViewModelTests
     [AvaloniaTest]
     public void AllFields_ContainsExpectedFields()
     {
-        string[] expected = ["Rating", "Value", "Read", "CurVolumes", "MaxVolumes",
+        string[] expected = ["Rating", "Value", "Read", "CurVolumes", "MaxVolumes", "Missing",
             "Format", "Status", "Demographic", "Series", "Favorite", "Genre",
             "Notes", "Publisher"];
 

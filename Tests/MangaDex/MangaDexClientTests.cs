@@ -7,6 +7,7 @@ using System.Text.Json;
 namespace Tsundoku.Tests.MangaDex;
 
 [TestFixture]
+[Category(TestCategories.Network)]
 [Parallelizable(ParallelScope.All)]
 public class MangaDexClientTests
 {
