@@ -295,6 +295,17 @@ public sealed partial class SeriesCardDisplay : UserControl
         }
     }
 
+    // Fades the bottom of a description that overflows, until it is scrolled to the end. ScrollChanged
+    // also fires when the extent changes, so a recycled card picks up its new description's length.
+    private void UpdateDescriptionFade(object? sender, ScrollChangedEventArgs e)
+    {
+        const double Tolerance = 1;
+        double extent = DescriptionScroller.Extent.Height;
+        double viewportBottom = DescriptionScroller.Offset.Y + DescriptionScroller.Viewport.Height;
+        bool hasMoreBelow = extent > DescriptionScroller.Viewport.Height + Tolerance && viewportBottom < extent - Tolerance;
+        DescriptionScroller.Classes.Set("fade-bottom", hasMoreBelow);
+    }
+
     private async void OpenVolumesOwned(object? sender, PointerPressedEventArgs e)
     {
         if (Series is null || !e.GetCurrentPoint(this).Properties.IsLeftButtonPressed

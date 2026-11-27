@@ -37,6 +37,7 @@
 			<SolidColorBrush x:Key="TsundokuSeriesCardDescColor" Color="#ffececec"/>
 			<SolidColorBrush x:Key="TsundokuSeriesCardBorderColor" Color="#ffdfd59e"/>
 			<SolidColorBrush x:Key="TsundokuSeriesProgressBarColor" Color="#ffdfd59e"/>
+			<SolidColorBrush x:Key="TsundokuSeriesSpecialVolumeColor" Color="#ffb9b4ff"/>
 			<SolidColorBrush x:Key="TsundokuSeriesProgressBarBGColor" Color="#ff20232d"/>
 			<SolidColorBrush x:Key="TsundokuSeriesProgressBarBorderColor" Color="#ffececec"/>
 			<SolidColorBrush x:Key="TsundokuSeriesProgressTextColor" Color="#ffececec"/>

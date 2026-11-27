@@ -33,14 +33,14 @@
             <Setter Property="Opacity" Value="1"/>
         </Style>
         <Style Selector="Border.vol-chip.special">
-            <Setter Property="BorderBrush" Value="{DynamicResource TsundokuSeriesCardStaffColor}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource TsundokuSeriesSpecialVolumeColor}"/>
         </Style>
         <Style Selector="Border.vol-chip.special > TextBlock">
-            <Setter Property="Foreground" Value="{DynamicResource TsundokuSeriesCardStaffColor}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TsundokuSeriesSpecialVolumeColor}"/>
             <Setter Property="Opacity" Value="1"/>
         </Style>
         <Style Selector="Border.vol-chip.special.owned">
-            <Setter Property="Background" Value="{DynamicResource TsundokuSeriesCardStaffColor}"/>
+            <Setter Property="Background" Value="{DynamicResource TsundokuSeriesSpecialVolumeColor}"/>
         </Style>
         <Style Selector="Border.vol-chip.special.owned > TextBlock">
             <Setter Property="Foreground" Value="{DynamicResource TsundokuMenuBGColor}"/>
@@ -68,7 +68,7 @@
         </Style>
     </UserControl.Styles>
 
-    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" RowSpacing="6">
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,*,Auto" RowSpacing="6">
         <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
             <TextBlock Name="HeaderText" Classes="section-title" VerticalAlignment="Center"/>
             <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6">
@@ -79,7 +79,9 @@
             </StackPanel>
         </Grid>
 
-        <Grid Grid.Row="1" ColumnDefinitions="*,6,Auto,14,150,6,Auto">
+        <TextBlock Grid.Row="1" Name="MissingText" FontSize="12" FontWeight="Bold" TextWrapping="Wrap"/>
+
+        <Grid Grid.Row="2" ColumnDefinitions="*,6,Auto,14,150,6,Auto">
             <TextBox Name="RangeBox" Classes="Menu" Height="32" BorderThickness="2" FontWeight="Bold" FontSize="13"
                      PlaceholderText="1-46, 48-100, 18.5"
                      ToolTip.Tip="Owned volumes as ranges. Decimals like 18.5 are added as specials."
@@ -93,9 +95,9 @@
                     Click="AddSpecial"/>
         </Grid>
 
-        <TextBlock Grid.Row="2" Name="MessageText" FontSize="11" FontWeight="Bold" Foreground="#E0605A" IsVisible="False" TextWrapping="Wrap"/>
+        <TextBlock Grid.Row="3" Name="MessageText" FontSize="11" FontWeight="Bold" Foreground="#E0605A" IsVisible="False" TextWrapping="Wrap"/>
 
-        <Border Grid.Row="3" Background="{DynamicResource TsundokuSearchBarBGColor}"
+        <Border Grid.Row="4" Background="{DynamicResource TsundokuSearchBarBGColor}"
                 BorderBrush="{DynamicResource TsundokuSearchBarBorderColor}"
                 BorderThickness="2"
                 CornerRadius="10"
@@ -106,7 +108,7 @@
             </ScrollViewer>
         </Border>
 
-        <TextBlock Grid.Row="4" FontSize="10" Opacity="0.55" TextWrapping="Wrap" Foreground="{DynamicResource TsundokuMenuTextColor}"
+        <TextBlock Grid.Row="5" FontSize="10" Opacity="0.55" TextWrapping="Wrap" Foreground="{DynamicResource TsundokuMenuTextColor}"
                    Text="Click a volume to toggle it · Shift+click toggles a range · right-click a special or extra to remove it · click a full row to expand it"/>
     </Grid>
 </UserControl>

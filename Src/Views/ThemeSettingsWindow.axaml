@@ -86,6 +86,7 @@
                             <controls:ColorPickerItem Title="Series Publisher" ColorBrush="{CompiledBinding CurrentTheme.SeriesCardPublisherColor, Mode=TwoWay}"/>
                             <controls:ColorPickerItem Title="Series Staff" ColorBrush="{CompiledBinding CurrentTheme.SeriesCardStaffColor, Mode=TwoWay}"/>
                             <controls:ColorPickerItem Title="Series Title" ColorBrush="{CompiledBinding CurrentTheme.SeriesCardTitleColor, Mode=TwoWay}"/>
+                            <controls:ColorPickerItem Title="Special Volumes" ColorBrush="{CompiledBinding CurrentTheme.SeriesSpecialVolumeColor, Mode=TwoWay}"/>
                         </WrapPanel>
                 </StackPanel>
 

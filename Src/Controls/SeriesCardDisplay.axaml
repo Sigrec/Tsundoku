@@ -30,6 +30,16 @@
     <Style Selector="controls|SeriesCardDisplay[GlassEnabled=True] ExperimentalAcrylicBorder#CardAcrylicBorder">
       <Setter Property="IsVisible" Value="True"/>
     </Style>
+    <!-- Long descriptions fade out at the bottom until scrolled to the end, so the text doesn't look cut off -->
+    <Style Selector="ScrollViewer.card-desc.fade-bottom">
+      <Setter Property="OpacityMask">
+        <LinearGradientBrush StartPoint="0%,0%" EndPoint="0%,100%">
+          <GradientStop Offset="0" Color="Black"/>
+          <GradientStop Offset="0.72" Color="Black"/>
+          <GradientStop Offset="1" Color="Transparent"/>
+        </LinearGradientBrush>
+      </Setter>
+    </Style>
   </UserControl.Styles>
 
   <UserControl.Resources>
@@ -297,9 +307,11 @@
 
               <!-- Description -->
               <ScrollViewer
+                  Name="DescriptionScroller"
                   Classes="card-desc"
                   VerticalScrollBarVisibility="Auto"
                   HorizontalScrollBarVisibility="Disabled"
+                  ScrollChanged="UpdateDescriptionFade"
                   Grid.Row="3">
                 <TextBlock
                     TextWrapping="Wrap"
@@ -311,31 +323,66 @@
                     Padding="0,0,10,10"/>
               </ScrollViewer>
 
-              <!-- Missing volumes (only when the owned run has gaps) -->
-              <TextBlock
-                  Grid.Row="4"
-                  IsVisible="{CompiledBinding HasGaps}"
-                  Text="{CompiledBinding GapText}"
-                  FontSize="11"
-                  FontWeight="Bold"
-                  Foreground="{DynamicResource TsundokuSeriesProgressBarColor}"
-                  TextTrimming="CharacterEllipsis"
-                  MaxLines="1"
-                  Margin="0,2,0,4"/>
+              <!-- Missing volumes (left, only when the owned run has gaps) and the volume count (right) -->
+              <Grid Grid.Row="4" ColumnDefinitions="*,Auto" Margin="0,2,0,4">
+                <TextBlock
+                    IsVisible="{CompiledBinding HasGaps}"
+                    FontSize="13"
+                    FontWeight="Bold"
+                    VerticalAlignment="Bottom"
+                    TextTrimming="CharacterEllipsis"
+                    MaxLines="1"
+                    Margin="0,0,8,0">
+                  <Run Text="{CompiledBinding GapMainText}" Foreground="{DynamicResource TsundokuSeriesProgressBarColor}"/>
+                  <Run Text="{CompiledBinding GapSpecialText}" Foreground="{DynamicResource TsundokuSeriesSpecialVolumeColor}"/>
+                </TextBlock>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Bottom">
+                  <TextBlock
+                      Text="{CompiledBinding MainCountText}"
+                      FontSize="13"
+                      FontWeight="ExtraBold"
+                      Foreground="{DynamicResource TsundokuSeriesCardDescColor}"/>
+                  <TextBlock
+                      Text="{CompiledBinding BeyondMainText}"
+                      IsVisible="{CompiledBinding BeyondMainText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                      FontSize="11"
+                      FontWeight="ExtraBold"
+                      Margin="3,0,0,0"
+                      VerticalAlignment="Top"
+                      Foreground="{DynamicResource TsundokuSeriesSpecialVolumeColor}"/>
+                  <TextBlock
+                      Text="{CompiledBinding CountSuffixText}"
+                      FontSize="12"
+                      FontWeight="Bold"
+                      Margin="4,0,0,0"
+                      Opacity="0.65"
+                      Foreground="{DynamicResource TsundokuSeriesCardDescColor}"/>
+                </StackPanel>
+              </Grid>
             </Grid>
 
             <!-- Progress Footer -->
             <Border Grid.Row="1" BorderThickness="0,2,0,0" BorderBrush="{DynamicResource TsundokuSeriesCardDividerColor}" Margin="8,0,8,0" Padding="0,6,0,6">
             <Grid
-                ColumnDefinitions="Auto,Auto,*,Auto">
-              <!-- - Button -->
-              <Button Grid.Column="0" Theme="{DynamicResource SeriesCardButton}" Content="&#x2212;" Margin="0,0,4,0" Click="SubtractVolume"/>
+                ColumnDefinitions="Auto,*,Auto">
+              <!-- + over − stacked to the bar's height -->
+              <StackPanel Grid.Column="0" Spacing="2" Margin="0,0,6,0" VerticalAlignment="Center">
+                <StackPanel.Styles>
+                  <Style Selector="Button.vol-step">
+                    <Setter Property="Width" Value="24"/>
+                    <Setter Property="Height" Value="13"/>
+                    <Setter Property="FontSize" Value="9"/>
+                    <Setter Property="BorderThickness" Value="1"/>
+                    <Setter Property="CornerRadius" Value="4"/>
+                    <Setter Property="Padding" Value="0"/>
+                  </Style>
+                </StackPanel.Styles>
+                <Button Classes="vol-step" Theme="{DynamicResource SeriesCardButton}" i:Attached.Icon="fa7-solid fa7-plus" Click="AddVolume" ToolTip.Tip="Add the next volume"/>
+                <Button Classes="vol-step" Theme="{DynamicResource SeriesCardButton}" i:Attached.Icon="fa7-solid fa7-minus" Click="SubtractVolume" ToolTip.Tip="Remove the highest volume"/>
+              </StackPanel>
 
-              <!-- + Button -->
-              <Button Grid.Column="1" Theme="{DynamicResource SeriesCardButton}" Content="+" Padding="1,0,0,2" Margin="0,0,8,0" Click="AddVolume"/>
-
-              <!-- Progress Bar with overlay text -->
-              <Panel Grid.Column="2"
+              <!-- Volume strip -->
+              <Panel Grid.Column="1"
                      Cursor="Hand"
                      Background="Transparent"
                      PointerPressed="OpenVolumesOwned"
@@ -349,28 +396,13 @@
                     Track="{DynamicResource TsundokuSeriesProgressBarBGColor}"
                     Fill="{DynamicResource TsundokuSeriesProgressBarColor}"
                     Outline="{DynamicResource TsundokuSeriesProgressBarBorderColor}"
-                    SpecialFill="{DynamicResource TsundokuSeriesCardStaffColor}"
+                    SpecialFill="{DynamicResource TsundokuSeriesSpecialVolumeColor}"
                     MissingFill="#E0605A"/>
-                <Border
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
-                    Background="{DynamicResource TsundokuSeriesProgressBarBGColor}"
-                    Opacity="0.88"
-                    CornerRadius="4"
-                    Padding="5,0"
-                    IsHitTestVisible="False">
-                  <TextBlock
-                      Margin="0,1,0,0"
-                      FontSize="13"
-                      FontWeight="Bold"
-                      Foreground="{DynamicResource TsundokuSeriesProgressTextColor}"
-                      Text="{CompiledBinding ProgressText}"/>
-                </Border>
               </Panel>
 
               <!-- Edit Button -->
               <Button
-                  Grid.Column="3"
+                  Grid.Column="2"
                   Theme="{DynamicResource SeriesCardButton}"
                   Margin="8,0,0,0"
                   i:Attached.Icon="fa7-solid fa7-pen"

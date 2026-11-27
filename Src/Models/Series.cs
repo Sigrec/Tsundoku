@@ -129,6 +129,26 @@ public sealed partial class Series(
         }
     }
 
+    /// <summary>Card count, e.g. <c>10 / 12</c>.</summary>
+    [JsonIgnore] public string MainCountText => $"{_curVolumeCount} / {_maxVolumeCount}";
+
+    /// <summary>Owned specials and extras on the card, e.g. <c>+2</c>; empty when there are none.</summary>
+    [JsonIgnore]
+    public string BeyondMainText
+    {
+        get
+        {
+            int ownedBeyondMain = OwnedSpecialCount + OwnedExtraCount;
+            return ownedBeyondMain > 0 ? $"+{ownedBeyondMain}" : string.Empty;
+        }
+    }
+
+    /// <summary>Text after the card count, e.g. <c>vols · 83%</c>, or just <c>vols</c> when the max is unknown.</summary>
+    [JsonIgnore]
+    public string CountSuffixText => _maxVolumeCount > 0
+        ? $"vols · {(int)Math.Round(_curVolumeCount * 100.0 / _maxVolumeCount)}%"
+        : "vols";
+
     [JsonIgnore] public int OwnedSpecialCount => VolumeMath.CountOwnedSpecials(_ownedVolumes, _specialVolumes);
 
     [JsonIgnore] public int OwnedExtraCount => _extraVolumes.Count(static e => e.Owned);
@@ -145,6 +165,39 @@ public sealed partial class Series(
 
     /// <summary>Whether a volume or special below the highest owned volume is missing.</summary>
     [JsonIgnore] public bool HasGaps => VolumeMath.HasGaps(_ownedVolumes, _specialVolumes);
+
+    /// <summary>Card gap line, numbered part: e.g. <c>Missing 3–4, 7–9</c>; empty without gaps.</summary>
+    [JsonIgnore]
+    public string GapMainText
+    {
+        get
+        {
+            if (!HasGaps) return string.Empty;
+            string[] rangeParts = SplitRanges(VolumeMath.FormatRanges(VolumeMath.MissingMain(_ownedVolumes, _maxVolumeCount), "–"));
+            if (rangeParts.Length == 0) return "Missing ";
+
+            const int MaxRangesShown = 4;
+            string shown = string.Join(", ", rangeParts.Take(MaxRangesShown));
+            string more = rangeParts.Length > MaxRangesShown ? $", +{rangeParts.Length - MaxRangesShown} more" : string.Empty;
+            return $"Missing {shown}{more}";
+        }
+    }
+
+    /// <summary>Card gap line, specials part: e.g. <c> · 3.5, Fanbook</c>; empty without gaps or missing specials.</summary>
+    [JsonIgnore]
+    public string GapSpecialText
+    {
+        get
+        {
+            if (!HasGaps) return string.Empty;
+            List<string> missing = [.. VolumeMath.MissingSpecials(_ownedVolumes, _specialVolumes).Select(VolumeMath.Format), .. MissingExtraNames];
+            if (missing.Count == 0) return string.Empty;
+            bool hasMainPart = VolumeMath.MissingMain(_ownedVolumes, _maxVolumeCount).Count > 0;
+            return (hasMainPart ? " · " : string.Empty) + string.Join(", ", missing);
+        }
+    }
+
+    private static string[] SplitRanges(string ranges) => ranges.Length == 0 ? [] : ranges.Split(", ");
 
     /// <summary>Card line listing missing volumes, shown only when the series has gaps.</summary>
     [JsonIgnore]
@@ -952,6 +1005,9 @@ public sealed partial class Series(
     private void RaiseVolumeDerivedChanged()
     {
         this.RaisePropertyChanged(nameof(ProgressText));
+        this.RaisePropertyChanged(nameof(MainCountText));
+        this.RaisePropertyChanged(nameof(BeyondMainText));
+        this.RaisePropertyChanged(nameof(CountSuffixText));
         this.RaisePropertyChanged(nameof(OwnedSpecialCount));
         this.RaisePropertyChanged(nameof(OwnedExtraCount));
         this.RaisePropertyChanged(nameof(MissingExtraNames));
@@ -959,6 +1015,8 @@ public sealed partial class Series(
         this.RaisePropertyChanged(nameof(MissingVolumeCount));
         this.RaisePropertyChanged(nameof(HasGaps));
         this.RaisePropertyChanged(nameof(GapText));
+        this.RaisePropertyChanged(nameof(GapMainText));
+        this.RaisePropertyChanged(nameof(GapSpecialText));
     }
 
     #endregion

@@ -88,6 +88,7 @@ public class ThemeResourceKeysTests
             Assert.That(ThemeResourceKeys.PropertyMap[ThemeResourceKeys.SeriesCardButtonBGHoverColor](theme), Is.SameAs(theme.SeriesCardButtonBGHoverColor));
             Assert.That(ThemeResourceKeys.PropertyMap[ThemeResourceKeys.SeriesCardButtonBorderColor](theme), Is.SameAs(theme.SeriesCardButtonBorderColor));
             Assert.That(ThemeResourceKeys.PropertyMap[ThemeResourceKeys.SeriesCardButtonBorderHoverColor](theme), Is.SameAs(theme.SeriesCardButtonBorderHoverColor));
+            Assert.That(ThemeResourceKeys.PropertyMap[ThemeResourceKeys.SeriesSpecialVolumeColor](theme), Is.SameAs(theme.SeriesSpecialVolumeColor));
         }
     }
 

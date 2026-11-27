@@ -518,6 +518,20 @@ public sealed partial class User : ReactiveObject
             updatedVersion = true;
         }
 
+        if (curVersion < 6.9) // 6.9 Adds the SeriesSpecialVolumeColor theme color, starting from each theme's staff color.
+        {
+            for (int x = 0; x < themeJsonArray.Count; x++)
+            {
+                if (themeJsonArray[x] is JsonObject themeObj && !themeObj.ContainsKey("SeriesSpecialVolumeColor"))
+                {
+                    themeObj.Add("SeriesSpecialVolumeColor", themeObj["SeriesCardStaffColor"]?.ToString() ?? "#ffb9b4ff");
+                }
+            }
+            userData[nameof(DataVersion)] = 6.9;
+            LOGGER.Info("Updated schema to v6.9: Added SeriesSpecialVolumeColor to every saved theme");
+            updatedVersion = true;
+        }
+
         bool migrated = updatedVersion || curVersion < ViewModelBase.SCHEMA_VERSION;
         if (!isImport && migrated)
         {

@@ -115,6 +115,12 @@ public sealed partial class TsundokuTheme : ReactiveObject, ICloneable, ICompara
     [JsonConverter(typeof(SolidColorBrushJsonConverter))]
     [Reactive] public partial SolidColorBrush SeriesCardDividerColor { get; set; }
 
+    /// <summary>Special volumes (18.5, 0, …) and named extras on cards and in the Volumes Owned window.</summary>
+    [JsonConverter(typeof(SolidColorBrushJsonConverter))]
+    [Reactive] public partial SolidColorBrush SeriesSpecialVolumeColor { get; set; } = new(Color.Parse(DefaultSpecialVolumeColor));
+
+    private const string DefaultSpecialVolumeColor = "#ffb9b4ff";
+
     public static readonly TsundokuTheme DEFAULT_THEME = new(
         "Default",
         new SolidColorBrush(Color.Parse("#ff20232d")),
@@ -152,7 +158,10 @@ public sealed partial class TsundokuTheme : ReactiveObject, ICloneable, ICompara
         new SolidColorBrush(Color.Parse("#ff626460")),
         new SolidColorBrush(Color.Parse("#ffdfd59e")),
         new SolidColorBrush(Color.Parse("#ffdfd59e"))
-    );
+    )
+    {
+        SeriesSpecialVolumeColor = new SolidColorBrush(Color.Parse(DefaultSpecialVolumeColor)),
+    };
 
     public TsundokuTheme()
     {
@@ -240,6 +249,7 @@ public sealed partial class TsundokuTheme : ReactiveObject, ICloneable, ICompara
         hash.Add(SeriesCardButtonBorderColor.Color.ToUInt32());
         hash.Add(SeriesCardButtonBorderHoverColor.Color.ToUInt32());
         hash.Add(SeriesCardDividerColor.Color.ToUInt32());
+        hash.Add(SeriesSpecialVolumeColor.Color.ToUInt32());
         return hash.ToHashCode();
     }
 
@@ -284,7 +294,10 @@ public sealed partial class TsundokuTheme : ReactiveObject, ICloneable, ICompara
             CloneBrush(SeriesCardButtonBorderColor),
             CloneBrush(SeriesCardButtonBorderHoverColor),
             CloneBrush(SeriesCardDividerColor)
-        );
+        )
+        {
+            SeriesSpecialVolumeColor = CloneBrush(SeriesSpecialVolumeColor),
+        };
     }
 
     [return: System.Diagnostics.CodeAnalysis.NotNullIfNotNull(nameof(brush))]
@@ -338,7 +351,8 @@ public sealed partial class TsundokuTheme : ReactiveObject, ICloneable, ICompara
         BrushEquals(SeriesCardButtonBGHoverColor, other.SeriesCardButtonBGHoverColor) &&
         BrushEquals(SeriesCardButtonBorderColor, other.SeriesCardButtonBorderColor) &&
         BrushEquals(SeriesCardButtonBorderHoverColor, other.SeriesCardButtonBorderHoverColor) &&
-        BrushEquals(SeriesCardDividerColor, other.SeriesCardDividerColor);
+        BrushEquals(SeriesCardDividerColor, other.SeriesCardDividerColor) &&
+        BrushEquals(SeriesSpecialVolumeColor, other.SeriesSpecialVolumeColor);
     }
 
     private static bool BrushEquals(SolidColorBrush? a, SolidColorBrush? b) => ReferenceEquals(a, b) || (a is not null && b is not null && a.Color.Equals(b.Color));

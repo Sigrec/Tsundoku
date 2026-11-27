@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Globalization;
 using Avalonia.Controls;
+using Avalonia.Controls.Documents;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Tsundoku.Helpers;
@@ -121,6 +122,7 @@ public sealed partial class VolumeGridEditor : UserControl
         string maxText = max > 0 ? max.ToString(CultureInfo.InvariantCulture) : "?";
         HeaderText.Text = $"VOLUMES OWNED · {series.CurVolumeCount} OF {maxText}{specialsText}";
         RangeBox.Text = VolumeMath.FormatRanges(owned);
+        UpdateMissingText(series);
 
         bool collapseFullRows = displayEnd > VolumeMath.DenseStripThreshold;
         int specialIndex = 0;
@@ -168,6 +170,45 @@ public sealed partial class VolumeGridEditor : UserControl
             RowCountChanged?.Invoke(this, EventArgs.Empty);
         }
         _lastRowCount = rowCount;
+    }
+
+    /// <summary>
+    /// Every missing volume: numbered volumes as ranges in the progress bar color, then specials and
+    /// extras in the special volume color. Shows "Complete" when nothing is missing.
+    /// </summary>
+    private void UpdateMissingText(Series series)
+    {
+        List<decimal> missingMain = VolumeMath.MissingMain(series.OwnedVolumes, series.MaxVolumeCount);
+        List<string> missingSpecials = [.. VolumeMath.MissingSpecials(series.OwnedVolumes, series.SpecialVolumes).Select(VolumeMath.Format), .. series.MissingExtraNames];
+
+        MissingText.Inlines ??= [];
+        MissingText.Inlines.Clear();
+        if (missingMain.Count == 0 && missingSpecials.Count == 0)
+        {
+            MissingText.Inlines.Add(ThemedRun("✓ Complete", ThemeResourceKeys.SeriesProgressBarColor));
+            return;
+        }
+
+        MissingText.Inlines.Add(ThemedRun("Missing ", ThemeResourceKeys.SeriesProgressBarColor));
+        if (missingMain.Count > 0)
+        {
+            MissingText.Inlines.Add(ThemedRun(VolumeMath.FormatRanges(missingMain, "–"), ThemeResourceKeys.SeriesProgressBarColor));
+        }
+        if (missingSpecials.Count > 0)
+        {
+            if (missingMain.Count > 0)
+            {
+                MissingText.Inlines.Add(ThemedRun(" · ", ThemeResourceKeys.SeriesProgressBarColor));
+            }
+            MissingText.Inlines.Add(ThemedRun(string.Join(", ", missingSpecials), ThemeResourceKeys.SeriesSpecialVolumeColor));
+        }
+    }
+
+    private Run ThemedRun(string text, string resourceKey)
+    {
+        Run run = new(text);
+        run.Bind(Run.ForegroundProperty, this.GetResourceObservable(resourceKey));
+        return run;
     }
 
     /// <summary>Named extras on their own line after every numbered row, each chip sized to its name.</summary>

@@ -138,6 +138,22 @@ public class SeriesOwnedVolumesTests
     }
 
     [Test]
+    public void GapParts_SplitNumberedAndSpecials()
+    {
+        Series series = CreateSeries(max: 10, cur: 0);
+        series.SpecialVolumes = [3.5m];
+        series.SetOwnedVolumes([1, 2, 5, 6, 10]);
+        series.AddExtraVolume("Fanbook");
+        series.ToggleExtraVolume("Fanbook");
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(series.GapMainText, Is.EqualTo("Missing 3–4, 7–9"));
+            Assert.That(series.GapSpecialText, Is.EqualTo(" · 3.5, Fanbook"));
+        }
+    }
+
+    [Test]
     public void SettingCurrentCount_AddsAndRemovesFromTheTop()
     {
         Series series = CreateSeries(max: 10, cur: 0);
