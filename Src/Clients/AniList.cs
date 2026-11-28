@@ -160,7 +160,7 @@ public sealed partial class AniList
             return 0; // No match
         }
 
-        List<AniListPickerSuggestion> list = new(Math.Min(media.GetArrayLength(), perPage));
+        List<AniListPickerSuggestion> list = [with(Math.Min(media.GetArrayLength(), perPage))];
         string needle = search.Trim();
 
         foreach (JsonElement m in media.EnumerateArray())
@@ -502,7 +502,7 @@ public sealed partial class AniList
         // 5. Normalize smart quotes
         cleaned = SmartQuotesRegex().Replace(cleaned, m => m.Value switch
         {
-            """ or """ => "\"",
+            "“" or "”" => "\"",
             "‘" or "’" => "'",
             _ => m.Value
         });
@@ -534,7 +534,7 @@ public sealed partial class AniList
         }
 
         int estimatedCapacity = genres.GetArrayLength();
-        HashSet<SeriesGenre> newGenres = new(estimatedCapacity);
+        HashSet<SeriesGenre> newGenres = [with(estimatedCapacity)];
 
         foreach (JsonElement element in genres.EnumerateArray())
         {
@@ -606,8 +606,8 @@ public sealed partial class AniList
 
         StringBuilder nativeBuilder = new(nativeStaff);
         StringBuilder fullBuilder = new(fullStaff);
-        HashSet<string> nativeSeen = new(StringComparer.Ordinal);
-        HashSet<string> fullSeen = new(StringComparer.Ordinal);
+        HashSet<string> nativeSeen = [with(StringComparer.Ordinal)];
+        HashSet<string> fullSeen = [with(StringComparer.Ordinal)];
 
         foreach (JsonElement edge in staffEdges.EnumerateArray())
         {

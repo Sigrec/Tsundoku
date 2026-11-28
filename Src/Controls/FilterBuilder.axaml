@@ -256,7 +256,7 @@
                             SelectedItem="{CompiledBinding Value}"
                             IsVisible="{CompiledBinding !IsValueFreeText}"/>
                   <Rectangle Classes="chip-div"/>
-                  <Button Classes="chip-remove" Click="OnRemoveChip">
+                  <Button Classes="chip-remove" Click="OnRemoveChip" ToolTip.Tip="Remove filter">
                     <i:Icon Value="fa7-solid fa7-xmark" FontSize="9"/>
                   </Button>
                 </StackPanel>

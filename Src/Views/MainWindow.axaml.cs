@@ -105,6 +105,11 @@ public sealed partial class MainWindow : ReactiveWindow<MainWindowViewModel>
                     onError: ex => LOGGER.Error(ex, "API status handler faulted"))
                 .DisposeWith(disposables);
 
+            _apiHealthCheckService.IsAniListAvailable
+                .ObserveOn(TsundokuSchedulers.MainThread)
+                .Subscribe(BulkEditBar.SetRefreshEnabled)
+                .DisposeWith(disposables);
+
             _apiHealthCheckService.Start();
             Disposable.Create(() => _apiHealthCheckService.Stop())
                 .DisposeWith(disposables);
@@ -176,7 +181,23 @@ KeyDown += async (s, e) =>
             {
                 AdvancedSearchPopup.IsVisible = false;
             }
+            else if (e.Key == Key.Escape && ViewModel.BulkEdit.HasSelection) // Clear bulk selection
+            {
+                ViewModel.BulkEdit.Clear();
+            }
+            else if (e.KeyModifiers == KeyModifiers.Control && e.Key == Key.A) // Select all visible series
+            {
+                ViewModel.BulkEdit.SelectAllVisible();
+            }
+            else if (e.KeyModifiers == KeyModifiers.Control && e.Key == Key.Z && ViewModel.BulkEdit.CanUndo) // Undo last bulk edit
+            {
+                await ToggleNotificationPopup(ViewModel.BulkEdit.Undo());
+            }
         };
+
+        BulkEditBar.NotificationRequested += async (_, message) => await ToggleNotificationPopup(message);
+        BulkEditBar.RefreshRequested += async (_, _) => await RefreshSelectedSeriesAsync();
+        BulkEditBar.TrashRequested += async (_, _) => await TrashSelectedSeriesAsync();
 
         Closing += (s, e) =>
         {
@@ -243,6 +264,55 @@ KeyDown += async (s, e) =>
     }
 
     public async void ShowNotification(string notiText) => await ToggleNotificationPopup(notiText);
+
+    private async Task TrashSelectedSeriesAsync()
+    {
+        int count = ViewModel!.BulkEdit.SelectedCount;
+        if (count == 0) return;
+
+        int hidden = ViewModel.BulkEdit.HiddenCount;
+        string hiddenNote = hidden > 0 ? $"\n\n{hidden} of them are hidden by the current filter." : string.Empty;
+        bool confirmed = await _popupDialogService.ConfirmAsync(
+            "Move to Trash",
+            "fa7-solid fa7-trash",
+            $"Move {count} selected series to the trash? You can restore them from the trash, or press Ctrl+Z right away.{hiddenNote}",
+            this);
+        if (!confirmed) return;
+
+        await ToggleNotificationPopup(ViewModel.BulkEdit.Trash());
+    }
+
+    private async Task RefreshSelectedSeriesAsync()
+    {
+        List<Series> selected = ViewModel!.BulkEdit.GetSelectedSeries();
+        if (selected.Count == 0) return;
+
+        ILoadingDialogService loadingDialogService = App.ServiceProvider!.GetRequiredService<ILoadingDialogService>();
+        int refreshed = 0;
+        await loadingDialogService.ShowCancellableAsync("Refreshing Selected Series", async (vm, ct) =>
+        {
+            vm.ProgressMaximum = selected.Count;
+            vm.ProgressValue = 0;
+            foreach (Series series in selected)
+            {
+                if (ct.IsCancellationRequested) break;
+                vm.StatusText = $"Refreshing {series.Titles[TsundokuLanguage.Romaji]}";
+                try
+                {
+                    await ViewModel.RefreshSeries(series);
+                    refreshed++;
+                }
+                catch (Exception ex)
+                {
+                    LOGGER.Error(ex, "Failed to refresh {Title} during bulk refresh", series.Titles[TsundokuLanguage.Romaji]);
+                }
+                vm.ProgressValue++;
+            }
+            ViewModel.SaveUserData();
+        }, this);
+
+        await ToggleNotificationPopup($"Refreshed {refreshed} of {selected.Count} series");
+    }
 
     private async Task ToggleNotificationPopup(string notiText)
     {

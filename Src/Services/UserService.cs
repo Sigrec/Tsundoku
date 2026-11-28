@@ -235,7 +235,7 @@ public sealed partial class UserService : ReactiveObject, IUserService, IDisposa
 
     private readonly Dictionary<Guid, int> _coverRefCounts = [];
     private readonly HashSet<Guid> _coversLoading = [];
-    private readonly object _coverRefLock = new();
+    private readonly Lock _coverRefLock = new();
     private readonly SourceCache<TsundokuTheme, string> _savedThemesSourceCache = new(t => t.ThemeName);
     public IObservable<IChangeSet<TsundokuTheme, string>> SavedThemeChanges => _savedThemesSourceCache.Connect();
 

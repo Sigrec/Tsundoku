@@ -24,6 +24,7 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
     private readonly BitmapHelper _bitmapHelper;
     private readonly MangaDex _mangaDex;
     private readonly AniList _aniList;
+    private readonly IUserBackupService _userBackupService;
     private bool disposedValue;
 
     // --- Reactive Properties (Public) ---
@@ -45,13 +46,16 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
     public ReadOnlyObservableCollection<TsundokuTheme> SavedThemes => _userService.SavedThemes;
     public ReadOnlyObservableCollection<SavedShelf> Shelves => _userService.SavedShelves;
     public FilterBuilderViewModel FilterBuilder { get; } = new();
+    public BulkEditViewModel BulkEdit { get; }
     [Reactive] public partial SavedShelf? SelectedShelf { get; set; }
 
     public Interaction<EditSeriesInfoViewModel, MainWindowViewModel?> EditSeriesInfoDialog { get; } = new Interaction<EditSeriesInfoViewModel, MainWindowViewModel?>();
 
-    public MainWindowViewModel(IUserService userService, ISharedSeriesCollectionProvider sharedSeriesProvider, BitmapHelper bitmapHelper, MangaDex mangaDex, AniList aniList) : base(userService)
+    public MainWindowViewModel(IUserService userService, ISharedSeriesCollectionProvider sharedSeriesProvider, BitmapHelper bitmapHelper, MangaDex mangaDex, AniList aniList, IUserBackupService userBackupService, BulkEditViewModel bulkEdit) : base(userService)
     {
+        BulkEdit = bulkEdit ?? throw new ArgumentNullException(nameof(bulkEdit));
         _sharedSeriesProvider = sharedSeriesProvider ?? throw new ArgumentNullException(nameof(sharedSeriesProvider));
+        _userBackupService = userBackupService ?? throw new ArgumentNullException(nameof(userBackupService));
         _bitmapHelper = bitmapHelper ?? throw new ArgumentNullException(nameof(bitmapHelper));
         _mangaDex = mangaDex ?? throw new ArgumentNullException(nameof(mangaDex));
         _aniList = aniList ?? throw new ArgumentNullException(nameof(aniList));
@@ -292,6 +296,12 @@ public sealed partial class MainWindowViewModel : ViewModelBase, IDisposable
         {
             _userService.SaveUserData();
             _userService.SaveBackupUserData();
+
+            User? user = _userService.GetCurrentUserSnapshot();
+            if (user is not null)
+            {
+                _userBackupService.CreateBackup(user.BackupFolderPath, user.BackupRetentionCount);
+            }
         }
     }
 

@@ -184,5 +184,25 @@
       "Errors now show a message with the details instead of the app closing without explanation"
     ],
     "actions": []
+  },
+  "3.2.0": {
+    "changes": [
+      "Track exactly which volumes you own: click a card's volume bar or the new Volumes Owned button in Edit Series to mark gaps, add special volumes like 18.5, and add named extras like a fanbook",
+      "Series cards show every volume in the bar, with missing volumes, the volume count, and owned specials listed just above it",
+      "Find what you're missing with the new Has Gaps filter, Missing in advanced search, and Copy Missing Volumes in Settings, and the CSV export now lists owned volumes",
+      "Bulk edit: Ctrl+click, Shift+click, or Ctrl+A cards to change demographic, publisher, genres, rating, or favorites, mark them complete or read, refresh, or trash them all at once, with Ctrl+Z to undo",
+      "A dated backup of your collection is saved each time you close the app, and you can choose how many to keep and where they go in Settings",
+      "Special volumes and extras now count in Collection Stats and have their own Special Volumes color in Theme Settings",
+      "Menus, flyouts, and tooltips now follow your theme, long descriptions fade out instead of looking cut off, and the header shows a larger user icon",
+      "Controls in Settings now opens a window listing every shortcut and click action, including ones that weren't listed before, and buttons that only show an icon now have tooltips",
+      "Collection Stats update faster, especially after bulk edits",
+      "Fixed the completion animation not playing, and the Refresh Series picker losing your selection when searching or mixing up series with the same title",
+      "Upgraded the Avalonia UI framework to 12.2.0"
+    ],
+    "actions": [
+      "Open Volumes Owned on series where you skipped a volume, since existing collections start out owning volumes 1 through your current count",
+      "Pick a Special Volumes color in Theme Settings to make special volumes stand out, since existing themes start with your Series Staff color",
+      "Choose a backup folder in Settings, such as OneDrive or Dropbox, if you want backups kept off this computer"
+    ]
   }
 }

@@ -139,6 +139,7 @@ public sealed partial class CollectionThemeWindow : ReactiveWindow<ThemeSettings
         BackupCurrentTheme.MenuButtonTextAndIconColor = tc1;
         BackupCurrentTheme.SeriesCardPublisherColor = tc1;
         BackupCurrentTheme.SeriesCardStaffColor = tc1;
+        BackupCurrentTheme.SeriesSpecialVolumeColor = new SolidColorBrush(tc1.Color);
 
         // TextColor2 roles
         BackupCurrentTheme.SeriesButtonIconColor = tc2;

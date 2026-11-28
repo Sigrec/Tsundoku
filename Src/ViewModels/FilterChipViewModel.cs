@@ -13,13 +13,13 @@ public sealed partial class FilterChipViewModel : ReactiveObject
 {
     public static readonly string[] AllFields =
     [
-        "Rating", "Value", "Read", "CurVolumes", "MaxVolumes",
+        "Rating", "Value", "Read", "CurVolumes", "MaxVolumes", "Missing",
         "Format", "Status", "Demographic", "Series", "Favorite", "Genre",
         "Notes", "Publisher"
     ];
 
     private static readonly FrozenSet<string> NumericFields =
-        new[] { "Rating", "Value", "Read", "CurVolumes", "MaxVolumes" }.ToFrozenSet(StringComparer.OrdinalIgnoreCase);
+        new[] { "Rating", "Value", "Read", "CurVolumes", "MaxVolumes", "Missing" }.ToFrozenSet(StringComparer.OrdinalIgnoreCase);
 
     private static readonly FrozenDictionary<string, string[]> EnumValues =
         new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase)

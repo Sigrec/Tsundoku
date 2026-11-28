@@ -1,0 +1,80 @@
+name: Tests
+
+on:
+  push:
+    branches: [main, 'feat/**']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      include_network:
+        description: 'Also run tests that call AniList and MangaDex'
+        required: false
+        type: boolean
+        default: false
+  schedule:
+    # Weekly check that the AniList and MangaDex APIs still return what the app expects
+    - cron: '17 6 * * 1'
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit-tests:
+    name: Unit tests
+    if: ${{ github.event_name != 'schedule' }}
+    runs-on: windows-latest
+    timeout-minutes: 20
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v6
+
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v5
+      with:
+        global-json-file: ./global.json
+
+    # Debug, because Release builds resolve app folders through the MSIX package APIs,
+    # which only work inside an installed package.
+    - name: Run tests
+      run: dotnet test ./Tests/Tsundoku.Tests.csproj --configuration Debug --filter "TestCategory!=Network" --logger trx --results-directory TestResults
+      shell: pwsh
+
+    - name: Upload test results
+      if: ${{ always() }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: unit-test-results
+        path: TestResults/*.trx
+        if-no-files-found: ignore
+
+  network-tests:
+    name: Network tests (AniList / MangaDex)
+    if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.include_network) }}
+    runs-on: windows-latest
+    timeout-minutes: 20
+    # These depend on outside services, so a failure here is reported but never blocks anything.
+    continue-on-error: true
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v6
+
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v5
+      with:
+        global-json-file: ./global.json
+
+    - name: Run network tests
+      run: dotnet test ./Tests/Tsundoku.Tests.csproj --configuration Debug --filter "TestCategory=Network" --logger trx --results-directory TestResults
+      shell: pwsh
+
+    - name: Upload test results
+      if: ${{ always() }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: network-test-results
+        path: TestResults/*.trx
+        if-no-files-found: ignore

@@ -1,8 +1,8 @@
 # [Tsundoku](https://en.wikipedia.org/wiki/Tsundoku) — Desktop Manga & Light Novel Collection App · [Follow me on AniList](https://anilist.co/user/Preminence/)
 
-> **[Windows Download (v3.1.1)](https://apps.microsoft.com/detail/9p85xxdqfhs2?hl=en-us&gl=US&ocid=pdpshare)**
+> **[Windows Download (v3.2.0)](https://apps.microsoft.com/detail/9p85xxdqfhs2?hl=en-us&gl=US&ocid=pdpshare)**
 
-**Important:** Your collection is stored in `UserData.json` with an automatic backup saved to `UserData_Backup.json` on every close. If you delete or lose both files, your library will be lost. The `Covers` folder is provided so you can replace cover images if you want—just keep the **exact** filename and extension (always `.png`).
+**Important:** Your collection is stored in `UserData.json` with an automatic backup saved to `UserData_Backup.json` on every close, plus dated copies in the `Backups` folder (the last 10 by default; the count and folder can be changed in Settings, e.g. to a OneDrive or Dropbox folder). To restore one, use **Json Import** in Settings. If you lose all of these files, your library will be lost. The `Covers` folder is provided so you can replace cover images if you want—just keep the **exact** filename and extension (always `.png`).
 
 ---
 
@@ -12,6 +12,7 @@
 
 - Add series from **AniList** or **MangaDex** by title or ID with automatic metadata, covers, and staff info
 - Track volumes collected, volumes read, ratings, value, publisher, and format
+- **Owned volumes**: mark exactly which volumes you own, including specials like 18.5 or 0. Cards show gaps at a glance, the **Has Gaps** filter and `Missing>0` search find them, and **Copy Missing Volumes** in Settings builds a shopping list
 - Support for Manga, Manhwa, Manhua, Manfra, Comic, and Novel formats
 - Import collections from **Libib CSV**, **Goodreads CSV**, or **JSON** backup files
 - Export your collection to a CSV spreadsheet
@@ -50,6 +51,7 @@
 - Hover effects with smooth animations
 - Quick volume increment/decrement buttons
 - Edit series info, refresh metadata, and change covers from URL or file
+- **Bulk edit**: Ctrl+click or Shift+click cards (Ctrl+A for everything shown) to set demographic, publisher, genres, rating, or favorites, mark series complete or read, refresh, or trash many series at once, with Ctrl+Z to undo
 
 ### Notes
 
@@ -60,9 +62,9 @@
 
 - Multilingual font support for Japanese, Korean, Chinese, Arabic, Thai, and more
 - **API health monitoring** — automatic notifications when AniList or MangaDex are unavailable
-- Automatic backup of user data on close
+- Automatic backup of user data on close, with rolling dated backups and an optional custom backup folder
 - Discord Rich Presence integration
-- Keyboard shortcuts for save (`Ctrl+S`), screenshot (`Ctrl+P`), fullscreen (`F11`), and advanced search (`Ctrl+F`)
+- Keyboard shortcuts for add series (`Ctrl+N`), edit or refresh the hovered series (`Ctrl+E` / `Ctrl+R`), save (`Ctrl+S`), screenshot (`Ctrl+P`), fullscreen (`F11`), advanced search (`Ctrl+F`), and bulk-edit select all / undo (`Ctrl+A` / `Ctrl+Z`). Settings → Controls lists every shortcut and click action
 - In-app changelog with a "What's New" button in settings
 
 ---
@@ -174,7 +176,7 @@ See their privacy policies:
 
 ### Data Security
 
-Keep your device secure and back up regularly. The app autosaves on open/close; you can also save manually with `Ctrl+S`. A backup file (`UserData_Backup.json`) is created automatically on every close. Tsundoku can't access or recover your data if it's lost.
+Keep your device secure and back up regularly. The app autosaves on open/close; you can also save manually with `Ctrl+S`. A dated backup is saved to the Backups folder on every close, and you can choose how many to keep and move the folder (for example to OneDrive) in Settings. Tsundoku can't access or recover your data if it's lost.
 
 ### Children's Privacy
 

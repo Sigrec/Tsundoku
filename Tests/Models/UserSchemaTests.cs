@@ -6,6 +6,18 @@ namespace Tsundoku.Tests.Models;
 [Parallelizable(ParallelScope.All)]
 public class UserSchemaTests
 {
+    [Test]
+    public void SchemaVersionText_RoundTripsWithInvariantDot()
+    {
+        string text = Tsundoku.ViewModels.ViewModelBase.SCHEMA_VERSION_TEXT;
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(text, Does.Contain("."));
+            Assert.That(double.Parse(text, System.Globalization.CultureInfo.InvariantCulture), Is.EqualTo(Tsundoku.ViewModels.ViewModelBase.SCHEMA_VERSION));
+        }
+    }
+
     private static readonly string[] RemovedKeys =
     [
         "SeriesProgressBGColor", "SeriesEditPaneBGColor",
@@ -144,13 +156,13 @@ public class UserSchemaTests
     }
 
     [Test]
-    public void V62Migration_UpdatesDataVersionTo6Point2()
+    public void V62Migration_UpdatesDataVersionToCurrentSchema()
     {
         JsonNode userData = CreatePreV62UserData();
 
         User.UpdateSchemaVersion(userData, isImport: true);
 
-        Assert.That(userData["DataVersion"]!.GetValue<double>(), Is.EqualTo(6.2));
+        Assert.That(userData["DataVersion"]!.GetValue<double>(), Is.EqualTo(Tsundoku.ViewModels.ViewModelBase.SCHEMA_VERSION));
     }
 
     [Test]

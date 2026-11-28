@@ -29,6 +29,12 @@ public sealed partial class UserSettingsViewModel : ViewModelBase
     [Reactive] public partial string SelectedSecondaryCurrency { get; set; } = OffOption;
     [Reactive] public partial string CurrencyRatesStatus { get; set; } = "Using bundled defaults";
     [Reactive] public partial bool CanRefreshCurrencyRates { get; set; } = true;
+    [Reactive] public partial int SelectedBackupRetentionCount { get; set; } = IUserBackupService.DefaultRetentionCount;
+    [Reactive] public partial string BackupFolderDisplay { get; set; } = string.Empty;
+    [Reactive] public partial bool IsCustomBackupFolder { get; set; }
+    [Reactive] public partial string BackupStatus { get; set; } = string.Empty;
+
+    public IReadOnlyList<int> BackupRetentionOptions { get; } = IUserBackupService.RetentionOptions;
 
     public const string OffOption = "Off";
     public IReadOnlyList<string> SecondaryCurrencyOptions { get; } =
@@ -42,8 +48,9 @@ public sealed partial class UserSettingsViewModel : ViewModelBase
     private readonly Clients.MangaDex _mangaDex;
     private readonly Clients.AniList _aniList;
     private readonly ICurrencyRateService _currencyRateService;
+    private readonly IUserBackupService _userBackupService;
 
-    public UserSettingsViewModel(IUserService userService, AddNewSeriesViewModel addNewSeriesViewModel, ILoadingDialogService loadingDialogService, BitmapHelper bitmapHelper, Clients.MangaDex mangaDex, Clients.AniList aniList, ICurrencyRateService currencyRateService) : base(userService)
+    public UserSettingsViewModel(IUserService userService, AddNewSeriesViewModel addNewSeriesViewModel, ILoadingDialogService loadingDialogService, BitmapHelper bitmapHelper, Clients.MangaDex mangaDex, Clients.AniList aniList, ICurrencyRateService currencyRateService, IUserBackupService userBackupService) : base(userService)
     {
         _addNewSeriesViewModel = addNewSeriesViewModel;
         _loadingDialogService = loadingDialogService;
@@ -51,6 +58,7 @@ public sealed partial class UserSettingsViewModel : ViewModelBase
         _mangaDex = mangaDex;
         _aniList = aniList;
         _currencyRateService = currencyRateService;
+        _userBackupService = userBackupService;
         RefreshRatesStatus();
 
         // Sync SelectedCurrency from user data
@@ -85,6 +93,20 @@ public sealed partial class UserSettingsViewModel : ViewModelBase
                 GlassmorphismEnabled = user.GlassmorphismEnabled;
                 PreferNearlyCompleteSeriesPick = user.PreferNearlyCompleteSeriesPick;
                 SelectedSecondaryCurrency = string.IsNullOrEmpty(user.SecondaryCurrency) ? OffOption : user.SecondaryCurrency;
+                SelectedBackupRetentionCount = user.BackupRetentionCount > 0 ? user.BackupRetentionCount : IUserBackupService.DefaultRetentionCount;
+                RefreshBackupFolderDisplay(user.BackupFolderPath);
+            })
+            .DisposeWith(_disposables);
+
+        this.WhenAnyValue(x => x.SelectedBackupRetentionCount)
+            .Skip(1)
+            .DistinctUntilChanged()
+            .Where(count => count > 0)
+            .ObserveOn(TsundokuSchedulers.MainThread)
+            .Subscribe(count =>
+            {
+                _userService.UpdateUser(user => user.BackupRetentionCount = count);
+                LOGGER.Debug("Updated BackupRetentionCount to {Value}", count);
             })
             .DisposeWith(_disposables);
 
@@ -173,6 +195,76 @@ public sealed partial class UserSettingsViewModel : ViewModelBase
         return last is null
             ? "Using bundled defaults — refresh for live rates"
             : $"Last refreshed {last.Value.ToLocalTime():yyyy-MM-dd HH:mm}";
+    }
+
+    /// <summary>
+    /// Builds a shopping list of every series with missing volumes, one line per series, e.g.
+    /// <c>Frieren — 4, 9, 13–14 · special 10.5</c>.
+    /// </summary>
+    /// <returns>The list text and how many series it covers.</returns>
+    public (string Text, int SeriesCount) BuildMissingVolumesList()
+    {
+        TsundokuLanguage language = CurrentUser?.Language ?? TsundokuLanguage.Romaji;
+        List<(string Title, string Missing)> lines = [];
+        foreach (Series series in _userService.GetUserCollection())
+        {
+            List<decimal> missingMain = VolumeMath.MissingMain(series.OwnedVolumes, series.MaxVolumeCount);
+            List<decimal> missingSpecials = VolumeMath.MissingSpecials(series.OwnedVolumes, series.SpecialVolumes);
+            List<string> missingExtras = series.MissingExtraNames;
+            if (missingMain.Count == 0 && missingSpecials.Count == 0 && missingExtras.Count == 0) continue;
+
+            string title = series.Titles.TryGetValue(language, out string? t) ? t : series.Titles[TsundokuLanguage.Romaji];
+            string missing = VolumeMath.FormatRanges(missingMain, "–");
+            if (missingSpecials.Count > 0)
+            {
+                string specials = "special " + string.Join(", ", missingSpecials.Select(VolumeMath.Format));
+                missing = missing.Length > 0 ? $"{missing} · {specials}" : specials;
+            }
+            if (missingExtras.Count > 0)
+            {
+                string extras = string.Join(", ", missingExtras);
+                missing = missing.Length > 0 ? $"{missing} · {extras}" : extras;
+            }
+            lines.Add((title, missing));
+        }
+
+        lines.Sort(static (a, b) => string.Compare(a.Title, b.Title, StringComparison.CurrentCultureIgnoreCase));
+        return (string.Join(Environment.NewLine, lines.Select(l => $"{l.Title} — {l.Missing}")), lines.Count);
+    }
+
+    /// <summary>Gets the folder dated backups are currently written to.</summary>
+    public string GetBackupFolder() => _userBackupService.ResolveBackupFolder(CurrentUser?.BackupFolderPath);
+
+    /// <summary>
+    /// Sets a custom backup folder, or clears it to go back to the app's own Backups folder.
+    /// </summary>
+    /// <param name="folderPath">The chosen folder, or <c>null</c> to use the default.</param>
+    public void SetBackupFolder(string? folderPath)
+    {
+        string? persisted = string.IsNullOrWhiteSpace(folderPath) ? null : folderPath;
+        _userService.UpdateUser(user => user.BackupFolderPath = persisted);
+        RefreshBackupFolderDisplay(persisted);
+        BackupStatus = string.Empty;
+        LOGGER.Info("Backup folder set to {Folder}", persisted ?? "(default)");
+    }
+
+    /// <summary>Saves the collection, then writes a dated backup immediately.</summary>
+    public void BackUpNow()
+    {
+        _userService.SaveUserData();
+        User? user = _userService.GetCurrentUserSnapshot();
+        if (user is null) return;
+
+        string? backupPath = _userBackupService.CreateBackup(user.BackupFolderPath, user.BackupRetentionCount);
+        BackupStatus = backupPath is not null
+            ? $"Backed up {DateTime.Now:yyyy-MM-dd HH:mm}"
+            : "No changes since the last backup";
+    }
+
+    private void RefreshBackupFolderDisplay(string? customFolder)
+    {
+        IsCustomBackupFolder = !string.IsNullOrWhiteSpace(customFolder);
+        BackupFolderDisplay = IsCustomBackupFolder ? customFolder! : "App folder (default)";
     }
 
     private void UpdateMembership(string websiteTitle, bool isMember)
@@ -310,7 +402,7 @@ public sealed partial class UserSettingsViewModel : ViewModelBase
                     output.Append($"\"{userNotes.Replace("\"", "\"\"")}\"").AppendLine().AppendLine();
                 }
 
-                string[] headers = ["Title", "Staff", "Format", "Status", "Cur Volumes", "Max Volumes", "Demographic", "Value", "Rating", "Volumes Read", "Genres", "Notes"];
+                string[] headers = ["Title", "Staff", "Format", "Status", "Cur Volumes", "Max Volumes", "Demographic", "Value", "Rating", "Volumes Read", "Genres", "Notes", "Owned Volumes"];
                 output.AppendLine(string.Join(",", headers));
 
                 foreach (Series curSeries in seriesToExport)
@@ -336,7 +428,14 @@ public sealed partial class UserSettingsViewModel : ViewModelBase
                     output.Append($"{(curSeries.Rating != -1 ? curSeries.Rating.ToString(CultureInfo.InvariantCulture) : string.Empty)},");
                     output.Append($"{curSeries.VolumesRead},");
                     output.Append($"{(curSeries.Genres.Count != 0 ? $"\"{string.Join(" | ", curSeries.Genres)}\"" : string.Empty)},");
-                    output.Append($"\"{(!string.IsNullOrWhiteSpace(curSeries.SeriesNotes) ? curSeries.SeriesNotes.Replace("\"", "\"\"") : string.Empty)}\"\n");
+                    output.Append($"\"{(!string.IsNullOrWhiteSpace(curSeries.SeriesNotes) ? curSeries.SeriesNotes.Replace("\"", "\"\"") : string.Empty)}\",");
+                    string ownedExtras = string.Join(", ", curSeries.ExtraVolumes.Where(e => e.Owned).Select(e => e.Name));
+                    string ownedText = VolumeMath.FormatRanges(curSeries.OwnedVolumes);
+                    if (ownedExtras.Length > 0)
+                    {
+                        ownedText = ownedText.Length > 0 ? $"{ownedText}, {ownedExtras}" : ownedExtras;
+                    }
+                    output.Append($"\"{ownedText.Replace("\"", "\"\"")}\"\n");
                 }
 
                 try

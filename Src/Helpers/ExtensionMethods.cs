@@ -1,12 +1,10 @@
 using System.Buffers;
 using System.Text.RegularExpressions;
-using Avalonia.Media.Imaging;
-using Microsoft.IO;
 
 namespace Tsundoku.Helpers;
 
 /// <summary>
-/// Provides extension methods and utility functions for string manipulation, bitmap cloning, and collection comparison.
+/// Provides extension methods and utility functions for string manipulation and collection comparison.
 /// </summary>
 public static partial class ExtensionMethods
 {
@@ -52,23 +50,6 @@ public static partial class ExtensionMethods
                 };
             }
         });
-    }
-
-    /// <summary>
-    /// Creates a deep copy of the given Avalonia Bitmap by encoding it to PNG in memory
-    /// and decoding it back into a new Bitmap instance.
-    /// </summary>
-    public static Bitmap? CloneBitmap(this Bitmap? source)
-    {
-        if (source is null)
-        {
-            return null;
-        }
-
-        using RecyclableMemoryStream stream = BitmapHelper.StreamManager.GetStream(nameof(CloneBitmap));
-        source.Save(stream, PngBitmapEncoderOptions.Default);
-        stream.Position = 0;
-        return new Bitmap(stream);
     }
 
     /// <summary>

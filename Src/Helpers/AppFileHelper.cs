@@ -21,12 +21,13 @@ public static class AppFileHelper
     private const string LogsFolderName = "Logs";
     private const string ThemesFolderName = "Themes";
     private const string ScreenshotsFolderName = "Screenshots";
+    private const string BackupsFolderName = "Backups";
 
     /// <summary>Recognized image file extensions for cover images.</summary>
-    public static readonly HashSet<string> VALID_IMAGE_EXTENSIONS = new(StringComparer.OrdinalIgnoreCase)
-    {
-        ".png", ".jpg", ".jpeg"
-    };
+    public static readonly HashSet<string> VALID_IMAGE_EXTENSIONS =
+    [
+with(StringComparer.OrdinalIgnoreCase),         ".png", ".jpg", ".jpeg"
+    ];
 
     /// <summary>
     /// Gets the full, writable path for application-specific files,
@@ -160,6 +161,12 @@ public static class AppFileHelper
     public static string GetScreenshotsFolderPath() => GetFolderPath(ScreenshotsFolderName);
 
     /// <summary>
+    /// Gets the full path for the default "Backups\" subfolder.
+    /// </summary>
+    /// <returns>The full path to the Backups folder.</returns>
+    public static string GetBackupsFolderPath() => GetFolderPath(BackupsFolderName);
+
+    /// <summary>
     /// Generates a unique file path for a screenshot within the "Screenshots" subfolder.
     /// Handles invalid filename characters and appends a number if a file with the same base name already exists.
     /// </summary>
@@ -249,8 +256,8 @@ public static class AppFileHelper
 
         try
         {
-            string jsonString = File.ReadAllText(filePath);
-            User? user = JsonSerializer.Deserialize(jsonString, UserModelContext.Default.User);
+            using FileStream stream = new(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize: 81920, FileOptions.SequentialScan);
+            User? user = JsonSerializer.Deserialize(stream, UserModelContext.Default.User);
 
             if (user is not null)
             {
@@ -259,7 +266,7 @@ public static class AppFileHelper
             else
             {
                 // This scenario might occur if the JSON content is literally "null" or an empty object that maps to null User.
-                LOGGER.Warn("Deserialization from {FilePath} completed, but resulted in a null User object. JSON content: {JsonContent}", filePath, jsonString);
+                LOGGER.Warn("Deserialization from {FilePath} completed, but resulted in a null User object.", filePath);
             }
 
             return user;

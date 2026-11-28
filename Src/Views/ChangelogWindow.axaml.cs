@@ -78,6 +78,8 @@ public sealed partial class ChangelogWindow : ReactiveWindow<ViewModelBase>
         NextVersionButton.Opacity = hasNext ? 1 : 0;
         NextVersionButton.IsHitTestVisible = hasNext;
         ToolTip.SetTip(NextVersionButton, hasNext ? $"v{_sortedVersions[_currentIndex + 1]}" : null);
+
+        WindowFit.Refit(this);
     }
 
     private void OnPrevVersionClicked(object? sender, RoutedEventArgs e)

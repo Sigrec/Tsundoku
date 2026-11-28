@@ -4,7 +4,6 @@ using Avalonia.Media;
 namespace Tsundoku.Tests.Models;
 
 [TestFixture]
-[Parallelizable(ParallelScope.All)]
 public class ThemeResourceKeysTests
 {
     private static readonly FieldInfo[] ConstantFields =
@@ -12,7 +11,7 @@ public class ThemeResourceKeysTests
             .GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
             .Where(f => f.IsLiteral && !f.IsInitOnly && f.FieldType == typeof(string))];
 
-    [Test]
+    [AvaloniaTest]
     public void PropertyMap_ContainsAllExpectedKeys()
     {
         string[] expectedKeys = [.. ConstantFields.Select(f => (string)f.GetRawConstantValue()!)];
@@ -27,7 +26,7 @@ public class ThemeResourceKeysTests
         }
     }
 
-    [Test]
+    [AvaloniaTest]
     public void PropertyMap_KeyCount_MatchesConstantCount()
     {
         Assert.That(
@@ -37,7 +36,7 @@ public class ThemeResourceKeysTests
         );
     }
 
-    [Test]
+    [AvaloniaTest]
     public void PropertyMap_HasNoDuplicateKeys()
     {
         string[] keys = [.. ThemeResourceKeys.PropertyMap.Keys];
@@ -46,7 +45,7 @@ public class ThemeResourceKeysTests
         Assert.That(keys.Length, Is.EqualTo(distinctKeys.Length), "PropertyMap should have no duplicate keys");
     }
 
-    [Test]
+    [AvaloniaTest]
     public void PropertyMap_GettersReturnCorrectProperties()
     {
         TsundokuTheme theme = TsundokuTheme.DEFAULT_THEME;
@@ -88,10 +87,11 @@ public class ThemeResourceKeysTests
             Assert.That(ThemeResourceKeys.PropertyMap[ThemeResourceKeys.SeriesCardButtonBGHoverColor](theme), Is.SameAs(theme.SeriesCardButtonBGHoverColor));
             Assert.That(ThemeResourceKeys.PropertyMap[ThemeResourceKeys.SeriesCardButtonBorderColor](theme), Is.SameAs(theme.SeriesCardButtonBorderColor));
             Assert.That(ThemeResourceKeys.PropertyMap[ThemeResourceKeys.SeriesCardButtonBorderHoverColor](theme), Is.SameAs(theme.SeriesCardButtonBorderHoverColor));
+            Assert.That(ThemeResourceKeys.PropertyMap[ThemeResourceKeys.SeriesSpecialVolumeColor](theme), Is.SameAs(theme.SeriesSpecialVolumeColor));
         }
     }
 
-    [Test]
+    [AvaloniaTest]
     public void PropertyMap_AllGettersReturnNonNull_ForDefaultTheme()
     {
         TsundokuTheme theme = TsundokuTheme.DEFAULT_THEME;
@@ -103,7 +103,7 @@ public class ThemeResourceKeysTests
         }
     }
 
-    [Test]
+    [AvaloniaTest]
     public void AllConstants_StartWithTsundokuPrefix()
     {
         foreach (FieldInfo field in ConstantFields)

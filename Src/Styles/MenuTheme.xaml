@@ -111,6 +111,49 @@
 		</Style>
 	</Style>
 
+	<!-- Popups: flyouts, menu flyouts and context menus use the theme, matching MenuComboBox dropdowns -->
+	<Style Selector="FlyoutPresenter">
+		<Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGColor}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource TsundokuMenuButtonBorderColor}"/>
+		<Setter Property="BorderThickness" Value="2"/>
+		<Setter Property="CornerRadius" Value="10"/>
+		<Setter Property="Padding" Value="8"/>
+		<Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
+	</Style>
+
+	<Style Selector="ToolTip">
+		<Setter Property="Background" Value="{DynamicResource TsundokuStatusAndBookTypeBGColor}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource TsundokuMenuButtonBorderColor}"/>
+		<Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
+	</Style>
+
+	<Style Selector="MenuFlyoutPresenter, ContextMenu">
+		<Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGColor}"/>
+		<Setter Property="BorderBrush" Value="{DynamicResource TsundokuMenuButtonBorderColor}"/>
+		<Setter Property="BorderThickness" Value="2"/>
+		<Setter Property="CornerRadius" Value="10"/>
+		<Setter Property="Padding" Value="4"/>
+	</Style>
+
+	<Style Selector="MenuItem">
+		<Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
+		<Setter Property="Background" Value="Transparent"/>
+		<Setter Property="FontWeight" Value="Bold"/>
+		<Setter Property="FontSize" Value="13"/>
+		<Setter Property="CornerRadius" Value="6"/>
+		<Setter Property="Cursor" Value="Hand"/>
+
+		<Style Selector="^ /template/ Border#PART_LayoutRoot">
+			<Setter Property="CornerRadius" Value="6"/>
+		</Style>
+		<Style Selector="^:pointerover /template/ Border#PART_LayoutRoot, ^:selected /template/ Border#PART_LayoutRoot, ^:pressed /template/ Border#PART_LayoutRoot">
+			<Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGHoverColor}"/>
+		</Style>
+		<Style Selector="^:pointerover /template/ ContentPresenter#PART_HeaderPresenter, ^:selected /template/ ContentPresenter#PART_HeaderPresenter, ^:pressed /template/ ContentPresenter#PART_HeaderPresenter">
+			<Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconHoverColor}"/>
+		</Style>
+	</Style>
+
 	<!-- Section title style (UPPERCASE labels) -->
 	<Style Selector="TextBlock.section-title">
 		<Setter Property="FontSize" Value="11"/>

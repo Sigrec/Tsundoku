@@ -24,7 +24,8 @@
                     BorderBrush="{DynamicResource TsundokuDividerColor}"
                     BorderThickness="2"
                     Padding="3"
-                    Cursor="Hand">
+                    Cursor="Hand"
+                    ToolTip.Tip="Pick color">
                 <Border Background="{CompiledBinding ColorBrush, ElementName=Root}"
                         CornerRadius="3"
                         HorizontalAlignment="Stretch"

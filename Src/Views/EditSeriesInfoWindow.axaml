@@ -80,6 +80,12 @@
                                 Theme="{StaticResource MenuButton}"
                                 ToolTip.Tip="Reapply reverted changes"
                                 Click="ReapplyRevertedChanges"/>
+                        <Button x:Name="VolumesOwnedButton"
+                                i:Attached.Icon="fa7-solid fa7-layer-group"
+                                FontSize="14" Width="34" Height="34"
+                                Theme="{StaticResource MenuButton}"
+                                ToolTip.Tip="Volumes Owned (mark gaps and specials like 18.5)"
+                                Click="OpenVolumesOwnedAsync"/>
                         <Button x:Name="MarkCompleteButton"
                                 i:Attached.Icon="fa7-solid fa7-check-double"
                                 FontSize="14" Width="34" Height="34"

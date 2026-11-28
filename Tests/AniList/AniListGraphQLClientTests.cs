@@ -6,6 +6,7 @@ using static Tsundoku.Models.Enums.SeriesFormatModel;
 namespace Tsundoku.Tests.AniList;
 
 [TestFixture]
+[Category(TestCategories.Network)]
 public class AniListGraphQLClientTests
 {
     private HttpClient _httpClient;

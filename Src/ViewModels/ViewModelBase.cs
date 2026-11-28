@@ -30,7 +30,10 @@ public partial class ViewModelBase : ReactiveObject
         .Split('+')[0];
 
     /// <summary>The current user data schema version for migration logic.</summary>
-    public const double SCHEMA_VERSION = 6.6;
+    public const double SCHEMA_VERSION = 6.9;
+
+    /// <summary><see cref="SCHEMA_VERSION"/> as display text, always with a <c>.</c> separator.</summary>
+    public static readonly string SCHEMA_VERSION_TEXT = SCHEMA_VERSION.ToString("0.0###", System.Globalization.CultureInfo.InvariantCulture);
 
     /// <summary>The file name used for persisting user data.</summary>
     public const string USER_DATA_FILEPATH = @"UserData.json";

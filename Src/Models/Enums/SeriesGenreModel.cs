@@ -26,7 +26,7 @@ public static class SeriesGenreModel
     // Static constructor: This code runs once, the first time any member of SeriesGenreModels is accessed.
     static SeriesGenreModel()
     {
-        Dictionary<string, SeriesGenre> genreMap = new(StringComparer.OrdinalIgnoreCase);
+        Dictionary<string, SeriesGenre> genreMap = [with(StringComparer.OrdinalIgnoreCase)];
 
         // Iterate through each enum value to build the map
         foreach (SeriesGenre genre in Enum.GetValues<SeriesGenre>())

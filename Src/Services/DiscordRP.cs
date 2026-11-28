@@ -3,10 +3,24 @@
 namespace Tsundoku.Services;
 
 /// <summary>
-/// Custom Discord RPC logger that suppresses known noisy internal exceptions.
+/// Custom Discord RPC logger that suppresses a known harmless library exception.
 /// </summary>
+/// <remarks>
+/// DiscordRPC throws a NullReferenceException in <c>Assets.Merge</c> when Discord echoes our presence
+/// back; it only affects the library's cached copy of the presence, which Tsundoku never reads. The
+/// library reports one exception as three separate Error calls (a header naming the exception type,
+/// the exception message, then the stack trace), so the header is held until the stack trace shows
+/// whether it is that known case. Anything else is logged in full.
+/// </remarks>
 internal sealed class FilteredDiscordLogger : DiscordRPC.Logging.ILogger
 {
+    private const string ExceptionHeaderPrefix = "Unhandled Exception while processing event:";
+    private const string KnownFailingFrame = "Assets.Merge";
+
+    private static readonly Logger LOGGER = LogManager.GetCurrentClassLogger();
+    private readonly Lock _gate = new();
+    private readonly List<string> _pending = [];
+
     public DiscordRPC.Logging.LogLevel Level { get; set; } = DiscordRPC.Logging.LogLevel.Error;
 
     public void Trace(string message, params object[] args) { }
@@ -16,9 +30,43 @@ internal sealed class FilteredDiscordLogger : DiscordRPC.Logging.ILogger
     public void Error(string message, params object[] args)
     {
         string formatted = args.Length > 0 ? string.Format(message, args) : message;
-        if (formatted.Contains("Assets.Merge", StringComparison.Ordinal)) return;
-        if (formatted.Contains("Object reference not set", StringComparison.Ordinal)) return;
-        LogManager.GetCurrentClassLogger().Error("DiscordRPC: {Message}", formatted);
+        lock (_gate)
+        {
+            if (formatted.StartsWith(ExceptionHeaderPrefix, StringComparison.Ordinal))
+            {
+                FlushPending();
+                _pending.Add(formatted);
+                return;
+            }
+
+            if (_pending.Count == 0)
+            {
+                LOGGER.Warn("DiscordRPC: {Message}", formatted);
+                return;
+            }
+
+            _pending.Add(formatted);
+            if (!formatted.TrimStart().StartsWith("at ", StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            if (formatted.Contains(KnownFailingFrame, StringComparison.Ordinal))
+            {
+                _pending.Clear();
+            }
+            else
+            {
+                FlushPending();
+            }
+        }
+    }
+
+    private void FlushPending()
+    {
+        if (_pending.Count == 0) return;
+        LOGGER.Warn("DiscordRPC: {Message}", string.Join(Environment.NewLine, _pending));
+        _pending.Clear();
     }
 }
 

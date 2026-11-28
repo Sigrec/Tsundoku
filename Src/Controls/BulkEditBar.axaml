@@ -1,0 +1,117 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Tsundoku.ViewModels"
+             xmlns:i="clr-namespace:Optris.Icons.Avalonia;assembly=Optris.Icons.Avalonia"
+             x:Class="Tsundoku.Controls.BulkEditBar"
+             x:DataType="vm:BulkEditViewModel"
+             IsVisible="{CompiledBinding HasSelection}">
+
+    <UserControl.Styles>
+        <Style Selector="Button.bulk">
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Margin" Value="3"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="Button.bulk-icon">
+            <Setter Property="Width" Value="32"/>
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Margin" Value="3"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="ToolTip.Placement" Value="Top"/>
+        </Style>
+        <Style Selector="Border.bulk-flyout">
+            <Setter Property="Padding" Value="2"/>
+        </Style>
+    </UserControl.Styles>
+
+    <Border Background="{DynamicResource TsundokuStatusAndBookTypeBGColor}"
+            BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}"
+            BorderThickness="2"
+            CornerRadius="12"
+            BoxShadow="0 0 15 6 #B3000000"
+            Padding="10,6">
+        <WrapPanel Orientation="Horizontal" HorizontalAlignment="Center">
+            <TextBlock Text="{CompiledBinding SelectionSummary}"
+                       FontSize="14" FontWeight="Bold"
+                       VerticalAlignment="Center"
+                       Margin="6,0,10,0"
+                       Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
+
+            <Button Classes="bulk" Theme="{StaticResource MenuButton}" Content="Demographic" Click="OpenDemographicMenu" Name="DemographicButton"/>
+
+            <Button Classes="bulk" Theme="{StaticResource MenuButton}" Content="Publisher">
+                <Button.Flyout>
+                    <Flyout Placement="Top" Opened="FocusPublisherBox">
+                        <Border Classes="bulk-flyout">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <TextBox Name="PublisherBox" Classes="Menu" Width="200" Height="32" BorderThickness="2" FontWeight="Bold"
+                                         PlaceholderText="New publisher" KeyDown="PublisherBoxKeyDown"/>
+                                <Button Classes="bulk" Theme="{StaticResource MenuButton}" Content="Apply" Click="ApplyPublisher"/>
+                            </StackPanel>
+                        </Border>
+                    </Flyout>
+                </Button.Flyout>
+            </Button>
+
+            <Button Classes="bulk" Theme="{StaticResource MenuButton}" Content="Genres">
+                <Button.Flyout>
+                    <Flyout Placement="Top">
+                        <Border Classes="bulk-flyout">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <ComboBox Name="GenreComboBox"
+                                          ItemsSource="{CompiledBinding Genres}"
+                                          Theme="{StaticResource MenuComboBox}"
+                                          ItemContainerTheme="{StaticResource MenuComboBoxItem}"
+                                          PlaceholderText="Genre"
+                                          Width="170" Height="30"/>
+                                <Button Classes="bulk" Theme="{StaticResource MenuButton}" Content="Add" Click="AddGenre"/>
+                                <Button Classes="bulk" Theme="{StaticResource MenuButton}" Content="Remove" Click="RemoveGenre"/>
+                            </StackPanel>
+                        </Border>
+                    </Flyout>
+                </Button.Flyout>
+            </Button>
+
+            <Button Classes="bulk" Theme="{StaticResource MenuButton}" Content="Rating">
+                <Button.Flyout>
+                    <Flyout Placement="Top" Opened="FocusRatingBox">
+                        <Border Classes="bulk-flyout">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <TextBox Name="RatingBox" Classes="Menu" Width="90" Height="32" BorderThickness="2" FontWeight="Bold"
+                                         PlaceholderText="0 – 10" MaxLength="4" KeyDown="RatingBoxKeyDown"/>
+                                <Button Classes="bulk" Theme="{StaticResource MenuButton}" Content="Apply" Click="ApplyRating"/>
+                            </StackPanel>
+                        </Border>
+                    </Flyout>
+                </Button.Flyout>
+            </Button>
+
+            <Button Classes="bulk-icon" Theme="{StaticResource MenuButton}" i:Attached.Icon="fa7-solid fa7-star" ToolTip.Tip="Favorite">
+                <Button.Flyout>
+                    <MenuFlyout Placement="Top">
+                        <MenuItem Header="Add to favorites" Click="AddFavorite"/>
+                        <MenuItem Header="Remove from favorites" Click="RemoveFavorite"/>
+                    </MenuFlyout>
+                </Button.Flyout>
+            </Button>
+
+            <Button Classes="bulk" Theme="{StaticResource MenuButton}" Content="Mark Complete" Click="MarkComplete"
+                    ToolTip.Tip="Set collected volumes to the max volume count (series with an unknown max are skipped)"/>
+            <Button Classes="bulk" Theme="{StaticResource MenuButton}" Content="Mark Read" Click="MarkAllRead"
+                    ToolTip.Tip="Set volumes read to the number of volumes collected"/>
+
+            <Button Classes="bulk-icon" Theme="{StaticResource MenuButton}" i:Attached.Icon="fa7-solid fa7-arrows-rotate" ToolTip.Tip="Refresh from AniList / MangaDex" Click="RequestRefresh" Name="RefreshButton"/>
+            <Button Classes="bulk-icon" Theme="{StaticResource MenuButton}" i:Attached.Icon="fa7-solid fa7-trash" ToolTip.Tip="Move to trash" Click="RequestTrash"/>
+            <Button Classes="bulk-icon" Theme="{StaticResource MenuButton}" i:Attached.Icon="fa7-solid fa7-rotate-left"
+                    IsVisible="{CompiledBinding CanUndo}"
+                    ToolTip.Tip="{CompiledBinding UndoToolTip}"
+                    Click="Undo"/>
+            <Button Classes="bulk-icon" Theme="{StaticResource MenuButton}" i:Attached.Icon="fa7-solid fa7-xmark" ToolTip.Tip="Clear selection (Esc)" Click="ClearSelection"/>
+        </WrapPanel>
+    </Border>
+</UserControl>

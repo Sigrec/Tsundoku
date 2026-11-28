@@ -117,7 +117,8 @@
                     i:Attached.Icon="fa7-solid fa7-chevron-up"
                     FontSize="18"
                     Cursor="Hand"
-                    Click="BackToTop_Click"/>
+                    Click="BackToTop_Click"
+                    ToolTip.Tip="Back to top"/>
         </Border>
 
         <!-- Theme Selector (floating bottom-right, extra right margin for scrollbar) -->
@@ -224,7 +225,8 @@
                         i:Attached.Icon="fa7-solid fa7-swatchbook"
                         FontSize="18"
                         Cursor="Hand"
-                        Click="ToggleThemeSelector"/>
+                        Click="ToggleThemeSelector"
+                        ToolTip.Tip="Change theme"/>
             </Border>
         </StackPanel>
 
@@ -241,23 +243,9 @@
                     <!-- Row 0: User Area + Search -->
                     <Grid ColumnDefinitions="Auto,*">
                         <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
-                            <!-- Brand -->
-                            <Image Source="/Assets/Icons/TsundokuLogo.ico"
-                                   Width="32" Height="32"/>
-                            <TextBlock Text="Tsundoku"
-                                       FontSize="17"
-                                       FontWeight="ExtraBold"
-                                       VerticalAlignment="Center"
-                                       Foreground="{DynamicResource TsundokuUsernameColor}"/>
-
-                            <!-- Divider -->
-                            <Rectangle Width="1" Height="24"
-                                       Fill="{DynamicResource TsundokuDividerColor}"
-                                       Opacity="0.5"/>
-
                             <!-- User -->
-                            <Border BorderThickness="2" BorderBrush="{DynamicResource TsundokuDividerColor}" CornerRadius="16" ClipToBounds="True" Height="32" Width="32">
-                                <Image Height="32" Width="32"
+                            <Border BorderThickness="2" BorderBrush="{DynamicResource TsundokuDividerColor}" CornerRadius="22" ClipToBounds="True" Height="44" Width="44">
+                                <Image Height="44" Width="44"
                                        Source="{CompiledBinding CurrentUser.UserIcon}"
                                        Cursor="Hand"
                                        PointerPressed="ChangeUserIcon"
@@ -266,7 +254,7 @@
                                        Name="IconImage"/>
                             </Border>
                             <TextBlock Name="Username"
-                                       FontSize="16"
+                                       FontSize="18"
                                        FontWeight="Bold"
                                        VerticalAlignment="Center"
                                        Text="{CompiledBinding CurrentUser.UserName, Mode=OneWay}"
@@ -658,6 +646,15 @@
                         </ItemsRepeater.ItemTemplate>
                     </ItemsRepeater>
                 </ScrollViewer>
+
+                <!-- Bulk edit bar: shown while cards are selected (Ctrl+click / Shift+click) -->
+                <controls:BulkEditBar Name="BulkEditBar"
+                                      DataContext="{CompiledBinding BulkEdit}"
+                                      ZIndex="3"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Bottom"
+                                      MaxWidth="1100"
+                                      Margin="20,0,20,20"/>
 
                 <!-- Empty state: active filter matches zero series -->
                 <StackPanel Name="EmptyStatePanel"

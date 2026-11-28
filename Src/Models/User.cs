@@ -50,6 +50,8 @@ public sealed partial class User : ReactiveObject
     [Reactive] public partial bool PreferNearlyCompleteSeriesPick { get; set; }
     [Reactive] public partial string? SecondaryCurrency { get; set; }
     public List<TrashedSeries> TrashedSeries { get; set; } = [];
+    [Reactive] public partial int BackupRetentionCount { get; set; } = Services.IUserBackupService.DefaultRetentionCount;
+    [Reactive] public partial string? BackupFolderPath { get; set; }
 
     [JsonConverter(typeof(UserIconBitmapJsonConverter))]
     [Reactive] public partial Bitmap? UserIcon { get; set; }
@@ -472,6 +474,61 @@ public sealed partial class User : ReactiveObject
             }
             userData[nameof(DataVersion)] = 6.6;
             LOGGER.Info("Updated schema to v6.6: Added SecondaryCurrency and TrashedSeries");
+            updatedVersion = true;
+        }
+
+        if (curVersion < 6.7) // 6.7 Adds BackupRetentionCount and BackupFolderPath (rolling dated backups).
+        {
+            if (!userData.AsObject().ContainsKey(nameof(BackupRetentionCount)))
+            {
+                userData.AsObject().Add(nameof(BackupRetentionCount), Services.IUserBackupService.DefaultRetentionCount);
+            }
+            if (!userData.AsObject().ContainsKey(nameof(BackupFolderPath)))
+            {
+                userData.AsObject().Add(nameof(BackupFolderPath), null);
+            }
+            userData[nameof(DataVersion)] = 6.7;
+            LOGGER.Info("Updated schema to v6.7: Added BackupRetentionCount and BackupFolderPath");
+            updatedVersion = true;
+        }
+
+        if (curVersion < 6.8) // 6.8 Adds per-series OwnedVolumes and SpecialVolumes (owned-volume tracking).
+        {
+            for (int x = 0; x < collectionJsonArray.Count; x++)
+            {
+                if (collectionJsonArray[x] is not JsonObject seriesObj) continue;
+
+                if (!seriesObj.ContainsKey("OwnedVolumes"))
+                {
+                    uint cur = uint.TryParse(seriesObj["CurVolumeCount"]?.ToString(), out uint parsedCur) ? parsedCur : 0;
+                    JsonArray owned = [];
+                    for (uint v = 1; v <= cur; v++)
+                    {
+                        owned.Add(v);
+                    }
+                    seriesObj.Add("OwnedVolumes", owned);
+                }
+                if (!seriesObj.ContainsKey("SpecialVolumes"))
+                {
+                    seriesObj.Add("SpecialVolumes", new JsonArray());
+                }
+            }
+            userData[nameof(DataVersion)] = 6.8;
+            LOGGER.Info("Updated schema to v6.8: Added OwnedVolumes and SpecialVolumes to every series");
+            updatedVersion = true;
+        }
+
+        if (curVersion < 6.9) // 6.9 Adds the SeriesSpecialVolumeColor theme color, starting from each theme's staff color.
+        {
+            for (int x = 0; x < themeJsonArray.Count; x++)
+            {
+                if (themeJsonArray[x] is JsonObject themeObj && !themeObj.ContainsKey("SeriesSpecialVolumeColor"))
+                {
+                    themeObj.Add("SeriesSpecialVolumeColor", themeObj["SeriesCardStaffColor"]?.ToString() ?? "#ffb9b4ff");
+                }
+            }
+            userData[nameof(DataVersion)] = 6.9;
+            LOGGER.Info("Updated schema to v6.9: Added SeriesSpecialVolumeColor to every saved theme");
             updatedVersion = true;
         }
 

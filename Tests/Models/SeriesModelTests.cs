@@ -1,4 +1,4 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Microsoft.Extensions.DependencyInjection;
@@ -82,6 +82,7 @@ public class SeriesModelTests
     public void Cleanup() => _series?.Dispose();
 
     [AvaloniaTest]
+    [Category(TestCategories.Network)]
     public async Task CreateNewSeriesCardAsync_IncludesAllRequestedAdditionalLanguages()
     {
         string input = "Rent-A-Girlfriend";
@@ -118,6 +119,7 @@ public class SeriesModelTests
     }
 
     [AvaloniaTest]
+    [Category(TestCategories.Network)]
     public async Task CreateNewSeriesCardAsync_Radiant_HasJapaneseTitle()
     {
         _series = await Series.CreateNewSeriesCardAsync(
@@ -143,6 +145,7 @@ public class SeriesModelTests
     }
 
     [AvaloniaTest]
+    [Category(TestCategories.Network)]
     public async Task CreateNewSeriesCardAsync_Anthology_HasFullStaffList()
     {
         App.ConfigureNLog();
@@ -197,18 +200,59 @@ public class SeriesModelTests
     public void Series_UpdateFrom_UpdatesCorrectly()
     {
         Series original = CreateDummySeries();
+        original.SetOwnedVolumes([1, 2, 4, 4.5m]);
         Series updated = CreateDummySeries();
         updated.Description = "New description";
-        updated.CurVolumeCount = 99;
+        updated.CurVolumeCount = 9;
 
         original.UpdateFrom(updated, false);
 
         using (Assert.EnterMultipleScope())
         {
             Assert.That(original.Description, Is.EqualTo("New description"));
-            Assert.That(original.CurVolumeCount, Is.EqualTo(99));
+            Assert.That(original.OwnedVolumes, Is.EqualTo(new List<decimal> { 1, 2, 4, 4.5m }));
+            Assert.That(original.CurVolumeCount, Is.EqualTo(3));
             Assert.That(original.Titles, Is.EqualTo(updated.Titles));
             Assert.That(original.Staff, Is.EqualTo(updated.Staff));
+        }
+    }
+
+    [AvaloniaTest]
+    public void Series_UpdateFrom_WithCoverRefresh_MovesCoverInsteadOfCopying()
+    {
+        Series original = CreateDummySeries();
+        Series refreshed = CreateDummySeries();
+        Avalonia.Media.Imaging.WriteableBitmap cover = new(new Avalonia.PixelSize(2, 2), new Avalonia.Vector(96, 96));
+        refreshed.CoverBitMap = cover;
+
+        original.UpdateFrom(refreshed, true);
+        Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+        refreshed.Dispose(deleteCover: false);
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(original.CoverBitMap, Is.SameAs(cover));
+            Assert.That(refreshed.CoverBitMap, Is.Null);
+            Assert.That(original.CoverBitMap!.PixelSize.Width, Is.EqualTo(2));
+        }
+    }
+
+    [AvaloniaTest]
+    public void Series_UpdateFrom_WithoutCoverRefresh_LeavesCoversAlone()
+    {
+        Series original = CreateDummySeries();
+        Avalonia.Media.Imaging.Bitmap? originalCover = original.CoverBitMap;
+        Series refreshed = CreateDummySeries();
+        Avalonia.Media.Imaging.WriteableBitmap cover = new(new Avalonia.PixelSize(2, 2), new Avalonia.Vector(96, 96));
+        refreshed.CoverBitMap = cover;
+
+        original.UpdateFrom(refreshed, false);
+        Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(original.CoverBitMap, Is.SameAs(originalCover));
+            Assert.That(refreshed.CoverBitMap, Is.SameAs(cover));
         }
     }
 

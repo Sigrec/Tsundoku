@@ -25,7 +25,7 @@ jobs:
     - name: Setup .NET SDK
       uses: actions/setup-dotnet@v5
       with:
-        dotnet-version: '10.x'
+        global-json-file: ./global.json
 
     - name: Extract Version from csproj
       id: version
@@ -51,13 +51,11 @@ jobs:
         Write-Host "Updated Package.appxmanifest Version to $version"
       shell: pwsh
 
-    - name: Build Main Project (for tests)
-      run: dotnet build ${{ env.AVALONIA_PROJECT_PATH }} --configuration Release -r win-x64
-      shell: pwsh
-
+    # Tests run in Debug: Release builds resolve app folders through the MSIX package APIs,
+    # which only work inside an installed package. Network tests are left to tests.yaml.
     - name: Run Tests
       if: ${{ github.event.inputs.skip_tests != 'true' }}
-      run: dotnet test ./Tests/Tsundoku.Tests.csproj --configuration Release --logger trx
+      run: dotnet test ./Tests/Tsundoku.Tests.csproj --configuration Debug --filter "TestCategory!=Network" --logger trx
       shell: pwsh
 
     - name: Restore Signing Certificate

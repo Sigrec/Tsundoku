@@ -53,7 +53,7 @@ public sealed class ColorApi
                 return [];
             }
 
-            List<GeneratedColor> colors = new(count);
+            List<GeneratedColor> colors = [with(count)];
             foreach (JsonElement colorElement in colorsElement.EnumerateArray())
             {
                 string hex = colorElement.GetProperty("hex").GetProperty("value").GetString() ?? string.Empty;

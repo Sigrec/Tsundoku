@@ -86,6 +86,7 @@
                             <controls:ColorPickerItem Title="Series Publisher" ColorBrush="{CompiledBinding CurrentTheme.SeriesCardPublisherColor, Mode=TwoWay}"/>
                             <controls:ColorPickerItem Title="Series Staff" ColorBrush="{CompiledBinding CurrentTheme.SeriesCardStaffColor, Mode=TwoWay}"/>
                             <controls:ColorPickerItem Title="Series Title" ColorBrush="{CompiledBinding CurrentTheme.SeriesCardTitleColor, Mode=TwoWay}"/>
+                            <controls:ColorPickerItem Title="Special Volumes" ColorBrush="{CompiledBinding CurrentTheme.SeriesSpecialVolumeColor, Mode=TwoWay}"/>
                         </WrapPanel>
                 </StackPanel>
 
@@ -95,13 +96,17 @@
                     <TextBlock Text="THEME MANAGEMENT" Classes="section-title"/>
                     <Grid ColumnDefinitions="Auto,Auto,6,*,Auto">
                         <Button x:Name="ExportThemeButton" Content="Export" Height="34" Padding="14,0" FontSize="13" Margin="0,0,6,0"
-                                Theme="{StaticResource MenuButton}" Click="ExportThemeAsync" i:Attached.Icon="fa7-solid fa7-file-export"/>
+                                Theme="{StaticResource MenuButton}" Click="ExportThemeAsync" i:Attached.Icon="fa7-solid fa7-file-export"
+                                ToolTip.Tip="Export the current theme to the Themes folder"/>
                         <Button x:Name="ImportThemeButton" Grid.Column="1" Content="Import" Height="34" Padding="14,0" FontSize="13"
-                                Theme="{StaticResource MenuButton}" Click="ImportThemeAsync" i:Attached.Icon="fa7-solid fa7-file-import"/>
+                                Theme="{StaticResource MenuButton}" Click="ImportThemeAsync" i:Attached.Icon="fa7-solid fa7-file-import"
+                                ToolTip.Tip="Import a theme file"/>
                         <TextBox x:Name="NewThemeName" Grid.Column="3" Height="34" FontSize="13" Classes="Menu" FontWeight="Bold" BorderThickness="2" PlaceholderText="New theme name..."/>
                         <Button x:Name="SaveThemeButton" Grid.Column="4" Content="Save" Height="34" Padding="14,0" FontSize="13" Margin="6,0,0,0"
                                 IsEnabled="{CompiledBinding IsSaveThemeButtonEnabled}" Theme="{StaticResource MenuButton}" Click="SaveNewTheme"
-                                i:Attached.Icon="fa7-solid fa7-floppy-disk"/>
+                                i:Attached.Icon="fa7-solid fa7-floppy-disk"
+                                ToolTip.Tip="Save the current colors as a new theme with this name"
+                                ToolTip.ShowOnDisabled="True"/>
                     </Grid>
                     <Grid ColumnDefinitions="*,Auto">
                         <ComboBox x:Name="ThemeSelector" SelectionChanged="ChangeMainTheme" Height="34"
@@ -112,7 +117,8 @@
                             </ComboBox.ItemTemplate>
                         </ComboBox>
                         <Button Grid.Column="1" FontSize="14" Width="34" Height="34" Margin="6,0,0,0"
-                                Theme="{StaticResource MenuButton}" i:Attached.Icon="fa7-solid fa7-trash" Click="RemoveSavedTheme"/>
+                                Theme="{StaticResource MenuButton}" i:Attached.Icon="fa7-solid fa7-trash" Click="RemoveSavedTheme"
+                                ToolTip.Tip="Delete selected theme"/>
                     </Grid>
                 </StackPanel>
 
@@ -148,7 +154,8 @@
                     </WrapPanel>
                     <StackPanel Orientation="Horizontal" Spacing="6">
                         <Button Theme="{StaticResource MenuButton}" Height="34" Padding="14,0" FontSize="13"
-                                i:Attached.Icon="fa7-solid fa7-eraser" Content="Clear" Click="ClearThemeValues"/>
+                                i:Attached.Icon="fa7-solid fa7-eraser" Content="Clear" Click="ClearThemeValues"
+                                ToolTip.Tip="Clear the generator colors"/>
                         <Button Theme="{StaticResource MenuButton}" Height="34" Padding="14,0" FontSize="13"
                                 i:Attached.Icon="fa7-solid fa7-wand-magic-sparkles" Content="Generate 1"
                                 ToolTip.Tip="Classy style: main color for hover icons, text color for progress bar"

@@ -1,6 +1,4 @@
-using System.Globalization;
 using CsvHelper;
-using CsvHelper.Configuration;
 
 namespace Tsundoku.Tests.Extensions;
 
@@ -50,14 +48,7 @@ public class ParserHelperTests
 
     private static CsvReader CreateCsvReader(string csvContent)
     {
-        StringReader stringReader = new(csvContent);
-        CsvConfiguration config = new(CultureInfo.InvariantCulture)
-        {
-            HasHeaderRecord = true,
-        };
-        CsvReader csv = new(stringReader, config);
-        csv.Read();
-        csv.ReadHeader();
+        CsvReader csv = CsvReader.FromText(csvContent);
         csv.Read();
         return csv;
     }
