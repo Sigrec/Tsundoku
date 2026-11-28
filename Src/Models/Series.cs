@@ -143,11 +143,11 @@ public sealed partial class Series(
         }
     }
 
-    /// <summary>Text after the card count, e.g. <c>vols · 83%</c>, or just <c>vols</c> when the max is unknown.</summary>
+    /// <summary>Text after the card count, e.g. <c>· 83%</c>; empty when the max is unknown.</summary>
     [JsonIgnore]
     public string CountSuffixText => _maxVolumeCount > 0
-        ? $"vols · {(int)Math.Round(_curVolumeCount * 100.0 / _maxVolumeCount)}%"
-        : "vols";
+        ? $"· {(int)Math.Round(_curVolumeCount * 100.0 / _maxVolumeCount)}%"
+        : string.Empty;
 
     [JsonIgnore] public int OwnedSpecialCount => VolumeMath.CountOwnedSpecials(_ownedVolumes, _specialVolumes);
 
@@ -161,7 +161,11 @@ public sealed partial class Series(
     /// <summary>Names of extras that aren't owned.</summary>
     [JsonIgnore] public List<string> MissingExtraNames => [.. _extraVolumes.Where(static e => !e.Owned).Select(static e => e.Name)];
 
-    [JsonIgnore] public int MissingVolumeCount => MissingVolumes.Count + _extraVolumes.Count(static e => !e.Owned);
+    [JsonIgnore]
+    public int MissingVolumeCount =>
+        VolumeMath.CountMissingMain(_ownedVolumes, _maxVolumeCount)
+        + (_specialVolumes.Count - VolumeMath.CountOwnedSpecials(_ownedVolumes, _specialVolumes))
+        + _extraVolumes.Count(static e => !e.Owned);
 
     /// <summary>Whether a volume or special below the highest owned volume is missing.</summary>
     [JsonIgnore] public bool HasGaps => VolumeMath.HasGaps(_ownedVolumes, _specialVolumes);
@@ -192,7 +196,7 @@ public sealed partial class Series(
             if (!HasGaps) return string.Empty;
             List<string> missing = [.. VolumeMath.MissingSpecials(_ownedVolumes, _specialVolumes).Select(VolumeMath.Format), .. MissingExtraNames];
             if (missing.Count == 0) return string.Empty;
-            bool hasMainPart = VolumeMath.MissingMain(_ownedVolumes, _maxVolumeCount).Count > 0;
+            bool hasMainPart = VolumeMath.CountMissingMain(_ownedVolumes, _maxVolumeCount) > 0;
             return (hasMainPart ? " · " : string.Empty) + string.Join(", ", missing);
         }
     }
@@ -1187,6 +1191,12 @@ public sealed partial class Series(
 
     public bool IsCoverImageEmpty() => this.CoverBitMap is null || this.CoverBitMap.PixelSize.Width == 0 || this.CoverBitMap.PixelSize.Height == 0;
 
+    /// <summary>
+    /// Copies refreshed data from <paramref name="other"/> into this series. When
+    /// <paramref name="isCoverEmpty"/> is true, this series takes ownership of
+    /// <paramref name="other"/>'s cover bitmap and clears it there, so disposing
+    /// <paramref name="other"/> afterwards leaves the moved cover intact.
+    /// </summary>
     public void UpdateFrom(Series other, bool isCoverEmpty)
     {
         // 1. Titles (Dictionary<TsundokuLanguage, string>) – deep‐compare by count + per‐key/value
@@ -1285,7 +1295,8 @@ public sealed partial class Series(
         // 17. Cover Image
         if (isCoverEmpty)
         {
-            Bitmap? newCover = other.CoverBitMap?.CloneBitmap();
+            Bitmap? newCover = other.CoverBitMap;
+            other.CoverBitMap = null;
             if (newCover is null)
             {
                 // Fallback: load from file if the bitmap wasn't in memory

@@ -63,11 +63,7 @@ public sealed partial class UserSettingsWindow : ReactiveWindow<UserSettingsView
     private async void ExportToSpreadSheetAsync(object sender, RoutedEventArgs e) => await ViewModel!.ExportToSpreadSheetAsync(this);
 
 
-    private void ToggleControlsSection(object? sender, RoutedEventArgs e)
-    {
-        ControlsContent.IsVisible = !ControlsContent.IsVisible;
-        ControlsChevron.Value = ControlsContent.IsVisible ? "fa7-solid fa7-chevron-up" : "fa7-solid fa7-chevron-down";
-    }
+    private async void ShowControlsAsync(object? sender, RoutedEventArgs e) => await ControlsWindow.ShowForAsync(this);
 
     private void ToggleYoutubersSection(object? sender, RoutedEventArgs e)
     {

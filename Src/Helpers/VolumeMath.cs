@@ -102,6 +102,25 @@ public static class VolumeMath
     }
 
     /// <summary>Special volumes listed for the series that aren't owned.</summary>
+    /// <summary>
+    /// How many main volumes in 1..<see cref="MainRunEnd"/> are not owned; the count of
+    /// <see cref="MissingMain"/> without building the list. <paramref name="owned"/> must be
+    /// normalized (no duplicates), as <see cref="Normalize"/> returns it.
+    /// </summary>
+    public static int CountMissingMain(IReadOnlyList<decimal> owned, uint maxVolumeCount)
+    {
+        uint end = MainRunEnd(owned, maxVolumeCount);
+        uint ownedInRun = 0;
+        foreach (decimal volume in owned)
+        {
+            if (IsMain(volume) && volume <= end)
+            {
+                ownedInRun++;
+            }
+        }
+        return (int)(end - ownedInRun);
+    }
+
     public static List<decimal> MissingSpecials(IReadOnlyList<decimal> owned, IReadOnlyList<decimal> specials)
     {
         HashSet<decimal> ownedSet = [.. owned];

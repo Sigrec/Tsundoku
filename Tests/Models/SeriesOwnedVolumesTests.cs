@@ -242,6 +242,83 @@ public class SeriesOwnedVolumesTests
         Assert.That(series.ExtraVolumes, Is.EqualTo(new List<ExtraVolume> { new("Fanbook", Owned: true) }));
     }
 
+    [Test]
+    public void MissingVolumeCount_MatchesMissingListsAcrossEdits()
+    {
+        Series series = CreateSeries(max: 10, cur: 0);
+        series.SetOwnedVolumes([1, 2, 5]);
+        series.AddSpecialVolume(2.5m);
+        series.AddExtraVolume("Fanbook");
+
+        void AssertCountMatchesLists() =>
+            Assert.That(series.MissingVolumeCount, Is.EqualTo(series.MissingVolumes.Count + series.MissingExtraNames.Count));
+
+        AssertCountMatchesLists();
+        Assert.That(series.MissingVolumeCount, Is.EqualTo(7));
+
+        series.ToggleVolume(2.5m);
+        AssertCountMatchesLists();
+        Assert.That(series.MissingVolumeCount, Is.EqualTo(8));
+
+        series.ToggleExtraVolume("Fanbook");
+        AssertCountMatchesLists();
+        Assert.That(series.MissingVolumeCount, Is.EqualTo(9));
+
+        series.UpdateMaxVolumeCount(5);
+        AssertCountMatchesLists();
+        Assert.That(series.MissingVolumeCount, Is.EqualTo(4));
+    }
+
+    [Test]
+    public void MissingVolumeCount_WithUnknownMax_CountsGapsBelowHighestOwned()
+    {
+        Series series = CreateSeries(max: 0, cur: 0);
+        series.SetOwnedVolumes([1, 4]);
+
+        Assert.That(series.MissingVolumeCount, Is.EqualTo(2));
+    }
+
+    [Test]
+    public void GapSpecialText_OnlySpecialsMissing_HasNoSeparator()
+    {
+        Series series = CreateSeries(max: 3, cur: 3);
+        series.AddSpecialVolume(1.5m);
+        series.ToggleVolume(1.5m);
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(series.GapMainText, Is.EqualTo("Missing "));
+            Assert.That(series.GapSpecialText, Is.EqualTo("1.5"));
+        }
+    }
+
+    [Test]
+    public void GapSpecialText_MainAndSpecialsMissing_HasSeparator()
+    {
+        Series series = CreateSeries(max: 4, cur: 0);
+        series.SetOwnedVolumes([1, 3, 4]);
+        series.AddSpecialVolume(1.5m);
+        series.ToggleVolume(1.5m);
+
+        Assert.That(series.GapSpecialText, Is.EqualTo(" · 1.5"));
+    }
+
+    [Test]
+    public void CountSuffixText_KnownMax_ShowsPercentWithoutVols()
+    {
+        Series series = CreateSeries(max: 12, cur: 10);
+
+        Assert.That(series.CountSuffixText, Is.EqualTo("· 83%"));
+    }
+
+    [Test]
+    public void CountSuffixText_UnknownMax_IsEmpty()
+    {
+        Series series = CreateSeries(max: 0, cur: 0);
+
+        Assert.That(series.CountSuffixText, Is.Empty);
+    }
+
     private static Series CreateSeries(uint max, uint cur) => new(
         Titles: new() { [TsundokuLanguage.Romaji] = "Test" },
         Staff: new() { [TsundokuLanguage.Romaji] = "Author" },

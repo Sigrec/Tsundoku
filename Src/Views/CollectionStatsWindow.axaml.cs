@@ -16,11 +16,7 @@ public sealed partial class CollectionStatsWindow : ReactiveWindow<CollectionSta
         InitializeComponent();
 
         this.ConfigureHideOnClose(
-            onOpened: () =>
-            {
-                CanUpdate = false;
-                if (Screens.Primary!.WorkingArea.Height < 1250) this.Height = 550;
-            });
+            onOpened: () => CanUpdate = false);
     }
 
     private async void CopyTextAsync(object sender, PointerPressedEventArgs args)

@@ -1,0 +1,91 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:Tsundoku.Controls"
+        x:Class="Tsundoku.Views.ControlsWindow"
+        Icon="\Assets\Icons\TsundokuLogo.ico"
+        Title="Controls"
+        Classes="Menu"
+        SizeToContent="Height"
+        Width="460"
+        CanResize="False"
+        CanMaximize="False"
+        WindowStartupLocation="CenterOwner">
+    <Window.Styles>
+        <Style Selector="TextBlock.group">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="LetterSpacing" Value="1"/>
+            <Setter Property="Margin" Value="0,10,0,2"/>
+            <Setter Property="Foreground" Value="{DynamicResource TsundokuDividerColor}"/>
+        </Style>
+        <Style Selector="Grid.row">
+            <Setter Property="Margin" Value="0,2"/>
+        </Style>
+        <Style Selector="Grid.row > TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="{DynamicResource TsundokuMenuTextColor}"/>
+        </Style>
+        <Style Selector="Border.key">
+            <Setter Property="Grid.Column" Value="1"/>
+            <Setter Property="Background" Value="{DynamicResource TsundokuMenuButtonBGColor}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource TsundokuMenuButtonBorderColor}"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="CornerRadius" Value="5"/>
+            <Setter Property="Padding" Value="6,2"/>
+            <Setter Property="Margin" Value="12,0,0,0"/>
+        </Style>
+        <Style Selector="Border.key > TextBlock">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
+        </Style>
+    </Window.Styles>
+
+    <Border Classes="Menu" BorderThickness="2" CornerRadius="0,0,8,8" ClipToBounds="True">
+        <Grid RowDefinitions="Auto,*">
+            <controls:WindowHeader Grid.Row="0" Icon="fa7-solid fa7-keyboard" Title="Controls"/>
+            <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled">
+                <StackPanel Margin="20,4,20,18">
+                    <TextBlock Text="COLLECTION" Classes="group"/>
+                    <Grid Classes="row" ColumnDefinitions="*,Auto"><TextBlock Text="Add Series"/><Border Classes="key"><TextBlock Text="CTRL + N"/></Border></Grid>
+                    <Grid Classes="row" ColumnDefinitions="*,Auto"><TextBlock Text="Edit Hovered Series"/><Border Classes="key"><TextBlock Text="CTRL + E"/></Border></Grid>
+                    <Grid Classes="row" ColumnDefinitions="*,Auto"><TextBlock Text="Refresh Hovered Series"/><Border Classes="key"><TextBlock Text="CTRL + R"/></Border></Grid>
+                    <Grid Classes="row" ColumnDefinitions="*,Auto"><TextBlock Text="Advanced Search"/><Border Classes="key"><TextBlock Text="CTRL + F"/></Border></Grid>
+                    <Grid Classes="row" ColumnDefinitions="*,Auto"><TextBlock Text="Close Advanced Search"/><Border Classes="key"><TextBlock Text="ESC"/></Border></Grid>
+                    <Grid Classes="row" ColumnDefinitions="*,Auto"><TextBlock Text="Save Collection"/><Border Classes="key"><TextBlock Text="CTRL + S"/></Border></Grid>
+                    <Grid Classes="row" ColumnDefinitions="*,Auto"><TextBlock Text="Screenshot Collection"/><Border Classes="key"><TextBlock Text="CTRL + P"/></Border></Grid>
+                    <Grid Classes="row" ColumnDefinitions="*,Auto"><TextBlock Text="Toggle Fullscreen"/><Border Classes="key"><TextBlock Text="F11"/></Border></Grid>
+
+                    <TextBlock Text="SERIES CARDS" Classes="group"/>
+                    <Grid Classes="row" ColumnDefinitions="*,Auto"><TextBlock Text="Copy Title"/><Border Classes="key"><TextBlock Text="Click Title"/></Border></Grid>
+                    <Grid Classes="row" ColumnDefinitions="*,Auto"><TextBlock Text="Open Series Page"/><Border Classes="key"><TextBlock Text="Click Cover"/></Border></Grid>
+                    <Grid Classes="row" ColumnDefinitions="*,Auto"><TextBlock Text="Open Volumes Owned"/><Border Classes="key"><TextBlock Text="Click Volume Bar"/></Border></Grid>
+
+                    <TextBlock Text="BULK EDIT" Classes="group"/>
+                    <Grid Classes="row" ColumnDefinitions="*,Auto"><TextBlock Text="Select Series"/><Border Classes="key"><TextBlock Text="CTRL + Click"/></Border></Grid>
+                    <Grid Classes="row" ColumnDefinitions="*,Auto"><TextBlock Text="Select a Range of Series"/><Border Classes="key"><TextBlock Text="SHIFT + Click"/></Border></Grid>
+                    <Grid Classes="row" ColumnDefinitions="*,Auto"><TextBlock Text="Select All Shown Series"/><Border Classes="key"><TextBlock Text="CTRL + A"/></Border></Grid>
+                    <Grid Classes="row" ColumnDefinitions="*,Auto"><TextBlock Text="Undo Last Bulk Edit"/><Border Classes="key"><TextBlock Text="CTRL + Z"/></Border></Grid>
+                    <Grid Classes="row" ColumnDefinitions="*,Auto"><TextBlock Text="Clear Selection"/><Border Classes="key"><TextBlock Text="ESC"/></Border></Grid>
+                    <Grid Classes="row" ColumnDefinitions="*,Auto"><TextBlock Text="Apply Publisher or Rating"/><Border Classes="key"><TextBlock Text="ENTER"/></Border></Grid>
+
+                    <TextBlock Text="VOLUMES OWNED" Classes="group"/>
+                    <Grid Classes="row" ColumnDefinitions="*,Auto"><TextBlock Text="Mark Volume Owned / Missing"/><Border Classes="key"><TextBlock Text="Click Volume"/></Border></Grid>
+                    <Grid Classes="row" ColumnDefinitions="*,Auto"><TextBlock Text="Mark a Range of Volumes"/><Border Classes="key"><TextBlock Text="SHIFT + Click"/></Border></Grid>
+                    <Grid Classes="row" ColumnDefinitions="*,Auto"><TextBlock Text="Remove a Special or Extra"/><Border Classes="key"><TextBlock Text="Right Click"/></Border></Grid>
+                    <Grid Classes="row" ColumnDefinitions="*,Auto"><TextBlock Text="Expand a Full Row"/><Border Classes="key"><TextBlock Text="Click Row"/></Border></Grid>
+                    <Grid Classes="row" ColumnDefinitions="*,Auto"><TextBlock Text="Apply Ranges or Add Special"/><Border Classes="key"><TextBlock Text="ENTER"/></Border></Grid>
+
+                    <TextBlock Text="RANDOM PICKER" Classes="group"/>
+                    <Grid Classes="row" ColumnDefinitions="*,Auto"><TextBlock Text="Pick Again"/><Border Classes="key"><TextBlock Text="SPACE / R"/></Border></Grid>
+                    <Grid Classes="row" ColumnDefinitions="*,Auto"><TextBlock Text="Close"/><Border Classes="key"><TextBlock Text="ESC"/></Border></Grid>
+
+                    <TextBlock Text="COLLECTION STATS" Classes="group"/>
+                    <Grid Classes="row" ColumnDefinitions="*,Auto"><TextBlock Text="Copy a Stat"/><Border Classes="key"><TextBlock Text="Click Stat"/></Border></Grid>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </Border>
+</Window>

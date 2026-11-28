@@ -34,8 +34,7 @@ jobs:
     - name: Setup .NET SDK
       uses: actions/setup-dotnet@v5
       with:
-        dotnet-version: '11.0.x'
-        dotnet-quality: 'preview'
+        global-json-file: ./global.json
 
     # Debug, because Release builds resolve app folders through the MSIX package APIs,
     # which only work inside an installed package.
@@ -66,8 +65,7 @@ jobs:
     - name: Setup .NET SDK
       uses: actions/setup-dotnet@v5
       with:
-        dotnet-version: '11.0.x'
-        dotnet-quality: 'preview'
+        global-json-file: ./global.json
 
     - name: Run network tests
       run: dotnet test ./Tests/Tsundoku.Tests.csproj --configuration Debug --filter "TestCategory=Network" --logger trx --results-directory TestResults

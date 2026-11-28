@@ -256,8 +256,8 @@ with(StringComparer.OrdinalIgnoreCase),         ".png", ".jpg", ".jpeg"
 
         try
         {
-            string jsonString = File.ReadAllText(filePath);
-            User? user = JsonSerializer.Deserialize(jsonString, UserModelContext.Default.User);
+            using FileStream stream = new(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize: 81920, FileOptions.SequentialScan);
+            User? user = JsonSerializer.Deserialize(stream, UserModelContext.Default.User);
 
             if (user is not null)
             {
@@ -266,7 +266,7 @@ with(StringComparer.OrdinalIgnoreCase),         ".png", ".jpg", ".jpeg"
             else
             {
                 // This scenario might occur if the JSON content is literally "null" or an empty object that maps to null User.
-                LOGGER.Warn("Deserialization from {FilePath} completed, but resulted in a null User object. JSON content: {JsonContent}", filePath, jsonString);
+                LOGGER.Warn("Deserialization from {FilePath} completed, but resulted in a null User object.", filePath);
             }
 
             return user;

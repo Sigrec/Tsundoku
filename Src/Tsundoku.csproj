@@ -18,7 +18,7 @@
 		<TrimMode>partial</TrimMode>
 		<PublishReadyToRun>true</PublishReadyToRun>
 		<SelfContained>true</SelfContained>
-        <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+        <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
         <InvariantGlobalization>false</InvariantGlobalization> <!-- Set to true to get add series to fail -->
 
 		<Deterministic>true</Deterministic>

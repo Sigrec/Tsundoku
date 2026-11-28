@@ -156,4 +156,26 @@ public class VolumeMathTests
     }
 
     #endregion
+
+    #region CountMissingMain
+
+    private static IEnumerable<TestCaseData> CountMissingMainCases()
+    {
+        yield return new TestCaseData(new decimal[] { }, 0u).SetName("CountMissingMain_EmptyUnknownMax");
+        yield return new TestCaseData(new decimal[] { }, 5u).SetName("CountMissingMain_NoneOwned");
+        yield return new TestCaseData(new decimal[] { 1, 2, 3 }, 3u).SetName("CountMissingMain_Complete");
+        yield return new TestCaseData(new decimal[] { 1, 3, 6 }, 10u).SetName("CountMissingMain_GapsAndTail");
+        yield return new TestCaseData(new decimal[] { 1, 4 }, 0u).SetName("CountMissingMain_UnknownMaxUsesHighest");
+        yield return new TestCaseData(new decimal[] { 0, 0.5m, 1, 2.5m, 4 }, 5u).SetName("CountMissingMain_IgnoresSpecials");
+        yield return new TestCaseData(new decimal[] { 1, 2, 7 }, 5u).SetName("CountMissingMain_IgnoresOwnedPastMax");
+    }
+
+    [TestCaseSource(nameof(CountMissingMainCases))]
+    public void CountMissingMain_MatchesMissingMainCount(decimal[] owned, uint max)
+    {
+        List<decimal> normalized = VolumeMath.Normalize(owned);
+        Assert.That(VolumeMath.CountMissingMain(normalized, max), Is.EqualTo(VolumeMath.MissingMain(normalized, max).Count));
+    }
+
+    #endregion
 }

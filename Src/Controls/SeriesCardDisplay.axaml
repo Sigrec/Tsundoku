@@ -352,6 +352,7 @@
                       Foreground="{DynamicResource TsundokuSeriesSpecialVolumeColor}"/>
                   <TextBlock
                       Text="{CompiledBinding CountSuffixText}"
+                      IsVisible="{CompiledBinding CountSuffixText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                       FontSize="12"
                       FontWeight="Bold"
                       Margin="4,0,0,0"

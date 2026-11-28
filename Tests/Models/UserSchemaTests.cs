@@ -6,6 +6,18 @@ namespace Tsundoku.Tests.Models;
 [Parallelizable(ParallelScope.All)]
 public class UserSchemaTests
 {
+    [Test]
+    public void SchemaVersionText_RoundTripsWithInvariantDot()
+    {
+        string text = Tsundoku.ViewModels.ViewModelBase.SCHEMA_VERSION_TEXT;
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(text, Does.Contain("."));
+            Assert.That(double.Parse(text, System.Globalization.CultureInfo.InvariantCulture), Is.EqualTo(Tsundoku.ViewModels.ViewModelBase.SCHEMA_VERSION));
+        }
+    }
+
     private static readonly string[] RemovedKeys =
     [
         "SeriesProgressBGColor", "SeriesEditPaneBGColor",

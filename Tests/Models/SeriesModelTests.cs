@@ -218,6 +218,45 @@ public class SeriesModelTests
     }
 
     [AvaloniaTest]
+    public void Series_UpdateFrom_WithCoverRefresh_MovesCoverInsteadOfCopying()
+    {
+        Series original = CreateDummySeries();
+        Series refreshed = CreateDummySeries();
+        Avalonia.Media.Imaging.WriteableBitmap cover = new(new Avalonia.PixelSize(2, 2), new Avalonia.Vector(96, 96));
+        refreshed.CoverBitMap = cover;
+
+        original.UpdateFrom(refreshed, true);
+        Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+        refreshed.Dispose(deleteCover: false);
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(original.CoverBitMap, Is.SameAs(cover));
+            Assert.That(refreshed.CoverBitMap, Is.Null);
+            Assert.That(original.CoverBitMap!.PixelSize.Width, Is.EqualTo(2));
+        }
+    }
+
+    [AvaloniaTest]
+    public void Series_UpdateFrom_WithoutCoverRefresh_LeavesCoversAlone()
+    {
+        Series original = CreateDummySeries();
+        Avalonia.Media.Imaging.Bitmap? originalCover = original.CoverBitMap;
+        Series refreshed = CreateDummySeries();
+        Avalonia.Media.Imaging.WriteableBitmap cover = new(new Avalonia.PixelSize(2, 2), new Avalonia.Vector(96, 96));
+        refreshed.CoverBitMap = cover;
+
+        original.UpdateFrom(refreshed, false);
+        Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(original.CoverBitMap, Is.SameAs(originalCover));
+            Assert.That(refreshed.CoverBitMap, Is.SameAs(cover));
+        }
+    }
+
+    [AvaloniaTest]
     public void Series_AdditionalLanguagesDetection_Works()
     {
         Series series = CreateDummySeries();

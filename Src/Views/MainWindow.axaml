@@ -117,7 +117,8 @@
                     i:Attached.Icon="fa7-solid fa7-chevron-up"
                     FontSize="18"
                     Cursor="Hand"
-                    Click="BackToTop_Click"/>
+                    Click="BackToTop_Click"
+                    ToolTip.Tip="Back to top"/>
         </Border>
 
         <!-- Theme Selector (floating bottom-right, extra right margin for scrollbar) -->
@@ -224,7 +225,8 @@
                         i:Attached.Icon="fa7-solid fa7-swatchbook"
                         FontSize="18"
                         Cursor="Hand"
-                        Click="ToggleThemeSelector"/>
+                        Click="ToggleThemeSelector"
+                        ToolTip.Tip="Change theme"/>
             </Border>
         </StackPanel>
 

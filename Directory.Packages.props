@@ -26,7 +26,7 @@
     <PackageVersion Include="NLog" Version="6.2.2" />
     <PackageVersion Include="NLog.Extensions.Logging" Version="6.3.0" />
     <PackageVersion Include="Optris.Icons.Avalonia.FontAwesome7" Version="12.2.1" />
-    <PackageVersion Include="System.Linq.Dynamic.Core" Version="1.7.4" />
+    <PackageVersion Include="System.Linq.Dynamic.Core" Version="1.8.0" />
     <PackageVersion Include="TextCopy" Version="6.2.1" />
     <PackageVersion Include="LiveChartsCore.SkiaSharpView.Avalonia" Version="2.2.0" />
     <PackageVersion Include="Microsoft.IO.RecyclableMemoryStream" Version="4.0.1" />
@@ -40,9 +40,5 @@
   </ItemGroup>
   <ItemGroup Label="Packaging">
     <PackageVersion Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2957" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageVersion Include="System.Private.Uri" Version="4.3.2" />
-    <PackageVersion Include="System.Text.RegularExpressions" Version="4.3.1" />
   </ItemGroup>
 </Project>

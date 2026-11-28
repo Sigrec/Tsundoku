@@ -109,6 +109,8 @@
                                 i:Attached.Icon="fa7-check"
                                 FontSize="14"
                                 Click="ChangeUsername"
+                                ToolTip.Tip="Change username"
+                                ToolTip.ShowOnDisabled="True"
                                 IsEnabled="{CompiledBinding IsChangeUsernameButtonEnabled}"/>
                     </Grid>
                 </StackPanel>
@@ -281,83 +283,16 @@
                     </WrapPanel>
                 </StackPanel>
 
-                <!-- Controls (collapsible) -->
+                <!-- Controls -->
                 <Border Classes="divider"/>
                 <StackPanel Margin="20,14,20,14" Spacing="4">
-                    <Button Theme="{StaticResource MenuButton}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Padding="10,6" Click="ToggleControlsSection">
-                        <Grid ColumnDefinitions="*,Auto">
-                            <TextBlock Text="CONTROLS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}" LetterSpacing="1" VerticalAlignment="Center"/>
-                            <i:Icon Grid.Column="1" Value="fa7-solid fa7-chevron-down" FontSize="11" Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}" VerticalAlignment="Center" Name="ControlsChevron"/>
+                    <Button Theme="{StaticResource MenuButton}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Padding="10,6" Click="ShowControlsAsync" ToolTip.Tip="Keyboard shortcuts and click actions">
+                        <Grid ColumnDefinitions="Auto,*,Auto">
+                            <i:Icon Value="fa7-solid fa7-keyboard" FontSize="12" Margin="0,0,8,0" Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="CONTROLS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}" LetterSpacing="1" VerticalAlignment="Center"/>
+                            <i:Icon Grid.Column="2" Value="fa7-solid fa7-up-right-from-square" FontSize="11" Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}" VerticalAlignment="Center"/>
                         </Grid>
                     </Button>
-                    <StackPanel Name="ControlsContent" IsVisible="False" Spacing="4" Margin="0,6,0,0">
-                        <Grid ColumnDefinitions="*,Auto" Margin="0,2">
-                            <TextBlock Text="Copy Title on Series Card" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource TsundokuMenuTextColor}"/>
-                            <Border Grid.Column="1" Background="{DynamicResource TsundokuMenuButtonBGColor}" BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}" BorderThickness="2" CornerRadius="5" Padding="6,2">
-                                <TextBlock Text="Click Title" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
-                            </Border>
-                        </Grid>
-                        <Grid ColumnDefinitions="*,Auto" Margin="0,2">
-                            <TextBlock Text="Open Series Page" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource TsundokuMenuTextColor}"/>
-                            <Border Grid.Column="1" Background="{DynamicResource TsundokuMenuButtonBGColor}" BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}" BorderThickness="2" CornerRadius="5" Padding="6,2">
-                                <TextBlock Text="Click Image" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
-                            </Border>
-                        </Grid>
-                        <Grid ColumnDefinitions="*,Auto" Margin="0,2">
-                            <TextBlock Text="Select Series for Bulk Edit" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource TsundokuMenuTextColor}"/>
-                            <Border Grid.Column="1" Background="{DynamicResource TsundokuMenuButtonBGColor}" BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}" BorderThickness="2" CornerRadius="5" Padding="6,2">
-                                <TextBlock Text="CTRL / SHIFT + Click" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
-                            </Border>
-                        </Grid>
-                        <Grid ColumnDefinitions="*,Auto" Margin="0,2">
-                            <TextBlock Text="Select All Shown Series" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource TsundokuMenuTextColor}"/>
-                            <Border Grid.Column="1" Background="{DynamicResource TsundokuMenuButtonBGColor}" BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}" BorderThickness="2" CornerRadius="5" Padding="6,2">
-                                <TextBlock Text="CTRL + A" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
-                            </Border>
-                        </Grid>
-                        <Grid ColumnDefinitions="*,Auto" Margin="0,2">
-                            <TextBlock Text="Undo Last Bulk Edit" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource TsundokuMenuTextColor}"/>
-                            <Border Grid.Column="1" Background="{DynamicResource TsundokuMenuButtonBGColor}" BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}" BorderThickness="2" CornerRadius="5" Padding="6,2">
-                                <TextBlock Text="CTRL + Z" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
-                            </Border>
-                        </Grid>
-                        <Grid ColumnDefinitions="*,Auto" Margin="0,2">
-                            <TextBlock Text="Clear Selection" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource TsundokuMenuTextColor}"/>
-                            <Border Grid.Column="1" Background="{DynamicResource TsundokuMenuButtonBGColor}" BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}" BorderThickness="2" CornerRadius="5" Padding="6,2">
-                                <TextBlock Text="ESC" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
-                            </Border>
-                        </Grid>
-                        <Grid ColumnDefinitions="*,Auto" Margin="0,2">
-                            <TextBlock Text="Toggle Fullscreen" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource TsundokuMenuTextColor}"/>
-                            <Border Grid.Column="1" Background="{DynamicResource TsundokuMenuButtonBGColor}" BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}" BorderThickness="2" CornerRadius="5" Padding="6,2">
-                                <TextBlock Text="F11" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
-                            </Border>
-                        </Grid>
-                        <Grid ColumnDefinitions="*,Auto" Margin="0,2">
-                            <TextBlock Text="Advanced Search" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource TsundokuMenuTextColor}"/>
-                            <Border Grid.Column="1" Background="{DynamicResource TsundokuMenuButtonBGColor}" BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}" BorderThickness="2" CornerRadius="5" Padding="6,2">
-                                <TextBlock Text="CTRL + F" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
-                            </Border>
-                        </Grid>
-                        <Grid ColumnDefinitions="*,Auto" Margin="0,2">
-                            <TextBlock Text="Screenshot Collection" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource TsundokuMenuTextColor}"/>
-                            <Border Grid.Column="1" Background="{DynamicResource TsundokuMenuButtonBGColor}" BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}" BorderThickness="2" CornerRadius="5" Padding="6,2">
-                                <TextBlock Text="CTRL + P" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
-                            </Border>
-                        </Grid>
-                        <Grid ColumnDefinitions="*,Auto" Margin="0,2">
-                            <TextBlock Text="Reload Filter/Sort" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource TsundokuMenuTextColor}"/>
-                            <Border Grid.Column="1" Background="{DynamicResource TsundokuMenuButtonBGColor}" BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}" BorderThickness="2" CornerRadius="5" Padding="6,2">
-                                <TextBlock Text="SHIFT + R" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
-                            </Border>
-                        </Grid>
-                        <Grid ColumnDefinitions="*,Auto" Margin="0,2">
-                            <TextBlock Text="Save Collection" FontSize="12" FontWeight="Medium" Foreground="{DynamicResource TsundokuMenuTextColor}"/>
-                            <Border Grid.Column="1" Background="{DynamicResource TsundokuMenuButtonBGColor}" BorderBrush="{DynamicResource TsundokuMenuButtonBorderColor}" BorderThickness="2" CornerRadius="5" Padding="6,2">
-                                <TextBlock Text="CTRL + S" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TsundokuMenuButtonTextAndIconColor}"/>
-                            </Border>
-                        </Grid>
-                    </StackPanel>
                 </StackPanel>
 
                 <!-- Youtubers (collapsible) -->
@@ -410,15 +345,24 @@
                 </StackPanel>
 
                 <!-- Version -->
-                <TextBlock Text="{CompiledBinding Source={x:Static vm:ViewModelBase.CUR_TSUNDOKU_VERSION}, StringFormat='v{0}'}"
-                           HorizontalAlignment="Center"
-                           FontSize="12"
-                           FontWeight="Bold"
-                           Foreground="{DynamicResource TsundokuSeriesCardStaffColor}"
-                           Opacity="0.5"
-                           Margin="0,0,0,12"
-                           Cursor="Hand"
-                           PointerPressed="OpenReleasesPage"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="6" Margin="0,0,0,12" Opacity="0.5">
+                    <TextBlock Text="{CompiledBinding Source={x:Static vm:ViewModelBase.CUR_TSUNDOKU_VERSION}, StringFormat='v{0}'}"
+                               FontSize="12"
+                               FontWeight="Bold"
+                               Foreground="{DynamicResource TsundokuSeriesCardStaffColor}"
+                               Cursor="Hand"
+                               ToolTip.Tip="Open release notes on GitHub"
+                               PointerPressed="OpenReleasesPage"/>
+                    <TextBlock Text="·"
+                               FontSize="12"
+                               FontWeight="Bold"
+                               Foreground="{DynamicResource TsundokuSeriesCardStaffColor}"/>
+                    <TextBlock Text="{CompiledBinding Source={x:Static vm:ViewModelBase.SCHEMA_VERSION_TEXT}, StringFormat='Schema v{0}'}"
+                               FontSize="12"
+                               FontWeight="Bold"
+                               Foreground="{DynamicResource TsundokuSeriesCardStaffColor}"
+                               ToolTip.Tip="Version of the saved collection data format"/>
+                </StackPanel>
             </StackPanel>
         </ScrollViewer>
         </Grid>

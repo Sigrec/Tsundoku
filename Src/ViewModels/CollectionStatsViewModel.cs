@@ -16,6 +16,7 @@ using static Tsundoku.Models.Enums.SeriesFormatModel;
 using static Tsundoku.Models.Enums.SeriesGenreModel;
 using System.Globalization;
 using System.Reactive.Disposables.Fluent;
+using System.Reactive.Subjects;
 
 namespace Tsundoku.ViewModels;
 
@@ -154,13 +155,24 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
     public ReadOnlyObservableCollection<Series> UserCollection { get; }
     private readonly ISharedSeriesCollectionProvider _sharedSeriesProvider;
     private readonly ICurrencyRateService _currencyRateService;
+    private readonly IObservable<decimal> _collectionValueTotal;
     private bool disposedValue;
+
+    private static readonly TimeSpan StatsThrottle = TimeSpan.FromMilliseconds(100);
 
     public CollectionStatsViewModel(IUserService userService, ISharedSeriesCollectionProvider sharedSeriesProvider, ICurrencyRateService currencyRateService) : base(userService)
     {
         _sharedSeriesProvider = sharedSeriesProvider ?? throw new ArgumentNullException(nameof(sharedSeriesProvider));
         _currencyRateService = currencyRateService ?? throw new ArgumentNullException(nameof(currencyRateService));
         UserCollection = _sharedSeriesProvider.DynamicUserCollection;
+
+        IConnectableObservable<decimal> collectionValueTotal = _userService.UserCollectionChanges
+            .AutoRefresh(x => x.Value)
+            .ThrottledSnapshot(StatsThrottle)
+            .Select(SumValue)
+            .Replay(1);
+        _collectionValueTotal = collectionValueTotal;
+        collectionValueTotal.Connect().DisposeWith(_disposables);
 
         SetupStats();
         SetupPieCharts();
@@ -170,10 +182,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
         // Recompute secondary total from the FULL collection (not the filtered view)
         // whenever total value, primary currency, or secondary currency changes.
         Observable.CombineLatest(
-                _userService.UserCollectionChanges
-                    .AutoRefresh(x => x.Value)
-                    .ToCollection()
-                    .Select(series => decimal.Round(series.Sum(s => s.Value), 2)),
+                _collectionValueTotal,
                 this.WhenAnyValue(x => x.CurrentUser.Currency),
                 this.WhenAnyValue(x => x.CurrentUser.SecondaryCurrency),
                 (total, primary, secondary) => (Total: total, Primary: primary, Secondary: secondary))
@@ -245,8 +254,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
     {
         _userService.UserCollectionChanges
             .AutoRefresh(x => x.Rating)
-            .ToCollection()
-            .Throttle(TimeSpan.FromMilliseconds(100))
+            .ThrottledSnapshot(StatsThrottle)
             .ObserveOn(TsundokuSchedulers.MainThread)
             .Select(list =>
             {
@@ -267,20 +275,14 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
 
         _userService.UserCollectionChanges
             .AutoRefresh(x => x.VolumesRead)
-            .ToCollection()
-            .Throttle(TimeSpan.FromMilliseconds(100))
+            .ThrottledSnapshot(StatsThrottle)
             .ObserveOn(TsundokuSchedulers.MainThread)
             .Select(seriesCollection => (uint)seriesCollection.Sum(item => item.VolumesRead))
             .Subscribe(volumesRead => _userService.UpdateUser(user => user.VolumesRead = volumesRead))
             .DisposeWith(_disposables);
 
         Observable.CombineLatest(
-            _userService.UserCollectionChanges
-                .AutoRefresh(x => x.Value)
-                .ToCollection()
-                .Throttle(TimeSpan.FromMilliseconds(100))
-                .ObserveOn(TsundokuSchedulers.MainThread)
-                .Select(seriesCollection => decimal.Round(seriesCollection.Sum(item => item.Value), 2)),
+            _collectionValueTotal,
             this.WhenAnyValue(x => x.CurrentUser.Currency),
             (Value, Currency) => new { Value, Currency }
         )
@@ -300,18 +302,18 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
         .DisposeWith(_disposables);
 
         _userService.UserCollectionChanges
+            .QueryWhenChanged(query => query.Count)
             .DistinctUntilChanged()
             .ObserveOn(TsundokuSchedulers.MainThread)
-            .ToCollection()
-            .Subscribe(seriesList => SeriesCount = seriesList.Count)
+            .Subscribe(count => SeriesCount = count)
             .DisposeWith(_disposables);
 
         _userService.UserCollectionChanges
             .AutoRefresh(x => x.IsFavorite)
+            .ThrottledSnapshot(StatsThrottle)
+            .Select(seriesList => seriesList.Count(x => x.IsFavorite))
             .DistinctUntilChanged()
             .ObserveOn(TsundokuSchedulers.MainThread)
-            .ToCollection()
-            .Select(seriesList => seriesList.Count(x => x.IsFavorite))
             .Subscribe(count => FavoriteCount = count)
             .DisposeWith(_disposables);
 
@@ -321,8 +323,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
             .AutoRefresh(x => x.OwnedVolumes)
             .AutoRefresh(x => x.SpecialVolumes)
             .AutoRefresh(x => x.ExtraVolumes)
-            .ToCollection()
-            .Throttle(TimeSpan.FromMilliseconds(500))
+            .ThrottledSnapshot(TimeSpan.FromMilliseconds(500))
             .ObserveOn(TsundokuSchedulers.MainThread)
             .Select(seriesList =>
             {
@@ -439,8 +440,8 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
 
         _ = _userService.UserCollectionChanges
                 .AutoRefresh(x => x.Rating)
+                .ThrottledSnapshot(StatsThrottle)
                 .ObserveOn(TsundokuSchedulers.MainThread)
-                .QueryWhenChanged(query => query.Items)
                 .Select(seriesList => // Perform all your counting logic on this snapshot
                 {
                     int[] counts = new int[11]; // For ratings 0-10
@@ -606,8 +607,8 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
 
         _userService.UserCollectionChanges
             .AutoRefresh(x => x.MaxVolumeCount)
+            .ThrottledSnapshot(StatsThrottle)
             .ObserveOn(TsundokuSchedulers.MainThread)
-            .QueryWhenChanged(query => query.Items)
             .Select(seriesList =>
             {
                 int[] volumeCounts = new int[11];
@@ -865,8 +866,7 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
 
         _userService.UserCollectionChanges
             .AutoRefresh(x => x.Genres)
-            .ToCollection()
-            .Throttle(TimeSpan.FromMilliseconds(500))
+            .ThrottledSnapshot(TimeSpan.FromMilliseconds(500))
             .ObserveOn(TsundokuSchedulers.MainThread)
             .Select(seriesList =>
             {
@@ -1179,6 +1179,16 @@ public sealed partial class CollectionStatsViewModel : ViewModelBase, IDisposabl
     }
 
 #endregion
+
+    private static decimal SumValue(IReadOnlyList<Series> series)
+    {
+        decimal total = 0;
+        foreach (Series s in series)
+        {
+            total += s.Value;
+        }
+        return decimal.Round(total, 2);
+    }
 
     private static decimal CalculatePercentage(double? count, decimal total) => count is null || total == 0 ? 0m : decimal.Round((decimal)count / total * 100m, 2);
 

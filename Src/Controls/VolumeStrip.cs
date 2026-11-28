@@ -115,21 +115,45 @@ public sealed class VolumeStrip : Control
         set => SetValue(MissingFillProperty, value);
     }
 
-    public override void Render(DrawingContext context)
-    {
-        Rect bounds = new(Bounds.Size);
-        if (bounds.Width <= 0 || bounds.Height <= 0) return;
+    private List<(decimal Volume, bool IsSpecial, bool IsOwned)>? _units;
+    private uint _mainCount;
+    private double _totalWeight;
+    private uint _highestOwned;
+    private Pen? _outlinePen;
+    private Pen? _missingMainPen;
+    private Pen? _missingSpecialPen;
 
-        Rect outer = bounds.Deflate(OuterBorderThickness / 2);
-        context.DrawRectangle(Track, Outline is null ? null : new Pen(Outline, OuterBorderThickness), outer, 6, 6);
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+
+        if (change.Property == OwnedVolumesProperty
+            || change.Property == SpecialVolumesProperty
+            || change.Property == ExtraVolumesProperty
+            || change.Property == MaxVolumeCountProperty)
+        {
+            _units = null;
+        }
+        else if (change.Property == OutlineProperty)
+        {
+            _outlinePen = null;
+        }
+        else if (change.Property == FillProperty)
+        {
+            _missingMainPen = null;
+        }
+        else if (change.Property == SpecialFillProperty)
+        {
+            _missingSpecialPen = null;
+        }
+    }
+
+    private List<(decimal Volume, bool IsSpecial, bool IsOwned)> GetUnits()
+    {
+        if (_units is not null) return _units;
 
         IReadOnlyList<decimal> owned = OwnedVolumes ?? [];
-        IReadOnlyList<decimal> specials = SpecialVolumes ?? [];
-        List<(decimal Volume, bool IsSpecial, bool IsOwned)> units = BuildUnits(owned, specials, ExtraVolumes ?? [], MaxVolumeCount);
-        if (units.Count == 0) return;
-
-        Rect inner = bounds.Deflate(OuterBorderThickness + InnerPadding);
-        if (inner.Width <= 0 || inner.Height <= 0) return;
+        List<(decimal Volume, bool IsSpecial, bool IsOwned)> units = BuildUnits(owned, SpecialVolumes ?? [], ExtraVolumes ?? [], MaxVolumeCount);
 
         uint mainCount = 0;
         double totalWeight = 0;
@@ -139,14 +163,37 @@ public sealed class VolumeStrip : Control
             if (!isSpecial) mainCount++;
         }
 
-        bool dense = mainCount > VolumeMath.DenseStripThreshold;
+        _mainCount = mainCount;
+        _totalWeight = totalWeight;
+        _highestOwned = VolumeMath.HighestMain(owned);
+        return _units = units;
+    }
+
+    public override void Render(DrawingContext context)
+    {
+        Rect bounds = new(Bounds.Size);
+        if (bounds.Width <= 0 || bounds.Height <= 0) return;
+
+        Rect outer = bounds.Deflate(OuterBorderThickness / 2);
+        if (Outline is not null) _outlinePen ??= new Pen(Outline, OuterBorderThickness);
+        context.DrawRectangle(Track, Outline is null ? null : _outlinePen, outer, 6, 6);
+
+        List<(decimal Volume, bool IsSpecial, bool IsOwned)> units = GetUnits();
+        if (units.Count == 0) return;
+
+        Rect inner = bounds.Deflate(OuterBorderThickness + InnerPadding);
+        if (inner.Width <= 0 || inner.Height <= 0) return;
+
+        bool dense = _mainCount > VolumeMath.DenseStripThreshold;
         double gap = dense ? 0 : SegmentGap;
-        double unitWidth = (inner.Width - (gap * (units.Count - 1))) / totalWeight;
+        double unitWidth = (inner.Width - (gap * (units.Count - 1))) / _totalWeight;
         if (unitWidth <= 0) return;
 
-        uint highestOwned = VolumeMath.HighestMain(owned);
-        Pen? missingMainPen = Fill is null ? null : new Pen(Fill, 1);
-        Pen? missingSpecialPen = SpecialFill is null ? null : new Pen(SpecialFill, 1);
+        uint highestOwned = _highestOwned;
+        if (Fill is not null) _missingMainPen ??= new Pen(Fill, 1);
+        if (SpecialFill is not null) _missingSpecialPen ??= new Pen(SpecialFill, 1);
+        Pen? missingMainPen = Fill is null ? null : _missingMainPen;
+        Pen? missingSpecialPen = SpecialFill is null ? null : _missingSpecialPen;
 
         using DrawingContext.PushedState clip = context.PushClip(new RoundedRect(inner, 3));
         double x = inner.X;

@@ -6,7 +6,6 @@
         Icon="\Assets\Icons\TsundokuLogo.ico"
         WindowStartupLocation="CenterOwner"
         SizeToContent="Height"
-        MaxHeight="600"
         Width="480"
         CanResize="False"
         Topmost="True"

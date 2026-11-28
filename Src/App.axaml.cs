@@ -48,6 +48,7 @@ public sealed partial class App : Application
         ConfigureNLog();
         UnhandledErrorReporter.Register(desktop);
         SingleLinePasteHelper.Register();
+        WindowFit.Register(static window => window is MainWindow);
 
         if (!createdNew)
         {

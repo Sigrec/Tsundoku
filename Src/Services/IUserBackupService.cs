@@ -7,7 +7,7 @@ namespace Tsundoku.Services;
 public interface IUserBackupService
 {
     /// <summary>Default number of dated backups kept before the oldest are removed.</summary>
-    const int DefaultRetentionCount = 10;
+    const int DefaultRetentionCount = 3;
 
     /// <summary>Retention counts offered in settings.</summary>
     static readonly IReadOnlyList<int> RetentionOptions = [3, 5, 10, 20, 50];
